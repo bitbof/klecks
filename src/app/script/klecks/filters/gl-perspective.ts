@@ -1,0 +1,349 @@
+import {BB} from '../../bb/bb';
+import {KlCanvasPreview} from '../canvas-ui/canvas-preview';
+// @ts-ignore
+import checkmarkImg from 'url:~/src/app/img/ui/checkmark.svg';
+import {getSharedFx} from './shared-gl-fx';
+
+export const glPerspective = {
+
+    getDialog(params) {
+        let context = params.context;
+        let canvas = params.canvas;
+        if (!context || !canvas) {
+            return false;
+        }
+
+        let isSmall = window.innerWidth < 550;
+        let layers = canvas.getLayers();
+        let selectedLayerIndex = canvas.getLayerIndex(context.canvas);
+
+        let fit = BB.fitInto(isSmall ? 280 : 490, isSmall ? 200 : 240, context.canvas.width, context.canvas.height, 1);
+        let w = parseInt('' + fit.width), h = parseInt('' + fit.height);
+
+        let tempCanvas = BB.canvas();
+        tempCanvas.width = w;
+        tempCanvas.height = h;
+        tempCanvas.getContext("2d").drawImage(context.canvas, 0, 0, w, h);
+        let previewScale = w / context.canvas.width;
+
+        let div = document.createElement("div");
+        let result: any = {
+            element: div
+        };
+        if (!isSmall) {
+            result.width = 500;
+        }
+
+        let pointerListenerArr = [];
+
+        function finishInit() {
+            let blur = 0;
+            div.innerHTML = "Transforms the selected layer. <br/><br/>";
+
+            let glCanvas = getSharedFx();
+            if (!glCanvas) {
+                return; // todo throw?
+            }
+            let texture = glCanvas.texture(tempCanvas);
+            let ba, bb, bc, bd; //before
+            let aa, ab, ac, ad; //after
+            function update() {
+                try {
+                    glCanvas.draw(texture).perspective([ba.x, ba.y, bb.x, bb.y, bc.x, bc.y, bd.x, bd.y], [aa.x, aa.y, ab.x, ab.y, ac.x, ac.y, ad.x, ad.y]).update();
+                    klCanvasPreview.render();
+                } catch(e) {
+                    (div as any).errorCallback(e);
+                }
+            }
+
+            function nob(x, y, callback?) {
+                let nobSize = 14;
+                let div = document.createElement("div");
+                (div as any).x = x;
+                (div as any).y = y;
+                div.style.width = nobSize + "px";
+                div.style.height = nobSize + "px";
+                div.style.backgroundColor = "#fff";
+                div.style.boxShadow = "inset 0 0 0 2px #000";
+                div.style.borderRadius = nobSize + "px";
+                div.style.position = "absolute";
+                div.style.cursor = "move";
+                div.style.left = ((div as any).x - nobSize / 2) + "px";
+                div.style.top = ((div as any).y - nobSize / 2) + "px";
+                BB.css(div, {
+                    userSelect: 'none'
+                });
+                let pointerListener = new BB.PointerListener({
+                    target: div,
+                    maxPointers: 1,
+                    onPointer: function(event) {
+                        if (event.button === 'left' && event.type === 'pointermove') {
+                            (div as any).x += event.dX;
+                            (div as any).y += event.dY;
+                            div.style.left = ((div as any).x - nobSize / 2) + "px";
+                            div.style.top = ((div as any).y - nobSize / 2) + "px";
+                            if (callback) {
+                                callback();
+                            }
+                            update();
+                        }
+                    }
+                });
+                (div as any).copy = function (p) {
+                    (div as any).x = p.x;
+                    (div as any).y = p.y;
+                    div.style.left = ((div as any).x - nobSize / 2) + "px";
+                    div.style.top = ((div as any).y - nobSize / 2) + "px";
+                };
+                pointerListenerArr.push(pointerListener);
+                return div;
+            }
+
+            function updateAfter() {
+                aa.copy(ba);
+                ab.copy(bb);
+                ac.copy(bc);
+                ad.copy(bd);
+            }
+
+            ba = nob(0, 0, updateAfter);
+            bb = nob(w, 0, updateAfter);
+            bc = nob(w, h, updateAfter);
+            bd = nob(0, h, updateAfter);
+            aa = nob(0, 0);
+            ab = nob(w, 0);
+            ac = nob(w, h);
+            ad = nob(0, h);
+
+            let before = false;
+            let beforeOption = document.createElement("div");
+            BB.setEventListener(beforeOption, 'onpointerdown', function () {
+                return false;
+            });
+            beforeOption.textContent = "Before";
+            beforeOption.style.width = "150px";
+            beforeOption.style.height = "30px";
+            beforeOption.style.marginLeft = isSmall ? '0' : "100px";
+            beforeOption.style.paddingTop = "10px";
+            beforeOption.style.textAlign = "center";
+            beforeOption.style.cssFloat = "left";
+            beforeOption.style.paddingBottom = "0px";
+            beforeOption.style.borderTopLeftRadius = "10px";
+            beforeOption.style.cursor = "pointer";
+            beforeOption.style.backgroundColor = "rgba(0, 0, 0, 0.1)";
+            beforeOption.style.backgroundSize = '8%';
+
+            let afterOption = document.createElement("div");
+            BB.setEventListener(afterOption, 'onpointerdown', function () {
+                return false;
+            });
+            afterOption.textContent = "After";
+            afterOption.style.width = "150px";
+            afterOption.style.height = "30px";
+            afterOption.style.paddingTop = "10px";
+            afterOption.style.textAlign = "center";
+            afterOption.style.cssFloat = "left";
+            afterOption.style.paddingBottom = "0px";
+            afterOption.style.borderTopRightRadius = "10px";
+            afterOption.style.boxShadow = "inset 0px 5px 10px rgba(0,0,0,0.5)";
+            afterOption.style.background = "url(" + checkmarkImg + ") no-repeat 12px 16px";
+            afterOption.style.backgroundSize = '8%';
+            afterOption.style.backgroundColor = "#9e9e9e";
+
+
+            BB.setEventListener(beforeOption, 'onpointerover', function () {
+                if (before === false)
+                    beforeOption.style.backgroundColor = "#ccc";
+            });
+            BB.setEventListener(beforeOption, 'onpointerout', function () {
+                if (before === false)
+                    beforeOption.style.backgroundColor = "rgba(0, 0, 0, 0.1)";
+            });
+            BB.setEventListener(afterOption, 'onpointerover', function () {
+                if (before === true)
+                    afterOption.style.backgroundColor = "#ccc";
+            });
+            BB.setEventListener(afterOption, 'onpointerout', function () {
+                if (before === true)
+                    afterOption.style.backgroundColor = "rgba(0, 0, 0, 0.1)";
+            });
+
+            beforeOption.onclick = function () {
+
+                beforeOption.style.background = "url(" + checkmarkImg + ") no-repeat 12px 16px";
+                beforeOption.style.backgroundSize = '8%';
+                beforeOption.style.backgroundColor = "#9e9e9e";
+                beforeOption.style.boxShadow = "inset 0px 5px 10px rgba(0,0,0,0.5)";
+                beforeOption.style.cursor = "default";
+
+                afterOption.style.background = "";
+                afterOption.style.backgroundColor = "rgba(0, 0, 0, 0.1)";
+                afterOption.style.boxShadow = "";
+                afterOption.style.cursor = "pointer";
+
+                aa.style.display = "none";
+                ab.style.display = "none";
+                ac.style.display = "none";
+                ad.style.display = "none";
+
+                ba.style.display = "block";
+                bb.style.display = "block";
+                bc.style.display = "block";
+                bd.style.display = "block";
+                ba.copy(aa);
+                bb.copy(ab);
+                bc.copy(ac);
+                bd.copy(ad);
+                before = true;
+                update();
+            };
+            afterOption.onclick = function () {
+                before = false;
+
+                afterOption.style.background = "url(" + checkmarkImg + ") no-repeat 12px 16px";
+                afterOption.style.backgroundSize = '8%';
+                afterOption.style.backgroundColor = "#9e9e9e";
+                afterOption.style.boxShadow = "inset 0px 5px 10px rgba(0,0,0,0.5)";
+                afterOption.style.cursor = "default";
+
+                beforeOption.style.background = "";
+                beforeOption.style.backgroundColor = "rgba(0, 0, 0, 0.1)";
+                beforeOption.style.boxShadow = "";
+                beforeOption.style.cursor = "pointer";
+
+                ba.style.display = "none";
+                bb.style.display = "none";
+                bc.style.display = "none";
+                bd.style.display = "none";
+
+                aa.style.display = "block";
+                ab.style.display = "block";
+                ac.style.display = "block";
+                ad.style.display = "block";
+                aa.copy(ba);
+                ab.copy(bb);
+                ac.copy(bc);
+                ad.copy(bd);
+            };
+
+            let optionWrapper = document.createElement("div");
+            optionWrapper.appendChild(beforeOption);
+            optionWrapper.appendChild(afterOption);
+            div.appendChild(optionWrapper);
+
+
+            let previewWrapper = document.createElement("div");
+            previewWrapper.oncontextmenu = function () {
+                return false;
+            };
+            BB.css(previewWrapper, {
+                width: isSmall ? '340px' : '540px',
+                marginLeft: "-20px",
+                height: isSmall ? '260px' : '300px',
+                backgroundColor: "#9e9e9e",
+                marginTop: "10px",
+                boxShadow: "rgba(0, 0, 0, 0.2) 0px 1px inset, rgba(0, 0, 0, 0.2) 0px -1px inset",
+                overflow: "hidden",
+                position: "relative",
+                userSelect: 'none',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+            });
+
+            let previewLayerArr = [];
+            {
+                for(let i = 0; i < layers.length; i++) {
+                    let canvas = i === selectedLayerIndex ? glCanvas : layers[i].context.canvas;
+                    previewLayerArr.push({
+                        canvas: canvas,
+                        opacity: layers[i].opacity,
+                        mixModeStr: layers[i].mixModeStr
+                    });
+                }
+            }
+            let klCanvasPreview = new KlCanvasPreview({
+                width: parseInt('' + w),
+                height: parseInt('' + h),
+                layerArr: previewLayerArr
+            });
+
+            let previewInnerWrapper = BB.el({
+                css: {
+                    position: 'relative',
+                    boxShadow: '0 0 5px rgba(0,0,0,0.5)',
+                    width: parseInt('' + w) + 'px',
+                    height: parseInt('' + h) + 'px'
+                }
+            });
+            previewInnerWrapper.appendChild(klCanvasPreview.getElement());
+            previewWrapper.appendChild(previewInnerWrapper);
+
+            previewInnerWrapper.appendChild(aa);
+            previewInnerWrapper.appendChild(ab);
+            previewInnerWrapper.appendChild(ac);
+            previewInnerWrapper.appendChild(ad);
+
+            ba.style.display = "none";
+            bb.style.display = "none";
+            bc.style.display = "none";
+            bd.style.display = "none";
+            previewInnerWrapper.appendChild(ba);
+            previewInnerWrapper.appendChild(bb);
+            previewInnerWrapper.appendChild(bc);
+            previewInnerWrapper.appendChild(bd);
+
+
+            div.appendChild(previewWrapper);
+            update();
+            result.destroy = () => {
+                for(let i = 0; i < pointerListenerArr.length; i++) {
+                    pointerListenerArr[i].destroy();
+                }
+                texture.destroy();
+            };
+            result.getInput = function () {
+                result.destroy();
+                return {
+                    before: [ba.x / previewScale, ba.y / previewScale, bb.x / previewScale, bb.y / previewScale, bc.x / previewScale, bc.y / previewScale, bd.x / previewScale, bd.y / previewScale],
+                    after: [aa.x / previewScale, aa.y / previewScale, ab.x / previewScale, ab.y / previewScale, ac.x / previewScale, ac.y / previewScale, ad.x / previewScale, ad.y / previewScale]
+                };
+            };
+        }
+
+        setTimeout(finishInit, 1);
+
+        return result;
+    },
+
+    apply(params) {
+        let context = params.context;
+        let history = params.history;
+        let before = params.input.before;
+        let after = params.input.after;
+        if (!context || !before || !after || !history)
+            return false;
+        history.pause();
+        let glCanvas = getSharedFx();
+        if (!glCanvas) {
+            return false; // todo more specific error?
+        }
+        let texture = glCanvas.texture(context.canvas);
+        let w = context.canvas.width;
+        let h = context.canvas.height;
+        glCanvas.draw(texture).perspective(before, after).update();
+        context.clearRect(0, 0, context.canvas.width, context.canvas.height);
+        context.drawImage(glCanvas, 0, 0);
+        texture.destroy();
+        history.pause(false);
+        history.add({
+            tool: ["filter", "glPerspective"],
+            action: "apply",
+            params: [{
+                input: params.input
+            }]
+        });
+        return true;
+    }
+
+};

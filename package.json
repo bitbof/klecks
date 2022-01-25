@@ -1,0 +1,26 @@
+{
+  "browserslist": [
+    "> 0.2%",
+    "last 2 versions",
+    "not dead",
+    "Firefox ESR",
+    "Chrome 61",
+    "Firefox 60",
+    "ios_saf 9"
+  ],
+  "scripts": {
+    "start": "parcel serve src/index.html --no-cache",
+    "build": "parcel build src/index.html",
+    "build:embed": "parcel build src/embed.ts"
+  },
+  "devDependencies": {
+    "@parcel/transformer-sass": "^2.0.1",
+    "ag-psd": "^11.6.2",
+    "file-saver": "^2.0.5"
+  },
+  "dependencies": {
+    "@parcel/transformer-image": "^2.0.1",
+    "mdn-polyfills": "^5.20.0",
+    "parcel": "^2.0.1"
+  }
+}

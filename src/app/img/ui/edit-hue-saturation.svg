@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg version="1.1" viewBox="0 0 24 26.667" xmlns="http://www.w3.org/2000/svg">
+<defs>
+<radialGradient id="a" cx="245.65" cy="274.07" r="215.9" gradientTransform="matrix(-.56206 .56206 -.56436 -.56349 566.25 289.92)" gradientUnits="userSpaceOnUse">
+<stop stop-color="#fff" offset="0"/>
+<stop stop-color="#fff" stop-opacity=".93333" offset=".40692"/>
+<stop stop-color="#fff" stop-opacity=".61809" offset=".74335"/>
+<stop stop-color="#fff" stop-opacity="0" offset="1"/>
+</radialGradient>
+<filter id="b" x="-.093726" y="-.093726" width="1.1875" height="1.1875" color-interpolation-filters="sRGB">
+<feGaussianBlur stdDeviation="19.532036"/>
+</filter>
+<clipPath id="c">
+<circle transform="rotate(-41.498)" cx="19.131" cy="381.81" r="204.18" fill="#fff" fill-opacity=".93333"/>
+</clipPath>
+</defs>
+<g transform="matrix(.03917 .034652 -.034652 .03917 11.231 -7.0016)">
+<g transform="translate(3.579 4.0456)" clip-path="url(#c)" filter="url(#b)">
+<path d="m511.48 205.3c11.906 44.433 11.906 84.977 0 129.41l-24.167 14.638-217.31-79.342 220.2-77.9z" fill="#fefe33"/>
+<path d="m334.7 28.519c44.433 11.906 79.545 32.178 112.07 64.705l0.62378 24.873-177.4 151.9 43.065-229.49z" fill="#fb9902"/>
+<path d="m446.78 93.223c32.527 32.527 52.799 67.639 64.705 112.07l-241.48 64.705z" fill="#fabc02"/>
+<path d="m93.223 93.223c32.527-32.527 67.639-52.799 112.07-64.705l25.91 15.983 38.795 225.5-177.26-149.94z" fill="#fe2712"/>
+<path d="m205.3 28.519c44.433-11.906 84.977-11.906 129.41 0l-64.705 241.48z" fill="#fd5308"/>
+<path d="m28.519 334.7c-11.906-44.433-11.906-84.977 0-129.41l27.793-18.668 213.69 83.373-214.15 79.405z" fill="#8601af"/>
+<path d="m28.519 205.3c11.906-44.433 32.178-79.545 64.705-112.07l176.78 176.78z" fill="#a7194b"/>
+<path d="m205.3 511.48c-44.433-11.906-79.545-32.178-112.07-64.705l2.0845-28.188 174.69-148.59-38.955 229.71z" fill="#0247fe"/>
+<path d="m93.223 446.78c-32.527-32.527-52.799-67.639-64.705-112.07l241.48-64.705z" fill="#3d01a4"/>
+<path d="m446.78 446.78c-32.527 32.527-67.639 52.799-112.07 64.705l-24.251-15.093-40.453-226.39 176.05 151.16z" fill="#66b032"/>
+<path d="m334.7 511.48c-44.433 11.906-84.977 11.906-129.41 0l64.705-241.48z" fill="#0391ce"/>
+<path d="m511.48 334.7c-11.906 44.433-32.178 79.545-64.705 112.07l-176.78-176.78z" fill="#d0ea2b"/>
+</g>
+<rect x="95.661" y="96.767" width="355.2" height="354.82" fill="url(#a)"/>
+</g>
+</svg>

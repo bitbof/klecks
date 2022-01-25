@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<!-- mocked drawing page -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Draw</title>
+
+    <!-- this is important -->
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+</head>
+<body>
+
+<!-- embed start -->
+<script src="../../dist/embed.js"></script>
+<script type="text/javascript">
+
+    let saveData = (function () {
+        let a = document.createElement("a");
+        document.body.appendChild(a);
+        a.style = "display: none";
+        return function (blob, fileName) {
+            let url = window.URL.createObjectURL(blob);
+            a.href = url;
+            a.download = fileName;
+            a.click();
+            window.URL.revokeObjectURL(url);
+        };
+    }());
+
+    const klecks = new Klecks({
+        onSubmit: (onSuccess, onError) => {
+            // download png
+            saveData(klecks.getPNG(), 'drawing.png');
+
+            /*// download psd
+            klecks.getPSD().then((blob) => {
+                saveData(blob, 'drawing.psd');
+            });*/
+
+            setTimeout(() => {
+                onSuccess();
+                location.reload();
+            }, 500);
+        }
+    });
+    klecks.openProject({
+        width: 500,
+        height: 500,
+        layers: [{
+            name: 'Background',
+            opacity: 1,
+            mixModeStr: 'source-over',
+            image: (() => {
+                let canvas = document.createElement('canvas');
+                canvas.width = 500;
+                canvas.height = 500;
+                return canvas;
+            })(),
+        }]
+    });
+</script>
+<!-- embed end -->
+
+</body>
+</html>

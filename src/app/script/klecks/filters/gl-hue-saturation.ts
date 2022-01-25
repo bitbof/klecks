@@ -1,0 +1,176 @@
+import {BB} from '../../bb/bb';
+import {eventResMs} from './filters-consts';
+import {PcSlider} from '../ui/base-components/slider';
+import {KlCanvasPreview} from '../canvas-ui/canvas-preview';
+import {getSharedFx} from './shared-gl-fx';
+
+export const glHueSaturation = {
+
+    getDialog(params) {
+
+        let context = params.context;
+        let canvas = params.canvas;
+        if (!context || !canvas) {
+            return false;
+        }
+
+        let layers = canvas.getLayers();
+        let selectedLayerIndex = canvas.getLayerIndex(context.canvas);
+
+        let fit = BB.fitInto(280, 200, context.canvas.width, context.canvas.height, 1);
+        let w = parseInt('' + fit.width), h = parseInt('' + fit.height);
+
+        let tempCanvas = BB.canvas();
+        tempCanvas.width = w;
+        tempCanvas.height = h;
+        tempCanvas.getContext("2d").drawImage(context.canvas, 0, 0, w, h);
+        let previewFactor = w / context.canvas.width;
+
+        let div = document.createElement("div");
+        let result: any = {
+            element: div
+        };
+
+        function finishInit() {
+            let hue = 0, Saturation = 0;
+            div.innerHTML = "Change hue and saturation for the selected layer.<br/><br/>";
+
+            let glCanvas = getSharedFx();
+            if (!glCanvas) {
+                return; // todo throw?
+            }
+            let texture = glCanvas.texture(tempCanvas);
+
+            let hueSlider = new PcSlider({
+                label: 'Hue',
+                width: 300,
+                height: 30,
+                min: -100,
+                max: 100,
+                initValue: hue * 100,
+                eventResMs: eventResMs,
+                onChange: function (val) {
+                    hue = val / 100;
+                    glCanvas.draw(texture).hueSaturation(hue, Saturation).update();
+                    klCanvasPreview.render();
+                }
+            });
+            let saturationSlider = new PcSlider({
+                label: 'Saturation',
+                width: 300,
+                height: 30,
+                min: 0,
+                max: 100,
+                initValue: (Saturation + 1) * 50,
+                eventResMs: eventResMs,
+                onChange: function (val) {
+                    Saturation = val / 50 - 1;
+                    glCanvas.draw(texture).hueSaturation(hue, Saturation).update();
+                    klCanvasPreview.render();
+                }
+            });
+            hueSlider.getElement().style.marginBottom = "10px";
+            div.appendChild(hueSlider.getElement());
+            div.appendChild(saturationSlider.getElement());
+
+
+            let previewWrapper = document.createElement("div");
+            BB.css(previewWrapper, {
+                width: "340px",
+                marginLeft: "-20px",
+                height: "220px",
+                backgroundColor: "#9e9e9e",
+                marginTop: "10px",
+                boxShadow: "rgba(0, 0, 0, 0.2) 0px 1px inset, rgba(0, 0, 0, 0.2) 0px -1px inset",
+                overflow: "hidden",
+                position: "relative",
+                userSelect: 'none',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+            });
+
+            let previewLayerArr = [];
+            {
+                for(let i = 0; i < layers.length; i++) {
+                    previewLayerArr.push({
+                        canvas: i === selectedLayerIndex ? glCanvas : layers[i].context.canvas,
+                        opacity: layers[i].opacity,
+                        mixModeStr: layers[i].mixModeStr
+                    });
+                }
+            }
+            let klCanvasPreview = new KlCanvasPreview({
+                width: parseInt('' + w),
+                height: parseInt('' + h),
+                layerArr: previewLayerArr
+            });
+
+            let previewInnerWrapper = BB.el({
+                css: {
+                    position: 'relative',
+                    boxShadow: '0 0 5px rgba(0,0,0,0.5)',
+                    width: parseInt('' + w) + 'px',
+                    height: parseInt('' + h) + 'px'
+                }
+            });
+            previewInnerWrapper.appendChild(klCanvasPreview.getElement());
+            previewWrapper.appendChild(previewInnerWrapper);
+
+
+            div.appendChild(previewWrapper);
+
+            try {
+                glCanvas.draw(texture).hueSaturation(hue, Saturation).update();
+                klCanvasPreview.render();
+            } catch(e) {
+                (div as any).errorCallback(e);
+            }
+
+            result.destroy = () => {
+                hueSlider.destroy();
+                saturationSlider.destroy();
+                texture.destroy();
+            };
+            result.getInput = function () {
+                result.destroy();
+                return {
+                    hue: hue,
+                    Saturation: Saturation
+                };
+            };
+        }
+
+        setTimeout(finishInit, 1);
+        return result;
+    },
+
+    apply(params) {
+        let context = params.context;
+        let hue = params.input.hue;
+        let history = params.history;
+        let Saturation = params.input.Saturation;
+        if (!context || hue === null || Saturation === null || !history)
+            return false;
+        history.pause();
+        let glCanvas = getSharedFx();
+        if (!glCanvas) {
+            return false; // todo more specific error?
+        }
+        let texture = glCanvas.texture(context.canvas);
+        glCanvas.draw(texture).hueSaturation(hue, Saturation).update();
+        context.clearRect(0, 0, context.canvas.width, context.canvas.height);
+        context.drawImage(glCanvas, 0, 0);
+        texture.destroy();
+        history.pause(false);
+        history.add({
+            tool: ["filter", "glHueSaturation"],
+            action: "apply",
+            params: [{
+                input: params.input
+            }]
+        });
+        return true;
+    }
+
+};

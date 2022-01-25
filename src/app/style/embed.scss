@@ -1,0 +1,65 @@
+/* --- entrypoint for embed ---*/
+@import "style";
+
+:root {
+  --kl-color-hover: #0946e9;
+}
+
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+}
+
+.toolspace-row-button__submit {
+  background: var(--kl-color);
+  color: #fff;
+}
+
+.toolspace-row-button-hover > .toolspace-row-button__submit {
+  background: var(--kl-color-hover);
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.upload-overlay {
+  position: absolute;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(50, 50, 50, 0.5);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 30px;
+  padding-bottom: 10%;
+}
+
+.upload-overlay > * {
+  filter: drop-shadow(0 0 8px rgba(0,0,0,1));
+}
+
+.spinner {
+  width: 20px;
+  height: 20px;
+  border-left: 2px solid #fff;
+  border-radius: 20px;
+  margin-right: 10px;
+  animation: spin 0.6s linear 0s infinite;
+}
+
+.loading-screen-error .spinner {
+  display: none;
+}
+.loading-screen-error #loading-screen-text {
+  background: black;
+  padding-right: 5px;
+}
