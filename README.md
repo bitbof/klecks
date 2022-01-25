@@ -6,7 +6,7 @@
 Klecks (German for "splash of color", pronounced "clex") is the official open-source release of the community-funded online painting app *Kleki* (https://kleki.com). Klecks and Kleki are by developer/artist *bitbof* (https://bitbof.com). Klecks offers the same features as Kleki but might diverge slightly in the future.
 
 Klecks was originally written in JavaScript and made the switch to TypeScript in December 2021. It uses Parcel as a bundler.
-[Glfx.js](https://github.com/evanw/glfx.js) is used for the filters.
+[Glfx.js](https://github.com/evanw/glfx.js) is used for the filters. [Ag-psd](https://github.com/Agamnentzar/ag-psd) is used for PSD import/export.
 
 Klecks can either run in standalone mode (e.g. on https://kleki.com), or as an embed (e.g. on https://2draw.net). The embed can be included on an existing page, and used for something like a drawing community where people draw and revise their works with Klecks, which are then uploaded. Using it inside of an iframe is not recommended due to various browser bugs.
 
