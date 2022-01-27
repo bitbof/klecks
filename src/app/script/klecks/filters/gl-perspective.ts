@@ -18,13 +18,21 @@ export const glPerspective = {
         let selectedLayerIndex = canvas.getLayerIndex(context.canvas);
 
         let fit = BB.fitInto(isSmall ? 280 : 490, isSmall ? 200 : 240, context.canvas.width, context.canvas.height, 1);
-        let w = parseInt('' + fit.width), h = parseInt('' + fit.height);
+        let displayW = parseInt('' + fit.width), displayH = parseInt('' + fit.height);
+        let w = Math.min(displayW, context.canvas.width);
+        let h = Math.min(displayH, context.canvas.height);
 
-        let tempCanvas = BB.canvas();
-        tempCanvas.width = w;
-        tempCanvas.height = h;
-        tempCanvas.getContext("2d").drawImage(context.canvas, 0, 0, w, h);
-        let previewScale = w / context.canvas.width;
+        let tempCanvas = BB.canvas(w, h);
+        {
+            const ctx = tempCanvas.getContext("2d");
+            ctx.save();
+            if (w > context.canvas.width) {
+                ctx.imageSmoothingEnabled = false;
+            }
+            ctx.drawImage(context.canvas, 0, 0, w, h);
+            ctx.restore();
+        }
+        let displayPreviewFactor = displayW / context.canvas.width;
 
         let div = document.createElement("div");
         let result: any = {
@@ -49,7 +57,22 @@ export const glPerspective = {
             let aa, ab, ac, ad; //after
             function update() {
                 try {
-                    glCanvas.draw(texture).perspective([ba.x, ba.y, bb.x, bb.y, bc.x, bc.y, bd.x, bd.y], [aa.x, aa.y, ab.x, ab.y, ac.x, ac.y, ad.x, ad.y]).update();
+                    glCanvas.draw(texture).perspective(
+                        [ba.x, ba.y, bb.x, bb.y, bc.x, bc.y, bd.x, bd.y].map((item, i) => {
+                            if (i % 2 === 0) {
+                                return item / displayW * w;
+                            } else {
+                                return item / displayH * h;
+                            }
+                        }),
+                        [aa.x, aa.y, ab.x, ab.y, ac.x, ac.y, ad.x, ad.y].map((item, i) => {
+                            if (i % 2 === 0) {
+                                return item / displayW * w;
+                            } else {
+                                return item / displayH * h;
+                            }
+                        })
+                    ).update();
                     klCanvasPreview.render();
                 } catch(e) {
                     (div as any).errorCallback(e);
@@ -107,13 +130,13 @@ export const glPerspective = {
             }
 
             ba = nob(0, 0, updateAfter);
-            bb = nob(w, 0, updateAfter);
-            bc = nob(w, h, updateAfter);
-            bd = nob(0, h, updateAfter);
+            bb = nob(displayW, 0, updateAfter);
+            bc = nob(displayW, displayH, updateAfter);
+            bd = nob(0, displayH, updateAfter);
             aa = nob(0, 0);
-            ab = nob(w, 0);
-            ac = nob(w, h);
-            ad = nob(0, h);
+            ab = nob(displayW, 0);
+            ac = nob(displayW, displayH);
+            ad = nob(0, displayH);
 
             let before = false;
             let beforeOption = document.createElement("div");
@@ -263,8 +286,8 @@ export const glPerspective = {
                 }
             }
             let klCanvasPreview = new KlCanvasPreview({
-                width: parseInt('' + w),
-                height: parseInt('' + h),
+                width: parseInt('' + displayW),
+                height: parseInt('' + displayH),
                 layerArr: previewLayerArr
             });
 
@@ -272,8 +295,8 @@ export const glPerspective = {
                 css: {
                     position: 'relative',
                     boxShadow: '0 0 5px rgba(0,0,0,0.5)',
-                    width: parseInt('' + w) + 'px',
-                    height: parseInt('' + h) + 'px'
+                    width: parseInt('' + displayW) + 'px',
+                    height: parseInt('' + displayH) + 'px'
                 }
             });
             previewInnerWrapper.appendChild(klCanvasPreview.getElement());
@@ -305,8 +328,32 @@ export const glPerspective = {
             result.getInput = function () {
                 result.destroy();
                 return {
-                    before: [ba.x / previewScale, ba.y / previewScale, bb.x / previewScale, bb.y / previewScale, bc.x / previewScale, bc.y / previewScale, bd.x / previewScale, bd.y / previewScale],
-                    after: [aa.x / previewScale, aa.y / previewScale, ab.x / previewScale, ab.y / previewScale, ac.x / previewScale, ac.y / previewScale, ad.x / previewScale, ad.y / previewScale]
+                    before: [
+                        ba.x / displayPreviewFactor,
+                        ba.y / displayPreviewFactor,
+
+                        bb.x / displayPreviewFactor,
+                        bb.y / displayPreviewFactor,
+
+                        bc.x / displayPreviewFactor,
+                        bc.y / displayPreviewFactor,
+
+                        bd.x / displayPreviewFactor,
+                        bd.y / displayPreviewFactor,
+                    ],
+                    after: [
+                        aa.x / displayPreviewFactor,
+                        aa.y / displayPreviewFactor,
+
+                        ab.x / displayPreviewFactor,
+                        ab.y / displayPreviewFactor,
+
+                        ac.x / displayPreviewFactor,
+                        ac.y / displayPreviewFactor,
+
+                        ad.x / displayPreviewFactor,
+                        ad.y / displayPreviewFactor,
+                    ]
                 };
             };
         }
