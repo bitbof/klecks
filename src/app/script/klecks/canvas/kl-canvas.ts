@@ -902,6 +902,10 @@ export function KlCanvas(params, layerNrOffset: number = 0) {
         resultCanvas.width = Math.max(1, parseInt('' + (_this.width * factor)));
         resultCanvas.height = Math.max(1, parseInt('' + (_this.height * factor)));
         let ctx = resultCanvas.getContext("2d");
+        ctx.save();
+        if (factor > 1) {
+            ctx.imageSmoothingEnabled = false;
+        }
         for (let i = 0; i < layerCanvasArr.length; i++) {
             if (parseFloat(layerCanvasArr[i].opacity) === 0) {
                 continue;
@@ -910,6 +914,7 @@ export function KlCanvas(params, layerNrOffset: number = 0) {
             ctx.globalCompositeOperation = layerCanvasArr[i].mixModeStr;
             ctx.drawImage(layerCanvasArr[i], 0, 0, resultCanvas.width, resultCanvas.height);
         }
+        ctx.restore();
         return resultCanvas;
     };
     _this.getLayerIndex = function (cnvs) {

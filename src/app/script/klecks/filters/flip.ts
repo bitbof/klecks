@@ -19,13 +19,6 @@ export const flip = {
         let fit = BB.fitInto(280, 200, context.canvas.width, context.canvas.height, 1);
         let w = parseInt('' + fit.width), h = parseInt('' + fit.height);
 
-        let tempCanvas = BB.canvas();
-        tempCanvas.width = w;
-        tempCanvas.height = h;
-        tempCanvas.style.display = 'block';
-        tempCanvas.getContext("2d").drawImage(context.canvas, 0, 0, w, h);
-        let previewFactor = w / context.canvas.width;
-
         let div = document.createElement("div");
         let result: any = {
             element: div
@@ -33,7 +26,7 @@ export const flip = {
         let isHorizontal = true;
         let isVertical = false;
         let doFlipCanvas = true;
-        div.innerHTML = "Flips layer or whole canvas.<br/><br/>";
+        div.innerHTML = "Flips layer or whole image.<br/><br/>";
 
 
         let horizontalCheckbox = checkBox({
@@ -71,7 +64,7 @@ export const flip = {
         BB.setEventListener(fcOption, 'onpointerdown', function () {
             return false;
         });
-        fcOption.textContent = "Flip Canvas";
+        fcOption.textContent = "Flip Image";
         fcOption.style.width = "150px";
         fcOption.style.height = "30px";
         fcOption.style.paddingTop = "10px";
@@ -221,6 +214,9 @@ export const flip = {
                         ctx.translate(0, previewLayer.canvas.height);
                         ctx.scale(1, -1);
                     }
+                }
+                if (ctx.canvas.width > layers[i].context.canvas.width) {
+                    ctx.imageSmoothingEnabled = false;
                 }
                 ctx.globalAlpha = parseFloat(layers[i].opacity);
                 ctx.globalCompositeOperation = layers[i].mixModeStr;

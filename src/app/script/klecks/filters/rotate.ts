@@ -92,7 +92,7 @@ export const rotate = {
             canvasWrapper.style.background = "url(" + url + ")";
         });
         //if(!visitor.chrome) {
-        canvasWrapper.style.transition = "all 0.4s ease-in-out";
+        canvasWrapper.style.transition = "all 0.2s ease-out";
         //}
 
         div.appendChild(previewWrapper);

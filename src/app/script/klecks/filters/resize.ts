@@ -150,22 +150,28 @@ export const resize = {
         let previewCanvas = BB.canvas();
         previewCanvas.width = w;
         previewCanvas.height = h;
+        previewCanvas.style.imageRendering = 'pixelated';
+
 
         let previewCtx = previewCanvas.getContext('2d');
-        previewCtx.imageSmoothingQuality = 'high';
+
 
         function draw() {
-
             if(algorithmSelect.getValue() === 'smooth') {
-                previewCanvas.style.imageRendering = '';
+                previewCanvas.style.imageRendering = previewFactor > 1 ? 'pixelated' : '';
 
                 previewCanvas.width = canvas.width;
                 previewCanvas.height = canvas.height;
+
+                previewCtx.save();
+                previewCtx.imageSmoothingQuality = 'high';
                 previewCtx.drawImage(tempCanvas, 0, 0);
                 BB.resizeCanvas(previewCanvas, newWidth, newHeight);
+                previewCtx.restore();
 
             } else {
                 previewCanvas.style.imageRendering = 'pixelated';
+
                 previewCanvas.width = newWidth;
                 previewCanvas.height = newHeight;
                 previewCtx.save();
@@ -173,14 +179,10 @@ export const resize = {
                 previewCtx.drawImage(tempCanvas, 0, 0, previewCanvas.width, previewCanvas.height);
                 previewCtx.restore();
             }
+
         }
 
         function update() {
-            /*if (widthInput.value === newWidth && heightInput.value === newHeight) {
-                heightChanged = false;
-                widthChanged = false;
-                return;
-            }*/
             if ((widthInput.value.length === 0 && widthChanged) || (heightInput.value.length === 0 && heightChanged)) {
                 heightChanged = false;
                 widthChanged = false;
@@ -216,6 +218,7 @@ export const resize = {
 
             let preview = BB.fitInto(280, 200, newWidth, newHeight, 1);
             let previewW = parseInt('' + preview.width), previewH = parseInt('' + preview.height);
+            previewFactor = previewW / newWidth;
 
             let offset = BB.centerWithin(340, 220, previewW, previewH);
 

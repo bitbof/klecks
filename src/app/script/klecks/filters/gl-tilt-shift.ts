@@ -17,13 +17,23 @@ export const glTiltShift = {
         let selectedLayerIndex = canvas.getLayerIndex(context.canvas);
 
         let fit = BB.fitInto(280, 200, context.canvas.width, context.canvas.height, 1);
-        let w = parseInt('' + fit.width), h = parseInt('' + fit.height);
+        let displayW = parseInt('' + fit.width), displayH = parseInt('' + fit.height);
+        let w = Math.min(displayW, context.canvas.width);
+        let h = Math.min(displayH, context.canvas.height);
 
-        let tempCanvas = BB.canvas();
-        tempCanvas.width = w;
-        tempCanvas.height = h;
-        tempCanvas.getContext("2d").drawImage(context.canvas, 0, 0, w, h);
+        let tempCanvas = BB.canvas(w, h);
+        {
+            const ctx = tempCanvas.getContext("2d");
+            ctx.save();
+            if (w > context.canvas.width) {
+                ctx.imageSmoothingEnabled = false;
+            }
+            ctx.drawImage(context.canvas, 0, 0, w, h);
+            ctx.restore();
+        }
         let previewFactor = w / context.canvas.width;
+        let displayPreviewFactor = displayW / context.canvas.width;
+
         let div = document.createElement("div");
         let result: any = {
             element: div
@@ -43,7 +53,14 @@ export const glTiltShift = {
             let fa, fb; // focus line
             function update() {
                 try {
-                    glCanvas.draw(texture).tiltShift(fa.x, fa.y, fb.x, fb.y, blur * previewFactor, gradient * previewFactor).update();
+                    glCanvas.draw(texture).tiltShift(
+                        fa.x / displayPreviewFactor * previewFactor,
+                        fa.y / displayPreviewFactor * previewFactor,
+                        fb.x / displayPreviewFactor * previewFactor,
+                        fb.y / displayPreviewFactor * previewFactor,
+                        blur * previewFactor,
+                        gradient * previewFactor
+                    ).update();
                     klCanvasPreview.render();
                 } catch(e) {
                     (div as any).errorCallback(e);
@@ -84,8 +101,8 @@ export const glTiltShift = {
                 return div;
             }
 
-            fa = nob(parseInt('' + (w / 6)), parseInt('' + (h / 2)));
-            fb = nob(parseInt('' + (w - w / 6)), parseInt('' + (h - h / 3)));
+            fa = nob(parseInt('' + (displayW / 6)), parseInt('' + (displayH / 2)));
+            fb = nob(parseInt('' + (displayW - displayW / 6)), parseInt('' + (displayH - displayH / 3)));
 
             let blurSlider = new PcSlider({
                 label: 'Blur Radius',
@@ -148,8 +165,8 @@ export const glTiltShift = {
                 }
             }
             let klCanvasPreview = new KlCanvasPreview({
-                width: parseInt('' + w),
-                height: parseInt('' + h),
+                width: parseInt('' + displayW),
+                height: parseInt('' + displayH),
                 layerArr: previewLayerArr
             });
 
@@ -157,8 +174,8 @@ export const glTiltShift = {
                 css: {
                     position: 'relative',
                     boxShadow: '0 0 5px rgba(0,0,0,0.5)',
-                    width: parseInt('' + w) + 'px',
-                    height: parseInt('' + h) + 'px'
+                    width: parseInt('' + displayW) + 'px',
+                    height: parseInt('' + displayH) + 'px'
                 }
             });
             previewInnerWrapper.appendChild(klCanvasPreview.getElement());
@@ -181,8 +198,8 @@ export const glTiltShift = {
             result.getInput = function () {
                 result.destroy();
                 return {
-                    a: {x: fa.x / previewFactor, y: fa.y / previewFactor},
-                    b: {x: fb.x / previewFactor, y: fb.y / previewFactor},
+                    a: {x: fa.x / displayPreviewFactor, y: fa.y / displayPreviewFactor},
+                    b: {x: fb.x / displayPreviewFactor, y: fb.y / displayPreviewFactor},
                     blur: blur,
                     gradient: gradient
                 };

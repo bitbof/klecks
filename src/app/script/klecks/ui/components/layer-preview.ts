@@ -269,10 +269,13 @@ export function LayerPreview(p) {
         let canvasDimensions = BB.fitInto(largeCanvasSize, largeCanvasSize, layerCanvas.width, layerCanvas.height, 1);
         largeCanvas.width = Math.round(canvasDimensions.width);
         largeCanvas.height = Math.round(canvasDimensions.height);
-
         largeCanvasCtx.save();
-        largeCanvasCtx.imageSmoothingEnabled = true;
-        largeCanvasCtx.imageSmoothingQuality = 'high';
+        if (largeCanvas.width > layerCanvas.width) {
+            largeCanvasCtx.imageSmoothingEnabled = false;
+        } else {
+            largeCanvasCtx.imageSmoothingEnabled = true;
+            largeCanvasCtx.imageSmoothingQuality = 'high';
+        }
         largeCanvasCtx.fillStyle = largeCanvasCheckerPattern;
         largeCanvasCtx.fillRect(0, 0, largeCanvas.width, largeCanvas.height);
         largeCanvasCtx.drawImage(layerCanvas, 0, 0, largeCanvas.width, largeCanvas.height);

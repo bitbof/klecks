@@ -30,6 +30,9 @@ export function KlCanvasPreview(p) {
         for(let i = 0; i < p.layerArr.length; i++) {
             ctx.globalAlpha = parseFloat(p.layerArr[i].opacity);
             ctx.globalCompositeOperation = p.layerArr[i].mixModeStr;
+            if (canvas.width > p.layerArr[i].canvas.width) {
+                ctx.imageSmoothingEnabled = false;
+            }
             ctx.drawImage(p.layerArr[i].canvas, 0, 0, canvas.width, canvas.height);
         }
         ctx.restore();

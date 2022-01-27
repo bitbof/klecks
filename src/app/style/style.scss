@@ -345,6 +345,8 @@ button {
     );
 
     box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.04), 0 1px rgba(0,0,0,0.1), 0 2px 3px rgba(0,0,0,0.05);
+    user-select: none;
+    -webkit-user-select: none;
 }
 
 button:hover {
@@ -652,6 +654,8 @@ textarea:focus, input:focus {
     color: #888;
     padding: 5px;
     line-height: 17px;
+    user-select: none;
+    -webkit-user-select: none;
 }
 
 .dialog-closebtn:hover {

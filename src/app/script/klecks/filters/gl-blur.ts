@@ -17,12 +17,20 @@ export const glBlur = {
         let selectedLayerIndex = canvas.getLayerIndex(context.canvas);
 
         let fit = BB.fitInto(280, 200, context.canvas.width, context.canvas.height, 1);
-        let w = parseInt('' + fit.width), h = parseInt('' + fit.height);
+        let displayW = parseInt('' + fit.width), displayH = parseInt('' + fit.height);
+        let w = Math.min(displayW, context.canvas.width);
+        let h = Math.min(displayH, context.canvas.height);
 
-        let tempCanvas = BB.canvas();
-        tempCanvas.width = w;
-        tempCanvas.height = h;
-        tempCanvas.getContext("2d").drawImage(context.canvas, 0, 0, w, h);
+        let tempCanvas = BB.canvas(w, h);
+        {
+            const ctx = tempCanvas.getContext("2d");
+            ctx.save();
+            if (w > context.canvas.width) {
+                ctx.imageSmoothingEnabled = false;
+            }
+            ctx.drawImage(context.canvas, 0, 0, w, h);
+            ctx.restore();
+        }
         let previewFactor = w / context.canvas.width;
 
         let div = document.createElement("div");
@@ -85,8 +93,8 @@ export const glBlur = {
                 }
             }
             let klCanvasPreview = new KlCanvasPreview({
-                width: parseInt('' + w),
-                height: parseInt('' + h),
+                width: parseInt('' + displayW),
+                height: parseInt('' + displayH),
                 layerArr: previewLayerArr
             });
 
@@ -94,8 +102,8 @@ export const glBlur = {
                 css: {
                     position: 'relative',
                     boxShadow: '0 0 5px rgba(0,0,0,0.5)',
-                    width: parseInt('' + w) + 'px',
-                    height: parseInt('' + h) + 'px'
+                    width: parseInt('' + displayW) + 'px',
+                    height: parseInt('' + displayH) + 'px'
                 }
             });
             previewInnerWrapper.appendChild(klCanvasPreview.getElement());

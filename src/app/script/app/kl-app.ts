@@ -920,7 +920,7 @@ export function KlApp(pProject: IKlProject | null, pOptions: IKlAppOptions) {
             });
         }
 
-
+        let hasUnsupportedFile = false;
         for (let i = 0, file; file = files[i]; i++) {
             let extension = file.name.split(".");
             extension = extension[extension.length - 1].toLowerCase();
@@ -1074,9 +1074,17 @@ export function KlApp(pProject: IKlProject | null, pOptions: IKlAppOptions) {
                         }, f.name, optionStr);
                     });
                 })(file);
+            } else {
+                hasUnsupportedFile = true;
             }
-
-
+        }
+        if (hasUnsupportedFile) {
+            KL.popup({
+                target: klRootEl,
+                message: 'Unsupported file type. See Help for supported types.',
+                type: 'error',
+                buttons: ['OK'],
+            });
         }
     }
 

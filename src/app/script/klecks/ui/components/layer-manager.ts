@@ -344,6 +344,9 @@ export function pcLayerManager(p_canvas, p_func, p_rootDiv) {
                         let ctx = preview.getContext("2d");
                         ctx.save();
                         ctx.clearRect(0, 0, preview.width, preview.height);
+                        if (preview.width > p.topCanvas.width) {
+                            ctx.imageSmoothingEnabled = false;
+                        }
                         ctx.drawImage(p.bottomCanvas, 0, 0, preview.width, preview.height);
 
                         if(options.getValue() === 'as-alpha') {
@@ -510,19 +513,23 @@ export function pcLayerManager(p_canvas, p_func, p_rootDiv) {
 
             //thumb
             {
-                (layer as any).thumb = BB.canvas();
                 let thumbDimensions = BB.fitInto(30, 30, layercanvas.width, layercanvas.height, 1);
-                (layer as any).thumb.width = thumbDimensions.width;
-                (layer as any).thumb.height = thumbDimensions.height;
-                let thc = (layer as any).thumb.getContext("2d");
-                thc.drawImage(layercanvas, 0, 0, (layer as any).thumb.width, (layer as any).thumb.height);
+                let thumb = (layer as any).thumb = BB.canvas(thumbDimensions.width, thumbDimensions.width);
+
+                let thc = thumb.getContext("2d");
+                thc.save();
+                if (thumb.width > layercanvas.width) {
+                    thc.imageSmoothingEnabled = false;
+                }
+                thc.drawImage(layercanvas, 0, 0, thumb.width, thumb.height);
+                thc.restore();
                 BB.css((layer as any).thumb, {
                     position: "absolute",
                     left: ((32 - (layer as any).thumb.width) / 2) + "px",
                     top: ((32 - (layer as any).thumb.height) / 2) + "px"
                 });
                 BB.createCheckerDataUrl(4, function(url) {
-                    (layer as any).thumb.style.backgroundImage = "url(" + url + ")";
+                    thumb.style.backgroundImage = "url(" + url + ")";
                 });
             }
 
@@ -608,9 +615,14 @@ export function pcLayerManager(p_canvas, p_func, p_rootDiv) {
                     largeThumbCanvas.height = thumbDimensions.height;
                 }
                 let ctx = largeThumbCanvas.getContext("2d");
+                ctx.save();
+                if (largeThumbCanvas.width > layercanvas.width) {
+                    ctx.imageSmoothingEnabled = false;
+                }
                 ctx.imageSmoothingQuality = 'high';
                 ctx.clearRect(0, 0, largeThumbCanvas.width, largeThumbCanvas.height);
                 ctx.drawImage(layercanvas, 0, 0, largeThumbCanvas.width, largeThumbCanvas.height);
+                ctx.restore();
                 BB.css(largeThumbDiv, {
                     top: (e.clientY - largeThumbCanvas.height / 2) + "px",
                     opacity: '0'
@@ -810,8 +822,13 @@ export function pcLayerManager(p_canvas, p_func, p_rootDiv) {
         for(let i = 0; i < layerElArr.length; i++) {
             if (selectedSpotIndex === layerElArr[i].spot && klCanvasLayerArr[layerElArr[i].spot]) { // second check, because might be out of date
                 let ctx = layerElArr[i].thumb.getContext("2d");
+                ctx.save();
                 ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+                if (klCanvasLayerArr[layerElArr[i].spot].context.canvas.width < layerElArr[i].thumb.width) {
+                    ctx.imageSmoothingEnabled = false;
+                }
                 ctx.drawImage(klCanvasLayerArr[layerElArr[i].spot].context.canvas, 0, 0, layerElArr[i].thumb.width, layerElArr[i].thumb.height);
+                ctx.restore();
             }
         }
 

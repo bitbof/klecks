@@ -22,8 +22,15 @@ export const glCurves = {
         let tempCanvas = BB.canvas();
         tempCanvas.width = w;
         tempCanvas.height = h;
-        tempCanvas.style.display = 'block';
-        tempCanvas.getContext("2d").drawImage(context.canvas, 0, 0, w, h);
+        {
+            const ctx = tempCanvas.getContext("2d");
+            ctx.save();
+            if (tempCanvas.width > context.canvas.width) {
+                ctx.imageSmoothingEnabled = false;
+            }
+            ctx.drawImage(context.canvas, 0, 0, w, h);
+            ctx.restore();
+        }
 
         let div = document.createElement("div");
         let result: any = {
