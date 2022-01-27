@@ -1,4 +1,4 @@
-//base storage indexedDB
+//browser storage indexedDB
 
 
 import {IKlStorageProject} from '../kl.types';

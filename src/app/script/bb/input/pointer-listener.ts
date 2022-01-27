@@ -7,10 +7,10 @@ import {addEventListener, removeEventListener} from './event-listener';
  *
  * Why:
  * - trackpad scrolling is different from old school mouse scrolling
- * - but there is not way to learn from the base if it's trackpad scrolling
+ * - but there is not way to learn from the browser if it's trackpad scrolling
  * - browsers don't even give access to the raw swiping or pinching movement, but some abstraction on top, making the scrolling
  *      continue an arbitrary amount, at an arbitrary scale
- * - each base does this differently. So you can't offer a coherent experience
+ * - each browser does this differently. So you can't offer a coherent experience
  *
  * - also trackpads are painful to draw with. So supporting a trackpad-based workflow makes not much sense.
  *
@@ -129,7 +129,7 @@ const WheelCleaner = function (callback) {
 
 /**
  * PointerListener - for pointer events, wheel events. uses fallbacks. ideally consistent behavior across browsers
- * Has some workarounds for base specific bugs. As browsers get better, this constructor should get smaller
+ * Has some workarounds for browser specific bugs. As browsers get better, this constructor should get smaller
  *
  * p = {
  *     target: DOM element,

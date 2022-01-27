@@ -129,7 +129,7 @@ let exports: any = {};
   } catch (e) {
   }
 
-  // Don't install the polyfill if the base already supports it or doesn't have WebGL
+  // Don't install the polyfill if the browser already supports it or doesn't have WebGL
   if (!gl || (gl as any).getSupportedExtensions().indexOf('OES_texture_float_linear') !== -1) {
     return;
   }
@@ -285,7 +285,7 @@ exports.canvas = function() {
         gl = null;
     }
     if (!gl) {
-        throw 'This base does not support WebGL';
+        throw 'This browser does not support WebGL';
     }
     canvas._ = {
         gl: gl,
