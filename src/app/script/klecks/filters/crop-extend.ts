@@ -7,10 +7,10 @@ import {Cropper} from '../ui/components/cropper';
 export const cropExtend = {
 
     getDialog(params) {
-        let canvas = params.canvas;
+        const canvas = params.canvas;
         if (!canvas)
             return false;
-        let tempCanvas = BB.canvas();
+        const tempCanvas = BB.canvas();
         (function () {
             let fit = BB.fitInto(560, 400, canvas.width, canvas.height, 1);
             let w = parseInt('' + fit.width), h = parseInt('' + fit.height);
@@ -21,28 +21,30 @@ export const cropExtend = {
             tempCanvas.getContext("2d").drawImage(canvas.getCompleteCanvas(previewFactor), 0, 0, w, h);
         })();
 
-        let div = document.createElement("div");
-        let result: any = {
+        const div = document.createElement("div");
+        const result: any = {
             element: div
         };
         div.innerHTML = "Crop or extend the image.<br/><br/>";
         let left = 0, right = 0, top = 0, bottom = 0;
         let leftChanged = false, rightChanged = false, topChanged = false, bottomChanged = false;
-        let maxWidth = params.maxWidth, maxHeight = params.maxHeight;
+        const maxWidth = params.maxWidth, maxHeight = params.maxHeight;
         let scale;
 
 
-        //manual input elements
-        let lrWrapper = BB.el({
+
+        // --- input elements ---
+
+        const lrWrapper = BB.el({
             css: {lineHeight: '30px', height: '35px'}
         });
-        let tbWrapper = BB.el({
+        const tbWrapper = BB.el({
             css: {lineHeight: '30px', height: '35px'}
         });
         div.appendChild(lrWrapper);
         div.appendChild(tbWrapper);
 
-        let leftInput = input({
+        const leftInput = input({
             init: 0,
             type: 'number',
             min: -canvas.width,
@@ -53,7 +55,7 @@ export const cropExtend = {
                 updateInput();
             }
         });
-        let rightInput = input({
+        const rightInput = input({
             init: 0,
             type: 'number',
             min: -canvas.width,
@@ -64,7 +66,7 @@ export const cropExtend = {
                 updateInput();
             }
         });
-        let topInput = input({
+        const topInput = input({
             init: 0,
             type: 'number',
             min: -canvas.height,
@@ -75,7 +77,7 @@ export const cropExtend = {
                 updateInput();
             }
         });
-        let bottomInput = input({
+        const bottomInput = input({
             init: 0,
             type: 'number',
             min: -canvas.height,
@@ -87,7 +89,7 @@ export const cropExtend = {
             }
         });
 
-        let labelStyle = {
+        const labelStyle = {
             display: 'inline-block',
             width: '60px'
         };
@@ -99,10 +101,6 @@ export const cropExtend = {
         tbWrapper.appendChild(topInput);
         tbWrapper.appendChild(BB.el({content: 'Bottom:', css: labelStyle}));
         tbWrapper.appendChild(bottomInput);
-
-
-
-
 
         function updateInput() {
             left = parseInt(leftInput.value);
@@ -170,11 +168,6 @@ export const cropExtend = {
             bottomChanged = false;
         }
 
-
-        function updateGrid() {
-            cropper.showThirds(useRuleOfThirds);
-        }
-
         let useRuleOfThirds = true;
         let ruleOThirdsCheckbox = checkBox({
             init: true,
@@ -182,7 +175,7 @@ export const cropExtend = {
             allowTab: true,
             callback: function(b) {
                 useRuleOfThirds = b;
-                updateGrid();
+                cropper.showThirds(useRuleOfThirds);
             }
         });
         div.appendChild(BB.el({
@@ -192,7 +185,7 @@ export const cropExtend = {
         }));
 
         let selectedRgbaObj = {r: 0, g: 0, b: 0, a: 0};
-        let colorOptionsArr = [
+        const colorOptionsArr = [
             {r: 0, g: 0, b: 0, a: 0},
             {r: 255, g: 255, b: 255, a: 1},
             {r: 0, g: 0, b: 0, a: 1}
@@ -210,7 +203,7 @@ export const cropExtend = {
             a: 1,
         });
 
-        let colorOptions = new ColorOptions({
+        const colorOptions = new ColorOptions({
             label: 'fill',
             colorArr: colorOptionsArr,
             onChange: function(rgbaObj) {
@@ -220,22 +213,24 @@ export const cropExtend = {
         });
 
 
-        let flewRow = BB.el({
+        const flexRow = BB.el({
             css: {
                 display: 'flex',
                 justifyContent: 'space-between'
             }
         });
-        div.appendChild(flewRow);
-        flewRow.appendChild(ruleOThirdsCheckbox);
-        flewRow.appendChild(colorOptions.getElement());
+        div.appendChild(flexRow);
+        flexRow.appendChild(ruleOThirdsCheckbox);
+        flexRow.appendChild(colorOptions.getElement());
 
 
+        // when input field changed, or dragging in preview finished
+        // adjusts the zoom
         function update(transform) {
-            let fit = BB.fitInto(260, 180, transform.width, transform.height, 1);
+            const fit = BB.fitInto(260, 180, transform.width, transform.height, 1);
             scale = fit.width / transform.width;
 
-            let offset = BB.centerWithin(340, 220, fit.width, fit.height);
+            const offset = BB.centerWithin(340, 220, fit.width, fit.height);
 
             tempCanvas.style.width = canvas.width * scale + "px";
             tempCanvas.style.height = canvas.height * scale + "px";
@@ -263,7 +258,7 @@ export const cropExtend = {
             cropper.setScale(scale);
         }
 
-        let previewWrapper = document.createElement("div");
+        const previewWrapper = document.createElement("div");
         previewWrapper.oncontextmenu = function () {
             return false;
         };
@@ -278,7 +273,7 @@ export const cropExtend = {
             overflow: "hidden",
             userSelect: 'none'
         });
-        let bgColorOverlay = BB.el({
+        const bgColorOverlay = BB.el({
             css: {
                 position: 'absolute',
                 left: '0',
@@ -289,14 +284,14 @@ export const cropExtend = {
         });
         previewWrapper.appendChild(bgColorOverlay);
 
-        let offsetWrapper = document.createElement("div");
+        const offsetWrapper = document.createElement("div");
         offsetWrapper.style.position = "absolute";
         offsetWrapper.style.left = "0px";
         offsetWrapper.style.top = "0px";
         previewWrapper.appendChild(offsetWrapper);
 
 
-        let canvasWrapper = BB.appendTextDiv(offsetWrapper, "");
+        const canvasWrapper = BB.appendTextDiv(offsetWrapper, "");
         canvasWrapper.appendChild(tempCanvas);
         //tempCanvas.style.width = w + "px";
         //tempCanvas.style.height = h + "px";
@@ -306,7 +301,7 @@ export const cropExtend = {
         tempCanvas.style.top = "0px";
 
         div.appendChild(previewWrapper);
-        let cropper = new Cropper({
+        const cropper = new Cropper({
             x: 0,
             y: 0,
             width: canvas.width,
@@ -322,7 +317,7 @@ export const cropExtend = {
         function updateBg(rgbaObj) {
 
             let borderColor;
-            if(rgbaObj.a === 0) {
+            if (rgbaObj.a === 0) {
                 borderColor = 'rgba(0,0,0,0.5)';
                 bgColorOverlay.style.background = '';
                 tempCanvas.style.background = '';
@@ -354,8 +349,8 @@ export const cropExtend = {
     },
 
     apply(params) {
-        let canvas = params.canvas;
-        let history = params.history;
+        const canvas = params.canvas;
+        const history = params.history;
         if (!canvas || !history || isNaN(params.input.left) || isNaN(params.input.right) || isNaN(params.input.top) || isNaN(params.input.bottom)) {
             return false;
         }

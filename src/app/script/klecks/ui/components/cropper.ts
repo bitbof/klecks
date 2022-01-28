@@ -46,23 +46,42 @@ export function Cropper (params) {
             height: ((grips[2].y - grips[0].y) * scale) + "px"
         });
     };
+    let pointerRemainder = { // needs to be reset after dragging complete
+        x: 0,
+        y: 0,
+    };
+    function calcIntDxy(pDx: number, pDy: number): {dX: number; dY: number} {
+        pointerRemainder.x += pDx;
+        pointerRemainder.y += pDy;
+        const dX = Math.round(pointerRemainder.x);
+        const dY = Math.round(pointerRemainder.y);
+        pointerRemainder.x -= dX;
+        pointerRemainder.y -= dY;
+        return {
+            dX,
+            dY,
+        }
+    }
     let outlinePointerListener = new BB.PointerListener({
         target: outline,
         onPointer: function(event) {
             if (event.type === 'pointermove' && event.button === 'left') {
-                grips[0].x += event.dX / scale;
-                grips[0].y += event.dY / scale;
-                grips[1].x += event.dX / scale;
-                grips[1].y += event.dY / scale;
-                grips[2].x += event.dX / scale;
-                grips[2].y += event.dY / scale;
-                grips[3].x += event.dX / scale;
-                grips[3].y += event.dY / scale;
+
+                const {dX, dY} = calcIntDxy(event.dX / scale, event.dY / scale);
+
+                grips[0].x += dX;
+                grips[0].y += dY;
+                grips[1].x += dX;
+                grips[1].y += dY;
+                grips[2].x += dX;
+                grips[2].y += dY;
+                grips[3].x += dX;
+                grips[3].y += dY;
 
                 update();
             }
             if (event.type === 'pointerup') {
-                callback(getTransform());
+                commit();
             }
         }
     });
@@ -101,39 +120,41 @@ export function Cropper (params) {
     const gripSize = 40;
     const gripOverlay = 10;
 
-    let grips = []; //aka corner coordinates
-    grips[0] = {}; //top left
-    grips[0].x = 0;
-    grips[0].y = 0;
-    grips[1] = {}; //top right
-    grips[1].x = width;
-    grips[1].y = 0;
-    grips[2] = {}; //bottom right
-    grips[2].x = width;
-    grips[2].y = height;
-    grips[3] = {}; //bottom left
-    grips[3].x = 0;
-    grips[3].y = height;
+    let grips: {
+        x: number; // int
+        y: number;
+    }[] = [ // aka corner coordinates
+        {x: 0, y: 0}, // top left
+        {x: width, y: 0}, // top right
+        {x: width, y: height}, // bottom right
+        {x: 0, y: height}, //bottom left
+    ];
 
     function transformTop(dY) {
-        grips[0].y += dY / scale;
+        grips[0].y += dY;
         grips[0].y = Math.max(grips[3].y - maxH, Math.min(grips[3].y - 1, grips[0].y));
         grips[1].y = grips[0].y;
     }
     function transformRight(dX) {
-        grips[1].x += dX / scale;
+        grips[1].x += dX;
         grips[1].x = Math.min(grips[0].x + maxW, Math.max(grips[0].x + 1, grips[1].x));
         grips[2].x = grips[1].x;
     }
     function transformBottom(dY) {
-        grips[2].y += dY / scale;
+        grips[2].y += dY;
         grips[2].y = Math.min(grips[1].y + maxH, Math.max(grips[1].y + 1, grips[2].y));
         grips[3].y = grips[2].y;
     }
     function transformLeft(dX) {
-        grips[0].x += dX / scale;
+        grips[0].x += dX;
         grips[0].x = Math.max(grips[1].x - maxW, Math.min(grips[1].x - 1, grips[0].x));
         grips[3].x = grips[0].x;
+    }
+
+    function commit() {
+        pointerRemainder.x = 0;
+        pointerRemainder.y = 0;
+        callback(getTransform());
     }
 
 
@@ -217,14 +238,15 @@ export function Cropper (params) {
         fixScribble: true,
         onPointer: function (event) {
             if (event.type === 'pointermove' && event.button === 'left') {
-                transformTop(event.dY);
+                const {dX, dY} = calcIntDxy(event.dX / scale, event.dY / scale);
+                transformTop(dY);
                 if(keyListener.isPressed('shift')) {
-                    transformBottom(-event.dY);
+                    transformBottom(-dY);
                 }
                 update();
             }
             if (event.type === 'pointerup') {
-                callback(getTransform());
+                commit();
             }
         }
     });
@@ -233,14 +255,15 @@ export function Cropper (params) {
         fixScribble: true,
         onPointer: function (event) {
             if (event.type === 'pointermove' && event.button === 'left') {
-                transformRight(event.dX);
+                const {dX, dY} = calcIntDxy(event.dX / scale, event.dY / scale);
+                transformRight(dX);
                 if(keyListener.isPressed('shift')) {
-                    transformLeft(-event.dX);
+                    transformLeft(-dX);
                 }
                 update();
             }
             if (event.type === 'pointerup') {
-                callback(getTransform());
+                commit();
             }
         }
     });
@@ -249,14 +272,15 @@ export function Cropper (params) {
         fixScribble: true,
         onPointer: function (event) {
             if (event.type === 'pointermove' && event.button === 'left') {
-                transformBottom(event.dY);
+                const {dX, dY} = calcIntDxy(event.dX / scale, event.dY / scale);
+                transformBottom(dY);
                 if(keyListener.isPressed('shift')) {
-                    transformTop(-event.dY);
+                    transformTop(-dY);
                 }
                 update();
             }
             if (event.type === 'pointerup') {
-                callback(getTransform());
+                commit();
             }
         }
     });
@@ -265,14 +289,15 @@ export function Cropper (params) {
         fixScribble: true,
         onPointer: function (event) {
             if (event.type === 'pointermove' && event.button === 'left') {
-                transformLeft(event.dX);
+                const {dX, dY} = calcIntDxy(event.dX / scale, event.dY / scale);
+                transformLeft(dX);
                 if(keyListener.isPressed('shift')) {
-                    transformRight(-event.dX);
+                    transformRight(-dX);
                 }
                 update();
             }
             if (event.type === 'pointerup') {
-                callback(getTransform());
+                commit();
             }
         }
     });
@@ -323,16 +348,17 @@ export function Cropper (params) {
         fixScribble: true,
         onPointer: function (event) {
             if (event.type === 'pointermove' && event.button === 'left') {
-                transformLeft(event.dX);
-                transformTop(event.dY);
+                const {dX, dY} = calcIntDxy(event.dX / scale, event.dY / scale);
+                transformLeft(dX);
+                transformTop(dY);
                 if(keyListener.isPressed('shift')) {
-                    transformRight(-event.dX);
-                    transformBottom(-event.dY);
+                    transformRight(-dX);
+                    transformBottom(-dY);
                 }
                 update();
             }
             if (event.type === 'pointerup') {
-                callback(getTransform());
+                commit();
             }
         }
     });
@@ -342,16 +368,17 @@ export function Cropper (params) {
         fixScribble: true,
         onPointer: function (event) {
             if (event.type === 'pointermove' && event.button === 'left') {
-                transformRight(event.dX);
-                transformTop(event.dY);
+                const {dX, dY} = calcIntDxy(event.dX / scale, event.dY / scale);
+                transformRight(dX);
+                transformTop(dY);
                 if(keyListener.isPressed('shift')) {
-                    transformLeft(-event.dX);
-                    transformBottom(-event.dY);
+                    transformLeft(-dX);
+                    transformBottom(-dY);
                 }
                 update();
             }
             if (event.type === 'pointerup') {
-                callback(getTransform());
+                commit();
             }
         }
     });
@@ -361,16 +388,17 @@ export function Cropper (params) {
         fixScribble: true,
         onPointer: function (event) {
             if (event.type === 'pointermove' && event.button === 'left') {
-                transformRight(event.dX);
-                transformBottom(event.dY);
+                const {dX, dY} = calcIntDxy(event.dX / scale, event.dY / scale);
+                transformRight(dX);
+                transformBottom(dY);
                 if(keyListener.isPressed('shift')) {
-                    transformLeft(-event.dX);
-                    transformTop(-event.dY);
+                    transformLeft(-dX);
+                    transformTop(-dY);
                 }
                 update();
             }
             if (event.type === 'pointerup') {
-                callback(getTransform());
+                commit();
             }
         }
     });
@@ -380,16 +408,17 @@ export function Cropper (params) {
         fixScribble: true,
         onPointer: function (event) {
             if (event.type === 'pointermove' && event.button === 'left') {
-                transformLeft(event.dX);
-                transformBottom(event.dY);
+                const {dX, dY} = calcIntDxy(event.dX / scale, event.dY / scale);
+                transformLeft(dX);
+                transformBottom(dY);
                 if(keyListener.isPressed('shift')) {
-                    transformRight(-event.dX);
-                    transformTop(-event.dY);
+                    transformRight(-dX);
+                    transformTop(-dY);
                 }
                 update();
             }
             if (event.type === 'pointerup') {
-                callback(getTransform());
+                commit();
             }
         }
     });
@@ -417,24 +446,26 @@ export function Cropper (params) {
     }
 
 
+    div.append(
+        darken[1],
+        darken[0],
+        darken[2],
+        darken[3],
+        thirdsHorizontal,
+        thirdsVertical,
+        outline,
 
-    div.appendChild(darken[1]);
-    div.appendChild(darken[0]);
-    div.appendChild(darken[2]);
-    div.appendChild(darken[3]);
-    div.appendChild(thirdsHorizontal);
-    div.appendChild(thirdsVertical);
-    div.appendChild(outline);
+        edges[1],
+        edges[0],
+        edges[2],
+        edges[3],
 
-    div.appendChild(edges[1]);
-    div.appendChild(edges[0]);
-    div.appendChild(edges[2]);
-    div.appendChild(edges[3]);
+        cornerElArr[0],
+        cornerElArr[1],
+        cornerElArr[2],
+        cornerElArr[3],
+    );
 
-    div.appendChild(cornerElArr[0]);
-    div.appendChild(cornerElArr[1]);
-    div.appendChild(cornerElArr[2]);
-    div.appendChild(cornerElArr[3]);
 
     function update() {
 
@@ -483,7 +514,7 @@ export function Cropper (params) {
         grips[3].y = height;
 
         update();
-        callback(getTransform());
+        commit();
     };
 
     this.setScale = function (s) {
