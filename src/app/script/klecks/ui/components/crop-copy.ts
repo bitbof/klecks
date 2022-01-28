@@ -15,7 +15,7 @@ import {BB} from '../../../bb/bb';
  * @constructor
  */
 export function CropCopy(param) {
-    let div = document.createElement('div');
+    const div = document.createElement('div');
     BB.css(div, {
         position: 'relative',
         height: param.height + 'px',
@@ -51,13 +51,13 @@ export function CropCopy(param) {
     }
     function updateSelectionRect() {
         BB.css(selectionRect, {
-            left: Math.round(thumbX + crop.x * scaleW) + 'px',
-            top: Math.round(thumbY + crop.y * scaleH) + 'px',
-            width: Math.round(crop.width * scaleW) + 'px',
-            height: Math.round(crop.height * scaleH) + 'px'
+            left: (thumbX + crop.x * scaleW) + 'px',
+            top: (thumbY + crop.y * scaleH) + 'px',
+            width: (crop.width * scaleW) + 'px',
+            height: (crop.height * scaleH) + 'px'
         });
         if (param.onChange) {
-            param.onChange(parseInt(crop.width), parseInt(crop.height));
+            param.onChange(Math.round(crop.width), Math.round(crop.height));
         }
     }
     function isInsideSelectionRect(p) {
@@ -71,7 +71,7 @@ export function CropCopy(param) {
             rect.y <= p.y && p.y <= rect.y + rect.height;
     }
 
-    let croppedCanvas = BB.canvas();
+    const croppedCanvas = BB.canvas();
     let eventTarget = croppedCanvas;
     let croppedImage = null;
     if(!param.isNotCopy) { //navigator.appName === 'Microsoft Internet Explorer') { //i would prefer not using an image
@@ -85,8 +85,8 @@ export function CropCopy(param) {
     div.appendChild(eventTarget);
     updateCroppedCanvas();
 
-    let padding = 20;
-    let previewWrapper = BB.el({
+    const padding = 20;
+    const previewWrapper = BB.el({
         css: {
             width: param.width + 'px',
             height: param.height + 'px',
@@ -101,29 +101,29 @@ export function CropCopy(param) {
         previewWrapper.style.backgroundImage = 'url('+v+')';
     });
 
-    let thumbCanvas = BB.canvas();
-    let thumbSize = BB.fitInto(param.width - padding * 2, param.height - padding * 2, param.canvas.width, param.canvas.height, 1);
+    const thumbCanvas = BB.canvas();
+    const thumbSize = BB.fitInto(param.width - padding * 2, param.height - padding * 2, param.canvas.width, param.canvas.height, 1);
     thumbCanvas.width = parseInt('' + thumbSize.width);
     thumbCanvas.height = parseInt('' + thumbSize.height);
     thumbCanvas.style.imageRendering = 'pixelated';
-    let scaleW = thumbCanvas.width / param.canvas.width;
-    let scaleH = thumbCanvas.height / param.canvas.height;
-    let thumbCtx = thumbCanvas.getContext('2d');
+    const scaleW = thumbCanvas.width / param.canvas.width;
+    const scaleH = thumbCanvas.height / param.canvas.height;
+    const thumbCtx = thumbCanvas.getContext('2d');
     thumbCtx.imageSmoothingEnabled = false;
     thumbCtx.drawImage(param.canvas, 0, 0, thumbCanvas.width, thumbCanvas.height);
     previewWrapper.appendChild(thumbCanvas);
-    let thumbX = parseInt('' + ((param.width - thumbCanvas.width) / 2));
-    let thumbY = parseInt('' + ((param.height - thumbCanvas.height) / 2));
+    const thumbX = parseInt('' + ((param.width - thumbCanvas.width) / 2));
+    const thumbY = parseInt('' + ((param.height - thumbCanvas.height) / 2));
     BB.css(thumbCanvas, {
         position: 'absolute',
         left: thumbX + "px",
         top: thumbY + "px"
     });
 
-    let selectionRect = BB.el({
+    const selectionRect = BB.el({
         css: {
             position: 'absolute',
-            boxShadow: '0 0 0 1px #fff, 0 0 0 2px #000, 0 0 40px 1px #000'
+            boxShadow: '0 0 0 1px #fff, 0 0 0 2px #000, 0 0 40px 1px #000',
         }
     });
     previewWrapper.appendChild(selectionRect);
@@ -132,8 +132,8 @@ export function CropCopy(param) {
 
     function toFullSpace(p) {
         return {
-            x: BB.clamp(parseInt('' + ((p.x - thumbX) / scaleW)), 0, param.canvas.width),
-            y: BB.clamp(parseInt('' + ((p.y - thumbY) / scaleH)), 0, param.canvas.height)
+            x: BB.clamp(Math.round((p.x - thumbX) / scaleW), 0, param.canvas.width),
+            y: BB.clamp(Math.round((p.y - thumbY) / scaleH), 0, param.canvas.height)
         };
     }
     //gen crop from thumb-space points
@@ -153,7 +153,7 @@ export function CropCopy(param) {
             y: FullTopLeftP.y,
             width: FullBottomRightP.x - FullTopLeftP.x,
             height: FullBottomRightP.y - FullTopLeftP.y
-        }
+        };
     }
 
     function isReset() {
@@ -165,7 +165,7 @@ export function CropCopy(param) {
     let isDragging = false;
     let didMove = false;
     let updateCropTimeout;
-    let pointerListener = new BB.PointerListener({
+    const pointerListener = new BB.PointerListener({
         target: eventTarget,
         fixScribble: true,
         onPointer: function(event) {
@@ -191,8 +191,8 @@ export function CropCopy(param) {
                 event.eventPreventDefault();
                 didMove = true;
                 if(startCrop) {
-                    crop.x = startCrop.x + (event.relX - startP.x) / scaleW;
-                    crop.y = startCrop.y + (event.relY - startP.y) / scaleH;
+                    crop.x = startCrop.x + Math.round((event.relX - startP.x) / scaleW);
+                    crop.y = startCrop.y + Math.round((event.relY - startP.y) / scaleH);
                     crop.x = BB.clamp(crop.x, 0, param.canvas.width - crop.width);
                     crop.y = BB.clamp(crop.y, 0, param.canvas.height - crop.height);
                 } else {
@@ -214,7 +214,7 @@ export function CropCopy(param) {
         }
     });
 
-    let keyListener = new BB.KeyListener({
+    const keyListener = new BB.KeyListener({
         onDown: function(keyStr, e, comboStr) {
             if(isDragging) {
                 return;
