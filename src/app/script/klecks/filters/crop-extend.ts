@@ -1,6 +1,6 @@
 import {BB} from '../../bb/bb';
 import {input} from '../ui/base-components/input';
-import {checkBox} from '../ui/base-components/check-box';
+import {Checkbox} from '../ui/base-components/checkbox';
 import {ColorOptions} from '../ui/base-components/color-options';
 import {Cropper} from '../ui/components/cropper';
 
@@ -169,7 +169,7 @@ export const cropExtend = {
         }
 
         let useRuleOfThirds = true;
-        let ruleOThirdsCheckbox = checkBox({
+        let ruleOThirdsCheckbox = new Checkbox({
             init: true,
             label: 'Rule of Thirds',
             allowTab: true,
@@ -220,7 +220,7 @@ export const cropExtend = {
             }
         });
         div.appendChild(flexRow);
-        flexRow.appendChild(ruleOThirdsCheckbox);
+        flexRow.appendChild(ruleOThirdsCheckbox.getElement());
         flexRow.appendChild(colorOptions.getElement());
 
 
@@ -334,6 +334,7 @@ export const cropExtend = {
 
         result.destroy = () => {
             cropper.destroy();
+            ruleOThirdsCheckbox.destroy();
         };
         result.getInput = function () {
             result.destroy();

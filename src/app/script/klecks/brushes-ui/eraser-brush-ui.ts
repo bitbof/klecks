@@ -4,7 +4,7 @@ import {eventResMs} from './brushes-consts';
 import {klHistory} from '../history/kl-history';
 import {PcSlider} from '../ui/base-components/slider';
 import {penPressureToggle} from '../ui/base-components/pen-pressure-toggle';
-import {checkBox} from '../ui/base-components/check-box';
+import {Checkbox} from '../ui/base-components/checkbox';
 // @ts-ignore
 import brushIconImg from 'url:~/src/app/img/ui/brush-eraser.svg';
 
@@ -100,16 +100,18 @@ export const eraserBrushUi = (function () {
             div.appendChild(pressureOpacityToggle);
             div.appendChild(opacitySlider.getElement());
 
-            let transparencyToggle = checkBox({
+            let transparencyToggle = new Checkbox({
                 init: false,
                 label: 'Transparent Background',
                 callback: function (b) {
                     isTransparentBg = b;
                     brush.setTransparentBG(b);
+                },
+                css: {
+                    marginTop: "10px",
                 }
             });
-            transparencyToggle.style.marginTop = "10px";
-            div.appendChild(transparencyToggle);
+            div.appendChild(transparencyToggle.getElement());
         }
 
         init();

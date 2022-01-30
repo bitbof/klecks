@@ -1,6 +1,6 @@
 import {BB} from '../../../bb/bb';
 import {CropCopy} from '../components/crop-copy';
-import {checkBox} from '../base-components/check-box';
+import {Checkbox} from '../base-components/checkbox';
 import {popup} from './popup';
 
 /**
@@ -97,6 +97,7 @@ export function showImportImageDialog(p) {
         alert(contentArr.join("\n"));
     }
 
+    let flattenCheckbox;
     if (p.image.type === 'psd') {
         const noteStyle = {
             background: 'rgba(255,255,0,0.5)',
@@ -107,14 +108,14 @@ export function showImportImageDialog(p) {
             borderRadius: '5px'
         };
         if (p.image.layerArr) {
-            const flattenCheckbox = checkBox({
+            flattenCheckbox = new Checkbox({
                 init: doFlatten,
                 label: 'Flatten image',
                 callback: function(b) {
                     doFlatten = b;
                 }
             });
-            div.appendChild(flattenCheckbox);
+            div.appendChild(flattenCheckbox.getElement());
 
             if (p.image.warningArr) {
                 const noteEl = BB.el({
@@ -143,6 +144,9 @@ export function showImportImageDialog(p) {
         const croppedImage = cropCopy.getCroppedImage();
         const cropRect = cropCopy.getRect();
         cropCopy.destroy();
+        if (flattenCheckbox) {
+            flattenCheckbox.destroy();
+        }
 
         if (result === "As Layer") {
             p.callback({

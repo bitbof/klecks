@@ -2,7 +2,7 @@ import {BB} from '../../bb/bb';
 import {brushes} from '../brushes/brushes';
 import {eventResMs} from './brushes-consts';
 import {klHistory} from '../history/kl-history';
-import {checkBox} from '../ui/base-components/check-box';
+import {Checkbox} from '../ui/base-components/checkbox';
 import {PcSlider} from '../ui/base-components/slider';
 import {penPressureToggle} from '../ui/base-components/pen-pressure-toggle';
 // @ts-ignore
@@ -36,32 +36,32 @@ export const pixelBrushUi = (function () {
         let sizeSlider;
         let opacitySlider;
 
-        let lockAlphaToggle = checkBox({
+        let lockAlphaToggle = new Checkbox({
             init: brush.getLockAlpha(),
             label: 'Lock Alpha',
             callback: function (b) {
                 brush.setLockAlpha(b);
             },
-            doHighlight: true
-        });
-        lockAlphaToggle.title = "Locks layer's alpha channel";
-        BB.css(lockAlphaToggle, {
-            marginRight: '10px'
+            doHighlight: true,
+            title: 'Locks layer\'s alpha channel',
+            css: {
+                marginRight: '10px',
+            }
         });
 
-        let eraserToggle = checkBox({
+        let eraserToggle = new Checkbox({
             init: brush.getIsEraser(),
             label: 'Eraser',
             callback: function (b) {
                 brush.setIsEraser(b);
+            },
+            css: {
+                width: '70px',
+                marginRight: '10px',
             }
         });
-        BB.css(eraserToggle, {
-            width: '70px',
-            marginRight: '10px'
-        });
 
-        let ditherToggle = checkBox({
+        let ditherToggle = new Checkbox({
             init: brush.getUseDither(),
             label: 'Dither',
             callback: function (b) {
@@ -136,9 +136,9 @@ export const pixelBrushUi = (function () {
                 }
             });
 
-            toggleRow.appendChild(lockAlphaToggle);
-            toggleRow.appendChild(eraserToggle);
-            toggleRow.appendChild(ditherToggle);
+            toggleRow.appendChild(lockAlphaToggle.getElement());
+            toggleRow.appendChild(eraserToggle.getElement());
+            toggleRow.appendChild(ditherToggle.getElement());
         }
 
         init();

@@ -1,5 +1,5 @@
 import {BB} from '../../bb/bb';
-import {checkBox} from '../ui/base-components/check-box';
+import {Checkbox} from '../ui/base-components/checkbox';
 import {KlCanvasPreview} from '../canvas-ui/canvas-preview';
 import {FreeTransform} from '../ui/components/free-transform';
 
@@ -163,7 +163,7 @@ export const transform = {
 
 
         let isConstrained = true;
-        let constrainCheckbox = checkBox({
+        let constrainCheckbox = new Checkbox({
             init: true,
             label: 'Constrain Proportions',
             allowTab: true,
@@ -176,7 +176,7 @@ export const transform = {
             }
         });
         let isSnapping = false;
-        let snappingCheckbox = checkBox({
+        let snappingCheckbox = new Checkbox({
             init: true,
             label: 'Snapping',
             allowTab: true,
@@ -196,8 +196,8 @@ export const transform = {
                 height: '10px'
             }
         }));
-        div.appendChild(constrainCheckbox);
-        div.appendChild(snappingCheckbox);
+        div.appendChild(constrainCheckbox.getElement());
+        div.appendChild(snappingCheckbox.getElement());
 
 
 
@@ -311,6 +311,8 @@ export const transform = {
         result.destroy = () => {
             keyListener.destroy();
             freeTransformObj.destroy();
+            constrainCheckbox.destroy();
+            snappingCheckbox.destroy();
         };
         result.getInput = function () {
             let trans = freeTransformObj.getTransform();

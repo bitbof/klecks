@@ -1,5 +1,5 @@
 import {BB} from '../../bb/bb';
-import {checkBox} from '../ui/base-components/check-box';
+import {Checkbox} from '../ui/base-components/checkbox';
 import {Select} from '../ui/base-components/select';
 // @ts-ignore
 import constrainImg from 'url:~/src/app/img/ui/constrain.svg';
@@ -108,7 +108,7 @@ export const resize = {
         }
 
         let isConstrained = true;
-        let constrainCheckbox = checkBox({
+        let constrainCheckbox = new Checkbox({
             init: true,
             label: 'Constrain Proportions',
             allowTab: true,
@@ -144,7 +144,7 @@ export const resize = {
                 justifyContent: 'space-between'
             }
         });
-        secondRowElement.appendChild(constrainCheckbox);
+        secondRowElement.appendChild(constrainCheckbox.getElement());
         secondRowElement.appendChild(algorithmSelect.getElement());
 
         let previewCanvas = BB.canvas();
@@ -261,8 +261,11 @@ export const resize = {
         div.appendChild(previewWrapper);
         update();
 
+        result.destroy = () => {
+            constrainCheckbox.destroy();
+        };
         result.getInput = function () {
-
+            result.destroy();
             return {
                 width: newWidth,
                 height: newHeight,

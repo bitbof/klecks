@@ -1,7 +1,7 @@
 import {BB} from '../../../bb/bb';
 import {PcSlider} from '../base-components/slider';
 import {Select} from '../base-components/select';
-import {checkBox} from '../base-components/check-box';
+import {Checkbox} from '../base-components/checkbox';
 
 /**
  * Paint Bucket tab contents (color slider, opacity slider, etc)
@@ -129,17 +129,19 @@ export function FillUi(p) {
 
 
     let isContiguous = true;
-    let contiguousToggle = checkBox({
+    let contiguousToggle = new Checkbox({
         init: true,
         label: 'Contiguous',
         callback: function (b) {
             isContiguous = b;
+        },
+        css: {
+            marginTop: '10px',
+            paddingRight: '5px',
+            display: 'inline-block',
         }
     });
-    contiguousToggle.style.marginTop = "10px";
-    contiguousToggle.style.paddingRight = "5px";
-    contiguousToggle.style.display = 'inline-block';
-    div.appendChild(contiguousToggle);
+    div.appendChild(contiguousToggle.getElement());
 
 
 

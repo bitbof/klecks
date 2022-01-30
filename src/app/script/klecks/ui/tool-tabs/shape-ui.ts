@@ -1,6 +1,6 @@
 import {BB} from '../../../bb/bb';
 import {Options} from '../base-components/options';
-import {checkBox} from '../base-components/check-box';
+import {Checkbox} from '../base-components/checkbox';
 import {PcSlider} from '../base-components/slider';
 
 /**
@@ -199,10 +199,10 @@ export function ShapeUi(p) {
             shape = split[0];
             mode = split[1];
 
-            BB.css(fixedToggle, {
+            BB.css(fixedToggle.getElement(), {
                 display: shape === 'line' ? 'none' : null
             });
-            BB.css(snapToggle, {
+            BB.css(snapToggle.getElement(), {
                 display: shape === 'line' ? null : 'none'
             });
             BB.css(lineWidthSlider.getElement(), {
@@ -214,14 +214,14 @@ export function ShapeUi(p) {
     shapeOptions.getElement().style.width = '120px';
     row1.appendChild(shapeOptions.getElement());
 
-    let eraserToggle = checkBox({
+    let eraserToggle = new Checkbox({
         init: false,
         label: 'Eraser',
         callback: function(b) {
             updatePreviews();
         }
     });
-    row1.appendChild(eraserToggle);
+    row1.appendChild(eraserToggle.getElement());
 
     let lineWidthSlider = new PcSlider({
         label: 'Line Width',
@@ -270,43 +270,41 @@ export function ShapeUi(p) {
         }
     });
 
-    let outwardsToggle = checkBox({
+    let outwardsToggle = new Checkbox({
         init: false,
         label: 'Outwards',
-        callback: function(b) {
-
+        callback: function(b) {},
+        css: {
+            width: '50%',
+            marginRight: '10px',
         }
     });
-    BB.css(outwardsToggle, {
-        width: '50%',
-        marginRight: '10px'
-    })
-    row2.appendChild(outwardsToggle);
+    row2.appendChild(outwardsToggle.getElement());
 
-    let fixedToggle = checkBox({
+    let fixedToggle = new Checkbox({
         init: false,
         label: 'Fixed 1:1',
         callback: function(b) {
             updatePreviews();
+        },
+        css: {
+            flexGrow: '1',
         }
     });
-    BB.css(fixedToggle, {
-        flexGrow: '1'
-    });
-    row2.appendChild(fixedToggle);
+    row2.appendChild(fixedToggle.getElement());
 
-    let snapToggle = checkBox({
+    let snapToggle = new Checkbox({
         init: false,
         label: 'Snap',
         title: '45° Angle Snapping',
         callback: function(b) {
             updatePreviews();
+        },
+        css: {
+            flexGrow: '1',
         }
     });
-    BB.css(snapToggle, {
-        flexGrow: '1'
-    });
-    row2.appendChild(snapToggle);
+    row2.appendChild(snapToggle.getElement());
 
 
 

@@ -1,5 +1,5 @@
 import {BB} from '../../bb/bb';
-import {checkBox} from '../ui/base-components/check-box';
+import {Checkbox} from '../ui/base-components/checkbox';
 import {KlCanvasPreview} from '../canvas-ui/canvas-preview';
 // @ts-ignore
 import checkmarkImg from 'url:~/src/app/img/ui/checkmark.svg';
@@ -29,7 +29,7 @@ export const flip = {
         div.innerHTML = "Flips layer or whole image.<br/><br/>";
 
 
-        let horizontalCheckbox = checkBox({
+        let horizontalCheckbox = new Checkbox({
             init: isHorizontal,
             label: 'Horizontal ⟷',
             allowTab: true,
@@ -41,7 +41,7 @@ export const flip = {
                 marginBottom: '10px'
             }
         });
-        let verticalCheckbox = checkBox({
+        let verticalCheckbox = new Checkbox({
             init: isVertical,
             label: 'Vertical ↕',
             allowTab: true,
@@ -53,8 +53,8 @@ export const flip = {
                 marginBottom: '10px'
             }
         });
-        div.appendChild(horizontalCheckbox);
-        div.appendChild(verticalCheckbox);
+        div.appendChild(horizontalCheckbox.getElement());
+        div.appendChild(verticalCheckbox.getElement());
 
 
 
@@ -230,7 +230,12 @@ export const flip = {
 
 
         div.appendChild(previewWrapper);
+        result.destroy = () => {
+            horizontalCheckbox.destroy();
+            verticalCheckbox.destroy();
+        };
         result.getInput = function () {
+            result.destroy();
             return {
                 horizontal: isHorizontal,
                 vertical: isVertical,

@@ -1,7 +1,7 @@
 import {klHistory} from './history/kl-history';
 import {Popup, popup} from './ui/modals/popup';
 import {dialogCounter} from './ui/modals/modal-count';
-import {checkBox} from './ui/base-components/check-box';
+import {Checkbox} from './ui/base-components/checkbox';
 import {input} from './ui/base-components/input';
 import {Select} from './ui/base-components/select';
 import {ImageToggle} from './ui/base-components/image-toggle';
@@ -111,7 +111,7 @@ export const KL = {
 
     // --- ui - base components ---
     calcSliderFalloffFactor,
-    checkBox,
+    CheckBox: Checkbox,
     input,
     Select,
     ImageToggle,

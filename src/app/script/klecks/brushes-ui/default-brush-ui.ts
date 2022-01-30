@@ -2,7 +2,7 @@ import {BB} from '../../bb/bb';
 import {brushes} from '../brushes/brushes';
 import {eventResMs} from './brushes-consts';
 import {klHistory} from '../history/kl-history';
-import {checkBox} from '../ui/base-components/check-box';
+import {Checkbox} from '../ui/base-components/checkbox';
 import {PcSlider} from '../ui/base-components/slider';
 import {penPressureToggle} from '../ui/base-components/pen-pressure-toggle';
 // @ts-ignore
@@ -89,17 +89,19 @@ export const defaultBrushUi = (function () {
             updateAlphas();
         }
 
-        let lockAlphaToggle = checkBox({
+        let lockAlphaToggle = new Checkbox({
             init: brush.getLockAlpha(),
             label: 'Lock Alpha',
             callback: function (b) {
                 brush.setLockAlpha(b);
             },
-            doHighlight: true
+            doHighlight: true,
+            title: 'Locks layer\'s alpha channel',
+            css: {
+                cssFloat: 'right',
+                textAlign: 'right',
+            }
         });
-        lockAlphaToggle.title = "Locks layer's alpha channel";
-        lockAlphaToggle.style.cssFloat = 'right';
-        lockAlphaToggle.style.textAlign = 'right';
 
         let spacingSpline = new BB.SplineInterpolator([[0, 15], [8, 7], [14, 4], [30, 3], [50, 2.7], [100, 2]]);
 
@@ -174,7 +176,7 @@ export const defaultBrushUi = (function () {
             }
             alphaWrapper.style.marginTop = "10px";
             div.appendChild(alphaWrapper);
-            alphaWrapper.appendChild(lockAlphaToggle);
+            alphaWrapper.appendChild(lockAlphaToggle.getElement());
 
         }
 

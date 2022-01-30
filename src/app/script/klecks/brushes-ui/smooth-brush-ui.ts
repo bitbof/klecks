@@ -1,7 +1,7 @@
 import {BB} from '../../bb/bb';
 import {penPressureToggle} from '../ui/base-components/pen-pressure-toggle';
 import {eventResMs} from './brushes-consts';
-import {checkBox} from '../ui/base-components/check-box';
+import {Checkbox} from '../ui/base-components/checkbox';
 import {brushes} from '../brushes/brushes';
 import {klHistory} from '../history/kl-history';
 import {PcSlider} from '../ui/base-components/slider';
@@ -96,18 +96,18 @@ export const smoothBrushUi = (function () {
                 brush.opacityPressure(b);
             });
 
-            let lockAlphaToggle = checkBox({
+            let lockAlphaToggle = new Checkbox({
                 init: brush.getLockAlpha(),
                 label: 'Lock Alpha',
                 callback: function (b) {
                     brush.setLockAlpha(b);
                 },
-                doHighlight: true
-            });
-            lockAlphaToggle.title = "Locks layer's alpha channel";
-            BB.css(lockAlphaToggle, {
-                marginTop: '10px',
-                display: 'inline-block'
+                doHighlight: true,
+                title: 'Locks layer\'s alpha channel',
+                css: {
+                    marginTop: '10px',
+                    display: 'inline-block',
+                }
             });
 
 
@@ -123,7 +123,7 @@ export const smoothBrushUi = (function () {
             div.appendChild(pressureOpacityToggle);
             div.appendChild(opacitySlider.getElement());
             div.appendChild(blendingSlider.getElement());
-            div.appendChild(lockAlphaToggle);
+            div.appendChild(lockAlphaToggle.getElement());
         }
 
         init();
