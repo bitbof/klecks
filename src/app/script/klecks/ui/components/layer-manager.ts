@@ -514,7 +514,7 @@ export function pcLayerManager(p_canvas, p_func, p_rootDiv) {
             //thumb
             {
                 let thumbDimensions = BB.fitInto(30, 30, layercanvas.width, layercanvas.height, 1);
-                let thumb = (layer as any).thumb = BB.canvas(thumbDimensions.width, thumbDimensions.width);
+                let thumb = (layer as any).thumb = BB.canvas(thumbDimensions.width, thumbDimensions.height);
 
                 let thc = thumb.getContext("2d");
                 thc.save();
