@@ -12,7 +12,7 @@ export const cropExtend = {
             return false;
         const tempCanvas = BB.canvas();
         (function () {
-            let fit = BB.fitInto(560, 400, canvas.width, canvas.height, 1);
+            let fit = BB.fitInto(canvas.width, canvas.height, 560, 400, 1);
             let w = parseInt('' + fit.width), h = parseInt('' + fit.height);
             let previewFactor = w / canvas.width;
             tempCanvas.width = w;
@@ -227,7 +227,7 @@ export const cropExtend = {
         // when input field changed, or dragging in preview finished
         // adjusts the zoom
         function update(transform) {
-            const fit = BB.fitInto(260, 180, transform.width, transform.height, 1);
+            const fit = BB.fitInto(transform.width, transform.height, 260, 180, 1);
             scale = fit.width / transform.width;
 
             const offset = BB.centerWithin(340, 220, fit.width, fit.height);

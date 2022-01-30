@@ -12,7 +12,7 @@ export const resize = {
         if (!canvas)
             return false;
 
-        let fit = BB.fitInto(280, 200, canvas.width, canvas.height, 1);
+        let fit = BB.fitInto( canvas.width, canvas.height, 280, 200,1);
         let w = parseInt('' + fit.width), h = parseInt('' + fit.height);
 
         let previewFactor = w / canvas.width;
@@ -199,7 +199,7 @@ export const resize = {
                 }
 
                 if (widthInput.value > maxWidth || heightInput.value > maxHeight) {
-                    let fit = BB.fitInto(maxWidth, maxHeight, parseInt(widthInput.value), parseInt(heightInput.value), 1);
+                    let fit = BB.fitInto(parseInt(widthInput.value), parseInt(heightInput.value), maxWidth, maxHeight, 1);
                     widthInput.value = '' + parseInt('' + fit.width);
                     heightInput.value = '' + parseInt('' + fit.height);
                 }
@@ -216,7 +216,7 @@ export const resize = {
             newWidth = widthInput.value;
             newHeight = heightInput.value;
 
-            let preview = BB.fitInto(280, 200, newWidth, newHeight, 1);
+            let preview = BB.fitInto(newWidth, newHeight, 280, 200, 1);
             let previewW = parseInt('' + preview.width), previewH = parseInt('' + preview.height);
             previewFactor = previewW / newWidth;
 

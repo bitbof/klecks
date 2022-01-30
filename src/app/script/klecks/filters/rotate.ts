@@ -7,7 +7,7 @@ export const rotate = {
         if (!canvas)
             return false;
 
-        let fit = BB.fitInto(280, 200, canvas.width, canvas.height, 1);
+        let fit = BB.fitInto(canvas.width, canvas.height, 280, 200, 1);
         let w = parseInt('' + fit.width), h = parseInt('' + fit.height);
 
         let previewFactor = w / canvas.width;
@@ -34,7 +34,7 @@ export const rotate = {
             (canvasWrapper.style as any).msTransform = "rotate(" + deg + "deg)";
             if (Math.abs(deg % 180) === 90) {
                 //height has to fit width because of rotation
-                let fit = BB.fitInto(280, 200, h, w, 1);
+                let fit = BB.fitInto(h, w, 280, 200, 1);
                 let scale = parseInt('' + fit.height) / w;
                 (canvasWrapper.style as any).WebkitTransform = "rotate(" + deg + "deg) scale(" + scale + ")";
                 (canvasWrapper.style as any).MozTransform = "rotate(" + deg + "deg) scale(" + scale + ")";

@@ -17,7 +17,7 @@ export const glPerspective = {
         let layers = canvas.getLayers();
         let selectedLayerIndex = canvas.getLayerIndex(context.canvas);
 
-        let fit = BB.fitInto(isSmall ? 280 : 490, isSmall ? 200 : 240, context.canvas.width, context.canvas.height, 1);
+        let fit = BB.fitInto(context.canvas.width, context.canvas.height, isSmall ? 280 : 490, isSmall ? 200 : 240, 1);
         let displayW = parseInt('' + fit.width), displayH = parseInt('' + fit.height);
         let w = Math.min(displayW, context.canvas.width);
         let h = Math.min(displayH, context.canvas.height);

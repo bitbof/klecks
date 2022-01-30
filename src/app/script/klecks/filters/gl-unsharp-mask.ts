@@ -16,7 +16,7 @@ export const glUnsharpMask = {
         let layers = canvas.getLayers();
         let selectedLayerIndex = canvas.getLayerIndex(context.canvas);
 
-        let fit = BB.fitInto(280, 200, context.canvas.width, context.canvas.height, 1);
+        let fit = BB.fitInto(context.canvas.width, context.canvas.height, 280, 200, 1);
         let displayW = parseInt('' + fit.width), displayH = parseInt('' + fit.height);
         let w = Math.min(displayW, context.canvas.width);
         let h = Math.min(displayH, context.canvas.height);

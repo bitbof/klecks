@@ -65,7 +65,7 @@ export function showImportImageDialog(p) {
         }
     });
     function updateResolution(w: number, h: number) {
-        const fit = BB.fitInto(p.maxSize, p.maxSize, w, h);
+        const fit = BB.fitInto(w, h, p.maxSize, p.maxSize);
 
         if (fit.width < w) {
             resolutionEl.innerHTML = `<span style="color:#f00">${w} X ${h}</span> ⟶ ${Math.round(fit.width)} X ${Math.round(fit.height)}`;

@@ -323,7 +323,7 @@ export function pcLayerManager(p_canvas, p_func, p_rootDiv) {
                     spacer.style.clear = "both";
                     div.appendChild(spacer);
                     div.appendChild(preview);
-                    let thumbDimensions = BB.fitInto(200, 200, p.topCanvas.width, p.topCanvas.height, 1);
+                    let thumbDimensions = BB.fitInto(p.topCanvas.width, p.topCanvas.height, 200, 200, 1);
                     preview.width = thumbDimensions.width;
                     preview.height = thumbDimensions.height;
                     BB.css(preview, {
@@ -513,7 +513,7 @@ export function pcLayerManager(p_canvas, p_func, p_rootDiv) {
 
             //thumb
             {
-                let thumbDimensions = BB.fitInto(30, 30, layercanvas.width, layercanvas.height, 1);
+                let thumbDimensions = BB.fitInto(layercanvas.width, layercanvas.height, 30, 30, 1);
                 let thumb = (layer as any).thumb = BB.canvas(thumbDimensions.width, thumbDimensions.height);
 
                 let thc = thumb.getContext("2d");
@@ -608,7 +608,7 @@ export function pcLayerManager(p_canvas, p_func, p_rootDiv) {
                     return;
                 }
 
-                let thumbDimensions = BB.fitInto(250, 250, layercanvas.width, layercanvas.height, 1);
+                let thumbDimensions = BB.fitInto(layercanvas.width, layercanvas.height, 250, 250, 1);
 
                 if(largeThumbCanvas.width !== thumbDimensions.width || largeThumbCanvas.height !== thumbDimensions.height) {
                     largeThumbCanvas.width = thumbDimensions.width;

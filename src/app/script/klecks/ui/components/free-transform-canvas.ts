@@ -33,10 +33,10 @@ export function FreeTransformCanvas(params) {
     */
 
     let previewFit = BB.fitInto(
-        params.elementWidth - 20,
-        params.elementHeight - 60,
         params.actualCanvasWidth,
         params.actualCanvasHeight,
+        params.elementWidth - 20,
+        params.elementHeight - 60,
         1
     );
     let scale = previewFit.width / params.actualCanvasWidth;
@@ -122,10 +122,10 @@ export function FreeTransformCanvas(params) {
         };
         if(transformSize.width > previewFit.width || transformSize.height > previewFit.height) {
             transformSize = BB.fitInto(
-                previewFit.width,
-                previewFit.height,
                 params.layerArr[params.transformIndex].canvas.width,
                 params.layerArr[params.transformIndex].canvas.height,
+                previewFit.width,
+                previewFit.height,
                 1
             );
         }
@@ -167,10 +167,10 @@ export function FreeTransformCanvas(params) {
     this.setTransformFit = function() {
 
         let fit = BB.fitInto(
-            previewFit.width,
-            previewFit.height,
             params.layerArr[params.transformIndex].canvas.width,
             params.layerArr[params.transformIndex].canvas.height,
+            previewFit.width,
+            previewFit.height,
             1
         );
 

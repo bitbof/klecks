@@ -17,7 +17,7 @@ export const glHueSaturation = {
         let layers = canvas.getLayers();
         let selectedLayerIndex = canvas.getLayerIndex(context.canvas);
 
-        let fit = BB.fitInto(280, 200, context.canvas.width, context.canvas.height, 1);
+        let fit = BB.fitInto(context.canvas.width, context.canvas.height,280, 200,  1);
         let w = parseInt('' + fit.width), h = parseInt('' + fit.height);
 
         let tempCanvas = BB.canvas(w, h);

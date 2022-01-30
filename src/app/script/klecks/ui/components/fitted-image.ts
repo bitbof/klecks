@@ -15,7 +15,7 @@ import {BB} from '../../../bb/bb';
  * @constructor
  */
 export function FittedImage(params) {
-    let fit = BB.fitInto(params.width, params.height, params.image.width, params.image.height, 1);
+    let fit = BB.fitInto(params.image.width, params.image.height, params.width, params.height, 1);
     let w = parseInt('' + fit.width);
     let h = parseInt('' + fit.height);
 

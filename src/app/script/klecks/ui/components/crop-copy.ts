@@ -102,7 +102,7 @@ export function CropCopy(param) {
     });
 
     const thumbCanvas = BB.canvas();
-    const thumbSize = BB.fitInto(param.width - padding * 2, param.height - padding * 2, param.canvas.width, param.canvas.height, 1);
+    const thumbSize = BB.fitInto(param.canvas.width, param.canvas.height, param.width - padding * 2, param.height - padding * 2, 1);
     thumbCanvas.width = parseInt('' + thumbSize.width);
     thumbCanvas.height = parseInt('' + thumbSize.height);
     thumbCanvas.style.imageRendering = 'pixelated';

@@ -1586,7 +1586,7 @@ export function KlCanvasWorkspace(p: {
 
         //fit bounds
         let padding = 40;
-        let fit = BB.fitInto(renderWidth - padding, renderHeight - padding, boundsWidth, boundsHeight, 1);
+        let fit = BB.fitInto(boundsWidth, boundsHeight, renderWidth - padding, renderHeight - padding, 1);
 
         //determine scale
         let factor = fit.width / boundsWidth;

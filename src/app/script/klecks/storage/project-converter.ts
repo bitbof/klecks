@@ -35,7 +35,7 @@ function loadImage(blob: Blob): Promise<HTMLImageElement> {
 export class ProjectConverter {
 
     private static createThumbnail(project): HTMLCanvasElement {
-        const size = BB.fitInto(thumbSize, thumbSize, project.width, project.height);
+        const size = BB.fitInto(project.width, project.height, thumbSize, thumbSize);
         const factor = size.width / project.width;
         return drawProject(project, factor);
     }

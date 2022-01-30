@@ -98,7 +98,7 @@ export function append(target: HTMLElement, els/*: [HTMLElement | null]*/) {
 }
 
 /**
- * b needs to fit into a
+ * a needs to fit into b
  * @param aw
  * @param ah
  * @param bw
@@ -106,20 +106,20 @@ export function append(target: HTMLElement, els/*: [HTMLElement | null]*/) {
  * @param min
  */
 export function fitInto (aw: number, ah: number, bw: number, bh: number, min?: number): ISize2D {
-    let w = bw * aw, h = bh * aw;
-    if (w > aw) {
-        h = aw / w * h;
-        w = aw;
+    let width = aw * bw, height = ah * bw;
+    if (width > bw) {
+        height = bw / width * height;
+        width = bw;
     }
-    if (h > ah) {
-        w = ah / h * w;
-        h = ah;
+    if (height > bh) {
+        width = bh / height * width;
+        height = bh;
     }
     if(min) {
-        w = Math.max(min, w);
-        h = Math.max(min, h);
+        width = Math.max(min, width);
+        height = Math.max(min, height);
     }
-    return {width: w, height: h};
+    return {width, height};
 }
 
 /**

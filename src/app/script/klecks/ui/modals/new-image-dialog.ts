@@ -32,7 +32,7 @@ export function newImageDialog(p) {
 
 
     function createRatioSize(ratioX, ratioY, width, height, padding) {
-        return BB.fitInto(Math.min(maxCanvasSize, width - padding), Math.min(maxCanvasSize, height - padding), ratioX, ratioY, 1);
+        return BB.fitInto(ratioX, ratioY, Math.min(maxCanvasSize, width - padding), Math.min(maxCanvasSize, height - padding), 1);
     }
 
     let newImDiv = document.createElement("div");

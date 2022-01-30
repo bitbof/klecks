@@ -151,7 +151,7 @@ export function textToolDialog(p) {
         let centerY = p.y + rotatedXY.y + rotatedWH.y / 2;
 
         let padding = 100;
-        let fitBounds = BB.fitInto(width - padding, height - padding, bounds.width, bounds.height);
+        let fitBounds = BB.fitInto(bounds.width, bounds.height, width - padding, height - padding);
         scale = Math.min(1, fitBounds.width / bounds.width);
         scale = Math.min(4, scale * Math.pow(2, zoomFac));
 

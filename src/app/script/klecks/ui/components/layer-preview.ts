@@ -198,7 +198,7 @@ export function LayerPreview(p) {
         let layerCanvas = layerObj.context.canvas;
 
         if(layerCanvas.width !== lastDrawnSize.width || layerCanvas.height !== lastDrawnSize.height) {
-            let canvasDimensions = BB.fitInto(canvasSize, canvasSize, layerCanvas.width, layerCanvas.height, 1);
+            let canvasDimensions = BB.fitInto(layerCanvas.width, layerCanvas.height, canvasSize, canvasSize, 1);
             canvas.width = Math.round(canvasDimensions.width);
             canvas.height = Math.round(canvasDimensions.height);
 
@@ -266,7 +266,7 @@ export function LayerPreview(p) {
 
         let layerCanvas = layerObj.context.canvas;
 
-        let canvasDimensions = BB.fitInto(largeCanvasSize, largeCanvasSize, layerCanvas.width, layerCanvas.height, 1);
+        let canvasDimensions = BB.fitInto(layerCanvas.width, layerCanvas.height, largeCanvasSize, largeCanvasSize, 1);
         largeCanvas.width = Math.round(canvasDimensions.width);
         largeCanvas.height = Math.round(canvasDimensions.height);
         largeCanvasCtx.save();
