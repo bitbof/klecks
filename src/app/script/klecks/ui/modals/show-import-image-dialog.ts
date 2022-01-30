@@ -29,12 +29,12 @@ import {popup} from './popup';
  * @param p {}
  */
 export function showImportImageDialog(p) {
-    let div = BB.el({});
+    const div = BB.el({});
 
     const isSmall = window.innerWidth < 550 || window.innerHeight < 550;
     const style = isSmall ? {} : { width: '500px' };
     let resolutionEl;
-    let cropCopy = new CropCopy({
+    const cropCopy = new CropCopy({
         width: isSmall ? 340 : 540,
         height: isSmall ? 300 : 400,
         canvas: p.image.canvas,
@@ -43,7 +43,6 @@ export function showImportImageDialog(p) {
             if (!resolutionEl) {
                 return;
             }
-            resolutionEl.textContent = width + ' x ' + height;
             updateResolution(width, height);
         }
     });
@@ -58,15 +57,23 @@ export function showImportImageDialog(p) {
 
     resolutionEl = BB.el({
         parent: div,
-        textContent: p.image.width + ' x ' + p.image.height,
         css: {
             marginTop: '10px',
-            textAlign: 'center'
+            textAlign: 'center',
+            color: '#888',
+            lineHeight: '20px',
         }
     });
-    function updateResolution(w, h) {
-        let isTooLarge = w > p.maxSize || h > p.maxSize;
-        resolutionEl.style.color = isTooLarge ? '#f00' : '#888';
+    function updateResolution(w: number, h: number) {
+        const fit = BB.fitInto(p.maxSize, p.maxSize, w, h);
+
+        if (fit.width < w) {
+            resolutionEl.innerHTML = `<span style="color:#f00">${w} X ${h}</span> ⟶ ${Math.round(fit.width)} X ${Math.round(fit.height)}`;
+            resolutionEl.title = 'Image too large, will be downscaled.';
+        } else {
+            resolutionEl.innerHTML = `${w} X ${h}`;
+            resolutionEl.title = '';
+        }
     }
     updateResolution(p.image.width, p.image.height);
 
@@ -91,7 +98,7 @@ export function showImportImageDialog(p) {
     }
 
     if (p.image.type === 'psd') {
-        let noteStyle = {
+        const noteStyle = {
             background: 'rgba(255,255,0,0.5)',
             padding: '10px',
             marginTop: '5px',
@@ -100,7 +107,7 @@ export function showImportImageDialog(p) {
             borderRadius: '5px'
         };
         if (p.image.layerArr) {
-            let flattenCheckbox = checkBox({
+            const flattenCheckbox = checkBox({
                 init: doFlatten,
                 label: 'Flatten image',
                 callback: function(b) {
@@ -110,7 +117,7 @@ export function showImportImageDialog(p) {
             div.appendChild(flattenCheckbox);
 
             if (p.image.warningArr) {
-                let noteEl = BB.el({
+                const noteEl = BB.el({
                     content: 'PSD support is limited. Flattened will more likely look correct. ',
                     css: noteStyle
                 });
@@ -124,7 +131,7 @@ export function showImportImageDialog(p) {
                 div.appendChild(noteEl);
             }
         } else {
-            let noteEl = BB.el({
+            const noteEl = BB.el({
                 content: 'Unsupported features. PSD had to be flattened. ',
                 css: noteStyle
             });
@@ -133,8 +140,8 @@ export function showImportImageDialog(p) {
     }
 
     function callback(result) {
-        let croppedImage = cropCopy.getCroppedImage();
-        let cropRect = cropCopy.getRect();
+        const croppedImage = cropCopy.getCroppedImage();
+        const cropRect = cropCopy.getRect();
         cropCopy.destroy();
 
         if (result === "As Layer") {
