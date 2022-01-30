@@ -84,22 +84,24 @@ export const glPerspective = {
                 let div = document.createElement("div");
                 (div as any).x = x;
                 (div as any).y = y;
-                div.style.width = nobSize + "px";
-                div.style.height = nobSize + "px";
-                div.style.backgroundColor = "#fff";
-                div.style.boxShadow = "inset 0 0 0 2px #000";
-                div.style.borderRadius = nobSize + "px";
-                div.style.position = "absolute";
-                div.style.cursor = "move";
-                div.style.left = ((div as any).x - nobSize / 2) + "px";
-                div.style.top = ((div as any).y - nobSize / 2) + "px";
                 BB.css(div, {
-                    userSelect: 'none'
+                    width: nobSize + "px",
+                    height: nobSize + "px",
+                    backgroundColor: "#fff",
+                    boxShadow: "inset 0 0 0 2px #000",
+                    borderRadius: nobSize + "px",
+                    position: "absolute",
+                    cursor: "move",
+                    left: ((div as any).x - nobSize / 2) + "px",
+                    top: ((div as any).y - nobSize / 2) + "px",
+                    userSelect: 'none',
                 });
+
                 let pointerListener = new BB.PointerListener({
                     target: div,
                     maxPointers: 1,
                     onPointer: function(event) {
+                        event.eventPreventDefault();
                         if (event.button === 'left' && event.type === 'pointermove') {
                             (div as any).x += event.dX;
                             (div as any).y += event.dY;

@@ -258,21 +258,22 @@ export const cropExtend = {
             cropper.setScale(scale);
         }
 
-        const previewWrapper = document.createElement("div");
+        const previewWrapper = BB.el({
+            css: {
+                width: "340px",
+                marginTop: '10px',
+                marginLeft: "-20px",
+                height: "220px",
+                backgroundColor: "#9e9e9e",
+                position: "relative",
+                boxShadow: "rgba(0, 0, 0, 0.2) 0px 1px inset, rgba(0, 0, 0, 0.2) 0px -1px inset",
+                overflow: "hidden",
+                userSelect: 'none'
+            }
+        });
         previewWrapper.oncontextmenu = function () {
             return false;
         };
-        BB.css(previewWrapper, {
-            width: "340px",
-            marginTop: '10px',
-            marginLeft: "-20px",
-            height: "220px",
-            backgroundColor: "#9e9e9e",
-            position: "relative",
-            boxShadow: "rgba(0, 0, 0, 0.2) 0px 1px inset, rgba(0, 0, 0, 0.2) 0px -1px inset",
-            overflow: "hidden",
-            userSelect: 'none'
-        });
         const bgColorOverlay = BB.el({
             css: {
                 position: 'absolute',

@@ -154,6 +154,8 @@ export const PcSlider = function (p) {
 
     let virtualVal;
     function onPointer(event) {
+        event.eventPreventDefault();
+
         if (isDisabled) {
             return;
         }

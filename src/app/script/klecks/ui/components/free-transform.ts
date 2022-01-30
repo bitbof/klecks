@@ -84,6 +84,7 @@ export function FreeTransform(params) {
         target: outline,
         fixScribble: true,
         onPointer: function(event) {
+            event.eventPreventDefault();
             if (event.type === 'pointerdown') {
                 (outline as any).startPos = {x: x, y: y};
             }
@@ -300,6 +301,7 @@ export function FreeTransform(params) {
         target: grips[0],
         fixScribble: true,
         onPointer: function(event) {
+            event.eventPreventDefault();
             if (event.type === 'pointerdown' && event.button === 'left') {
                 grips[0].virtualPos = {
                     x: grips[0].x,
@@ -341,6 +343,7 @@ export function FreeTransform(params) {
         target: grips[1],
         fixScribble: true,
         onPointer: function(event) {
+            event.eventPreventDefault();
             if (event.type === 'pointerdown' && event.button === 'left') {
                 grips[1].virtualPos = {
                     x: grips[1].x,
@@ -381,6 +384,7 @@ export function FreeTransform(params) {
         target: grips[2],
         fixScribble: true,
         onPointer: function(event) {
+            event.eventPreventDefault();
             if (event.type === 'pointerdown' && event.button === 'left') {
                 grips[2].virtualPos = {
                     x: grips[2].x,
@@ -421,6 +425,7 @@ export function FreeTransform(params) {
         target: grips[3],
         fixScribble: true,
         onPointer: function (event) {
+            event.eventPreventDefault();
             if (event.type === 'pointerdown' && event.button === 'left') {
                 grips[3].virtualPos = {
                     x: grips[3].x,
@@ -533,6 +538,7 @@ export function FreeTransform(params) {
         target: edges[0],
         fixScribble: true,
         onPointer: function(event) {
+            event.eventPreventDefault();
             let inverted = false;
             if (event.type === 'pointerdown' && event.button === 'left') {
                 if (grips[0].y < grips[3].y) {
@@ -570,6 +576,7 @@ export function FreeTransform(params) {
         target: edges[1],
         fixScribble: true,
         onPointer: function (event) {
+            event.eventPreventDefault();
             let inverted = false;
             if (event.type === 'pointerdown' && event.button === 'left') {
                 if (grips[0].x < grips[1].x) {
@@ -607,6 +614,7 @@ export function FreeTransform(params) {
         target: edges[2],
         fixScribble: true,
         onPointer: function (event) {
+            event.eventPreventDefault();
             let inverted = false;
             if (event.type === 'pointerdown' && event.button === 'left') {
                 if (grips[0].y < grips[3].y) {
@@ -644,6 +652,7 @@ export function FreeTransform(params) {
         target: edges[3],
         fixScribble: true,
         onPointer: function (event) {
+            event.eventPreventDefault();
             let inverted = false;
             if (event.type === 'pointerdown' && event.button === 'left') {
                 if (grips[0].x < grips[1].x) {
@@ -714,6 +723,7 @@ export function FreeTransform(params) {
             target: g,
             fixScribble: true,
             onPointer: function (event) {
+                event.eventPreventDefault();
                 if (event.type === 'pointermove' && event.button === 'left') {
 
                     let offset = BB.getPageOffset(maindiv);

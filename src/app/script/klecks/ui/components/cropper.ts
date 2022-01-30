@@ -65,6 +65,7 @@ export function Cropper (params) {
     let outlinePointerListener = new BB.PointerListener({
         target: outline,
         onPointer: function(event) {
+            event.eventPreventDefault();
             if (event.type === 'pointermove' && event.button === 'left') {
 
                 const {dX, dY} = calcIntDxy(event.dX / scale, event.dY / scale);
@@ -237,6 +238,7 @@ export function Cropper (params) {
         target: edges[0],
         fixScribble: true,
         onPointer: function (event) {
+            event.eventPreventDefault();
             if (event.type === 'pointermove' && event.button === 'left') {
                 const {dX, dY} = calcIntDxy(event.dX / scale, event.dY / scale);
                 transformTop(dY);
@@ -254,6 +256,7 @@ export function Cropper (params) {
         target: edges[1],
         fixScribble: true,
         onPointer: function (event) {
+            event.eventPreventDefault();
             if (event.type === 'pointermove' && event.button === 'left') {
                 const {dX, dY} = calcIntDxy(event.dX / scale, event.dY / scale);
                 transformRight(dX);
@@ -271,6 +274,7 @@ export function Cropper (params) {
         target: edges[2],
         fixScribble: true,
         onPointer: function (event) {
+            event.eventPreventDefault();
             if (event.type === 'pointermove' && event.button === 'left') {
                 const {dX, dY} = calcIntDxy(event.dX / scale, event.dY / scale);
                 transformBottom(dY);
@@ -288,6 +292,7 @@ export function Cropper (params) {
         target: edges[3],
         fixScribble: true,
         onPointer: function (event) {
+            event.eventPreventDefault();
             if (event.type === 'pointermove' && event.button === 'left') {
                 const {dX, dY} = calcIntDxy(event.dX / scale, event.dY / scale);
                 transformLeft(dX);
@@ -347,6 +352,7 @@ export function Cropper (params) {
         target: cornerElArr[0],
         fixScribble: true,
         onPointer: function (event) {
+            event.eventPreventDefault();
             if (event.type === 'pointermove' && event.button === 'left') {
                 const {dX, dY} = calcIntDxy(event.dX / scale, event.dY / scale);
                 transformLeft(dX);
@@ -367,6 +373,7 @@ export function Cropper (params) {
         target: cornerElArr[1],
         fixScribble: true,
         onPointer: function (event) {
+            event.eventPreventDefault();
             if (event.type === 'pointermove' && event.button === 'left') {
                 const {dX, dY} = calcIntDxy(event.dX / scale, event.dY / scale);
                 transformRight(dX);
@@ -387,6 +394,7 @@ export function Cropper (params) {
         target: cornerElArr[2],
         fixScribble: true,
         onPointer: function (event) {
+            event.eventPreventDefault();
             if (event.type === 'pointermove' && event.button === 'left') {
                 const {dX, dY} = calcIntDxy(event.dX / scale, event.dY / scale);
                 transformRight(dX);
@@ -407,6 +415,7 @@ export function Cropper (params) {
         target: cornerElArr[3],
         fixScribble: true,
         onPointer: function (event) {
+            event.eventPreventDefault();
             if (event.type === 'pointermove' && event.button === 'left') {
                 const {dX, dY} = calcIntDxy(event.dX / scale, event.dY / scale);
                 transformLeft(dX);

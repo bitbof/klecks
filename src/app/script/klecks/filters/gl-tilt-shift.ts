@@ -88,6 +88,7 @@ export const glTiltShift = {
                     target: div,
                     maxPointers: 1,
                     onPointer: function(event) {
+                        event.eventPreventDefault();
                         if (event.button === 'left' && event.type === 'pointermove') {
                             (div as any).x += event.dX;
                             (div as any).y += event.dY;

@@ -181,6 +181,11 @@ export const glCurves = {
                         target: point,
                         maxPointers: 1,
                         onPointer: function(event) {
+                            event.eventPreventDefault();
+                            if (event.type === 'pointerdown') {
+                                internalX = x;
+                                internalY = y;
+                            }
                             if (event.button === 'left' && event.type === 'pointermove') {
                                 if (!lock) {
                                     internalX += event.dX;
