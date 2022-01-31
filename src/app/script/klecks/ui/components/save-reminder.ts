@@ -9,9 +9,8 @@ export class SaveReminder {
     private remindersShowed: number = 0;
     private unsavedInterval;
     private lastReminderResetAt: number;
-    private originalTitle: string;
 
-    constructor(private history, private showReminder: boolean, private changeTitle: boolean) /* klLog */ { }
+    constructor(private history, private showReminder: boolean, private changeTitle: boolean, private title: string = 'Klecks') { }
 
     init() {
         if (this.oldActionNumber) { // already initialized
@@ -56,22 +55,19 @@ export class SaveReminder {
         if (this.changeTitle) {
             document.addEventListener("visibilitychange", () => {
                 if(document.visibilityState === 'visible') {
-                    document.title = this.originalTitle;
+                    document.title = this.title;
                     clearInterval(this.unsavedInterval);
                 } else {
-                    if (!this.originalTitle) {
-                        this.originalTitle = document.title;
-                    }
                     let actionNumber = this.history.getActionNumber();
                     if(0 !== actionNumber && this.oldActionNumber.join('.') !== actionNumber.join('.')) {
-                        document.title = 'Unsaved - ' + this.originalTitle;
+                        document.title = 'Unsaved - ' + this.title;
                         let state = 0;
                         this.unsavedInterval = setInterval(() => {
                             state = (state + 1) % 2;
                             if (state === 1) {
-                                document.title = 'Unsaved · ' + this.originalTitle;
+                                document.title = 'Unsaved · ' + this.title;
                             } else {
-                                document.title = 'Unsaved - ' + this.originalTitle;
+                                document.title = 'Unsaved - ' + this.title;
                             }
                         }, 1000 * 60 * 3);
                     }
