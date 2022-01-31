@@ -130,10 +130,10 @@ export function CropCopy(param) {
     updateSelectionRect();
 
 
-    function toFullSpace(p) {
+    function toOriginalSpace(p) {
         return {
-            x: BB.clamp(Math.round((p.x - thumbX) / scaleW), 0, param.canvas.width),
-            y: BB.clamp(Math.round((p.y - thumbY) / scaleH), 0, param.canvas.height)
+            x: BB.clamp((p.x - thumbX) / scaleW, 0, param.canvas.width),
+            y: BB.clamp((p.y - thumbY) / scaleH, 0, param.canvas.height),
         };
     }
     //gen crop from thumb-space points
@@ -146,13 +146,17 @@ export function CropCopy(param) {
             x: Math.max(p1.x, p2.x),
             y: Math.max(p1.y, p2.y)
         };
-        let FullTopLeftP = toFullSpace(topLeftP);
-        let FullBottomRightP = toFullSpace(bottomRightP);
+        let origTopLeftP = toOriginalSpace(topLeftP);
+        let origBottomRightP = toOriginalSpace(bottomRightP);
+        origTopLeftP.x = Math.floor(origTopLeftP.x);
+        origTopLeftP.y = Math.floor(origTopLeftP.y);
+        origBottomRightP.x = Math.ceil(origBottomRightP.x);
+        origBottomRightP.y = Math.ceil(origBottomRightP.y);
         return {
-            x: FullTopLeftP.x,
-            y: FullTopLeftP.y,
-            width: FullBottomRightP.x - FullTopLeftP.x,
-            height: FullBottomRightP.y - FullTopLeftP.y
+            x: origTopLeftP.x,
+            y: origTopLeftP.y,
+            width: origBottomRightP.x - origTopLeftP.x,
+            height: origBottomRightP.y - origTopLeftP.y
         };
     }
 
