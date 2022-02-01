@@ -29,20 +29,28 @@ export const transform = {
             y2: null
         };
         let imdat = context.getImageData(0, 0, context.canvas.width, context.canvas.height);
-        for (i = 0; i < context.canvas.width; i++) {
-            for (let e = 0; e < context.canvas.height; e++) {
-                if (imdat.data[i * 4 + e * context.canvas.width * 4 + 3] > 0) {
-                    if (i < boundsObj.x1 || boundsObj.x1 === null) {
-                        boundsObj.x1 = i;
+
+        if (imdat.data[3] > 0 && imdat.data[imdat.data.length - 1] > 0) {
+            boundsObj.x1 = 0;
+            boundsObj.y1 = 0;
+            boundsObj.x2 = context.canvas.width;
+            boundsObj.y2 = context.canvas.height;
+        } else {
+            for (i = 3; i < imdat.data.length; i += 4) {
+                if (imdat.data[i] > 0 ) {
+                    let x = ((i - 3) / 4) %  context.canvas.width;
+                    let y = Math.floor((i - 3) / 4 / context.canvas.width);
+                    if (boundsObj.x1 > x || boundsObj.x1 === null) {
+                        boundsObj.x1 = x;
                     }
-                    if (e < boundsObj.y1 || boundsObj.y1 === null) {
-                        boundsObj.y1 = e;
+                    if (boundsObj.y1 === null) {
+                        boundsObj.y1 = y;
                     }
-                    if (i > boundsObj.x2 || boundsObj.x2 === null) {
-                        boundsObj.x2 = i;
+                    if (boundsObj.x2 < x || boundsObj.x2 === null) {
+                        boundsObj.x2 = x;
                     }
-                    if (e > boundsObj.y2 || boundsObj.y2 === null) {
-                        boundsObj.y2 = e;
+                    if (boundsObj.y2 < y || boundsObj.y2 === null) {
+                        boundsObj.y2 = y;
                     }
                 }
             }
