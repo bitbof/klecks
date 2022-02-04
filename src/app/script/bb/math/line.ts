@@ -1,22 +1,29 @@
 import {Vec2} from './vec2';
-import {angleFromPoints, clamp, dist, mix} from './math';
+import {pointsToAngleDeg, clamp, dist, mix} from './math';
+import {IVector2D} from "../bb.types";
 
-export const projectPointOnLine = function (line1, line2, toProject) {
+/**
+ * project p onto line
+ * @param lineStart
+ * @param lineEnd
+ * @param p
+ */
+export const projectPointOnLine = function (lineStart: IVector2D, lineEnd: IVector2D, p: IVector2D): IVector2D {
     let x, y;
-    if (line1.x === line2.x) {
-        x = line1.x;
-        y = toProject.y;
+    if (lineStart.x === lineEnd.x) {
+        x = lineStart.x;
+        y = p.y;
 
         return {
             x: x,
             y: y
         };
     }
-    const m = (line2.y - line1.y) / (line2.x - line1.x);
-    const b = line1.y - (m * line1.x);
+    const m = (lineEnd.y - lineStart.y) / (lineEnd.x - lineStart.x);
+    const b = lineStart.y - (m * lineStart.x);
 
-    x = (m * toProject.y + toProject.x - m * b) / (m * m + 1);
-    y = (m * m * toProject.y + m * toProject.x + b) / (m * m + 1);
+    x = (m * p.y + p.x - m * b) / (m * m + 1);
+    y = (m * m * p.y + m * p.x + b) / (m * m + 1);
 
     return {
         x: x,
@@ -186,7 +193,7 @@ export const BezierLine = function () {
         for (; d <= len; d += tempSpacing) {
             tempSpacing = mix(lastSpacing, spacing, clamp(d / len, 0, 1));
             const point = pointLine.getAtDist(d);
-            const angle = lastCallbackPoint ? angleFromPoints(lastCallbackPoint, point) : undefined;
+            const angle = lastCallbackPoint ? pointsToAngleDeg(lastCallbackPoint, point) : undefined;
             if (callback) {
                 callback({
                     x: point.x,

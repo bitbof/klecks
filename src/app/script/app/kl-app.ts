@@ -779,7 +779,7 @@ export function KlApp(pProject: IKlProject | null, pOptions: IKlAppOptions) {
                         klCanvas.renameLayer(activeLayerIndex, filename);
                     }
                     let activeLayerContext = klCanvas.getLayerContext(activeLayerIndex);
-                    BB.drawTransformedImageOnCanvas(activeLayerContext.canvas, canvas, transformObj);
+                    BB.drawTransformedImageOnCanvasDeprectated(activeLayerContext, canvas, transformObj);
                     setCurrentLayer(klCanvas.getLayer(activeLayerIndex));
                     layerManager.update(activeLayerIndex);
 

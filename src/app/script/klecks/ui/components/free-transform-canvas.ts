@@ -107,9 +107,9 @@ export function FreeTransformCanvas(params) {
         ctx.save();
         ctx.clearRect(0, 0, transformLayerCanvas.width, transformLayerCanvas.height);
         BB.drawTransformedImageOnCanvasDeprectated(
-            transformLayerCanvas,
+            ctx,
             params.layerArr[params.transformIndex].canvas,
-            transformationObj
+            transformationObj,
         );
         ctx.restore();
         klCanvasPreview.render();
@@ -134,11 +134,14 @@ export function FreeTransformCanvas(params) {
             y: previewFit.height / 2,
             width: transformSize.width,
             height: transformSize.height,
-            angle: 0,
-            constrained: true,
+            angleDeg: 0,
+            isConstrained: true,
             snapX: [0, previewFit.width],
             snapY: [0, previewFit.height],
-            callback: updatePreviewCanvas
+            scale: 1, // todo
+            callback: (transform) => {
+                updatePreviewCanvas();
+            },
         });
     }
     BB.css(freeTransform.getElement(), {
@@ -161,7 +164,7 @@ export function FreeTransformCanvas(params) {
 
         freeTransform.setSize(w, h);
         freeTransform.setPos({x: w / 2, y: h / 2});
-        freeTransform.setAngle(0);
+        freeTransform.setAngleDeg(0);
         updatePreviewCanvas();
     };
     this.setTransformFit = function() {
@@ -176,12 +179,12 @@ export function FreeTransformCanvas(params) {
 
         freeTransform.setSize(fit.width, fit.height);
         freeTransform.setPos({x: fit.width / 2, y: fit.height / 2});
-        freeTransform.setAngle(0);
+        freeTransform.setAngleDeg(0);
         updatePreviewCanvas();
     };
     this.setTransformCenter = function() {
         freeTransform.setPos({x: previewFit.width / 2, y: previewFit.height / 2});
-        freeTransform.setAngle(0);
+        freeTransform.setAngleDeg(0);
         updatePreviewCanvas();
     };
     //gives you the transformation in the original scale

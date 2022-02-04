@@ -12,6 +12,10 @@ export function pointsToAngleRad (p1: IVector2D, p2: IVector2D): number {
     return Math.atan2(p2.y - p1.y, p2.x - p1.x);
 }
 
+export function pointsToAngleDeg (p1: IVector2D, p2: IVector2D): number {
+    return pointsToAngleRad(p1, p2) * 180 / Math.PI;
+}
+
 export function clamp (val: number, min: number, max: number): number {
     return Math.max(min, Math.min(max, val));
 }
@@ -34,14 +38,58 @@ export function rotateAround (center: IVector2D, point: IVector2D, deg: number):
     return rot;
 }
 
-export function angleDeg (center: IVector2D, p1: IVector2D): number {
-    const p0 = {
-        x: center.x,
-        y: center.y - Math.sqrt(Math.abs(p1.x - center.x) * Math.abs(p1.x - center.x) + Math.abs(p1.y - center.y) * Math.abs(p1.y - center.y))
+export function intDxy(remainder: IVector2D, fDx: number, fDy: number) {
+    remainder.x += fDx;
+    remainder.y += fDy;
+    const dX = Math.round(remainder.x);
+    const dY = Math.round(remainder.y);
+    remainder.x -= dX;
+    remainder.y -= dY;
+    return {
+        dX,
+        dY,
     };
-    return (2 * Math.atan2(p1.y - p0.y, p1.x - p0.x)) * 180 / Math.PI;
 }
 
-export function angleFromPoints (p1: IVector2D, p2: IVector2D): number {
-    return Math.atan2(p2.y - p1.y, p2.x - p1.x) * 180 / Math.PI;
+/**
+ * return closest even number
+ * @param f
+ */
+export function roundEven(f: number) {
+    if (f % 1 === 0) {
+        if (f % 2 === 0) {
+            return f;
+        }
+        return f + 1;
+    }
+    const above = Math.ceil(f);
+    const below = Math.floor(f);
+    if (above % 2 === 0) {
+        return above;
+    } else {
+        return below;
+    }
 }
+
+/**
+ * return closest uneven number
+ * @param f
+ */
+export function roundUneven(f: number) {
+    if (f % 1 === 0) {
+        if (f % 2 === 0) {
+            return f + 1;
+        }
+        return f;
+    }
+    const above = Math.ceil(f);
+    const below = Math.floor(f);
+    if (above % 2 === 1) {
+        return above;
+    } else {
+        return below;
+    }
+}
+
+
+

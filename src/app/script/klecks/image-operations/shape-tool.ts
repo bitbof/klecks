@@ -66,7 +66,7 @@ export function drawShape(ctx, shapeObj) {
         let dY = r2.y - r1.y;
 
         if (shapeObj.isAngleSnap) {
-            let angleDeg = BB.angleDeg(r1, r2);
+            let angleDeg = BB.pointsToAngleDeg(r1, r2) + 90;
             let angleDegSnapped = Math.round(angleDeg / 45) * 45;
             let rotated = BB.rotate(dX, dY, angleDegSnapped - angleDeg);
             dX = rotated.x;

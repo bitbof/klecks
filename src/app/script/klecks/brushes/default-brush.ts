@@ -285,7 +285,7 @@ export function defaultBrush() {
             return;
         }
 
-        let angle = BB.angleFromPoints({x:x1, y:y1}, {x:x2, y:y2});
+        let angle = BB.pointsToAngleDeg({x:x1, y:y1}, {x:x2, y:y2});
         let mouseDist = Math.sqrt(Math.pow(x2 - x1, 2.0) + Math.pow(y2 - y1, 2.0));
         let eX = (x2 - x1) / mouseDist;
         let eY = (y2 - y1) / mouseDist;

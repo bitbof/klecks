@@ -137,21 +137,7 @@ export function showImportAsLayerDialog(params) {
             BB.destroyEl(fitSizeBtn);
             BB.destroyEl(centerBtn);
             if(buttonStr === 'Ok') {
-
-                let freeTransformTransformationObj = freeTransformCanvas.getTransformation();
-                let transformObj = {
-                    angleDegree: freeTransformTransformationObj.angle,
-                    translate: {
-                        x: Math.round(freeTransformTransformationObj.x - params.importImage.width / 2),
-                        y: Math.round(freeTransformTransformationObj.y - params.importImage.height / 2)
-                    },
-                    scale: {
-                        x: freeTransformTransformationObj.width / params.importImage.width,
-                        y: freeTransformTransformationObj.height / params.importImage.height
-                    }
-                };
-
-                params.callback(transformObj);
+                params.callback(freeTransformCanvas.getTransformation());
             } else {
                 params.callback();
             }

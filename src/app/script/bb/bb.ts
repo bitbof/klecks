@@ -32,7 +32,17 @@ import {Vec2} from './math/vec2';
 import {BezierLine, PointLine, projectPointOnLine, quadraticSplineInput, SplineInterpolator} from './math/line';
 import {CMYK, ColorConverter, HSV, RGB, testIsWhiteBestContrast} from './color/color';
 import {appendTextDiv, clearSelection, destroyEl, el, makeUnfocusable} from './base/ui';
-import {angleDeg, angleFromPoints, clamp, dist, mix, pointsToAngleRad, rotate, rotateAround} from './math/math';
+import {
+    pointsToAngleDeg,
+    clamp,
+    dist,
+    mix,
+    pointsToAngleRad,
+    rotate,
+    rotateAround,
+    intDxy,
+    roundEven, roundUneven
+} from './math/math';
 import {createCanvas} from './base/create-canvas';
 import {BbLog} from './base/bb-log';
 
@@ -74,13 +84,15 @@ export const BB = {
     mix,
     dist,
     pointsToAngleRad,
+    pointsToAngleDeg,
     clamp,
     rotate,
     rotateAround,
-    angleDeg,
-    angleFromPoints,
     Matrix,
     Vec2,
+    intDxy,
+    roundEven,
+    roundUneven,
 
     // ---- line ----
     projectPointOnLine,

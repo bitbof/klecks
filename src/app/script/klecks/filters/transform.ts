@@ -1,7 +1,14 @@
 import {BB} from '../../bb/bb';
 import {Checkbox} from '../ui/base-components/checkbox';
 import {KlCanvasPreview} from '../canvas-ui/canvas-preview';
-import {FreeTransform} from '../ui/components/free-transform';
+import {FreeTransform, ITransform} from '../ui/components/free-transform';
+import {Select} from '../ui/base-components/select';
+
+interface IFilterTransformInput {
+    bounds: {x: number, y: number, width: number, height: number};
+    transform: ITransform;
+    isPixelated: boolean;
+}
 
 export const transform = {
 
@@ -18,53 +25,72 @@ export const transform = {
         let selectedLayerIndex = canvas.getLayerIndex(context.canvas);
 
         let fit = BB.fitInto(context.canvas.width, context.canvas.height, isSmall ? 280 : 490, isSmall ? 200 : 240, 1);
-        let w = parseInt('' + fit.width), h = parseInt('' + fit.height);
-        let ratio = fit.width / context.canvas.width;
-        let freeTransformObj;
+        let displayW = parseInt('' + fit.width), displayH = parseInt('' + fit.height);
+        let w = Math.min(displayW, context.canvas.width);
+        let h = Math.min(displayH, context.canvas.height);
+        let freeTransform: FreeTransform;
+        let displayPreviewFactor = displayW / context.canvas.width;
 
-        let boundsObj: any = {
-            x1: null,
-            y1: null,
-            x2: null,
-            y2: null
-        };
-        let imdat = context.getImageData(0, 0, context.canvas.width, context.canvas.height);
+        // determine bounds and initial transformation
+        let boundsObj: {
+            x: number;
+            y: number;
+            width: number;
+            height: number;
+        } = { x: 0, y: 0, width: 0, height: 0 };
+        {
+            let tempBounds: any = {
+                x1: null,
+                y1: null,
+                x2: null,
+                y2: null
+            };
+            let imdat = context.getImageData(0, 0, context.canvas.width, context.canvas.height);
 
-        if (imdat.data[3] > 0 && imdat.data[imdat.data.length - 1] > 0) {
-            boundsObj.x1 = 0;
-            boundsObj.y1 = 0;
-            boundsObj.x2 = context.canvas.width;
-            boundsObj.y2 = context.canvas.height;
-        } else {
-            for (i = 3; i < imdat.data.length; i += 4) {
-                if (imdat.data[i] > 0 ) {
-                    let x = ((i - 3) / 4) %  context.canvas.width;
-                    let y = Math.floor((i - 3) / 4 / context.canvas.width);
-                    if (boundsObj.x1 > x || boundsObj.x1 === null) {
-                        boundsObj.x1 = x;
-                    }
-                    if (boundsObj.y1 === null) {
-                        boundsObj.y1 = y;
-                    }
-                    if (boundsObj.x2 < x || boundsObj.x2 === null) {
-                        boundsObj.x2 = x;
-                    }
-                    if (boundsObj.y2 < y || boundsObj.y2 === null) {
-                        boundsObj.y2 = y;
+            if (imdat.data[3] > 0 && imdat.data[imdat.data.length - 1] > 0) {
+                tempBounds.x1 = 0;
+                tempBounds.y1 = 0;
+                tempBounds.x2 = context.canvas.width - 1;
+                tempBounds.y2 = context.canvas.height - 1;
+            } else {
+                for (i = 3; i < imdat.data.length; i += 4) {
+                    if (imdat.data[i] > 0 ) {
+                        let x = ((i - 3) / 4) %  context.canvas.width;
+                        let y = Math.floor((i - 3) / 4 / context.canvas.width);
+                        if (tempBounds.x1 > x || tempBounds.x1 === null) {
+                            tempBounds.x1 = x;
+                        }
+                        if (tempBounds.y1 === null) {
+                            tempBounds.y1 = y;
+                        }
+                        if (tempBounds.x2 < x || tempBounds.x2 === null) {
+                            tempBounds.x2 = x;
+                        }
+                        if (tempBounds.y2 < y || tempBounds.y2 === null) {
+                            tempBounds.y2 = y;
+                        }
                     }
                 }
             }
+            if (tempBounds.x1 === null || tempBounds.y1 === null) {
+                alert('Layer is empty.');
+                return false;
+            }
+            boundsObj.x = tempBounds.x1;
+            boundsObj.y = tempBounds.y1;
+            boundsObj.width = tempBounds.x2 - tempBounds.x1 + 1;
+            boundsObj.height = tempBounds.y2 - tempBounds.y1 + 1;
         }
-        if (boundsObj.x1 === null || boundsObj.y1 === null) {
-            alert('Layer is empty.');
-            return false;
-        }
-        boundsObj = {
-            x: boundsObj.x1,
-            y: boundsObj.y1,
-            width: boundsObj.x2 - boundsObj.x1 + 1,
-            height: boundsObj.y2 - boundsObj.y1 + 1
+
+        const initTransform = {
+            x: boundsObj.x + boundsObj.width / 2,
+            y: boundsObj.y + boundsObj.height / 2,
+            width: boundsObj.width,
+            height: boundsObj.height,
+            angleDeg: 0,
         };
+
+
 
         let div = document.createElement("div");
         let result: any = {
@@ -73,8 +99,7 @@ export const transform = {
         if (!isSmall) {
             result.width = 500;
         }
-        let brightness = 0, contrast = 0;
-        div.innerHTML = "Transforms selected layer. Hold Shift for additional behavior.<br/><br/>";
+        div.innerHTML = "Transforms selected layer. Hold Shift for additional behavior.";
 
         let keyListener = new BB.KeyListener({
             onDown: function(keyStr) {
@@ -117,11 +142,9 @@ export const transform = {
         rotWrapper.style.display = "inline-block";
         rotWrapper.style.width = "150px";
         rotWrapper.style.height = "30px";
-        if (navigator.appName !== 'Microsoft Internet Explorer') {
-            inputY.type = "number";
-            inputX.type = "number";
-            inputR.type = "number";
-        }
+        inputY.type = "number";
+        inputX.type = "number";
+        inputR.type = "number";
         inputX.style.width = 70 + "px";
         inputY.style.width = 70 + "px";
         inputR.style.width = 70 + "px";
@@ -158,26 +181,131 @@ export const transform = {
         inputR.onkeyup = function () {
             onInputsChanged();
         };
-        leftWrapper.append("X: ");
-        leftWrapper.appendChild(inputX);
-        rightWrapper.append("Y: ");
-        rightWrapper.appendChild(inputY);
-        rotWrapper.append('Rotation: ');
-        rotWrapper.appendChild(inputR);
-        div.appendChild(leftWrapper);
-        div.appendChild(rightWrapper);
-        div.appendChild(rotWrapper);
+        leftWrapper.append("X: ", inputX);
+        rightWrapper.append("Y: ", inputY);
+        rotWrapper.append('Rotation: ', inputR);
+        if (!isSmall) {
+            const inputRow = BB.el({
+                parent: div,
+                css: {
+                    marginTop: '10px',
+                }
+            });
+            inputRow.append(leftWrapper, rightWrapper, rotWrapper);
+        }
+
+        // buttons
+        const buttonRow = BB.el ({
+            parent: div,
+            css: {
+                display: 'flex',
+                flexWrap: 'wrap',
+                marginLeft: '-10px',
+            }
+        });
+        const flipXBtn = BB.el ({
+            parent: buttonRow,
+            tagName: 'button',
+            content: 'Flip X',
+            onClick: () => {
+                const t = freeTransform.getTransform();
+                freeTransform.setSize(-t.width, t.height);
+            },
+            css: {
+                marginLeft: '10px',
+                marginTop: '10px',
+            }
+        });
+        const flipYBtn = BB.el ({
+            parent: buttonRow,
+            tagName: 'button',
+            content: 'Flip Y',
+            onClick: () => {
+                const t = freeTransform.getTransform();
+                freeTransform.setSize(t.width, -t.height);
+            },
+            css: {
+                marginLeft: '10px',
+                marginTop: '10px',
+            }
+        });
+        const scaleRotLeftBtn = BB.el ({
+            parent: buttonRow,
+            tagName: 'button',
+            content: '-90°',
+            onClick: () => {
+                const t = freeTransform.getTransform();
+                t.angleDeg -= 90;
+                t.angleDeg %= 360;
+                freeTransform.setAngleDeg(t.angleDeg);
+                inputR.value = '' + Math.round(t.angleDeg);
+                updatePreview();
+            },
+            css: {
+                marginLeft: '10px',
+                marginTop: '10px',
+            }
+        });
+        const scaleRotRightBtn = BB.el ({
+            parent: buttonRow,
+            tagName: 'button',
+            content: '+90°',
+            onClick: () => {
+                const t = freeTransform.getTransform();
+                t.angleDeg += 90;
+                t.angleDeg %= 360;
+                freeTransform.setAngleDeg(t.angleDeg);
+                inputR.value = '' + Math.round(t.angleDeg);
+                updatePreview();
+            },
+            css: {
+                marginLeft: '10px',
+                marginTop: '10px',
+            }
+        });
+        const scaleDoubleBtn = BB.el ({
+            parent: buttonRow,
+            tagName: 'button',
+            content: '2x',
+            onClick: () => {
+                const t = freeTransform.getTransform();
+                if (constrainCheckbox.getValue()) {
+                    freeTransform.setSize(freeTransform.getRatio() * t.height * 2, t.height * 2);
+                } else {
+                    freeTransform.setSize(t.width * 2, t.height * 2);
+                }
+            },
+            css: {
+                marginLeft: '10px',
+                marginTop: '10px',
+            }
+        });
+        const scaleHalfBtn = BB.el ({
+            parent: buttonRow,
+            tagName: 'button',
+            content: '1/2x',
+            onClick: () => {
+                const t = freeTransform.getTransform();
+                freeTransform.setSize(Math.round(t.width / 2), Math.round(t.height / 2));
+            },
+            css: {
+                marginLeft: '10px',
+                marginTop: '10px',
+            }
+        });
+
+
 
 
 
         let isConstrained = true;
         let constrainCheckbox = new Checkbox({
             init: true,
-            label: 'Constrain Proportions',
+            label: 'Constrain',
             allowTab: true,
             callback: function(b) {
                 isConstrained = b;
-                freeTransformObj.setConstrained(isConstrained);
+                freeTransform.setConstrained(isConstrained);
             },
             css: {
                 display: 'inline-block'
@@ -186,17 +314,19 @@ export const transform = {
         let isSnapping = false;
         let snappingCheckbox = new Checkbox({
             init: true,
-            label: 'Snapping',
+            label: 'Snap',
             allowTab: true,
             callback: function(b) {
                 isSnapping = b;
-                freeTransformObj.setSnapping(isSnapping);
+                freeTransform.setSnapping(isSnapping);
             },
             css: {
                 display: 'inline-block',
-                marginLeft: '5px'
+                marginLeft: '10px',
             }
         });
+        const checkboxWrapper = BB.el({});
+        checkboxWrapper.append(constrainCheckbox.getElement(), snappingCheckbox.getElement());
 
         div.appendChild(BB.el({
             css: {
@@ -204,9 +334,27 @@ export const transform = {
                 height: '10px'
             }
         }));
-        div.appendChild(constrainCheckbox.getElement());
-        div.appendChild(snappingCheckbox.getElement());
 
+        const bottomRow = BB.el({
+            parent: div,
+            css: {
+                display: 'flex',
+                justifyContent: 'space-between',
+            }
+        });
+
+        let algorithmSelect = new Select({
+            isFocusable: true,
+            optionArr: [
+                ['smooth', 'Smooth'],
+                ['pixelated', 'Pixelated']
+            ],
+            initValue: 'smooth',
+            onChange: function() {
+                updatePreview(true);
+            },
+        });
+        bottomRow.append(checkboxWrapper, algorithmSelect.getElement());
 
 
         let previewWrapper = document.createElement("div");
@@ -247,8 +395,8 @@ export const transform = {
             }
         }
         let klCanvasPreview = new KlCanvasPreview({
-            width: parseInt('' + w),
-            height: parseInt('' + h),
+            width: parseInt('' + displayW),
+            height: parseInt('' + displayH),
             layerArr: previewLayerArr
         });
 
@@ -256,111 +404,118 @@ export const transform = {
             css: {
                 position: 'relative',
                 boxShadow: '0 0 5px rgba(0,0,0,0.5)',
-                width: parseInt('' + w) + 'px',
-                height: parseInt('' + h) + 'px'
+                width: parseInt('' + displayW) + 'px',
+                height: parseInt('' + displayH) + 'px'
             }
         });
         previewInnerWrapper.appendChild(klCanvasPreview.getElement());
         previewWrapper.appendChild(previewInnerWrapper);
 
-
-        function updateTransformLayer() {
-            if(!freeTransformObj) {
+        let lastDrawnTransformStr;
+        function updatePreview(doForce: boolean = false) {
+            if(!freeTransform) {
                 return;
             }
-
-            let transformationObj = freeTransformObj.getTransform();
+            let transformationObj = freeTransform.getTransform();
+            if (JSON.stringify(transformationObj) === lastDrawnTransformStr && !doForce) {
+                return;
+            }
+            lastDrawnTransformStr = JSON.stringify(transformationObj);
+            if (displayPreviewFactor < 1) {
+                transformationObj.x *= displayPreviewFactor;
+                transformationObj.y *= displayPreviewFactor;
+                transformationObj.width *= displayPreviewFactor;
+                transformationObj.height *= displayPreviewFactor;
+            }
             let transformLayerCanvas = previewLayerArr[selectedLayerIndex].canvas;
             let ctx = transformLayerCanvas.getContext('2d');
             ctx.save();
             ctx.clearRect(0, 0, transformLayerCanvas.width, transformLayerCanvas.height);
-            BB.drawTransformedImageOnCanvasDeprectated(transformLayerCanvas, layers[selectedLayerIndex].context.canvas, transformationObj, boundsObj);
+            BB.drawTransformedImageOnCanvasDeprectated(
+                ctx,
+                layers[selectedLayerIndex].context.canvas,
+                transformationObj,
+                boundsObj,
+                algorithmSelect.getValue() === 'pixelated',
+            );
             ctx.restore();
             klCanvasPreview.render();
-
         }
 
-        let transformParams = {
-            x: boundsObj.x * ratio + boundsObj.width * ratio / 2,
-            y: boundsObj.y * ratio + boundsObj.height * ratio / 2,
-            width: boundsObj.width * ratio,
-            height: boundsObj.height * ratio,
-            angle: 0,
-            //elem: tempCanvas,
-            //appendElem: false,
-            constrained: true,
-            snapX: [0, fit.width],
-            snapY: [0, fit.height],
+        freeTransform = new FreeTransform({
+            x: initTransform.x,
+            y: initTransform.y,
+            width: initTransform.width,
+            height: initTransform.height,
+            angleDeg: initTransform.angleDeg,
+            isConstrained: true,
+            snapX: [0, context.canvas.width],
+            snapY: [0, context.canvas.height],
             callback: function (t) {
-                inputX.value = "" + Math.round(t.x / ratio);
-                inputY.value = "" + Math.round(t.y / ratio);
-                inputR.value = "" + Math.round(t.angle);
-                updateTransformLayer();
+                inputX.value = '' + Math.round(t.x - initTransform.x);
+                inputY.value = '' + Math.round(t.y - initTransform.y);
+                inputR.value = '' + Math.round(t.angleDeg);
+                updatePreview();
             },
-            scale: ratio
-        };
-        freeTransformObj = new FreeTransform(transformParams);
-        BB.css(freeTransformObj.getElement(), {
+            scale: displayPreviewFactor
+        });
+        BB.css(freeTransform.getElement(), {
             position: 'absolute',
             left: '0',
             top: '0'
         });
-        previewInnerWrapper.appendChild(freeTransformObj.getElement());
+        previewInnerWrapper.appendChild(freeTransform.getElement());
 
         function onInputsChanged() {
-            freeTransformObj.setPos({x: parseInt(inputX.value) * ratio, y: parseInt(inputY.value) * ratio});
-            freeTransformObj.setAngle(inputR.value);
-            updateTransformLayer();
+            freeTransform.setPos({
+                x: parseInt(inputX.value) + initTransform.x,
+                y: parseInt(inputY.value) + initTransform.y}
+            );
+            freeTransform.setAngleDeg(parseInt(inputR.value));
+            updatePreview();
         }
 
-        updateTransformLayer();
+        updatePreview();
 
         div.appendChild(previewWrapper);
         result.destroy = () => {
             keyListener.destroy();
-            freeTransformObj.destroy();
+            freeTransform.destroy();
             constrainCheckbox.destroy();
             snappingCheckbox.destroy();
         };
         result.getInput = function () {
-            let trans = freeTransformObj.getTransform();
-            trans.width /= ratio;
-            trans.height /= ratio;
-            trans.x /= ratio;
-            trans.y /= ratio;
-            trans.bounds = boundsObj;
+            let input = {
+                transform: freeTransform.getTransform(),
+                bounds: boundsObj,
+                isPixelated: algorithmSelect.getValue() === 'pixelated',
+            } as IFilterTransformInput;
             result.destroy();
-
-            return trans;
+            return JSON.parse(JSON.stringify(input));
         };
         return result;
     },
 
-    apply(params) {
+    apply(params: {
+        context: CanvasRenderingContext2D,
+        history: any, // todo
+        input: IFilterTransformInput,
+    }) {
         let context = params.context;
         let history = params.history;
         if (!context || !history)
             return false;
         history.pause();
 
-        let transformObj = {
-            translate: {
-                x: Math.round(params.input.x - (params.input.bounds.x + params.input.bounds.width / 2)),
-                y: Math.round(params.input.y - (params.input.bounds.y + params.input.bounds.height / 2))
-            },
-            scale: {
-                x: params.input.width / params.input.bounds.width,
-                y: params.input.height / params.input.bounds.height
-            },
-            center: {
-                x: params.input.bounds.x + params.input.bounds.width / 2,
-                y: params.input.bounds.y + params.input.bounds.height / 2
-            },
-            angleDegree: params.input.angle
-        };
         let copyCanvas = BB.copyCanvas(context.canvas);
         context.clearRect(0, 0, context.canvas.width, context.canvas.height);
-        BB.drawTransformedImageOnCanvas(context.canvas, copyCanvas, transformObj);
+        BB.drawTransformedImageOnCanvasDeprectated(
+            context,
+            copyCanvas,
+            params.input.transform,
+            params.input.bounds,
+            params.input.isPixelated,
+        );
 
         history.pause(false);
         history.add({

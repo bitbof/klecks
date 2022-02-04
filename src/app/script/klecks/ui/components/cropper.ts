@@ -50,25 +50,13 @@ export function Cropper (params) {
         x: 0,
         y: 0,
     };
-    function calcIntDxy(pDx: number, pDy: number): {dX: number; dY: number} {
-        pointerRemainder.x += pDx;
-        pointerRemainder.y += pDy;
-        const dX = Math.round(pointerRemainder.x);
-        const dY = Math.round(pointerRemainder.y);
-        pointerRemainder.x -= dX;
-        pointerRemainder.y -= dY;
-        return {
-            dX,
-            dY,
-        }
-    }
     let outlinePointerListener = new BB.PointerListener({
         target: outline,
         onPointer: function(event) {
             event.eventPreventDefault();
             if (event.type === 'pointermove' && event.button === 'left') {
 
-                const {dX, dY} = calcIntDxy(event.dX / scale, event.dY / scale);
+                const {dX, dY} = BB.intDxy(pointerRemainder, event.dX / scale, event.dY / scale);
 
                 grips[0].x += dX;
                 grips[0].y += dY;
@@ -240,7 +228,7 @@ export function Cropper (params) {
         onPointer: function (event) {
             event.eventPreventDefault();
             if (event.type === 'pointermove' && event.button === 'left') {
-                const {dX, dY} = calcIntDxy(event.dX / scale, event.dY / scale);
+                const {dX, dY} = BB.intDxy(pointerRemainder, event.dX / scale, event.dY / scale);
                 transformTop(dY);
                 if(keyListener.isPressed('shift')) {
                     transformBottom(-dY);
@@ -258,7 +246,7 @@ export function Cropper (params) {
         onPointer: function (event) {
             event.eventPreventDefault();
             if (event.type === 'pointermove' && event.button === 'left') {
-                const {dX, dY} = calcIntDxy(event.dX / scale, event.dY / scale);
+                const {dX, dY} = BB.intDxy(pointerRemainder, event.dX / scale, event.dY / scale);
                 transformRight(dX);
                 if(keyListener.isPressed('shift')) {
                     transformLeft(-dX);
@@ -276,7 +264,7 @@ export function Cropper (params) {
         onPointer: function (event) {
             event.eventPreventDefault();
             if (event.type === 'pointermove' && event.button === 'left') {
-                const {dX, dY} = calcIntDxy(event.dX / scale, event.dY / scale);
+                const {dX, dY} = BB.intDxy(pointerRemainder, event.dX / scale, event.dY / scale);
                 transformBottom(dY);
                 if(keyListener.isPressed('shift')) {
                     transformTop(-dY);
@@ -294,7 +282,7 @@ export function Cropper (params) {
         onPointer: function (event) {
             event.eventPreventDefault();
             if (event.type === 'pointermove' && event.button === 'left') {
-                const {dX, dY} = calcIntDxy(event.dX / scale, event.dY / scale);
+                const {dX, dY} = BB.intDxy(pointerRemainder, event.dX / scale, event.dY / scale);
                 transformLeft(dX);
                 if(keyListener.isPressed('shift')) {
                     transformRight(-dX);
@@ -354,7 +342,7 @@ export function Cropper (params) {
         onPointer: function (event) {
             event.eventPreventDefault();
             if (event.type === 'pointermove' && event.button === 'left') {
-                const {dX, dY} = calcIntDxy(event.dX / scale, event.dY / scale);
+                const {dX, dY} = BB.intDxy(pointerRemainder, event.dX / scale, event.dY / scale);
                 transformLeft(dX);
                 transformTop(dY);
                 if(keyListener.isPressed('shift')) {
@@ -375,7 +363,7 @@ export function Cropper (params) {
         onPointer: function (event) {
             event.eventPreventDefault();
             if (event.type === 'pointermove' && event.button === 'left') {
-                const {dX, dY} = calcIntDxy(event.dX / scale, event.dY / scale);
+                const {dX, dY} = BB.intDxy(pointerRemainder, event.dX / scale, event.dY / scale);
                 transformRight(dX);
                 transformTop(dY);
                 if(keyListener.isPressed('shift')) {
@@ -396,7 +384,7 @@ export function Cropper (params) {
         onPointer: function (event) {
             event.eventPreventDefault();
             if (event.type === 'pointermove' && event.button === 'left') {
-                const {dX, dY} = calcIntDxy(event.dX / scale, event.dY / scale);
+                const {dX, dY} = BB.intDxy(pointerRemainder, event.dX / scale, event.dY / scale);
                 transformRight(dX);
                 transformBottom(dY);
                 if(keyListener.isPressed('shift')) {
@@ -417,7 +405,7 @@ export function Cropper (params) {
         onPointer: function (event) {
             event.eventPreventDefault();
             if (event.type === 'pointermove' && event.button === 'left') {
-                const {dX, dY} = calcIntDxy(event.dX / scale, event.dY / scale);
+                const {dX, dY} = BB.intDxy(pointerRemainder, event.dX / scale, event.dY / scale);
                 transformLeft(dX);
                 transformBottom(dY);
                 if(keyListener.isPressed('shift')) {

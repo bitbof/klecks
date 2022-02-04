@@ -12,19 +12,21 @@ export function copyCanvas(canvas: HTMLCanvasElement): HTMLCanvasElement {
 }
 
 /**
- * @param baseCanvas - the canvas that will be drawn on
+ * @param destCtx - the canvas that will be drawn on
  * @param transformImage - image that will be drawn on canvas
- * @param transformObj - {x, y, width, height, angle} - x and y are center of transformImage
- * @param boundsObj object - optional {x, y, width, height} - crop of transformImage in transformImage image space
+ * @param transform - {x, y, width, height, angle} - x and y are center of transformImage
+ * @param bounds object - optional {x, y, width, height} - crop of transformImage in transformImage image space
+ * @param pixelated
  */
 export function drawTransformedImageOnCanvasDeprectated(
-    baseCanvas: HTMLCanvasElement,
+    destCtx: CanvasRenderingContext2D,
     transformImage: HTMLImageElement | HTMLCanvasElement,
-    transformObj: {x: number, y: number, width:number, height: number, angle: number},
-    boundsObj?: {x: number, y: number, width: number, height: number},
+    transform: {x: number, y: number, width:number, height: number, angleDeg: number},
+    bounds?: {x: number, y: number, width: number, height: number},
+    pixelated?: boolean,
 ): void {
-    if (!boundsObj) {
-        boundsObj = {
+    if (!bounds) {
+        bounds = {
             x: 0,
             y: 0,
             width: transformImage.width,
@@ -32,27 +34,23 @@ export function drawTransformedImageOnCanvasDeprectated(
         };
     }
 
-    const translateX = transformObj.x - (boundsObj.x + boundsObj.width / 2);
-    const translateY = transformObj.y - (boundsObj.y + boundsObj.height / 2);
-    const scaleX = transformObj.width / boundsObj.width;
-    const scaleY = transformObj.height / boundsObj.height;
-
-    const ctx = baseCanvas.getContext('2d');
-    if (!ctx) {
-        throw new Error('2d context not supported or canvas already initialized');
+    destCtx.save();
+    if (pixelated) {
+        destCtx.imageSmoothingEnabled = false;
+    } else {
+        destCtx.imageSmoothingEnabled = true;
+        destCtx.imageSmoothingQuality = 'high';
     }
-    ctx.save();
-    ctx.imageSmoothingEnabled = true;
-    ctx.imageSmoothingQuality = 'high';
 
-    ctx.translate(transformObj.x, transformObj.y);
-    ctx.rotate(transformObj.angle / 180 * Math.PI);
-    ctx.scale(scaleX, scaleY);
-    ctx.translate(-transformObj.x, -transformObj.y);
-    ctx.translate(translateX, translateY);
-    ctx.drawImage(transformImage, 0, 0, transformImage.width, transformImage.height);
+    destCtx.translate(transform.x, transform.y);
+    destCtx.rotate(transform.angleDeg / 180 * Math.PI);
+    destCtx.scale(transform.width > 0 ? 1 : -1, transform.height > 0 ? 1 : -1);
+    destCtx.drawImage(
+        transformImage,
+        bounds.x, bounds.y, bounds.width, bounds.height,
+        -Math.abs(transform.width) / 2, -Math.abs(transform.height) / 2, Math.abs(transform.width), Math.abs(transform.height));
 
-    ctx.restore();
+    destCtx.restore();
 }
 
 /**
