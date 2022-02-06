@@ -195,6 +195,10 @@ export const transform = {
         }
 
         // buttons
+        const actionBtnCss = {
+            marginLeft: '10px',
+            marginTop: '10px',
+        };
         const buttonRow = BB.el ({
             parent: div,
             css: {
@@ -211,10 +215,7 @@ export const transform = {
                 const t = freeTransform.getTransform();
                 freeTransform.setSize(-t.width, t.height);
             },
-            css: {
-                marginLeft: '10px',
-                marginTop: '10px',
-            }
+            css: actionBtnCss,
         });
         const flipYBtn = BB.el ({
             parent: buttonRow,
@@ -224,10 +225,7 @@ export const transform = {
                 const t = freeTransform.getTransform();
                 freeTransform.setSize(t.width, -t.height);
             },
-            css: {
-                marginLeft: '10px',
-                marginTop: '10px',
-            }
+            css: actionBtnCss,
         });
         const scaleRotLeftBtn = BB.el ({
             parent: buttonRow,
@@ -241,10 +239,7 @@ export const transform = {
                 inputR.value = '' + Math.round(t.angleDeg);
                 updatePreview();
             },
-            css: {
-                marginLeft: '10px',
-                marginTop: '10px',
-            }
+            css: actionBtnCss,
         });
         const scaleRotRightBtn = BB.el ({
             parent: buttonRow,
@@ -258,10 +253,7 @@ export const transform = {
                 inputR.value = '' + Math.round(t.angleDeg);
                 updatePreview();
             },
-            css: {
-                marginLeft: '10px',
-                marginTop: '10px',
-            }
+            css: actionBtnCss,
         });
         const scaleDoubleBtn = BB.el ({
             parent: buttonRow,
@@ -275,10 +267,7 @@ export const transform = {
                     freeTransform.setSize(t.width * 2, t.height * 2);
                 }
             },
-            css: {
-                marginLeft: '10px',
-                marginTop: '10px',
-            }
+            css: actionBtnCss,
         });
         const scaleHalfBtn = BB.el ({
             parent: buttonRow,
@@ -288,10 +277,19 @@ export const transform = {
                 const t = freeTransform.getTransform();
                 freeTransform.setSize(Math.round(t.width / 2), Math.round(t.height / 2));
             },
-            css: {
-                marginLeft: '10px',
-                marginTop: '10px',
-            }
+            css: actionBtnCss,
+        });
+        const centerBtn = BB.el ({
+            parent: buttonRow,
+            tagName: 'button',
+            content: 'Center',
+            onClick: () => {
+                const t = freeTransform.getTransform();
+                freeTransform.setPos({ x: context.canvas.width / 2, y: context.canvas.height / 2 });
+                freeTransform.setAngleDeg(t.angleDeg);
+                updatePreview();
+            },
+            css: actionBtnCss,
         });
 
 
@@ -416,16 +414,16 @@ export const transform = {
             if(!freeTransform) {
                 return;
             }
-            let transformationObj = freeTransform.getTransform();
-            if (JSON.stringify(transformationObj) === lastDrawnTransformStr && !doForce) {
+            let transform = freeTransform.getTransform();
+            if (JSON.stringify(transform) === lastDrawnTransformStr && !doForce) {
                 return;
             }
-            lastDrawnTransformStr = JSON.stringify(transformationObj);
+            lastDrawnTransformStr = JSON.stringify(transform);
             if (displayPreviewFactor < 1) {
-                transformationObj.x *= displayPreviewFactor;
-                transformationObj.y *= displayPreviewFactor;
-                transformationObj.width *= displayPreviewFactor;
-                transformationObj.height *= displayPreviewFactor;
+                transform.x *= displayPreviewFactor;
+                transform.y *= displayPreviewFactor;
+                transform.width *= displayPreviewFactor;
+                transform.height *= displayPreviewFactor;
             }
             let transformLayerCanvas = previewLayerArr[selectedLayerIndex].canvas;
             let ctx = transformLayerCanvas.getContext('2d');
@@ -434,7 +432,7 @@ export const transform = {
             BB.drawTransformedImageOnCanvasDeprectated(
                 ctx,
                 layers[selectedLayerIndex].context.canvas,
-                transformationObj,
+                transform,
                 boundsObj,
                 algorithmSelect.getValue() === 'pixelated',
             );

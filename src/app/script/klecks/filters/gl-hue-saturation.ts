@@ -45,6 +45,7 @@ export const glHueSaturation = {
                 return; // todo throw?
             }
             let texture = glCanvas.texture(tempCanvas);
+            glCanvas.draw(texture).update(); // update glCanvas size
 
             let hueSlider = new PcSlider({
                 label: 'Hue',

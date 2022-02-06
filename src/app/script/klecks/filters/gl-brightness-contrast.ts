@@ -47,6 +47,7 @@ export const glBrightnessContrast = {
                 return; // todo throw?
             }
             let texture = glCanvas.texture(tempCanvas);
+            glCanvas.draw(texture).update(); // update glCanvas size
 
             let brightnessSlider = new PcSlider({
                 label: 'Brightness',

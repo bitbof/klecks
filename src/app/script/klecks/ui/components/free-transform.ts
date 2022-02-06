@@ -919,6 +919,7 @@ export class FreeTransform {
             }
         });
 
+        snapToPixel(this.transform);
         this.updateDOM(true);
         BB.append(this.transEl, [
             this.boundsEl,

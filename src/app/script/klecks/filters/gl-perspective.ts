@@ -45,7 +45,6 @@ export const glPerspective = {
         let pointerListenerArr = [];
 
         function finishInit() {
-            let blur = 0;
             div.innerHTML = "Transforms the selected layer. <br/><br/>";
 
             let glCanvas = getSharedFx();
@@ -53,6 +52,7 @@ export const glPerspective = {
                 return; // todo throw?
             }
             let texture = glCanvas.texture(tempCanvas);
+            glCanvas.draw(texture).update(); // update glCanvas size
             let ba, bb, bc, bd; //before
             let aa, ab, ac, ad; //after
             function update() {

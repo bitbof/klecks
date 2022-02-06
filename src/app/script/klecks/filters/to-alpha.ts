@@ -49,6 +49,7 @@ export const toAlpha = {
                 return; // todo throw?
             }
             let texture = glCanvas.texture(tempCanvas);
+            glCanvas.draw(texture).update(); // update glCanvas size
 
             function updatePreview() {
                 glCanvas.draw(texture).toAlpha(sourceId === 'inverted-luminance', selectedRgbaObj).update();

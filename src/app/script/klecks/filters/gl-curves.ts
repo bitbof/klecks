@@ -56,6 +56,7 @@ export const glCurves = {
                 return; // todo throw?
             }
             let texture = glCanvas.texture(tempCanvas);
+            glCanvas.draw(texture).update(); // update glCanvas size
 
             function update() {
                 try {

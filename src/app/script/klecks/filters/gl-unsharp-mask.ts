@@ -47,6 +47,7 @@ export const glUnsharpMask = {
                 return; // todo throw?
             }
             let texture = glCanvas.texture(tempCanvas);
+            glCanvas.draw(texture).update(); // update glCanvas size
 
             let radiusSlider = new PcSlider({
                 label: 'Radius',

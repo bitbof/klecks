@@ -90,14 +90,14 @@ export function showImportAsLayerDialog(params) {
     let freeTransformCanvas = new FreeTransformCanvas({
         elementWidth: isSmall ? 340 : 540,
         elementHeight: isSmall ? 280 : 350,
-        actualCanvasWidth: params.klCanvas.getLayerContext(0).canvas.width,
-        actualCanvasHeight: params.klCanvas.getLayerContext(0).canvas.height,
+        imageWidth: params.klCanvas.getLayerContext(0).canvas.width,
+        imageHeight: params.klCanvas.getLayerContext(0).canvas.height,
         layerArr: layerArr,
-        transformIndex: layerArr.length - 1
+        transformIndex: layerArr.length - 1,
     });
     BB.css(freeTransformCanvas.getElement(), {
         marginTop: '10px',
-        marginLeft: '-20px'
+        marginLeft: '-20px',
     });
     div.appendChild(freeTransformCanvas.getElement());
 

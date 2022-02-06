@@ -3,28 +3,24 @@ import {KlCanvasPreview} from '../../canvas-ui/canvas-preview';
 import {FreeTransform} from './free-transform';
 
 /**
- * a simple canvas where you can transform one layer(move around, rotate, scale)
- *
- * params = {
- *     elementWidth: number,
- *     elementHeight: number,
- *     actualCanvasWidth: number,
- *     actualCanvasHeight: number,
- *     layerArr: [
- *         {
- *             canvas: Canvas|Image,
- *             opacity: 0-1,
- *             mixModeStr: string
- *         }
- *     ],
- *     transformIndex: number
- * }
+ * a basic canvas where you can transform one layer(move around, rotate, scale)
  *
  * @param params
  * @returns {HTMLDivElement}
  * @constructor
  */
-export function FreeTransformCanvas(params) {
+export function FreeTransformCanvas(params: {
+    elementWidth: number;
+    elementHeight: number;
+    imageWidth: number;
+    imageHeight: number;
+    layerArr: {
+            canvas: (HTMLCanvasElement | HTMLImageElement),
+            opacity: number; // 0-1
+            mixModeStr: string;
+    }[];
+    transformIndex: number;
+}) {
     /*
     div
         innerWrapper
@@ -33,13 +29,13 @@ export function FreeTransformCanvas(params) {
     */
 
     let previewFit = BB.fitInto(
-        params.actualCanvasWidth,
-        params.actualCanvasHeight,
+        params.imageWidth,
+        params.imageHeight,
         params.elementWidth - 20,
         params.elementHeight - 60,
         1
     );
-    let scale = previewFit.width / params.actualCanvasWidth;
+    let scale = previewFit.width / params.imageWidth;
 
     let div = BB.el({
         css: {
@@ -69,24 +65,17 @@ export function FreeTransformCanvas(params) {
     });
     div.appendChild(innerWrapper);
 
-    let previewLayerArr = [];
-    {
-        for(let i = 0; i < params.layerArr.length; i++) {
-            let canvas;
-            if (i === params.transformIndex) {
-                canvas = BB.canvas(previewFit.width, previewFit.height);
-                let ctx = canvas.getContext('2d');
-                ctx.drawImage(params.layerArr[i].canvas, 0, 0, canvas.width, canvas.height);
-            } else {
-                canvas = params.layerArr[i].canvas;
-            }
-            previewLayerArr.push({
-                canvas: canvas,
-                opacity: params.layerArr[i].opacity,
-                mixModeStr: params.layerArr[i].mixModeStr
-            });
+    let previewLayerArr = params.layerArr.map(item => {
+        return {
+            canvas: item.canvas,
+            mixModeStr: item.mixModeStr,
+            opacity: item.opacity,
         }
-    }
+    });
+    previewLayerArr[previewLayerArr.length - 1].canvas = BB.canvas(
+        scale > 1 ? params.imageWidth : previewFit.width,
+        scale > 1 ? params.imageHeight : previewFit.height,
+    );
     let klCanvasPreview = new KlCanvasPreview({
         width: previewFit.width,
         height: previewFit.height,
@@ -94,22 +83,28 @@ export function FreeTransformCanvas(params) {
     });
     innerWrapper.appendChild(klCanvasPreview.getElement());
 
-
     let freeTransform;
-    function updatePreviewCanvas() {
+    function updatePreview() {
         if(!freeTransform) {
             return;
         }
 
-        let transformationObj = freeTransform.getTransform();
-        let transformLayerCanvas = previewLayerArr[params.transformIndex].canvas;
-        let ctx = transformLayerCanvas.getContext('2d');
+        let transform = freeTransform.getTransform();
+        if (scale < 1) {
+            transform.x *= scale;
+            transform.y *= scale;
+            transform.width *= scale;
+            transform.height *= scale;
+        }
+
+        let destCanvas = previewLayerArr[params.transformIndex].canvas;
+        let ctx = (destCanvas as HTMLCanvasElement).getContext('2d');
         ctx.save();
-        ctx.clearRect(0, 0, transformLayerCanvas.width, transformLayerCanvas.height);
+        ctx.clearRect(0, 0, destCanvas.width, destCanvas.height);
         BB.drawTransformedImageOnCanvasDeprectated(
             ctx,
             params.layerArr[params.transformIndex].canvas,
-            transformationObj,
+            transform,
         );
         ctx.restore();
         klCanvasPreview.render();
@@ -130,17 +125,17 @@ export function FreeTransformCanvas(params) {
             );
         }
         freeTransform = new FreeTransform({
-            x: previewFit.width / 2,
-            y: previewFit.height / 2,
-            width: transformSize.width,
-            height: transformSize.height,
+            x: params.imageWidth / 2,
+            y: params.imageHeight / 2,
+            width: params.layerArr[params.transformIndex].canvas.width,
+            height: params.layerArr[params.transformIndex].canvas.height,
             angleDeg: 0,
             isConstrained: true,
-            snapX: [0, previewFit.width],
-            snapY: [0, previewFit.height],
-            scale: 1, // todo
+            snapX: [0, params.imageWidth],
+            snapY: [0, params.imageHeight],
+            scale: scale,
             callback: (transform) => {
-                updatePreviewCanvas();
+                updatePreview();
             },
         });
     }
@@ -150,7 +145,7 @@ export function FreeTransformCanvas(params) {
         top: '0'
     });
     innerWrapper.appendChild(freeTransform.getElement());
-    setTimeout(updatePreviewCanvas, 0);
+    setTimeout(updatePreview, 0);
 
 
     // --- interface ---
@@ -159,46 +154,40 @@ export function FreeTransformCanvas(params) {
         freeTransform.move(dX, dY);
     };
     this.setTransformOriginal = function() {
-        let w = params.layerArr[params.transformIndex].canvas.width * scale;
-        let h = params.layerArr[params.transformIndex].canvas.height * scale;
+        let w = params.layerArr[params.transformIndex].canvas.width;
+        let h = params.layerArr[params.transformIndex].canvas.height;
 
         freeTransform.setSize(w, h);
         freeTransform.setPos({x: w / 2, y: h / 2});
         freeTransform.setAngleDeg(0);
-        updatePreviewCanvas();
+        updatePreview();
     };
     this.setTransformFit = function() {
 
         let fit = BB.fitInto(
             params.layerArr[params.transformIndex].canvas.width,
             params.layerArr[params.transformIndex].canvas.height,
-            previewFit.width,
-            previewFit.height,
+            params.imageWidth,
+            params.imageHeight,
             1
         );
 
         freeTransform.setSize(fit.width, fit.height);
         freeTransform.setPos({x: fit.width / 2, y: fit.height / 2});
         freeTransform.setAngleDeg(0);
-        updatePreviewCanvas();
+        updatePreview();
     };
     this.setTransformCenter = function() {
-        freeTransform.setPos({x: previewFit.width / 2, y: previewFit.height / 2});
+        freeTransform.setPos({x: params.imageWidth / 2, y: params.imageHeight / 2});
         freeTransform.setAngleDeg(0);
-        updatePreviewCanvas();
+        updatePreview();
     };
     //gives you the transformation in the original scale
     this.getTransformation = function () {
         if (!freeTransform) {
             return false;
         }
-
-        let trans = freeTransform.getTransform();
-        trans.width /= scale;
-        trans.height /= scale;
-        trans.x /= scale;
-        trans.y /= scale;
-        return trans;
+        return freeTransform.getTransform();
     };
     this.getElement = function() {
         return div;

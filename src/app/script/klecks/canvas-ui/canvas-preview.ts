@@ -20,9 +20,19 @@ import {BB} from '../../bb/bb';
  * @constructor
  */
 export function KlCanvasPreview(p) {
-    let canvas = BB.canvas(p.width, p.height);
+    const scale = p.width / p.layerArr[0].canvas.width;
+    const width = scale > 1 ? p.layerArr[0].canvas.width : p.width;
+    const height = scale > 1 ? p.layerArr[0].canvas.height : p.height;
+
+    let canvas = BB.canvas(width, height);
     canvas.style.backgroundImage = 'url(' + BB.createCheckerDataUrl(8) + ')';
     let ctx = canvas.getContext('2d');
+
+    BB.css(canvas, {
+        width: '100%',
+        height: '100%',
+        imageRendering: scale > 1 ? 'pixelated' : null,
+    });
 
     function render() {
         ctx.save();
