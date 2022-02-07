@@ -130,6 +130,7 @@ export const resize = {
                 ['smooth', 'Smooth'],
                 ['pixelated', 'Pixelated']
             ],
+            title: 'Scaling algorithm',
             initValue: 'smooth',
             onChange: function() {
                 update();
@@ -138,7 +139,6 @@ export const resize = {
 
         let secondRowElement = BB.el({
             parent: div,
-            title: 'Algorithm',
             css: {
                 display: 'flex',
                 justifyContent: 'space-between'

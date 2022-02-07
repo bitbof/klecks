@@ -300,6 +300,7 @@ export const transform = {
         let constrainCheckbox = new Checkbox({
             init: true,
             label: 'Constrain',
+            title: 'Constrain proportions',
             allowTab: true,
             callback: function(b) {
                 isConstrained = b;
@@ -313,6 +314,7 @@ export const transform = {
         let snappingCheckbox = new Checkbox({
             init: true,
             label: 'Snap',
+            title: 'Snap rotation and position',
             allowTab: true,
             callback: function(b) {
                 isSnapping = b;
@@ -348,6 +350,7 @@ export const transform = {
                 ['pixelated', 'Pixelated']
             ],
             initValue: 'smooth',
+            title: 'Scaling algorithm',
             onChange: function() {
                 updatePreview(true);
             },

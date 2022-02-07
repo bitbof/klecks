@@ -1,87 +1,92 @@
 import {BB} from '../../../bb/bb';
+import {IKeyString} from '../../../bb/bb.types';
 
 /**
  * A select dropdown
- *
- * p = {
- *     isFocusable: boolean, // default false
- *     optionArr: [
- *         [value: string, label: string]
- *     ],
- *     initValue?: string | null,
- *     onChange: func(str),
- * }
- *
- * @param p
- * @constructor
  */
-export const Select = function(p) {
+export class Select {
 
-    const selectEl = BB.el({
-        tagName: 'select',
-        css: {
-            cursor: 'pointer',
-            fontSize: '15px',
-            padding: '3px',
-            background: '#fff', // makes safari pay attention to font-size
-            //webkitAppearance: 'none'
-        }
-    }) as HTMLSelectElement;
-    if (p.css) {
-        BB.css(selectEl, p.css);
-    }
+    private selectEl: HTMLSelectElement;
+    private optionArr: ([string, string] | null)[]; // [value, label]
+    private changeListener: (event) => void;
+    private onChange: (val: string) => void;
 
-    const isFocusable = p.isFocusable;
-    if (!isFocusable) {
-        selectEl.tabIndex = -1;
-    }
-    const optionArr = p.optionArr;
-    for(let i = 0; i < optionArr.length; i++) {
-        if (optionArr[i] === null) {
-            continue;
+    
+    // --- public ---
+    constructor (p: {
+        isFocusable?: boolean; // default false
+        optionArr: ([string, string] | null)[],
+        initValue?: string; // default null
+        onChange: (val: string) => void;
+        css?: IKeyString;
+        title?: string;
+    }) {
+        this.selectEl = BB.el({
+            tagName: 'select',
+            title: p.title,
+            css: {
+                cursor: 'pointer',
+                fontSize: '15px',
+                padding: '3px',
+                background: '#fff', // makes safari pay attention to font-size
+                //webkitAppearance: 'none'
+            }
+        }) as HTMLSelectElement;
+        if (p.css) {
+            BB.css(this.selectEl, p.css);
         }
-        const option = document.createElement('option');
-        option.value = optionArr[i][0];
-        option.textContent = optionArr[i][1];
-        selectEl.appendChild(option);
-    }
-    function onChange() {
+
+        const isFocusable = p.isFocusable;
         if (!isFocusable) {
-            selectEl.blur();
+            this.selectEl.tabIndex = -1;
         }
-        p.onChange(selectEl.value);
+        this.optionArr = p.optionArr;
+        for(let i = 0; i < this.optionArr.length; i++) {
+            if (this.optionArr[i] === null) {
+                continue;
+            }
+            const option = document.createElement('option');
+            option.value = this.optionArr[i][0];
+            option.textContent = this.optionArr[i][1];
+            this.selectEl.append(option);
+        }
+        this.changeListener = (e) => {
+            if (!isFocusable) {
+                this.selectEl.blur();
+            }
+            this.onChange(this.selectEl.value);
+        };
+        this.selectEl.addEventListener('change', this.changeListener);
+        this.selectEl.value = 'initValue' in p ? p.initValue : null;
     }
-    selectEl.addEventListener('change', onChange);
-    selectEl.value = 'initValue' in p ? p.initValue : null;
 
-    // --- interface ---
+    setValue (val) {
+        this.selectEl.value = val;
+    }
 
-    this.setValue = function(val) {
-        selectEl.value = val;
-    };
+    getValue () {
+        return this.selectEl.value;
+    }
 
-    this.getValue = function() {
-        return selectEl.value;
-    };
-
-    this.setDeltaValue = function(delta) {
+    setDeltaValue (delta) {
         let index = 0;
-        for (let i = 0; i < optionArr.length; i++) {
-            if ('' + optionArr[i][0] === selectEl.value) {
+        for (let i = 0; i < this.optionArr.length; i++) {
+            if ('' + this.optionArr[i][0] === this.selectEl.value) {
                 index = i;
                 break;
             }
         }
-        index = Math.max(0, Math.min(optionArr.length -1, index + delta));
-        selectEl.value = optionArr[index][0];
-        p.onChange(selectEl.value);
-    };
+        index = Math.max(0, Math.min(this.optionArr.length -1, index + delta));
+        this.selectEl.value = this.optionArr[index][0];
+        this.onChange(this.selectEl.value);
+    }
 
-    this.getElement = function() {
-        return selectEl;
-    };
+    getElement () {
+        return this.selectEl;
+    }
 
-    this.destroy = () => {
-        selectEl.removeEventListener('change', onChange);
-    };
-};
+    destroy = () => {
+        this.selectEl.removeEventListener('change', this.changeListener);
+    }
+    
+}
