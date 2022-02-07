@@ -5,7 +5,7 @@ import {popup} from './popup';
 /**
  * transformObj: {angleDegree: number, translate: {x: number, y: number}, scale: {x: number, y: number}}
  *
- * @param params object - {target, klCanvas, importImage, callback(transformObj | void)}
+ * @param params object - {target, klCanvas, importImage, callback(transformObj | void, isPixelated: boolean)}
  */
 export function showImportAsLayerDialog(params) {
 
@@ -39,7 +39,7 @@ export function showImportAsLayerDialog(params) {
             marginRight: '10px'
         },
         onClick: function() {
-            freeTransformCanvas.setTransformOriginal();
+            freeTransformCanvas.reset();
         }
     });
     let fitSizeBtn = BB.el({
@@ -137,7 +137,7 @@ export function showImportAsLayerDialog(params) {
             BB.destroyEl(fitSizeBtn);
             BB.destroyEl(centerBtn);
             if(buttonStr === 'Ok') {
-                params.callback(freeTransformCanvas.getTransformation());
+                params.callback(freeTransformCanvas.getTransformation(), freeTransformCanvas.getIsPixelated());
             } else {
                 params.callback();
             }

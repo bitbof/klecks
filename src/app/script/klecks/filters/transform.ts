@@ -432,12 +432,13 @@ export const transform = {
             let ctx = transformLayerCanvas.getContext('2d');
             ctx.save();
             ctx.clearRect(0, 0, transformLayerCanvas.width, transformLayerCanvas.height);
-            BB.drawTransformedImageOnCanvasDeprectated(
+            BB.drawTransformedImageWithBounds(
                 ctx,
                 layers[selectedLayerIndex].context.canvas,
                 transform,
                 boundsObj,
-                algorithmSelect.getValue() === 'pixelated',
+                algorithmSelect.getValue() === 'pixelated' ||
+                BB.testShouldPixelate(transform, transform.width / initTransform.width, transform.height / initTransform.height),
             );
             ctx.restore();
             klCanvasPreview.render();
@@ -486,10 +487,12 @@ export const transform = {
             snappingCheckbox.destroy();
         };
         result.getInput = function () {
+            const transform = freeTransform.getTransform();
             let input = {
-                transform: freeTransform.getTransform(),
+                transform,
                 bounds: boundsObj,
-                isPixelated: algorithmSelect.getValue() === 'pixelated',
+                isPixelated: algorithmSelect.getValue() === 'pixelated' ||
+                    BB.testShouldPixelate(transform, transform.width / initTransform.width, transform.height / initTransform.height),
             } as IFilterTransformInput;
             result.destroy();
             return JSON.parse(JSON.stringify(input));
@@ -502,15 +505,16 @@ export const transform = {
         history: any, // todo
         input: IFilterTransformInput,
     }) {
-        let context = params.context;
-        let history = params.history;
-        if (!context || !history)
+        const context = params.context;
+        const history = params.history;
+        if (!context || !history) {
             return false;
+        }
         history.pause();
 
         let copyCanvas = BB.copyCanvas(context.canvas);
         context.clearRect(0, 0, context.canvas.width, context.canvas.height);
-        BB.drawTransformedImageOnCanvasDeprectated(
+        BB.drawTransformedImageWithBounds(
             context,
             copyCanvas,
             params.input.transform,

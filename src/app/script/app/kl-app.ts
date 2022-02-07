@@ -766,7 +766,7 @@ export function KlApp(pProject: IKlProject | null, pOptions: IKlAppOptions) {
                 target: klRootEl,
                 klCanvas: klCanvas,
                 importImage: canvas,
-                callback: function(transformObj) {
+                callback: function(transformObj, isPixelated: boolean) {
                     if (!transformObj) {
                         return;
                     }
@@ -779,7 +779,7 @@ export function KlApp(pProject: IKlProject | null, pOptions: IKlAppOptions) {
                         klCanvas.renameLayer(activeLayerIndex, filename);
                     }
                     let activeLayerContext = klCanvas.getLayerContext(activeLayerIndex);
-                    BB.drawTransformedImageOnCanvasDeprectated(activeLayerContext, canvas, transformObj);
+                    BB.drawTransformedImageWithBounds(activeLayerContext, canvas, transformObj, null, isPixelated);
                     setCurrentLayer(klCanvas.getLayer(activeLayerIndex));
                     layerManager.update(activeLayerIndex);
 

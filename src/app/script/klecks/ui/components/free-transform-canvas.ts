@@ -84,6 +84,7 @@ export function FreeTransformCanvas(params: {
     innerWrapper.appendChild(klCanvasPreview.getElement());
 
     let freeTransform;
+    let initTransform;
     function updatePreview() {
         if(!freeTransform) {
             return;
@@ -101,10 +102,12 @@ export function FreeTransformCanvas(params: {
         let ctx = (destCanvas as HTMLCanvasElement).getContext('2d');
         ctx.save();
         ctx.clearRect(0, 0, destCanvas.width, destCanvas.height);
-        BB.drawTransformedImageOnCanvasDeprectated(
+        BB.drawTransformedImageWithBounds(
             ctx,
             params.layerArr[params.transformIndex].canvas,
             transform,
+            null,
+            BB.testShouldPixelate(transform, transform.width / initTransform.width, transform.height / initTransform.height),
         );
         ctx.restore();
         klCanvasPreview.render();
@@ -124,11 +127,17 @@ export function FreeTransformCanvas(params: {
                 1
             );
         }
-        freeTransform = new FreeTransform({
+        initTransform = {
             x: params.imageWidth / 2,
             y: params.imageHeight / 2,
             width: params.layerArr[params.transformIndex].canvas.width,
             height: params.layerArr[params.transformIndex].canvas.height,
+        };
+        freeTransform = new FreeTransform({
+            x: initTransform.x,
+            y: initTransform.y,
+            width: initTransform.width,
+            height: initTransform.height,
             angleDeg: 0,
             isConstrained: true,
             snapX: [0, params.imageWidth],
@@ -153,7 +162,7 @@ export function FreeTransformCanvas(params: {
     this.move = function(dX, dY) {
         freeTransform.move(dX, dY);
     };
-    this.setTransformOriginal = function() {
+    this.reset = function() {
         let w = params.layerArr[params.transformIndex].canvas.width;
         let h = params.layerArr[params.transformIndex].canvas.height;
 
@@ -188,6 +197,10 @@ export function FreeTransformCanvas(params: {
             return false;
         }
         return freeTransform.getTransform();
+    };
+    this.getIsPixelated = () => {
+        const transform = freeTransform.getTransform();
+        return BB.testShouldPixelate(transform, transform.width / initTransform.width, transform.height / initTransform.height);
     };
     this.getElement = function() {
         return div;

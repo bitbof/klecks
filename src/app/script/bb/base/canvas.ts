@@ -12,13 +12,43 @@ export function copyCanvas(canvas: HTMLCanvasElement): HTMLCanvasElement {
 }
 
 /**
+ * Determine if should disable imageSmoothing for transformation.
+ * ImageSmoothing can make images blurry even when they're in the original scale and aligned with the pixelgrid.
+ */
+export function testShouldPixelate(
+    transform: {x: number, y: number, width:number, height: number, angleDeg: number},
+    scaleX: number,
+    scaleY: number,
+): boolean {
+    if (
+        ![1, -1].includes(scaleX) || ![1, -1].includes(scaleY) ||
+        transform.width % 1 !== 0 || transform.height % 1 !== 0 ||
+        Math.abs(transform.angleDeg) % 90 !== 0
+    ) {
+        return false;
+    }
+    const whSwapped = Math.abs(transform.angleDeg - 90) % 180 === 0;
+    const width = whSwapped ? transform.height : transform.width;
+    const height = whSwapped ? transform.width : transform.height;
+    return (
+            (Math.abs(width) % 2 === 0 && transform.x % 1 === 0) ||
+            (Math.abs(width) % 2 === 1 && transform.x % 1 === 0.5)
+        ) &&
+        (
+            (Math.abs(height) % 2 === 0 && transform.y % 1 === 0) ||
+            (Math.abs(height) % 2 === 1 && transform.y % 1 === 0.5)
+        );
+}
+
+
+/**
  * @param destCtx - the canvas that will be drawn on
  * @param transformImage - image that will be drawn on canvas
  * @param transform - {x, y, width, height, angle} - x and y are center of transformImage
  * @param bounds object - optional {x, y, width, height} - crop of transformImage in transformImage image space
  * @param pixelated
  */
-export function drawTransformedImageOnCanvasDeprectated(
+export function drawTransformedImageWithBounds(
     destCtx: CanvasRenderingContext2D,
     transformImage: HTMLImageElement | HTMLCanvasElement,
     transform: {x: number, y: number, width:number, height: number, angleDeg: number},

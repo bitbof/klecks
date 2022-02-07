@@ -25,7 +25,7 @@ import {
     copyCanvas,
     createCheckerCanvas, createCheckerDataUrl,
     drawTransformedImageOnCanvas,
-    drawTransformedImageOnCanvasDeprectated, resizeCanvas
+    drawTransformedImageWithBounds, resizeCanvas, testShouldPixelate
 } from './base/canvas';
 import {Matrix} from './math/matrix';
 import {Vec2} from './math/vec2';
@@ -104,7 +104,8 @@ export const BB = {
     // ---- canvas ----
     canvas: createCanvas,
     copyCanvas,
-    drawTransformedImageOnCanvasDeprectated,
+    testShouldPixelate,
+    drawTransformedImageWithBounds,
     drawTransformedImageOnCanvas,
     createCheckerCanvas,
     createCheckerDataUrl,
