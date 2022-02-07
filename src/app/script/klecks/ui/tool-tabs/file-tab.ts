@@ -164,7 +164,6 @@ export class FileTab {
                         ['layers', 'Save Layers'],
                     ],
                     initValue: exportType,
-                    allowScroll: false,
                     onChange: function(val) {
                         exportType = val;
                         onExportTypeChange(exportType);

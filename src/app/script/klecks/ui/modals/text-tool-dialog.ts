@@ -422,14 +422,14 @@ export function textToolDialog(p) {
         custom: {
             type: 'number',
             min: 1,
-            max: 1000,
+            max: 10000,
             value: p.size
         },
         css: {
             width: '60px'
         },
         onChange: function() {
-            sizeInput.value = '' + Math.max(1, Math.min(1000, parseInt(sizeInput.value)));
+            sizeInput.value = '' + Math.max(1, Math.min(10000, parseInt(sizeInput.value)));
             updatePreview();
         }
     }) as HTMLInputElement;
@@ -553,6 +553,7 @@ export function textToolDialog(p) {
         tagName: 'textarea',
         custom: {
             placeholder: 'Your text (multiline Shift+Enter)',
+            'data-ignore-focus': 'true',
         },
         css: {
             whiteSpace: 'nowrap',
@@ -571,10 +572,10 @@ export function textToolDialog(p) {
         textInput.focus();
         textInput.select();
     });
-
+    let closefunc;
     let keyListener = new BB.KeyListener({
-        onDown: function(keyStr) {
-            if(document.activeElement && ['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName)) {
+        onDown: function(keyStr, e, comboStr) {
+            if (BB.isInputFocused(true)) {
                 return;
             }
             if (keyStr === 'left') {
@@ -629,7 +630,10 @@ export function textToolDialog(p) {
             }
         },
         autoFocus: false,
-        clickOnEnter: 'Ok'
+        clickOnEnter: 'Ok',
+        closefunc: function (func) {
+            closefunc = func;
+        },
     });
 
     updatePreview();

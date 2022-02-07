@@ -100,7 +100,8 @@ export function imgurUpload(klCanvas, klRootEl, saveReminder: SaveReminder, imgu
         items: [
             { label: 'JPG', value: 'jpeg' },
             { label: 'PNG', value: 'png' },
-        ]
+        ],
+        ignoreFocus: true,
     });
     BB.css(typeRadio.getElement(), {
         marginBottom: '10px',
@@ -126,6 +127,7 @@ export function imgurUpload(klCanvas, klRootEl, saveReminder: SaveReminder, imgu
         type: "upload",
         div: outDiv,
         buttons: ["Upload", "Cancel"],
+        clickOnEnter: 'Upload',
         primaries: ['Upload'],
         callback: async function (val) {
             if (val === "Upload" || val === "Yes" || val === "Ok") {

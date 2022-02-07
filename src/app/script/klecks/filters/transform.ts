@@ -103,7 +103,7 @@ export const transform = {
 
         let keyListener = new BB.KeyListener({
             onDown: function(keyStr) {
-                if(document.activeElement && document.activeElement.tagName === 'INPUT') {
+                if(BB.isInputFocused(true)) {
                     return;
                 }
 

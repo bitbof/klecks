@@ -9,6 +9,20 @@ export function appendTextDiv(target: HTMLElement, text: string): HTMLDivElement
     return div;
 }
 
+/**
+ * Is an input element focused.
+ * Set attribute "data-ignore-focus" to "true" if its focus should be ignored.
+ *
+ * @param getAll - check all, even those with "data-ignore-focus" = "true"
+ */
+export function isInputFocused(getAll: boolean = false): boolean {
+    let result = document.activeElement && ['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName);
+    if (getAll) {
+        return result;
+    } else {
+        return result && !document.activeElement.getAttribute('data-ignore-focus');
+    }
+}
 
 /**
  * clears text selection in window

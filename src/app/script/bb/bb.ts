@@ -31,7 +31,7 @@ import {Matrix} from './math/matrix';
 import {Vec2} from './math/vec2';
 import {BezierLine, PointLine, projectPointOnLine, quadraticSplineInput, SplineInterpolator} from './math/line';
 import {CMYK, ColorConverter, HSV, RGB, testIsWhiteBestContrast} from './color/color';
-import {appendTextDiv, clearSelection, destroyEl, el, makeUnfocusable} from './base/ui';
+import {appendTextDiv, clearSelection, destroyEl, el, isInputFocused, makeUnfocusable} from './base/ui';
 import {
     pointsToAngleDeg,
     clamp,
@@ -125,6 +125,7 @@ export const BB = {
     makeUnfocusable,
     el,
     destroyEl,
+    isInputFocused: isInputFocused,
 
 
     // ---- events / input ----

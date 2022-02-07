@@ -141,6 +141,7 @@ export class FilterTab {
                         div: filterDialog.element,
                         style: style,
                         buttons: ["Ok", "Cancel"],
+                        clickOnEnter: 'Ok',
                         callback: function(result) {
                             finishedDialog(result, filterDialog);
                         },

@@ -464,7 +464,7 @@ export function KlApp(pProject: IKlProject | null, pOptions: IKlAppOptions) {
             if (KL.dialogCounter.count > 0) {
                 return;
             }
-            if(document.activeElement && document.activeElement.tagName === 'INPUT') {
+            if (BB.isInputFocused(true)) {
                 return;
             }
 

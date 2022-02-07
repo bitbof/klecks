@@ -380,6 +380,7 @@ export function pcLayerManager(p_canvas, p_func, p_rootDiv) {
                         message: "<b>Merge/Mix Layers</b>",
                         div: div,
                         buttons: ["Ok", "Cancel"],
+                        clickOnEnter: 'Ok',
                         callback: function (val) {
                             keyListener.destroy();
                             options.destroy();

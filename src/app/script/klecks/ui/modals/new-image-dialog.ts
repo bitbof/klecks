@@ -62,6 +62,9 @@ export function newImageDialog(p) {
     heightUnit.style.marginLeft = "5px";
     heightUnit.style.cssFloat = "right";
 
+    widthInput.setAttribute('data-ignore-focus', 'true');
+    heightInput.setAttribute('data-ignore-focus', 'true');
+
     widthInput.type = 'number';
     widthInput.min = '1';
     widthInput.max = maxCanvasSize;

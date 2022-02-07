@@ -130,6 +130,7 @@ export function showImportAsLayerDialog(params) {
             width: '500px'
         },
         buttons: ["Ok", "Cancel"],
+        clickOnEnter: 'Ok',
         callback: function(buttonStr) {
             keyListener.destroy();
             freeTransformCanvas.destroy();

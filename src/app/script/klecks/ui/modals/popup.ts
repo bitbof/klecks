@@ -198,12 +198,10 @@ export const popup = function (params) {
             if (destructed) {
                 return;
             }
-            if(comboStr === 'enter') {
+            if(clickOnEnterButton !== null && comboStr === 'enter' && !BB.isInputFocused()) {
+                e.stopPropagation();
                 setTimeout(function() {
-                    if(clickOnEnterButton !== null) {
-                        e.stopPropagation();
-                        clickOnEnterButton.click();
-                    }
+                    clickOnEnterButton.click();
                 }, 10);
             }
             if (comboStr === 'esc') {

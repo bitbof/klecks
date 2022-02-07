@@ -11,7 +11,8 @@ export class RadioList {
         items: {
             label: string;
             value: string;
-        }[]
+        }[],
+        ignoreFocus?: boolean; // default false
     }) {
         this.el = BB.el({
             className: 'kl-radio'
@@ -30,6 +31,9 @@ export class RadioList {
                     type: 'radio',
                 }
             }) as HTMLInputElement;
+            if (p.ignoreFocus) {
+                input.setAttribute('data-ignore-focus', 'true');
+            }
             if (p.init === item.value) {
                 input.checked = true;
             }
