@@ -86,7 +86,7 @@ export const pixelBrushUi = (function () {
                 initValue: brush.getSize(),
                 eventResMs: eventResMs,
                 onChange: function (val) {
-                    val = Math.round(val);
+                    val = Math.round(val * 2) / 2;
                     setSize(val);
                     p.onSizeChange(val);
                 },
