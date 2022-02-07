@@ -50,6 +50,7 @@ export class Select {
             option.textContent = this.optionArr[i][1];
             this.selectEl.append(option);
         }
+        this.onChange = p.onChange;
         this.changeListener = (e) => {
             if (!isFocusable) {
                 this.selectEl.blur();
