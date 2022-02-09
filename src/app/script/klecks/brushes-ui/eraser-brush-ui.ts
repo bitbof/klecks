@@ -11,7 +11,7 @@ import brushIconImg from 'url:~/src/app/img/ui/brush-eraser.svg';
 export const eraserBrushUi = (function () {
     let brushInterface: any = {
         image: brushIconImg,
-        tooltip: 'Eraser',
+        tooltip: 'Eraser [E]',
         sizeSlider: {
             min: 0.5,
             max: 200,

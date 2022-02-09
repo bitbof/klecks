@@ -30,64 +30,35 @@ export function ShapeTool(p) {
 
 /**
  * Draw a shape (rectangle, ellipse, line)
- * p = {
- *     type: 'rect' | 'ellipse' | 'line',
- *     x1: number,
- *     y1: number,
- *     x2: number,
- *     y2: number,
- *     angleRad: number, // angle of canvas
- *     isOutwards: boolean, // center is x1 y1
- *     opacity: number, // 0-1
- *     isEraser: boolean,
- *     fillRgb?: rgb, // for rect or ellipse
- *     strokeRgb?: rgb, // needed for line
- *     lineWidth?: number, // needed for line
- *     isAngleSnap?: boolean, // 45° angle snapping
- *     isFixedRatio?: boolean, // 1:1 for rect or ellipse
- * }
  *
  * @param ctx
  * @param shapeObj
  */
-export function drawShape(ctx, shapeObj) {
+export function drawShape(
+    ctx: CanvasRenderingContext2D,
+    shapeObj: {
+        type: 'rect' | 'ellipse' | 'line';
+        x1: number;
+        y1: number;
+        x2: number;
+        y2: number;
+        angleRad: number; // angle of canvas
+        isOutwards: boolean; // center is x1 y1
+        opacity: number; // 0-1
+        isEraser: boolean;
+        fillRgb?: { r: number; g: number; b: number }; // for rect or ellipse
+        strokeRgb?: { r: number; g: number; b: number }; // needed for line
+        lineWidth?: number; // needed for line
+        isAngleSnap?: boolean; // 45° angle snapping
+        isFixedRatio?: boolean; // 1:1 for rect or ellipse
+    }
+) {
+
     if (['rect', 'ellipse', 'line'].includes(shapeObj.type)) {
+        const lineWidth = Math.round(shapeObj.lineWidth);
+        const angleDeg = shapeObj.angleRad * 180 / Math.PI;
 
-        let r1 = BB.rotate(shapeObj.x1, shapeObj.y1, shapeObj.angleRad / Math.PI * 180);
-        let r2 = BB.rotate(shapeObj.x2, shapeObj.y2, shapeObj.angleRad / Math.PI * 180);
-        r1.x = Math.round(r1.x);
-        r1.y = Math.round(r1.y);
-        r2.x = Math.round(r2.x);
-        r2.y = Math.round(r2.y);
-
-        let x = r1.x;
-        let y = r1.y;
-        let dX = r2.x - r1.x;
-        let dY = r2.y - r1.y;
-
-        if (shapeObj.isAngleSnap) {
-            let angleDeg = BB.pointsToAngleDeg(r1, r2) + 90;
-            let angleDegSnapped = Math.round(angleDeg / 45) * 45;
-            let rotated = BB.rotate(dX, dY, angleDegSnapped - angleDeg);
-            dX = rotated.x;
-            dY = rotated.y;
-        }
-
-        if (shapeObj.type !== 'line' && shapeObj.isFixedRatio) {
-            if (Math.abs(dX) < Math.abs(dY)) {
-                dY = Math.abs(dX) * (dY < 0 ? -1 : 1);
-            } else {
-                dX = Math.abs(dY) * (dX < 0 ? -1 : 1);
-            }
-        }
-
-        if (shapeObj.isOutwards) {
-            x -= dX;
-            y -= dY;
-            dX *= 2;
-            dY *= 2;
-        }
-
+        // --- prep canvas ---
         ctx.save();
         if (shapeObj.opacity) {
             ctx.globalAlpha = shapeObj.opacity;
@@ -98,32 +69,276 @@ export function drawShape(ctx, shapeObj) {
         ctx.rotate(-shapeObj.angleRad);
         if (shapeObj.fillRgb) {
             ctx.fillStyle = BB.ColorConverter.toRgbStr(shapeObj.fillRgb);
-
-            if (shapeObj.type === 'rect') {
-                ctx.fillRect(x, y, dX, dY);
-            } else if (shapeObj.type === 'ellipse') {
-                ctx.beginPath();
-                ctx.ellipse(x + dX / 2, y + dY / 2, Math.abs(dX / 2), Math.abs(dY / 2), 0, 0, Math.PI * 2);
-                ctx.fill();
-            }
-
         } else if (shapeObj.strokeRgb) {
             ctx.strokeStyle = BB.ColorConverter.toRgbStr(shapeObj.strokeRgb);
-            ctx.lineWidth = Math.round(shapeObj.lineWidth);
+            ctx.lineWidth = lineWidth;
+        }
 
-            if (shapeObj.type === 'rect') {
-                ctx.strokeRect(x, y, dX, dY);
-            } else if (shapeObj.type === 'ellipse') {
-                ctx.beginPath();
-                ctx.ellipse(x + dX / 2, y + dY / 2, Math.abs(dX / 2), Math.abs(dY / 2), 0, 0, Math.PI * 2);
-                ctx.stroke();
-            } else if (shapeObj.type === 'line') {
-                ctx.beginPath();
-                ctx.moveTo(x, y);
-                ctx.lineTo(x + dX, y + dY);
+
+        let x1 = shapeObj.x1;
+        let y1 = shapeObj.y1;
+        let x2 = shapeObj.x2;
+        let y2 = shapeObj.y2;
+
+        // --- angle snapping ---
+        {
+            let r1 = BB.rotate(shapeObj.x1, shapeObj.y1, shapeObj.angleRad / Math.PI * 180);
+            let r2 = BB.rotate(shapeObj.x2, shapeObj.y2, shapeObj.angleRad / Math.PI * 180);
+
+            if (shapeObj.isAngleSnap) {
+                let angleDeg = BB.pointsToAngleDeg(r1, r2) + 90;
+                let angleDegSnapped = Math.round(angleDeg / 45) * 45;
+                let rotated = BB.rotateAround({x: x1, y: y1}, {x: x2, y: y2}, angleDegSnapped - angleDeg);
+                x2 = rotated.x;
+                y2 = rotated.y;
+            }
+        }
+
+        let x = x1;
+        let y = y1;
+        let dX = x2 - x1;
+        let dY = y2 - y1;
+
+        // --- 1:1 ratio ---
+        if (shapeObj.type !== 'line' && shapeObj.isFixedRatio) {
+            let r1 = BB.rotate(shapeObj.x1, shapeObj.y1, shapeObj.angleRad / Math.PI * 180);
+            let r2 = BB.rotate(shapeObj.x2, shapeObj.y2, shapeObj.angleRad / Math.PI * 180);
+
+            let rx = r1.x;
+            let ry = r1.y;
+            let rdX = r2.x - r1.x;
+            let rdY = r2.y - r1.y;
+
+            if (Math.abs(rdX) < Math.abs(rdY)) {
+                rdY = Math.abs(rdX) * (rdY < 0 ? -1 : 1);
+            } else {
+                rdX = Math.abs(rdY) * (rdX < 0 ? -1 : 1);
+            }
+            r2.x = rx + rdX;
+            r2.y = ry + rdY;
+
+            r1 = BB.rotate(r1.x, r1.y, -shapeObj.angleRad / Math.PI * 180);
+            r2 = BB.rotate(r2.x, r2.y, -shapeObj.angleRad / Math.PI * 180);
+
+            x1 = r1.x;
+            y1 = r1.y;
+            x2 = r2.x;
+            y2 = r2.y;
+
+            x = x1;
+            y = y1;
+            dX = x2 - x1;
+            dY = y2 - y1;
+        }
+
+        // outwards modifier
+        if (shapeObj.isOutwards) {
+            x -= dX;
+            y -= dY;
+            dX *= 2;
+            dY *= 2;
+
+            x1 = x;
+            y1 = y;
+            x2 = x + dX;
+            y2 = y + dY;
+        }
+
+        let p1;
+        let p2;
+        if (shapeObj.type === 'line') { // --- line ---
+
+            // rounded
+            const x1r = Math.round(x1);
+            const y1r = Math.round(y1);
+            const x2r = Math.round(x2);
+            const y2r = Math.round(y2);
+
+            // floored
+            const x1f = Math.floor(x1);
+            const y1f = Math.floor(y1);
+            const x2f = Math.floor(x2);
+            const y2f = Math.floor(y2);
+
+            if (lineWidth % 2 === 0) {
+
+                if (y1r === y2r) {
+                    p1 = {
+                        x: x1f,
+                        y: y1r,
+                    };
+                    p2 = {
+                        x: x2f,
+                        y: y2r,
+                    };
+
+                    if (x1f < x2f) {
+                        p2.x += 1;
+                    } else {
+                        p1.x += 1;
+                    }
+                } else if (x1r === x2r) {
+                    p1 = {
+                        x: x1r,
+                        y: y1f,
+                    };
+                    p2 = {
+                        x: x2r,
+                        y: y2f,
+                    };
+
+                    if (y1f < y2f) {
+                        p2.y += 1;
+                    } else {
+                        p1.y += 1;
+                    }
+                } else {
+                    p1 = {
+                        x: x1,
+                        y: y1,
+                    };
+                    p2 = {
+                        x: x2,
+                        y: y2,
+                    };
+                }
+
+            } else {
+                p1 = {
+                    x: x1f,
+                    y: y1f,
+                };
+                p2 = {
+                    x: x2f,
+                    y: y2f,
+                };
+                if (y1f === y2f) {
+                    if (x1f < x2f) {
+                        p2.x += 1;
+                    } else {
+                        p1.x += 1;
+                    }
+                    p1.y += 0.5;
+                    p2.y += 0.5;
+                } else if (x1f === x2f) {
+                    if (y1f < y2f) {
+                        p2.y += 1;
+                    } else {
+                        p1.y += 1;
+                    }
+                    p1.x += 0.5;
+                    p2.x += 0.5;
+                } else {
+                    p1.x = x1;
+                    p1.y = y1;
+                    p2.x = x2;
+                    p2.y = y2;
+                }
+            }
+
+            p1 = BB.rotate(p1.x, p1.y, shapeObj.angleRad / Math.PI * 180);
+            p2 = BB.rotate(p2.x, p2.y, shapeObj.angleRad / Math.PI * 180);
+
+            ctx.beginPath();
+            ctx.moveTo(p1.x, p1.y);
+            ctx.lineTo(p2.x, p2.y);
+            ctx.stroke();
+
+        } else if (shapeObj.type === 'rect') { // --- rect ---
+
+            // floored
+            const x1f = Math.floor(x1);
+            const y1f = Math.floor(y1);
+            const x2f = Math.floor(x2);
+            const y2f = Math.floor(y2);
+
+            if (angleDeg % 90 === 0) {
+                if (shapeObj.fillRgb) {
+                    if (x1 % 1 === 0) {
+                        x1 += 1;
+                    }
+                    if (y1 % 1 === 0) {
+                        y1 += 1;
+                    }
+                    if (x2 % 1 === 0) {
+                        x2 += 1;
+                    }
+                    if (y2 % 1 === 0) {
+                        y2 += 1;
+                    }
+
+                    p1 = {
+                        x: x1 < x2 ? x1f : x2f,
+                        y: y1 < y2 ? y1f : y2f,
+                    };
+                    p2 = {
+                        x: Math.ceil((x1 < x2 ? x2 : x1) - p1.x),
+                        y: Math.ceil((y1 < y2 ? y2 : y1) - p1.y),
+                    };
+                    p2.x = p1.x + p2.x;
+                    p2.y = p1.y + p2.y;
+
+                } else {
+                    if (lineWidth % 2 === 0) {
+                        p1 = {
+                            x: x1f,
+                            y: y1f,
+                        };
+                        p2 = {
+                            x: x2f,
+                            y: y2f,
+                        };
+                    } else {
+                        p1 = {
+                            x: x1f + 0.5,
+                            y: y1f + 0.5,
+                        };
+                        p2 = {
+                            x: x2f + 0.5,
+                            y: y2f + 0.5,
+                        };
+                    }
+                }
+            } else {
+                p1 = {
+                    x: x1,
+                    y: y1,
+                };
+                p2 = {
+                    x: x2,
+                    y: y2,
+                };
+            }
+
+            p1 = BB.rotate(p1.x, p1.y, shapeObj.angleRad / Math.PI * 180);
+            p2 = BB.rotate(p2.x, p2.y, shapeObj.angleRad / Math.PI * 180);
+            p2.x = p2.x - p1.x;
+            p2.y = p2.y - p1.y;
+
+            if (shapeObj.fillRgb) {
+                ctx.fillRect(p1.x, p1.y, p2.x, p2.y);
+            } else {
+                ctx.strokeRect(p1.x, p1.y, p2.x, p2.y);
+            }
+
+        } else {  // --- circle ---
+            p1 = BB.rotate(x1, y1, shapeObj.angleRad / Math.PI * 180);
+            p2 = BB.rotate(x2, y2, shapeObj.angleRad / Math.PI * 180);
+            x = p1.x;
+            y = p1.y;
+            dX = p2.x - p1.x;
+            dY = p2.y - p1.y;
+
+            ctx.beginPath();
+            ctx.ellipse(x + dX / 2, y + dY / 2, Math.abs(dX / 2), Math.abs(dY / 2), 0, 0, Math.PI * 2);
+            if (shapeObj.fillRgb) {
+                ctx.fill();
+            } else {
                 ctx.stroke();
             }
         }
+
+
         ctx.restore();
 
     } else {

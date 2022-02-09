@@ -32,7 +32,7 @@ export function ToolDropdown(p) {
         toolTextImg,
         toolShapeImg
     ];
-    let titleArr = ['Brush', 'Paint Bucket', 'Text', 'Shape'];
+    let titleArr = ['Brush [B]', 'Paint Bucket [G]', 'Text [T]', 'Shape [U]'];
     let currentActiveIndex = 0;
     let isActive = true;
     let isOpen = false;
