@@ -80,24 +80,22 @@ export function drawShape(
         let y2 = shapeObj.y2;
 
         // --- angle snapping ---
-        {
+        if (shapeObj.isAngleSnap) {
             let r1 = BB.rotate(x1, y1, shapeObj.angleRad / Math.PI * 180);
             let r2 = BB.rotate(x2, y2, shapeObj.angleRad / Math.PI * 180);
 
-            if (shapeObj.isAngleSnap) {
-                let pAngleDeg = BB.pointsToAngleDeg(r1, r2) + 90;
-                let pAngleDegSnapped = Math.round(pAngleDeg / 45) * 45;
-                let rotated = BB.rotateAround({x: x1, y: y1}, {x: x2, y: y2}, pAngleDegSnapped - pAngleDeg);
-                x2 = rotated.x;
-                y2 = rotated.y;
+            let pAngleDeg = BB.pointsToAngleDeg(r1, r2) + 90;
+            let pAngleDegSnapped = Math.round(pAngleDeg / 45) * 45;
+            let rotated = BB.rotateAround({x: x1, y: y1}, {x: x2, y: y2}, pAngleDegSnapped - pAngleDeg);
+            x2 = rotated.x;
+            y2 = rotated.y;
 
-                // needs to be perfect if p1->p2 aligns with canvas x- or y-axis
-                if ((angleDeg + pAngleDegSnapped) % 90 === 0) {
-                    if (Math.round((angleDeg - pAngleDegSnapped) / 90) % 2 === 0) { // up or down
-                        x2 = x1;
-                    } else { // left or right
-                        y2 = y1;
-                    }
+            // needs to be perfect if p1->p2 aligns with canvas x- or y-axis
+            if ((angleDeg + pAngleDegSnapped) % 90 === 0) {
+                if (Math.round((angleDeg - pAngleDegSnapped) / 90) % 2 === 0) { // up or down
+                    x2 = x1;
+                } else { // left or right
+                    y2 = y1;
                 }
             }
         }
