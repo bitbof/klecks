@@ -22,7 +22,8 @@ export const penPressureToggle = function(isChecked, changeCallback) {
             backgroundSize: 'contain',
             backgroundRepeat: 'no-repeat',
             cursor: 'pointer',
-            boxSizing: 'border-box'
+            boxSizing: 'border-box',
+            colorScheme: 'only light',
         }
     });
 

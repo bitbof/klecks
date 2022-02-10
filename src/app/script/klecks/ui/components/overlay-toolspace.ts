@@ -1,6 +1,7 @@
 import {BB} from '../../../bb/bb';
 import {PcSmallColorSlider} from '../base-components/color-slider-small';
 import {PcSlider} from '../base-components/slider';
+import {HexColorDialog} from '../modals/color-slider-hex-dialog';
 
 /**
  * Compressed HUD toolspace. When you hold ctrl+alt.
@@ -35,7 +36,8 @@ export function OverlayToolspace(p) {
             background: 'rgb(221, 221, 221)',
             display: 'none',
             border: '1px solid #fff',
-            boxShadow: '0 0 10px rgba(0,0,0,0.5)'
+            boxShadow: '0 0 10px rgba(0,0,0,0.5)',
+            colorScheme: 'only light',
         }
     });
     let queuedObj = {

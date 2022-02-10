@@ -129,7 +129,8 @@ export const glCurves = {
                 let curveArea = document.createElement("div");
                 BB.css(curveArea, {
                     position: 'relative',
-                    marginTop: '10px'
+                    marginTop: '10px',
+                    colorScheme: 'only light',
                 })
                 div.appendChild(curveArea);
 
@@ -138,7 +139,7 @@ export const glCurves = {
                 canvas.width = areaw;
                 canvas.height = areah;
                 BB.css(canvas, {
-                    background: "rgba(0, 0, 0, 0.1)",
+                    background: "#c6c6c6",
                     boxShadow: "0 0 0 1px rgba(0,0,0,0.3)"
                 });
                 let ctx = canvas.getContext("2d");
@@ -342,7 +343,8 @@ export const glCurves = {
                 userSelect: 'none',
                 display: 'flex',
                 alignItems: 'center',
-                justifyContent: 'center'
+                justifyContent: 'center',
+                colorScheme: 'only light',
             });
 
             let previewLayerArr = [];

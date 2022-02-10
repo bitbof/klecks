@@ -92,7 +92,8 @@ export function textToolDialog(p) {
             position: 'relative',
             width: width + 'px',
             marginLeft: '-20px',
-            cursor: 'move'
+            cursor: 'move',
+            colorScheme: 'only light',
         },
         onClick: function() {
             textInput.focus();
@@ -107,7 +108,7 @@ export function textToolDialog(p) {
             right: '0',
             bottom: '0',
             boxShadow: 'rgba(0, 0, 0, 0.2) 0px 1px inset, rgba(0, 0, 0, 0.2) 0px -1px inset',
-            pointerEvents: 'none'
+            pointerEvents: 'none',
         }
     });
     previewWrapper.appendChild(previewCanvas);

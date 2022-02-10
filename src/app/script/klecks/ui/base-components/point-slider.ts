@@ -15,7 +15,11 @@ export const PointSlider = function(param) {
     const div = document.createElement('div');
     div.style.position = 'relative';
     const sliderLine = BB.el({});
-    const sliderPoint = BB.el({});
+    const sliderPoint = BB.el({
+        css: {
+            colorScheme: 'only light',
+        }
+    });
     div.appendChild(sliderLine);
     div.appendChild(sliderPoint);
     let sliderPos;

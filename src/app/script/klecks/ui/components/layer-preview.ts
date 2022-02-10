@@ -71,7 +71,8 @@ export function LayerPreview(p) {
     let canvasCtx = canvas.getContext('2d');
     canvas.title = 'Active Layer';
     BB.css(canvas, {
-        boxShadow: '0 0 0 1px #9e9e9e'
+        boxShadow: '0 0 0 1px #9e9e9e',
+        colorScheme: 'only light',
     });
     let nameWrapper = BB.el({
         css: {
@@ -143,6 +144,7 @@ export function LayerPreview(p) {
             userSelect: 'none',
             display: 'block',
             webkitTouchCallout: 'none',
+            colorScheme: 'only light',
         }
     });
     let largeCanvas = BB.canvas(largeCanvasSize, largeCanvasSize);

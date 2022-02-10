@@ -20,7 +20,8 @@ export const ColorOptions = function(p) {
         content: p.label ? p.label : '',
         css: {
             display: 'flex',
-            alignItems: 'center'
+            alignItems: 'center',
+            colorScheme: 'only light',
         }
     });
 

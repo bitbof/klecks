@@ -138,7 +138,8 @@ export function KlCanvasWorkspace(p: {
         top: '0',
         bottom: '0',
         cursor: 'crosshair',
-        userSelect: 'none'
+        userSelect: 'none',
+        colorScheme: 'only light',
     });
     BB.addEventListener(div, 'touchend', function(e) {
         e.preventDefault();

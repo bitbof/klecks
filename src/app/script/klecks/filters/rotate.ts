@@ -73,7 +73,8 @@ export const rotate = {
             boxShadow: "rgba(0, 0, 0, 0.2) 0px 1px inset, rgba(0, 0, 0, 0.2) 0px -1px inset",
             overflow: "hidden",
             position: "relative",
-            userSelect: 'none'
+            userSelect: 'none',
+            colorScheme: 'only light',
         });
 
         let previewcell = document.createElement("div");

@@ -258,7 +258,8 @@ export function newImageDialog(p) {
         padding: '10px',
         marginTop: '10px',
         boxShadow: 'rgba(0, 0, 0, 0.2) 0px 1px inset, rgba(0, 0, 0, 0.2) 0px -1px inset',
-        marginLeft: '-20px'
+        marginLeft: '-20px',
+        colorScheme: 'only light',
     });
     let preview = document.createElement("div");
     BB.css(preview, {

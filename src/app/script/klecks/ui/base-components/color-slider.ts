@@ -1,5 +1,5 @@
 import {BB} from '../../../bb/bb';
-import {HexColorDialog} from './color-slider-hex-dialog';
+import {HexColorDialog} from '../modals/color-slider-hex-dialog';
 import {calcSliderFalloffFactor} from './slider-falloff';
 // @ts-ignore
 import eyedropperImg from 'url:~/src/app/img/ui/tool-picker.svg';
@@ -190,7 +190,8 @@ export const PcColorSlider = function (p) {
         width: (height * 2.5) + 'px',
         height: height + 'px',
         //position: "relative",
-        boxShadow: 'rgb(188, 188, 188) 0 0 0 1px'
+        boxShadow: 'rgb(188, 188, 188) 0 0 0 1px',
+        colorScheme: 'only light',
     });
 
     BB.css(divH, {
@@ -432,7 +433,8 @@ export const PcColorSlider = function (p) {
             marginLeft: '5px',
             width: '22px',
             height: '22px',
-            boxShadow: 'rgb(188, 188, 188) 0px 0px 0px 1px'
+            boxShadow: 'rgb(188, 188, 188) 0px 0px 0px 1px',
+            colorScheme: 'only light',
         },
         onClick: function(e) {
             e.preventDefault();

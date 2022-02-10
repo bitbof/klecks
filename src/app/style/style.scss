@@ -238,6 +238,7 @@ a:hover, a:not([href]):hover {
 .colorSlider {
     margin-left: -1px;
     margin-top: -1px;
+    color-scheme: only light;
 }
 
 .color-picker-preview-button {
@@ -304,6 +305,7 @@ a:hover, a:not([href]):hover {
     background: linear-gradient(to bottom, #909090 1%, #b3b3b3 73%);
     color: #333;
     cursor: ew-resize;
+    color-scheme: only light;
 }
 
 .sliderWrapperActive {
@@ -515,6 +517,7 @@ button img {
     pointer-events: none;
     user-select: none;
     -webkit-user-select: none; // safari
+    color-scheme: only light;
 
     display: flex;
     justify-content: center;

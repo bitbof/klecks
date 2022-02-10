@@ -242,7 +242,8 @@ export const resize = {
             marginTop: "10px",
             boxShadow: "rgba(0, 0, 0, 0.2) 0px 1px inset, rgba(0, 0, 0, 0.2) 0px -1px inset",
             position: "relative",
-            userSelect: 'none'
+            userSelect: 'none',
+            colorScheme: 'only light',
         });
 
 

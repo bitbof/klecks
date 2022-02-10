@@ -9,7 +9,7 @@ import {ImageRadioList} from './ui/base-components/image-radio-list';
 import {penPressureToggle} from './ui/base-components/pen-pressure-toggle';
 import {PcSlider} from './ui/base-components/slider';
 import {calcSliderFalloffFactor} from './ui/base-components/slider-falloff';
-import {HexColorDialog} from './ui/base-components/color-slider-hex-dialog';
+import {HexColorDialog} from './ui/modals/color-slider-hex-dialog';
 import {PcColorSlider} from './ui/base-components/color-slider';
 import {PcSmallColorSlider} from './ui/base-components/color-slider-small';
 import {PointSlider} from './ui/base-components/point-slider';

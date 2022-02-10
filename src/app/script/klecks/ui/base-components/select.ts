@@ -30,6 +30,7 @@ export class Select {
                 padding: '3px',
                 background: '#fff', // makes safari pay attention to font-size
                 //webkitAppearance: 'none'
+                colorScheme: 'only light', // chrome doesn't properly invert the text color
             }
         }) as HTMLSelectElement;
         if (p.css) {

@@ -186,6 +186,7 @@ export class BrowserStorageUi {
                 boxShadow: 'inset 0 0 0 1px #aaa',
                 background: '#cdcdcd',
                 color: '#545454',
+                colorScheme: 'only light',
             }
         }) as HTMLDivElement;
         this.ageEl = BB.el({

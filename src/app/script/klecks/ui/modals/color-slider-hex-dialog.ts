@@ -1,6 +1,6 @@
 import {BB} from '../../../bb/bb';
-import {input} from './input';
-import {popup} from '../modals/popup';
+import {input} from '../base-components/input';
+import {popup} from './popup';
 
 
 /**
@@ -20,7 +20,8 @@ export const HexColorDialog = function (p) {
             height: '20px',
             marginBottom: '10px',
             boxShadow: 'inset 0 0 0 1px #fff, 0 0 0 1px #000',
-            background: '#' + BB.ColorConverter.toHexString(lastValidRgb)
+            background: '#' + BB.ColorConverter.toHexString(lastValidRgb),
+            colorScheme: 'only light',
         }
     });
     div.appendChild(previewEl);

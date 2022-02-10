@@ -20,7 +20,8 @@ export function CropCopy(param) {
         position: 'relative',
         height: param.height + 'px',
         width: param.width + 'px',
-        overflow: 'hidden'
+        overflow: 'hidden',
+        colorScheme: 'only light',
     });
     div.style.position = 'relative';
 

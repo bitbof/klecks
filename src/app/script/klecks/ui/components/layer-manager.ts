@@ -38,6 +38,7 @@ export function pcLayerManager(p_canvas, p_func, p_rootDiv) {
             border: "1px solid #aaa",
             transition: "opacity 0.3s ease-out",
             userSelect: 'none',
+            colorScheme: 'only light',
         }
     });
     BB.createCheckerDataUrl(4, function(url) {
@@ -527,7 +528,8 @@ export function pcLayerManager(p_canvas, p_func, p_rootDiv) {
                 BB.css((layer as any).thumb, {
                     position: "absolute",
                     left: ((32 - (layer as any).thumb.width) / 2) + "px",
-                    top: ((32 - (layer as any).thumb.height) / 2) + "px"
+                    top: ((32 - (layer as any).thumb.height) / 2) + "px",
+                    colorScheme: 'only light',
                 });
                 BB.createCheckerDataUrl(4, function(url) {
                     thumb.style.backgroundImage = "url(" + url + ")";

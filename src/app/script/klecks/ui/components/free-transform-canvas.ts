@@ -48,7 +48,8 @@ export function FreeTransformCanvas(params: {
             position: "relative",
             display: 'flex',
             alignItems: 'center',
-            justifyContent: 'center'
+            justifyContent: 'center',
+            colorScheme: 'only light',
         }
     });
     div.oncontextmenu = function () {

@@ -93,7 +93,8 @@ export const glHueSaturation = {
                 userSelect: 'none',
                 display: 'flex',
                 alignItems: 'center',
-                justifyContent: 'center'
+                justifyContent: 'center',
+                colorScheme: 'only light',
             });
 
             let previewLayerArr = [];
