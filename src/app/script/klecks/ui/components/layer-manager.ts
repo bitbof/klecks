@@ -330,7 +330,8 @@ export function pcLayerManager(p_canvas, p_func, p_rootDiv) {
                     BB.css(preview, {
                         display: "block",
                         marginLeft: "auto",
-                        marginRight: "auto"
+                        marginRight: "auto",
+                        colorScheme: 'only light',
                     });
                     preview.style.boxShadow = "0 0 3px rgba(0,0,0,0.5)";
                     BB.createCheckerDataUrl(4, function(url) {
