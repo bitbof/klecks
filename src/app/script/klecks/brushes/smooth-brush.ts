@@ -1,5 +1,11 @@
 import {BB} from '../../bb/bb';
 
+const sampleCanvas = BB.canvas(32, 32);
+const sampleCtx = sampleCanvas.getContext('2d');
+const brushCanvas = BB.canvas(512, 512);
+const brushCtx = brushCanvas.getContext('2d');
+
+
 export function smoothBrush() {
     let debugStr = '';
     let color;
@@ -36,12 +42,17 @@ export function smoothBrush() {
         let x1 = Math.round(x + width / 2);
         let y1 = Math.round(y + width / 2);
 
+        let w = Math.min(sampleCanvas.width, x1 - x0);
+        let h = Math.min(sampleCanvas.height, y1 - y0);
 
-        let imdat = context.getImageData(x0, y0, x1 - x0, y1 - y0);
-        let stepSize = Math.pow(size * 1.5, 2) / 60;
-        stepSize = Math.max(1, parseInt('' + (stepSize + 0.5), 10));
+        sampleCtx.save();
+        sampleCtx.globalCompositeOperation = 'copy';
+        sampleCtx.drawImage(context.canvas, x0, y0, x1 - x0, y1 - y0, 0, 0, w, h);
+        sampleCtx.restore();
+
+        let imdat = sampleCtx.getImageData(0, 0, w, h);
         let ar = 0, ag = 0, ab = 0, aa = 0, alpha;
-        for (let i = 0; i < imdat.data.length; i += 4 * stepSize) {
+        for (let i = 0; i < imdat.data.length; i += 4) {
             alpha = imdat.data[i + 3];
             ar += imdat.data[i] * alpha;
             ag += imdat.data[i + 1] * alpha;
@@ -69,21 +80,37 @@ export function smoothBrush() {
             return;
         }
 
+        size = Math.max(1, size);
+        const sharpness = Math.pow(opacity, 2) * 0.8;
+        const oFac = Math.max(0, Math.min(1, opacity));
+        const localOpacity = 2 * oFac - oFac * oFac;
+
+        brushCtx.save();
+        if (blending > 0) {
+            brushCtx.globalCompositeOperation = 'copy';
+            brushCtx.fillStyle = "rgba(" + parseInt(mixr) + ", " + parseInt(mixg) + ", " + parseInt(mixb) + ", 1)";
+            brushCtx.fillRect(0, 0, size * 2, size * 2);
+        }
+        brushCtx.globalCompositeOperation = 'source-over';
+        brushCtx.fillStyle = "rgba(" + parseInt(color.r) + ", " + parseInt(color.g) + ", " + parseInt(color.b) + ", " + (1 - blending) + ")";
+        brushCtx.fillRect(0, 0, size * 2, size * 2);
+
+        size = Math.max(1, size);
+        const radgrad = brushCtx.createRadialGradient(size, size, 0, size, size, size);
+        radgrad.addColorStop(sharpness, `rgba(0, 0, 0, ${localOpacity})`);
+        radgrad.addColorStop(1, `rgba(0, 0, 0, 0)`);
+        brushCtx.fillStyle = radgrad;
+        brushCtx.globalCompositeOperation = 'destination-in';
+        brushCtx.fillRect(0, 0, size * 2, size * 2);
+
+        brushCtx.restore();
+
+        // draw onto canvas
         context.save();
         if (settingLockLayerAlpha) {
             context.globalCompositeOperation = "source-atop";
         }
-        size = Math.max(1, size);
-        let radgrad = context.createRadialGradient(size, size, 0, size, size, size);
-        let sharpness = Math.pow(opacity, 2) * 0.8;
-        let oFac = Math.max(0, Math.min(1, opacity));
-        let localOpacity = 2 * oFac - oFac * oFac;
-        radgrad.addColorStop(sharpness, "rgba(" + parseInt(mixr) + ", " + parseInt(mixg) + ", " + parseInt(mixb) + ", " + localOpacity + ")");
-
-        radgrad.addColorStop(1, "rgba(" + parseInt(mixr) + ", " + parseInt(mixg) + ", " + parseInt(mixb) + ", 0)");
-        context.fillStyle = radgrad;
-        context.translate(x - size, y - size);
-        context.fillRect(0, 0, size * 2, size * 2);
+        context.drawImage(brushCanvas, 0, 0, size*2, size*2, x - size, y - size, size * 2, size * 2);
         context.restore();
     }
 
@@ -130,20 +157,26 @@ export function smoothBrush() {
                 blendCol.g = average.g;
                 blendCol.b = average.b;
                 blendCol.a = average.a;
-                localColNew.r = BB.mix(color.r, blendCol.r, blending);
-                localColNew.g = BB.mix(color.g, blendCol.g, blending);
-                localColNew.b = BB.mix(color.b, blendCol.b, blending);
+                localColNew.r = blendCol.r;
+                localColNew.g = blendCol.g;
+                localColNew.b = blendCol.b;
                 localColNew.a = blendCol.a;
 
             } else {
+                if (average.a === 0) {
+                    average.r = color.r;
+                    average.g = color.g;
+                    average.b = color.b;
+                    average.a = 1 - blending;
+                }
+
                 blendCol.r = BB.mix(blendCol.r, BB.mix(blendCol.r, average.r, blendMix), average.a);
                 blendCol.g = BB.mix(blendCol.g, BB.mix(blendCol.g, average.g, blendMix), average.a);
                 blendCol.b = BB.mix(blendCol.b, BB.mix(blendCol.b, average.b, blendMix), average.a);
                 blendCol.a = Math.min(1, blendCol.a + average.a);
-
-                localColNew.r = BB.mix(color.r, BB.mix(color.r, blendCol.r, blending), blendCol.a);
-                localColNew.g = BB.mix(color.g, BB.mix(color.g, blendCol.g, blending), blendCol.a);
-                localColNew.b = BB.mix(color.b, BB.mix(color.b, blendCol.b, blending), blendCol.a);
+                localColNew.r = blendCol.r;
+                localColNew.g = blendCol.g;
+                localColNew.b = blendCol.b;
                 localColNew.a = blendCol.a;
             }
 
@@ -159,9 +192,9 @@ export function smoothBrush() {
             localOpacity = (opacityPressure) ? (opacity * localPressure * localPressure) : opacity;
             localSize = (sizePressure) ? Math.max(0.1, localPressure * size) : Math.max(0.1, size);
             if (blending != 0) {
-                mixr = parseInt('' + BB.mix(localColOld.r, localColNew.r, factor));
-                mixg = parseInt('' + BB.mix(localColOld.g, localColNew.g, factor));
-                mixb = parseInt('' + BB.mix(localColOld.b, localColNew.b, factor));
+                mixr = BB.mix(localColOld.r, localColNew.r, factor);
+                mixg = BB.mix(localColOld.g, localColNew.g, factor);
+                mixb = BB.mix(localColOld.b, localColNew.b, factor);
             }
             if (blending === 1 && localColOld.a === 0) {
                 mixr = localColNew.r;
@@ -272,19 +305,25 @@ export function smoothBrush() {
                 average = getAverage(x, y, ((sizePressure) ? Math.max(0.1, p * size) : Math.max(0.1, size)));
             }
 
-            blendCol = {
-                r: average.r,
-                g: average.g,
-                b: average.b,
-                a: average.a
-            };
+            if (average.a === 0) {
+                blendCol = {
+                    r: color.r,
+                    g: color.g,
+                    b: color.b,
+                    a: 1 - blending,
+                };
+            } else {
+                blendCol = {
+                    r: average.r,
+                    g: average.g,
+                    b: average.b,
+                    a: average.a,
+                };
+            }
 
-            mixr = color.r * (1 - blendCol.a) + (blending * blendCol.r + color.r * (1 - blending)) * blendCol.a;
-            mixg = color.g * (1 - blendCol.a) + (blending * blendCol.g + color.g * (1 - blending)) * blendCol.a;
-            mixb = color.b * (1 - blendCol.a) + (blending * blendCol.b + color.b * (1 - blending)) * blendCol.a;
-            mixr = parseInt(mixr);
-            mixg = parseInt(mixg);
-            mixb = parseInt(mixb);
+            mixr = blendCol.r;
+            mixg = blendCol.g;
+            mixb = blendCol.b;
         }
 
         localColOld = {r: mixr, g: mixg, b: mixb, a: blendCol.a};
@@ -358,12 +397,21 @@ export function smoothBrush() {
             average = getAverage(x1, y1, Math.max(0.1, size));
         }
 
-        blendCol = {
-            r: average.r,
-            g: average.g,
-            b: average.b,
-            a: average.a
-        };
+        if (average.a === 0) {
+            blendCol = {
+                r: color.r,
+                g: color.g,
+                b: color.b,
+                a: 1 - blending,
+            };
+        } else {
+            blendCol = {
+                r: average.r,
+                g: average.g,
+                b: average.b,
+                a: average.a,
+            };
+        }
 
         mixr = color.r * (1 - blendCol.a) + (blending * blendCol.r + color.r * (1 - blending)) * blendCol.a;
         mixg = color.g * (1 - blendCol.a) + (blending * blendCol.g + color.g * (1 - blending)) * blendCol.a;

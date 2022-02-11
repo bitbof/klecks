@@ -1,5 +1,8 @@
 import {BB} from '../../bb/bb';
 
+const sampleCanvas = BB.canvas(32, 32);
+const sampleCtx = sampleCanvas.getContext('2d');
+
 export function sketchyBrush() {
     let debugStr = '';
     let context;
@@ -251,7 +254,14 @@ export function sketchyBrush() {
             mixw -= mixx;
             mixh -= mixy;
             if (mixw > 0 && mixh > 0) {
-                let imdat = context.getImageData(mixx, mixy, mixw, mixh);
+                let w = Math.min(sampleCanvas.width, mixw);
+                let h = Math.min(sampleCanvas.height, mixh);
+                sampleCtx.save();
+                sampleCtx.globalCompositeOperation = 'copy';
+                sampleCtx.drawImage(context.canvas, mixx, mixy, mixw, mixh, 0, 0, w, h);
+                sampleCtx.restore();
+
+                let imdat = sampleCtx.getImageData(mixx, mixy, mixw, mixh);
                 let countmix = 0;
                 for (let i = 0; i < imdat.data.length; i += 4) {
                     mixr += imdat.data[i + 0];
