@@ -26,8 +26,9 @@ You can easily run your own instance using docker
 
 ```sh
 git clone https://github.com/bitbof/klecks.git
+cd klecks
 docker-compose build
-docker-compose up
+docker-compose up -d
 ```
 
 http://localhost:5050
