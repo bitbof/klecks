@@ -21,6 +21,17 @@ For a demo and list of features visit [kleki.com/home](https://kleki.com/home/).
 # Embed
 Example usage of the embed can be found under: `/examples/embed/`
 
+# Selfhost
+You can easily run your own instance using docker
+
+```sh
+git clone https://github.com/bitbof/klecks.git
+docker-compose build
+docker-compose up
+```
+
+http://localhost:5050
+
 # Contribute
 Klecks and Kleki are community funded. [Donate today](https://kleki.com/donate/)
 
