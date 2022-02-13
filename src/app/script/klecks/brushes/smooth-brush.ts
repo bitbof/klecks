@@ -2,9 +2,6 @@ import {BB} from '../../bb/bb';
 
 const sampleCanvas = BB.canvas(32, 32);
 const sampleCtx = sampleCanvas.getContext('2d');
-const brushCanvas = BB.canvas(512, 512);
-const brushCtx = brushCanvas.getContext('2d');
-
 
 export function smoothBrush() {
     let debugStr = '';
@@ -20,7 +17,6 @@ export function smoothBrush() {
     let lastInput = {x: 0, y: 0, pressure: 0};
     let lastInput2 = {x: 0, y: 0, pressure: 0};
     let sizePressure = true, opacityPressure = false;
-    let lastPressure = 0;
     let history = {
         add: function (p?) {
         }
@@ -47,6 +43,7 @@ export function smoothBrush() {
 
         sampleCtx.save();
         sampleCtx.globalCompositeOperation = 'copy';
+        sampleCtx.imageSmoothingEnabled = false;
         sampleCtx.drawImage(context.canvas, x0, y0, x1 - x0, y1 - y0, 0, 0, w, h);
         sampleCtx.restore();
 
@@ -84,33 +81,24 @@ export function smoothBrush() {
         const sharpness = Math.pow(opacity, 2) * 0.8;
         const oFac = Math.max(0, Math.min(1, opacity));
         const localOpacity = 2 * oFac - oFac * oFac;
+        const r = Math.round(BB.mix(color.r, mixr, blending));
+        const g = Math.round(BB.mix(color.g, mixg, blending));
+        const b = Math.round(BB.mix(color.b, mixb, blending));
 
-        brushCtx.save();
-        if (blending > 0) {
-            brushCtx.globalCompositeOperation = 'copy';
-            brushCtx.fillStyle = "rgba(" + parseInt(mixr) + ", " + parseInt(mixg) + ", " + parseInt(mixb) + ", 1)";
-            brushCtx.fillRect(0, 0, size * 2, size * 2);
-        }
-        brushCtx.globalCompositeOperation = 'source-over';
-        brushCtx.fillStyle = "rgba(" + parseInt(color.r) + ", " + parseInt(color.g) + ", " + parseInt(color.b) + ", " + (1 - blending) + ")";
-        brushCtx.fillRect(0, 0, size * 2, size * 2);
-
-        size = Math.max(1, size);
-        const radgrad = brushCtx.createRadialGradient(size, size, 0, size, size, size);
-        radgrad.addColorStop(sharpness, `rgba(0, 0, 0, ${localOpacity})`);
-        radgrad.addColorStop(1, `rgba(0, 0, 0, 0)`);
-        brushCtx.fillStyle = radgrad;
-        brushCtx.globalCompositeOperation = 'destination-in';
-        brushCtx.fillRect(0, 0, size * 2, size * 2);
-
-        brushCtx.restore();
-
-        // draw onto canvas
+        /*
+        Radial gradients have a dithering pattern in Chrome which makes lines look unappealing, as the pattern is distracting.
+        It's worse when it's a GPU accelerated canvas as the pattern will be visible even without blending and 100% opacity,
+        making the line look dirty. Perhaps it's something that could be fixed with radial gradients in Chromium.
+        CPU based canvas looks a bit better but it's not worth the heavy performance drop for other brushes.
+        (CPU vs GPU canvas might be the other way around, but there's two different kinds)
+         */
         context.save();
-        if (settingLockLayerAlpha) {
-            context.globalCompositeOperation = "source-atop";
-        }
-        context.drawImage(brushCanvas, 0, 0, size*2, size*2, x - size, y - size, size * 2, size * 2);
+        const radgrad = context.createRadialGradient(size, size, 0, size, size, size);
+        radgrad.addColorStop(sharpness, `rgba(${r}, ${g}, ${b}, ${localOpacity})`);
+        radgrad.addColorStop(1, `rgba(${r}, ${g}, ${b}, 0)`);
+        context.fillStyle = radgrad;
+        context.translate(x - size, y - size);
+        context.fillRect(0, 0, size * 2, size * 2);
         context.restore();
     }
 
