@@ -96,6 +96,9 @@ export function smoothBrush() {
         (CPU vs GPU canvas might be the other way around, but there's two different kinds)
          */
         context.save();
+        if (settingLockLayerAlpha) {
+            context.globalCompositeOperation = "source-atop";
+        }
         const radgrad = context.createRadialGradient(size, size, 0, size, size, size);
         radgrad.addColorStop(sharpness, `rgba(${r}, ${g}, ${b}, ${localOpacity})`);
         radgrad.addColorStop(1, `rgba(${r}, ${g}, ${b}, 0)`);
