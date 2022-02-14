@@ -356,7 +356,7 @@ export function smoothBrush() {
     this.endLine = function () {
 
         if (bezierLine) {
-            continueLine(null, null, lastInput.pressure, null, false);
+            continueLine(null, null, lastInput.pressure, {r: mixr, g: mixg, b: mixb, a: 1}, false);
         }
 
         isDrawing = false;
