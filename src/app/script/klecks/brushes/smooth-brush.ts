@@ -30,16 +30,16 @@ export function smoothBrush() {
 
 
     function getAverage(x, y, size) {
-        let width = Math.max(1, parseInt('' + (size * 1.5), 10));
+        const width = Math.max(1, parseInt('' + (size * 1.5), 10));
 
         //determine bounds
-        let x0 = Math.round(x - width / 2);
-        let y0 = Math.round(y - width / 2);
-        let x1 = Math.round(x + width / 2);
-        let y1 = Math.round(y + width / 2);
+        const x0 = Math.round(x - width / 2);
+        const y0 = Math.round(y - width / 2);
+        const x1 = Math.round(x + width / 2);
+        const y1 = Math.round(y + width / 2);
 
-        let w = Math.min(sampleCanvas.width, x1 - x0);
-        let h = Math.min(sampleCanvas.height, y1 - y0);
+        const w = Math.min(sampleCanvas.width, x1 - x0);
+        const h = Math.min(sampleCanvas.height, y1 - y0);
 
         sampleCtx.save();
         sampleCtx.globalCompositeOperation = 'copy';
@@ -47,7 +47,10 @@ export function smoothBrush() {
         sampleCtx.drawImage(context.canvas, x0, y0, x1 - x0, y1 - y0, 0, 0, w, h);
         sampleCtx.restore();
 
-        let imdat = sampleCtx.getImageData(0, 0, w, h);
+        const imdat = sampleCtx.getImageData(0, 0, w, h); // not always up to date on iPad. iPadOS Safari bug?
+        // to reproduce: blending 100, draw within a blue area. then place a dot in a white area. it will be a blue dot.
+        // it should be white though.
+
         let ar = 0, ag = 0, ab = 0, aa = 0, alpha;
         for (let i = 0; i < imdat.data.length; i += 4) {
             alpha = imdat.data[i + 3];
@@ -131,7 +134,7 @@ export function smoothBrush() {
             average = {r: color.r, g: color.g, b: color.b};
         } else {
 
-            if (avrg != undefined) {
+            if (avrg) {
                 average = {r: avrg.r, g: avrg.g, b: avrg.b, a: avrg.a};
             } else if (isCoalesced) {
                 average = {r: localColOld.r, g: localColOld.g, b: localColOld.b, a: 0};
@@ -287,12 +290,11 @@ export function smoothBrush() {
             mixb = parseInt(color.b);
             average = {r: color.r, g: color.g, b: color.b};
         } else {
-            if (avrg != undefined) {
+            if (avrg) {
                 average = {r: avrg.r, g: avrg.g, b: avrg.b, a: avrg.a};
             } else {
                 average = getAverage(x, y, ((sizePressure) ? Math.max(0.1, p * size) : Math.max(0.1, size)));
             }
-
             if (average.a === 0) {
                 blendCol = {
                     r: color.r,
@@ -331,7 +333,7 @@ export function smoothBrush() {
         lastDot = realsize * spacing;
         historyEntry.actions.push({
             action: "startLine",
-            params: [x, y, p, {r: average.r, g: average.g, b: average.b, a: average.a}]
+            params: [x, y, p, {r: average.r, g: average.g, b: average.b, a: average.a}],
         });
     };
     this.goLine = function (x, y, p, avrg, isCoalesced) {
