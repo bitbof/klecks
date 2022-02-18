@@ -3,6 +3,7 @@ import {smoothBrushUi} from './smooth-brush-ui';
 import {sketchyBrushUi} from './sketchy-brush-ui';
 import {pixelBrushUi} from './pixel-brush-ui';
 import {eraserBrushUi} from './eraser-brush-ui';
+import {smudgeBrushUi} from './smudge-brush-ui';
 
 /**
  * UI for brushes.
@@ -28,5 +29,6 @@ export const brushesUI = {
     smoothBrush: smoothBrushUi,
     sketchy: sketchyBrushUi,
     pixel: pixelBrushUi,
+    displace: smudgeBrushUi,
     eraser: eraserBrushUi,
 };

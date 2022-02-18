@@ -200,7 +200,7 @@ export class FileTab {
             };
 
             let saveNote = document.createElement("div");
-            saveNote.textContent = "No autosave available";
+            saveNote.textContent = "⚠️ No autosave, no cloud storage";
             BB.css(saveNote, {
                 textAlign: "center",
                 marginTop: "10px",
@@ -208,8 +208,9 @@ export class FileTab {
                 marginLeft: "10px",
                 marginRight: "10px",
                 borderRadius: "4px",
-                padding: "5px",
-                color: 'rgba(0,0,0,0.65)'
+                padding: "5px 0px",
+                color: 'rgba(0,0,0,0.65)',
+                fontSize: '15px',
             });
 
             function createSpacer() {
