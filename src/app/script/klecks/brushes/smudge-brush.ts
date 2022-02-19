@@ -19,7 +19,6 @@ import {IVector2D} from '../../bb/bb.types';
 
 /**
  * Pixel operations that do the smudging via ImageData
- * everything needs to be integers
  * @param imageData
  * @param aP
  * @param bP
@@ -28,11 +27,11 @@ import {IVector2D} from '../../bb/bb.types';
  */
 function smudge(
     imageData: ImageData,
-    aP: IVector2D, // top left of source
-    bP: IVector2D, // top left of dest
-    size: {w: number; h: number}, // size of both rectangles
+    aP: IVector2D, // top left of source, integers
+    bP: IVector2D, // top left of dest, integers
+    size: {w: number; h: number}, // size of both rectangles, integers
     options: {
-        opacity: number;
+        opacity: number; // 0 - 1 float
         alphaLock: boolean;
     }
 ) {

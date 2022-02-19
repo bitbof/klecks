@@ -73,6 +73,7 @@ export function FillUi(p) {
     let modeSelect;
     modeWrapper = BB.el({
         content: 'Sample&nbsp;',
+        title: 'Which layers to sample color from',
         css: {
             fontSize: '15px'
         }
@@ -99,6 +100,7 @@ export function FillUi(p) {
     let growSelect;
     growWrapper = BB.el({
         content: 'Grow&nbsp;',
+        title: 'Grow filled area (in pixels)',
         css: {
             fontSize: '15px',
             marginLeft: '10px'
@@ -106,16 +108,16 @@ export function FillUi(p) {
     });
     growSelect = new Select({
         optionArr: [
-            [0, '0'],
-            [1, '1'],
-            [2, '2'],
-            [3, '3'],
-            [4, '4'],
-            [5, '5'],
-            [6, '6'],
-            [7, '7'],
+            ['0', '0'],
+            ['1', '1'],
+            ['2', '2'],
+            ['3', '3'],
+            ['4', '4'],
+            ['5', '5'],
+            ['6', '6'],
+            ['7', '7'],
         ],
-        initValue: 0,
+        initValue: '0',
         onChange: function(val) {}
     });
     let growPointerListener = new BB.PointerListener({
@@ -132,6 +134,7 @@ export function FillUi(p) {
     let contiguousToggle = new Checkbox({
         init: true,
         label: 'Contiguous',
+        title: 'Only fill connected areas of same color',
         callback: function (b) {
             isContiguous = b;
         },

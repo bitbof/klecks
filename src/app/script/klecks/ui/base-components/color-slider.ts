@@ -227,7 +227,7 @@ export const PcColorSlider = function (p) {
 
 
     const pickerButton = BB.el({
-        title: 'Eyedropper',
+        title: 'Eyedropper [Alt]',
         className: 'color-picker-preview-button',
         css: {
             width: '30px',
