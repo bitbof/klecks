@@ -34,9 +34,9 @@ function smudge(
         opacity: number; // 0 - 1 float
         alphaLock: boolean;
     }
-) {
+): IBounds {
     if (aP.x === bP.x && aP.y === bP.y) {
-        return;
+        return null;
     }
 
     const cSize = size.w / 2;
@@ -85,7 +85,7 @@ function smudge(
         size.w = size.w - left - right;
         size.h = size.h - top - bottom;
         if (size.w <= 0 || size.h <= 0) {
-            return;
+            return null;
         }
     }
 
@@ -189,7 +189,21 @@ function smudge(
 
     /*statCount++;
     statAcc += performance.now() - start;*/
+
+    return {
+        x1: bP.x,
+        y1: bP.y,
+        x2: bP.x + size.w,
+        y2: bP.y + size.h
+    };
 }
+
+interface IBounds {
+    x1: number;
+    y1: number;
+    x2: number;
+    y2: number;
+};
 
 /**
  * Brush that pushes colors around.
@@ -219,30 +233,23 @@ export function smudgeBrush() {
     let bezierLine = null;
 
 
-    let redrawBounds: {
-        x1: number;
-        y1: number;
-        x2: number;
-        y2: number;
-    };
-    let completeRedrawBounds: {
-        x1: number;
-        y1: number;
-        x2: number;
-        y2: number;
-    };
+    let redrawBounds: IBounds;
+    let completeRedrawBounds: IBounds;
 
     let copyImageData;
 
 
-    function updateRedrawBounds(x1, y1, x2, y2) {
+    function updateRedrawBounds(bounds: IBounds) {
+        if (!bounds) {
+            return;
+        }
         if (!redrawBounds) {
-            redrawBounds = { x1, y1, x2, y2 };
+            redrawBounds = { x1: bounds.x1, y1: bounds.y1, x2: bounds.x2, y2: bounds.y2 };
         } else {
-            redrawBounds.x1 = Math.min(redrawBounds.x1, x1);
-            redrawBounds.y1 = Math.min(redrawBounds.y1, y1);
-            redrawBounds.x2 = Math.max(redrawBounds.x2, x2);
-            redrawBounds.y2 = Math.max(redrawBounds.y2, y2);
+            redrawBounds.x1 = Math.min(redrawBounds.x1, bounds.x1);
+            redrawBounds.y1 = Math.min(redrawBounds.y1, bounds.y1);
+            redrawBounds.x2 = Math.max(redrawBounds.x2, bounds.x2);
+            redrawBounds.y2 = Math.max(redrawBounds.y2, bounds.y2);
         }
     }
     function updateCompleteRedrawBounds(x1, y1, x2, y2) {
@@ -281,7 +288,7 @@ export function smudgeBrush() {
         const w = Math.round(size * 2);
         const h = Math.round(size * 2);
 
-        smudge(
+        const bounds = smudge(
             copyImageData,
             {
                 x: Math.round(lastDot.x - size),
@@ -300,7 +307,7 @@ export function smudgeBrush() {
                 alphaLock: settingLockLayerAlpha,
             }
         );
-        updateRedrawBounds(Math.round(x - size), Math.round(y - size), Math.round(x - size) + w, Math.round(y - size) + h);
+        updateRedrawBounds(bounds);
 
 
         lastDot = {
@@ -384,7 +391,7 @@ export function smudgeBrush() {
 
 
         if (redrawBounds) {
-            context.putImageData(copyImageData, 0, 0);
+            context.putImageData(copyImageData, 0, 0, redrawBounds.x1, redrawBounds.y1, redrawBounds.x2 - redrawBounds.x1, redrawBounds.y2 - redrawBounds.y1);
             updateCompleteRedrawBounds(redrawBounds.x1, redrawBounds.y1, redrawBounds.x2, redrawBounds.y2);
         }
 
@@ -408,20 +415,24 @@ export function smudgeBrush() {
         bezierLine = null;
 
         if (redrawBounds) {
-            context.putImageData(copyImageData, 0, 0);
+            context.putImageData(copyImageData, 0, 0, redrawBounds.x1, redrawBounds.y1, redrawBounds.x2 - redrawBounds.x1, redrawBounds.y2 - redrawBounds.y1);
             updateCompleteRedrawBounds(redrawBounds.x1, redrawBounds.y1, redrawBounds.x2, redrawBounds.y2);
         }
 
         if (historyEntry && completeRedrawBounds) {
+            let historyImageData = copyImageData;
+            if (!(completeRedrawBounds.x1 === 0 && completeRedrawBounds.y1 === 0 && completeRedrawBounds.x2 >= context.canvas.width - 1 && completeRedrawBounds.y2 >= context.canvas.height - 1)) {
+                historyImageData = context.getImageData(
+                    completeRedrawBounds.x1,
+                    completeRedrawBounds.y1,
+                    completeRedrawBounds.x2 - completeRedrawBounds.x1,
+                    completeRedrawBounds.y2 - completeRedrawBounds.y1
+                );
+            }
             historyEntry.actions.push({
                 action: "drawImage",
                 params: [
-                    context.getImageData(
-                        completeRedrawBounds.x1,
-                        completeRedrawBounds.y1,
-                        completeRedrawBounds.x2 - completeRedrawBounds.x1,
-                        completeRedrawBounds.y2 - completeRedrawBounds.y1
-                    ),
+                    historyImageData,
                     completeRedrawBounds.x1,
                     completeRedrawBounds.y1,
                 ],
