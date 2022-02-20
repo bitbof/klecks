@@ -134,7 +134,7 @@ export function FillUi(p) {
     let contiguousToggle = new Checkbox({
         init: true,
         label: 'Contiguous',
-        title: 'Only fill connected areas of same color',
+        title: 'Only fill connected areas',
         callback: function (b) {
             isContiguous = b;
         },
