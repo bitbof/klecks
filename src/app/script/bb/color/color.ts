@@ -91,7 +91,7 @@ export const ColorConverter = {
 
         let var_h, var_i, var_1, var_2, var_3, var_r, var_g, var_b;
 
-        const h = HSV.h / 360;
+        const h = (HSV.h / 360) % 1;
         const s = HSV.s / 100;
         const v = HSV.v / 100;
 
