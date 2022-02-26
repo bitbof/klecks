@@ -1,17 +1,16 @@
-import {IEmbedParams} from '../../main-embed';
+import {IEmbedParams, IReadPSD} from '../../main-embed';
 import {IKlProject} from '../../klecks/kl.types';
 // @ts-ignore
 import logoImg from 'url:~/src/app/img/klecks-logo.png';
 
-let embedInstance: boolean = false;
+let wrapperInstance: boolean = false;
 
 // lazy load rest of library, show a loading screen, expose Embed interface
 export function EmbedWrapper(p: IEmbedParams) {
-    const _this = this;
-    if (embedInstance) {
+    if (wrapperInstance) {
         throw new Error('Already created an embed');
     }
-    embedInstance = true;
+    wrapperInstance = true;
 
 
     // loading screen
@@ -49,21 +48,27 @@ export function EmbedWrapper(p: IEmbedParams) {
 
     let project: IKlProject;
     let errorStr: string;
+    let psds: IReadPSD[] = []; // if instance not loaded yet, these are psds to be read
+    let instance; // instance of loaded Embed
+
 
     (async () => {
         const mainEmbed = await import('../../main-embed');
-        const instance = new mainEmbed.Embed(p);
+        instance = new mainEmbed.Embed(p);
 
-        _this.openProject = instance.openProject;
-        _this.getPNG = instance.getPNG;
-        _this.getPSD = instance.getPSD;
-        _this.initError = instance.initError;
+        this.openProject = instance.openProject;
+        this.getPNG = instance.getPNG;
+        this.getPSD = instance.getPSD;
+        this.initError = instance.initError;
 
         if (project) {
             instance.openProject(project);
         }
         if (errorStr) {
             instance.initError(errorStr);
+        }
+        if (psds.length) {
+            instance.readPSDs(psds);
         }
     })();
 
@@ -75,5 +80,26 @@ export function EmbedWrapper(p: IEmbedParams) {
     };
     this.initError = (error: string) => {
         errorStr = error;
+    };
+    this.readPSD = async (blob: Blob) => {
+        const promise = new Promise((resolve, reject) => {
+            const item: IReadPSD = {
+                blob,
+                callback: (k: IKlProject) => {
+                    psds.splice(psds.indexOf(item), 1);
+                    if (k) {
+                        resolve(k);
+                    } else {
+                        reject();
+                    }
+                },
+            };
+            if (instance) {
+                instance.readPSDs([item]);
+            } else {
+                psds.push(item);
+            }
+        });
+        return promise;
     };
 }

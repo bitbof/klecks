@@ -15,6 +15,15 @@
 <script src="../../dist/embed.js"></script>
 <script type="text/javascript">
 
+    /*
+    Using Klecks in a drawing community:
+    - on first time opening, start with a manually created project (klecks.openProject)
+    - on submit, upload psd (and png) to the server
+    - on continuing a drawing, read psd that was stored on server (klecks.readPsd -> klecks.openProject)
+     */
+
+    const psdURL = 'example-drawing.psd';
+
     let saveData = (function () {
         let a = document.createElement("a");
         document.body.appendChild(a);
@@ -44,21 +53,40 @@
             }, 500);
         }
     });
-    klecks.openProject({
-        width: 500,
-        height: 500,
-        layers: [{
-            name: 'Background',
-            opacity: 1,
-            mixModeStr: 'source-over',
-            image: (() => {
-                let canvas = document.createElement('canvas');
-                canvas.width = 500;
-                canvas.height = 500;
-                return canvas;
-            })(),
-        }]
-    });
+
+    if (psdURL) {
+        fetch(new Request(psdURL)).then(response => {
+            return response.arrayBuffer();
+        }).then(buffer => {
+            return klecks.readPSD(buffer); // resolves to Klecks project
+        }).then(project => {
+            klecks.openProject(project);
+        }).catch(e => {
+            klecks.initError('failed to read image');
+        });
+
+    } else {
+        klecks.openProject({
+            width: 500,
+            height: 500,
+            layers: [{
+                name: 'Background',
+                opacity: 1,
+                mixModeStr: 'source-over',
+                image: (() => {
+                    const canvas = document.createElement('canvas');
+                    canvas.width = 500;
+                    canvas.height = 500;
+                    const ctx = canvas.getContext('2d');
+                    ctx.save();
+                    ctx.fillStyle = '#fff';
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+                    ctx.restore();
+                    return canvas;
+                })(),
+            }]
+        });
+    }
 </script>
 <!-- embed end -->
 
