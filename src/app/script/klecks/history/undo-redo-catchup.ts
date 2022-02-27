@@ -54,13 +54,9 @@ export class UndoRedoCatchup {
             if (KL.brushes.hasOwnProperty(b)) {
                 brushes[b] = new KL.brushes[b]();
                 brushes[b].setContext(_this.getCurrentLayerCtx());
-                brushes[b].setDebug('is_undo');
             }
         }
         brushes.sketchy.setSeed(_this.getInitState().brushes.sketchy.getSeed());
-        brushes.smoothBrush.setRequestCanvas(function () {
-            return _this.getKlCanvas();
-        });
         for (let i = 0; i < actions.length; i++) {
             (function (i) {
                 if (actions[i].tool[0] === "brush") {
@@ -158,9 +154,6 @@ export class UndoRedoCatchup {
                 brushes[b].setContext(_this.getCurrentLayerCtx());
             }
         }
-        brushes.smoothBrush.setRequestCanvas(function () {
-            return _this.getKlCanvas();
-        });
         brushes.sketchy.setSeed(_this.brushUiObj.sketchy.getSeed());
         for (let i = 0; i < actions.length; i++) {
             (function (i) {
@@ -243,6 +236,7 @@ export class UndoRedoCatchup {
 
     catchup (logParam) {
         const _this = this;
+        // const start = performance.now();
         //play catch up (the version that is a few steps behind)
         if (logParam && logParam.bufferUpdate) {
             let brushes = _this.getInitState().brushes;
@@ -313,6 +307,7 @@ export class UndoRedoCatchup {
             })(0);
             _this.getInitState().focus = layerIndex;
         }
+        // console.log('catchup', performance.now() - start);
     }
 
 

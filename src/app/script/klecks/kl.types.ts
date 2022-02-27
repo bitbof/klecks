@@ -66,3 +66,16 @@ export type IKlStorageProject = {
         blob: Blob; // png
     }[],
 };
+
+export interface IRGB {
+    r: number;
+    g: number;
+    b: number;
+}
+
+export interface IRGBA {
+    r: number;
+    g: number;
+    b: number;
+    a: number;
+}

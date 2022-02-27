@@ -1,5 +1,5 @@
 import {BB} from '../../bb/bb';
-import {IVector2D} from '../../bb/bb.types';
+import {IBounds, IVector2D} from '../../bb/bb.types';
 
 
 
@@ -16,14 +16,6 @@ import {IVector2D} from '../../bb/bb.types';
 // ix, iy + sans rounding + fast random: 0.46 ms
 // ix, iy + sans rounding + fast random + offset const: 0.48 ms
 
-
-
-interface IBounds {
-    x1: number;
-    y1: number;
-    x2: number;
-    y2: number;
-}
 
 interface ISmudgeParams {
     aP: IVector2D;
@@ -546,7 +538,7 @@ export function smudgeBrush() {
         }
 
         if (historyEntry && completeRedrawBounds) {
-            let historyImageData = copyImageData;
+            let historyIm: ImageData | HTMLCanvasElement = copyImageData;
             if (!(completeRedrawBounds.x1 === 0 && completeRedrawBounds.y1 === 0 && completeRedrawBounds.x2 >= context.canvas.width - 1 && completeRedrawBounds.y2 >= context.canvas.height - 1)) {
 
                 // temp canvas to prevent main canvas from getting slowed down in chrome
@@ -554,29 +546,29 @@ export function smudgeBrush() {
                 const tmpCtx = tmpCanvas.getContext('2d');
                 tmpCtx.drawImage(context.canvas, -completeRedrawBounds.x1, -completeRedrawBounds.y1);
 
-                historyImageData = tmpCtx.getImageData(
-                    0,
-                    0,
-                    tmpCanvas.width,
-                    tmpCanvas.height,
-                );
+                historyIm = tmpCanvas; // faster than getting image data (measured on 2018 lenovo chromebook)
             }
             historyEntry.actions.push({
                 action: "drawImage",
                 params: [
-                    historyImageData,
+                    historyIm,
                     completeRedrawBounds.x1,
                     completeRedrawBounds.y1,
                 ],
             });
             history.add(historyEntry);
+            historyEntry = undefined;
         }
         copyImageData = null;
-        historyEntry = undefined;
     };
 
-    this.drawImage = (imageData: ImageData, x: number, y: number) => {
-        context.putImageData(imageData, x, y);
+    this.drawImage = (im: ImageData | HTMLCanvasElement, x: number, y: number) => {
+        if (im instanceof ImageData) {
+            context.putImageData(im, x, y);
+        } else {
+            context.clearRect(x, y, im.width, im.height);
+            context.drawImage(im, x, y);
+        }
     };
 
     this.drawLineSegment = function (x1, y1, x2, y2) {

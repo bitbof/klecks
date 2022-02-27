@@ -8,14 +8,14 @@ import {PcSlider} from '../ui/base-components/slider';
 // @ts-ignore
 import brushIconImg from 'url:~/src/app/img/ui/brush-smooth.png';
 
-export const smoothBrushUi = (function () {
+export const blendBrushUi = (function () {
     let brushInterface: any = {
         image: brushIconImg,
         tooltip: 'Blend',
         sizeSlider: {
             min: 0.5,
-            max: 200,
-            curve: BB.quadraticSplineInput(0.5, 200, 0.1)
+            max: 100,
+            curve: BB.quadraticSplineInput(0.5, 100, 0.1)
         },
         opacitySlider: {
             min: 1 / 100,
@@ -29,7 +29,7 @@ export const smoothBrushUi = (function () {
      */
     brushInterface.Ui = function (p) {
         let div = document.createElement("div"); // the gui
-        let brush = new brushes.smoothBrush();
+        let brush = new brushes.BlendBrush();
         brush.setHistory(klHistory);
         p.onSizeChange(brush.getSize());
 
@@ -90,10 +90,10 @@ export const smoothBrushUi = (function () {
             blendingSlider.getElement().style.marginTop = "10px";
 
             let pressureSizeToggle = penPressureToggle(true, function (b) {
-                brush.sizePressure(b);
+                brush.setSizePressure(b);
             });
             let pressureOpacityToggle = penPressureToggle(false, function (b) {
-                brush.opacityPressure(b);
+                brush.setOpacityPressure(b);
             });
 
             let lockAlphaToggle = new Checkbox({
@@ -129,12 +129,12 @@ export const smoothBrushUi = (function () {
         init();
 
         this.increaseSize = function (f) {
-            if (!brush.isDrawing()) {
+            if (!brush.getIsDrawing()) {
                 sizeSlider.increaseValue(f);
             }
         };
         this.decreaseSize = function (f) {
-            if (!brush.isDrawing()) {
+            if (!brush.getIsDrawing()) {
                 sizeSlider.decreaseValue(f);
             }
         };
@@ -164,20 +164,16 @@ export const smoothBrushUi = (function () {
             brush.startLine(x, y, p);
         };
         this.goLine = function (x, y, p, isCoalesced) {
-            brush.goLine(x, y, p, undefined, isCoalesced);
+            brush.goLine(x, y, p, isCoalesced);
         };
         this.endLine = function () {
             brush.endLine();
-        };
-
-        this.setRequestCanvas = function (f) {
-            brush.setRequestCanvas(f);
         };
         this.getBrush = function () {
             return brush;
         };
         this.isDrawing = function () {
-            return brush.isDrawing();
+            return brush.getIsDrawing();
         };
         this.getElement = function () {
             return div;

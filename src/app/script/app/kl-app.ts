@@ -119,11 +119,6 @@ export function KlApp(pProject: IKlProject | null, pOptions: IKlAppOptions) {
                 }
             }
         }
-        if (initState.canvas) {
-            initState.brushes.smoothBrush.setRequestCanvas(function () {
-                return initState.canvas;
-            });
-        }
     };
     initState.initBrushes();
 
@@ -1118,11 +1113,6 @@ export function KlApp(pProject: IKlProject | null, pOptions: IKlAppOptions) {
             });
             brushUiObj[b] = ui;
             ui.getElement().style.padding = 10 + 'px';
-            if (brushUiObj[b].setRequestCanvas) {
-                brushUiObj[b].setRequestCanvas(function () {
-                    return klCanvas;
-                });
-            }
         }
     }
 

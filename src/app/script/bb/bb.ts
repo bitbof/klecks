@@ -41,7 +41,7 @@ import {
     rotate,
     rotateAround,
     intDxy,
-    roundEven, roundUneven
+    roundEven, roundUneven, distSquared, lenSquared, updateBounds
 } from './math/math';
 import {createCanvas} from './base/create-canvas';
 import {BbLog} from './base/bb-log';
@@ -83,6 +83,8 @@ export const BB = {
     // ---- math ----
     mix,
     dist,
+    distSquared,
+    lenSquared,
     pointsToAngleRad,
     pointsToAngleDeg,
     clamp,
@@ -93,6 +95,7 @@ export const BB = {
     intDxy,
     roundEven,
     roundUneven,
+    updateBounds,
 
     // ---- line ----
     projectPointOnLine,

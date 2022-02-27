@@ -1,4 +1,4 @@
-import {IVector2D} from '../BB.types';
+import {IBounds, IVector2D} from '../BB.types';
 
 export function mix (x: number, y: number, a: number): number {
     return x * (1 - a) + y * a;
@@ -6,6 +6,16 @@ export function mix (x: number, y: number, a: number): number {
 
 export function dist (ax: number, ay: number, bx: number, by: number): number {
     return Math.sqrt(Math.pow(ax - bx, 2) + Math.pow(ay - by, 2));
+}
+
+export function distSquared (ax: number, ay: number, bx: number, by: number): number {
+    // faster because no square-root
+    return Math.pow(ax - bx, 2) + Math.pow(ay - by, 2);
+}
+
+export function lenSquared (x: number, y: number): number {
+    // faster because no square-root
+    return x * x + y * y;
 }
 
 export function pointsToAngleRad (p1: IVector2D, p2: IVector2D): number {
@@ -16,8 +26,12 @@ export function pointsToAngleDeg (p1: IVector2D, p2: IVector2D): number {
     return pointsToAngleRad(p1, p2) * 180 / Math.PI;
 }
 
-export function clamp (val: number, min: number, max: number): number {
-    return Math.max(min, Math.min(max, val));
+export function clamp (num: number, min: number, max: number): number {
+    return num <= min
+        ? min
+        : num >= max
+            ? max
+            : num;
 }
 
 export function rotate (x: number, y: number, deg: number): IVector2D {
@@ -91,5 +105,22 @@ export function roundUneven(f: number) {
     }
 }
 
-
-
+/**
+ * update target so it includes bounds
+ * @param target
+ * @param bounds
+ */
+export function updateBounds(target: IBounds, bounds: IBounds): IBounds {
+    if (!bounds) {
+        return target;
+    }
+    if (!target) {
+        target = { x1: bounds.x1, y1: bounds.y1, x2: bounds.x2, y2: bounds.y2 };
+    } else {
+        target.x1 = Math.min(target.x1, bounds.x1);
+        target.y1 = Math.min(target.y1, bounds.y1);
+        target.x2 = Math.max(target.x2, bounds.x2);
+        target.y2 = Math.max(target.y2, bounds.y2);
+    }
+    return target;
+}
