@@ -815,7 +815,7 @@ export function KlCanvasWorkspace(p: {
                     let offsetX = event.pageX - event.relX;
                     let offsetY = event.pageY - event.relY;
 
-                    internalZoomByStep(event.dX / 200, event.downPageX - offsetX, event.downPageY - offsetY);
+                    internalZoomByStep(event.dX / 175, event.downPageX - offsetX, event.downPageY - offsetY);
                     highResTransformObj = JSON.parse(JSON.stringify(targetTransformObj));
                     lastRenderedState = -1;
                     requestFrame();

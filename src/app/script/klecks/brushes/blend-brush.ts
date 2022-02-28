@@ -182,7 +182,7 @@ export class BlendBrush {
 
     private getAverage (x, y, size): IRGBA {
 
-        size = Math.max(1, size * 0.75);
+        size = Math.max(0.5, size * 0.75);
         const x1 = Math.max(0, Math.floor(x - size));
         const y1 = Math.max(0, Math.floor(y - size));
         const x2 = Math.min(this.context.canvas.width - 1, Math.ceil(x + size));
@@ -230,6 +230,7 @@ export class BlendBrush {
     }
 
     private prepDot (x: number, y: number, size: number): IBounds {
+        size = Math.max(0.5, size);
         let x1 = Math.max(0, Math.floor(x - size));
         let y1 = Math.max(0, Math.floor(y - size));
         let x2 = Math.min(this.context.canvas.width - 1, Math.ceil(x + size));
@@ -250,8 +251,8 @@ export class BlendBrush {
         }
 
         // thin lines take more than just 1 sample
-        const sampleArr = [4,4,4,2,2,2,2,2,2];
-        const samples = sampleArr[Math.floor(params.size * 2) - 1];
+        const sampleArr = [8,4,4,4,2,2,2,2,2,2]; // <0.5, 0.5, 1, 1.5, etc.
+        const samples = sampleArr[Math.floor(params.size * 2)];
         const samplesSquared: number = samples ? samples * samples : 0;
         const sampleOffsets = [];
         if (samples) {
@@ -399,9 +400,10 @@ export class BlendBrush {
             if (isCoalesced) {
                 average = {r: this.localColOld.r, g: this.localColOld.g, b: this.localColOld.b, a: 0};
             } else {
-                const bounds = this.prepDot(avgX, avgY, ((this.settingSizePressure) ? Math.max(0.1, p * this.size) : Math.max(0.1, this.size)));
+                const avgParams = [avgX, avgY, ((this.settingSizePressure) ? Math.max(0.5, p * this.size) : Math.max(0.5, this.size))];
+                const bounds = this.prepDot(avgParams[0], avgParams[1], avgParams[2]);
                 this.copyFromCanvas(bounds);
-                average = this.getAverage(avgX, avgY, ((this.settingSizePressure) ? Math.max(0.1, p * this.size) : Math.max(0.1, this.size)));
+                average = this.getAverage(avgParams[0], avgParams[1], avgParams[2]);
             }
             localColNew = {r: 0, g: 0, b: 0, a: 0};
 
