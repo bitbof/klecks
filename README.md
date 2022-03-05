@@ -17,6 +17,7 @@ For a demo and list of features visit [kleki.com/home](https://kleki.com/home/).
 - `npm run start` - dev server (to run it locally)
 - `npm run build` - build standalone into `/dist/`
 - `npm run build:embed` - build of embed into `/dist/`
+- `npm run build:help` - build help page (when clicking the questionmark) into `/dist/`
 
 # Embed
 Example usage of the embed can be found under: `/examples/embed/`

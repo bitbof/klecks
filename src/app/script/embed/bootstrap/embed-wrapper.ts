@@ -2,6 +2,7 @@ import {IEmbedParams, IReadPSD} from '../../main-embed';
 import {IKlProject} from '../../klecks/kl.types';
 // @ts-ignore
 import logoImg from 'url:~/src/app/img/klecks-logo.png';
+import {getEmbedUrl} from './get-embed-url';
 
 let wrapperInstance: boolean = false;
 
@@ -11,6 +12,11 @@ export function EmbedWrapper(p: IEmbedParams) {
         throw new Error('Already created an embed');
     }
     wrapperInstance = true;
+
+    p = {
+        ...p,
+        embedUrl: p.embedUrl ? p.embedUrl : getEmbedUrl(),
+    };
 
 
     // loading screen

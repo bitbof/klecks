@@ -11,7 +11,8 @@
   "scripts": {
     "start": "parcel serve src/index.html --no-cache",
     "build": "parcel build src/index.html",
-    "build:embed": "parcel build src/embed.ts"
+    "build:embed": "parcel build src/embed.ts",
+    "build:help": "parcel build src/help.html --public-url ."
   },
   "devDependencies": {
     "@parcel/transformer-sass": "^2.0.1",

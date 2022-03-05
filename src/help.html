@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Klecks Help</title>
+    <style>
+        :root {
+            --active-highlight-color: #87abf1;
+            --body-bg-color: #ddd;
+            --klecks-color: #2a64f8;
+            --line-color: #e1e1e1;
+        }
+
+        body, html {
+            text-size-adjust: none;
+            -webkit-text-size-adjust: none;
+            -moz-text-size-adjust: none;
+            -ms-text-size-adjust: none;
+        }
+
+        body {
+            background: #fff;
+            margin: 20px;
+            color: #000;
+            font-family: Arial, sans-serif;
+            font-size: 17px;
+            line-height: 22px;
+        }
+
+        div, a, span, p {
+            box-sizing: border-box;
+        }
+
+        a:link, a:not([href]) {
+            color: var(--klecks-color);
+            text-decoration: underline;
+            cursor: pointer;
+        }
+
+        a:visited {
+            color: #536184;
+            text-decoration: underline;
+        }
+
+        a:hover, a:not([href]):hover {
+            color: #000;
+            text-decoration: underline;
+        }
+
+        .content {
+            max-width: 880px;
+            background: #fff;
+            margin-left: auto;
+            margin-right: auto;
+            padding: 20px 40px;
+            overflow: hidden;
+
+            display: flex;
+            min-height: 100vh;
+            flex-direction: column;
+        }
+
+        .content-content {
+            flex: 1 auto;
+        }
+
+        .iframe-overlay {
+            position: fixed;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            right: 0;
+            background: linear-gradient(180deg, rgba(0, 0, 0, 0.1) 0px, rgba(0, 0, 0, 0) 30px);
+            pointer-events: none;
+            display: none;
+            transition: opacity 100ms ease-out;
+            opacity: 0;
+        }
+
+        .bv-checkbox {
+            display: inline-block;
+            cursor: pointer;
+            user-select: none;
+            webkit-user-select: none;
+            color: rgba(0, 0, 0, 0.75);
+        }
+
+        .bv-checkbox:hover {
+            color: rgba(0, 0, 0, 1);
+        }
+
+        li {
+            margin-left: 0;
+        }
+
+        ul {
+            margin-top: 0;
+            padding-top: 0;
+        }
+
+        .aboveList {
+            margin-bottom: 4px;
+        }
+
+        .w-290 {
+            width: 290px;
+        }
+
+        /* --- help ---*/
+        .key {
+            background: #eee;
+            padding: 0 4px;
+            border-radius: 3px;
+            box-shadow: 1px 1px #ccc;
+            color: rgb(55, 55, 55);
+            min-width: 13px;
+            display: inline-block;
+            text-align: center;
+            font-size: 0.9em;
+            line-height: 1.6em;
+            font-family: monospace;
+        }
+
+        .help-block {
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--line-color);
+            padding-bottom: 40px;
+            margin-bottom: 40px;
+        }
+
+        .help-block > img {
+            align-self: flex-start;
+            flex-shrink: 0;
+            margin-left: 10px;
+        }
+
+        .help-shortcut {
+            display: flex;
+        }
+
+        .help-shortcut>div:first-child {
+            width: 160px;
+            padding-right: 10px;
+        }
+
+        .help-shortcut>div:last-child {
+            line-height: 1.6em;
+        }
+
+        .help-shortcut-title {
+            display: inline-block;
+            width: 160px;
+        }
+
+        .help-ul {
+            list-style-type: circle;
+            padding-inline-start: 20px;
+        }
+
+        .help-ul > li {
+            border-bottom: 1px solid #e0e0e0;
+            /*width: 500px;*/
+            padding-right: 10px;
+            padding-top: 5px;
+            padding-bottom: 5px;
+        }
+
+        .help-ul > li:nth-child(even) {
+            background: #f9f9f9;
+        }
+
+        .help-header {
+            display: flex;
+            align-items: center;
+            font-size: 30px;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+        .help-header > img {
+            margin-right: 10px;
+            height: 30px;
+        }
+        .help-header__version {
+            font-size: 20px;
+        }
+
+
+        /* --- utils ---*/
+        .mt0 {
+            margin-top: 0;
+        }
+
+        .mb0 {
+            margin-bottom: 0;
+        }
+
+        .pb0 {
+            padding-bottom: 0;
+        }
+
+        .bb0 {
+            border-bottom: none;
+        }
+
+
+
+        /* --- mobile --- */
+
+        @media (max-width: 640px) {
+            .nav-link.hide-in-iframe {
+                display: none;
+            }
+        }
+
+        @media (max-width: 590px) {
+
+
+            body {
+                font-size: 15px;
+            }
+
+            .content {
+                padding: 15px;
+            }
+
+            .header-logo img {
+                height: 20px;
+            }
+
+            .nav-link {
+                margin: 0;
+            }
+
+            .home-intro > iframe {
+                height: 250px;
+            }
+
+            .home-row {
+                display: block;
+                margin-bottom: 0;
+            }
+
+            .home-row>div {
+                margin-bottom: 40px;
+            }
+
+            .footer {
+                flex-wrap: wrap;
+            }
+
+            .footer > div {
+                min-width: 33%;
+
+            }
+
+            .footer-col {
+                margin-bottom: 20px;
+            }
+
+            .about-wrapper {
+                display:block;
+            }
+
+            .about-wrapper>img {
+                display: block;
+                margin-left: auto;
+                margin-right: auto;
+            }
+
+            #donate-title > div {
+                width: 450px;
+            }
+
+            #donate-swoosh-bottom {
+                width: 200px;
+                right: -222px;
+                top: 5px;
+            }
+
+
+        }
+
+        @media (max-width: 750px) {
+            .help-block {
+                display: block;
+            }
+
+            .help-shortcut>div:first-child {
+                width: 110px !important;
+                min-width: 110px !important;
+            }
+
+            .help-block>img {
+                display: block;
+                margin-top: 20px;
+                margin-left: auto;
+                margin-right: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="content-content">
+    <div class="help-header">
+        <img src="./app/img/klecks-logo.png" data-allow-click="true" alt="Klecks Logo">
+        <div>Help</div>
+        <div style="flex-grow: 1"></div>
+        <a class="help-header__version" href="#about">About</a>
+    </div>
+    <div class="help-block">
+        <div>
+            <h3 class="mt0">Shortcuts</h3>
+            <ul class="help-ul">
+                <li>
+                    <div class="help-shortcut">
+                        <div>Eyedropper</div>
+                        <div>Right Mouse Button, or <span class="key">Alt</span> + Mouse</div>
+                    </div>
+                </li>
+                <li>
+                    <div class="help-shortcut">
+                        <div>Hand Tool</div>
+                        <div>Middle Mouse Button, or <span class="key">Space</span> + Mouse</div>
+                    </div>
+                </li>
+                <li>
+                    <div class="help-shortcut">
+                        <div>Hand Tool</div>
+                        <div>Arrow keys</div>
+                    </div>
+                </li>
+                <li>
+                    <div class="help-shortcut">
+                        <div>Zoom</div>
+                        <div>Scroll, or hold <span class="key">Z</span> + drag horizontally</div>
+                    </div>
+                </li>
+                <li>
+                    <div class="help-shortcut">
+                        <div>Zoom</div>
+                        <div><span class="key">+</span> in, <span class="key">-</span> out</div>
+                    </div>
+                </li>
+                <li>
+                    <div class="help-shortcut">
+                        <div>Rotate View</div>
+                        <div>Hold <span class="key">R</span> and drag (+ Shift for snapping)</div>
+                    </div>
+                </li>
+                <li>
+                    <div class="help-shortcut">
+                        <div>Rotate View</div>
+                        <div>Hold <span class="key">R</span> and press <span class="key">←</span> or <span class="key">→</span></div>
+                    </div>
+                </li>
+                <li>
+                    <div class="help-shortcut">
+                        <div>Reset Rotation</div>
+                        <div><span class="key">R</span> + <span class="key">Up-Arrow</span></div>
+                    </div>
+                </li>
+                <li>
+                    <div class="help-shortcut">
+                        <div>Fit Into View</div>
+                        <div>Double click while using Hand Tool, or <span class="key">Home</span></div>
+                    </div>
+                </li>
+                <li>
+                    <div class="help-shortcut">
+                        <div>Reset View</div>
+                        <div><span class="key">End</span></div>
+                    </div>
+                </li>
+                <li>
+                    <div class="help-shortcut">
+                        <div>Undo</div>
+                        <div><span class="key">Ctrl</span> + <span class="key">Z</span> or <span class="key">⌘</span> + <span class="key">Z</span></div>
+                    </div>
+                </li>
+                <li>
+                    <div class="help-shortcut">
+                        <div>Redo</div>
+                        <div><span class="key">Ctrl</span> + <span class="key">Y</span> or <span class="key">⌘</span> + <span class="key">Y</span></div>
+                    </div>
+                </li>
+                <li>
+                    <div class="help-shortcut">
+                        <div>HUD Color Picker</div>
+                        <div><span class="key">Ctrl</span> + <span class="key">Alt</span> or <span class="key">⌘</span> + <span class="key">Alt</span></div>
+                    </div>
+                </li>
+                <li>
+                    <div class="help-shortcut">
+                        <div>Line Tool</div>
+                        <div>Hold <span class="key">Shift</span> while drawing</div>
+                    </div>
+                </li>
+                <li>
+                    <div class="help-shortcut">
+                        <div>Change Brushsize</div>
+                        <div><span class="key">[</span> decrease, <span class="key">]</span> increase</div>
+                    </div>
+                </li>
+                <li>
+                    <div class="help-shortcut">
+                        <div>Swap color</div>
+                        <div><span class="key">X</span></div>
+                    </div>
+                </li>
+                <li>
+                    <div class="help-shortcut">
+                        <div>Paint Bucket</div>
+                        <div><span class="key">G</span></div>
+                    </div>
+                </li>
+                <li>
+                    <div class="help-shortcut">
+                        <div>Text Tool</div>
+                        <div><span class="key">T</span></div>
+                    </div>
+                </li>
+                <li>
+                    <div class="help-shortcut">
+                        <div>Shape Tool</div>
+                        <div><span class="key">U</span></div>
+                    </div>
+                </li>
+                <li>
+                    <div class="help-shortcut">
+                        <div>Last Brush</div>
+                        <div><span class="key">B</span></div>
+                    </div>
+                </li>
+                <li>
+                    <div class="help-shortcut">
+                        <div>Eraser</div>
+                        <div><span class="key">E</span></div>
+                    </div>
+                </li>
+                <li>
+                    <div class="help-shortcut">
+                        <div>Clear Layer</div>
+                        <div><span class="key">Delete</span> or <span class="key">Backspace</span></div>
+                    </div>
+                </li>
+                <li>
+                    <div class="help-shortcut">
+                        <div>Fill Layer</div>
+                        <div><span class="key">Enter</span></div>
+                    </div>
+                </li>
+                <li>
+                    <div class="help-shortcut">
+                        <div>Relative Sliding</div>
+                        <div>Drag with Right Mouse Button</div>
+                    </div>
+                </li>
+                <li>
+                    <div class="help-shortcut">
+                        <div>Relative Sliding</div>
+                        <div>Scroll-Wheel</div>
+                    </div>
+                </li>
+                <li>
+                    <div class="help-shortcut">
+                        <div>Finegrained Sliding</div>
+                        <div>Pull pointer away vertically</div>
+                    </div>
+                </li>
+            </ul>
+            <b>Touch</b>
+            <ul class="help-ul mb0">
+                <li>
+                    <div class="help-shortcut">
+                        <div>Hand Tool</div>
+                        <div>Drag/pinch/twist with 2 fingers</div>
+                    </div>
+                </li>
+                <li>
+                    <div class="help-shortcut">
+                        <div>Fit Into View</div>
+                        <div>Double tap with 1 finger</div>
+                    </div>
+                </li>
+                <li>
+                    <div class="help-shortcut">
+                        <div>Undo</div>
+                        <div>Tap with 2 fingers</div>
+                    </div>
+                </li>
+                <li>
+                    <div class="help-shortcut">
+                        <div>Redo</div>
+                        <div>Tap with 3 fingers</div>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <div class="help-block">
+        <div>
+            <h3 class="mt0">Pressure Sensitivity</h3>
+            If you use a stylus (Wacom tablet, Apple Pencil, ...) and your browser supports it, then Klecks offers pressure
+            sensitivity.
+            You can toggle it next to the brush sliders.
+            That way your pen pressure can affect brush size and opacity.
+        </div>
+    </div>
+    <div class="help-block">
+        <div>
+            <h3 class="mt0">Stabilizer</h3>
+            Stabilization makes it easier to control your lines by lagging behind and averaging your drawing motion.
+            This is mostly used to create clean final lineart. It can also help making drawing easier in general when you
+            only
+            have a mouse.<br><br>
+            The responsiveness of no stabilization is desirable for fast sketching, or for large brush sizes, where jitter
+            is
+            less visible.<br>
+        </div>
+    </div>
+    <div class="help-block" id="about">
+        <div>
+            <h3 class="mt0">About</h3>
+
+            Klecks (<a href="https://klecks.org" target="_blank" rel="noopener noreferrer">Klecks.org</a>, <a href="https://kleki.com/home" target="_blank" rel="noopener noreferrer">Kleki.com</a>)<br>
+            An open-source, community funded, painting tool for the browser. <a href="https://kleki.com/donate" target="_blank" rel="noopener noreferrer">Donate</a> to support further improvements.<br>
+            Copyright (c) <a href="https://bitbof.com" target="_blank" rel="noopener noreferrer">bitbof</a><br>
+            <br>
+            Additional Credits: <a href="https://evanw.github.com/glfx.js" target="_blank" rel="noopener noreferrer">glfx.js</a> for filters, <a href="http://mrdoob.com/projects/harmony/" target="_blank" rel="noopener noreferrer">Harmony</a> inspired the Sketchy-Brush, <a href="https://github.com/eligrey/FileSaver.js" target="_blank" rel="noopener noreferrer">FileSaver.js</a> for saving files, <a href="https://github.com/Agamnentzar/ag-psd" target="_blank" rel="noopener noreferrer">ag-psd</a> for PSD import/export.
+        </div>
+    </div>
+</div>
+
+<script>
+
+    (function() {
+        "use strict";
+
+        //iframe styling - hiding and showing certain elements
+        if(self !== parent) {
+            let styleEl = document.createElement('style');
+            styleEl.innerHTML = '.hide-in-iframe { display: none !important; } .iframe-overlay { display: block; }';
+            document.head.appendChild(styleEl);
+
+            //meta tag to prevent zooming on ipad, because of an ipados 13 bug. gets stuck zoomed in.
+            let metaArr = document.head.getElementsByTagName('meta');
+            for(let i = 0; i < metaArr.length; i++) {
+                let meta = metaArr[i];
+                if(meta.getAttribute('name') === 'viewport') {
+                    meta.setAttribute('content', 'width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no');
+                }
+            }
+            document.body.onclick = function(clickEvent) {
+                if(['A', 'LABEL', 'INPUT'].includes(clickEvent.target.tagName) || clickEvent.target.getAttribute('data-allow-click') === "true") {
+                    return true;
+                }
+                clickEvent.preventDefault();
+                return false;
+            };
+        }
+
+
+    })();
+
+</script>
+</body>
+</html>
