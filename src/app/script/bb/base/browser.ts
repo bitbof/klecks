@@ -1,7 +1,6 @@
 import {createCanvas} from './create-canvas';
 
 export const isFirefox = navigator.userAgent.toLowerCase().indexOf('firefox') > -1;
-export const isEdge = window.navigator.userAgent.indexOf('Edge') > -1;
 
 export const eventUsesHighResTimeStamp = (function() {
 

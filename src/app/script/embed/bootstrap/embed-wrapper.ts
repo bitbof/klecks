@@ -18,7 +18,6 @@ export function EmbedWrapper(p: IEmbedParams) {
         embedUrl: p.embedUrl ? p.embedUrl : getEmbedUrl(),
     };
 
-
     // loading screen
     let loadingScreen = document.createElement('div');
     const loadingStyleArr = [

@@ -368,11 +368,7 @@ export const PointerListener = (function () {
 
             let customPressure = null;
             if ('pointerId' in event) {
-                if (isFirefox) {
-                    correctedObj.pressure = 1;
-                    customPressure = 1;
-                    //correctedObj.pointerId = 0; // commented -> make multi touch work on mobile
-                } else if ('pressure' in event && event.buttons !== 0 && (['mouse'].includes(event.pointerType) || (event.pointerType === 'touch' && event.pressure === 0))) {
+                if ('pressure' in event && event.buttons !== 0 && (['mouse'].includes(event.pointerType) || (event.pointerType === 'touch' && event.pressure === 0))) {
                     correctedObj.pressure = 1;
                     customPressure = 1;
                 }
