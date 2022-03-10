@@ -1,5 +1,5 @@
 import {BB} from '../../../bb/bb';
-import {PcSlider} from '../base-components/slider';
+import {KlSlider} from '../base-components/kl-slider';
 import {Select} from '../base-components/select';
 import {Checkbox} from '../base-components/checkbox';
 
@@ -7,7 +7,7 @@ import {Checkbox} from '../base-components/checkbox';
  * Paint Bucket tab contents (color slider, opacity slider, etc)
  *
  * p = {
- *     colorSlider: PcColorSlider// when opening tab, inserts it (snatches it from where else it was)
+ *     colorSlider: KlColorSlider// when opening tab, inserts it (snatches it from where else it was)
  * }
  *
  * @param p
@@ -28,7 +28,7 @@ export function FillUi(p) {
         }
     });
 
-    let opacitySlider = new PcSlider({
+    let opacitySlider = new KlSlider({
         label: 'Opacity',
         width: 250,
         height: 30,
@@ -43,7 +43,7 @@ export function FillUi(p) {
     });
     div.appendChild(opacitySlider.getElement());
 
-    let toleranceSlider = new PcSlider({
+    let toleranceSlider = new KlSlider({
         label: 'Tolerance',
         width: 250,
         height: 30,
@@ -158,7 +158,7 @@ export function FillUi(p) {
     this.setIsVisible = function(pIsVisible) {
         isVisible = !!pIsVisible;
         div.style.display = isVisible ? 'block' : 'none';
-        if(isVisible) {
+        if (isVisible) {
             colorDiv.appendChild(p.colorSlider.getElement());
             colorDiv.appendChild(p.colorSlider.getOutputElement());
         }

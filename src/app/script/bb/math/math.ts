@@ -1,7 +1,7 @@
 import {IBounds, IVector2D} from '../BB.types';
 
-export function mix (x: number, y: number, a: number): number {
-    return x * (1 - a) + y * a;
+export function mix (a: number, b: number, f: number): number {
+    return a * (1 - f) + b * f;
 }
 
 export function dist (ax: number, ay: number, bx: number, by: number): number {
@@ -110,7 +110,7 @@ export function roundUneven(f: number) {
  * @param target
  * @param bounds
  */
-export function updateBounds(target: IBounds, bounds: IBounds): IBounds {
+export function updateBounds (target: IBounds, bounds: IBounds): IBounds {
     if (!bounds) {
         return target;
     }
@@ -123,4 +123,18 @@ export function updateBounds(target: IBounds, bounds: IBounds): IBounds {
         target.y2 = Math.max(target.y2, bounds.y2);
     }
     return target;
+}
+
+/**
+ * determine overlap of bounds with width&height
+ */
+export function boundsInArea (bounds: IBounds, width: number, height: number): IBounds | null {
+    let x1 = Math.max(0, bounds.x1);
+    let y1 = Math.max(0, bounds.y1);
+    let x2 = Math.min(width - 1, bounds.x2);
+    let y2 = Math.min(height - 1, bounds.y2);
+    if (x1 > x2 || y1 > y2) {
+        return null;
+    }
+    return { x1, y1, x2, y2 };
 }

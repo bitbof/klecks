@@ -1,12 +1,13 @@
 import {BB} from '../../bb/bb';
 import {eventResMs} from './filters-consts';
-import {PcSlider} from '../ui/base-components/slider';
+import {KlSlider} from '../ui/base-components/kl-slider';
 import {KlCanvasPreview} from '../canvas-ui/canvas-preview';
 import {getSharedFx} from './shared-gl-fx';
+import {IFilterApply, IFilterGetDialogParam} from '../kl.types';
 
 export const glUnsharpMask = {
 
-    getDialog(params) {
+    getDialog(params: IFilterGetDialogParam) {
         let context = params.context;
         let canvas = params.canvas;
         if (!context || !canvas) {
@@ -49,7 +50,7 @@ export const glUnsharpMask = {
             let texture = glCanvas.texture(tempCanvas);
             glCanvas.draw(texture).update(); // update glCanvas size
 
-            let radiusSlider = new PcSlider({
+            let radiusSlider = new KlSlider({
                 label: 'Radius',
                 width: 300,
                 height: 30,
@@ -64,7 +65,7 @@ export const glUnsharpMask = {
                 },
                 curve: [[0, 0], [0.1, 2], [0.5, 50], [1, 200]]
             });
-            let strengthSlider = new PcSlider({
+            let strengthSlider = new KlSlider({
                 label: 'Strength',
                 width: 300,
                 height: 30,
@@ -103,7 +104,7 @@ export const glUnsharpMask = {
 
             let previewLayerArr = [];
             {
-                for(let i = 0; i < layers.length; i++) {
+                for (let i = 0; i < layers.length; i++) {
                     previewLayerArr.push({
                         canvas: i === selectedLayerIndex ? glCanvas : layers[i].context.canvas,
                         opacity: layers[i].opacity,
@@ -158,14 +159,14 @@ export const glUnsharpMask = {
     },
 
 
-    apply(params) {
+    apply(params: IFilterApply) {
         let context = params.context;
         let history = params.history;
         let radius = params.input.radius;
         let strength = params.input.strength;
         if (!context || radius === null || strength === null || !history)
             return false;
-        history.pause();
+        history.pause(true);
         let glCanvas = getSharedFx();
         if (!glCanvas) {
             return false; // todo more specific error?
@@ -176,7 +177,7 @@ export const glUnsharpMask = {
         context.drawImage(glCanvas, 0, 0);
         texture.destroy();
         history.pause(false);
-        history.add({
+        history.push({
             tool: ["filter", "glUnsharpMask"],
             action: "apply",
             params: [{

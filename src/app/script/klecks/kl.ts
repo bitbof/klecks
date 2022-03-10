@@ -1,4 +1,4 @@
-import {klHistory} from './history/kl-history';
+import {DecoyKlHistory, klHistory} from './history/kl-history';
 import {Popup, popup} from './ui/modals/popup';
 import {dialogCounter} from './ui/modals/modal-count';
 import {Checkbox} from './ui/base-components/checkbox';
@@ -7,11 +7,11 @@ import {Select} from './ui/base-components/select';
 import {ImageToggle} from './ui/base-components/image-toggle';
 import {ImageRadioList} from './ui/base-components/image-radio-list';
 import {penPressureToggle} from './ui/base-components/pen-pressure-toggle';
-import {PcSlider} from './ui/base-components/slider';
+import {KlSlider} from './ui/base-components/kl-slider';
 import {calcSliderFalloffFactor} from './ui/base-components/slider-falloff';
 import {HexColorDialog} from './ui/modals/color-slider-hex-dialog';
-import {PcColorSlider} from './ui/base-components/color-slider';
-import {PcSmallColorSlider} from './ui/base-components/color-slider-small';
+import {KlColorSlider} from './ui/base-components/kl-color-slider';
+import {KlSmallColorSlider} from './ui/base-components/kl-color-slider-small';
 import {PointSlider} from './ui/base-components/point-slider';
 import {ColorOptions} from './ui/base-components/color-options';
 import {Options} from './ui/base-components/options';
@@ -20,9 +20,9 @@ import {exportDialog} from './ui/modals/export-dialog-deprecated';
 import {CropCopy} from './ui/components/crop-copy';
 import {clipboardDialog} from './ui/modals/clipboard-dialog';
 import {TabMenu} from './ui/components/tab-menu-deprecated';
-import {pcLayerManager} from './ui/components/layer-manager';
+import {klLayerManager} from './ui/components/kl-layer-manager';
 import {WorkspaceSvgOverlay} from './canvas-ui/workspace-svg-overlay';
-import {KlCanvasWorkspace} from './canvas-ui/canvas-workspace';
+import {KlCanvasWorkspace} from './canvas-ui/kl-canvas-workspace';
 import {KlCanvasPreview} from './canvas-ui/canvas-preview';
 import {FreeTransform} from './ui/components/free-transform';
 import {FreeTransformCanvas} from './ui/components/free-transform-canvas';
@@ -32,7 +32,7 @@ import {LayerPreview} from './ui/components/layer-preview';
 import {showSaveReminderToast} from './ui/components/show-reminder-toast';
 import {FittedImage} from './ui/components/fitted-image';
 import {showImportAsLayerDialog} from './ui/modals/show-import-as-layer-dialog';
-import {PcImageDropper} from './ui/components/image-dropper';
+import {KlImageDropper} from './ui/components/kl-image-dropper';
 import {OverlayToolspace} from './ui/components/overlay-toolspace';
 import {ToolspaceTopRow} from './ui/components/toolspace-top-row';
 import {ToolDropdown} from './ui/components/tool-dropdown';
@@ -69,6 +69,8 @@ import {SaveReminder} from "./ui/components/save-reminder";
 import {SaveToComputer} from "./storage/save-to-computer";
 import {UndoRedoCatchup} from "./history/undo-redo-catchup";
 import {setDbName} from './storage/indexed-db';
+import {BrushSettingService} from './brushes-ui/brush-setting-service';
+import {BoxToggle} from './ui/base-components/box-toggle';
 
 /**
  * paint tool functionality
@@ -78,6 +80,7 @@ export const KL = {
     // --- brushes ---
     brushes,
     brushesUI,
+    BrushSettingService,
 
     // --- canvas ---
     KlCanvas,
@@ -111,33 +114,34 @@ export const KL = {
 
     // --- ui - base components ---
     calcSliderFalloffFactor,
-    CheckBox: Checkbox,
+    Checkbox,
     input,
     Select,
     ImageToggle,
     ImageRadioList,
     RadioList,
     penPressureToggle,
-    PcSlider,
+    KlSlider,
     HexColorDialog,
-    PcColorSlider,
-    PcSmallColorSlider,
+    KlColorSlider,
+    KlSmallColorSlider,
     PointSlider,
     ColorOptions,
     Options,
+    BoxToggle,
 
     // --- ui - components ---
     StatusOverlay,
     CropCopy,
     TabMenu,
-    pcLayerManager,
+    klLayerManager,
     FreeTransform,
     FreeTransformCanvas,
     Cropper,
     LayerPreview,
     showSaveReminderToast,
     FittedImage,
-    PcImageDropper,
+    KlImageDropper,
     OverlayToolspace,
     ToolspaceTopRow,
     ToolDropdown,
@@ -172,4 +176,5 @@ export const KL = {
 
 
     klHistory,
+    DecoyKlHistory,
 };

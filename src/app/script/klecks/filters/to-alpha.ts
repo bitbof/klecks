@@ -3,10 +3,11 @@ import {Options} from '../ui/base-components/options';
 import {ColorOptions} from '../ui/base-components/color-options';
 import {KlCanvasPreview} from '../canvas-ui/canvas-preview';
 import {getSharedFx} from './shared-gl-fx';
+import {IFilterApply, IFilterGetDialogParam} from '../kl.types';
 
 export const toAlpha = {
 
-    getDialog(params) {
+    getDialog(params: IFilterGetDialogParam) {
         let context = params.context;
         let canvas = params.canvas;
         if (!context || !canvas) {
@@ -129,7 +130,7 @@ export const toAlpha = {
 
             let previewLayerArr = [];
             {
-                for(let i = 0; i < layers.length; i++) {
+                for (let i = 0; i < layers.length; i++) {
                     previewLayerArr.push({
                         canvas: i === selectedLayerIndex ? glCanvas : layers[i].context.canvas,
                         opacity: layers[i].opacity,
@@ -184,14 +185,14 @@ export const toAlpha = {
     },
 
 
-    apply(params) {
+    apply(params: IFilterApply) {
         let context = params.context;
         let history = params.history;
         let sourceId = params.input.sourceId;
         let selectedRgbaObj = params.input.selectedRgbaObj;
         if (!context || !sourceId || !history)
             return false;
-        history.pause();
+        history.pause(true);
         let glCanvas = getSharedFx();
         if (!glCanvas) {
             return false; // todo more specific error?
@@ -202,7 +203,7 @@ export const toAlpha = {
         context.drawImage(glCanvas, 0, 0);
         texture.destroy();
         history.pause(false);
-        history.add({
+        history.push({
             tool: ["filter", "toAlpha"],
             action: "apply",
             params: [{

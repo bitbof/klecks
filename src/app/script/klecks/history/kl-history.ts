@@ -1,131 +1,188 @@
 
+export interface IHistoryEntry {
+    tool: string[];
+    action?: string;
+    params?: any[];
 
-export const klHistory = (function () {
-    let clearCount = 0;
-    let state = 0; //a number incrementing up with every clear, add, undo, redo
-    const hInterface: any = {};
-    let dataArr = [];
-    const listeners = [];
-    let pauseStack = 0;
-    const max = 14; //max amount of undo steps
-    let maxState = -1; //can't go backwards -> max state is the buffer image(klCanvas)
+    actions?: {
+        action: string;
+        params: any[];
+    }[]
+}
 
-    let currentIndex = -1; // current action the user is on. untouched document = -1 because dataArr.length is 0
+export interface IHistoryBroadcast {
+    bufferUpdate: IHistoryEntry;
+}
 
-    hInterface.clear = function () {
-        dataArr = [];
-        pauseStack = 0;
-        currentIndex = -1;
-        maxState = -1;
-        clearCount++;
-        broadcast();
-    };
-    //you need pause because there are sometimes actions that would cause other
-    // undo steps
-    // for example a filter that does something crazy with two layers and then merges them
-    // you want that to be one undo step, and prevent merging from causing its undo step.
-    // so while that filter is doing its magic you should pause possible undo steps that
-    // that are caused by a part of its code(in this example: merging layers)
-    hInterface.pause = function (b) {
-        if (b === false) {
-            pauseStack = Math.max(0, pauseStack - 1);
-        } else {
-            pauseStack++;
-        }
-    };
+export type IHistoryListener = (p: IHistoryBroadcast | null) => void;
 
-    hInterface.addListener = function (l) {
-        listeners.push(l);
-    };
+let historyInstance: boolean = false;
 
-    function broadcast(p?) {
-        setTimeout(function () {
-            for (let i = 0; i < listeners.length; i++) {
-                listeners[i](p);
+export interface KlHistoryInterface {
+    pause (b: boolean): void;
+    addListener (l: IHistoryListener): void;
+    push (e: IHistoryEntry): void;
+    undo (): (IHistoryEntry | null)[];
+    redo (): (IHistoryEntry | null)[];
+    getAll (): (IHistoryEntry | null)[];
+    canRedo (): boolean;
+    canUndo (): boolean;
+    getState (): number;
+    getActionNumber (): number;
+}
+
+export class DecoyKlHistory implements KlHistoryInterface {
+    pause (b: boolean): void {}
+    addListener (l: IHistoryListener): void {}
+    push (e: IHistoryEntry): void {}
+    undo (): (IHistoryEntry | null)[] { return []; }
+    redo (): (IHistoryEntry | null)[] { return []; }
+    getAll (): (IHistoryEntry | null)[] { return []; }
+    canRedo (): boolean { return false; }
+    canUndo (): boolean { return false; }
+    getState (): number { return 0; }
+    getActionNumber (): number { return 0; }
+}
+
+export class KlHistory implements KlHistoryInterface {
+
+    private state: number; // on .push state increments by one
+    private dataArr: (IHistoryEntry | null)[]; // null if beyond max undo to trigger garbage collection
+    private listeners: IHistoryListener[];
+    private pauseStack: number; // how often paused without unpause
+    private readonly max: number = 14; // max number undo steps
+    private maxState: number; // can't go backwards -> max state is the buffer image(klCanvas)
+    private actionNumber: number; // current action the user is on. untouched document = -1 because dataArr.length is 0
+    
+    private broadcast (p: IHistoryBroadcast | null): void {
+        setTimeout(() => {
+            for (let i = 0; i < this.listeners.length; i++) {
+                this.listeners[i](p);
             }
-            state++;
+            this.state++;
         }, 1);
     }
+    
+    // ---- public ----
+    
+    constructor () {
+        if (historyInstance) {
+            throw new Error('klHistory already instantiated');
+        }
+        historyInstance = true;
+        this.state = 0;
+        this.dataArr = [];
+        this.listeners = [];
+        this.pauseStack = 0;
+        this.maxState = -1;
+        this.actionNumber = -1;
+    }
 
-    hInterface.add = function (e) {
-        if (pauseStack > 0) {
+    /**
+     * you need pause because there are sometimes actions that would cause other
+     * undo steps
+     * for example a filter that does something crazy with two layers and then merges them
+     * you want that to be one undo step, and prevent merging from causing its undo step.
+     * so while that filter is doing its magic you should pause possible undo steps that
+     * that are caused by a part of its code(in this example: merging layers)
+     *
+     * @param b
+     */
+    pause (b: boolean): void {
+        if (b === false) {
+            this.pauseStack = Math.max(0, this.pauseStack - 1);
+        } else {
+            this.pauseStack++;
+        }
+    }
+
+    addListener (l: IHistoryListener): void {
+        this.listeners.push(l);
+    }
+
+    push (e: IHistoryEntry): void {
+        if (this.pauseStack > 0) {
             return;
         }
-        while (currentIndex < dataArr.length - 1) {
-            dataArr.pop();
+        while (this.actionNumber < this.dataArr.length - 1) {
+            this.dataArr.pop();
         }
 
         //taking care of actions that shouldn't cause a new undo step
-        const top = dataArr[dataArr.length - 1];
+        const top = this.dataArr[this.dataArr.length - 1];
         if (e.action === 'layerOpacity' && top && top.action === 'layerOpacity' && top.params[0] === e.params[0]) {
-            dataArr[dataArr.length - 1] = e;
-            state++; //still needs to increment because something changed
+            this.dataArr[this.dataArr.length - 1] = e;
+            this.state++; //still needs to increment because something changed
             return;
         }
         if (e.action === 'focusLayer' && top && top.action === 'focusLayer') {
-            dataArr[dataArr.length - 1] = e;
-            state++;
+            this.dataArr[this.dataArr.length - 1] = e;
+            this.state++;
             return;
         }
 
 
-        dataArr[dataArr.length] = e;
-        currentIndex = dataArr.length - 1;
-        const maxBefore = maxState;
-        maxState = Math.max(maxState, currentIndex - max);
-        if (maxBefore < maxState) {
-            broadcast({bufferUpdate: dataArr[maxState]});
+        this.dataArr[this.dataArr.length] = e;
+        this.actionNumber = this.dataArr.length - 1;
+        const maxBefore = this.maxState;
+        this.maxState = Math.max(this.maxState, this.actionNumber - this.max);
+        if (maxBefore < this.maxState) {
+            this.broadcast({bufferUpdate: this.dataArr[this.maxState]});
         } else {
-            broadcast();
+            this.broadcast(null);
         }
-        dataArr[maxState] = {}; //to free some memory...imported images take a lot of space
-    };
-    hInterface.undo = function () {
+        if (this.maxState >= 0) {
+            this.dataArr[this.maxState] = null; //to free some memory...imported images take a lot of space
+        }
+    }
+
+    undo (): (IHistoryEntry | null)[] {
         let result;
-        if (hInterface.canUndo()) {
+        if (this.canUndo()) {
             result = [];
-            for (let i = maxState + 1; i < currentIndex; i++) {
-                result.push(dataArr[i]);
+            for (let i = this.maxState + 1; i < this.actionNumber; i++) {
+                result.push(this.dataArr[i]);
             }
-            currentIndex--;
-            broadcast();
+            this.actionNumber--;
+            this.broadcast(null);
         }
 
         return result;
-    };
-    hInterface.redo = function () {
+    }
+
+    redo (): (IHistoryEntry | null)[] {
         const result = [];
-        if (hInterface.canRedo()) {
-            currentIndex++;
-            result.push(dataArr[currentIndex]);
-            broadcast();
+        if (this.canRedo()) {
+            this.actionNumber++;
+            result.push(this.dataArr[this.actionNumber]);
+            this.broadcast(null);
         }
         return result;
-    };
-    hInterface.getAll = function () {
-        const result = [];
-        for (let i = 0; i < dataArr.length; i++) {
-            result[i] = dataArr[i];
-        }
-        return result;
-    };
-    hInterface.canRedo = function () {
-        return currentIndex < dataArr.length - 1;
-    };
-    hInterface.canUndo = function () {
-        return currentIndex > maxState;
-    };
-    hInterface.getState = function () {
-        return parseInt('' + state, 10);
-    };
+    }
+
+    getAll (): (IHistoryEntry | null)[] {
+        return [].concat(this.dataArr);
+    }
+
+    canRedo (): boolean {
+        return this.actionNumber < this.dataArr.length - 1;
+    }
+
+    canUndo (): boolean {
+        return this.actionNumber > this.maxState;
+    }
+
+    getState (): number {
+        return this.state;
+    }
 
     /**
-     * clearCount - how often clear was called
      * actionNumber - number of undo-able actions a user has done (e.g. if drawn 5 lines total -> 5)
-     * @returns [clearCount int, actionNumber int]
      */
-    hInterface.getActionNumber = function() {
-        return [clearCount, currentIndex + 1];
-    };
-    return hInterface;
-})();
+    getActionNumber (): number {
+        return (this.actionNumber + 1);
+    }
+    
+}
+
+export const klHistory = new KlHistory();

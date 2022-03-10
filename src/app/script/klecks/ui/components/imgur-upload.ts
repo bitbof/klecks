@@ -4,6 +4,7 @@ import {KL} from '../../kl';
 import loadingImg from 'url:~/src/app/img/ui/loading.gif';
 import {SaveReminder} from './save-reminder';
 import {base64ToBlob} from '../../storage/base-64-to-blob';
+import {KlCanvas} from '../../canvas/kl-canvas';
 
 
 async function upload(canvas, title, description, type: 'png' | 'jpeg', imgurKey: string): Promise<{deletehash: string}> {
@@ -71,7 +72,7 @@ async function upload(canvas, title, description, type: 'png' | 'jpeg', imgurKey
 }
 
 
-export function imgurUpload(klCanvas, klRootEl, saveReminder: SaveReminder, imgurKey: string) {
+export function imgurUpload(klCanvas: KlCanvas, klRootEl, saveReminder: SaveReminder, imgurKey: string) {
     if (!imgurKey) {
         throw new Error('imgur key missing');
     }

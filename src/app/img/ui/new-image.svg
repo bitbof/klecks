@@ -1,10 +1,1 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<svg version="1.1" viewBox="0 0 24 26.667" xmlns="http://www.w3.org/2000/svg">
-<defs>
-<filter id="a" x="-.072576" y="-.058529" width="1.1452" height="1.1171" color-interpolation-filters="sRGB">
-<feGaussianBlur stdDeviation="0.54363332"/>
-</filter>
-</defs>
-<rect x="2.1173" y="1.7781" width="17.977" height="22.292" filter="url(#a)" opacity=".52486"/>
-<rect x="2.3171" y="1.099" width="17.977" height="22.292" fill="#fff"/>
-</svg>
+<svg viewBox="0 0 24 26.67" xmlns="http://www.w3.org/2000/svg"><defs><filter id="a" x="-.07" y="-.06" width="1.15" height="1.12" color-interpolation-filters="sRGB"><feGaussianBlur stdDeviation=".54"/></filter></defs><path filter="url(#a)" opacity=".52" d="M2.12 1.78H20.1v22.29H2.12z"/><path fill="#fff" d="M2.32 1.1H20.3v22.29H2.32z"/></svg>

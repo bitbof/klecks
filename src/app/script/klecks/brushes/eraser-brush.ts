@@ -1,12 +1,11 @@
 import {BB} from '../../bb/bb';
+import {IHistoryEntry, KlHistoryInterface} from '../history/kl-history';
+import {KL} from '../kl';
 
-export function eraserBrush() {
-    let debugStr = '';
+export function EraserBrush() {
     let context;
-    let history = {
-        add: function (p?) {
-        }
-    }, historyEntry;
+    let history: KlHistoryInterface = new KL.DecoyKlHistory();
+    let historyEntry: IHistoryEntry;
 
     let size = 30, spacing = 0.4, opacity = 1;
     let sizePressure = true, opacityPressure = false;
@@ -70,7 +69,7 @@ export function eraserBrush() {
 
     this.startLine = function (x, y, p) {
         historyEntry = {
-            tool: ["brush", "eraser"],
+            tool: ["brush", "EraserBrush"],
             actions: []
         };
         historyEntry.actions.push({
@@ -94,11 +93,7 @@ export function eraserBrush() {
             params: [isTransparentBG]
         });
 
-        let klCanvas = context.canvas.klCanvas;
-        if (!klCanvas) {
-            throw 'context.canvas has no parent element (' + debugStr + ')';
-        }
-        isBaseLayer = 0 === klCanvas.getLayerIndex(context.canvas);
+        isBaseLayer = 0 === context.canvas.index;
 
         p = Math.max(0, Math.min(1, p));
         let localOpacity = (opacityPressure) ? (opacity * p * p) : opacity;
@@ -153,15 +148,14 @@ export function eraserBrush() {
                 action: "endLine",
                 params: []
             });
-            history.add(historyEntry);
+            history.push(historyEntry);
             historyEntry = undefined;
         }
     };
     //cheap n' ugly
     this.drawLineSegment = function (x1, y1, x2, y2) {
 
-        let klCanvas = context.canvas.klCanvas;
-        isBaseLayer = 0 === klCanvas.getLayerIndex(context.canvas);
+        isBaseLayer = 0 === context.canvas.index;
 
         lastInput.x = x2;
         lastInput.y = y2;
@@ -182,7 +176,7 @@ export function eraserBrush() {
 
 
         let historyEntry = {
-            tool: ["brush", "eraser"],
+            tool: ["brush", "EraserBrush"],
             actions: []
         };
         historyEntry.actions.push({
@@ -210,7 +204,7 @@ export function eraserBrush() {
             action: "drawLineSegment",
             params: [x1, y1, x2, y2]
         });
-        history.add(historyEntry);
+        history.push(historyEntry);
     };
 
     //IS
@@ -226,7 +220,7 @@ export function eraserBrush() {
     this.setContext = function (c) {
         context = c;
     };
-    this.setHistory = function (l) {
+    this.setHistory = function (l: KlHistoryInterface) {
         history = l;
     };
     this.setSize = function (s) {
@@ -250,8 +244,5 @@ export function eraserBrush() {
     };
     this.getOpacity = function () {
         return opacity;
-    };
-    this.setDebug = function (str) {
-        debugStr = str;
     };
 }

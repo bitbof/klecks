@@ -44,7 +44,7 @@ export class Checkbox {
         if (params.doHighlight && this.check.checked) {
             BB.addClassName(this.element, 'kl-checkbox--highlight');
         }
-        if(!params.allowTab) {
+        if (!params.allowTab) {
             this.check.tabIndex = -1;
         }
 
@@ -71,7 +71,7 @@ export class Checkbox {
                 this.check.blur();
             }, 0);
         };
-        if(params.css) {
+        if (params.css) {
             BB.css(this.element, params.css);
         }
     }

@@ -339,8 +339,8 @@ export const PointerListener = (function () {
                 return event.corrected;
             }
 
-            /*if(event.type === 'pointermove' && !window.hidePressureOut) {
-                if(event.type === 'pointermove') {
+            /*if (event.type === 'pointermove' && !window.hidePressureOut) {
+                if (event.type === 'pointermove') {
                     BB.throwOut(event.pressure + ' ' + event.pointerType);
                 }
             }*/
@@ -885,7 +885,7 @@ export const PointerListener = (function () {
                 addEventListener(targetElement, 'touchstart', onTouchstart);
             }
 
-        } else if(p.fixScribble) {
+        } else if (p.fixScribble) {
             //ipad scribble workaround https://developer.apple.com/forums/thread/662874
             onTouchmove = function(e) {
                 e.preventDefault();

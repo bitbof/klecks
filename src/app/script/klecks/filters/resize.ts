@@ -3,19 +3,20 @@ import {Checkbox} from '../ui/base-components/checkbox';
 import {Select} from '../ui/base-components/select';
 // @ts-ignore
 import constrainImg from 'url:~/src/app/img/ui/constrain.svg';
+import {IFilterApply, IFilterGetDialogParam} from '../kl.types';
 
 export const resize = {
 
-    getDialog(params) {
+    getDialog(params: IFilterGetDialogParam) {
         //BB.centerWithin
         let canvas = params.canvas;
         if (!canvas)
             return false;
 
-        let fit = BB.fitInto( canvas.width, canvas.height, 280, 200,1);
+        let fit = BB.fitInto( canvas.getWidth(), canvas.getHeight(), 280, 200,1);
         let w = parseInt('' + fit.width), h = parseInt('' + fit.height);
 
-        let previewFactor = w / canvas.width;
+        let previewFactor = w / canvas.getWidth();
         let tempCanvas = canvas.getCompleteCanvas(1);
 
 
@@ -23,37 +24,53 @@ export const resize = {
         let result: any = {
             element: div
         };
-        let newWidth = canvas.width, newHeight = canvas.height;
+        let newWidth = canvas.getWidth(), newHeight = canvas.getHeight();
 
         div.innerHTML = "Resizes the image.<br/><br/>";
 
 
         let maxWidth = params.maxWidth, maxHeight = params.maxHeight;
 
-        let widthWrapper = document.createElement("div");
-        let heightWrapper = document.createElement("div");
-        let widthInput = document.createElement("input");
-        let heightInput = document.createElement("input");
-        widthInput.style.cssFloat = "right";
-        widthInput.style.width = "90px";
-        widthWrapper.style.width = "150px";
-        widthWrapper.style.height = "35px";
-        widthWrapper.style.lineHeight = "30px";
-        heightInput.style.cssFloat = "right";
-        heightInput.style.width = "90px";
-        heightWrapper.style.width = "150px";
-        heightWrapper.style.height = "35px";
-        heightWrapper.style.lineHeight = "30px";
-        if (navigator.appName != 'Microsoft Internet Explorer')
-            widthInput.type = "number";
-        widthInput.min = '1';
-        widthInput.max = maxWidth;
-        if (navigator.appName != 'Microsoft Internet Explorer')
-            heightInput.type = "number";
-        heightInput.min = '1';
-        heightInput.max = maxHeight;
-        widthInput.value = canvas.width;
-        heightInput.value = canvas.height;
+        let widthWrapper = BB.el({
+            css: {
+                width: '150px',
+                height: '35px',
+                lineHeight: '30px',
+            }
+        });
+        let heightWrapper = BB.el({
+            css: {
+                width: '150px',
+                height: '35px',
+                lineHeight: '30px',
+            }
+        });
+        let widthInput = BB.el({
+            tagName: 'input',
+            css: {
+                cssFloat: 'right',
+                width: '90px',
+            },
+            custom: {
+                type: 'number',
+                min: '1',
+                max: '' + maxWidth,
+                value: '' + canvas.getWidth(),
+            }
+        }) as HTMLInputElement;
+        let heightInput = BB.el({
+            tagName: 'input',
+            css: {
+                cssFloat: 'right',
+                width: '90px',
+            },
+            custom: {
+                type: 'number',
+                min: '1',
+                max: '' + maxHeight,
+                value: '' + canvas.getHeight(),
+            }
+        }) as HTMLInputElement;
         widthInput.onclick = function () {
             (this as any).focus();
             widthChanged = true;
@@ -72,33 +89,25 @@ export const resize = {
             heightChanged = true;
             update();
         };
-        /*widthInput.onkeyup = function () {
-            widthChanged = true;
-            update();
-        };
-        heightInput.onkeyup = function () {
-            heightChanged = true;
-            update();
-        };*/
-        widthWrapper.append("Width: ");
-        widthWrapper.appendChild(widthInput);
-        heightWrapper.append("Height: ");
-        heightWrapper.appendChild(heightInput);
-        let inputWrapper = document.createElement("div");
-        inputWrapper.style.background = "url(" + constrainImg + ") no-repeat 140px 5px";
-        inputWrapper.style.backgroundSize = '50px 52px';
-        inputWrapper.appendChild(widthWrapper);
-        inputWrapper.appendChild(heightWrapper);
+        widthWrapper.append("Width: ", widthInput);
+        heightWrapper.append("Height: ", heightInput);
+        let inputWrapper = BB.el({
+            css: {
+                background: "url(" + constrainImg + ") no-repeat 140px 5px",
+                backgroundSize: '50px 52px',
+            }
+        });
+        inputWrapper.append(widthWrapper, heightWrapper);
         div.appendChild(inputWrapper);
 
         //contrain checkbox
         let heightChanged = false, widthChanged = false;
-        let ratio = canvas.width / canvas.height;
+        let ratio = canvas.getWidth() / canvas.getHeight();
 
         function updateConstrain() {
             if (isConstrained) {
-                widthInput.value = canvas.width;
-                heightInput.value = canvas.height;
+                widthInput.value = '' + canvas.getWidth();
+                heightInput.value = '' + canvas.getHeight();
                 inputWrapper.style.background = "url(" + constrainImg + ") no-repeat 140px 5px";
                 inputWrapper.style.backgroundSize = '50px 52px';
                 update();
@@ -147,9 +156,7 @@ export const resize = {
         secondRowElement.appendChild(constrainCheckbox.getElement());
         secondRowElement.appendChild(algorithmSelect.getElement());
 
-        let previewCanvas = BB.canvas();
-        previewCanvas.width = w;
-        previewCanvas.height = h;
+        let previewCanvas = BB.canvas(w, h);
         previewCanvas.style.imageRendering = 'pixelated';
 
 
@@ -157,11 +164,11 @@ export const resize = {
 
 
         function draw() {
-            if(algorithmSelect.getValue() === 'smooth') {
+            if (algorithmSelect.getValue() === 'smooth') {
                 previewCanvas.style.imageRendering = previewFactor > 1 ? 'pixelated' : '';
 
-                previewCanvas.width = canvas.width;
-                previewCanvas.height = canvas.height;
+                previewCanvas.width = canvas.getWidth();
+                previewCanvas.height = canvas.getHeight();
 
                 previewCtx.save();
                 previewCtx.imageSmoothingQuality = 'high';
@@ -198,23 +205,25 @@ export const resize = {
                     heightInput.value = '' + parseInt('' + (parseInt(widthInput.value) / ratio));
                 }
 
-                if (widthInput.value > maxWidth || heightInput.value > maxHeight) {
+                if (parseInt(widthInput.value) > maxWidth || parseInt(heightInput.value) > maxHeight) {
                     let fit = BB.fitInto(parseInt(widthInput.value), parseInt(heightInput.value), maxWidth, maxHeight, 1);
                     widthInput.value = '' + parseInt('' + fit.width);
                     heightInput.value = '' + parseInt('' + fit.height);
                 }
             }
 
-            if (widthInput.value > maxWidth)
-                widthInput.value = maxWidth;
-            if (heightInput.value > maxHeight)
-                heightInput.value = maxHeight;
+            if (parseInt(widthInput.value) > maxWidth) {
+                widthInput.value = '' + maxWidth;
+            }
+            if (parseInt(heightInput.value) > maxHeight) {
+                heightInput.value = '' + maxHeight;
+            }
 
             heightChanged = false;
             widthChanged = false;
 
-            newWidth = widthInput.value;
-            newHeight = heightInput.value;
+            newWidth = parseInt(widthInput.value);
+            newHeight = parseInt(heightInput.value);
 
             let preview = BB.fitInto(newWidth, newHeight, 280, 200, 1);
             let previewW = parseInt('' + preview.width), previewH = parseInt('' + preview.height);
@@ -276,7 +285,7 @@ export const resize = {
         return result;
     },
 
-    apply(params) {
+    apply(params: IFilterApply) {
         let canvas = params.canvas;
         let history = params.history;
         let width = params.input.width;
@@ -285,10 +294,10 @@ export const resize = {
         if (!canvas || !history) {
             return false;
         }
-        history.pause();
+        history.pause(true);
         canvas.resize(width, height, algorithm);
         history.pause(false);
-        history.add({
+        history.push({
             tool: ["filter", "resize"],
             action: "apply",
             params: [{

@@ -1,12 +1,13 @@
 import {BB} from '../../bb/bb';
 import {eventResMs} from './filters-consts';
-import {PcSlider} from '../ui/base-components/slider';
+import {KlSlider} from '../ui/base-components/kl-slider';
 import {KlCanvasPreview} from '../canvas-ui/canvas-preview';
 import {getSharedFx} from './shared-gl-fx';
+import {IFilterApply, IFilterGetDialogParam} from '../kl.types';
 
 export const glTiltShift = {
 
-    getDialog(params) {
+    getDialog(params: IFilterGetDialogParam) {
         let context = params.context;
         let canvas = params.canvas;
         if (!context || !canvas) {
@@ -106,7 +107,7 @@ export const glTiltShift = {
             fa = nob(parseInt('' + (displayW / 6)), parseInt('' + (displayH / 2)));
             fb = nob(parseInt('' + (displayW - displayW / 6)), parseInt('' + (displayH - displayH / 3)));
 
-            let blurSlider = new PcSlider({
+            let blurSlider = new KlSlider({
                 label: 'Blur Radius',
                 width: 300,
                 height: 30,
@@ -121,7 +122,7 @@ export const glTiltShift = {
             });
             blurSlider.getElement().style.marginBottom = "10px";
             div.appendChild(blurSlider.getElement());
-            let gradientSlider = new PcSlider({
+            let gradientSlider = new KlSlider({
                 label: 'Gradient Radius',
                 width: 300,
                 height: 30,
@@ -159,7 +160,7 @@ export const glTiltShift = {
 
             let previewLayerArr = [];
             {
-                for(let i = 0; i < layers.length; i++) {
+                for (let i = 0; i < layers.length; i++) {
                     previewLayerArr.push({
                         canvas: i === selectedLayerIndex ? glCanvas : layers[i].context.canvas,
                         opacity: layers[i].opacity,
@@ -191,7 +192,7 @@ export const glTiltShift = {
             div.appendChild(previewWrapper);
             update();
             result.destroy = () => {
-                for(let i = 0; i < pointerListenerArr.length; i++) {
+                for (let i = 0; i < pointerListenerArr.length; i++) {
                     pointerListenerArr[i].destroy();
                 }
                 blurSlider.destroy();
@@ -215,7 +216,7 @@ export const glTiltShift = {
         return result;
     },
 
-    apply(params) {
+    apply(params: IFilterApply) {
         let context = params.context;
         let history = params.history;
         let a = params.input.a;
@@ -224,20 +225,18 @@ export const glTiltShift = {
         let gradient = params.input.gradient;
         if (!context || !history)
             return false;
-        history.pause();
+        history.pause(true);
         let glCanvas = getSharedFx();
         if (!glCanvas) {
             return false; // todo more specific error?
         }
         let texture = glCanvas.texture(context.canvas);
-        let w = context.canvas.width;
-        let h = context.canvas.height;
         glCanvas.draw(texture).tiltShift(a.x, a.y, b.x, b.y, blur, gradient).update();
         context.clearRect(0, 0, context.canvas.width, context.canvas.height);
         context.drawImage(glCanvas, 0, 0);
         texture.destroy();
         history.pause(false);
-        history.add({
+        history.push({
             tool: ["filter", "glTiltShift"],
             action: "apply",
             params: [{

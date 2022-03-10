@@ -1,12 +1,13 @@
 import {BB} from '../../bb/bb';
-import {PcSlider} from '../ui/base-components/slider';
+import {KlSlider} from '../ui/base-components/kl-slider';
 import {eventResMs} from './filters-consts';
 import {KlCanvasPreview} from '../canvas-ui/canvas-preview';
 import {getSharedFx} from './shared-gl-fx';
+import {IFilterApply, IFilterGetDialogParam} from '../kl.types';
 
 export const glBlur = {
 
-    getDialog(params) {
+    getDialog(params: IFilterGetDialogParam) {
         let canvas = params.canvas;
         let context = params.context;
         if (!canvas || !context) {
@@ -50,7 +51,7 @@ export const glBlur = {
             let texture = glCanvas.texture(tempCanvas);
             glCanvas.draw(texture).update(); // update glCanvas size
 
-            let radiusSlider = new PcSlider({
+            let radiusSlider = new KlSlider({
                 label: 'Radius',
                 width: 300,
                 height: 30,
@@ -86,7 +87,7 @@ export const glBlur = {
 
             let previewLayerArr = [];
             {
-                for(let i = 0; i < layers.length; i++) {
+                for (let i = 0; i < layers.length; i++) {
                     previewLayerArr.push({
                         canvas: i === selectedLayerIndex ? glCanvas : layers[i].context.canvas,
                         opacity: layers[i].opacity,
@@ -137,13 +138,13 @@ export const glBlur = {
         return result;
     },
 
-    apply(params) {
+    apply(params: IFilterApply) {
         let context = params.context;
         let history = params.history;
         let radius = params.input.radius;
         if (!context || !radius || !history)
             return false;
-        history.pause();
+        history.pause(true);
         let glCanvas = getSharedFx();
         if (!glCanvas) {
             return false; // todo more specific error?
@@ -154,7 +155,7 @@ export const glBlur = {
         context.drawImage(glCanvas, 0, 0);
         texture.destroy();
         history.pause(false);
-        history.add({
+        history.push({
             tool: ["filter", "glBlur"],
             action: "apply",
             params: [{

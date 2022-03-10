@@ -3,6 +3,8 @@ import {KL} from '../../kl';
 import {klHistory} from '../../history/kl-history';
 import {IKeyString} from '../../../bb/bb.types';
 import {StatusOverlay} from '../components/status-overlay';
+import {KlCanvasWorkspace} from '../../canvas-ui/kl-canvas-workspace';
+import {KlCanvas} from '../../canvas/kl-canvas';
 
 
 export class FilterTab {
@@ -12,14 +14,14 @@ export class FilterTab {
 
     constructor (
         private klRootEl,
-        private pcColorSlider,
+        private klColorSlider,
         private layerManager,
         private setCurrentLayer,
-        private klCanvasWorkspace,
+        private klCanvasWorkspace: KlCanvasWorkspace,
         private handUi,
         private getCurrentColor,
         private getKlMaxCanvasSize,
-        private getKlCanvas,
+        private getKlCanvas: () => KlCanvas,
         private getCurrentLayerCtx,
         private isEmbed: boolean,
         private statusOverlay: StatusOverlay,
@@ -65,7 +67,7 @@ export class FilterTab {
                     try {
                         input = filterDialog.getInput(); // also destroys
                     } catch (e) {
-                        if(e.message.indexOf('.getInput is not a function') !== -1) {
+                        if (e.message.indexOf('.getInput is not a function') !== -1) {
                             throw 'filterDialog.getInput is not a function, filter: ' + filterArr[filterKey].name;
                         } else {
                             throw e;
@@ -104,7 +106,7 @@ export class FilterTab {
                     applyFilter(null);
                     _this.statusOverlay.out('"' + filterArr[filterKey].name + '" applied', true);
                 } else {
-                    let secondaryColorRGB = _this.pcColorSlider.getSecondaryRGB();
+                    let secondaryColorRGB = _this.klColorSlider.getSecondaryRGB();
                     let filterDialog = filterArr[filterKey].getDialog({
                         context: _this.getCurrentLayerCtx(),
                         canvas: _this.getKlCanvas(),
@@ -131,7 +133,7 @@ export class FilterTab {
 
 
                     let style: IKeyString = {};
-                    if('width' in filterDialog) {
+                    if ('width' in filterDialog) {
                         style.width = filterDialog.width + 'px'
                     }
 

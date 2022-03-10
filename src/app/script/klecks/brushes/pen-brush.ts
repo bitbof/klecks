@@ -1,17 +1,14 @@
 import {BB} from '../../bb/bb';
 import {alphaImArr} from './brushes-common';
+import {IHistoryEntry, KlHistoryInterface} from '../history/kl-history';
+import {KL} from '../kl';
 
 
-export function defaultBrush() {
+export function PenBrush() {
 
-    let _this = this;
-    let debugStr = '';
     let context;
-    let history = {
-        add: function (p?) {
-        },
-        isFake: true
-    }, historyEntry;
+    let history: KlHistoryInterface = new KL.DecoyKlHistory();
+    let historyEntry: IHistoryEntry;
 
     let settingColor, settingSize = 2, settingSpacing = 0.8489, settingOpacity = 1;
     let settingColorStr;
@@ -55,7 +52,7 @@ export function defaultBrush() {
 
         let ctx;
 
-        for(let i = 0; i < instructionArr.length; i++) {
+        for (let i = 0; i < instructionArr.length; i++) {
             ctx = (instructionArr[i][0] as any).getContext("2d");
 
             ctx.save();
@@ -83,7 +80,7 @@ export function defaultBrush() {
      * @param before - [x, y, size, opacity, angle] the drawDot call before
      */
     function drawDot(x, y, size, opacity, angle?, before?) {
-        if(size <= 0) {
+        if (size <= 0) {
             return;
         }
 
@@ -106,7 +103,7 @@ export function defaultBrush() {
             context.fill();
 
         } else if (settingAlphaId === ALPHA_SQUARE) {
-            if(angle !== undefined) {
+            if (angle !== undefined) {
                 context.save();
                 context.translate(x, y);
                 context.rotate(angle / 180 * Math.PI);
@@ -134,7 +131,7 @@ export function defaultBrush() {
     }
 
     function continueLine(x, y, size, pressure) {
-        if(bezierLine === null) {
+        if (bezierLine === null) {
             bezierLine = new BB.BezierLine();
             bezierLine.add(lastInput.x, lastInput.y, 0, function(){});
         }
@@ -149,7 +146,7 @@ export function defaultBrush() {
         }
 
         let localSpacing = size * settingSpacing;
-        if(x === null) {
+        if (x === null) {
             bezierLine.addFinal(localSpacing, dotCallback);
         } else {
             bezierLine.add(x, y, localSpacing, dotCallback);
@@ -171,7 +168,7 @@ export function defaultBrush() {
 
     this.startLine = function (x, y, p) {
         historyEntry = {
-            tool: ["brush", "defaultBrush"],
+            tool: ["brush", "PenBrush"],
             actions: []
         };
         historyEntry.actions.push({
@@ -271,7 +268,7 @@ export function defaultBrush() {
                 action: "endLine",
                 params: [x, y]
             });
-            history.add(historyEntry);
+            history.push(historyEntry);
             historyEntry = undefined;
         }
     };
@@ -298,7 +295,7 @@ export function defaultBrush() {
 
 
         let historyEntry = {
-            tool: ["brush", "defaultBrush"],
+            tool: ["brush", "PenBrush"],
             actions: []
         };
         historyEntry.actions.push({
@@ -338,7 +335,7 @@ export function defaultBrush() {
             action: "drawLineSegment",
             params: [x1, y1, x2, y2]
         });
-        history.add(historyEntry);
+        history.push(historyEntry);
     };
 
     //IS
@@ -347,14 +344,14 @@ export function defaultBrush() {
     };
     //SET
     this.setAlpha = function (a) {
-        if(settingAlphaId === a) {
+        if (settingAlphaId === a) {
             return;
         }
         settingAlphaId = a;
         updateAlphaCanvas();
     };
     this.setColor = function (c) {
-        if(settingColor === c) {
+        if (settingColor === c) {
             return;
         }
         settingColor = {r: c.r, g: c.g, b: c.b};
@@ -364,7 +361,7 @@ export function defaultBrush() {
     this.setContext = function (c) {
         context = c;
     };
-    this.setHistory = function (l) {
+    this.setHistory = function (l: KlHistoryInterface) {
         history = l;
     };
     this.setSize = function (s) {
@@ -397,8 +394,5 @@ export function defaultBrush() {
     };
     this.getLockAlpha = function (b) {
         return settingLockLayerAlpha;
-    };
-    this.setDebug = function(str) {
-        debugStr = str;
     };
 }

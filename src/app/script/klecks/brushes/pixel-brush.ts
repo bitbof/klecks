@@ -1,14 +1,12 @@
 import {BB} from '../../bb/bb';
+import {IHistoryEntry, KlHistoryInterface} from '../history/kl-history';
+import {KL} from '../kl';
 
-export function pixelBrush() {
+export function PixelBrush() {
 
-    let _this = this;
-    let debugStr = '';
     let context;
-    let history = {
-        add: function (p?) {
-        }
-    }, historyEntry;
+    let history: KlHistoryInterface = new KL.DecoyKlHistory();
+    let historyEntry: IHistoryEntry;
 
     let settingColor, settingSize = 0.5, settingSpacing = 0.9, settingOpacity = 1;
     let settingColorStr;
@@ -249,7 +247,7 @@ export function pixelBrush() {
 
     this.startLine = function (x, y, p) {
         historyEntry = {
-            tool: ["brush", "pixel"],
+            tool: ["brush", "PixelBrush"],
             actions: []
         };
         historyEntry.actions.push({
@@ -348,7 +346,7 @@ export function pixelBrush() {
                 action: "endLine",
                 params: [x, y]
             });
-            history.add(historyEntry);
+            history.push(historyEntry);
             historyEntry = undefined;
         }
     };
@@ -362,6 +360,9 @@ export function pixelBrush() {
             return;
         }
 
+        if (settingUseDither) {
+            updateDither();
+        }
 
         if (Math.round(settingSize * 2) === 1) {
             plotLine(x1, y1, x2, y2, true);
@@ -379,7 +380,7 @@ export function pixelBrush() {
         }
 
         let historyEntry = {
-            tool: ["brush", "pixel"],
+            tool: ["brush", "PixelBrush"],
             actions: []
         };
         historyEntry.actions.push({
@@ -410,12 +411,16 @@ export function pixelBrush() {
             action: "setIsEraser",
             params: [settingIsEraser]
         });
+        historyEntry.actions.push({
+            action: "setUseDither",
+            params: [settingUseDither]
+        });
 
         historyEntry.actions.push({
             action: "drawLineSegment",
             params: [x1, y1, x2, y2]
         });
-        history.add(historyEntry);
+        history.push(historyEntry);
     };
 
     //IS
@@ -433,7 +438,7 @@ export function pixelBrush() {
     this.setContext = function (c) {
         context = c;
     };
-    this.setHistory = function (l) {
+    this.setHistory = function (l: KlHistoryInterface) {
         history = l;
     };
     this.setSize = function (s) {
@@ -478,8 +483,5 @@ export function pixelBrush() {
     };
     this.getUseDither = function () {
         return settingUseDither;
-    };
-    this.setDebug = function (str) {
-        debugStr = str;
     };
 }

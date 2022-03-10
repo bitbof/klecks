@@ -230,7 +230,7 @@ export const DoubleTapper = function (p) {
             }
         }
         if (lastSequenceItem && event.type === 'pointermove' && lastSequenceItem.pointerId === event.pointerId) {
-            /*if(lastSequenceItem.pointerId !== event.pointerId) { //another pointer mixing in -> fail
+            /*if (lastSequenceItem.pointerId !== event.pointerId) { //another pointer mixing in -> fail
                 console.log('another pointer mixing in -> fail');
                 fail();
                 return;

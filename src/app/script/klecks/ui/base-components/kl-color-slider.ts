@@ -19,7 +19,7 @@ import eyedropperImg from 'url:~/src/app/img/ui/tool-picker.svg';
  * @param p
  * @constructor
  */
-export const PcColorSlider = function (p) {
+export const KlColorSlider = function (p) {
 
     const _this = this;
     let pickCallback = function(result?) {};
@@ -85,9 +85,7 @@ export const PcColorSlider = function (p) {
             display: 'none',
             pointerEvents: 'none'
         });
-        const cv = BB.canvas();
-        cv.width = width;
-        cv.height = height;
+        const cv = BB.canvas(width, height);
         const ctx = cv.getContext('2d');
         const gradH = ctx.createLinearGradient(0, 0, width, 0);
         for (let i = 0; i < 1; i += 0.01) {
@@ -255,10 +253,10 @@ export const PcColorSlider = function (p) {
     const pickerButtonPointerListener = new BB.PointerListener({
         target: pickerButton,
         onEnterLeave: function(isOver) {
-            if(isPicking) {
+            if (isPicking) {
                 return;
             }
-            if(isOver) {
+            if (isOver) {
                 BB.addClassName(pickerButton, 'color-picker-preview-button-hover');
             } else {
                 BB.removeClassName(pickerButton, 'color-picker-preview-button-hover');
@@ -282,7 +280,7 @@ export const PcColorSlider = function (p) {
             HexColorDialog({
                 color: new BB.RGB(primaryColorRGB.r, primaryColorRGB.g, primaryColorRGB.b),
                 onClose: function(rgbObj) {
-                    if(!rgbObj) {
+                    if (!rgbObj) {
                         return;
                     }
                     _this.setColor(rgbObj);
@@ -294,7 +292,7 @@ export const PcColorSlider = function (p) {
     const hexButtonPointerListener = new BB.PointerListener({
         target: hexButton,
         onEnterLeave: function(isOver) {
-            if(isOver) {
+            if (isOver) {
                 BB.addClassName(hexButton, 'color-picker-preview-button-hover');
             } else {
                 BB.removeClassName(hexButton, 'color-picker-preview-button-hover');
@@ -314,13 +312,13 @@ export const PcColorSlider = function (p) {
             maxPointers: 1,
             fixScribble: true,
             onPointer: function(event) {
-                if(event.type === 'pointerdown') {
+                if (event.type === 'pointerdown') {
                     BB.css(SVContainer, {
                         boxShadow: '0px 0px 0px 1px rgb(255,255,255)',
                         zIndex: '1'
                     });
 
-                    if(event.button === 'left') {
+                    if (event.button === 'left') {
 
                         virtualHSV.s = event.relX / width * 100;
                         virtualHSV.v = 100 - event.relY / svHeight * 100;
@@ -337,10 +335,10 @@ export const PcColorSlider = function (p) {
                     }
                 }
 
-                if(event.type === 'pointermove' && ['left', 'right'].includes(event.button)) {
+                if (event.type === 'pointermove' && ['left', 'right'].includes(event.button)) {
 
                     let factor = 1;
-                    if(event.button === 'right') {
+                    if (event.button === 'right') {
                         factor = 0.5;
                     }
 
@@ -355,7 +353,7 @@ export const PcColorSlider = function (p) {
 
                 }
 
-                if(event.type === 'pointerup') {
+                if (event.type === 'pointerup') {
                     BB.css(SVContainer, {
                         boxShadow: '0 0 0 1px rgb(188, 188, 188)',
                         zIndex: '0'
@@ -370,12 +368,12 @@ export const PcColorSlider = function (p) {
             fixScribble: true,
             onPointer: function(event) {
 
-                if(event.type === 'pointerdown') {
+                if (event.type === 'pointerdown') {
                     BB.css(divH, {
                         boxShadow: '0px 0px 0px 1px rgba(255,255,255,1)'
                     });
 
-                    if(event.button === 'left') {
+                    if (event.button === 'left') {
 
                         virtualHSV.h = event.relX / width * 359.99;
 
@@ -390,14 +388,14 @@ export const PcColorSlider = function (p) {
                     }
                 }
 
-                if(event.type === 'pointermove' && ['left', 'right'].includes(event.button)) {
+                if (event.type === 'pointermove' && ['left', 'right'].includes(event.button)) {
 
                     const deltaY = Math.abs(event.pageY - event.downPageY);
                     const factor = calcSliderFalloffFactor(deltaY, event.button === 'right');
 
                     virtualHSV.h += event.dX / width * 359.99 * factor;
 
-                    if(event.button === 'right') {
+                    if (event.button === 'right') {
                         virtualHSV.h = virtualHSV.h % 359.99;
                         if (virtualHSV.h < 0) {
                             virtualHSV.h += 359.99;
@@ -413,7 +411,7 @@ export const PcColorSlider = function (p) {
 
                 }
 
-                if(event.type === 'pointerup') {
+                if (event.type === 'pointerup') {
                     BB.css(divH, {
                         boxShadow: 'rgb(188, 188, 188) 0 0 0 1px'
                     });
@@ -490,7 +488,7 @@ export const PcColorSlider = function (p) {
     };
 
     this.pickingDone = function () {
-        if(!isPicking) {
+        if (!isPicking) {
             return;
         }
         isPicking = false;

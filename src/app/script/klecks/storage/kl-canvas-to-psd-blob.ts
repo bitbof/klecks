@@ -1,6 +1,7 @@
 import {KL} from '../kl';
+import {KlCanvas} from '../canvas/kl-canvas';
 
-export async function klCanvasToPsdBlob(klCanvas): Promise<Blob> {
+export async function klCanvasToPsdBlob(klCanvas: KlCanvas): Promise<Blob> {
     let layerArr = klCanvas.getLayersFast();
 
     let psdConfig = {

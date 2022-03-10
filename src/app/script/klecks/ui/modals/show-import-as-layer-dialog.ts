@@ -1,17 +1,24 @@
 import {BB} from '../../../bb/bb';
 import {FreeTransformCanvas} from '../components/free-transform-canvas';
 import {popup} from './popup';
+import {KlCanvas} from '../../canvas/kl-canvas';
+import {IVector2D} from '../../../bb/bb.types';
 
-/**
- * transformObj: {angleDegree: number, translate: {x: number, y: number}, scale: {x: number, y: number}}
- *
- * @param params object - {target, klCanvas, importImage, callback(transformObj | void, isPixelated: boolean)}
- */
-export function showImportAsLayerDialog(params) {
+export function showImportAsLayerDialog(
+    params: {
+        target: HTMLElement;
+        klCanvas: KlCanvas;
+        importImage: HTMLImageElement | HTMLCanvasElement;
+        callback: (
+            p?: {x: number, y: number, width:number, height: number, angleDeg: number},
+            isPixelated?: boolean
+        ) => void;
+    }
+): void {
 
     let div = document.createElement("div");
     BB.appendTextDiv(div, "Adjust the position of the imported image.");
-    if(params.klCanvas.isLayerLimitReached()) {
+    if (params.klCanvas.isLayerLimitReached()) {
         let noteEl = BB.el({
             content: 'Layer limit reached. Image will be placed on existing layer.',
             css: {
@@ -72,7 +79,7 @@ export function showImportAsLayerDialog(params) {
     let layerArr = [];
     {
         let klCanvasLayerArr = params.klCanvas.getLayers();
-        for(let i = 0; i < klCanvasLayerArr.length; i++) {
+        for (let i = 0; i < klCanvasLayerArr.length; i++) {
             layerArr.push({
                 canvas: klCanvasLayerArr[i].context.canvas,
                 opacity: klCanvasLayerArr[i].opacity,
@@ -137,7 +144,7 @@ export function showImportAsLayerDialog(params) {
             BB.destroyEl(originalSizeBtn);
             BB.destroyEl(fitSizeBtn);
             BB.destroyEl(centerBtn);
-            if(buttonStr === 'Ok') {
+            if (buttonStr === 'Ok') {
                 params.callback(freeTransformCanvas.getTransformation(), freeTransformCanvas.getIsPixelated());
             } else {
                 params.callback();

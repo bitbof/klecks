@@ -102,13 +102,13 @@ export class StatusOverlay {
             this.init();
         }
 
-        if(msg && typeof msg === 'object') {
+        if (msg && typeof msg === 'object') {
 
-            if(msg.type === 'transform') {
+            if (msg.type === 'transform') {
                 this.angleIm.style.display = 'inline-block';
                 this.angleIm.style.transform = 'rotate(' + msg.angleDeg + 'deg)';
 
-                if(msg.angleDeg % 90 === 0) {
+                if (msg.angleDeg % 90 === 0) {
                     this.angleIm.style.boxShadow = 'inset 0 0 0 1px rgba(255, 255, 255, 0.7)';
                 } else {
                     this.angleIm.style.boxShadow = '';
@@ -128,7 +128,7 @@ export class StatusOverlay {
             this.innerInnerEl.innerHTML = msg;
         }
 
-        if(doPulse) {
+        if (doPulse) {
             this.innerEl.style.animation = '';
             setTimeout(
                 () => this.innerEl.style.animation = 'top-overlay-pulse 0.5s ease-out',

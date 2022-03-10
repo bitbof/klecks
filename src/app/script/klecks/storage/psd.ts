@@ -1,4 +1,6 @@
 import {createCanvas} from '../../bb/base/create-canvas';
+import {Psd} from 'ag-psd/dist/psd';
+import {IKlProject, IKlPsd, IMixMode} from '../kl.types';
 
 let kl2PsdMap;
 let psd2KlMap;
@@ -39,60 +41,28 @@ function init() {
     }
 }
 
-export function blendPsdToKl(str) {
+export function blendPsdToKl(str: string): string {
     init();
     return psd2KlMap[str];
 }
 
-export function blendKlToPsd(str) {
+export function blendKlToPsd(str: string): string {
     init();
     return kl2PsdMap[str];
 }
 
 
-
 /**
  * Converts ag-psd object into something that KlCanvas can represent
- *
- * return success:
- * {
- *     type: 'psd', // for duck typing
- *     canvas: canvas,
- *     width: number,
- *     height: number,
- *     layerArr: [
- *         {
- *             name: string,
- *             mixModeStr: string,
- *             opacity: float,
- *             canvas: canvas
- *         }
- *     ],
- *     // if one of these features show up, they become a warning
- *     // because we can't properly represent them (yet)
- *     warningArr: ('mask' | 'clipping' | 'group' | 'adjustment' | 'layer-effect' | 'smart-object' | 'blend-mode' | 'bits-per-channel')[],
- * }
- *
- * return error:
- * {
- *     type: 'psd',
- *     canvas: canvas,
- *     width: number,
- *     height: number,
- *     error: true,
- * }
- * - if there are too many layers
- *
- *
  * @param psdObj
  */
-export function readPsd(psdObj) {
-    let result = {
+export function readPsd(psdObj: Psd): IKlPsd {
+    let result: IKlPsd = {
         type: 'psd',
         canvas: psdObj.canvas,
         width: psdObj.width,
         height: psdObj.height
-    } as any;
+    };
 
     function addWarning(warningStr) {
         if (!result.warningArr) {
@@ -154,7 +124,7 @@ export function readPsd(psdObj) {
         return result;
     }
 
-    result.layerArr = [];
+    result.layers = [];
 
     function prepareMask(maskCanvas, defaultColor) {
         const groupMaskCtx = maskCanvas.getContext('2d');
@@ -171,7 +141,12 @@ export function readPsd(psdObj) {
         groupMaskCtx.putImageData(imData, 0, 0);
     }
 
-    function convertGroup(psdGroupObj) {
+    function convertGroup(psdGroupObj): {
+        name: string;
+        mixModeStr: IMixMode;
+        opacity: number;
+        image: HTMLCanvasElement;
+    }[] {
 
         let resultArr = [];
         let groupOpacity = psdGroupObj.hidden ? 0 : psdGroupObj.opacity;
@@ -211,13 +186,13 @@ export function readPsd(psdObj) {
 
                 for (let e = 0; e < innerArr.length; e++) {
                     let innerItem = innerArr[e];
-                    let innerCtx = innerItem.canvas.getContext('2d');
+                    let innerCtx = innerItem.image.getContext('2d');
 
                     // clipping
                     if (hasClipping) {
                         let clippingCanvas = createCanvas(result.width, result.height);
                         let clippingCtx = clippingCanvas.getContext('2d');
-                        clippingCtx.drawImage(innerItem.canvas, 0, 0);
+                        clippingCtx.drawImage(innerItem.image, 0, 0);
 
                         for (let f = i + 1; f < psdGroupObj.children.length && psdGroupObj.children[f].clipping; f++) {
                             let clippingItem = psdGroupObj.children[f];
@@ -244,7 +219,7 @@ export function readPsd(psdObj) {
                     if (groupCanvas) {
                         groupCtx.globalCompositeOperation = innerItem.mixModeStr;
                         groupCtx.globalAlpha = innerItem.opacity;
-                        groupCtx.drawImage(innerItem.canvas, 0, 0);
+                        groupCtx.drawImage(innerItem.image, 0, 0);
 
                     } else {
                         innerItem.opacity = innerItem.opacity * groupOpacity;
@@ -332,12 +307,40 @@ export function readPsd(psdObj) {
         return resultArr;
     }
 
-    result.layerArr = convertGroup({
+    result.layers = convertGroup({
         name: 'root',
         opacity: 1,
         blendMode: 'normal',
         children: psdObj.children
     });
 
+    return result;
+}
+
+export function klPsdToKlProject(klPsd: IKlPsd): IKlProject {
+    // only share references to Canvas elements
+    const result: IKlProject = {
+        width: klPsd.width,
+        height: klPsd.height,
+        layers: [],
+    };
+    if (klPsd.layers) {
+        result.layers = result.layers.concat(klPsd.layers.map(item => {
+            return {
+                name: item.name,
+                opacity: item.opacity,
+                mixModeStr: item.mixModeStr,
+                image: item.image,
+            };
+        }));
+    } else {
+        // flattened
+        result.layers.push({
+            name: 'Background',
+            opacity: 1,
+            mixModeStr: 'source-over',
+            image: klPsd.canvas,
+        });
+    }
     return result;
 }

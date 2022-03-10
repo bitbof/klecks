@@ -1,10 +1,11 @@
 import {BB} from '../../bb/bb';
+import {IHistoryEntry, KlHistoryInterface} from '../history/kl-history';
+import {KL} from '../kl';
 
 const sampleCanvas = BB.canvas(32, 32);
 const sampleCtx = sampleCanvas.getContext('2d');
 
-export function sketchyBrush() {
-    let debugStr = '';
+export function SketchyBrush() {
     let context;
     let settingColor;
 
@@ -15,15 +16,12 @@ export function sketchyBrush() {
     let lastX, lastY;
     let isDrawing = false;
     let lastInput = {x: 0, y: 0, pressure: 0};
-    let history = {
-        add: function (p?) {
-        }
-    };
+    let history: KlHistoryInterface = new KL.DecoyKlHistory();
+    let historyEntry: IHistoryEntry;
     let sketchySeed = 0;
-    this.setHistory = function (l) {
+    this.setHistory = function (l: KlHistoryInterface) {
         history = l;
     };
-    let historyEntry;
     this.setSeed = function (s) {
         sketchySeed = parseInt(s);
     };
@@ -101,7 +99,7 @@ export function sketchyBrush() {
             lastInput.x = x;
             lastInput.y = y;
             historyEntry = {
-                tool: ["brush", "sketchy"],
+                tool: ["brush", "SketchyBrush"],
                 actions: []
             };
             historyEntry.actions.push({
@@ -225,7 +223,7 @@ export function sketchyBrush() {
                 action: "endLine",
                 params: []
             });
-            history.add(historyEntry);
+            history.push(historyEntry);
             historyEntry = undefined;
         }
     };
@@ -288,7 +286,7 @@ export function sketchyBrush() {
 
 
         let historyEntry = {
-            tool: ["brush", "sketchy"],
+            tool: ["brush", "SketchyBrush"],
             actions: []
         };
         historyEntry.actions.push({
@@ -316,13 +314,10 @@ export function sketchyBrush() {
             action: "drawLineSegment",
             params: [x1, y1, x2, y2]
         });
-        history.add(historyEntry);
+        history.push(historyEntry);
     };
 
     this.isDrawing = function () {
         return isDrawing;
-    };
-    this.setDebug = function (str) {
-        debugStr = str;
     };
 }

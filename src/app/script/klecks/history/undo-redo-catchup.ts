@@ -1,28 +1,18 @@
 import {KL} from '../kl';
-import {klHistory} from './kl-history';
+import {IHistoryBroadcast, IHistoryEntry, klHistory} from './kl-history';
+import {KlCanvasWorkspace} from '../canvas-ui/kl-canvas-workspace';
+import {IFilterApply, IInitState} from '../kl.types';
+import {KlCanvas} from '../canvas/kl-canvas';
 
 export class UndoRedoCatchup {
 
     private doIgnore = false;
 
-    constructor(
-        private brushUiObj,
-        private layerPreview,
-        private layerManager,
-        private handUi,
-        private klCanvasWorkspace,
-        private getInitState,
-        private getKlCanvas,
-        private getCurrentLayerCtx,
-        private setCurrentLayerCtx,
-        private getCurrentBrush,
-    ) { }
-
     /**
      * Prevent multiple undo / redo getting triggered at once.
      * Might be confusing if main thread is choking.
      */
-    ignoreTest() {
+    private ignoreTest (): boolean {
         if (this.doIgnore) {
             return false;
         }
@@ -33,8 +23,22 @@ export class UndoRedoCatchup {
         return true;
     }
 
-    undo(): boolean {
-        const _this = this;
+    // ---- public ----
+
+    constructor (
+        private brushUiObj,
+        private layerPreview,
+        private layerManager,
+        private handUi,
+        private klCanvasWorkspace: KlCanvasWorkspace,
+        private getInitState: () => IInitState,
+        private getKlCanvas: () => KlCanvas,
+        private getCurrentLayerCtx,
+        private setCurrentLayerCtx,
+        private getCurrentBrush,
+    ) { }
+
+    undo (): boolean {
         if (!this.ignoreTest()) {
             return false;
         }
@@ -42,224 +46,218 @@ export class UndoRedoCatchup {
         if (!klHistory.canUndo()) { // || workspace.isPainting()) {
             return false;
         }
-        let startTime = performance.now();
-        let actions = klHistory.undo();
-        klHistory.pause();
-        let oldSize = {w: _this.getKlCanvas().getWidth(), h: _this.getKlCanvas().getHeight()};
-        _this.getKlCanvas().copy(_this.getInitState().canvas);
-        let layerIndex = _this.getInitState().focus;
-        _this.setCurrentLayerCtx(_this.getKlCanvas().getLayerContext(layerIndex));
-        let brushes: any = {};
+        const actions: IHistoryEntry[] = klHistory.undo();
+        klHistory.pause(true);
+        const initState: IInitState = this.getInitState();
+        const oldSize = {w: this.getKlCanvas().getWidth(), h: this.getKlCanvas().getHeight()};
+        this.getKlCanvas().copy(initState.canvas);
+        let layerIndex = initState.focus;
+        this.setCurrentLayerCtx(this.getKlCanvas().getLayerContext(layerIndex));
+        const brushes: any = {};
         for (let b in KL.brushes) {
             if (KL.brushes.hasOwnProperty(b)) {
                 brushes[b] = new KL.brushes[b]();
-                brushes[b].setContext(_this.getCurrentLayerCtx());
+                brushes[b].setContext(this.getCurrentLayerCtx());
             }
         }
-        brushes.sketchy.setSeed(_this.getInitState().brushes.sketchy.getSeed());
+        brushes.SketchyBrush.setSeed(initState.brushes.SketchyBrush.getSeed());
         for (let i = 0; i < actions.length; i++) {
-            (function (i) {
+            ((i) => {
                 if (actions[i].tool[0] === "brush") {
-                    let b = brushes[actions[i].tool[1]];
+                    const b = brushes[actions[i].tool[1]];
                     if (actions[i].actions) {
                         for (let e = 0; e < actions[i].actions.length; e++) {
-                            let p = actions[i].actions[e].params;
+                            const p = actions[i].actions[e].params;
                             b[actions[i].actions[e].action].apply(b, p);
                         }
                     } else {
-                        let p = actions[i].params;
+                        const p = actions[i].params;
                         b[actions[i].action].apply(b, p);
                     }
                 } else if (actions[i].tool[0] === "canvas") {
-                    let p = actions[i].params;
-                    let id = _this.getKlCanvas()[actions[i].action].apply(_this.getKlCanvas(), p);
-                    if (typeof id === typeof 123) {
+                    const p = actions[i].params;
+                    const id = this.getKlCanvas()[actions[i].action].apply(this.getKlCanvas(), p);
+                    if (typeof id === 'number') {
                         layerIndex = id;
-                        _this.setCurrentLayerCtx(_this.getKlCanvas().getLayerContext(layerIndex));
+                        this.setCurrentLayerCtx(this.getKlCanvas().getLayerContext(layerIndex));
                         for (let b in brushes) {
                             if (brushes.hasOwnProperty(b)) {
-                                brushes[b].setContext(_this.getCurrentLayerCtx());
+                                brushes[b].setContext(this.getCurrentLayerCtx());
                             }
                         }
                     }
                 } else if (actions[i].tool[0] === "filter") {
-                    let p = [{
-                        context: _this.getCurrentLayerCtx(),
-                        canvas: _this.getKlCanvas(),
+                    const p = [{
+                        context: this.getCurrentLayerCtx(),
+                        canvas: this.getKlCanvas(),
                         input: actions[i].params[0].input,
-                        history: {
-                            add: function () {
-                            }, pause: function () {
-                            }
-                        }
-                    }];
+                        history: new KL.DecoyKlHistory(),
+                    } as IFilterApply];
                     KL.filterLib[actions[i].tool[1]][actions[i].action].apply(null, p);
+
                 } else if (actions[i].tool[0] === "misc" && actions[i].action === "focusLayer") {
                     layerIndex = actions[i].params[0];
-                    _this.setCurrentLayerCtx(_this.getKlCanvas().getLayerContext(actions[i].params[0]));
+                    this.setCurrentLayerCtx(this.getKlCanvas().getLayerContext(actions[i].params[0]));
                     for (let b in brushes) {
                         if (brushes.hasOwnProperty(b)) {
-                            brushes[b].setContext(_this.getCurrentLayerCtx());
+                            brushes[b].setContext(this.getCurrentLayerCtx());
                         }
                     }
                 } else if (actions[i].tool[0] === "misc" && actions[i].action === "importImage") {
-                    let id = _this.getKlCanvas().addLayer();
-                    if (typeof id === typeof 123) {
+                    const id = this.getKlCanvas().addLayer();
+                    if (typeof id === 'number') {
                         layerIndex = id;
                         if (actions[i].params[1]) {
-                            _this.getKlCanvas().renameLayer(layerIndex, actions[i].params[1]);
+                            this.getKlCanvas().renameLayer(layerIndex, actions[i].params[1]);
                         }
-                        _this.setCurrentLayerCtx(_this.getKlCanvas().getLayerContext(layerIndex));
+                        this.setCurrentLayerCtx(this.getKlCanvas().getLayerContext(layerIndex));
                         for (let b in brushes) {
                             if (brushes.hasOwnProperty(b)) {
-                                brushes[b].setContext(_this.getCurrentLayerCtx());
+                                brushes[b].setContext(this.getCurrentLayerCtx());
                             }
                         }
                     }
-                    _this.getCurrentLayerCtx().drawImage(actions[i].params[0], 0, 0);
+                    this.getCurrentLayerCtx().drawImage(actions[i].params[0], 0, 0);
                 }
             })(i);
         }
-        if (oldSize.w !== _this.getKlCanvas().getWidth() || oldSize.h !== _this.getKlCanvas().getHeight()) {
-            _this.klCanvasWorkspace.resetView();
-            _this.handUi.update(_this.klCanvasWorkspace.getScale(), _this.klCanvasWorkspace.getAngleDeg());
+        if (oldSize.w !== this.getKlCanvas().getWidth() || oldSize.h !== this.getKlCanvas().getHeight()) {
+            this.klCanvasWorkspace.resetView();
+            this.handUi.update(this.klCanvasWorkspace.getScale(), this.klCanvasWorkspace.getAngleDeg());
         }
-        _this.layerManager.update(layerIndex);
-        _this.layerPreview.setLayer(_this.getKlCanvas().getLayer(layerIndex));
-        _this.brushUiObj.sketchy.setSeed(brushes.sketchy.getSeed());
-        _this.getCurrentBrush().setContext(_this.getCurrentLayerCtx());
-        _this.klCanvasWorkspace.setLastDrawEvent(null);
+        this.layerManager.update(layerIndex);
+        this.layerPreview.setLayer(this.getKlCanvas().getLayer(layerIndex));
+        this.brushUiObj.sketchyBrush.setSeed(brushes.SketchyBrush.getSeed());
+        this.getCurrentBrush().setContext(this.getCurrentLayerCtx());
+        this.klCanvasWorkspace.setLastDrawEvent(null);
 
         klHistory.pause(false);
         return true;
     }
 
-    redo(): boolean {
-        const _this = this;
+    redo (): boolean {
         if (!this.ignoreTest()) {
             return false;
         }
 
-        if (!klHistory.canRedo()) { // || workspace.isPainting()) {
+        if (!klHistory.canRedo()) {
             return false;
         }
-        let actions = klHistory.redo();
-        klHistory.pause();
-        let oldSize = {w: _this.getKlCanvas().getWidth(), h: _this.getKlCanvas().getHeight()};
+        const actions = klHistory.redo();
+        klHistory.pause(true);
+        const oldSize = {w: this.getKlCanvas().getWidth(), h: this.getKlCanvas().getHeight()};
         let layerIndex;
-        let brushes: any = {};
+        const brushes: any = {};
         for (let b in KL.brushes) {
             if (KL.brushes.hasOwnProperty(b)) {
                 brushes[b] = new KL.brushes[b]();
-                brushes[b].setContext(_this.getCurrentLayerCtx());
+                brushes[b].setContext(this.getCurrentLayerCtx());
             }
         }
-        brushes.sketchy.setSeed(_this.brushUiObj.sketchy.getSeed());
+        brushes.SketchyBrush.setSeed(this.brushUiObj.sketchyBrush.getSeed());
         for (let i = 0; i < actions.length; i++) {
-            (function (i) {
+            ((i) => {
                 if (actions[i].tool[0] === "brush") {
-                    let b = brushes[actions[i].tool[1]];
+                    const b = brushes[actions[i].tool[1]];
                     if (actions[i].actions) {
                         for (let e = 0; e < actions[i].actions.length; e++) {
-                            let p = actions[i].actions[e].params;
+                            const p = actions[i].actions[e].params;
                             b[actions[i].actions[e].action].apply(b, p);
                         }
                     } else {
-                        let p = actions[i].params;
+                        const p = actions[i].params;
                         b[actions[i].action].apply(b, p);
                     }
                 } else if (actions[i].tool[0] === "canvas") {
-                    let p = actions[i].params;
-                    let id = _this.getKlCanvas()[actions[i].action].apply(_this.getKlCanvas(), p);
-                    if (typeof id === typeof 123) {
+                    const p = actions[i].params;
+                    const id = this.getKlCanvas()[actions[i].action].apply(this.getKlCanvas(), p);
+                    if (typeof id === 'number') {
                         layerIndex = id;
-                        _this.setCurrentLayerCtx(_this.getKlCanvas().getLayerContext(layerIndex));
+                        this.setCurrentLayerCtx(this.getKlCanvas().getLayerContext(layerIndex));
                         for (let b in brushes) {
                             if (brushes.hasOwnProperty(b)) {
-                                brushes[b].setContext(_this.getCurrentLayerCtx());
+                                brushes[b].setContext(this.getCurrentLayerCtx());
                             }
                         }
                     }
                 } else if (actions[i].tool[0] === "filter") {
-                    let p = [{
-                        context: _this.getCurrentLayerCtx(),
-                        canvas: _this.getKlCanvas(),
+                    const p = [{
+                        context: this.getCurrentLayerCtx(),
+                        canvas: this.getKlCanvas(),
                         input: actions[i].params[0].input,
-                        history: {
-                            add: function () {
-                            }, pause: function () {
-                            }
-                        }
-                    }];
+                        history: new KL.DecoyKlHistory(),
+                    } as IFilterApply];
                     KL.filterLib[actions[i].tool[1]][actions[i].action].apply(null, p);
+
                 } else if (actions[i].tool[0] === "misc" && actions[i].action === "focusLayer") {
                     layerIndex = actions[i].params[0];
-                    _this.setCurrentLayerCtx(_this.getKlCanvas().getLayerContext(actions[i].params[0]));
+                    this.setCurrentLayerCtx(this.getKlCanvas().getLayerContext(actions[i].params[0]));
                     for (let b in brushes) {
                         if (brushes.hasOwnProperty(b)) {
-                            brushes[b].setContext(_this.getCurrentLayerCtx());
+                            brushes[b].setContext(this.getCurrentLayerCtx());
                         }
                     }
                 } else if (actions[i].tool[0] === "misc" && actions[i].action === "importImage") {
-                    let id = _this.getKlCanvas().addLayer();
-                    if (typeof id === typeof 123) {
+                    const id = this.getKlCanvas().addLayer();
+                    if (typeof id === 'number') {
                         layerIndex = id;
                         if (actions[i].params[1]) {
-                            _this.getKlCanvas().renameLayer(layerIndex, actions[i].params[1]);
+                            this.getKlCanvas().renameLayer(layerIndex, actions[i].params[1]);
                         }
-                        _this.setCurrentLayerCtx(_this.getKlCanvas().getLayerContext(layerIndex));
+                        this.setCurrentLayerCtx(this.getKlCanvas().getLayerContext(layerIndex));
                         for (let b in brushes) {
                             if (brushes.hasOwnProperty(b)) {
-                                brushes[b].setContext(_this.getCurrentLayerCtx());
+                                brushes[b].setContext(this.getCurrentLayerCtx());
                             }
                         }
                     }
-                    _this.getCurrentLayerCtx().drawImage(actions[i].params[0], 0, 0);
+                    this.getCurrentLayerCtx().drawImage(actions[i].params[0], 0, 0);
                 }
             })(i);
         }
 
-        if (oldSize.w !== _this.getKlCanvas().getWidth() || oldSize.h !== _this.getKlCanvas().getHeight()) {
-            _this.klCanvasWorkspace.resetView();
-            _this.handUi.update(_this.klCanvasWorkspace.getScale(), _this.klCanvasWorkspace.getAngleDeg());
+        if (oldSize.w !== this.getKlCanvas().getWidth() || oldSize.h !== this.getKlCanvas().getHeight()) {
+            this.klCanvasWorkspace.resetView();
+            this.handUi.update(this.klCanvasWorkspace.getScale(), this.klCanvasWorkspace.getAngleDeg());
         }
-        let currentLayerIndex = _this.getKlCanvas().getLayerIndex(_this.getCurrentLayerCtx().canvas);
-        _this.layerManager.update(currentLayerIndex);
-        _this.layerPreview.setLayer(_this.getKlCanvas().getLayer(currentLayerIndex));
-        _this.brushUiObj.sketchy.setSeed(brushes.sketchy.getSeed());
-        _this.getCurrentBrush().setContext(_this.getCurrentLayerCtx());
-        _this.klCanvasWorkspace.setLastDrawEvent(null);
+        const currentLayerIndex = this.getKlCanvas().getLayerIndex(this.getCurrentLayerCtx().canvas);
+        this.layerManager.update(currentLayerIndex);
+        this.layerPreview.setLayer(this.getKlCanvas().getLayer(currentLayerIndex));
+        this.brushUiObj.sketchyBrush.setSeed(brushes.SketchyBrush.getSeed());
+        this.getCurrentBrush().setContext(this.getCurrentLayerCtx());
+        this.klCanvasWorkspace.setLastDrawEvent(null);
         klHistory.pause(false);
 
         return true;
     }
 
-    catchup (logParam) {
-        const _this = this;
+    catchup (logParam: IHistoryBroadcast | null): void {
         // const start = performance.now();
         //play catch up (the version that is a few steps behind)
         if (logParam && logParam.bufferUpdate) {
-            let brushes = _this.getInitState().brushes;
-            let actions = [logParam.bufferUpdate];
-            let localCurrentLayerCtx = _this.getInitState().canvas.getLayerContext(_this.getInitState().focus);
-            let canvas = _this.getInitState().canvas;
-            let layerIndex = _this.getInitState().focus;
-            (function (i) {
+            const initState: IInitState = this.getInitState();
+
+            const brushes = initState.brushes;
+            const actions = [logParam.bufferUpdate];
+            let localCurrentLayerCtx = initState.canvas.getLayerContext(initState.focus);
+            const canvas = initState.canvas;
+            let layerIndex = initState.focus;
+            ((i) => {
                 if (actions[i].tool[0] === "brush") {
                     let b = brushes[actions[i].tool[1]];
                     if (actions[i].actions) {
                         for (let e = 0; e < actions[i].actions.length; e++) {
-                            let p = actions[i].actions[e].params;
+                            const p = actions[i].actions[e].params;
                             b[actions[i].actions[e].action].apply(b, p);
                         }
                     } else {
-                        let p = actions[i].params;
+                        const p = actions[i].params;
                         b[actions[i].action].apply(b, p);
                     }
                 } else if (actions[i].tool[0] === "canvas") {
-                    let p = actions[i].params;
-                    let id = canvas[actions[i].action].apply(canvas, p);
-                    if (typeof id === typeof 123) {
+                    const p = actions[i].params;
+                    const id = canvas[actions[i].action].apply(canvas, p);
+                    if (typeof id === 'number') {
                         layerIndex = id;
                         localCurrentLayerCtx = canvas.getLayerContext(layerIndex);
                         for (let b in brushes) {
@@ -269,17 +267,14 @@ export class UndoRedoCatchup {
                         }
                     }
                 } else if (actions[i].tool[0] === "filter") {
-                    let p = [{
+                    const p = [{
                         context: localCurrentLayerCtx,
                         canvas: canvas,
                         input: actions[i].params[0].input,
-                        history: {
-                            add: function () {
-                            }, pause: function () {
-                            }
-                        }
-                    }];
+                        history: new KL.DecoyKlHistory(),
+                    } as IFilterApply];
                     KL.filterLib[actions[i].tool[1]][actions[i].action].apply(null, p);
+
                 } else if (actions[i].tool[0] === "misc" && actions[i].action === "focusLayer") {
                     layerIndex = actions[i].params[0];
                     localCurrentLayerCtx = canvas.getLayerContext(actions[i].params[0]);
@@ -289,11 +284,11 @@ export class UndoRedoCatchup {
                         }
                     }
                 } else if (actions[i].tool[0] === "misc" && actions[i].action === "importImage") {
-                    let id = canvas.addLayer();
-                    if (typeof id === typeof 123) {
+                    const id = canvas.addLayer();
+                    if (typeof id === 'number') {
                         layerIndex = id;
                         if (actions[i].params[1]) {
-                            _this.getKlCanvas().renameLayer(layerIndex, actions[i].params[1]);
+                            this.getKlCanvas().renameLayer(layerIndex, actions[i].params[1]);
                         }
                         localCurrentLayerCtx = canvas.getLayerContext(layerIndex);
                         for (let b in brushes) {
@@ -305,7 +300,7 @@ export class UndoRedoCatchup {
                     localCurrentLayerCtx.drawImage(actions[i].params[0], 0, 0);
                 }
             })(0);
-            _this.getInitState().focus = layerIndex;
+            initState.focus = layerIndex;
         }
         // console.log('catchup', performance.now() - start);
     }

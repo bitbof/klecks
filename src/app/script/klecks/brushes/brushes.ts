@@ -1,15 +1,17 @@
-import {defaultBrush} from './default-brush';
+import {PenBrush} from './pen-brush';
 import {BlendBrush} from './blend-brush';
-import {sketchyBrush} from './sketchy-brush';
-import {pixelBrush} from './pixel-brush';
-import {eraserBrush} from './eraser-brush';
-import {smudgeBrush} from './smudge-brush';
+import {SketchyBrush} from './sketchy-brush';
+import {PixelBrush} from './pixel-brush';
+import {EraserBrush} from './eraser-brush';
+import {SmudgeBrush} from './smudge-brush';
+import {ChemyBrush} from './chemy-brush';
 
 export const brushes = {
-    defaultBrush: defaultBrush,
+    PenBrush,
     BlendBrush,
-    sketchy: sketchyBrush,
-    pixel: pixelBrush,
-    smudge: smudgeBrush,
-    eraser: eraserBrush,
+    SketchyBrush,
+    PixelBrush,
+    ChemyBrush,
+    SmudgeBrush,
+    EraserBrush,
 }

@@ -72,7 +72,7 @@ export function TabRow(p) {
         let pointerListener = new BB.PointerListener({ // because :hover causes problems w touch
             target: tabDiv,
             onEnterLeave: function(isOver) {
-                if(isOver) {
+                if (isOver) {
                     BB.addClassName(tabDiv, 'tabrow-tab-hover');
                 } else {
                     BB.removeClassName(tabDiv, 'tabrow-tab-hover');
@@ -80,7 +80,7 @@ export function TabRow(p) {
             }
         });
 
-        if(initialId === result.id) {
+        if (initialId === result.id) {
             result.onOpen();
         } else {
             result.onClose();
@@ -89,21 +89,21 @@ export function TabRow(p) {
         return result;
     }
 
-    for(let i = 0; i < p.tabArr.length; i++) {
+    for (let i = 0; i < p.tabArr.length; i++) {
         tabArr.push(createTab(p.tabArr[i], p.initialId, p.useAccent));
     }
 
-    for(let i = 0; i < tabArr.length; i++) {
+    for (let i = 0; i < tabArr.length; i++) {
         if (tabArr[i].id === p.initialId) {
             openedTabObj = tabArr[i];
         }
     }
-    if(openedTabObj === null) {
+    if (openedTabObj === null) {
         throw 'invalid initialId';
     }
 
     function update() {
-        for(let i = 0; i < tabArr.length; i++) {
+        for (let i = 0; i < tabArr.length; i++) {
             tabArr[i].update(openedTabObj);
         }
     }
@@ -114,9 +114,9 @@ export function TabRow(p) {
     };
 
     this.open = function(tabId) {
-        for(let i = 0; i < tabArr.length; i++) {
-            if(tabArr[i].id === tabId) {
-                if(openedTabObj === tabArr[i]) { // already open
+        for (let i = 0; i < tabArr.length; i++) {
+            if (tabArr[i].id === tabId) {
+                if (openedTabObj === tabArr[i]) { // already open
                     return;
                 }
                 openedTabObj.onClose();
@@ -134,8 +134,8 @@ export function TabRow(p) {
     };
 
     this.setIsVisible = function(tabId, isVisible) {
-        for(let i = 0; i < tabArr.length; i++) {
-            if(tabArr[i].id === tabId) {
+        for (let i = 0; i < tabArr.length; i++) {
+            if (tabArr[i].id === tabId) {
                 tabArr[i].isVisible = !!isVisible;
                 update();
                 return;

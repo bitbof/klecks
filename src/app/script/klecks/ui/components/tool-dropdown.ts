@@ -1,7 +1,7 @@
 import {BB} from '../../../bb/bb';
 import {dialogCounter} from '../modals/modal-count';
 // @ts-ignore
-import toolPaintImg from 'url:~/src/app/img/ui/tool-paint.png';
+import toolPaintImg from 'url:~/src/app/img/ui/tool-paint.svg';
 // @ts-ignore
 import toolFillImg from 'url:~/src/app/img/ui/tool-fill.svg';
 // @ts-ignore
@@ -39,7 +39,7 @@ export function ToolDropdown(p) {
 
     //preload images
     setTimeout(function() {
-        for(let i = 1; i < imArr.length; i++) {
+        for (let i = 1; i < imArr.length; i++) {
             let im = new Image();
             im.src = imArr[i];
         }

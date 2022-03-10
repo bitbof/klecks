@@ -1,4 +1,5 @@
 import {BB} from '../../bb/bb';
+import {IShapeToolObject} from '../kl.types';
 
 
 /**
@@ -36,22 +37,7 @@ export function ShapeTool(p) {
  */
 export function drawShape(
     ctx: CanvasRenderingContext2D,
-    shapeObj: {
-        type: 'rect' | 'ellipse' | 'line';
-        x1: number;
-        y1: number;
-        x2: number;
-        y2: number;
-        angleRad: number; // angle of canvas
-        isOutwards: boolean; // center is x1 y1
-        opacity: number; // 0-1
-        isEraser: boolean;
-        fillRgb?: { r: number; g: number; b: number }; // for rect or ellipse
-        strokeRgb?: { r: number; g: number; b: number }; // needed for line
-        lineWidth?: number; // needed for line
-        isAngleSnap?: boolean; // 45° angle snapping
-        isFixedRatio?: boolean; // 1:1 for rect or ellipse
-    }
+    shapeObj: IShapeToolObject,
 ) {
 
     if (['rect', 'ellipse', 'line'].includes(shapeObj.type)) {

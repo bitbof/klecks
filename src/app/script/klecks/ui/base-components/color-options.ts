@@ -54,7 +54,7 @@ export const ColorOptions = function(p) {
         }
     }
 
-    for(let i = 0; i < colorArr.length; i++) {
+    for (let i = 0; i < colorArr.length; i++) {
         (function(i) {
 
             const colorButton = BB.el({
@@ -72,7 +72,7 @@ export const ColorOptions = function(p) {
                     color: '#aaa'
                 }
             });
-            if(colorArr[i] && colorArr[i].a === 0) {
+            if (colorArr[i] && colorArr[i].a === 0) {
                 colorButton.style.backgroundImage = 'url(' + checkerUrl + ')';
             }
 
@@ -84,7 +84,7 @@ export const ColorOptions = function(p) {
             };
 
             (colorButton as any).setIsSelected = function(b) {
-                if(b) {
+                if (b) {
                     BB.css(colorButton, {
                         boxShadow: '0 0 0 2px var(--active-highlight-color), 0 0 5px 0 var(--active-highlight-color)',
                         pointerEvents: 'none'
@@ -105,7 +105,7 @@ export const ColorOptions = function(p) {
 
 
     function update() {
-        for(let i = 0; i < buttonArr.length; i++) {
+        for (let i = 0; i < buttonArr.length; i++) {
             buttonArr[i].setIsSelected(i === selectedIndex);
         }
     }

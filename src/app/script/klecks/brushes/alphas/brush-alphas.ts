@@ -62,9 +62,7 @@ export function genBrushAlpha02(w: number): HTMLCanvasElement {
     const p2 = {x: w - (w * pDist), y: pDist * w};
 
     const h = w;
-    const canvas = BB.canvas();
-    canvas.width = w;
-    canvas.height = h;
+    const canvas = BB.canvas(w, h);
     let ctx = canvas.getContext('2d');
     const imData = ctx.createImageData(w, h);
     for (let x = 0; x < w; x++) {

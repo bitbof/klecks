@@ -47,7 +47,7 @@ export const PointSlider = function(param) {
 
     function redrawPoint() {
         sliderPoint.style.left = sliderPos + 'px';
-        if(isDragging) {
+        if (isDragging) {
             sliderPoint.style.boxShadow = '0 0 6px rgba(0,0,0,1)';
         } else {
             sliderPoint.style.boxShadow = '0 0 3px rgba(0,0,0,0.8)';
@@ -107,7 +107,7 @@ export const PointSlider = function(param) {
         return div;
     };
     this.setActive = function(isActive) {
-        if(isActive) {
+        if (isActive) {
             sliderPoint.style.backgroundColor = '#fff';
         } else {
             sliderPoint.style.backgroundColor = '#eaeaea';

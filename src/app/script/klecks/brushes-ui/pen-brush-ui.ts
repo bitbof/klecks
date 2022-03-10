@@ -3,14 +3,15 @@ import {brushes} from '../brushes/brushes';
 import {eventResMs} from './brushes-consts';
 import {klHistory} from '../history/kl-history';
 import {Checkbox} from '../ui/base-components/checkbox';
-import {PcSlider} from '../ui/base-components/slider';
+import {KlSlider} from '../ui/base-components/kl-slider';
 import {penPressureToggle} from '../ui/base-components/pen-pressure-toggle';
 // @ts-ignore
-import brushIconImg from 'url:~/src/app/img/ui/brush-smpl.png';
+import brushIconImg from 'url:~/src/app/img/ui/brush-pen.svg';
 import {genBrushAlpha01, genBrushAlpha02} from '../brushes/alphas/brush-alphas';
+import {IBrushUi} from '../kl.types';
 
-export const defaultBrushUi = (function () {
-    let brushInterface: any = {
+export const penBrushUi = (function () {
+    let brushInterface: IBrushUi = {
         image: brushIconImg,
         tooltip: 'Pen',
         sizeSlider: {
@@ -22,18 +23,15 @@ export const defaultBrushUi = (function () {
             min: 0,
             max: 1,
             curve: [[0, 1 / 100], [0.5, 0.3], [1, 1]]
-        }
+        },
+        Ui: null,
     };
 
     let alphaNames = ['Circle', 'Chalk', 'Calligraphy', 'Square'];
 
-    /**
-     * @param p = {onSizeChange: function(size), onOpacityChange: function(opacity)}
-     * @constructor
-     */
     brushInterface.Ui = function (p) {
         let div = document.createElement("div"); // the gui
-        let brush = new brushes.defaultBrush();
+        let brush = new brushes.PenBrush();
         brush.setHistory(klHistory);
         p.onSizeChange(brush.getSize());
         let sizeSlider;
@@ -111,7 +109,7 @@ export const defaultBrushUi = (function () {
         }
 
         function init() {
-            sizeSlider = new PcSlider({
+            sizeSlider = new KlSlider({
                 label: 'Size',
                 width: 225,
                 height: 30,
@@ -133,7 +131,7 @@ export const defaultBrushUi = (function () {
                     }
                 }
             });
-            opacitySlider = new PcSlider({
+            opacitySlider = new KlSlider({
                 label: 'Opacity',
                 width: 225,
                 height: 30,

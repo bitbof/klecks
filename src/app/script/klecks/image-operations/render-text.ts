@@ -1,25 +1,30 @@
 import {BB} from '../../bb/bb';
+import {IRect} from '../../bb/bb.types';
+
+export interface IRenderTextParam {
+    textStr: string; // text to be drawn. can contain newlines
+    x: number;
+    y: number;
+    size: number;
+    font: 'serif' | 'monospace' | 'sans-serif' | 'cursive' | 'fantasy'; // default sans-serif
+    align: 'left' | 'center' | 'right'; // default 'left'
+    isBold: boolean; // default false
+    isItalic: boolean; // default false
+    angleRad: number; // default 0 - rotates around x y
+    lineHeight?: number; // pixels
+    color: string;
+    isDebug?: boolean;
+}
+
 
 /**
  * Draw text on a canvas.
  *
- * p = {
- *     canvas: canvas, // drawn on this canvas
- *     textStr: str, // text to be drawn. can contain newlines
- *     x: number,
- *     y: number,
- *     size: number,
- *     font: 'serif' | 'monospace' | 'sans-serif' | 'cursive' | 'fantasy', // default sans-serif
- *     align: 'left' | 'center' | 'right', // default 'left'
- *     isBold: boolean, // default false
- *     isItalic: boolean, // default false
- *     angleRad: number, // default 0 - rotates around x y
- * }
- *
+ * @param canvas
  * @param p
- * @returns {{x: number, width: number, y: number, height: number}} - bounds. coords relative to p.x p.y
+ * @returns - bounds. coords relative to p.x p.y
  */
-export function renderText(p) {
+export function renderText(canvas: HTMLCanvasElement, p: IRenderTextParam): IRect {
 
     // always at least a space. so bounds aren't just a dot
     let textStr = p.textStr === '' ? ' ' : p.textStr;
@@ -102,7 +107,7 @@ export function renderText(p) {
     }
 
     // --- draw ---
-    let ctx = p.canvas.getContext('2d');
+    let ctx = canvas.getContext('2d');
     ctx.save();
 
     let font = [];

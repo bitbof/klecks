@@ -60,7 +60,7 @@ export function TabMenu(params) {
                     borderTopLeftRadius: '4px',
                     borderTopRightRadius: '4px'
                 });
-                if(i === params.entries.length - 1) {
+                if (i === params.entries.length - 1) {
                     entries[i].style.width = width - widthSum + 'px';
                 } else {
                     widthSum += parseInt('' + (width / params.entries.length));

@@ -3,10 +3,11 @@ import {Checkbox} from '../ui/base-components/checkbox';
 import {KlCanvasPreview} from '../canvas-ui/canvas-preview';
 // @ts-ignore
 import checkmarkImg from 'url:~/src/app/img/ui/checkmark.svg';
+import {IFilterApply, IFilterGetDialogParam} from '../kl.types';
 
 export const flip = {
 
-    getDialog(params) {
+    getDialog(params: IFilterGetDialogParam) {
         let context = params.context;
         let canvas = params.canvas;
         if (!context || !canvas) {
@@ -204,7 +205,7 @@ export const flip = {
                 }
             }
 
-            for(let i = 0; i < layers.length; i++) {
+            for (let i = 0; i < layers.length; i++) {
                 ctx.save();
                 if (!doFlipCanvas && selectedLayerIndex === i) {
                     if (isHorizontal) {
@@ -219,7 +220,7 @@ export const flip = {
                 if (ctx.canvas.width > layers[i].context.canvas.width) {
                     ctx.imageSmoothingEnabled = false;
                 }
-                ctx.globalAlpha = parseFloat(layers[i].opacity);
+                ctx.globalAlpha = layers[i].opacity;
                 ctx.globalCompositeOperation = layers[i].mixModeStr;
                 ctx.drawImage(layers[i].context.canvas, 0, 0, previewLayer.canvas.width, previewLayer.canvas.height);
                 ctx.restore();
@@ -246,7 +247,7 @@ export const flip = {
         return result;
     },
 
-    apply(params) {
+    apply(params: IFilterApply) {
         let context = params.context;
         let canvas = params.canvas;
         let history = params.history;
@@ -257,11 +258,11 @@ export const flip = {
             return false;
         }
 
-        history.pause();
+        history.pause(true);
         canvas.flip(horizontal, vertical, flipCanvas ? null : canvas.getLayerIndex(context.canvas));
         history.pause(false);
 
-        history.add({
+        history.push({
             tool: ["filter", "flip"],
             action: "apply",
             params: [{

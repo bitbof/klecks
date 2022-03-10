@@ -63,7 +63,7 @@ export function ToolspaceTopRow(p) {
         (result as any).pointerListener = new BB.PointerListener({ // because :hover causes problems w touch
             target: result,
             onEnterLeave: function(isOver) {
-                if(isOver) {
+                if (isOver) {
                     BB.addClassName(result, 'toolspace-row-button-hover');
                 } else {
                     BB.removeClassName(result, 'toolspace-row-button-hover');
@@ -104,7 +104,7 @@ export function ToolspaceTopRow(p) {
     });
 
     let shareButton = null;
-    if(BB.canShareFiles()) {
+    if (BB.canShareFiles()) {
         shareButton = createButton({
             onClick: p.onShare,
             title: 'Share',
@@ -123,7 +123,7 @@ export function ToolspaceTopRow(p) {
     div.appendChild(newButton);
     div.appendChild(importButton);
     div.appendChild(saveButton);
-    if(shareButton) {
+    if (shareButton) {
         div.appendChild(shareButton);
     }
     div.appendChild(helpButton);

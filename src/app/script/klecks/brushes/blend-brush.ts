@@ -1,14 +1,9 @@
 import {BB} from '../../bb/bb';
 import {IRGB, IRGBA} from '../kl.types';
-import {IBounds} from '../../bb/bb.types';
+import {IBounds, IPressureInput} from '../../bb/bb.types';
+import {IHistoryEntry, KlHistoryInterface} from '../history/kl-history';
 
 const cellSize = 256;
-
-interface IPressureInput {
-    x: number;
-    y: number;
-    pressure: number; // 0-1
-}
 
 interface IDrawBufferItem {
     x: number;
@@ -59,14 +54,8 @@ export class BlendBrush {
     private lastInput2: IPressureInput = {x: 0, y: 0, pressure: 0}; // todo docs
     private bezierLine: any; // todo type
 
-    private history: any; // todo type
-    private historyEntry: {
-        tool: string[];
-        actions: {
-            action: string;
-            params: any[];
-        }[];
-    };
+    private history: KlHistoryInterface | null;
+    private historyEntry: IHistoryEntry;
     private redrawBounds: IBounds;
     private cells: (ImageData | null)[];
     private drawBuffer: IDrawBufferItem[];
@@ -498,7 +487,7 @@ export class BlendBrush {
     constructor () {
     }
 
-    setHistory (h: any): void {
+    setHistory (h: KlHistoryInterface): void {
         this.history = h;
     }
 
@@ -684,7 +673,7 @@ export class BlendBrush {
                 action: "drawCells",
                 params: [this.cells],
             });
-            this.history.add(this.historyEntry);
+            this.history.push(this.historyEntry);
             this.historyEntry = null;
         }
         this.cells = null;
@@ -785,7 +774,7 @@ export class BlendBrush {
                     params: [this.cells],
                 }],
             };
-            this.history.add(this.historyEntry);
+            this.history.push(this.historyEntry);
             this.historyEntry = null;
         }
         this.cells = null;

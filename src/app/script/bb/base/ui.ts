@@ -61,7 +61,7 @@ export const makeUnfocusable = (function() {
                 console.error('failed to focus');
             }
         }
-        if(!didFocusRelated) {
+        if (!didFocusRelated) {
             (event.currentTarget as HTMLElement).blur();
         }
     }
@@ -100,7 +100,7 @@ export function el(
         parent?: HTMLElement,
         css?: { [key: string]: string },
         custom?: { [key: string]: any },
-        content?: string | HTMLElement[] | HTMLElement,
+        content?: string | HTMLElement[] | HTMLElement | SVGElement,
         textContent?: string,
         className?: string,
         title?: string,
@@ -129,27 +129,27 @@ export function el(
             }
         }
     }
-    if(params.textContent) {
+    if (params.textContent) {
         div.textContent = params.textContent;
     }
     if (params.className) {
         div.className = params.className;
     }
-    if(params.id) {
+    if (params.id) {
         div.id = params.id;
     }
-    if(params.parent) {
+    if (params.parent) {
         params.parent.appendChild(div);
     }
-    if('title' in params && params.title !== undefined) {
+    if ('title' in params && params.title !== undefined) {
         div.title = params.title;
     }
     const listeners = [];
-    if('onClick' in params) {
+    if ('onClick' in params) {
         addEventListener(div, 'click', params.onClick);
         listeners.push(['click', params.onClick]);
     }
-    if('onChange' in params) {
+    if ('onChange' in params) {
         addEventListener(div, 'change', params.onChange);
         listeners.push(['change', params.onChange]);
     }
@@ -161,9 +161,9 @@ export function el(
         /*div.style.backgroundColor = '#ff0';
         div.style.border = '1px solid #ff0';*/
     }
-    if('custom' in params) {
+    if ('custom' in params) {
         const customKeyArr = Object.keys(params.custom);
-        for(let i = 0; i < customKeyArr.length; i++) {
+        for (let i = 0; i < customKeyArr.length; i++) {
             div.setAttribute(customKeyArr[i], params.custom[customKeyArr[i]]);
         }
     }

@@ -14,12 +14,15 @@ import uploadImg from 'url:~/src/app/img/ui/upload.svg';
 import importImg from 'url:~/src/app/img/ui/import.svg';
 import {exportType} from '../klecks/ui/tool-tabs/file-tab';
 import {ToolspaceTopRow} from "../embed/toolspace-top-row";
-import {IKlProject} from '../klecks/kl.types';
+import {IInitState, IKlProject, IKlPsd} from '../klecks/kl.types';
 import {importFilters} from '../klecks/filters/filters-lazy';
 import {base64ToBlob} from '../klecks/storage/base-64-to-blob';
 import {klCanvasToPsdBlob} from '../klecks/storage/kl-canvas-to-psd-blob';
 import {ProjectStore} from '../klecks/storage/project-store';
 import {SaveReminder} from "../klecks/ui/components/save-reminder";
+import {KlCanvasWorkspace} from '../klecks/canvas-ui/kl-canvas-workspace';
+import {KlCanvas} from '../klecks/canvas/kl-canvas';
+
 
 interface IKlAppOptions {
     saveReminder?: SaveReminder;
@@ -45,14 +48,6 @@ export function KlApp(pProject: IKlProject | null, pOptions: IKlAppOptions) {
     let collapseThreshold = 820;
     let uiState: 'left' | 'right' = (pOptions.embed ? 'left' : (localStorage.getItem('uiState') ? localStorage.getItem('uiState') : 'right')) as any;
     const filenameBase = (pOptions.app && pOptions.app.filenameBase) ? pOptions.app.filenameBase : 'Klecks';
-    //private Element
-    //containing methods etc
-    let pEl = {
-        fillLayer: function (ctx) {
-            ctx.fillStyle = "#fff";
-            ctx.fillRect(0, 0, klCanvas.width, klCanvas.height);
-        }
-    };
     const projectStore = pOptions.projectStore;
     let klRootEl = document.createElement("div");
     klRootEl.className = 'g-root kl-initialized';
@@ -60,7 +55,7 @@ export function KlApp(pProject: IKlProject | null, pOptions: IKlAppOptions) {
     let uiHeight: number = Math.max(0, window.innerHeight);
     const toolWidth = 271;
     let exportType: exportType = 'png';
-    let klCanvas = new KL.KlCanvas(
+    let klCanvas: KlCanvas = new KL.KlCanvas(
         pProject ? {
             projectObj: pProject
         } : {
@@ -68,27 +63,27 @@ export function KlApp(pProject: IKlProject | null, pOptions: IKlAppOptions) {
             height: Math.min(klMaxCanvasSize, uiHeight)
         }, pOptions.embed ? -1 : 0);
     klCanvas.setHistory(klHistory);
-    let initState: any = {};
+    let initState: IInitState = null;
     let mainTabRow;
 
     if (!pOptions.saveReminder) {
         pOptions.saveReminder = {init: () => {}, reset: () => {}} as SaveReminder;
     }
 
-    function translateSmoothing(s) {
-        if(s == 1) {
+    function translateSmoothing(s: number): number {
+        if (s == 1) {
             return 1 - 0.5;
         }
-        if(s == 2) {
+        if (s == 2) {
             return 1 - 0.16;
         }
-        if(s == 3) {
+        if (s == 3) {
             return 1 - 0.035;
         }
-        if(s == 4) {
+        if (s == 4) {
             return 1 - 0.0175;
         }
-        if(s == 5) {
+        if (s == 5) {
             return 1 - 0.00875;
         }
         return s;
@@ -96,31 +91,27 @@ export function KlApp(pProject: IKlProject | null, pOptions: IKlAppOptions) {
 
     let isFirstImage = true;
 
-    if(pProject) {
+    if (pProject) {
         pProject = null;
     } else {
-        klHistory.pause();
+        klHistory.pause(true);
         klCanvas.addLayer();
-        pEl.fillLayer(klCanvas.getLayerContext(0));
+        klCanvas.layerFill(0, { r: 255, g: 255, b: 255});
         klHistory.pause(false);
     }
     initState = {
         canvas: new KL.KlCanvas({copy: klCanvas}, pOptions.embed ? -1 : 0),
-        focus: klCanvas.getLayerCount() - 1
+        focus: klCanvas.getLayerCount() - 1,
+        brushes: {},
     };
-
-    initState.initBrushes = function () {
-        initState.brushes = {};
-        for (let b in KL.brushes) {
-            if (KL.brushes.hasOwnProperty(b)) {
-                initState.brushes[b] = new KL.brushes[b]();
-                if (initState.canvas) {
-                    initState.brushes[b].setContext(initState.canvas.getLayerContext(initState.focus));
-                }
+    for (let b in KL.brushes) {
+        if (KL.brushes.hasOwnProperty(b)) {
+            initState.brushes[b] = new KL.brushes[b]();
+            if (initState.canvas) {
+                initState.brushes[b].setContext(initState.canvas.getLayerContext(initState.focus));
             }
         }
-    };
-    initState.initBrushes();
+    }
 
 
     let currentColor = new BB.RGB(0, 0, 0);
@@ -135,170 +126,32 @@ export function KlApp(pProject: IKlProject | null, pOptions: IKlAppOptions) {
         }
     }
 
-    /**
-     * Central place to update brush settings, and to subscribe to changes.
-     *
-     * subscribers receive in this format:
-     * BrushSettingEvent
-     * {
-     *     type: 'color',
-     *     value: rgb obj
-     * } | {
-     *     type: 'size',
-     *     value: number
-     * } | {
-     *     type: 'opacity',
-     *     value: number 0-1
-     * } | {
-     *     type: 'sliderConfig',
-     *     value: {
-     *         sizeSlider: {min: number, max: number, curve: []} // curve optional
-     *         opacitySlider: {min: number, max: number, curve: []} // curve optional
-     *     }
-     * }
-     *
-     * interface in the return.
-     *
-     * @type obj
-     */
-    let brushSettingService = (function() {
-        let subscriberArr = [];
-
-        /**
-         * sends obj to all subscribers. except the skipSubscriber
-         * @param obj
-         * @param skipSubscriberr - optional - subscriber function not to emit to
-         */
-        function emit(obj, skipSubscriber?) {
-            for (let i = 0; i < subscriberArr.length; i++) {
-                if (subscriberArr[i] === skipSubscriber) {
-                    continue;
-                }
-                subscriberArr[i](obj);
-            }
+    const brushSettingService = new KL.BrushSettingService(
+        (color) => {
+            klColorSlider.setColor(color);
+            currentBrush.setColor(color);
+            currentColor = BB.copyObj(color);
+        },
+        (size) => {
+            currentBrush.setSize(size);
+            klCanvasWorkspace.setCursorSize(size * 2);
+        },
+        (opacity) => {
+            currentBrush.setOpacity(opacity);
+        },
+        () => klColorSlider.getColor(),
+        () => brushUiObj[currentBrushId].getSize(),
+        () => brushUiObj[currentBrushId].getOpacity(),
+        () => {
+            return {
+                sizeSlider: KL.brushesUI[currentBrushId].sizeSlider,
+                opacitySlider: KL.brushesUI[currentBrushId].opacitySlider,
+            };
         }
-
-        function emitColor(rgbObj, skipSubscriber?) {
-            emit({
-                type: 'color',
-                value: rgbObj
-            }, skipSubscriber);
-        }
-
-        function emitSize(size, skipSubscriber?) {
-            emit({
-                type: 'size',
-                value: size
-            }, skipSubscriber);
-        }
-
-        /**
-         * @param opacity 0-1
-         * @param skipSubscriber
-         */
-        function emitOpacity(opacity, skipSubscriber?) {
-            emit({
-                type: 'opacity',
-                value: opacity
-            }, skipSubscriber);
-        }
-
-        /**
-         * @param config
-         * @param skipSubscriber
-         */
-        function emitSliderConfig(config, skipSubscriber?) {
-            emit({
-                type: 'sliderConfig',
-                value: config
-            }, skipSubscriber);
-        }
-
-
-        return {
-            emitColor: emitColor,
-            emitSize: emitSize,
-            emitOpacity: emitOpacity,
-            emitSliderConfig: emitSliderConfig,
-            /**
-             * set current brush color
-             * @param rgbObj
-             * @param skipSubscriber
-             */
-            setColor: function(rgbObj, skipSubscriber?) { //for a subscriber
-                pcColorSlider.setColor(rgbObj);
-                currentBrush.setColor(rgbObj);
-                currentColor = rgbObj;
-                emitColor(rgbObj, skipSubscriber);
-            },
-
-            /**
-             * set current brush size
-             * @param size
-             * @param skipSubscriber
-             */
-            setSize: function(size, skipSubscriber?) {
-                currentBrush.setSize(size);
-                klCanvasWorkspace.setCursorSize(size * 2);
-            },
-
-            /**
-             * set current opacity
-             * @param opacity 0-1
-             * @param skipSubscriber
-             */
-            setOpacity: function(opacity, skipSubscriber?) {
-                currentBrush.setOpacity(opacity);
-            },
-
-            /**
-             * get current brush color
-             * @returns rgbObj
-             */
-            getColor: function() {
-                return pcColorSlider.getColor();
-            },
-            /**
-             * @returns number
-             */
-            getSize: function() {
-                return brushUiObj[currentBrushId].getSize();
-            },
-            /**
-             * @returns number 0-1
-             */
-            getOpacity: function() {
-                return brushUiObj[currentBrushId].getOpacity();
-            },
-            /**
-             * @returns config
-             */
-            getSliderConfig: function() {
-                return {
-                    sizeSlider: KL.brushesUI[currentBrushId].sizeSlider,
-                    opacitySlider: KL.brushesUI[currentBrushId].opacitySlider
-                };
-            },
-            /**
-             * subscribe to changes
-             * @param func(BrushSettingEvent) - this function gets called on change
-             */
-            subscribe: function(func) {
-                subscriberArr.push(func);
-            },
-            unsubscribe: function(func) {
-                for(let i = 0; i < subscriberArr.length; i++) {
-                    if(func === subscriberArr[i]) {
-                        subscriberArr.splice(i, 1);
-                        i--;
-                    }
-                }
-            }
-        };
-    })();
+    );
 
     let lineSmoothing = new BB.EventChain.LineSmoothing({
-        smoothing: translateSmoothing(1)
+        smoothing: translateSmoothing(1),
     });
     let lineSanitizer = new BB.EventChain.LineSanitizer();
 
@@ -306,61 +159,55 @@ export function KlApp(pProject: IKlProject | null, pOptions: IKlAppOptions) {
         chainArr: [
             lineSanitizer,
             lineSmoothing
-        ]
+        ],
     });
-    //window.line = [];
+
     drawEventChain.setChainOut(function(event) {
-        if(event.type === 'down') {
+        if (event.type === 'down') {
             toolspace.style.pointerEvents = 'none';
             currentBrush.startLine(event.x, event.y, event.pressure);
-            //window.line.push(['start', event.x, event.y, event.pressure]);
             klCanvasWorkspace.requestFrame();
         }
-        if(event.type === 'move') {
+        if (event.type === 'move') {
             currentBrush.goLine(event.x, event.y, event.pressure, false, event.isCoalesced)
-            //window.line.push(['goLine', event.x, event.y, event.pressure, false, event.isCoalesced]);
             klCanvasWorkspace.setLastDrawEvent(event.x, event.y, event.pressure);
             klCanvasWorkspace.requestFrame();
         }
-        if(event.type === 'up') {
+        if (event.type === 'up') {
             toolspace.style.pointerEvents = '';
             currentBrush.endLine();
-            //window.line.push(['endLine']);
             klCanvasWorkspace.requestFrame();
         }
-        if(event.type === 'line') {
-            //window.line.push(['lineSegment', event.x0, event.y0, event.x1, event.y1]);
+        if (event.type === 'line') {
             currentBrush.getBrush().drawLineSegment(event.x0, event.y0, event.x1, event.y1);
             klCanvasWorkspace.requestFrame();
         }
     });
 
-    // <- debug drawing goes here
-
     let textToolSettings = {
         size: 20,
-        align: 'left',
+        align: 'left' as ('left' | 'center' | 'right'),
         isBold: false,
         isItalic: false,
-        font: 'sans-serif',
+        font: 'sans-serif' as ('serif' | 'monospace' | 'sans-serif' | 'cursive' | 'fantasy'),
         opacity: 1
     };
 
-    const klCanvasWorkspace = new KL.KlCanvasWorkspace({
+    const klCanvasWorkspace: KlCanvasWorkspace = new KL.KlCanvasWorkspace({
         klCanvas: klCanvas,
         width: Math.max(0, uiWidth - toolWidth),
         height: uiHeight,
         onDraw: drawEventChain.chainIn,
         onPick: function(rgbObj, isDragDone) {
             brushSettingService.setColor(rgbObj);
-            if(isDragDone) {
-                pcColorSlider.pickingDone();
+            if (isDragDone) {
+                klColorSlider.pickingDone();
                 klCanvasWorkspace.setMode(toolspaceToolRow.getActive());
             }
         },
         onFill: function(canvasX, canvasY) {
             let layerIndex = klCanvas.getLayerIndex(currentLayerCtx.canvas);
-            klCanvas.floodFill(layerIndex, canvasX, canvasY, pcColorSlider.getColor(), fillUi.getOpacity(), fillUi.getTolerance(), fillUi.getSample(), fillUi.getGrow(), fillUi.getContiguous());
+            klCanvas.floodFill(layerIndex, canvasX, canvasY, klColorSlider.getColor(), fillUi.getOpacity(), fillUi.getTolerance(), fillUi.getSample(), fillUi.getGrow(), fillUi.getContiguous());
             klCanvasWorkspace.requestFrame();
         },
         onText: function(canvasX, canvasY, angleRad) {
@@ -374,8 +221,8 @@ export function KlApp(pProject: IKlProject | null, pOptions: IKlAppOptions) {
                 x: canvasX,
                 y: canvasY,
                 angleRad: angleRad,
-                color: pcColorSlider.getColor(),
-                secondaryColor: pcColorSlider.getSecondaryRGB(),
+                color: klColorSlider.getColor(),
+                secondaryColor: klColorSlider.getSecondaryRGB(),
                 size: textToolSettings.size,
                 align: textToolSettings.align,
                 isBold: textToolSettings.isBold,
@@ -399,13 +246,13 @@ export function KlApp(pProject: IKlProject | null, pOptions: IKlAppOptions) {
                         textStr: val.textStr,
                         x: val.x,
                         y: val.y,
-                        angleRad: angleRad,
-                        color: BB.ColorConverter.toRgbaStr(colorRGBA),
                         size: val.size,
+                        font: val.font,
                         align: val.align,
                         isBold: val.isBold,
                         isItalic: val.isItalic,
-                        font: val.font
+                        angleRad: angleRad,
+                        color: BB.ColorConverter.toRgbaStr(colorRGBA)
                     });
                     klCanvasWorkspace.requestFrame();
                 }
@@ -426,7 +273,7 @@ export function KlApp(pProject: IKlProject | null, pOptions: IKlAppOptions) {
 
         onViewChange: function(viewChangeObj) {
 
-            if(viewChangeObj.changed.includes('scale')) {
+            if (viewChangeObj.changed.includes('scale')) {
                 statusOverlay.out({
                     type: 'transform',
                     scale: viewChangeObj.scale,
@@ -440,14 +287,14 @@ export function KlApp(pProject: IKlProject | null, pOptions: IKlAppOptions) {
             handUi.update(viewChangeObj.scale, viewChangeObj.angle * 180 / Math.PI);
         },
         onUndo: function() {
-            if(klHistory.canUndo()) {
+            if (klHistory.canUndo()) {
                 if (undoRedoCatchup.undo()) {
                     statusOverlay.out('Undo', true);
                 }
             }
         },
         onRedo: function() {
-            if(klHistory.canRedo()) {
+            if (klHistory.canRedo()) {
                 if (undoRedoCatchup.redo()) {
                     statusOverlay.out('Redo', true);
                 }
@@ -468,37 +315,33 @@ export function KlApp(pProject: IKlProject | null, pOptions: IKlAppOptions) {
                 return;
             }
 
-            if(comboStr === 'plus') {
+            if (comboStr === 'plus') {
                 klCanvasWorkspace.zoomByStep(keyListener.isPressed('shift') ? 1/8 : 1/2);
             }
-            if(comboStr === 'minus') {
+            if (comboStr === 'minus') {
                 klCanvasWorkspace.zoomByStep(keyListener.isPressed('shift') ? -1/8 : -1/2);
             }
-            if(comboStr === 'home') {
+            if (comboStr === 'home') {
                 klCanvasWorkspace.fitView();
             }
-            if(comboStr === 'end') {
+            if (comboStr === 'end') {
                 klCanvasWorkspace.resetView(true);
             }
             if (['ctrl+z', 'cmd+z'].includes(comboStr)) {
                 event.preventDefault();
-                event.returnValue = false;
                 undoRedoCatchup.undo();
             }
             if (['ctrl+y', 'cmd+y'].includes(comboStr)) {
                 event.preventDefault();
-                event.returnValue = false;
                 undoRedoCatchup.redo();
             }
             if (!pOptions.embed) {
                 if (['ctrl+s', 'cmd+s'].includes(comboStr)) {
                     event.preventDefault();
-                    event.returnValue = false;
                     saveToComputer.save();
                 }
                 if (['ctrl+shift+s', 'cmd+shift+s'].includes(comboStr)) {
                     event.preventDefault();
-                    event.returnValue = false;
 
                     (async () => {
                         let success = true;
@@ -519,17 +362,15 @@ export function KlApp(pProject: IKlProject | null, pOptions: IKlAppOptions) {
                 }
                 if (['ctrl+c', 'cmd+c'].includes(comboStr)) {
                     event.preventDefault();
-                    event.returnValue = false;
                     copyToClipboard(true);
                 }
             }
             if (['ctrl+a', 'cmd+a'].includes(comboStr)) {
                 event.preventDefault();
-                event.returnValue = false;
             }
 
 
-            if(keyListener.comboOnlyContains(['left', 'right', 'up', 'down'])) {
+            if (keyListener.comboOnlyContains(['left', 'right', 'up', 'down'])) {
                 if (keyStr === 'left') {
                     klCanvasWorkspace.translateView(1, 0);
                 }
@@ -545,7 +386,7 @@ export function KlApp(pProject: IKlProject | null, pOptions: IKlAppOptions) {
             }
 
 
-            if(['r+left','r+right'].includes(comboStr)) {
+            if (['r+left','r+right'].includes(comboStr)) {
                 if (keyStr === 'left') {
                     klCanvasWorkspace.setAngle(-15, true);
                     handUi.update(klCanvasWorkspace.getScale(), klCanvasWorkspace.getAngleDeg());
@@ -555,7 +396,7 @@ export function KlApp(pProject: IKlProject | null, pOptions: IKlAppOptions) {
                     handUi.update(klCanvasWorkspace.getScale(), klCanvasWorkspace.getAngleDeg());
                 }
             }
-            if(['r+up'].includes(comboStr)) {
+            if (['r+up'].includes(comboStr)) {
                 klCanvasWorkspace.setAngle(0);
                 handUi.update(klCanvasWorkspace.getScale(), klCanvasWorkspace.getAngleDeg());
             }
@@ -568,12 +409,12 @@ export function KlApp(pProject: IKlProject | null, pOptions: IKlAppOptions) {
                 currentBrush.increaseSize(0.03 / klCanvasWorkspace.getScale());
             }
             if (comboStr === 'enter') {
-                klCanvas.layerFill(klCanvas.getLayerIndex(currentLayerCtx.canvas), pcColorSlider.getColor());
+                klCanvas.layerFill(klCanvas.getLayerIndex(currentLayerCtx.canvas), klColorSlider.getColor());
                 statusOverlay.out('Filled', true);
             }
             if (['delete', 'backspace'].includes(comboStr)) {
                 let layerIndex = klCanvas.getLayerIndex(currentLayerCtx.canvas);
-                if (layerIndex === 0 && !brushUiObj.eraser.getIsTransparentBg()) {
+                if (layerIndex === 0 && !brushUiObj.eraserBrush.getIsTransparentBg()) {
                     klCanvas.layerFill(layerIndex, {r: 255, g: 255, b: 255}, 'source-in');
                 } else {
                     klCanvas.clearLayer(layerIndex);
@@ -586,7 +427,7 @@ export function KlApp(pProject: IKlProject | null, pOptions: IKlAppOptions) {
                 toolspaceToolRow.setActive('draw');
                 mainTabRow.open('draw');
                 updateMainTabVisibility();
-                brushTabRow.open('eraser');
+                brushTabRow.open('eraserBrush');
             }
             if (comboStr === 'b') {
                 event.preventDefault();
@@ -619,7 +460,7 @@ export function KlApp(pProject: IKlProject | null, pOptions: IKlAppOptions) {
             }
             if (comboStr === 'x') {
                 event.preventDefault();
-                pcColorSlider.swapColors();
+                klColorSlider.swapColors();
             }
 
 
@@ -634,7 +475,16 @@ export function KlApp(pProject: IKlProject | null, pOptions: IKlAppOptions) {
      * @param filename - string e.g. 'drawing.psd'
      * @param optionStr? - 'default' | 'layer' | 'image'
      */
-    function importFinishedLoading(importedImage, filename, optionStr) {
+    function importFinishedLoading(
+        importedImage: IKlPsd | {
+            type: 'image';
+            width: number;
+            height: number;
+            canvas: HTMLCanvasElement | HTMLImageElement;
+        },
+        filename: string,
+        optionStr: 'default' | 'layer' | 'image',
+    ) {
         if (!importedImage || isNaN(importedImage.width) || isNaN(importedImage.height) || importedImage.width <= 0 || importedImage.height <= 0) {
             KL.popup({
                 target: klRootEl,
@@ -766,7 +616,7 @@ export function KlApp(pProject: IKlProject | null, pOptions: IKlAppOptions) {
                         return;
                     }
 
-                    klHistory.pause();
+                    klHistory.pause(true);
                     klCanvas.addLayer();
                     let layers = klCanvas.getLayers();
                     let activeLayerIndex = layers.length - 1;
@@ -780,7 +630,7 @@ export function KlApp(pProject: IKlProject | null, pOptions: IKlAppOptions) {
 
                     klHistory.pause(false);
 
-                    klHistory.add({
+                    klHistory.push({
                         tool: ["misc"],
                         action: "importImage",
                         params: [BB.copyCanvas(activeLayerContext.canvas), filename]
@@ -790,7 +640,7 @@ export function KlApp(pProject: IKlProject | null, pOptions: IKlAppOptions) {
         }
 
 
-        if(optionStr === 'default' || !optionStr) {
+        if (optionStr === 'default' || !optionStr) {
             KL.showImportImageDialog({
                 image: importedImage,
                 target: klRootEl,
@@ -809,10 +659,10 @@ export function KlApp(pProject: IKlProject | null, pOptions: IKlAppOptions) {
             });
         }
 
-        if(optionStr === 'layer') {
+        if (optionStr === 'layer') {
             importAsLayer(importedImage.canvas);
         }
-        if(optionStr === 'image') {
+        if (optionStr === 'image') {
             if (importedImage.type === 'psd') {
                 importAsImagePsd(importedImage);
             } else {
@@ -840,18 +690,19 @@ export function KlApp(pProject: IKlProject | null, pOptions: IKlAppOptions) {
                 if (typeof (callback) == "function") {
                     callback(undefined);
                 }
+            } else {
+                for (let i = 0; i < items.length; i++) {
+                    if (items[i].type.indexOf("image") == -1) {
+                        continue;
+                    }
+                    let blob = items[i].getAsFile();
+
+                    if (typeof (callback) == "function") {
+                        callback(blob);
+                    }
+                }
             }
 
-            for (let i = 0; i < items.length; i++) {
-                if (items[i].type.indexOf("image") == -1) {
-                    continue;
-                }
-                let blob = items[i].getAsFile();
-
-                if (typeof (callback) == "function") {
-                    callback(blob);
-                }
-            }
         }
 
         e.stopPropagation();
@@ -965,7 +816,6 @@ export function KlApp(pProject: IKlProject | null, pOptions: IKlAppOptions) {
                             }
 
                             try {
-                                //let psd = agPsdLazy.readPsd(readerResult.target.result, { skipLayerImageData: true, skipThumbnail: true });
                                 let psd;
 
                                 // first pass, only read metadata
@@ -983,7 +833,7 @@ export function KlApp(pProject: IKlProject | null, pOptions: IKlAppOptions) {
                                     KL.popup({
                                         target: klRootEl,
                                         type: "error",
-                                        message: "Image exceeds maximum dimensions of "+maxResolution+" x "+maxResolution+" pixels. Unable to import."
+                                        message: "Image exceeds maximum dimensions of " + maxResolution + " x " + maxResolution + " pixels. Unable to import."
                                             + "<br /><br />"
                                             + "Image size: " + psd.width + " x " + psd.height + ' pixels'
                                             + "<br /><br />"
@@ -1084,7 +934,7 @@ export function KlApp(pProject: IKlProject | null, pOptions: IKlAppOptions) {
     }
 
     if (!pOptions.embed) {
-        let pcImageDropper = new KL.PcImageDropper({
+        new KL.KlImageDropper({
             target: document.body,
             onDrop: function(files, optionStr) {
                 if (KL.dialogCounter.count > 0) {
@@ -1109,6 +959,12 @@ export function KlApp(pProject: IKlProject | null, pOptions: IKlAppOptions) {
                 onSizeChange: sizeWatcher,
                 onOpacityChange: function(opacity) {
                     brushSettingService.emitOpacity(opacity);
+                },
+                onConfigChange: () => {
+                    brushSettingService.emitSliderConfig({
+                        sizeSlider: KL.brushesUI[currentBrushId].sizeSlider,
+                        opacitySlider: KL.brushesUI[currentBrushId].opacitySlider
+                    });
                 }
             });
             brushUiObj[b] = ui;
@@ -1247,7 +1103,7 @@ export function KlApp(pProject: IKlProject | null, pOptions: IKlAppOptions) {
             enabledTest: function() {
                 return !KL.dialogCounter.count && !lineSanitizer.getIsDrawing();
             },
-            brushSettingService: brushSettingService
+            brushSettingService,
         });
         klRootEl.appendChild(overlayToolspace.getElement());
     }, 0);
@@ -1335,22 +1191,22 @@ export function KlApp(pProject: IKlProject | null, pOptions: IKlAppOptions) {
 
     let toolspaceToolRow = new KL.ToolspaceToolRow({
         onActivate: function(activeStr) {
-            if(activeStr === 'draw') {
+            if (activeStr === 'draw') {
                 klCanvasWorkspace.setMode('draw');
-            } else if(activeStr === 'hand') {
+            } else if (activeStr === 'hand') {
                 klCanvasWorkspace.setMode('hand');
-            } else if(activeStr === 'fill') {
+            } else if (activeStr === 'fill') {
                 klCanvasWorkspace.setMode('fill');
-            } else if(activeStr === 'text') {
+            } else if (activeStr === 'text') {
                 klCanvasWorkspace.setMode('text');
-            } else if(activeStr === 'shape') {
+            } else if (activeStr === 'shape') {
                 klCanvasWorkspace.setMode('shape');
             } else {
                 throw new Error('unknown activeStr');
             }
             mainTabRow.open(activeStr);
             updateMainTabVisibility();
-            pcColorSlider.pickingDone();
+            klColorSlider.pickingDone();
         },
         onZoomIn: function() {
             klCanvasWorkspace.zoomByStep(keyListener.isPressed('shift') ? 1/8 : 1/2);
@@ -1372,18 +1228,18 @@ export function KlApp(pProject: IKlProject | null, pOptions: IKlAppOptions) {
     BB.addClassName(toolspaceToolRow.getElement(), 'toolspace-row-shadow');
     toolspace.appendChild(toolspaceToolRow.getElement());
 
-    let pcColorSlider;
+    let klColorSlider;
 
     function setCurrentBrush(brushId) {
-        if (brushId !== 'eraser') {
+        if (brushId !== 'eraserBrush') {
             lastNonEraserBrushId = brushId;
         }
 
-        if(pcColorSlider) {
-            if (brushId === 'eraser') {
-                pcColorSlider.enable(false);
+        if (klColorSlider) {
+            if (brushId === 'eraserBrush') {
+                klColorSlider.enable(false);
             } else {
-                pcColorSlider.enable(true);
+                klColorSlider.enable(true);
             }
         }
 
@@ -1405,26 +1261,21 @@ export function KlApp(pProject: IKlProject | null, pOptions: IKlAppOptions) {
     function setBrushColor(p_color) {
         currentColor = p_color;
         currentBrush.setColor(p_color);
-        //klCanvasWorkspace.setMode('draw')
-        //toolspaceToolRow.setActive('draw');
-        //updateMainTabVisibility();
         brushSettingService.emitColor(p_color);
-        pcColorSlider.pickingDone();
+        klColorSlider.pickingDone();
     }
 
-    setCurrentBrush('defaultBrush');
-
-    pcColorSlider = new KL.PcColorSlider({
+    klColorSlider = new KL.KlColorSlider({
         width: 250,
         height: 30,
         svHeight: 100,
         startValue: new BB.RGB(0, 0, 0),
         onPick: setBrushColor
     });
-    pcColorSlider.setHeight(Math.max(163, Math.min(400, uiHeight - 505)));
-    pcColorSlider.setPickCallback(function (doPick) {
+    klColorSlider.setHeight(Math.max(163, Math.min(400, uiHeight - 505)));
+    klColorSlider.setPickCallback(function (doPick) {
 
-        if(doPick) {
+        if (doPick) {
             klCanvasWorkspace.setMode('pick');
         } else {
             klCanvasWorkspace.setMode(toolspaceToolRow.getActive());
@@ -1452,25 +1303,24 @@ export function KlApp(pProject: IKlProject | null, pOptions: IKlAppOptions) {
     brushDiv.appendChild(colorDiv);
     BB.append(
         colorDiv,
-        [pcColorSlider.getElement(), pcColorSlider.getOutputElement(), toolspaceStabilizerRow.getElement()]
+        [klColorSlider.getElement(), klColorSlider.getOutputElement(), toolspaceStabilizerRow.getElement()]
     );
 
     let brushTabRow = new KL.TabRow({
-        initialId: 'defaultBrush',
+        initialId: 'penBrush',
         useAccent: true,
         tabArr: (function () {
             let result = [];
-            let counter = 0;
 
             function createTab(keyStr) {
-                let result = {
+                return {
                     id: keyStr,
                     image: KL.brushesUI[keyStr].image,
                     title: KL.brushesUI[keyStr].tooltip,
                     onOpen: function() {
                         brushUiObj[keyStr].getElement().style.display = 'block';
                         setCurrentBrush(keyStr);
-                        pcColorSlider.pickingDone();
+                        klColorSlider.pickingDone();
                         brushSettingService.emitSliderConfig({
                             sizeSlider: KL.brushesUI[keyStr].sizeSlider,
                             opacitySlider: KL.brushesUI[keyStr].opacitySlider
@@ -1482,11 +1332,10 @@ export function KlApp(pProject: IKlProject | null, pOptions: IKlAppOptions) {
                         brushUiObj[keyStr].getElement().style.display = 'none';
                     }
                 };
-                return result;
             }
 
             let keyArr = Object.keys(brushUiObj);
-            for(let i = 0; i < keyArr.length; i++) {
+            for (let i = 0; i < keyArr.length; i++) {
                 result.push(createTab(keyArr[i]));
             }
             return result;
@@ -1517,15 +1366,15 @@ export function KlApp(pProject: IKlProject | null, pOptions: IKlAppOptions) {
     });
 
     let fillUi = new KL.FillUi({
-        colorSlider: pcColorSlider
+        colorSlider: klColorSlider
     });
 
     let textUi = new KL.TextUi({
-        colorSlider: pcColorSlider
+        colorSlider: klColorSlider
     });
 
     let shapeUi = new KL.ShapeUi({
-        colorSlider: pcColorSlider
+        colorSlider: klColorSlider
     });
 
     let shapeTool = new KL.ShapeTool({
@@ -1545,16 +1394,16 @@ export function KlApp(pProject: IKlProject | null, pOptions: IKlAppOptions) {
                 isEraser: shapeUi.getIsEraser()
             };
             if (shapeUi.getShape() === 'line') {
-                shapeObj.strokeRgb = pcColorSlider.getColor();
+                shapeObj.strokeRgb = klColorSlider.getColor();
                 shapeObj.lineWidth = shapeUi.getLineWidth();
                 shapeObj.isAngleSnap = shapeUi.getIsSnap() || keyListener.isPressed('shift');
             } else {
                 shapeObj.isFixedRatio = shapeUi.getIsFixed() || keyListener.isPressed('shift');
                 if (shapeUi.getMode() === 'stroke') {
-                    shapeObj.strokeRgb = pcColorSlider.getColor();
+                    shapeObj.strokeRgb = klColorSlider.getColor();
                     shapeObj.lineWidth = shapeUi.getLineWidth();
                 } else {
-                    shapeObj.fillRgb = pcColorSlider.getColor();
+                    shapeObj.fillRgb = klColorSlider.getColor();
                 }
             }
 
@@ -1573,9 +1422,9 @@ export function KlApp(pProject: IKlProject | null, pOptions: IKlAppOptions) {
         }
     });
 
-    const layerManager = KL.pcLayerManager(klCanvas, function (val) {
+    const layerManager = KL.klLayerManager(klCanvas, function (val) {
         setCurrentLayer(klCanvas.getLayer(val));
-        klHistory.add({
+        klHistory.push({
             tool: ["misc"],
             action: "focusLayer",
             params: [val]
@@ -1591,7 +1440,7 @@ export function KlApp(pProject: IKlProject | null, pOptions: IKlAppOptions) {
 
     const filterTab = new KL.FilterTab(
         klRootEl,
-        pcColorSlider,
+        klColorSlider,
         layerManager,
         setCurrentLayer,
         klCanvasWorkspace,
@@ -1619,6 +1468,9 @@ export function KlApp(pProject: IKlProject | null, pOptions: IKlAppOptions) {
         handUi,
         klCanvasWorkspace,
         () => {
+            if (!initState) {
+                throw new Error('initState not initialized');
+            }
             return initState;
         },
         () => klCanvas,
@@ -1635,10 +1487,10 @@ export function KlApp(pProject: IKlProject | null, pOptions: IKlAppOptions) {
     function showNewImageDialog() {
         KL.newImageDialog({
             currentColor: currentColor,
-            secondaryColor: pcColorSlider.getSecondaryRGB(),
+            secondaryColor: klColorSlider.getSecondaryRGB(),
             maxCanvasSize: klMaxCanvasSize,
-            canvasWidth: klCanvas.width,
-            canvasHeight: klCanvas.height,
+            canvasWidth: klCanvas.getWidth(),
+            canvasHeight: klCanvas.getHeight(),
             workspaceWidth: window.innerWidth < collapseThreshold ? uiWidth : uiWidth - toolWidth,
             workspaceHeight: uiHeight,
             onConfirm: function(width, height, color) {
@@ -1704,12 +1556,12 @@ export function KlApp(pProject: IKlProject | null, pOptions: IKlAppOptions) {
                 id: 'draw',
                 label: 'Brush',
                 onOpen: function() {
-                    if (currentBrushId === 'eraser') {
-                        pcColorSlider.enable(false);
+                    if (currentBrushId === 'eraserBrush') {
+                        klColorSlider.enable(false);
                     }
                     BB.append(
                         colorDiv,
-                        [pcColorSlider.getElement(), pcColorSlider.getOutputElement(), toolspaceStabilizerRow.getElement()]
+                        [klColorSlider.getElement(), klColorSlider.getOutputElement(), toolspaceStabilizerRow.getElement()]
                     );
                     brushDiv.style.display = 'block';
                 },
@@ -1733,7 +1585,7 @@ export function KlApp(pProject: IKlProject | null, pOptions: IKlAppOptions) {
                 label: 'Fill',
                 isVisible: false,
                 onOpen: function() {
-                    pcColorSlider.enable(true);
+                    klColorSlider.enable(true);
                     fillUi.setIsVisible(true);
                 },
                 onClose: function() {
@@ -1745,7 +1597,7 @@ export function KlApp(pProject: IKlProject | null, pOptions: IKlAppOptions) {
                 label: 'Text',
                 isVisible: false,
                 onOpen: function() {
-                    pcColorSlider.enable(true);
+                    klColorSlider.enable(true);
                     textUi.setIsVisible(true);
                 },
                 onClose: function() {
@@ -1757,7 +1609,7 @@ export function KlApp(pProject: IKlProject | null, pOptions: IKlAppOptions) {
                 label: 'Shape',
                 isVisible: false,
                 onOpen: function() {
-                    pcColorSlider.enable(true);
+                    klColorSlider.enable(true);
                     shapeUi.setIsVisible(true);
                 },
                 onClose: function() {
@@ -1807,7 +1659,7 @@ export function KlApp(pProject: IKlProject | null, pOptions: IKlAppOptions) {
         ]
     });
     function updateMainTabVisibility() {
-        if(!mainTabRow) {
+        if (!mainTabRow) {
             return;
         }
 
@@ -1914,7 +1766,7 @@ export function KlApp(pProject: IKlProject | null, pOptions: IKlAppOptions) {
             bottomBarWrapper.style.display = uiHeight >= threshold ? '' : 'none';
         }
         layerPreview.setIsVisible(uiHeight >= 579);
-        pcColorSlider.setHeight(Math.max(163, Math.min(400, uiHeight - 505)));
+        klColorSlider.setHeight(Math.max(163, Math.min(400, uiHeight - 505)));
         toolspaceToolRow.setIsSmall(uiHeight < 540);
     };
 

@@ -3,6 +3,7 @@ import {Checkbox} from '../ui/base-components/checkbox';
 import {KlCanvasPreview} from '../canvas-ui/canvas-preview';
 import {FreeTransform, ITransform} from '../ui/components/free-transform';
 import {Select} from '../ui/base-components/select';
+import {IFilterApply, IFilterGetDialogParam} from '../kl.types';
 
 interface IFilterTransformInput {
     bounds: {x: number, y: number, width: number, height: number};
@@ -12,7 +13,7 @@ interface IFilterTransformInput {
 
 export const transform = {
 
-    getDialog(params) {
+    getDialog(params: IFilterGetDialogParam) {
         let i;
         let context = params.context;
         let canvas = params.canvas;
@@ -103,7 +104,7 @@ export const transform = {
 
         let keyListener = new BB.KeyListener({
             onDown: function(keyStr) {
-                if(BB.isInputFocused(true)) {
+                if (BB.isInputFocused(true)) {
                     return;
                 }
 
@@ -380,7 +381,7 @@ export const transform = {
 
         let previewLayerArr = [];
         {
-            for(let i = 0; i < layers.length; i++) {
+            for (let i = 0; i < layers.length; i++) {
                 let canvas;
                 if (i === selectedLayerIndex) {
                     canvas = BB.canvas(parseInt('' + w), parseInt('' + h));
@@ -415,7 +416,7 @@ export const transform = {
 
         let lastDrawnTransformStr;
         function updatePreview(doForce: boolean = false) {
-            if(!freeTransform) {
+            if (!freeTransform) {
                 return;
             }
             let transform = freeTransform.getTransform();
@@ -501,35 +502,31 @@ export const transform = {
         return result;
     },
 
-    apply(params: {
-        context: CanvasRenderingContext2D,
-        history: any, // todo
-        input: IFilterTransformInput,
-    }) {
+    apply(params: IFilterApply) {
         const context = params.context;
         const history = params.history;
         if (!context || !history) {
             return false;
         }
-        history.pause();
+        history.pause(true);
+
+        const input: IFilterTransformInput = params.input;
 
         let copyCanvas = BB.copyCanvas(context.canvas);
         context.clearRect(0, 0, context.canvas.width, context.canvas.height);
         BB.drawTransformedImageWithBounds(
             context,
             copyCanvas,
-            params.input.transform,
-            params.input.bounds,
-            params.input.isPixelated,
+            input.transform,
+            input.bounds,
+            input.isPixelated,
         );
 
         history.pause(false);
-        history.add({
+        history.push({
             tool: ["filter", "transform"],
             action: "apply",
-            params: [{
-                input: params.input
-            }]
+            params: [{input}],
         });
         return true;
     }

@@ -1,5 +1,6 @@
 import {BB} from '../../../bb/bb';
 import {calcSliderFalloffFactor} from './slider-falloff';
+import {IKlSliderConfig} from '../../kl.types';
 
 
 
@@ -21,7 +22,8 @@ import {calcSliderFalloffFactor} from './slider-falloff';
  *      },
  *      onChange: function(value) {},
  *      isChangeOnFinal: true,
- *      eventResMs: 123
+ *      eventResMs: 123,
+ *      isEnabled?: boolean, // default = true
  * }
  *
  * Values can be spline interpolated
@@ -30,8 +32,9 @@ import {calcSliderFalloffFactor} from './slider-falloff';
  * @param p - obj
  * @constructor
  */
-export const PcSlider = function (p) {
-    let isDisabled = false;
+export const KlSlider = function (p) {
+    const _this = this;
+    let isEnabled = p.isEnabled !== false;
     let useSpline = !!p.curve;
     let splineInterpolator;
 
@@ -121,6 +124,21 @@ export const PcSlider = function (p) {
         pointerEvents: 'none'
     });
 
+    function updateEnable (): void {
+        if (isEnabled) {
+            BB.css(div, {
+                opacity: null,
+                pointerEvents: null,
+            });
+        } else {
+            BB.css(div, {
+                opacity: '0.5',
+                pointerEvents: 'none',
+            });
+        }
+    }
+    updateEnable();
+
     function getOutsideVal() {
         let result = min + linearValue * (max - min);
         if (useSpline) {
@@ -138,12 +156,12 @@ export const PcSlider = function (p) {
 
     let lastCallbackTime = 0;
     function emit(isFinal) {
-        if(!isFinal && isChangeOnFinal) {
+        if (!isFinal && isChangeOnFinal) {
             return;
         }
-        if(eventResMs && !isFinal) {
+        if (eventResMs && !isFinal) {
             const now = performance.now();
-            if(now - lastCallbackTime >= eventResMs) {
+            if (now - lastCallbackTime >= eventResMs) {
                 lastCallbackTime = now;
                 onChange(getOutsideVal());
             }
@@ -156,14 +174,14 @@ export const PcSlider = function (p) {
     function onPointer(event) {
         event.eventPreventDefault();
 
-        if (isDisabled) {
+        if (!isEnabled) {
             return;
         }
 
-        if(event.type === 'pointerdown') {
+        if (event.type === 'pointerdown') {
             div.className = 'sliderWrapper sliderWrapperActive';
 
-            if(event.button === 'left') {
+            if (event.button === 'left') {
                 linearValue = event.relX / elementWidth;
                 linearValue = Math.max(0, Math.min(1, linearValue));
                 updateLabel();
@@ -172,7 +190,7 @@ export const PcSlider = function (p) {
             virtualVal = linearValue;
         }
 
-        if(event.type === 'pointermove' && ['left', 'right'].includes(event.button)) {
+        if (event.type === 'pointermove' && ['left', 'right'].includes(event.button)) {
 
             let deltaX = event.dX;
             const deltaY = Math.abs(event.pageY - event.downPageY);
@@ -187,7 +205,7 @@ export const PcSlider = function (p) {
             emit(false);
         }
 
-        if(event.type === 'pointerup') {
+        if (event.type === 'pointerup') {
             div.className = 'sliderWrapper';
             emit(true);
         }
@@ -235,10 +253,7 @@ export const PcSlider = function (p) {
     this.getValue = function () {
         return getOutsideVal();
     };
-    /**
-     * @param config {min: number, max: number, curve: []} curve optional
-     */
-    this.update = function(config) {
+    this.update = function(config: IKlSliderConfig): void {
         min = config.min;
         max = config.max;
         useSpline = !!config.curve;
@@ -248,9 +263,11 @@ export const PcSlider = function (p) {
         } else {
             splineInterpolator = null;
         }
+        _this.setIsEnabled(!config.isDisabled);
     };
-    this.disable = function () {
-        isDisabled = true;
+    this.setIsEnabled = function (e: boolean): void {
+        isEnabled = !!e;
+        updateEnable();
     };
 
     this.destroy = function() {

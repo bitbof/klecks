@@ -3,13 +3,14 @@ import {brushes} from '../brushes/brushes';
 import {eventResMs} from './brushes-consts';
 import {klHistory} from '../history/kl-history';
 import {Checkbox} from '../ui/base-components/checkbox';
-import {PcSlider} from '../ui/base-components/slider';
+import {KlSlider} from '../ui/base-components/kl-slider';
 import {penPressureToggle} from '../ui/base-components/pen-pressure-toggle';
 // @ts-ignore
-import brushIconImg from 'url:~/src/app/img/ui/brush-smudge.png';
+import brushIconImg from 'url:~/src/app/img/ui/brush-smudge.svg';
+import {IBrushUi} from '../kl.types';
 
 export const smudgeBrushUi = (function () {
-    let brushInterface: any = {
+    let brushInterface: IBrushUi = {
         image: brushIconImg,
         tooltip: 'Smudge',
         sizeSlider: {
@@ -21,16 +22,13 @@ export const smudgeBrushUi = (function () {
             min: 0,
             max: 1,
             curve: [[0, 1 / 100], [0.5, 0.3], [1, 1]]
-        }
+        },
+        Ui: null,
     };
 
-    /**
-     * @param p = {onSizeChange: function(size), onOpacityChange: function(opacity)}
-     * @constructor
-     */
     brushInterface.Ui = function (p) {
         let div = document.createElement("div"); // the gui
-        let brush = new brushes.smudge();
+        let brush = new brushes.SmudgeBrush();
         brush.setHistory(klHistory);
         p.onSizeChange(brush.getSize());
         let sizeSlider;
@@ -58,7 +56,7 @@ export const smudgeBrushUi = (function () {
         }
 
         function init() {
-            sizeSlider = new PcSlider({
+            sizeSlider = new KlSlider({
                 label: 'Size',
                 width: 225,
                 height: 30,
@@ -80,7 +78,7 @@ export const smudgeBrushUi = (function () {
                     }
                 }
             });
-            opacitySlider = new PcSlider({
+            opacitySlider = new KlSlider({
                 label: 'Opacity',
                 width: 225,
                 height: 30,
@@ -130,12 +128,12 @@ export const smudgeBrushUi = (function () {
         init();
 
         this.increaseSize = function (f) {
-            if (!brush.isDrawing()) {
+            if (!brush.getIsDrawing()) {
                 sizeSlider.increaseValue(f);
             }
         };
         this.decreaseSize = function (f) {
-            if (!brush.isDrawing()) {
+            if (!brush.getIsDrawing()) {
                 sizeSlider.decreaseValue(f);
             }
         };
@@ -168,13 +166,13 @@ export const smudgeBrushUi = (function () {
             brush.goLine(x, y, p);
         };
         this.endLine = function (x, y) {
-            brush.endLine(x, y);
+            brush.endLine();
         };
         this.getBrush = function () {
             return brush;
         };
         this.isDrawing = function () {
-            return brush.isDrawing();
+            return brush.getIsDrawing();
         };
         this.getElement = function () {
             return div;

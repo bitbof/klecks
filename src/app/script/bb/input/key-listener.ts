@@ -145,11 +145,14 @@ const globalKey = (() => {
             eventArr.push(keyToKeyStrArr[i]);
         }
         for (let i = 0; i < eventArr.length; i++) {
-            emitUp(eventArr[i], {
-                preventDefault: function () {
-                }, stopPropagation: function () {
-                }
-            }, oldComboStr);
+            emitUp(
+                eventArr[i],
+                {
+                    preventDefault: function () {},
+                    stopPropagation: function () {},
+                },
+                oldComboStr,
+            );
         }
         emitBlur();
     }
@@ -213,15 +216,12 @@ export class KeyListener {
     private readonly onBlur;
     private readonly ref;
 
-    /**
-     * onDown: function(keyStr, KeyEvent, comboStr, isRepeat), // optional - when key down
-     * onUp: function(keyStr, KeyEvent, oldComboStr), // optional - when key up
-     * onBlur: function(), // optional - when window blur - yes, no params
-     *
-     * @param p
-     */
     constructor (
-        p: {onDown?: any, onUp?: any, onBlur?: any},
+        p: {
+            onDown?: (keyStr: string, e: KeyboardEvent, comboStr: string, isRepeat?: boolean) => void;
+            onUp?: (keyStr: string, e: KeyboardEvent, oldComboStr: string) => void;
+            onBlur?: () => void;
+        },
     ) {
         this.onDown = p.onDown;
         this.onUp = p.onUp;
@@ -230,18 +230,18 @@ export class KeyListener {
         globalKey.add(this.ref);
     }
 
-    isPressed (keyStr) {
+    isPressed (keyStr: string): boolean {
         if (!(keyStr in globalKey.getIsDown())) {
             throw 'key "' + keyStr + '" not found';
         }
         return globalKey.getIsDown()[keyStr];
     }
 
-    getComboStr () {
+    getComboStr (): string {
         return globalKey.getCombo().join('+');
     }
 
-    comboOnlyContains (keyStrArr) {
+    comboOnlyContains (keyStrArr: string[]): boolean {
         for (let i = 0; i < globalKey.getCombo().length; i++) {
             if (!keyStrArr.includes(globalKey.getCombo()[i])) {
                 return false;
@@ -250,7 +250,7 @@ export class KeyListener {
         return true;
     }
 
-    destroy () {
+    destroy (): void {
         globalKey.remove(this.ref);
     }
 }

@@ -1,38 +1,35 @@
 import {BB} from '../../../bb/bb';
-import {PcSmallColorSlider} from '../base-components/color-slider-small';
-import {PcSlider} from '../base-components/slider';
-import {HexColorDialog} from '../modals/color-slider-hex-dialog';
+import {KlSmallColorSlider} from '../base-components/kl-color-slider-small';
+import {KlSlider} from '../base-components/kl-slider';
+import {BrushSettingService} from '../../brushes-ui/brush-setting-service';
 
 /**
  * Compressed HUD toolspace. When you hold ctrl+alt.
- * small color picker. in future more ui elements (brushsize, opacity)
- *
- * p = {
- *     brushSettingService: BB.BrushSettingService, // to sync with outside
- *     enabledTest: func(): bool, // calls to see if it's allowed to show
- * }
+ * small color picker, brush settings
  *
  * @param p
  * @constructor
  */
-export function OverlayToolspace(p) {
+export function OverlayToolspace(
+    p: {
+        brushSettingService: BrushSettingService; // to sync with outside
+        enabledTest: () => boolean; // calls to see if it's allowed to show
+    }
+) {
 
-    let sizeObj = {
+    const sizeObj = {
         width: 150,
         svHeight: 90,
         hHeight: 20,
         sliderHeight: 25
-    }
+    };
 
-    let isEnabled = true;
     let isVisible = false;
-    let div = BB.el({
+    const div = BB.el({
         css: {
             position: 'absolute',
             left: '500px',
             top: '500px',
-            //width: '500px',
-            //height: '500px',
             background: 'rgb(221, 221, 221)',
             display: 'none',
             border: '1px solid #fff',
@@ -40,7 +37,7 @@ export function OverlayToolspace(p) {
             colorScheme: 'only light',
         }
     });
-    let queuedObj = {
+    const queuedObj = {
         color: null,
         size: null,
         opacity: null
@@ -50,7 +47,7 @@ export function OverlayToolspace(p) {
     // --- inputs ---
 
     //color selection
-    let colorSlider = new PcSmallColorSlider({
+    const colorSlider = new KlSmallColorSlider({
         width: sizeObj.width,
         heightSV: sizeObj.svHeight,
         heightH: sizeObj.hHeight,
@@ -60,7 +57,7 @@ export function OverlayToolspace(p) {
             p.brushSettingService.setColor(rgbObj, subscriptionFunc);
         }
     });
-    let selectedColorEl = BB.el({
+    const selectedColorEl = BB.el({
         css: {
             width: sizeObj.width + 'px',
             height: sizeObj.hHeight + 'px',
@@ -68,7 +65,7 @@ export function OverlayToolspace(p) {
         }
     });
     {
-        let initialColor = p.brushSettingService.getColor();
+        const initialColor = p.brushSettingService.getColor();
         selectedColorEl.style.backgroundColor = "rgb(" + initialColor.r + "," + initialColor.g + "," + initialColor.b + ")";
     }
 
@@ -87,7 +84,7 @@ export function OverlayToolspace(p) {
 
     //brushsize slider
 
-    let sizeSlider = new PcSlider({
+    const sizeSlider = new KlSlider({
         label: 'Size',
         width: sizeObj.width,
         height: sizeObj.sliderHeight,
@@ -100,7 +97,7 @@ export function OverlayToolspace(p) {
             p.brushSettingService.setSize(v);
         },
         formatFunc: function(v) {
-            if(v * 2 < 10) {
+            if (v * 2 < 10) {
                 return Math.round(v * 2 * 10) / 10;
             }
             return Math.round(v * 2);
@@ -111,7 +108,7 @@ export function OverlayToolspace(p) {
     });
     div.appendChild(sizeSlider.getElement());
 
-    let opacitySlider = new PcSlider({
+    const opacitySlider = new KlSlider({
         label: 'Opacity',
         width: sizeObj.width,
         height: sizeObj.sliderHeight,
@@ -136,36 +133,36 @@ export function OverlayToolspace(p) {
 
     // --- general setup ---
 
-    let subscriptionFunc = function(event) {
-        if(event.type === 'color') {
-            if(!isVisible) {
+    const subscriptionFunc = function(event) {
+        if (event.type === 'color') {
+            if (!isVisible) {
                 queuedObj.color = event.value;
             } else {
                 updateColor(event.value);
             }
         }
-        if(event.type === 'size') {
-            if(!isVisible) {
+        if (event.type === 'size') {
+            if (!isVisible) {
                 queuedObj.size = event.value;
             } else {
                 sizeSlider.setValue(event.value);
             }
         }
-        if(event.type === 'opacity') {
-            if(!isVisible) {
+        if (event.type === 'opacity') {
+            if (!isVisible) {
                 queuedObj.opacity = event.value;
             } else {
                 opacitySlider.setValue(event.value);
             }
         }
-        if(event.type === 'sliderConfig') {
+        if (event.type === 'sliderConfig') {
             sizeSlider.update(event.value.sizeSlider);
             opacitySlider.update(event.value.opacitySlider);
         }
     };
     p.brushSettingService.subscribe(subscriptionFunc);
     {
-        let sliderConfig = p.brushSettingService.getSliderConfig();
+        const sliderConfig = p.brushSettingService.getSliderConfig();
         sizeSlider.update(sliderConfig.sizeSlider);
         opacitySlider.update(sliderConfig.opacitySlider);
         sizeSlider.setValue(p.brushSettingService.getSize());
@@ -174,7 +171,7 @@ export function OverlayToolspace(p) {
 
     function updateUI() {
         div.style.display = isVisible ? 'block' : 'none';
-        if(isVisible && mousePos) {
+        if (isVisible && mousePos) {
             div.style.left = (mousePos.x - Math.round(sizeObj.width / 2)) + 'px';
             div.style.top = (mousePos.y - Math.round(sizeObj.svHeight + sizeObj.hHeight * 3 / 2)) + 'px';
         }
@@ -188,34 +185,34 @@ export function OverlayToolspace(p) {
         };
     });
 
-    let keyListener = new BB.KeyListener({
+    const keyListener = new BB.KeyListener({
         onDown: function(keyStr, event, comboStr, isRepeat) {
-            if(isRepeat) {
+            if (isRepeat) {
                 return;
             }
-            if(isVisible) {
+            if (isVisible) {
                 isVisible = false;
                 updateUI();
                 return;
             }
 
-            if(!p.enabledTest() || !mousePos) {
+            if (!p.enabledTest() || !mousePos) {
                 return;
             }
 
-            if(['ctrl+alt', 'cmd+alt', 'alt+ctrl', 'alt+cmd'].includes(comboStr)) {
+            if (['ctrl+alt', 'cmd+alt', 'alt+ctrl', 'alt+cmd'].includes(comboStr)) {
                 event.preventDefault();
                 isVisible = true;
 
-                if(queuedObj.color !== null) {
+                if (queuedObj.color !== null) {
                     updateColor(queuedObj.color);
                     queuedObj.color = null;
                 }
-                if(queuedObj.size !== null) {
+                if (queuedObj.size !== null) {
                     sizeSlider.setValue(queuedObj.size);
                     queuedObj.size = null;
                 }
-                if(queuedObj.opacity !== null) {
+                if (queuedObj.opacity !== null) {
                     opacitySlider.setValue(queuedObj.opacity);
                     queuedObj.opacity = null;
                 }
@@ -225,14 +222,14 @@ export function OverlayToolspace(p) {
 
         },
         onUp: function(keyStr, event, oldComboStr) {
-            if(['ctrl+alt', 'cmd+alt', 'alt+ctrl', 'alt+cmd'].includes(oldComboStr) && isVisible) {
+            if (['ctrl+alt', 'cmd+alt', 'alt+ctrl', 'alt+cmd'].includes(oldComboStr) && isVisible) {
                 isVisible = false;
                 colorSlider.end();
                 updateUI();
             }
         },
         onBlur: function() {
-            if(isVisible) {
+            if (isVisible) {
                 isVisible = false;
                 colorSlider.end();
                 updateUI();

@@ -44,20 +44,20 @@ export function ToolspaceToolRow(p) {
     let redoIsEnabled = false;
 
     function setActive(activeStr, doEmit?) {
-        if(currentActiveStr === activeStr) {
+        if (currentActiveStr === activeStr) {
             return;
         }
 
         currentActiveStr = activeStr;
 
         toolDropdown.setActive(currentActiveStr);
-        if(currentActiveStr === 'hand') {
+        if (currentActiveStr === 'hand') {
             BB.addClassName(handButton, 'toolspace-row-button-activated');
         } else {
             BB.removeClassName(handButton, 'toolspace-row-button-activated');
         }
 
-        if(doEmit) {
+        if (doEmit) {
             p.onActivate(currentActiveStr);
         }
     }
@@ -91,7 +91,7 @@ export function ToolspaceToolRow(p) {
         (result as any).pointerListener = new BB.PointerListener({ // because :hover causes problems w touch
             target: result,
             onEnterLeave: function(isOver) {
-                if(isOver) {
+                if (isOver) {
                     BB.addClassName(result, 'toolspace-row-button-hover');
                 } else {
                     BB.removeClassName(result, 'toolspace-row-button-hover');
@@ -239,7 +239,7 @@ export function ToolspaceToolRow(p) {
         (result as any).leftPointerListener = new BB.PointerListener({
             target: svgTriangleLeft,
             onEnterLeave: function(isOver) {
-                if(isOver) {
+                if (isOver) {
                     BB.addClassName(svgTriangleLeft, 'toolspace-svg-triangle-button-hover');
                 } else {
                     BB.removeClassName(svgTriangleLeft, 'toolspace-svg-triangle-button-hover');
@@ -249,7 +249,7 @@ export function ToolspaceToolRow(p) {
         (result as any).rightPointerListener = new BB.PointerListener({
             target: svgTriangleRight,
             onEnterLeave: function(isOver) {
-                if(isOver) {
+                if (isOver) {
                     BB.addClassName(svgTriangleRight, 'toolspace-svg-triangle-button-hover');
                 } else {
                     BB.removeClassName(svgTriangleRight, 'toolspace-svg-triangle-button-hover');
@@ -302,7 +302,7 @@ export function ToolspaceToolRow(p) {
 
 
         (result as any).setIsEnabledLeft = function(b) {
-            if(b) {
+            if (b) {
                 BB.removeClassName(svgTriangleLeft, 'toolspace-row-button-disabled');
                 BB.removeClassName(leftIm, 'toolspace-row-button-disabled');
             } else {
@@ -311,7 +311,7 @@ export function ToolspaceToolRow(p) {
             }
         };
         (result as any).setIsEnabledRight = function(b) {
-            if(b) {
+            if (b) {
                 BB.removeClassName(svgTriangleRight, 'toolspace-row-button-disabled');
                 BB.removeClassName(rightIm, 'toolspace-row-button-disabled');
             } else {
@@ -391,7 +391,7 @@ export function ToolspaceToolRow(p) {
         (result as any).leftPointerListener = new BB.PointerListener({
             target: leftButton,
             onEnterLeave: function(isOver) {
-                if(isOver) {
+                if (isOver) {
                     BB.addClassName(leftButton, 'toolspace-row-button-hover');
                 } else {
                     BB.removeClassName(leftButton, 'toolspace-row-button-hover');
@@ -401,7 +401,7 @@ export function ToolspaceToolRow(p) {
         (result as any).rightPointerListener = new BB.PointerListener({
             target: rightButton,
             onEnterLeave: function(isOver) {
-                if(isOver) {
+                if (isOver) {
                     BB.addClassName(rightButton, 'toolspace-row-button-hover');
                 } else {
                     BB.removeClassName(rightButton, 'toolspace-row-button-hover');
@@ -412,14 +412,14 @@ export function ToolspaceToolRow(p) {
 
 
         (result as any).setIsEnabledLeft = function(b) {
-            if(b) {
+            if (b) {
                 BB.removeClassName(leftButton, 'toolspace-row-button-disabled');
             } else {
                 BB.addClassName(leftButton, 'toolspace-row-button-disabled');
             }
         };
         (result as any).setIsEnabledRight = function(b) {
-            if(b) {
+            if (b) {
                 BB.removeClassName(rightButton, 'toolspace-row-button-disabled');
             } else {
                 BB.addClassName(rightButton, 'toolspace-row-button-disabled');
@@ -539,7 +539,7 @@ export function ToolspaceToolRow(p) {
         (undoButton as any).setIsSmall(b);
         (redoButton as any).setIsSmall(b);
 
-        if(b) {
+        if (b) {
             zoomInNOutButton.style.display = 'none';
             undoNRedoButton.style.display = 'none';
             zoomInButton.style.display = 'block';
@@ -558,7 +558,7 @@ export function ToolspaceToolRow(p) {
     };
 
     this.setEnableZoomIn = function(b) {
-        if(b) {
+        if (b) {
             BB.removeClassName(zoomInButton, 'toolspace-row-button-disabled');
         } else {
             BB.addClassName(zoomInButton, 'toolspace-row-button-disabled');
@@ -566,7 +566,7 @@ export function ToolspaceToolRow(p) {
         (zoomInNOutButton as any).setIsEnabledLeft(b);
     };
     this.setEnableZoomOut = function(b) {
-        if(b) {
+        if (b) {
             BB.removeClassName(zoomOutButton, 'toolspace-row-button-disabled');
         } else {
             BB.addClassName(zoomOutButton, 'toolspace-row-button-disabled');
@@ -574,7 +574,7 @@ export function ToolspaceToolRow(p) {
         (zoomInNOutButton as any).setIsEnabledRight(b);
     };
     this.setEnableUndo = function(b) {
-        if(b) {
+        if (b) {
             BB.removeClassName(undoButton, 'toolspace-row-button-disabled');
         } else {
             BB.addClassName(undoButton, 'toolspace-row-button-disabled');
@@ -582,7 +582,7 @@ export function ToolspaceToolRow(p) {
         (undoNRedoButton as any).setIsEnabledLeft(b);
     };
     this.setEnableRedo = function(b) {
-        if(b) {
+        if (b) {
             BB.removeClassName(redoButton, 'toolspace-row-button-disabled');
         } else {
             BB.addClassName(redoButton, 'toolspace-row-button-disabled');

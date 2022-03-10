@@ -53,17 +53,17 @@ let gradP = new Array(512);
 // This isn't a very good seeding function, but it works ok. It supports 2^16
 // different seed values. Write something better if you need more seeds.
 myModule.seed = function(seed) {
-    if(seed > 0 && seed < 1) {
+    if (seed > 0 && seed < 1) {
         // Scale the seed out
         seed *= 65536;
     }
 
     seed = Math.floor(seed);
-    if(seed < 256) {
+    if (seed < 256) {
         seed |= seed << 8;
     }
 
-    for(let i = 0; i < 256; i++) {
+    for (let i = 0; i < 256; i++) {
         let v;
         if (i & 1) {
             v = p[i] ^ (seed & 255);
@@ -79,7 +79,7 @@ myModule.seed = function(seed) {
 myModule.seed(0);
 
 /*
-for(let i=0; i<256; i++) {
+for (let i=0; i<256; i++) {
   perm[i] = perm[i + 256] = p[i];
   gradP[i] = gradP[i + 256] = grad3[perm[i] % 12];
 }*/
@@ -104,7 +104,7 @@ myModule.simplex2 = function(xin, yin) {
     // For the 2D case, the simplex shape is an equilateral triangle.
     // Determine which simplex we are in.
     let i1, j1; // Offsets for second (middle) corner of simplex in (i,j) coords
-    if(x0>y0) { // lower triangle, XY order: (0,0)->(1,0)->(1,1)
+    if (x0>y0) { // lower triangle, XY order: (0,0)->(1,0)->(1,1)
         i1=1; j1=0;
     } else {    // upper triangle, YX order: (0,0)->(0,1)->(1,1)
         i1=0; j1=1;
@@ -124,21 +124,21 @@ myModule.simplex2 = function(xin, yin) {
     let gi2 = gradP[i+1+perm[j+1]];
     // Calculate the contribution from the three corners
     let t0 = 0.5 - x0*x0-y0*y0;
-    if(t0<0) {
+    if (t0<0) {
         n0 = 0;
     } else {
         t0 *= t0;
         n0 = t0 * t0 * gi0.dot2(x0, y0);  // (x,y) of grad3 used for 2D gradient
     }
     let t1 = 0.5 - x1*x1-y1*y1;
-    if(t1<0) {
+    if (t1<0) {
         n1 = 0;
     } else {
         t1 *= t1;
         n1 = t1 * t1 * gi1.dot2(x1, y1);
     }
     let t2 = 0.5 - x2*x2-y2*y2;
-    if(t2<0) {
+    if (t2<0) {
         n2 = 0;
     } else {
         t2 *= t2;
@@ -168,13 +168,13 @@ myModule.simplex3 = function(xin, yin, zin) {
     // Determine which simplex we are in.
     let i1, j1, k1; // Offsets for second corner of simplex in (i,j,k) coords
     let i2, j2, k2; // Offsets for third corner of simplex in (i,j,k) coords
-    if(x0 >= y0) {
-        if(y0 >= z0)      { i1=1; j1=0; k1=0; i2=1; j2=1; k2=0; }
-        else if(x0 >= z0) { i1=1; j1=0; k1=0; i2=1; j2=0; k2=1; }
+    if (x0 >= y0) {
+        if (y0 >= z0)      { i1=1; j1=0; k1=0; i2=1; j2=1; k2=0; }
+        else if (x0 >= z0) { i1=1; j1=0; k1=0; i2=1; j2=0; k2=1; }
         else              { i1=0; j1=0; k1=1; i2=1; j2=0; k2=1; }
     } else {
-        if(y0 < z0)      { i1=0; j1=0; k1=1; i2=0; j2=1; k2=1; }
-        else if(x0 < z0) { i1=0; j1=1; k1=0; i2=0; j2=1; k2=1; }
+        if (y0 < z0)      { i1=0; j1=0; k1=1; i2=0; j2=1; k2=1; }
+        else if (x0 < z0) { i1=0; j1=1; k1=0; i2=0; j2=1; k2=1; }
         else             { i1=0; j1=1; k1=0; i2=1; j2=1; k2=0; }
     }
     // A step of (1,0,0) in (i,j,k) means a step of (1-c,-c,-c) in (x,y,z),
@@ -204,28 +204,28 @@ myModule.simplex3 = function(xin, yin, zin) {
 
     // Calculate the contribution from the four corners
     let t0 = 0.6 - x0*x0 - y0*y0 - z0*z0;
-    if(t0<0) {
+    if (t0<0) {
         n0 = 0;
     } else {
         t0 *= t0;
         n0 = t0 * t0 * gi0.dot3(x0, y0, z0);  // (x,y) of grad3 used for 2D gradient
     }
     let t1 = 0.6 - x1*x1 - y1*y1 - z1*z1;
-    if(t1<0) {
+    if (t1<0) {
         n1 = 0;
     } else {
         t1 *= t1;
         n1 = t1 * t1 * gi1.dot3(x1, y1, z1);
     }
     let t2 = 0.6 - x2*x2 - y2*y2 - z2*z2;
-    if(t2<0) {
+    if (t2<0) {
         n2 = 0;
     } else {
         t2 *= t2;
         n2 = t2 * t2 * gi2.dot3(x2, y2, z2);
     }
     let t3 = 0.6 - x3*x3 - y3*y3 - z3*z3;
-    if(t3<0) {
+    if (t3<0) {
         n3 = 0;
     } else {
         t3 *= t3;

@@ -19,9 +19,7 @@ export function FittedImage(params) {
     let w = parseInt('' + fit.width);
     let h = parseInt('' + fit.height);
 
-    let canvas = BB.canvas();
-    canvas.width = w;
-    canvas.height = h;
+    let canvas = BB.canvas(w, h);
 
     canvas.getContext("2d").drawImage(params.image, 0, 0, w, h);
     BB.css(canvas, {

@@ -162,7 +162,7 @@ export const BezierLine = function () {
             const pointM2 = pointArr[pointArr.length - 2];
             const pointM3 = pointArr[pointArr.length - 3];
             pointM2.dir = Vec2.nor(Vec2.sub(pointM1, pointM3));
-            if(isNaN(pointM2.dir.x) || isNaN(pointM2.dir.y)) {
+            if (isNaN(pointM2.dir.x) || isNaN(pointM2.dir.y)) {
                 //when xy -3 == -1
                 pointM2.dir = JSON.parse(JSON.stringify(pointM3.dir));
             }
@@ -178,7 +178,7 @@ export const BezierLine = function () {
 
 
         let pointLine;
-        if(callback) {
+        if (callback) {
             let curvePoints;
             curvePoints = getBezierPoints(p1, p2, p3, p4, 20);
             pointLine = new PointLine({points: curvePoints});
@@ -218,7 +218,7 @@ export const BezierLine = function () {
     };
 
     this.addFinal = function(spacing, callback, controlsCallback) {
-        if(pointArr.length < 2) {
+        if (pointArr.length < 2) {
             return;
         }
 
@@ -333,7 +333,7 @@ SplineInterpolator.prototype.interpolate = function (x) {
 SplineInterpolator.prototype.findX = function (y, resolution) {
     let x = null;
     let dist = null;
-    for(let i = 0; i <= resolution; i++) {
+    for (let i = 0; i <= resolution; i++) {
         const tempX = i / resolution;
         const tempY = this.interpolate(tempX);
         if (x === null) {
@@ -344,7 +344,7 @@ SplineInterpolator.prototype.findX = function (y, resolution) {
 
         const tempDist = Math.abs(tempY - y);
 
-        if(tempDist < dist) {
+        if (tempDist < dist) {
             x = tempX;
             dist = tempDist;
         } else {

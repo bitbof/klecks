@@ -87,7 +87,7 @@ export function FreeTransformCanvas(params: {
     let freeTransform;
     let initTransform;
     function updatePreview() {
-        if(!freeTransform) {
+        if (!freeTransform) {
             return;
         }
 
@@ -119,7 +119,7 @@ export function FreeTransformCanvas(params: {
             width: params.layerArr[params.transformIndex].canvas.width * scale,
             height: params.layerArr[params.transformIndex].canvas.height * scale
         };
-        if(transformSize.width > previewFit.width || transformSize.height > previewFit.height) {
+        if (transformSize.width > previewFit.width || transformSize.height > previewFit.height) {
             transformSize = BB.fitInto(
                 params.layerArr[params.transformIndex].canvas.width,
                 params.layerArr[params.transformIndex].canvas.height,

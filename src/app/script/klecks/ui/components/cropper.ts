@@ -230,7 +230,7 @@ export function Cropper (params) {
             if (event.type === 'pointermove' && event.button === 'left') {
                 const {dX, dY} = BB.intDxy(pointerRemainder, event.dX / scale, event.dY / scale);
                 transformTop(dY);
-                if(keyListener.isPressed('shift')) {
+                if (keyListener.isPressed('shift')) {
                     transformBottom(-dY);
                 }
                 update();
@@ -248,7 +248,7 @@ export function Cropper (params) {
             if (event.type === 'pointermove' && event.button === 'left') {
                 const {dX, dY} = BB.intDxy(pointerRemainder, event.dX / scale, event.dY / scale);
                 transformRight(dX);
-                if(keyListener.isPressed('shift')) {
+                if (keyListener.isPressed('shift')) {
                     transformLeft(-dX);
                 }
                 update();
@@ -266,7 +266,7 @@ export function Cropper (params) {
             if (event.type === 'pointermove' && event.button === 'left') {
                 const {dX, dY} = BB.intDxy(pointerRemainder, event.dX / scale, event.dY / scale);
                 transformBottom(dY);
-                if(keyListener.isPressed('shift')) {
+                if (keyListener.isPressed('shift')) {
                     transformTop(-dY);
                 }
                 update();
@@ -284,7 +284,7 @@ export function Cropper (params) {
             if (event.type === 'pointermove' && event.button === 'left') {
                 const {dX, dY} = BB.intDxy(pointerRemainder, event.dX / scale, event.dY / scale);
                 transformLeft(dX);
-                if(keyListener.isPressed('shift')) {
+                if (keyListener.isPressed('shift')) {
                     transformRight(-dX);
                 }
                 update();
@@ -345,7 +345,7 @@ export function Cropper (params) {
                 const {dX, dY} = BB.intDxy(pointerRemainder, event.dX / scale, event.dY / scale);
                 transformLeft(dX);
                 transformTop(dY);
-                if(keyListener.isPressed('shift')) {
+                if (keyListener.isPressed('shift')) {
                     transformRight(-dX);
                     transformBottom(-dY);
                 }
@@ -366,7 +366,7 @@ export function Cropper (params) {
                 const {dX, dY} = BB.intDxy(pointerRemainder, event.dX / scale, event.dY / scale);
                 transformRight(dX);
                 transformTop(dY);
-                if(keyListener.isPressed('shift')) {
+                if (keyListener.isPressed('shift')) {
                     transformLeft(-dX);
                     transformBottom(-dY);
                 }
@@ -387,7 +387,7 @@ export function Cropper (params) {
                 const {dX, dY} = BB.intDxy(pointerRemainder, event.dX / scale, event.dY / scale);
                 transformRight(dX);
                 transformBottom(dY);
-                if(keyListener.isPressed('shift')) {
+                if (keyListener.isPressed('shift')) {
                     transformLeft(-dX);
                     transformTop(-dY);
                 }
@@ -408,7 +408,7 @@ export function Cropper (params) {
                 const {dX, dY} = BB.intDxy(pointerRemainder, event.dX / scale, event.dY / scale);
                 transformLeft(dX);
                 transformBottom(dY);
-                if(keyListener.isPressed('shift')) {
+                if (keyListener.isPressed('shift')) {
                     transformRight(-dX);
                     transformTop(-dY);
                 }

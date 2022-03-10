@@ -2,14 +2,15 @@ import {BB} from '../../bb/bb';
 import {brushes} from '../brushes/brushes';
 import {eventResMs} from './brushes-consts';
 import {klHistory} from '../history/kl-history';
-import {PcSlider} from '../ui/base-components/slider';
+import {KlSlider} from '../ui/base-components/kl-slider';
 import {penPressureToggle} from '../ui/base-components/pen-pressure-toggle';
 import {Checkbox} from '../ui/base-components/checkbox';
 // @ts-ignore
 import brushIconImg from 'url:~/src/app/img/ui/brush-eraser.svg';
+import {IBrushUi} from '../kl.types';
 
 export const eraserBrushUi = (function () {
-    let brushInterface: any = {
+    let brushInterface: IBrushUi = {
         image: brushIconImg,
         tooltip: 'Eraser [E]',
         sizeSlider: {
@@ -20,16 +21,13 @@ export const eraserBrushUi = (function () {
         opacitySlider: {
             min: 1 / 100,
             max: 1
-        }
+        },
+        Ui: null,
     };
 
-    /**
-     * @param p = {onSizeChange: function(size), onOpacityChange: function(opacity)}
-     * @constructor
-     */
     brushInterface.Ui = function (p) {
         let div = document.createElement("div"); // the gui
-        let brush = new brushes.eraser();
+        let brush = new brushes.EraserBrush();
         brush.setHistory(klHistory);
         p.onSizeChange(brush.getSize());
 
@@ -42,7 +40,7 @@ export const eraserBrushUi = (function () {
         }
 
         function init() {
-            sizeSlider = new PcSlider({
+            sizeSlider = new KlSlider({
                 label: 'Size',
                 width: 225,
                 height: 30,
@@ -64,7 +62,7 @@ export const eraserBrushUi = (function () {
                     }
                 }
             });
-            opacitySlider = new PcSlider({
+            opacitySlider = new KlSlider({
                 label: 'Opacity',
                 width: 225,
                 height: 30,

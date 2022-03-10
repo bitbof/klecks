@@ -78,7 +78,7 @@ export function HandUi(p) {
 
 
         angleIm.style.transform = 'rotate(' + angleDeg + 'deg)';
-        if(angleDeg % 90 === 0) {
+        if (angleDeg % 90 === 0) {
             angleIm.style.boxShadow = 'inset 0 0 0 1px rgba(255,255,255, 1), 0 0 0 1px rgba(0, 0, 0, 0.3)';
         } else {
             angleIm.style.boxShadow = '';
@@ -156,14 +156,14 @@ export function HandUi(p) {
     this.setIsVisible = function(pIsVisible) {
         isVisible = !!pIsVisible;
         div.style.display = isVisible ? 'block' : 'none';
-        if(isVisible) {
+        if (isVisible) {
             update();
         }
     };
     this.update = function(pScale, pAngleDeg) {
         scale = pScale;
         angleDeg = pAngleDeg;
-        if(isVisible) {
+        if (isVisible) {
             update();
         }
     };

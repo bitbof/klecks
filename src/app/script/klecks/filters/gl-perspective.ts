@@ -3,10 +3,11 @@ import {KlCanvasPreview} from '../canvas-ui/canvas-preview';
 // @ts-ignore
 import checkmarkImg from 'url:~/src/app/img/ui/checkmark.svg';
 import {getSharedFx} from './shared-gl-fx';
+import {IFilterApply, IFilterGetDialogParam} from '../kl.types';
 
 export const glPerspective = {
 
-    getDialog(params) {
+    getDialog(params: IFilterGetDialogParam) {
         let context = params.context;
         let canvas = params.canvas;
         if (!context || !canvas) {
@@ -279,7 +280,7 @@ export const glPerspective = {
 
             let previewLayerArr = [];
             {
-                for(let i = 0; i < layers.length; i++) {
+                for (let i = 0; i < layers.length; i++) {
                     let canvas = i === selectedLayerIndex ? glCanvas : layers[i].context.canvas;
                     previewLayerArr.push({
                         canvas: canvas,
@@ -323,7 +324,7 @@ export const glPerspective = {
             div.appendChild(previewWrapper);
             update();
             result.destroy = () => {
-                for(let i = 0; i < pointerListenerArr.length; i++) {
+                for (let i = 0; i < pointerListenerArr.length; i++) {
                     pointerListenerArr[i].destroy();
                 }
                 texture.destroy();
@@ -366,14 +367,14 @@ export const glPerspective = {
         return result;
     },
 
-    apply(params) {
+    apply(params: IFilterApply) {
         let context = params.context;
         let history = params.history;
         let before = params.input.before;
         let after = params.input.after;
         if (!context || !before || !after || !history)
             return false;
-        history.pause();
+        history.pause(true);
         let glCanvas = getSharedFx();
         if (!glCanvas) {
             return false; // todo more specific error?
@@ -386,7 +387,7 @@ export const glPerspective = {
         context.drawImage(glCanvas, 0, 0);
         texture.destroy();
         history.pause(false);
-        history.add({
+        history.push({
             tool: ["filter", "glPerspective"],
             action: "apply",
             params: [{

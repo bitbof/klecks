@@ -1,6 +1,7 @@
 import {BB} from '../../bb/bb';
 import {KL} from '../kl';
 import {saveAs} from 'file-saver';
+import {KlCanvas} from '../canvas/kl-canvas';
 
 export class SaveToComputer {
 
@@ -8,7 +9,7 @@ export class SaveToComputer {
         private saveReminder,
         private klRootEl,
         private getExportType,
-        private getKlCanvas,
+        private getKlCanvas: () => KlCanvas,
         private filenameBase: string,
     ) {}
 
@@ -39,7 +40,7 @@ export class SaveToComputer {
             let fullCanvas = _this.getKlCanvas().getCompleteCanvas(1);
 
             /*fullCanvas.toBlob(function(blob) {
-                if(blob === null) {
+                if (blob === null) {
                     throw 'save image error, blob is null';
                 }
                 saveAs(blob, filename);

@@ -1,19 +1,18 @@
 import {BB} from '../../bb/bb';
+import {IFilterApply, IFilterGetDialogParam} from '../kl.types';
 
 export const rotate = {
 
-    getDialog(params) {
+    getDialog(params: IFilterGetDialogParam) {
         let canvas = params.canvas;
         if (!canvas)
             return false;
 
-        let fit = BB.fitInto(canvas.width, canvas.height, 280, 200, 1);
+        let fit = BB.fitInto(canvas.getWidth(), canvas.getHeight(), 280, 200, 1);
         let w = parseInt('' + fit.width), h = parseInt('' + fit.height);
 
-        let previewFactor = w / canvas.width;
-        let tempCanvas = BB.canvas();
-        tempCanvas.width = w;
-        tempCanvas.height = h;
+        let previewFactor = w / canvas.getWidth();
+        let tempCanvas = BB.canvas(w, h);
         tempCanvas.style.display = 'block';
         tempCanvas.getContext("2d").drawImage(canvas.getCompleteCanvas(previewFactor), 0, 0, w, h);
 
@@ -92,9 +91,7 @@ export const rotate = {
         BB.createCheckerDataUrl(4, function (url) {
             canvasWrapper.style.background = "url(" + url + ")";
         });
-        //if(!visitor.chrome) {
         canvasWrapper.style.transition = "all 0.2s ease-out";
-        //}
 
         div.appendChild(previewWrapper);
         update();
@@ -107,16 +104,16 @@ export const rotate = {
         return result;
     },
 
-    apply(params) {
+    apply(params: IFilterApply) {
         let canvas = params.canvas;
         let history = params.history;
         let deg = params.input.deg;
         if (!canvas || !history)
             return false;
-        history.pause();
+        history.pause(true);
         canvas.rotate(deg);
         history.pause(false);
-        history.add({
+        history.push({
             tool: ["filter", "rotate"],
             action: "apply",
             params: [{

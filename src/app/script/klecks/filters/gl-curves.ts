@@ -2,10 +2,11 @@ import {BB} from '../../bb/bb';
 import {Options} from '../ui/base-components/options';
 import {KlCanvasPreview} from '../canvas-ui/canvas-preview';
 import {getSharedFx} from './shared-gl-fx';
+import {IFilterApply, IFilterGetDialogParam} from '../kl.types';
 
 export const glCurves = {
 
-    getDialog(params) {
+    getDialog(params: IFilterGetDialogParam) {
 
         let context = params.context;
         let canvas = params.canvas;
@@ -19,9 +20,7 @@ export const glCurves = {
         let fit = BB.fitInto(context.canvas.width, context.canvas.height, 280, 200, 1);
         let w = parseInt('' + fit.width), h = parseInt('' + fit.height);
 
-        let tempCanvas = BB.canvas();
-        tempCanvas.width = w;
-        tempCanvas.height = h;
+        let tempCanvas = BB.canvas(w, h);
         {
             const ctx = tempCanvas.getContext("2d");
             ctx.save();
@@ -61,7 +60,7 @@ export const glCurves = {
             function update() {
                 try {
                     glCanvas.draw(texture).curves(curves.r, curves.g, curves.b).update();
-                    if(klCanvasPreview) {
+                    if (klCanvasPreview) {
                         klCanvasPreview.render();
                     }
                 } catch(e) {
@@ -349,7 +348,7 @@ export const glCurves = {
 
             let previewLayerArr = [];
             {
-                for(let i = 0; i < layers.length; i++) {
+                for (let i = 0; i < layers.length; i++) {
                     previewLayerArr.push({
                         canvas: i === selectedLayerIndex ? glCanvas : layers[i].context.canvas,
                         opacity: layers[i].opacity,
@@ -395,13 +394,13 @@ export const glCurves = {
         return result;
     },
 
-    apply(params) {
+    apply(params: IFilterApply) {
         let context = params.context;
         let curves = params.input.curves;
         let history = params.history;
         if (!context || curves === null || !history)
             return false;
-        history.pause();
+        history.pause(true);
         let glCanvas = getSharedFx();
         if (!glCanvas) {
             return false; // todo more specific error?
@@ -412,7 +411,7 @@ export const glCurves = {
         context.drawImage(glCanvas, 0, 0);
         texture.destroy();
         history.pause(false);
-        history.add({
+        history.push({
             tool: ["filter", "glCurves"],
             action: "apply",
             params: [{

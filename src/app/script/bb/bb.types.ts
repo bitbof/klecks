@@ -4,6 +4,12 @@ export interface IVector2D {
     y: number;
 }
 
+export interface IPressureInput {
+    x: number;
+    y: number;
+    pressure: number; // 0-1
+}
+
 export interface ISize2D {
     width: number;
     height: number;
@@ -24,4 +30,11 @@ export interface IBounds {
     y1: number;
     x2: number;
     y2: number;
+}
+
+export interface IRect {
+    x: number;
+    y: number;
+    width: number;
+    height: number;
 }

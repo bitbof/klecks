@@ -1,7 +1,8 @@
 import {BB} from '../../bb/bb';
-import {IBounds, IVector2D} from '../../bb/bb.types';
-
-
+import {IBounds, IPressureInput, IVector2D} from '../../bb/bb.types';
+import {IHistoryEntry, KlHistoryInterface} from '../history/kl-history';
+import {KL} from '../kl';
+import {IRGB} from '../kl.types';
 
 // let statCount = 1;
 // let statAcc = 0;
@@ -16,6 +17,7 @@ import {IBounds, IVector2D} from '../../bb/bb.types';
 // ix, iy + sans rounding + fast random: 0.46 ms
 // ix, iy + sans rounding + fast random + offset const: 0.48 ms
 
+const CELL_SIZE = 256;
 
 interface ISmudgeParams {
     aP: IVector2D;
@@ -123,13 +125,21 @@ function prepSmudge(
     };
 }
 
+// faster than using BB.clamp somehow (in chrome)
+function clamp(num, min, max) {
+    return num <= min
+        ? min
+        : num >= max
+            ? max
+            : num
+}
 
 /**
  * Pixel operations that do the smudging via ImageData
  * @param imageData
  * @param p
  */
-function smudge(imageData: ImageData, p : ISmudgeParams) {
+function smudge(imageData: ImageData, p : ISmudgeParams): void {
 
     p = BB.copyObj(p);
 
@@ -151,18 +161,18 @@ function smudge(imageData: ImageData, p : ISmudgeParams) {
 
     // array with random numbers. faster than Math.random()
     let randI = 0;
-    const randLen = Math.floor(25 + Math.random() * 25);
+    const randLen = cSize > 30 ? 1024 : 512; // lower lengths lead to noticeable patterns
     const randArr = [];
     for (let i = 0; i < randLen; i++) {
-        randArr[i] = Math.random();
+        randArr[i] = (Math.random() - 0.5) / 1.001 + 0.5;
     }
 
-    const softness = Math.max(3, Math.min(8, p.brush.size - 8));
+    const softnessPx = Math.max(3, Math.min(8, p.brush.size - 8));
 
     const pixel = (ai, bi, ix, iy) => {
 
-        const dist = Math.abs(BB.dist(cX, cY, ix, iy));
-        const fac = 1 - p.brush.opacity * (1 - BB.clamp((dist - (cSize - softness)) / softness, 0, 1));
+        const dist = BB.dist(cX, cY, ix, iy);
+        const fac = 1 - p.brush.opacity * (1 - clamp((dist - (cSize - softnessPx)) / softnessPx, 0, 1));
 
         if (fac === 1) {
             return;
@@ -177,7 +187,7 @@ function smudge(imageData: ImageData, p : ISmudgeParams) {
         } else {
 
             // consider alpha ratio. If a has lower alpha than b, then b should be stronger, and vice versa
-            // not totally accurate. TODO research accurate smudging
+            // not totally accurate. TODO same compositing as blend brush
             let fac2;
             if (imageData.data[ai + 3] < imageData.data[bi + 3]) {
                 fac2 = 1 - imageData.data[ai + 3] / imageData.data[bi + 3] * (1 - fac);
@@ -188,9 +198,11 @@ function smudge(imageData: ImageData, p : ISmudgeParams) {
             // ImageData's Uint8ClampedArray rounds -> 0.5 becomes 1. But not in Safari, so needs to be done manually
             // Offset mixed color by random number noise (-0.5, 0.5), so it doesn't get stuck while mixing.
             // No +0.5, because it cancels out with rand.
-            imageData.data[bi] = Math.floor(BB.mix(imageData.data[ai], imageData.data[bi + 0], fac2) + randArr[randI++ % randLen]);
-            imageData.data[bi + 1] = Math.floor(BB.mix(imageData.data[ai + 1], imageData.data[bi + 1], fac2) + randArr[randI++ % randLen]);
-            imageData.data[bi + 2] = Math.floor(BB.mix(imageData.data[ai + 2], imageData.data[bi + 2], fac2) + randArr[randI++ % randLen]);
+            imageData.data[bi] = Math.floor(BB.mix(imageData.data[ai], imageData.data[bi + 0], fac2) + randArr[randI]);
+            imageData.data[bi + 1] = Math.floor(BB.mix(imageData.data[ai + 1], imageData.data[bi + 1], fac2) + randArr[randI]);
+            imageData.data[bi + 2] = Math.floor(BB.mix(imageData.data[ai + 2], imageData.data[bi + 2], fac2) + randArr[randI]);
+
+            randI = (randI + 1) % randLen;
         }
         // Always mix alpha. unless alpha lock
         if (!p.brush.alphaLock) {
@@ -239,88 +251,68 @@ function smudge(imageData: ImageData, p : ISmudgeParams) {
     //statAcc += performance.now() - start;
 }
 
-/**
- * Brush that pushes colors around.
- */
-export function smudgeBrush() {
+export class SmudgeBrush {
 
-    let _this = this;
-    let debugStr = '';
-    let context: CanvasRenderingContext2D;
-    let history = {
-        add: function (p?) {
-        },
-        isFake: true
-    }, historyEntry;
+    private context: CanvasRenderingContext2D;
+    private history: KlHistoryInterface = new KL.DecoyKlHistory();
+    private historyEntry: IHistoryEntry;
 
-    let settingColor, settingSize = 35, settingSpacing = 0.20446882736951905, settingOpacity = 0.8;
-    let settingColorStr: string;
-    let settingHasSizePressure = false, settingHasOpacityPressure = false;
-    let settingLockLayerAlpha = false;
+    private settingColor: IRGB = {r: 0, g: 0, b: 0};
+    private settingSize: number = 35;
+    private settingSpacing: number = 0.20446882736951905;
+    private settingOpacity: number = 0.8;
+    private settingColorStr: string;
+    private settingHasSizePressure: boolean = false;
+    private settingHasOpacityPressure: boolean = false;
+    private settingLockLayerAlpha: boolean = false;
 
-    let lineToolLastDot;
-    let lastInput = {x: 0, y: 0, pressure: 0};
-    let lastInput2 = {x: 0, y: 0, pressure: 0};
+    private lineToolLastDot: number;
+    private lastInput: IPressureInput = {x: 0, y: 0, pressure: 0};
+    private lastInput2: IPressureInput = {x: 0, y: 0, pressure: 0};
+    private lastDot: IVector2D;
 
-    let isDrawing = false;
+    private isDrawing: boolean = false;
 
-    let bezierLine = null;
+    private bezierLine: any = null; // todo type BezierLine
 
+    private redrawBounds: IBounds;
+    private completeRedrawBounds: IBounds;
 
-    let redrawBounds: IBounds;
-    let completeRedrawBounds: IBounds;
+    private copyImageData: ImageData;
 
-    let copyImageData: ImageData;
+    private drawBuffer: ISmudgeParams[] = [];
 
-    let smudgeBuffer: ISmudgeParams[] = [];
-    const cellSize = 256;
-    let copiedCells: boolean[];
+    private copiedCells: boolean[];
 
-    function updateRedrawBounds(bounds: IBounds) {
-        if (!bounds) {
-            return;
-        }
-        if (!redrawBounds) {
-            redrawBounds = { x1: bounds.x1, y1: bounds.y1, x2: bounds.x2, y2: bounds.y2 };
-        } else {
-            redrawBounds.x1 = Math.min(redrawBounds.x1, bounds.x1);
-            redrawBounds.y1 = Math.min(redrawBounds.y1, bounds.y1);
-            redrawBounds.x2 = Math.max(redrawBounds.x2, bounds.x2);
-            redrawBounds.y2 = Math.max(redrawBounds.y2, bounds.y2);
-        }
-    }
-    function updateCompleteRedrawBounds(x1, y1, x2, y2) {
-        if (!completeRedrawBounds) {
-            completeRedrawBounds = { x1, y1, x2, y2 };
-        } else {
-            completeRedrawBounds.x1 = Math.min(completeRedrawBounds.x1, x1);
-            completeRedrawBounds.y1 = Math.min(completeRedrawBounds.y1, y1);
-            completeRedrawBounds.x2 = Math.max(completeRedrawBounds.x2, x2);
-            completeRedrawBounds.y2 = Math.max(completeRedrawBounds.y2, y2);
-        }
+    updateRedrawBounds(bounds: IBounds): void {
+        this.redrawBounds = BB.updateBounds(this.redrawBounds, bounds);
     }
 
-
-    let lastDot;
+    updateCompleteRedrawBounds (x1, y1, x2, y2): void {
+        this.completeRedrawBounds = BB.updateBounds(
+            this.completeRedrawBounds,
+            { x1, y1, x2, y2 }
+        );
+    }
 
     /**
      * update copyImageData. copy over new regions if needed
      */
-    function copyFromCanvas() {
+    copyFromCanvas(): void {
 
-        const touchedCells = copiedCells.map(item => false);
+        const touchedCells = this.copiedCells.map(item => false);
 
         const bounds: IBounds[] = [];
-        const cellsW = Math.ceil(copyImageData.width / cellSize);
+        const cellsW = Math.ceil(this.copyImageData.width / CELL_SIZE);
 
-        if (!redrawBounds) {
+        if (!this.redrawBounds) {
             return;
         }
         bounds.push({
-            x1: Math.floor(redrawBounds.x1 / cellSize),
-            y1: Math.floor(redrawBounds.y1 / cellSize),
-            x2: Math.floor(redrawBounds.x2 / cellSize),
-            y2: Math.floor(redrawBounds.y2 / cellSize),
+            x1: Math.floor(this.redrawBounds.x1 / CELL_SIZE),
+            y1: Math.floor(this.redrawBounds.y1 / CELL_SIZE),
+            x2: Math.floor(this.redrawBounds.x2 / CELL_SIZE),
+            y2: Math.floor(this.redrawBounds.y2 / CELL_SIZE),
         });
         bounds.forEach(item => {
             for (let i = item.x1; i <= item.x2; i++) {
@@ -331,29 +323,29 @@ export function smudgeBrush() {
         });
 
         touchedCells.forEach((item, i) => {
-            if (!item || copiedCells[i]) {
+            if (!item || this.copiedCells[i]) {
                 // not touched, or already copied
                 return;
             }
-            copiedCells[i] = true;
+            this.copiedCells[i] = true;
             const x = i % cellsW;
             const y = Math.floor(i / cellsW);
-            const w = (Math.min(x * cellSize + cellSize, copyImageData.width) - 1) % cellSize + 1;
-            const h = (Math.min(y * cellSize + cellSize, copyImageData.height) - 1) % cellSize + 1;
+            const w = (Math.min(x * CELL_SIZE + CELL_SIZE, this.copyImageData.width) - 1) % CELL_SIZE + 1;
+            const h = (Math.min(y * CELL_SIZE + CELL_SIZE, this.copyImageData.height) - 1) % CELL_SIZE + 1;
 
             // temp canvas to prevent main canvas from getting slowed down in chrome
             const tmpCanvas = BB.canvas(w, h);
             const tmpCtx = tmpCanvas.getContext('2d');
-            tmpCtx.drawImage(context.canvas, -x * cellSize, -y * cellSize);
+            tmpCtx.drawImage(this.context.canvas, -x * CELL_SIZE, -y * CELL_SIZE);
 
             const data = tmpCtx.getImageData(0, 0, w, h);
 
             for (let i = 0; i < h; i++) {
-                for (let e = 0, e2 = i * w * 4, e3 = ((y * cellSize + i) * copyImageData.width + x * cellSize) * 4; e < w; e++, e2 += 4, e3 += 4) {
-                    copyImageData.data[e3] = data.data[e2];
-                    copyImageData.data[e3 + 1] = data.data[e2 + 1];
-                    copyImageData.data[e3 + 2] = data.data[e2 + 2];
-                    copyImageData.data[e3 + 3] = data.data[e2 + 3];
+                for (let e = 0, e2 = i * w * 4, e3 = ((y * CELL_SIZE + i) * this.copyImageData.width + x * CELL_SIZE) * 4; e < w; e++, e2 += 4, e3 += 4) {
+                    this.copyImageData.data[e3] = data.data[e2];
+                    this.copyImageData.data[e3 + 1] = data.data[e2 + 1];
+                    this.copyImageData.data[e3 + 2] = data.data[e2 + 2];
+                    this.copyImageData.data[e3 + 3] = data.data[e2 + 3];
                 }
             }
         });
@@ -361,16 +353,15 @@ export function smudgeBrush() {
 
 
     /**
-     *
-     *
+     * fill drawBuffer with params about to be drawn
      * @param x
      * @param y
      * @param size
      * @param opacity
      */
-    function drawDot(x, y, size, opacity) {
-        if (!lastDot) {
-            lastDot = {
+    prepDot (x: number, y: number, size: number, opacity: number): void {
+        if (!this.lastDot) {
+            this.lastDot = {
                 x: x,
                 y: y,
             };
@@ -384,11 +375,11 @@ export function smudgeBrush() {
         const h = Math.round(size * 2);
 
         const bounds = prepSmudge(
-            copyImageData.width,
-            copyImageData.height,
+            this.copyImageData.width,
+            this.copyImageData.height,
             {
-                x: Math.round(lastDot.x - size),
-                y: Math.round(lastDot.y - size),
+                x: Math.round(this.lastDot.x - size),
+                y: Math.round(this.lastDot.y - size),
             },
             {
                 x: Math.round(x - size),
@@ -409,169 +400,206 @@ export function smudgeBrush() {
                     center: { x, y },
                     size,
                     opacity,
-                    alphaLock: settingLockLayerAlpha,
+                    alphaLock: this.settingLockLayerAlpha,
                 }
             };
-            updateRedrawBounds({
+            this.updateRedrawBounds({
                 x1: params.bP.x,
                 y1: params.bP.y,
                 x2: params.bP.x + params.brush.size * 2,
                 y2: params.bP.y + params.brush.size * 2,
             });
-            smudgeBuffer.push(params);
+            this.drawBuffer.push(params);
         }
 
-        lastDot = {
+        this.lastDot = {
             x: x,
             y: y,
         };
     }
 
-    function continueLine(x, y, size, pressure) {
-        smudgeBuffer = [];
+    continueLine (x: number, y: number, size: number, pressure: number): void {
+        this.drawBuffer = [];
 
-        if(bezierLine === null) {
-            bezierLine = new BB.BezierLine();
-            bezierLine.add(lastInput.x, lastInput.y, 0, function(){});
+        if (this.bezierLine === null) {
+            this.bezierLine = new BB.BezierLine();
+            this.bezierLine.add(this.lastInput.x, this.lastInput.y, 0, function(){});
         }
 
-        let drawArr = []; //draw instructions. will be all drawn at once
+        const drawArr = []; //draw instructions. will be all drawn at once
 
-        function dotCallback(val) {
-            let localPressure = BB.mix(lastInput2.pressure, pressure, val.t);
-            let localOpacity = settingOpacity * (settingHasOpacityPressure ? (localPressure * localPressure) : 1);
-            let localSize = Math.max(0.1, settingSize * (settingHasSizePressure ? localPressure : 1));
+        const dotCallback = (val): void => {
+            const localPressure = BB.mix(this.lastInput2.pressure, pressure, val.t);
+            const localOpacity = this.settingOpacity * (this.settingHasOpacityPressure ? (localPressure * localPressure) : 1);
+            const localSize = Math.max(0.1, this.settingSize * (this.settingHasSizePressure ? localPressure : 1));
             drawArr.push([val.x, val.y, localSize, localOpacity, val.angle]);
-        }
+        };
 
-        let localSpacing = size * settingSpacing / 3;
-        if(x === null) {
-            bezierLine.addFinal(localSpacing, dotCallback);
+        const localSpacing = size * this.settingSpacing / 3;
+        if (x === null) {
+            this.bezierLine.addFinal(localSpacing, dotCallback);
         } else {
-            bezierLine.add(x, y, localSpacing, dotCallback);
+            this.bezierLine.add(x, y, localSpacing, dotCallback);
         }
 
         // execute draw instructions
         let before;
         for (let i = 0; i < drawArr.length; i++) {
-            let item = drawArr[i];
-            drawDot(item[0], item[1], item[2], item[3]);
+            const item = drawArr[i];
+            this.prepDot(item[0], item[1], item[2], item[3]);
             before = item;
         }
 
-        copyFromCanvas();
+        this.copyFromCanvas();
 
-        for (let i = 0; i < smudgeBuffer.length; i++) {
-            smudge(copyImageData, smudgeBuffer[i]);
+        for (let i = 0; i < this.drawBuffer.length; i++) {
+            smudge(this.copyImageData, this.drawBuffer[i]);
         }
     }
 
-    //------------------ interface ---------------------------------------------------
 
 
-    this.startLine = function (x, y, p) {
-        historyEntry = {
-            tool: ["brush", "smudge"],
+    // ---- public ----
+
+    constructor () { }
+
+    startLine (x: number, y: number, p: number): void {
+        this.historyEntry = {
+            tool: ["brush", "SmudgeBrush"],
             actions: []
         };
 
         p = BB.clamp(p, 0, 1);
-        let localOpacity = settingHasOpacityPressure ? (settingOpacity * p * p) : settingOpacity;
-        let localSize = settingHasSizePressure ? Math.max(0.1, p * settingSize) : Math.max(0.1, settingSize);
+        const localOpacity = this.settingHasOpacityPressure ? (this.settingOpacity * p * p) : this.settingOpacity;
+        const localSize = this.settingHasSizePressure ? Math.max(0.1, p * this.settingSize) : Math.max(0.1, this.settingSize);
 
-        lastDot = null;
-        isDrawing = true;
+        this.lastDot = null;
+        this.isDrawing = true;
 
-        copyImageData = new ImageData(context.canvas.width, context.canvas.height);
-        const totalCells = Math.ceil(context.canvas.width / cellSize) * Math.ceil(context.canvas.height / cellSize);
-        copiedCells = '0'.repeat(totalCells).split('').map(item => false);
+        this.copyImageData = new ImageData(this.context.canvas.width, this.context.canvas.height);
+        const totalCells = Math.ceil(this.context.canvas.width / CELL_SIZE) * Math.ceil(this.context.canvas.height / CELL_SIZE);
+        this.copiedCells = '0'.repeat(totalCells).split('').map(item => false);
 
-        drawDot(x, y, localSize, localOpacity);
+        this.prepDot(x, y, localSize, localOpacity);
 
-        lineToolLastDot = localSize * settingSpacing;
-        lastInput.x = x;
-        lastInput.y = y;
-        lastInput.pressure = p;
-        lastInput2.pressure = p;
+        this.lineToolLastDot = localSize * this.settingSpacing;
+        this.lastInput.x = x;
+        this.lastInput.y = y;
+        this.lastInput.pressure = p;
+        this.lastInput2.pressure = p;
 
-        completeRedrawBounds = null;
-    };
+        this.completeRedrawBounds = null;
+    }
 
-    this.goLine = function (x, y, p) {
-        if (!isDrawing) {
+    goLine (x: number, y: number, p: number): void {
+        if (!this.isDrawing) {
             return;
         }
 
-        redrawBounds = null;
-        let pressure = BB.clamp(p, 0, 1);
-        let localSize = settingHasSizePressure ? Math.max(0.1, lastInput.pressure * settingSize) : Math.max(0.1, settingSize);
+        this.redrawBounds = null;
+        const pressure = BB.clamp(p, 0, 1);
+        const localSize = this.settingHasSizePressure ?
+            Math.max(0.1, this.lastInput.pressure * this.settingSize) : Math.max(0.1, this.settingSize);
 
-        continueLine(x, y, localSize, lastInput.pressure);
+        this.continueLine(x, y, localSize, this.lastInput.pressure);
 
 
-        if (redrawBounds) {
-            context.putImageData(copyImageData, 0, 0, redrawBounds.x1, redrawBounds.y1, redrawBounds.x2 - redrawBounds.x1 - 1, redrawBounds.y2 - redrawBounds.y1 - 1);
-            updateCompleteRedrawBounds(redrawBounds.x1, redrawBounds.y1, redrawBounds.x2, redrawBounds.y2);
+        if (this.redrawBounds) {
+            this.context.putImageData(
+                this.copyImageData,
+                0,
+                0,
+                this.redrawBounds.x1,
+                this.redrawBounds.y1,
+                this.redrawBounds.x2 - this.redrawBounds.x1 - 1,
+                this.redrawBounds.y2 - this.redrawBounds.y1 - 1
+            );
+            this.updateCompleteRedrawBounds(
+                this.redrawBounds.x1,
+                this.redrawBounds.y1,
+                this.redrawBounds.x2,
+                this.redrawBounds.y2
+            );
         }
 
-        lastInput.x = x;
-        lastInput.y = y;
-        lastInput2.pressure = lastInput.pressure;
-        lastInput.pressure = pressure;
+        this.lastInput.x = x;
+        this.lastInput.y = y;
+        this.lastInput2.pressure = this.lastInput.pressure;
+        this.lastInput.pressure = pressure;
+    }
 
-    };
+    endLine (): void {
+        this.redrawBounds = null;
+        const localSize = this.settingHasSizePressure ?
+            Math.max(0.1, this.lastInput.pressure * this.settingSize) : Math.max(0.1, this.settingSize);
+        this.context.save();
+        this.continueLine(null, null, localSize, this.lastInput.pressure);
+        this.context.restore();
 
-    this.endLine = function (x, y) {
-        redrawBounds = null;
-        let localSize = settingHasSizePressure ? Math.max(0.1, lastInput.pressure * settingSize) : Math.max(0.1, settingSize);
-        context.save();
-        continueLine(null, null, localSize, lastInput.pressure);
-        context.restore();
+        this.isDrawing = false;
+        this.bezierLine = null;
 
-        isDrawing = false;
-
-        bezierLine = null;
-
-        if (redrawBounds) {
-            context.putImageData(copyImageData, 0, 0, redrawBounds.x1, redrawBounds.y1, redrawBounds.x2 - redrawBounds.x1 - 1, redrawBounds.y2 - redrawBounds.y1 - 1);
-            updateCompleteRedrawBounds(redrawBounds.x1, redrawBounds.y1, redrawBounds.x2, redrawBounds.y2);
+        if (this.redrawBounds) {
+            this.context.putImageData(
+                this.copyImageData,
+                0,
+                0,
+                this.redrawBounds.x1,
+                this.redrawBounds.y1,
+                this.redrawBounds.x2 - this.redrawBounds.x1 - 1,
+                this.redrawBounds.y2 - this.redrawBounds.y1 - 1
+            );
+            this.updateCompleteRedrawBounds(
+                this.redrawBounds.x1,
+                this.redrawBounds.y1,
+                this.redrawBounds.x2,
+                this.redrawBounds.y2
+            );
         }
 
-        if (historyEntry && completeRedrawBounds) {
-            let historyIm: ImageData | HTMLCanvasElement = copyImageData;
-            if (!(completeRedrawBounds.x1 === 0 && completeRedrawBounds.y1 === 0 && completeRedrawBounds.x2 >= context.canvas.width - 1 && completeRedrawBounds.y2 >= context.canvas.height - 1)) {
+        if (this.historyEntry && this.completeRedrawBounds) {
+            let historyIm: ImageData | HTMLCanvasElement = this.copyImageData;
+            if (!(
+                this.completeRedrawBounds.x1 === 0 &&
+                this.completeRedrawBounds.y1 === 0 &&
+                this.completeRedrawBounds.x2 >= this.context.canvas.width - 1 &&
+                this.completeRedrawBounds.y2 >= this.context.canvas.height - 1
+            )) {
 
                 // temp canvas to prevent main canvas from getting slowed down in chrome
-                const tmpCanvas = BB.canvas(completeRedrawBounds.x2 - completeRedrawBounds.x1 + 1, completeRedrawBounds.y2 - completeRedrawBounds.y1 + 1);
+                const tmpCanvas = BB.canvas(
+                    this.completeRedrawBounds.x2 - this.completeRedrawBounds.x1 + 1,
+                    this.completeRedrawBounds.y2 - this.completeRedrawBounds.y1 + 1
+                );
                 const tmpCtx = tmpCanvas.getContext('2d');
-                tmpCtx.drawImage(context.canvas, -completeRedrawBounds.x1, -completeRedrawBounds.y1);
+                tmpCtx.drawImage(this.context.canvas, -this.completeRedrawBounds.x1, -this.completeRedrawBounds.y1);
 
                 historyIm = tmpCanvas; // faster than getting image data (measured on 2018 lenovo chromebook)
             }
-            historyEntry.actions.push({
+            this.historyEntry.actions.push({
                 action: "drawImage",
                 params: [
                     historyIm,
-                    completeRedrawBounds.x1,
-                    completeRedrawBounds.y1,
+                    this.completeRedrawBounds.x1,
+                    this.completeRedrawBounds.y1,
                 ],
             });
-            history.add(historyEntry);
-            historyEntry = undefined;
+            this.history.push(this.historyEntry);
+            this.historyEntry = undefined;
         }
-        copyImageData = null;
-    };
+        this.copyImageData = null;
+    }
 
-    this.drawImage = (im: ImageData | HTMLCanvasElement, x: number, y: number) => {
+    drawImage (im: ImageData | HTMLCanvasElement, x: number, y: number): void {
         if (im instanceof ImageData) {
-            context.putImageData(im, x, y);
+            this.context.putImageData(im, x, y);
         } else {
-            context.clearRect(x, y, im.width, im.height);
-            context.drawImage(im, x, y);
+            this.context.clearRect(x, y, im.width, im.height);
+            this.context.drawImage(im, x, y);
         }
-    };
+    }
 
-    this.drawLineSegment = function (x1, y1, x2, y2) {
+    drawLineSegment (x1: number, y1: number, x2: number, y2: number): void {
         return;
         /*
         // todo
@@ -596,65 +624,71 @@ export function smudgeBrush() {
 
 
         let historyEntry = {
-            tool: ["brush", "smudge"],
+            tool: ["brush", "SmudgeBrush"],
             actions: []
         };
         // todo
         history.add(historyEntry);*/
-    };
+    }
 
-    //IS
-    this.isDrawing = function () {
-        return isDrawing;
-    };
-    //SET
+    getIsDrawing (): boolean {
+        return this.isDrawing;
+    }
 
-    // not needed, but might add in the future
-    this.setColor = function (c) {
-        if(settingColor === c) {
+    setColor (c: IRGB): void {
+        if (this.settingColor.r === c.r && this.settingColor.g === c.g && this.settingColor.b === c.b) {
             return;
         }
-        settingColor = {r: c.r, g: c.g, b: c.b};
-        settingColorStr = "rgb(" + settingColor.r + "," + settingColor.g + "," + settingColor.b + ")";
-    };
-    this.setContext = function (c) {
-        context = c;
-    };
-    this.setHistory = function (l) {
-        history = l;
-    };
-    this.setSize = function (s) {
-        settingSize = s;
-    };
-    this.setOpacity = function (o) {
-        settingOpacity = o;
-    };
-    this.setSpacing = function (s) {
-        settingSpacing = s;
-    };
-    this.sizePressure = function (b) {
-        settingHasSizePressure = b;
-    };
-    this.opacityPressure = function (b) {
-        settingHasOpacityPressure = b;
-    };
-    this.setLockAlpha = function (b) {
-        settingLockLayerAlpha = b;
-    };
-    //GET
-    this.getSpacing = function () {
-        return settingSpacing;
-    };
-    this.getSize = function () {
-        return settingSize;
-    };
-    this.getOpacity = function () {
-        return settingOpacity;
-    };
-    this.getLockAlpha = function (b) {
-        return settingLockLayerAlpha;
-    };
-    this.setDebug = function(str) {
-        debugStr = str;
-    };
+        this.settingColor = {r: c.r, g: c.g, b: c.b};
+        this.settingColorStr = BB.ColorConverter.toRgbStr(this.settingColor);
+    }
+
+    setContext (c: CanvasRenderingContext2D): void {
+        this.context = c;
+    }
+
+    setHistory (h: KlHistoryInterface): void {
+        this.history = h;
+    }
+
+    setSize (s: number): void {
+        this.settingSize = s;
+    }
+
+    setOpacity (o: number): void {
+        this.settingOpacity = o;
+    }
+
+    setSpacing (s: number): void {
+        this.settingSpacing = s;
+    }
+
+    sizePressure (b: boolean): void {
+        this.settingHasSizePressure = !!b;
+    }
+
+    opacityPressure (b: boolean): void {
+        this.settingHasOpacityPressure = !!b;
+    }
+
+    setLockAlpha (b: boolean): void {
+        this.settingLockLayerAlpha = !!b;
+    }
+
+    getSpacing (): number {
+        return this.settingSpacing;
+    }
+
+    getSize (): number {
+        return this.settingSize;
+    }
+
+    getOpacity (): number {
+        return this.settingOpacity;
+    }
+
+    getLockAlpha (): boolean {
+        return this.settingLockLayerAlpha;
+    }
+
 }

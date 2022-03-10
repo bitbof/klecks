@@ -111,7 +111,7 @@ export function LayerPreview(p) {
             height: '100%'
         }
     });
-    if(p.onClick) {
+    if (p.onClick) {
         BB.addEventListener(clickableEl,'click', function() {
             p.onClick();
         });
@@ -172,7 +172,7 @@ export function LayerPreview(p) {
     // --- update logic ---
 
     function animate() {
-        if(animationCount === 0) {
+        if (animationCount === 0) {
             return;
         }
 
@@ -183,14 +183,14 @@ export function LayerPreview(p) {
         canvasCtx.drawImage(animationCanvas, 0, 0);
         canvasCtx.restore();
 
-        if(animationCount > 0) {
+        if (animationCount > 0) {
             requestAnimationFrame(animate);
         }
     }
 
     function draw(isInstant) {
 
-        if(!isVisible) {
+        if (!isVisible) {
             return;
         }
 
@@ -199,7 +199,7 @@ export function LayerPreview(p) {
 
         let layerCanvas = layerObj.context.canvas;
 
-        if(layerCanvas.width !== lastDrawnSize.width || layerCanvas.height !== lastDrawnSize.height) {
+        if (layerCanvas.width !== lastDrawnSize.width || layerCanvas.height !== lastDrawnSize.height) {
             let canvasDimensions = BB.fitInto(layerCanvas.width, layerCanvas.height, canvasSize, canvasSize, 1);
             canvas.width = Math.round(canvasDimensions.width);
             canvas.height = Math.round(canvasDimensions.height);
@@ -217,7 +217,7 @@ export function LayerPreview(p) {
         animationCanvasCtx.drawImage(layerCanvas, 0, 0, animationCanvas.width, animationCanvas.height);
         animationCanvasCtx.restore();
 
-        if(isInstant) {
+        if (isInstant) {
             animationCount = 0;
             canvasCtx.save();
             canvasCtx.drawImage(animationCanvas, 0, 0);
@@ -242,12 +242,12 @@ export function LayerPreview(p) {
 
     setInterval(function() {
 
-        if(!layerObj) {
+        if (!layerObj) {
             return;
         }
 
         let currentState = klHistory.getState();
-        if(currentState === lastDrawnState) {
+        if (currentState === lastDrawnState) {
             return;
         }
 
@@ -262,7 +262,7 @@ export function LayerPreview(p) {
     //is always instant
     function drawLargeCanvas() {
 
-        if(!largeCanvasIsVisible || !layerObj) {
+        if (!largeCanvasIsVisible || !layerObj) {
             return;
         }
 
@@ -306,7 +306,7 @@ export function LayerPreview(p) {
         clearTimeout(largeCanvasAnimationTimeout);
         largeCanvasIsVisible = b;
 
-        if(b) {
+        if (b) {
             largeCanvasAnimationTimeout = setTimeout(function() {
                 drawLargeCanvas();
                 largeCanvasWrapper.style.opacity = '0';
@@ -339,7 +339,7 @@ export function LayerPreview(p) {
     };
 
     this.setIsVisible = function(b) {
-        if(isVisible === b) {
+        if (isVisible === b) {
             return;
         }
         isVisible = b;
@@ -347,7 +347,7 @@ export function LayerPreview(p) {
         div.style.marginBottom = isVisible ? '' : '10px';
 
         let currentState = klHistory.getState();
-        if(b && lastDrawnState !== currentState) {
+        if (b && lastDrawnState !== currentState) {
             update();
         }
     };

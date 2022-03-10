@@ -369,7 +369,7 @@ export function newImageDialog(p) {
     }
 
     widthInput.onchange = function () {
-        if(widthInput.value === '' || parseInt(widthInput.value) < 0) {
+        if (widthInput.value === '' || parseInt(widthInput.value) < 0) {
             widthInput.value = '1';
         }
         updateRatio();
@@ -378,7 +378,7 @@ export function newImageDialog(p) {
         updateRatio();
     };
     heightInput.onchange = function () {
-        if(heightInput.value === '' || parseFloat(heightInput.value) < 0) {
+        if (heightInput.value === '' || parseFloat(heightInput.value) < 0) {
             heightInput.value = '1';
         }
         updateRatio();

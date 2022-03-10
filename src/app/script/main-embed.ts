@@ -3,7 +3,7 @@ import {KlApp} from './app/kl-app';
 import {IKlProject} from './klecks/kl.types';
 import {SaveReminder} from './klecks/ui/components/save-reminder';
 import {klHistory} from './klecks/history/kl-history';
-import {readPsd} from './klecks/storage/psd';
+import {klPsdToKlProject, readPsd} from './klecks/storage/psd';
 
 export interface IEmbedParams {
     project?: IKlProject,
@@ -93,16 +93,7 @@ export function Embed(p: IEmbedParams) {
         const readItem = (item: IReadPSD) => {
             try {
                 const psd = agPsd.readPsd(item.blob);
-                const project = readPsd(psd);
-                if (project) {
-                    // convert to KlekiProjectObj
-                    for (let i = 0; i < project.layerArr.length; i++) {
-                        project.layerArr[i].image = project.layerArr[i].canvas;
-                        delete project.layerArr[i].canvas;
-                    }
-                    project.layers = project.layerArr;
-                    delete project.layerArr;
-                }
+                const project = klPsdToKlProject(readPsd(psd));
                 item.callback(project);
             } catch (e) {
                 console.error('failed to read psd', e);

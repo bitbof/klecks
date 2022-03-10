@@ -7,7 +7,7 @@ import {BB} from '../../../bb/bb';
  * @param p object {onDrop: func(files, optionStr), target: DOM Element, enabledTest: func -> bool} - optionStr: 'default'|'layer'|'image'
  * @constructor
  */
-export function PcImageDropper(p) {
+export function KlImageDropper(p) {
 
     //set up DOM
     let rootEl = BB.el({
@@ -81,10 +81,10 @@ export function PcImageDropper(p) {
 
     function updateOptions() {
         let boxShadow = '0 0 20px 4px #fff';
-        if(optionLayerCounter > 0) {
+        if (optionLayerCounter > 0) {
             optionLayerEl.style.boxShadow = boxShadow;
             optionImageEl.style.boxShadow = '';
-        } else if(optionImageCounter > 0) {
+        } else if (optionImageCounter > 0) {
             optionLayerEl.style.boxShadow = '';
             optionImageEl.style.boxShadow = boxShadow;
         } else {
@@ -112,34 +112,34 @@ export function PcImageDropper(p) {
 
 
     function rootDragOver(event) {
-        if(!testAcceptType(event)) {
+        if (!testAcceptType(event)) {
             return;
         }
         event.stopPropagation();
         event.preventDefault();
     }
     function rootDragEnter(event) {
-        if(!p.enabledTest() || !testAcceptType(event)) {
+        if (!p.enabledTest() || !testAcceptType(event)) {
             return;
         }
-        if(rootCounter === 0) {
+        if (rootCounter === 0) {
             p.target.appendChild(rootEl);
         }
         rootCounter++;
 
     }
     function rootDragLeave(event) {
-        if(!testAcceptType(event) || rootCounter === 0) {
+        if (!testAcceptType(event) || rootCounter === 0) {
             return;
         }
         rootCounter = Math.max(0, rootCounter - 1);
-        if(rootCounter === 0) {
+        if (rootCounter === 0) {
             p.target.removeChild(rootEl);
         }
 
     }
     function rootDrop(event) {
-        if(!testAcceptType(event) || event.dataTransfer.files.length === 0) {
+        if (!testAcceptType(event) || event.dataTransfer.files.length === 0) {
             destroy();
             return;
         }
@@ -147,16 +147,16 @@ export function PcImageDropper(p) {
         event.preventDefault();
 
         let optionStr = 'default';
-        if(optionLayerCounter > 0) {
+        if (optionLayerCounter > 0) {
             optionStr = 'layer';
-        } else if(optionImageCounter > 0) {
+        } else if (optionImageCounter > 0) {
             optionStr = 'image';
         }
 
         p.onDrop(event.dataTransfer.files, optionStr);
 
 
-        if(rootCounter > 0) {
+        if (rootCounter > 0) {
             p.target.removeChild(rootEl);
         }
         rootCounter = 0;

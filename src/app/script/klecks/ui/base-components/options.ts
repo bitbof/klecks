@@ -42,9 +42,12 @@ export const Options = function(p) {
         if (p.isSmall) {
             classArr.push('kl-option--small');
         }
-        if (typeof '' !== typeof o.label) {
+        if (typeof o.label !== 'string') {
             classArr.push('kl-option--custom-el');
-            o.label.style.pointerEvents = 'none';
+            BB.css(o.label, {
+                display: 'block',
+                pointerEvents: 'none',
+            });
         }
 
         optionObj.el = BB.el({
@@ -52,7 +55,7 @@ export const Options = function(p) {
             content: o.label,
             className: classArr.join(' '),
             onClick: function() {
-                if(selectedId !== optionObj.id) {
+                if (selectedId !== optionObj.id) {
                     selectedId = optionObj.id;
                     update();
                     p.onChange(selectedId);
@@ -68,8 +71,8 @@ export const Options = function(p) {
     }
 
     function update() {
-        for(let i = 0; i < optionArr.length; i++) {
-            if(optionArr[i].id === selectedId) {
+        for (let i = 0; i < optionArr.length; i++) {
+            if (optionArr[i].id === selectedId) {
                 BB.addClassName(optionArr[i].el, 'kl-option-selected');
             } else {
                 BB.removeClassName(optionArr[i].el, 'kl-option-selected');
@@ -77,7 +80,7 @@ export const Options = function(p) {
         }
     }
 
-    for(let i = 0; i < p.optionArr.length; i++) {
+    for (let i = 0; i < p.optionArr.length; i++) {
         createOption(p.optionArr[i]);
     }
 

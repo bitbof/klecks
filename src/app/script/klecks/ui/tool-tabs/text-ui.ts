@@ -4,7 +4,7 @@ import {BB} from '../../../bb/bb';
  * Text Tool tab contents (color slider)
  *
  * p = {
- *     colorSlider: PcColorSlider// when opening tab, inserts it (snatches it from where else it was)
+ *     colorSlider: KlColorSlider// when opening tab, inserts it (snatches it from where else it was)
  * }
  *
  * @param p
@@ -40,7 +40,7 @@ export function TextUi(p) {
     this.setIsVisible = function(pIsVisible) {
         isVisible = !!pIsVisible;
         div.style.display = isVisible ? 'block' : 'none';
-        if(isVisible) {
+        if (isVisible) {
             colorDiv.appendChild(p.colorSlider.getElement());
             colorDiv.appendChild(p.colorSlider.getOutputElement());
             //update();

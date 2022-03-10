@@ -16,7 +16,7 @@ import {calcSliderFalloffFactor} from './slider-falloff';
  * @param params
  * @constructor
  */
-export const PcSmallColorSlider = function (params) {
+export const KlSmallColorSlider = function (params) {
     const div = document.createElement('div');
     div.oncontextmenu = function(e) {
         e.preventDefault();
@@ -29,9 +29,7 @@ export const PcSmallColorSlider = function (params) {
         userSelect: 'none'
     });
 
-    const canvasSV = BB.canvas();
-    canvasSV.width = 10;
-    canvasSV.height = 10;
+    const canvasSV = BB.canvas(10, 10);
     canvasSV.style.width = params.width + 'px';
     canvasSV.style.height = params.heightSV + 'px';
     canvasSV.style.cursor = 'crosshair';
@@ -53,9 +51,7 @@ export const PcSmallColorSlider = function (params) {
 
     updateSV();
 
-    const canvasH = BB.canvas();
-    canvasH.width = params.width;
-    canvasH.height = params.heightH;
+    const canvasH = BB.canvas(params.width, params.heightH);
     canvasH.style.cursor = 'ew-resize';
     (function () {
         const ctx = canvasH.getContext('2d');
@@ -112,7 +108,7 @@ export const PcSmallColorSlider = function (params) {
             left: left + 'px',
             top: top + 'px'
         });
-        /*if(top < params.heightSV/3) {
+        /*if (top < params.heightSV/3) {
         pointerSV.style.border = "1px solid rgba(0,0,0,1)";
     } else {
         pointerSV.style.border = "1px solid rgba(255,255,255,1)";
@@ -139,9 +135,9 @@ export const PcSmallColorSlider = function (params) {
         fixScribble: true,
         onPointer: function(event) {
 
-            if(event.type === 'pointerdown') {
+            if (event.type === 'pointerdown') {
                 svPointerId = event.pointerId;
-                if(event.button === 'left') {
+                if (event.button === 'left') {
 
                     virtualHSV.s = event.relX / params.width * 100;
                     virtualHSV.v = 100 - event.relY / params.heightSV * 100;
@@ -156,10 +152,10 @@ export const PcSmallColorSlider = function (params) {
                 }
             }
 
-            if(event.type === 'pointermove' && ['left', 'right'].includes(event.button) && svPointerId === event.pointerId) {
+            if (event.type === 'pointermove' && ['left', 'right'].includes(event.button) && svPointerId === event.pointerId) {
 
                 let factor = 1;
-                if(event.button === 'right') {
+                if (event.button === 'right') {
                     factor = 0.5;
                 }
 
@@ -171,7 +167,7 @@ export const PcSmallColorSlider = function (params) {
                 params.callback(BB.ColorConverter.toRGB(color));
 
             }
-            if(event.type === 'pointerup') {
+            if (event.type === 'pointerup') {
                 svPointerId = null;
             }
 
@@ -185,9 +181,9 @@ export const PcSmallColorSlider = function (params) {
         fixScribble: true,
         onPointer: function(event) {
 
-            if(event.type === 'pointerdown') {
+            if (event.type === 'pointerdown') {
                 hPointerId = event.pointerId;
-                if(event.button === 'left') {
+                if (event.button === 'left') {
 
                     virtualHSV.h = event.relX / params.width * 359.99;
 
@@ -200,14 +196,14 @@ export const PcSmallColorSlider = function (params) {
                 }
             }
 
-            if(event.type === 'pointermove' && ['left', 'right'].includes(event.button) && hPointerId === event.pointerId) {
+            if (event.type === 'pointermove' && ['left', 'right'].includes(event.button) && hPointerId === event.pointerId) {
 
                 const deltaY = Math.abs(event.pageY - event.downPageY);
                 const factor = calcSliderFalloffFactor(deltaY, event.button === 'right');
 
                 virtualHSV.h += event.dX / params.width * 359.99 * factor;
 
-                if(event.button === 'right') {
+                if (event.button === 'right') {
                     virtualHSV.h = virtualHSV.h % 359.99;
                     if (virtualHSV.h < 0) {
                         virtualHSV.h += 359.99;
@@ -220,7 +216,7 @@ export const PcSmallColorSlider = function (params) {
                 params.callback(BB.ColorConverter.toRGB(color));
 
             }
-            if(event.type === 'pointerup') {
+            if (event.type === 'pointerup') {
                 hPointerId = null;
             }
         }

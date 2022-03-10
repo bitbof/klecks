@@ -4,12 +4,13 @@ import {eventResMs} from './brushes-consts';
 import {Checkbox} from '../ui/base-components/checkbox';
 import {brushes} from '../brushes/brushes';
 import {klHistory} from '../history/kl-history';
-import {PcSlider} from '../ui/base-components/slider';
+import {KlSlider} from '../ui/base-components/kl-slider';
 // @ts-ignore
-import brushIconImg from 'url:~/src/app/img/ui/brush-smooth.png';
+import brushIconImg from 'url:~/src/app/img/ui/brush-blend.svg';
+import {IBrushUi} from '../kl.types';
 
 export const blendBrushUi = (function () {
-    let brushInterface: any = {
+    let brushInterface: IBrushUi = {
         image: brushIconImg,
         tooltip: 'Blend',
         sizeSlider: {
@@ -20,13 +21,10 @@ export const blendBrushUi = (function () {
         opacitySlider: {
             min: 1 / 100,
             max: 1
-        }
+        },
+        Ui: null,
     };
 
-    /**
-     * @param p = {onSizeChange: function(size), onOpacityChange: function(opacity)}
-     * @constructor
-     */
     brushInterface.Ui = function (p) {
         let div = document.createElement("div"); // the gui
         let brush = new brushes.BlendBrush();
@@ -41,7 +39,7 @@ export const blendBrushUi = (function () {
         }
 
         function init() {
-            sizeSlider = new PcSlider({
+            sizeSlider = new KlSlider({
                 label: 'Size',
                 width: 225,
                 height: 30,
@@ -59,7 +57,7 @@ export const blendBrushUi = (function () {
                     return Math.round(v);
                 }
             });
-            opacitySlider = new PcSlider({
+            opacitySlider = new KlSlider({
                 label: 'Opacity',
                 width: 225,
                 height: 30,
@@ -75,7 +73,7 @@ export const blendBrushUi = (function () {
                     return Math.round(v * 100);
                 }
             });
-            let blendingSlider = new PcSlider({
+            let blendingSlider = new KlSlider({
                 label: 'Blending',
                 width: 225,
                 height: 30,

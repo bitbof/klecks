@@ -1,14 +1,15 @@
 import {getSharedFx} from './shared-gl-fx';
+import {IFilterApply} from '../kl.types';
 
 export const invert = {
 
-    apply(params) {
+    apply(params: IFilterApply) {
         let context = params.context;
         let history = params.history;
         if (!context || !history) {
             return false;
         }
-        history.pause();
+        history.pause(true);
 
         let glCanvas = getSharedFx();
         if (!glCanvas) {
@@ -21,7 +22,7 @@ export const invert = {
         texture.destroy();
 
         history.pause(false);
-        history.add({
+        history.push({
             tool: ["filter", "invert"],
             action: "apply",
             params: [{

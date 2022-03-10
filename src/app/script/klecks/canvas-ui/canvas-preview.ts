@@ -37,7 +37,7 @@ export function KlCanvasPreview(p) {
     function render() {
         ctx.save();
         ctx.clearRect(0, 0, canvas.width, canvas.height);
-        for(let i = 0; i < p.layerArr.length; i++) {
+        for (let i = 0; i < p.layerArr.length; i++) {
             ctx.globalAlpha = parseFloat(p.layerArr[i].opacity);
             ctx.globalCompositeOperation = p.layerArr[i].mixModeStr;
             if (canvas.width > p.layerArr[i].canvas.width) {

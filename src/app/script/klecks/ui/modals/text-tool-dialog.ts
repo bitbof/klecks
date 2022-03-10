@@ -4,7 +4,7 @@ import {ColorOptions} from '../base-components/color-options';
 import {Select} from '../base-components/select';
 import {ImageRadioList} from '../base-components/image-radio-list';
 import {ImageToggle} from '../base-components/image-toggle';
-import {PcSlider} from '../base-components/slider';
+import {KlSlider} from '../base-components/kl-slider';
 import {popup} from './popup';
 // @ts-ignore
 import alignLeftImg from 'url:~/src/app/img/ui/align-left.svg';
@@ -20,26 +20,11 @@ import typoBoldImg from 'url:~/src/app/img/ui/typo-bold.svg';
 import toolZoomInImg from 'url:~/src/app/img/ui/tool-zoom-in.svg';
 // @ts-ignore
 import toolZoomOutImg from 'url:~/src/app/img/ui/tool-zoom-out.svg';
+import {IRGB} from '../../kl.types';
+import {KlCanvas} from '../../canvas/kl-canvas';
 
 /**
  * Text Tool dialog
- *
- * p = {
- *     klCanvas: klCanvas,
- *     layerIndex: number,
- *     x: number,
- *     y: number,
- *     angleRad: number,
- *     color: rgb,
- *     secondaryColor: rgb,
- *     size: number, // px
- *     align: 'left' | 'center' | 'right', // default 'left'
- *     isBold: boolean, // default false
- *     isItalic: boolean, // default false
- *     font: 'serif' | 'monospace' | 'sans-serif' | 'cursive' | 'fantasy', // default sans-serif
- *     opacity: number, // 0 - 1; default 1
- *     onConfirm: function(confirmP)
- * }
  *
  * confirmP = {
  *     x: number,
@@ -56,7 +41,24 @@ import toolZoomOutImg from 'url:~/src/app/img/ui/tool-zoom-out.svg';
  *
  * @param p
  */
-export function textToolDialog(p) {
+export function textToolDialog(
+    p: {
+        klCanvas: KlCanvas;
+        layerIndex: number;
+        x: number;
+        y: number;
+        angleRad: number;
+        color: IRGB;
+        secondaryColor: IRGB;
+        size: number; // px
+        align: 'left' | 'center' | 'right'; // default 'left'
+        isBold: boolean; // default false
+        isItalic: boolean; // default false
+        font: 'serif' | 'monospace' | 'sans-serif' | 'cursive' | 'fantasy'; // default sans-serif
+        opacity: number; // 0 - 1; default 1
+        onConfirm: (confirmP) => void;
+    }
+) {
 
     let div = BB.el({});
 
@@ -125,17 +127,18 @@ export function textToolDialog(p) {
 
         // --- draw text ---
         textCtx.clearRect(0, 0, textCanvas.width, textCanvas.height);
-        let colorRGBA = p.color;
-        colorRGBA.a = opacitySlider.getValue();
-        let bounds = renderText({
-            canvas: textCanvas,
+        let colorRGBA = {
+            ...p.color,
+            a: opacitySlider.getValue(),
+        };
+        let bounds = renderText(textCanvas, {
             x: p.x,
             y: p.y,
             textStr: textInput.value,
             align: alignRadioList.getValue(),
             isItalic: italicToggle.getValue(),
             isBold: boldToggle.getValue(),
-            size: sizeInput.value,
+            size: parseFloat(sizeInput.value),
             font: fontSelect.getValue(),
             color: BB.ColorConverter.toRgbaStr(colorRGBA),
             angleRad: p.angleRad
@@ -160,7 +163,7 @@ export function textToolDialog(p) {
         // --- compose text and target layer ---
         targetCtx.save();
 
-        if(scale >= 4) {
+        if (scale >= 4) {
             targetCtx.imageSmoothingEnabled = false;
         } else {
             targetCtx.imageSmoothingEnabled = true;
@@ -206,7 +209,7 @@ export function textToolDialog(p) {
 
         { // individual layers
 
-            if(scale >= 4) {
+            if (scale >= 4) {
                 layersCtx.imageSmoothingEnabled = false;
             } else {
                 layersCtx.imageSmoothingEnabled = true;
@@ -529,7 +532,7 @@ export function textToolDialog(p) {
 
 
 
-    let opacitySlider = new PcSlider({
+    let opacitySlider = new KlSlider({
         label: 'Opacity',
         width: 150,
         height: 30,

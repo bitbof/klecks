@@ -51,9 +51,9 @@ export const popup = function (params) {
     BB.addEventListener(div, 'wheel', wheelPrevent);
 
     let autoFocusArr = [];
-    if(params.autoFocus) {
+    if (params.autoFocus) {
         autoFocusArr = [params.autoFocus];
-    } else if(params.autoFocus === false) {
+    } else if (params.autoFocus === false) {
         autoFocusArr = [];
     } else {
         autoFocusArr = ['Ok', 'Yes', 'Upload'];
@@ -78,7 +78,7 @@ export const popup = function (params) {
     content.className = 'popup-content';
 
     function closePopup(result) {
-        if(destructed) {
+        if (destructed) {
             return;
         }
         dialogCounter.count--;
@@ -126,7 +126,7 @@ export const popup = function (params) {
     content.appendChild(message);
     if (params.div) {
         content.appendChild(params.div);
-        if(params.buttons) {
+        if (params.buttons) {
             params.div.style.marginBottom = '20px';
         }
     }
@@ -165,13 +165,13 @@ export const popup = function (params) {
             closePopup(label);
         };
 
-        if(autoFocusArr.includes(label)) {
+        if (autoFocusArr.includes(label)) {
             setTimeout(function () {
                 button.focus();
             }, 10);
         }
 
-        if(label === params.clickOnEnter) {
+        if (label === params.clickOnEnter) {
             clickOnEnterButton = button;
         }
 
@@ -180,7 +180,7 @@ export const popup = function (params) {
     /*for (let i = params.buttons.length - 1; i >= 0; i--) {
         addbutton(params.buttons[i], i);
     }*/
-    if(params.buttons) {
+    if (params.buttons) {
         for (let i = 0; i < params.buttons.length; i++) {
             addbutton(params.buttons[i], i);
         }
@@ -198,7 +198,7 @@ export const popup = function (params) {
             if (destructed) {
                 return;
             }
-            if(clickOnEnterButton !== null && comboStr === 'enter' && !BB.isInputFocused()) {
+            if (clickOnEnterButton !== null && comboStr === 'enter' && !BB.isInputFocused()) {
                 e.stopPropagation();
                 setTimeout(function() {
                     clickOnEnterButton.click();
@@ -300,7 +300,7 @@ export const Popup = function(p) {
         keyListener.destroy();
         BB.destroyEl(xButton);
         BB.destroyEl(bgEl);
-        if(p.onClose) {
+        if (p.onClose) {
             p.onClose();
         }
     }
@@ -361,7 +361,7 @@ export const Popup = function(p) {
             paddingLeft: (titleHeight / 2) + 'px'
         }
     });
-    if(p.title) {
+    if (p.title) {
         titleEl.appendChild(p.title);
     }
     const xButton = BB.el({
@@ -383,7 +383,7 @@ export const Popup = function(p) {
             height: 'calc(100% - ' + titleHeight + 'px)'
         }
     });
-    if(p.content) {
+    if (p.content) {
         contentEl.appendChild(p.content);
     }
 

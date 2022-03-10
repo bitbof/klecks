@@ -17,7 +17,7 @@ export const eventUsesHighResTimeStamp = (function() {
     }
 
     return function(): boolean {
-        if(eventUsesHighResTimeStamp === null) {
+        if (eventUsesHighResTimeStamp === null) {
             throw 'eventUsesHighResTimeStamp not initialized';
         }
         return eventUsesHighResTimeStamp;

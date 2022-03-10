@@ -12,10 +12,12 @@ import duplicateLayerImg from 'url:~/src/app/img/ui/duplicate-layer.svg';
 import mergeLayerImg from 'url:~/src/app/img/ui/merge-layers.svg';
 // @ts-ignore
 import removeLayerImg from 'url:~/src/app/img/ui/remove-layer.svg';
+import {KlCanvas} from '../../canvas/kl-canvas';
+import {IMixMode} from '../../kl.types';
 
 
-export function pcLayerManager(p_canvas, p_func, p_rootDiv) {
-    let klCanvas = p_canvas;
+export function klLayerManager(p_canvas: KlCanvas, p_func, p_rootDiv) {
+    let klCanvas: KlCanvas = p_canvas;
     let layerElArr = [];
     let layerHeight = 35;
     let layerSpacing = 0;
@@ -147,12 +149,12 @@ export function pcLayerManager(p_canvas, p_func, p_rootDiv) {
                 });
                 suggestionBtns.splice(0, suggestionBtns.length);
                 if (val === "Rename") {
-                    if(input.value === klCanvas.getLayer(layer).name) {
+                    if (input.value === klCanvas.getLayer(layer).name) {
                         return;
                     }
                     klCanvas.renameLayer(layer, input.value.replace(/[^\w\s]/gi, ''));
                     createLayerList();
-                    klHistory.pause();
+                    klHistory.pause(true);
                     updatefunc(layer);
                     klHistory.pause(false);
                 }
@@ -247,7 +249,7 @@ export function pcLayerManager(p_canvas, p_func, p_rootDiv) {
                 removeBtn.disabled = false;
                 selectedSpotIndex = selectedSpotIndex + 1;
                 createLayerList();
-                klHistory.pause();
+                klHistory.pause(true);
                 updatefunc(selectedSpotIndex);
                 klHistory.pause(false);
             };
@@ -263,7 +265,7 @@ export function pcLayerManager(p_canvas, p_func, p_rootDiv) {
                 removeBtn.disabled = false;
                 selectedSpotIndex++;
                 createLayerList();
-                klHistory.pause();
+                klHistory.pause(true);
                 updatefunc(selectedSpotIndex);
                 klHistory.pause(false);
             };
@@ -278,7 +280,7 @@ export function pcLayerManager(p_canvas, p_func, p_rootDiv) {
                 }
                 klCanvasLayerArr = klCanvas.getLayers();
                 createLayerList();
-                klHistory.pause();
+                klHistory.pause(true);
                 updatefunc(selectedSpotIndex);
                 klHistory.pause(false);
                 if (klCanvasLayerArr.length === 1) {
@@ -351,7 +353,7 @@ export function pcLayerManager(p_canvas, p_func, p_rootDiv) {
                         }
                         ctx.drawImage(p.bottomCanvas, 0, 0, preview.width, preview.height);
 
-                        if(options.getValue() === 'as-alpha') {
+                        if (options.getValue() === 'as-alpha') {
                             ctx.globalCompositeOperation = 'destination-in';
                             ctx.globalAlpha = p.topOpacity;
                             ctx.drawImage(alphaCanvas, 0, 0, preview.width, preview.height);
@@ -395,7 +397,7 @@ export function pcLayerManager(p_canvas, p_func, p_rootDiv) {
                 mergeDialog({
                     topCanvas: klCanvasLayerArr[selectedSpotIndex].context.canvas,
                     bottomCanvas: klCanvasLayerArr[selectedSpotIndex - 1].context.canvas,
-                    topOpacity: parseFloat(klCanvas.getLayer(selectedSpotIndex).opacity),
+                    topOpacity: klCanvas.getLayer(selectedSpotIndex).opacity,
                     mixModeStr: klCanvasLayerArr[selectedSpotIndex].mixModeStr,
                     callback: function (mode) {
                         klCanvas.mergeLayers(selectedSpotIndex, selectedSpotIndex - 1, mode);
@@ -409,7 +411,7 @@ export function pcLayerManager(p_canvas, p_func, p_rootDiv) {
                             duplicateBtn.disabled = false;
                         }
                         createLayerList();
-                        klHistory.pause();
+                        klHistory.pause(true);
                         updatefunc(selectedSpotIndex);
                         klHistory.pause(false);
                     }
@@ -460,7 +462,7 @@ export function pcLayerManager(p_canvas, p_func, p_rootDiv) {
                 ['luminosity', 'luminosity']
             ],
             onChange: function(val) {
-                klCanvas.setMixMode(selectedSpotIndex, val);
+                klCanvas.setMixMode(selectedSpotIndex, val as IMixMode);
                 (div as any).update(selectedSpotIndex);
             },
             css: {
@@ -583,12 +585,12 @@ export function pcLayerManager(p_canvas, p_func, p_rootDiv) {
                 width: 204,
                 pointSize: 14,
                 callback: function(sliderValue, isFirst, isLast) {
-                    if(isFirst) {
+                    if (isFirst) {
                         oldOpacity = klCanvas.getLayer((layer as any).spot).opacity;
-                        klHistory.pause();
+                        klHistory.pause(true);
                         return;
                     }
-                    if(isLast) {
+                    if (isLast) {
                         klHistory.pause(false);
                         if (oldOpacity !== sliderValue) {
                             klCanvas.layerOpacity((layer as any).spot, sliderValue);
@@ -608,13 +610,13 @@ export function pcLayerManager(p_canvas, p_func, p_rootDiv) {
 
             //larger layer preview - hover
             BB.setEventListener((layer as any).thumb, 'onpointerover', function (e) {
-                if(e.buttons !== 0 && (!e.pointerType || e.pointerType !== 'touch')) { //shouldn't show while dragging
+                if (e.buttons !== 0 && (!e.pointerType || e.pointerType !== 'touch')) { //shouldn't show while dragging
                     return;
                 }
 
                 let thumbDimensions = BB.fitInto(layercanvas.width, layercanvas.height, 250, 250, 1);
 
-                if(largeThumbCanvas.width !== thumbDimensions.width || largeThumbCanvas.height !== thumbDimensions.height) {
+                if (largeThumbCanvas.width !== thumbDimensions.width || largeThumbCanvas.height !== thumbDimensions.height) {
                     largeThumbCanvas.width = thumbDimensions.width;
                     largeThumbCanvas.height = thumbDimensions.height;
                 }
@@ -711,7 +713,7 @@ export function pcLayerManager(p_canvas, p_func, p_rootDiv) {
                     let oldSpot = (layer as any).spot;
                     move((layer as any).spot, newSpot);
                     if (oldSpot != newSpot) {
-                        klHistory.pause();
+                        klHistory.pause(true);
                         updatefunc(selectedSpotIndex);
                         klHistory.pause(false);
                     }
@@ -760,7 +762,7 @@ export function pcLayerManager(p_canvas, p_func, p_rootDiv) {
     //update css position of all layers that are not being dragged, while dragging
     function updateLayersVerticalPosition(id, newspot) {
         newspot = Math.min(klCanvasLayerArr.length - 1, Math.max(0, newspot));
-        if(newspot === lastpos) {
+        if (newspot === lastpos) {
             return;
         }
         for (let i = 0; i < klCanvasLayerArr.length; i++) {
@@ -781,7 +783,7 @@ export function pcLayerManager(p_canvas, p_func, p_rootDiv) {
     }
 
     function move(oldSpotIndex, newSpotIndex) {
-        if(isNaN(oldSpotIndex) || isNaN(newSpotIndex)) {
+        if (isNaN(oldSpotIndex) || isNaN(newSpotIndex)) {
             throw 'layermanager - invalid move';
         }
         for (let i = 0; i < klCanvasLayerArr.length; i++) {
@@ -813,7 +815,7 @@ export function pcLayerManager(p_canvas, p_func, p_rootDiv) {
     //updating the thumbs in interval
     //don't update when: manager not visible || layer didn't change || is drawing
     let updateThumbsInterval = setInterval(function() {
-        if(div.style.display !== "block") {
+        if (div.style.display !== "block") {
             return;
         }
 
@@ -823,7 +825,7 @@ export function pcLayerManager(p_canvas, p_func, p_rootDiv) {
         }
         oldHistoryState = historyState;
 
-        for(let i = 0; i < layerElArr.length; i++) {
+        for (let i = 0; i < layerElArr.length; i++) {
             if (selectedSpotIndex === layerElArr[i].spot && klCanvasLayerArr[layerElArr[i].spot]) { // second check, because might be out of date
                 let ctx = layerElArr[i].thumb.getContext("2d");
                 ctx.save();
@@ -842,7 +844,7 @@ export function pcLayerManager(p_canvas, p_func, p_rootDiv) {
 
     (div as any).update = function (activeLayerSpotIndex) {
         klCanvasLayerArr = klCanvas.getLayers();
-        if(activeLayerSpotIndex || activeLayerSpotIndex === 0) {
+        if (activeLayerSpotIndex || activeLayerSpotIndex === 0) {
             selectedSpotIndex = activeLayerSpotIndex;
         }
         removeBtn.disabled = klCanvasLayerArr.length === 1;
@@ -861,7 +863,7 @@ export function pcLayerManager(p_canvas, p_func, p_rootDiv) {
         return selectedSpotIndex;
     };
     (div as any).activateLayer = function (spotIndex) {
-        if(spotIndex < 0 || spotIndex > layerElArr.length - 1) {
+        if (spotIndex < 0 || spotIndex > layerElArr.length - 1) {
             throw 'invalid spotIndex ' + spotIndex + ', layerElArr.length ' + layerElArr.length;
         }
         selectedSpotIndex = spotIndex;

@@ -3,23 +3,24 @@ import {input} from '../ui/base-components/input';
 import {Checkbox} from '../ui/base-components/checkbox';
 import {ColorOptions} from '../ui/base-components/color-options';
 import {Cropper} from '../ui/components/cropper';
+import {IFilterApply, IFilterGetDialogParam} from '../kl.types';
 
 export const cropExtend = {
 
-    getDialog(params) {
+    getDialog(params: IFilterGetDialogParam) {
         const canvas = params.canvas;
         if (!canvas)
             return false;
         const tempCanvas = BB.canvas();
-        (function () {
-            let fit = BB.fitInto(canvas.width, canvas.height, 560, 400, 1);
+        {
+            let fit = BB.fitInto(canvas.getWidth(), canvas.getHeight(), 560, 400, 1);
             let w = parseInt('' + fit.width), h = parseInt('' + fit.height);
-            let previewFactor = w / canvas.width;
+            let previewFactor = w / canvas.getWidth();
             tempCanvas.width = w;
             tempCanvas.height = h;
             tempCanvas.style.display = 'block';
             tempCanvas.getContext("2d").drawImage(canvas.getCompleteCanvas(previewFactor), 0, 0, w, h);
-        })();
+        }
 
         const div = document.createElement("div");
         const result: any = {
@@ -47,7 +48,7 @@ export const cropExtend = {
         const leftInput = input({
             init: 0,
             type: 'number',
-            min: -canvas.width,
+            min: -canvas.getWidth(),
             max: maxWidth,
             css: {width: '75px', marginRight: '20px'},
             callback: function(v) {
@@ -58,7 +59,7 @@ export const cropExtend = {
         const rightInput = input({
             init: 0,
             type: 'number',
-            min: -canvas.width,
+            min: -canvas.getWidth(),
             max: maxWidth,
             css: {width: '75px'},
             callback: function(v) {
@@ -69,7 +70,7 @@ export const cropExtend = {
         const topInput = input({
             init: 0,
             type: 'number',
-            min: -canvas.height,
+            min: -canvas.getHeight(),
             max: maxHeight,
             css: {width: '75px', marginRight: '20px'},
             callback: function(v) {
@@ -80,7 +81,7 @@ export const cropExtend = {
         const bottomInput = input({
             init: 0,
             type: 'number',
-            min: -canvas.height,
+            min: -canvas.getHeight(),
             max: maxHeight,
             css: {width: '75px'},
             callback: function(v) {
@@ -93,63 +94,67 @@ export const cropExtend = {
             display: 'inline-block',
             width: '60px'
         };
-        lrWrapper.appendChild(BB.el({content: 'Left:', css: labelStyle}));
-        lrWrapper.appendChild(leftInput);
-        lrWrapper.appendChild(BB.el({content: 'Right:', css: labelStyle}));
-        lrWrapper.appendChild(rightInput);
-        tbWrapper.appendChild(BB.el({content: 'Top:', css: labelStyle}));
-        tbWrapper.appendChild(topInput);
-        tbWrapper.appendChild(BB.el({content: 'Bottom:', css: labelStyle}));
-        tbWrapper.appendChild(bottomInput);
+        lrWrapper.append(
+            BB.el({content: 'Left:', css: labelStyle}),
+            leftInput,
+            BB.el({content: 'Right:', css: labelStyle}),
+            rightInput
+        );
+        tbWrapper.append(
+            BB.el({content: 'Top:', css: labelStyle}),
+            topInput,
+            BB.el({content: 'Bottom:', css: labelStyle}),
+            bottomInput
+        );
 
         function updateInput() {
             left = parseInt(leftInput.value);
             right = parseInt(rightInput.value);
             top = parseInt(topInput.value);
             bottom = parseInt(bottomInput.value);
-            let newWidth = canvas.width + left + right;
-            let newHeight = canvas.height + top + bottom;
+            let newWidth = canvas.getWidth() + left + right;
+            let newHeight = canvas.getHeight() + top + bottom;
 
             if (newWidth <= 0) {
                 if (leftChanged) {
-                    left = -canvas.width - right + 1;
+                    left = -canvas.getWidth() - right + 1;
                     leftInput.value = '' + left;
                 }
                 if (rightChanged) {
-                    right = -canvas.width - left + 1;
+                    right = -canvas.getWidth() - left + 1;
                     rightInput.value = '' + right;
                 }
                 newWidth = 1;
             }
             if (newWidth > maxWidth) {
                 if (leftChanged) {
-                    left = -canvas.width - right + maxWidth;
+                    left = -canvas.getWidth() - right + maxWidth;
                     leftInput.value = '' + left;
                 }
                 if (rightChanged) {
-                    right = -canvas.width - left + maxWidth;
+                    right = -canvas.getWidth() - left + maxWidth;
                     rightInput.value = '' + right;
                 }
                 newWidth = maxWidth;
             }
             if (newHeight <= 0) {
                 if (topChanged) {
-                    top = -canvas.height - bottom + 1;
+                    top = -canvas.getHeight() - bottom + 1;
                     topInput.value = '' + top;
                 }
                 if (bottomChanged) {
-                    bottom = -canvas.height - top + 1;
+                    bottom = -canvas.getHeight() - top + 1;
                     bottomInput.value = '' + bottom;
                 }
                 newHeight = 1;
             }
             if (newHeight > maxHeight) {
                 if (topChanged) {
-                    top = -canvas.height - bottom + maxHeight;
+                    top = -canvas.getHeight() - bottom + maxHeight;
                     topInput.value = '' + top;
                 }
                 if (bottomChanged) {
-                    bottom = -canvas.height - top + maxHeight;
+                    bottom = -canvas.getHeight() - top + maxHeight;
                     bottomInput.value = '' + bottom;
                 }
                 newHeight = maxHeight;
@@ -232,16 +237,16 @@ export const cropExtend = {
 
             const offset = BB.centerWithin(340, 220, fit.width, fit.height);
 
-            tempCanvas.style.width = canvas.width * scale + "px";
-            tempCanvas.style.height = canvas.height * scale + "px";
+            tempCanvas.style.width = canvas.getWidth() * scale + "px";
+            tempCanvas.style.height = canvas.getHeight() * scale + "px";
 
             offsetWrapper.style.left = (offset.x - transform.x * scale) + "px";
             offsetWrapper.style.top = (offset.y - transform.y * scale) + "px";
 
             left = parseInt('' + -transform.x);
             top = parseInt('' + -transform.y);
-            right = parseInt('' + (transform.x + transform.width - canvas.width));
-            bottom = parseInt('' + (transform.y + transform.height - canvas.height));
+            right = parseInt('' + (transform.x + transform.width - canvas.getWidth()));
+            bottom = parseInt('' + (transform.y + transform.height - canvas.getHeight()));
             leftInput.value = '' + left;
             topInput.value = '' + top;
             rightInput.value = '' + right;
@@ -306,8 +311,8 @@ export const cropExtend = {
         const cropper = new Cropper({
             x: 0,
             y: 0,
-            width: canvas.width,
-            height: canvas.height,
+            width: canvas.getWidth(),
+            height: canvas.getHeight(),
             scale: scale,
             callback: update,
             maxW: maxWidth,
@@ -351,16 +356,16 @@ export const cropExtend = {
         return result;
     },
 
-    apply(params) {
+    apply(params: IFilterApply) {
         const canvas = params.canvas;
         const history = params.history;
         if (!canvas || !history || isNaN(params.input.left) || isNaN(params.input.right) || isNaN(params.input.top) || isNaN(params.input.bottom)) {
             return false;
         }
-        history.pause();
+        history.pause(true);
         canvas.resizeCanvas(params.input);
         history.pause(false);
-        history.add({
+        history.push({
             tool: ["filter", "cropExtend"],
             action: "apply",
             params: [{

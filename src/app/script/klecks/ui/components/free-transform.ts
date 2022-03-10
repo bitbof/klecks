@@ -704,7 +704,7 @@ export class FreeTransform {
 
                             this.corners[indexes[0]].x = this.corners[i].x;
                             this.corners[indexes[1]].y = this.corners[i].y;
-                            if(this.keyListener.isPressed('shift')) {
+                            if (this.keyListener.isPressed('shift')) {
                                 this.corners[indexes[2]].x -= dX;
                                 this.corners[indexes[2]].y -= dY;
                                 this.corners[indexes[1]].x = this.corners[indexes[2]].x;

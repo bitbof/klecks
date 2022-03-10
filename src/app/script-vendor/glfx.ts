@@ -428,7 +428,7 @@ var Shader = (function() {
         this.program = gl.createProgram();
         vertexSource = vertexSource || defaultVertexSource;
         fragmentSource = fragmentSource || defaultFragmentSource;
-        if(floatPrecision === null) {
+        if (floatPrecision === null) {
             floatPrecision = testPrecisionSupport(gl.HIGH_FLOAT) ? 'highp' : (testPrecisionSupport(gl.MEDIUM_FLOAT) ? 'mediump' : 'lowp');
         }
         fragmentSource = 'precision ' + floatPrecision + ' float;' + fragmentSource; // annoying requirement is annoying
@@ -1890,9 +1890,9 @@ function toAlpha(isInverted, replaceRGBA) {
     void main() {\
         vec4 color = texture2D(texture, texCoord);\
         float alpha = (color.r + color.g + color.b) / 3.0;\
-        if(isInverted) alpha = 1.0 - alpha;\
+        if (isInverted) alpha = 1.0 - alpha;\
         alpha = min(color.a, alpha);\
-        if(replace.a > 0.0) color = replace;\
+        if (replace.a > 0.0) color = replace;\
         gl_FragColor = vec4(color.r, color.g, color.b, alpha);\
     }\
 ', 'toAlpha');

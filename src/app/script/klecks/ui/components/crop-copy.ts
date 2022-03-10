@@ -42,7 +42,7 @@ export function CropCopy(param) {
         croppedCanvas.height = Math.round(crop.height);
         let ctx = croppedCanvas.getContext('2d');
         ctx.drawImage(param.canvas, Math.round(-crop.x), Math.round(-crop.y));
-        if(croppedImage) {
+        if (croppedImage) {
             croppedImage.src = croppedCanvas.toDataURL('image/png');
         }
 
@@ -75,7 +75,7 @@ export function CropCopy(param) {
     const croppedCanvas = BB.canvas();
     let eventTarget = croppedCanvas;
     let croppedImage = null;
-    if(!param.isNotCopy) { //navigator.appName === 'Microsoft Internet Explorer') { //i would prefer not using an image
+    if (!param.isNotCopy) { //navigator.appName === 'Microsoft Internet Explorer') { //i would prefer not using an image
         croppedImage = new Image();
         eventTarget = croppedImage;
     }
@@ -102,10 +102,8 @@ export function CropCopy(param) {
         previewWrapper.style.backgroundImage = 'url('+v+')';
     });
 
-    const thumbCanvas = BB.canvas();
     const thumbSize = BB.fitInto(param.canvas.width, param.canvas.height, param.width - padding * 2, param.height - padding * 2, 1);
-    thumbCanvas.width = parseInt('' + thumbSize.width);
-    thumbCanvas.height = parseInt('' + thumbSize.height);
+    const thumbCanvas = BB.canvas(Math.round(thumbSize.width), Math.round(thumbSize.height));
     thumbCanvas.style.imageRendering = 'pixelated';
     const scaleW = thumbCanvas.width / param.canvas.width;
     const scaleH = thumbCanvas.height / param.canvas.height;
@@ -182,7 +180,7 @@ export function CropCopy(param) {
                     x: event.relX,
                     y: event.relY
                 };
-                if(!isReset() && isInsideSelectionRect(startP)) {
+                if (!isReset() && isInsideSelectionRect(startP)) {
                     startCrop = {
                         x: crop.x,
                         y: crop.y,
@@ -195,7 +193,7 @@ export function CropCopy(param) {
             } else if (event.type === 'pointermove' && event.button === 'left') {
                 event.eventPreventDefault();
                 didMove = true;
-                if(startCrop) {
+                if (startCrop) {
                     crop.x = startCrop.x + Math.round((event.relX - startP.x) / scaleW);
                     crop.y = startCrop.y + Math.round((event.relY - startP.y) / scaleH);
                     crop.x = BB.clamp(crop.x, 0, param.canvas.width - crop.width);
@@ -209,7 +207,7 @@ export function CropCopy(param) {
                 isDragging = false;
                 startCrop = null;
                 startP = null;
-                if(crop.width === 0 || crop.height === 0 || !didMove) {
+                if (crop.width === 0 || crop.height === 0 || !didMove) {
                     resetCrop();
                     updateSelectionRect();
                 }
@@ -221,7 +219,7 @@ export function CropCopy(param) {
 
     const keyListener = new BB.KeyListener({
         onDown: function(keyStr, e, comboStr) {
-            if(isDragging) {
+            if (isDragging) {
                 return;
             }
             let doUpdate = false;
@@ -229,32 +227,32 @@ export function CropCopy(param) {
             let stepSize = Math.max(1, 1 / scaleW);
             let shiftIsPressed = keyListener.isPressed('shift');
 
-            if(keyStr === 'left') {
-                if(shiftIsPressed) {
+            if (keyStr === 'left') {
+                if (shiftIsPressed) {
                     crop.width = BB.clamp(crop.width - stepSize, 1, param.canvas.width - crop.x);
                 } else {
                     crop.x = BB.clamp(crop.x - stepSize, 0, param.canvas.width - crop.width);
                 }
                 doUpdate = true;
             }
-            if(keyStr === 'right') {
-                if(shiftIsPressed) {
+            if (keyStr === 'right') {
+                if (shiftIsPressed) {
                     crop.width = BB.clamp(crop.width + stepSize, 1, param.canvas.width - crop.x);
                 } else {
                     crop.x = BB.clamp(crop.x + stepSize, 0, param.canvas.width - crop.width);
                 }
                 doUpdate = true;
             }
-            if(keyStr === 'up') {
-                if(shiftIsPressed) {
+            if (keyStr === 'up') {
+                if (shiftIsPressed) {
                     crop.height = BB.clamp(crop.height - stepSize, 1, param.canvas.height - crop.y);
                 } else {
                     crop.y = BB.clamp(crop.y - stepSize, 0, param.canvas.height - crop.height);
                 }
                 doUpdate = true;
             }
-            if(keyStr === 'down') {
-                if(shiftIsPressed) {
+            if (keyStr === 'down') {
+                if (shiftIsPressed) {
                     crop.height = BB.clamp(crop.height + stepSize, 1, param.canvas.height - crop.y);
                 } else {
                     crop.y = BB.clamp(crop.y + stepSize, 0, param.canvas.height - crop.height);
@@ -262,7 +260,7 @@ export function CropCopy(param) {
                 doUpdate = true;
             }
 
-            if(doUpdate) {
+            if (doUpdate) {
                 e.preventDefault();
                 updateSelectionRect();
                 clearTimeout(updateCropTimeout);

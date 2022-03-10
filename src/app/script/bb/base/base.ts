@@ -42,7 +42,7 @@ export function css (el: HTMLElement | SVGElement, styleObj: IKeyString): void {
     const keyArr = Object.keys(styleObj);
     let keyStr: string;
     const style = (el.style as unknown) as IKeyString;
-    for(let i = 0; i < keyArr.length; i++) {
+    for (let i = 0; i < keyArr.length; i++) {
         keyStr = keyArr[i];
         style[keyStr] = styleObj[keyStr];
         style.alignContent = 'true';
@@ -55,7 +55,7 @@ export function css (el: HTMLElement | SVGElement, styleObj: IKeyString): void {
 export function setAttributes (el: HTMLElement, attrObj: IKeyString): void {
     const keyArr = Object.keys(attrObj);
     let keyStr;
-    for(let i = 0; i < keyArr.length; i++) {
+    for (let i = 0; i < keyArr.length; i++) {
         keyStr = keyArr[i];
         el.setAttribute(keyStr, attrObj[keyStr]);
     }
@@ -64,7 +64,7 @@ export function setAttributes (el: HTMLElement, attrObj: IKeyString): void {
 export function addClassName (el: HTMLElement | SVGElement, classStr: string): void {
     const classAttr = el.getAttribute('class');
     const splitArr = classAttr === null ? [] : classAttr.split(' ');
-    if(splitArr.includes(classStr)) {
+    if (splitArr.includes(classStr)) {
         return;
     }
     splitArr.push(classStr);
@@ -74,11 +74,11 @@ export function addClassName (el: HTMLElement | SVGElement, classStr: string): v
 export function removeClassName (el: HTMLElement | SVGElement, classStr: string): void {
     const classAttr = el.getAttribute('class');
     const splitArr = classAttr === null ? [] : classAttr.split(' ');
-    if(!splitArr.includes(classStr)) {
+    if (!splitArr.includes(classStr)) {
         return;
     }
-    for(let i = 0; i < splitArr.length; i++) {
-        if(splitArr[i] === classStr) {
+    for (let i = 0; i < splitArr.length; i++) {
+        if (splitArr[i] === classStr) {
             splitArr.splice(i, 1);
             i--;
         }
@@ -115,7 +115,7 @@ export function fitInto (aw: number, ah: number, bw: number, bh: number, min?: n
         width = bh / height * width;
         height = bh;
     }
-    if(min) {
+    if (min) {
         width = Math.max(min, width);
         height = Math.max(min, height);
     }
@@ -173,7 +173,7 @@ export function imageBlobToUrl(blobObj: Blob): string {
     }
     if (window.Blob && blobObj instanceof Blob) {
         return URL.createObjectURL(blobObj); // object url
-    } else if(blobObj.constructor.name === 'Object') {
+    } else if (blobObj.constructor.name === 'Object') {
         const fauxBlob = (blobObj as unknown) as {type: string, encoding: string, data: string};
         return 'data:' + fauxBlob.type + ';' + fauxBlob.encoding + ',' + fauxBlob.data; // data url
     } else {
@@ -240,7 +240,7 @@ export function handleClick (clickEvent: MouseEvent): boolean {
     if (!target) {
         return false;
     }
-    if(['A', 'LABEL', 'INPUT'].includes(target.tagName) || (target as any).allowClick) {
+    if (['A', 'LABEL', 'INPUT'].includes(target.tagName) || (target as any).allowClick) {
         return true;
     }
     clickEvent.preventDefault();
@@ -256,13 +256,13 @@ export function createSvg (el: ISVG): SVGElement {
     const result = document.createElementNS('http://www.w3.org/2000/svg', el.elementType);
     const keyArr = Object.keys(el);
     let keyStr;
-    for(let i = 0; i < keyArr.length; i++) {
+    for (let i = 0; i < keyArr.length; i++) {
         keyStr = keyArr[i];
-        if(keyStr === 'childrenArr') {
-            for(let e = 0; e < el.childrenArr.length; e++) {
+        if (keyStr === 'childrenArr') {
+            for (let e = 0; e < el.childrenArr.length; e++) {
                 result.appendChild(createSvg(el.childrenArr[e]));
             }
-        } else if(keyStr !== 'elementType') {
+        } else if (keyStr !== 'elementType') {
             result.setAttribute(keyStr, el[keyStr] as string);
         }
     }

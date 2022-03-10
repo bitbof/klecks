@@ -1,11 +1,12 @@
 import {BB} from '../../bb/bb';
-import {PcSlider} from '../ui/base-components/slider';
+import {KlSlider} from '../ui/base-components/kl-slider';
 import {eventResMs} from './filters-consts';
 import {KlCanvasPreview} from '../canvas-ui/canvas-preview';
 import {getSharedFx} from './shared-gl-fx';
+import {IFilterApply, IFilterGetDialogParam} from '../kl.types';
 
 export const glBrightnessContrast = {
-    getDialog(params) {
+    getDialog(params: IFilterGetDialogParam) {
 
         let div = document.createElement("div");
         let result: any = {
@@ -49,7 +50,7 @@ export const glBrightnessContrast = {
             let texture = glCanvas.texture(tempCanvas);
             glCanvas.draw(texture).update(); // update glCanvas size
 
-            let brightnessSlider = new PcSlider({
+            let brightnessSlider = new KlSlider({
                 label: 'Brightness',
                 width: 300,
                 height: 30,
@@ -63,7 +64,7 @@ export const glBrightnessContrast = {
                     klCanvasPreview.render();
                 }
             });
-            let contrastSlider = new PcSlider({
+            let contrastSlider = new KlSlider({
                 label: 'Contrast',
                 width: 300,
                 height: 30,
@@ -102,7 +103,7 @@ export const glBrightnessContrast = {
 
             let previewLayerArr = [];
             {
-                for(let i = 0; i < layers.length; i++) {
+                for (let i = 0; i < layers.length; i++) {
                     previewLayerArr.push({
                         canvas: i === selectedLayerIndex ? glCanvas : layers[i].context.canvas,
                         opacity: layers[i].opacity,
@@ -155,14 +156,14 @@ export const glBrightnessContrast = {
         return result;
     },
 
-    apply(params) {
+    apply(params: IFilterApply) {
         let context = params.context;
         let brightness = params.input.brightness;
         let contrast = params.input.contrast;
         let history = params.history;
         if (!context || brightness === null || contrast === null || !history)
             return false;
-        history.pause();
+        history.pause(true);
         let glCanvas = getSharedFx();
         if (!glCanvas) {
             return false; // todo more specific error?
@@ -173,7 +174,7 @@ export const glBrightnessContrast = {
         context.drawImage(glCanvas, 0, 0);
         texture.destroy();
         history.pause(false);
-        history.add({
+        history.push({
             tool: ["filter", "glBrightnessContrast"],
             action: "apply",
             params: [{

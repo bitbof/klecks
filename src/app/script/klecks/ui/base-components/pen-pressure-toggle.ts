@@ -27,12 +27,12 @@ export const penPressureToggle = function(isChecked, changeCallback) {
         }
     });
 
-    if(!BB.hasPointerEvents) {
+    if (!BB.hasPointerEvents) {
         toggleDiv.style.display = 'none';
     }
 
     function redraw() {
-        if(isChecked) {
+        if (isChecked) {
             BB.css(toggleDiv, {
                 backgroundColor: '#fff',
                 opacity: '0.9',

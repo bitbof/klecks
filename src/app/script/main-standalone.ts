@@ -14,7 +14,7 @@ let klApp;
 
 
 function onProjectLoaded(project: IKlProject, projectStore: ProjectStore) {
-    if(klApp) {
+    if (klApp) {
         throw 'onKlProjectObjLoaded called more than once';
     }
     let loadingScreenEl = document.getElementById("loading-screen");

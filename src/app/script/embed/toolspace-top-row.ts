@@ -58,7 +58,7 @@ export class ToolspaceTopRow {
             (result as any).pointerListener = new BB.PointerListener({ // because :hover causes problems w touch
                 target: result,
                 onEnterLeave: function(isOver) {
-                    if(isOver) {
+                    if (isOver) {
                         BB.addClassName(result, 'toolspace-row-button-hover');
                     } else {
                         BB.removeClassName(result, 'toolspace-row-button-hover');

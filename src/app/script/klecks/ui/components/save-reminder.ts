@@ -1,19 +1,25 @@
 import {KL} from '../../kl';
 import {BB} from '../../../bb/bb';
+import {KlHistoryInterface} from '../../history/kl-history';
 
 /**
  * remind user of saving, keep user aware of save state
  */
 export class SaveReminder {
-    private oldActionNumber: [number, number];
+    private oldActionNumber: number = null;
     private remindersShowed: number = 0;
     private unsavedInterval;
     private lastReminderResetAt: number;
 
-    constructor(private history, private showReminder: boolean, private changeTitle: boolean, private title: string = 'Klecks') { }
+    constructor (
+        private history: KlHistoryInterface,
+        private showReminder: boolean,
+        private changeTitle: boolean,
+        private title: string = 'Klecks'
+    ) { }
 
-    init() {
-        if (this.oldActionNumber) { // already initialized
+    init (): void {
+        if (this.oldActionNumber !== null) { // already initialized
             return;
         }
         this.oldActionNumber = this.history.getActionNumber();
@@ -28,9 +34,9 @@ export class SaveReminder {
 
                 let actionNumber = this.history.getActionNumber();
                 //number of actions that were done since last reminder
-                let historyDist = actionNumber[0] !== this.oldActionNumber[0] ? actionNumber[1] : Math.abs(actionNumber[1] - this.oldActionNumber[1]);
+                let historyDist = Math.abs(actionNumber - this.oldActionNumber);
 
-                if(this.lastReminderResetAt + reminderTimelimitMs < (performance.now()) && historyDist >= 30) {
+                if (this.lastReminderResetAt + reminderTimelimitMs < (performance.now()) && historyDist >= 30) {
                     this.reset(true);
                     KL.showSaveReminderToast(this.remindersShowed++);
                 }
@@ -45,7 +51,7 @@ export class SaveReminder {
 
         this.history.addListener(() => {
             let actionNumber = this.history.getActionNumber();
-            if(0 !== actionNumber && this.oldActionNumber.join('.') !== actionNumber.join('.')) {
+            if (this.oldActionNumber !== actionNumber) {
                 BB.setEventListener(window, 'onbeforeunload', onBeforeUnload);
             } else {
                 BB.setEventListener(window, 'onbeforeunload', null);
@@ -54,12 +60,12 @@ export class SaveReminder {
 
         if (this.changeTitle) {
             document.addEventListener("visibilitychange", () => {
-                if(document.visibilityState === 'visible') {
+                if (document.visibilityState === 'visible') {
                     document.title = this.title;
                     clearInterval(this.unsavedInterval);
                 } else {
                     let actionNumber = this.history.getActionNumber();
-                    if(0 !== actionNumber && this.oldActionNumber.join('.') !== actionNumber.join('.')) {
+                    if (this.oldActionNumber !== actionNumber) {
                         document.title = 'Unsaved - ' + this.title;
                         let state = 0;
                         this.unsavedInterval = setInterval(() => {
@@ -76,8 +82,8 @@ export class SaveReminder {
         }
     }
 
-    reset(isSoft?) {
-        if (!this.oldActionNumber) { // not initialized
+    reset (isSoft?: boolean): void {
+        if (this.oldActionNumber === null) { // not initialized
             return;
         }
         if (!isSoft) {

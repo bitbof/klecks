@@ -42,7 +42,7 @@ export class Select {
             this.selectEl.tabIndex = -1;
         }
         this.optionArr = p.optionArr;
-        for(let i = 0; i < this.optionArr.length; i++) {
+        for (let i = 0; i < this.optionArr.length; i++) {
             if (this.optionArr[i] === null) {
                 continue;
             }

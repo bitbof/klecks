@@ -48,7 +48,7 @@ export const HexColorDialog = function (p) {
         },
         callback: function() {
             let rgbObj = BB.ColorConverter.hexToRGB(hexInput.value);
-            if(rgbObj === null) {
+            if (rgbObj === null) {
                 rgbObj = lastValidRgb;
                 hexInput.value = '#' + BB.ColorConverter.toHexString(lastValidRgb);
             } else {
@@ -56,7 +56,7 @@ export const HexColorDialog = function (p) {
             }
             previewEl.style.background = '#' + BB.ColorConverter.toHexString(rgbObj);
 
-            for(let i = 0; i < rgbArr.length; i++) {
+            for (let i = 0; i < rgbArr.length; i++) {
                 rgbArr[i].update();
             }
         }
@@ -109,7 +109,7 @@ export const HexColorDialog = function (p) {
                 width: '80px'
             },
             callback: function() {
-                if(inputEl.value === '' || parseFloat(inputEl.value) < 0 || parseFloat(inputEl.value) > 255) {
+                if (inputEl.value === '' || parseFloat(inputEl.value) < 0 || parseFloat(inputEl.value) > 255) {
                     result.update();
                     return;
                 }

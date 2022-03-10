@@ -7,7 +7,7 @@
  */
 export const calcSliderFalloffFactor = function(deltaY, isRightButton) {
     let result = Math.min(10, 1 + Math.pow(Math.floor(deltaY / 50), 2));
-    if(isRightButton) {
+    if (isRightButton) {
         result *= 2;
     }
     return 1 / result;

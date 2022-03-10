@@ -793,6 +793,35 @@ iframe {
     cursor: default;
 }
 
+.kl-box-toggle {
+    cursor: pointer;
+    padding: 6px 10px;
+    font-size: 16px;
+    border-radius: 4px;
+    transition: all 0.1s ease-in-out;
+
+    color: rgba(0, 0, 0, 0.6);
+    box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.3);
+
+    user-select: none;
+    -webkit-user-select: none; // safari
+}
+
+.kl-box-toggle--active {
+    background: #fff;
+    color: #000;
+    box-shadow: inset 0 0 0 1px var(--active-highlight-color);
+    cursor: default;
+}
+
+.kl-box-toggle--custom-el {
+    padding: 0;
+}
+
+.kl-box-toggle--custom-el:not(.kl-box-toggle--active) > * {
+    opacity: 0.5;
+}
+
 
 .tool-dropdown-wrapper {
     background: rgb(241, 241, 241);

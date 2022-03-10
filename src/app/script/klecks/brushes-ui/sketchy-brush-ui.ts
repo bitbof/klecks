@@ -1,12 +1,13 @@
 import {brushes} from '../brushes/brushes';
 import {eventResMs} from './brushes-consts';
 import {klHistory} from '../history/kl-history';
-import {PcSlider} from '../ui/base-components/slider';
+import {KlSlider} from '../ui/base-components/kl-slider';
 // @ts-ignore
 import brushIconImg from 'url:~/src/app/img/ui/brush-sketchy.png';
+import {IBrushUi} from '../kl.types';
 
 export const sketchyBrushUi = (function () {
-    let brushInterface: any = {
+    let brushInterface: IBrushUi = {
         image: brushIconImg,
         tooltip: 'Sketchy',
         sizeSlider: {
@@ -16,16 +17,13 @@ export const sketchyBrushUi = (function () {
         opacitySlider: {
             min: 1 / 100,
             max: 1
-        }
+        },
+        Ui: null,
     };
 
-    /**
-     * @param p = {onSizeChange: function(size), onOpacityChange: function(opacity)}
-     * @constructor
-     */
     brushInterface.Ui = function (p) {
         let div = document.createElement("div"); // the gui
-        let brush = new brushes.sketchy();
+        let brush = new brushes.SketchyBrush();
         brush.setHistory(klHistory);
         p.onSizeChange(brush.getSize());
         let sizeSlider;
@@ -36,7 +34,7 @@ export const sketchyBrushUi = (function () {
         }
 
         function init() {
-            sizeSlider = new PcSlider({
+            sizeSlider = new KlSlider({
                 label: 'Size',
                 width: 250,
                 height: 30,
@@ -57,7 +55,7 @@ export const sketchyBrushUi = (function () {
                     }
                 }
             });
-            opacitySlider = new PcSlider({
+            opacitySlider = new KlSlider({
                 label: 'Opacity',
                 width: 250,
                 height: 30,
@@ -73,7 +71,7 @@ export const sketchyBrushUi = (function () {
                     return Math.round(v * 100);
                 }
             });
-            let blendSlider = new PcSlider({
+            let blendSlider = new KlSlider({
                 label: 'Blending',
                 width: 250,
                 height: 30,
@@ -85,7 +83,7 @@ export const sketchyBrushUi = (function () {
                     brush.setBlending(val / 100);
                 }
             });
-            let scaleSlider = new PcSlider({
+            let scaleSlider = new KlSlider({
                 label: 'Scale',
                 width: 250,
                 height: 30,
