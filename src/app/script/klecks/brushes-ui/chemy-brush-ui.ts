@@ -278,12 +278,12 @@ export const chemyBrushUi = (function () {
         init();
 
         this.increaseSize = function (f) {
-            if (!brush.getIsDrawing()) {
+            if (!brush.getIsDrawing() && brush.getMode() === 'stroke') {
                 sizeSlider.increaseValue(f);
             }
         };
         this.decreaseSize = function (f) {
-            if (!brush.getIsDrawing()) {
+            if (!brush.getIsDrawing() && brush.getMode() === 'stroke') {
                 sizeSlider.decreaseValue(f);
             }
         };

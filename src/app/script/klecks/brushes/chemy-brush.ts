@@ -52,10 +52,11 @@ export class ChemyBrush {
                 }
             );
         }
-        bounds.x1 = Math.floor(bounds.x1 - 1);
-        bounds.y1 = Math.floor(bounds.y1 - 1);
-        bounds.x2 = Math.ceil(bounds.x2 + 1);
-        bounds.y2 = Math.ceil(bounds.y2 + 1);
+        const buffer = this.settingMode === 'stroke' ? this.settingSize + 1 : 1;
+        bounds.x1 = Math.floor(bounds.x1 - buffer);
+        bounds.y1 = Math.floor(bounds.y1 - buffer);
+        bounds.x2 = Math.ceil(bounds.x2 + buffer);
+        bounds.y2 = Math.ceil(bounds.y2 + buffer);
 
         this.completeRedrawBounds = BB.updateBounds(this.completeRedrawBounds, bounds);
     }
