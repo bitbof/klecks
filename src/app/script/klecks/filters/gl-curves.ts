@@ -2,7 +2,7 @@ import {BB} from '../../bb/bb';
 import {Options} from '../ui/base-components/options';
 import {KlCanvasPreview} from '../canvas-ui/canvas-preview';
 import {getSharedFx} from './shared-gl-fx';
-import {IFilterApply, IFilterGetDialogParam} from '../kl.types';
+import {IFilterApply, IFilterGetDialogParam, IKlBasicLayer} from '../kl.types';
 
 export const glCurves = {
 
@@ -346,11 +346,11 @@ export const glCurves = {
                 colorScheme: 'only light',
             });
 
-            let previewLayerArr = [];
+            let previewLayerArr: IKlBasicLayer[] = [];
             {
                 for (let i = 0; i < layers.length; i++) {
                     previewLayerArr.push({
-                        canvas: i === selectedLayerIndex ? glCanvas : layers[i].context.canvas,
+                        image: i === selectedLayerIndex ? glCanvas : layers[i].context.canvas,
                         opacity: layers[i].opacity,
                         mixModeStr: layers[i].mixModeStr
                     });
@@ -359,7 +359,7 @@ export const glCurves = {
             klCanvasPreview = new KlCanvasPreview({
                 width: parseInt('' + w),
                 height: parseInt('' + h),
-                layerArr: previewLayerArr
+                layers: previewLayerArr
             });
 
             let previewInnerWrapper = BB.el({

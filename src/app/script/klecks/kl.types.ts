@@ -58,6 +58,11 @@ export type IMixMode = (
     'luminosity'
 );
 
+export type IKlBasicLayer = {
+    opacity: number; // 0 - 1
+    mixModeStr?: IMixMode; // default "source-over"
+    image: HTMLImageElement | HTMLCanvasElement; // already loaded
+};
 
 export type IKlProject = {
     width: number; // int

@@ -1,4 +1,5 @@
 import {BB} from '../../bb/bb';
+import {IKlBasicLayer} from '../kl.types';
 
 /**
  * preview of image with layers. can do mix modes and opacity.
@@ -7,9 +8,9 @@ import {BB} from '../../bb/bb';
  * p = {
  *     width: 123,
  *     height: 123,
- *     layerArr: [// can be changed after the fact
+ *     layers: [// can be changed after the fact
  *         {
- *             canvas: Canvas,
+ *             image: Canvas,
  *             opacity: 1,
  *             mixModeStr: 'source-over'
  *         }
@@ -19,10 +20,16 @@ import {BB} from '../../bb/bb';
  * @param p
  * @constructor
  */
-export function KlCanvasPreview(p) {
-    const scale = p.width / p.layerArr[0].canvas.width;
-    const width = scale > 1 ? p.layerArr[0].canvas.width : p.width;
-    const height = scale > 1 ? p.layerArr[0].canvas.height : p.height;
+export function KlCanvasPreview(
+    p: {
+        width: number;
+        height: number;
+        layers: IKlBasicLayer[];
+    }
+) {
+    const scale = p.width / p.layers[0].image.width;
+    const width = scale > 1 ? p.layers[0].image.width : p.width;
+    const height = scale > 1 ? p.layers[0].image.height : p.height;
 
     let canvas = BB.canvas(width, height);
     canvas.style.backgroundImage = 'url(' + BB.createCheckerDataUrl(8) + ')';
@@ -37,13 +44,13 @@ export function KlCanvasPreview(p) {
     function render() {
         ctx.save();
         ctx.clearRect(0, 0, canvas.width, canvas.height);
-        for (let i = 0; i < p.layerArr.length; i++) {
-            ctx.globalAlpha = parseFloat(p.layerArr[i].opacity);
-            ctx.globalCompositeOperation = p.layerArr[i].mixModeStr;
-            if (canvas.width > p.layerArr[i].canvas.width) {
+        for (let i = 0; i < p.layers.length; i++) {
+            ctx.globalAlpha = p.layers[i].opacity;
+            ctx.globalCompositeOperation = p.layers[i].mixModeStr;
+            if (canvas.width > p.layers[i].image.width) {
                 ctx.imageSmoothingEnabled = false;
             }
-            ctx.drawImage(p.layerArr[i].canvas, 0, 0, canvas.width, canvas.height);
+            ctx.drawImage(p.layers[i].image, 0, 0, canvas.width, canvas.height);
         }
         ctx.restore();
     }

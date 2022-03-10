@@ -148,7 +148,7 @@ export class KlCanvas {
 
     /**
      * Resets canvas -> 1 layer, 100% opacity,
-     * unless layerArr provided.
+     * unless layers provided.
      * @param p
      */
     reset (
@@ -158,11 +158,11 @@ export class KlCanvas {
             color?: IRGB; // optional - fill color
             image?: HTMLImageElement | HTMLCanvasElement; // image drawn on layer
             layerName?: string; // if via image
-            layerArr?: {
+            layers?: {
                 name: string;
                 opacity: number;
                 mixModeStr: IMixMode;
-                canvas: HTMLCanvasElement;
+                image: HTMLCanvasElement;
             }[];
         }
     ): void | number {
@@ -177,9 +177,9 @@ export class KlCanvas {
 
         this.layerCanvasArr.splice(1, Math.max(0, this.layerCanvasArr.length - 1));
 
-        if (p.layerArr) {
-            for (let i = 0; i < p.layerArr.length; i++) {
-                let item = p.layerArr[i];
+        if (p.layers) {
+            for (let i = 0; i < p.layers.length; i++) {
+                let item = p.layers[i];
                 if (!this.layerCanvasArr[i]) {
                     this.addLayer();
                 }
@@ -187,7 +187,7 @@ export class KlCanvas {
                 this.layerCanvasArr[i].width = this.width;
                 this.layerCanvasArr[i].height = this.height;
                 this.layerCanvasArr[i].mixModeStr = item.mixModeStr ? item.mixModeStr : 'source-over';
-                this.layerCanvasArr[i].getContext("2d").drawImage(item.canvas, 0, 0);
+                this.layerCanvasArr[i].getContext("2d").drawImage(item.image, 0, 0);
                 this.layerOpacity(i, item.opacity);
             }
         } else {

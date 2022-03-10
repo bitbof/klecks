@@ -3,7 +3,7 @@ import {KlCanvasPreview} from '../canvas-ui/canvas-preview';
 // @ts-ignore
 import checkmarkImg from 'url:~/src/app/img/ui/checkmark.svg';
 import {getSharedFx} from './shared-gl-fx';
-import {IFilterApply, IFilterGetDialogParam} from '../kl.types';
+import {IFilterApply, IFilterGetDialogParam, IKlBasicLayer} from '../kl.types';
 
 export const glPerspective = {
 
@@ -278,12 +278,12 @@ export const glPerspective = {
                 colorScheme: 'only light',
             });
 
-            let previewLayerArr = [];
+            let previewLayerArr: IKlBasicLayer[] = [];
             {
                 for (let i = 0; i < layers.length; i++) {
                     let canvas = i === selectedLayerIndex ? glCanvas : layers[i].context.canvas;
                     previewLayerArr.push({
-                        canvas: canvas,
+                        image: canvas,
                         opacity: layers[i].opacity,
                         mixModeStr: layers[i].mixModeStr
                     });
@@ -292,7 +292,7 @@ export const glPerspective = {
             let klCanvasPreview = new KlCanvasPreview({
                 width: parseInt('' + displayW),
                 height: parseInt('' + displayH),
-                layerArr: previewLayerArr
+                layers: previewLayerArr
             });
 
             let previewInnerWrapper = BB.el({

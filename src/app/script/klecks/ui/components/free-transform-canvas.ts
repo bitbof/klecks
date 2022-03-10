@@ -1,6 +1,7 @@
 import {BB} from '../../../bb/bb';
 import {KlCanvasPreview} from '../../canvas-ui/canvas-preview';
 import {FreeTransform} from './free-transform';
+import {IKlBasicLayer, IMixMode} from '../../kl.types';
 
 /**
  * a basic canvas where you can transform one layer(move around, rotate, scale)
@@ -14,11 +15,7 @@ export function FreeTransformCanvas(params: {
     elementHeight: number;
     imageWidth: number;
     imageHeight: number;
-    layerArr: {
-            canvas: (HTMLCanvasElement | HTMLImageElement),
-            opacity: number; // 0-1
-            mixModeStr: string;
-    }[];
+    layers: IKlBasicLayer[];
     transformIndex: number;
 }) {
     /*
@@ -66,21 +63,21 @@ export function FreeTransformCanvas(params: {
     });
     div.appendChild(innerWrapper);
 
-    let previewLayerArr = params.layerArr.map(item => {
+    let previewLayerArr = params.layers.map(item => {
         return {
-            canvas: item.canvas,
+            image: item.image,
             mixModeStr: item.mixModeStr,
             opacity: item.opacity,
         }
     });
-    previewLayerArr[previewLayerArr.length - 1].canvas = BB.canvas(
+    previewLayerArr[previewLayerArr.length - 1].image = BB.canvas(
         scale > 1 ? params.imageWidth : previewFit.width,
         scale > 1 ? params.imageHeight : previewFit.height,
     );
     let klCanvasPreview = new KlCanvasPreview({
         width: previewFit.width,
         height: previewFit.height,
-        layerArr: previewLayerArr
+        layers: previewLayerArr
     });
     innerWrapper.appendChild(klCanvasPreview.getElement());
 
@@ -99,13 +96,13 @@ export function FreeTransformCanvas(params: {
             transform.height *= scale;
         }
 
-        let destCanvas = previewLayerArr[params.transformIndex].canvas;
+        let destCanvas = previewLayerArr[params.transformIndex].image;
         let ctx = (destCanvas as HTMLCanvasElement).getContext('2d');
         ctx.save();
         ctx.clearRect(0, 0, destCanvas.width, destCanvas.height);
         BB.drawTransformedImageWithBounds(
             ctx,
-            params.layerArr[params.transformIndex].canvas,
+            params.layers[params.transformIndex].image,
             transform,
             null,
             BB.testShouldPixelate(transform, transform.width / initTransform.width, transform.height / initTransform.height),
@@ -116,13 +113,13 @@ export function FreeTransformCanvas(params: {
 
     {
         let transformSize = {
-            width: params.layerArr[params.transformIndex].canvas.width * scale,
-            height: params.layerArr[params.transformIndex].canvas.height * scale
+            width: params.layers[params.transformIndex].image.width * scale,
+            height: params.layers[params.transformIndex].image.height * scale
         };
         if (transformSize.width > previewFit.width || transformSize.height > previewFit.height) {
             transformSize = BB.fitInto(
-                params.layerArr[params.transformIndex].canvas.width,
-                params.layerArr[params.transformIndex].canvas.height,
+                params.layers[params.transformIndex].image.width,
+                params.layers[params.transformIndex].image.height,
                 previewFit.width,
                 previewFit.height,
                 1
@@ -131,8 +128,8 @@ export function FreeTransformCanvas(params: {
         initTransform = {
             x: params.imageWidth / 2,
             y: params.imageHeight / 2,
-            width: params.layerArr[params.transformIndex].canvas.width,
-            height: params.layerArr[params.transformIndex].canvas.height,
+            width: params.layers[params.transformIndex].image.width,
+            height: params.layers[params.transformIndex].image.height,
         };
         freeTransform = new FreeTransform({
             x: initTransform.x,
@@ -164,8 +161,8 @@ export function FreeTransformCanvas(params: {
         freeTransform.move(dX, dY);
     };
     this.reset = function() {
-        let w = params.layerArr[params.transformIndex].canvas.width;
-        let h = params.layerArr[params.transformIndex].canvas.height;
+        let w = params.layers[params.transformIndex].image.width;
+        let h = params.layers[params.transformIndex].image.height;
 
         freeTransform.setSize(w, h);
         freeTransform.setPos({x: w / 2, y: h / 2});
@@ -175,8 +172,8 @@ export function FreeTransformCanvas(params: {
     this.setTransformFit = function() {
 
         let fit = BB.fitInto(
-            params.layerArr[params.transformIndex].canvas.width,
-            params.layerArr[params.transformIndex].canvas.height,
+            params.layers[params.transformIndex].image.width,
+            params.layers[params.transformIndex].image.height,
             params.imageWidth,
             params.imageHeight,
             1

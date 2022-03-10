@@ -3,7 +3,7 @@ import {Checkbox} from '../ui/base-components/checkbox';
 import {KlCanvasPreview} from '../canvas-ui/canvas-preview';
 import {FreeTransform, ITransform} from '../ui/components/free-transform';
 import {Select} from '../ui/base-components/select';
-import {IFilterApply, IFilterGetDialogParam} from '../kl.types';
+import {IFilterApply, IFilterGetDialogParam, IKlBasicLayer} from '../kl.types';
 
 interface IFilterTransformInput {
     bounds: {x: number, y: number, width: number, height: number};
@@ -379,7 +379,7 @@ export const transform = {
             colorScheme: 'only light',
         });
 
-        let previewLayerArr = [];
+        let previewLayerArr: IKlBasicLayer[] = [];
         {
             for (let i = 0; i < layers.length; i++) {
                 let canvas;
@@ -391,7 +391,7 @@ export const transform = {
                     canvas = layers[i].context.canvas;
                 }
                 previewLayerArr.push({
-                    canvas: canvas,
+                    image: canvas,
                     opacity: layers[i].opacity,
                     mixModeStr: layers[i].mixModeStr
                 });
@@ -400,7 +400,7 @@ export const transform = {
         let klCanvasPreview = new KlCanvasPreview({
             width: parseInt('' + displayW),
             height: parseInt('' + displayH),
-            layerArr: previewLayerArr
+            layers: previewLayerArr
         });
 
         let previewInnerWrapper = BB.el({
@@ -430,7 +430,7 @@ export const transform = {
                 transform.width *= displayPreviewFactor;
                 transform.height *= displayPreviewFactor;
             }
-            let transformLayerCanvas = previewLayerArr[selectedLayerIndex].canvas;
+            let transformLayerCanvas = previewLayerArr[selectedLayerIndex].image as HTMLCanvasElement;
             let ctx = transformLayerCanvas.getContext('2d');
             ctx.save();
             ctx.clearRect(0, 0, transformLayerCanvas.width, transformLayerCanvas.height);

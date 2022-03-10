@@ -3,7 +3,7 @@ import {Options} from '../ui/base-components/options';
 import {ColorOptions} from '../ui/base-components/color-options';
 import {KlCanvasPreview} from '../canvas-ui/canvas-preview';
 import {getSharedFx} from './shared-gl-fx';
-import {IFilterApply, IFilterGetDialogParam} from '../kl.types';
+import {IFilterApply, IFilterGetDialogParam, IKlBasicLayer} from '../kl.types';
 
 export const toAlpha = {
 
@@ -128,11 +128,11 @@ export const toAlpha = {
                 colorScheme: 'only light',
             });
 
-            let previewLayerArr = [];
+            let previewLayerArr: IKlBasicLayer[] = [];
             {
                 for (let i = 0; i < layers.length; i++) {
                     previewLayerArr.push({
-                        canvas: i === selectedLayerIndex ? glCanvas : layers[i].context.canvas,
+                        image: i === selectedLayerIndex ? glCanvas : layers[i].context.canvas,
                         opacity: layers[i].opacity,
                         mixModeStr: layers[i].mixModeStr
                     });
@@ -141,7 +141,7 @@ export const toAlpha = {
             let klCanvasPreview = new KlCanvasPreview({
                 width: parseInt('' + w),
                 height: parseInt('' + h),
-                layerArr: previewLayerArr
+                layers: previewLayerArr
             });
 
             let previewInnerWrapper = BB.el({

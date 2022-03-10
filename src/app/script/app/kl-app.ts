@@ -541,10 +541,10 @@ export function KlApp(pProject: IKlProject | null, pOptions: IKlAppOptions) {
 
         /**
          *
-         * @param convertedPsdObj - if flattened then without layerArr
+         * @param convertedPsdObj - if flattened then without layers
          * @param cropObj? - {x: number, y: number, width: number, height: number}
          */
-        function importAsImagePsd(convertedPsdObj, cropObj?) {
+        function importAsImagePsd(convertedPsdObj: IKlPsd, cropObj?) {
 
             // crop
             function crop(targetCanvas, cropCanvas, cropObj) {
@@ -559,13 +559,13 @@ export function KlApp(pProject: IKlProject | null, pOptions: IKlAppOptions) {
                 convertedPsdObj.width = cropObj.width;
                 convertedPsdObj.height = cropObj.height;
 
-                if (!convertedPsdObj.layerArr) {
+                if (!convertedPsdObj.layers) {
                     crop(convertedPsdObj.canvas, cropCanvas, cropObj);
                 }
-                if (convertedPsdObj.layerArr) {
-                    for (let i = 0; i < convertedPsdObj.layerArr.length; i++) {
-                        let item = convertedPsdObj.layerArr[i];
-                        crop(item.canvas, cropCanvas, cropObj);
+                if (convertedPsdObj.layers) {
+                    for (let i = 0; i < convertedPsdObj.layers.length; i++) {
+                        let item = convertedPsdObj.layers[i];
+                        crop(item.image, cropCanvas, cropObj);
                     }
                 }
             }
@@ -574,22 +574,22 @@ export function KlApp(pProject: IKlProject | null, pOptions: IKlAppOptions) {
             let resizedDimensions = getResizedDimensions(convertedPsdObj.width, convertedPsdObj.height);
             convertedPsdObj.width = resizedDimensions.width;
             convertedPsdObj.height = resizedDimensions.height;
-            if (!convertedPsdObj.layerArr) {
+            if (!convertedPsdObj.layers) {
                 BB.resizeCanvas(convertedPsdObj.canvas, convertedPsdObj.width, convertedPsdObj.height);
             }
-            if (convertedPsdObj.layerArr) {
-                for (let i = 0; i < convertedPsdObj.layerArr.length; i++) {
-                    let item = convertedPsdObj.layerArr[i];
-                    BB.resizeCanvas(item.canvas, convertedPsdObj.width, convertedPsdObj.height);
+            if (convertedPsdObj.layers) {
+                for (let i = 0; i < convertedPsdObj.layers.length; i++) {
+                    let item = convertedPsdObj.layers[i];
+                    BB.resizeCanvas(item.image, convertedPsdObj.width, convertedPsdObj.height);
                 }
             }
 
             let layerIndex;
-            if (convertedPsdObj.layerArr) {
+            if (convertedPsdObj.layers) {
                 layerIndex = klCanvas.reset({
                     width: convertedPsdObj.width,
                     height: convertedPsdObj.height,
-                    layerArr: convertedPsdObj.layerArr
+                    layers: convertedPsdObj.layers
                 });
             } else {
                 layerIndex = klCanvas.reset({

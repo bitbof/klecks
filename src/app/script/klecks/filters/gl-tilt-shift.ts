@@ -3,7 +3,7 @@ import {eventResMs} from './filters-consts';
 import {KlSlider} from '../ui/base-components/kl-slider';
 import {KlCanvasPreview} from '../canvas-ui/canvas-preview';
 import {getSharedFx} from './shared-gl-fx';
-import {IFilterApply, IFilterGetDialogParam} from '../kl.types';
+import {IFilterApply, IFilterGetDialogParam, IKlBasicLayer} from '../kl.types';
 
 export const glTiltShift = {
 
@@ -158,11 +158,11 @@ export const glTiltShift = {
                 colorScheme: 'only light',
             });
 
-            let previewLayerArr = [];
+            let previewLayerArr: IKlBasicLayer[] = [];
             {
                 for (let i = 0; i < layers.length; i++) {
                     previewLayerArr.push({
-                        canvas: i === selectedLayerIndex ? glCanvas : layers[i].context.canvas,
+                        image: i === selectedLayerIndex ? glCanvas : layers[i].context.canvas,
                         opacity: layers[i].opacity,
                         mixModeStr: layers[i].mixModeStr
                     });
@@ -171,7 +171,7 @@ export const glTiltShift = {
             let klCanvasPreview = new KlCanvasPreview({
                 width: parseInt('' + displayW),
                 height: parseInt('' + displayH),
-                layerArr: previewLayerArr
+                layers: previewLayerArr
             });
 
             let previewInnerWrapper = BB.el({

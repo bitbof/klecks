@@ -2,7 +2,7 @@ import {BB} from '../../../bb/bb';
 import {FreeTransformCanvas} from '../components/free-transform-canvas';
 import {popup} from './popup';
 import {KlCanvas} from '../../canvas/kl-canvas';
-import {IVector2D} from '../../../bb/bb.types';
+import {IKlBasicLayer} from '../../kl.types';
 
 export function showImportAsLayerDialog(
     params: {
@@ -76,19 +76,19 @@ export function showImportAsLayerDialog(
 
 
 
-    let layerArr = [];
+    let layers: IKlBasicLayer[] = [];
     {
         let klCanvasLayerArr = params.klCanvas.getLayers();
         for (let i = 0; i < klCanvasLayerArr.length; i++) {
-            layerArr.push({
-                canvas: klCanvasLayerArr[i].context.canvas,
+            layers.push({
+                image: klCanvasLayerArr[i].context.canvas,
                 opacity: klCanvasLayerArr[i].opacity,
                 mixModeStr: klCanvasLayerArr[i].mixModeStr
             });
         }
     }
-    layerArr.push({
-        canvas: params.importImage,
+    layers.push({
+        image: params.importImage,
         opacity: 1,
         mixModeStr: 'source-over'
     });
@@ -99,8 +99,8 @@ export function showImportAsLayerDialog(
         elementHeight: isSmall ? 280 : 350,
         imageWidth: params.klCanvas.getLayerContext(0).canvas.width,
         imageHeight: params.klCanvas.getLayerContext(0).canvas.height,
-        layerArr: layerArr,
-        transformIndex: layerArr.length - 1,
+        layers: layers,
+        transformIndex: layers.length - 1,
     });
     BB.css(freeTransformCanvas.getElement(), {
         marginTop: '10px',

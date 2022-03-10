@@ -3,7 +3,7 @@ import {Checkbox} from '../ui/base-components/checkbox';
 import {KlCanvasPreview} from '../canvas-ui/canvas-preview';
 // @ts-ignore
 import checkmarkImg from 'url:~/src/app/img/ui/checkmark.svg';
-import {IFilterApply, IFilterGetDialogParam} from '../kl.types';
+import {IFilterApply, IFilterGetDialogParam, IKlBasicLayer, IMixMode} from '../kl.types';
 
 export const flip = {
 
@@ -167,15 +167,15 @@ export const flip = {
             colorScheme: 'only light',
         });
 
-        let previewLayer = {
-            canvas: BB.canvas(parseInt('' + w), parseInt('' + h)),
+        let previewLayer: IKlBasicLayer = {
+            image: BB.canvas(Math.round(w), Math.round(h)),
             opacity: 1,
-            mixModeStr: 'source-over'
+            mixModeStr: 'source-over' as IMixMode,
         };
         let klCanvasPreview = new KlCanvasPreview({
-            width: parseInt('' + w),
-            height: parseInt('' + h),
-            layerArr: [previewLayer]
+            width: Math.round(w),
+            height: Math.round(h),
+            layers: [previewLayer]
         });
 
         let previewInnerWrapper = BB.el({
@@ -190,17 +190,17 @@ export const flip = {
         previewWrapper.appendChild(previewInnerWrapper);
 
         function updatePreview() {
-            let ctx = previewLayer.canvas.getContext('2d');
+            let ctx = (previewLayer.image as HTMLCanvasElement).getContext('2d');
             ctx.save();
-            ctx.clearRect(0, 0, previewLayer.canvas.width, previewLayer.canvas.height);
+            ctx.clearRect(0, 0, previewLayer.image.width, previewLayer.image.height);
 
             if (doFlipCanvas) {
                 if (isHorizontal) {
-                    ctx.translate(previewLayer.canvas.width, 0);
+                    ctx.translate(previewLayer.image.width, 0);
                     ctx.scale(-1, 1);
                 }
                 if (isVertical) {
-                    ctx.translate(0, previewLayer.canvas.height);
+                    ctx.translate(0, previewLayer.image.height);
                     ctx.scale(1, -1);
                 }
             }
@@ -209,11 +209,11 @@ export const flip = {
                 ctx.save();
                 if (!doFlipCanvas && selectedLayerIndex === i) {
                     if (isHorizontal) {
-                        ctx.translate(previewLayer.canvas.width, 0);
+                        ctx.translate(previewLayer.image.width, 0);
                         ctx.scale(-1, 1);
                     }
                     if (isVertical) {
-                        ctx.translate(0, previewLayer.canvas.height);
+                        ctx.translate(0, previewLayer.image.height);
                         ctx.scale(1, -1);
                     }
                 }
@@ -222,7 +222,7 @@ export const flip = {
                 }
                 ctx.globalAlpha = layers[i].opacity;
                 ctx.globalCompositeOperation = layers[i].mixModeStr;
-                ctx.drawImage(layers[i].context.canvas, 0, 0, previewLayer.canvas.width, previewLayer.canvas.height);
+                ctx.drawImage(layers[i].context.canvas, 0, 0, previewLayer.image.width, previewLayer.image.height);
                 ctx.restore();
             }
             klCanvasPreview.render();

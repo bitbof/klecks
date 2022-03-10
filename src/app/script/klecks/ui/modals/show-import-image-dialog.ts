@@ -107,7 +107,7 @@ export function showImportImageDialog(p) {
             border: '1px solid #e7d321',
             borderRadius: '5px'
         };
-        if (p.image.layerArr) {
+        if (p.image.layers) {
             flattenCheckbox = new Checkbox({
                 init: doFlatten,
                 label: 'Flatten image',
@@ -157,7 +157,7 @@ export function showImportImageDialog(p) {
         } else if (result === "As Image") {
             if (p.image.type === 'psd') {
                 if (doFlatten) {
-                    p.image.layerArr = null;
+                    p.image.layers = null;
                 }
                 p.callback({
                     type: 'as-image-psd',
