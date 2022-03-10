@@ -312,4 +312,8 @@ export class ChemyBrush {
         this.context.drawImage(im, x, y);
         this.context.restore();
     }
+
+    drawLineSegment (x1, y1, x2, y2): void {
+        // might make sense for stroke
+    }
 }
