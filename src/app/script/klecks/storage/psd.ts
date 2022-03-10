@@ -41,7 +41,7 @@ function init() {
     }
 }
 
-export function blendPsdToKl(str: string): string {
+export function blendPsdToKl(str: string): IMixMode {
     init();
     return psd2KlMap[str];
 }
@@ -74,8 +74,8 @@ export function readPsd(psdObj: Psd): IKlPsd {
         result.warningArr.push(warningStr);
     }
 
-    function getMixModeStr(blendMode) {
-        let mixModeStr = blendPsdToKl(blendMode);
+    function getMixModeStr(blendMode): IMixMode {
+        let mixModeStr: IMixMode = blendPsdToKl(blendMode);
         if (!mixModeStr) {
             addWarning('blend-mode');
             mixModeStr = 'source-over';
@@ -148,7 +148,12 @@ export function readPsd(psdObj: Psd): IKlPsd {
         image: HTMLCanvasElement;
     }[] {
 
-        let resultArr = [];
+        let resultArr: {
+            name: string;
+            mixModeStr: IMixMode;
+            opacity: number;
+            image: HTMLCanvasElement;
+        }[] = [];
         let groupOpacity = psdGroupObj.hidden ? 0 : psdGroupObj.opacity;
         let groupMixModeStr = getMixModeStr(psdGroupObj.blendMode);
         let groupCanvas;
@@ -288,7 +293,7 @@ export function readPsd(psdObj: Psd): IKlPsd {
                     name: item.name,
                     opacity: (item.hidden ? 0 : item.opacity) * groupOpacity,
                     mixModeStr: getMixModeStr(item.blendMode),
-                    canvas: canvas
+                    image: canvas,
                 });
             }
         }
@@ -299,7 +304,7 @@ export function readPsd(psdObj: Psd): IKlPsd {
                     name: psdGroupObj.name,
                     opacity: groupOpacity,
                     mixModeStr: groupMixModeStr,
-                    canvas: groupCanvas
+                    image: groupCanvas,
                 }
             ];
         }
