@@ -113,7 +113,10 @@ const globalKey = (() => {
 
         // because of a macOS bug: when meta key is down, keyup of other keys does not fire.
         // https://stackoverflow.com/questions/25438608/javascript-keyup-isnt-called-when-command-and-another-is-pressed
-        if (['Meta', 'MetaLeft', 'MetaRight'].includes(code)) {
+        if ([
+            'Meta', 'MetaLeft', 'MetaRight',
+            'OSLeft', 'OSRight', // Firefox
+        ].includes(code)) {
             blur(null);
             return;
         }
