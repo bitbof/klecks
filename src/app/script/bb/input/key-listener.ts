@@ -111,8 +111,8 @@ const globalKey = (() => {
         const code = 'code' in e ? e.code : e.keyCode; // ie doesn't have code
         const oldComboStr = comboArr.join('+');
 
-        // because of a safari bug: when meta key is down, keyup of over keys does not fire.
-        if (['Meta', 'MetaLeft'].includes(code)) {
+        // because of a safari bug: when meta key is down, keyup of other keys does not fire.
+        if (['Meta', 'MetaLeft', 'MetaRight'].includes(code)) {
             blur(null);
             return;
         }
