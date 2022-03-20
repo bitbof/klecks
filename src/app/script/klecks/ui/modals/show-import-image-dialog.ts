@@ -2,6 +2,7 @@ import {BB} from '../../../bb/bb';
 import {CropCopy} from '../components/crop-copy';
 import {Checkbox} from '../base-components/checkbox';
 import {popup} from './popup';
+import {LANG} from '../../../language/language';
 
 /**
  *
@@ -51,7 +52,7 @@ export function showImportImageDialog(p) {
         borderTop: '1px solid #bbb',
         borderBottom: '1px solid #bbb'
     });
-    cropCopy.getEl().title = 'Drag to crop';
+    cropCopy.getEl().title = LANG('crop-drag-to-crop');
     div.appendChild(cropCopy.getEl());
 
 
@@ -69,7 +70,7 @@ export function showImportImageDialog(p) {
 
         if (fit.width < w) {
             resolutionEl.innerHTML = `<span style="color:#f00">${w} X ${h}</span> ⟶ ${Math.round(fit.width)} X ${Math.round(fit.height)}`;
-            resolutionEl.title = 'Image too large, will be downscaled.';
+            resolutionEl.title = LANG('import-too-large');
         } else {
             resolutionEl.innerHTML = `${w} X ${h}`;
             resolutionEl.title = '';
@@ -110,7 +111,7 @@ export function showImportImageDialog(p) {
         if (p.image.layers) {
             flattenCheckbox = new Checkbox({
                 init: doFlatten,
-                label: 'Flatten image',
+                label: LANG('import-flatten'),
                 callback: function(b) {
                     doFlatten = b;
                 }
@@ -119,7 +120,7 @@ export function showImportImageDialog(p) {
 
             if (p.image.warningArr) {
                 const noteEl = BB.el({
-                    content: 'PSD support is limited. Flattened will more likely look correct. ',
+                    content: LANG('import-psd-limited-support'),
                     css: noteStyle
                 });
                 noteEl.appendChild(BB.el({
@@ -133,7 +134,7 @@ export function showImportImageDialog(p) {
             }
         } else {
             const noteEl = BB.el({
-                content: 'Unsupported features. PSD had to be flattened. ',
+                content: LANG('import-psd-unsupported'),
                 css: noteStyle
             });
             div.appendChild(noteEl);
@@ -148,13 +149,13 @@ export function showImportImageDialog(p) {
             flattenCheckbox.destroy();
         }
 
-        if (result === "As Layer") {
+        if (result === LANG('import-btn-as-layer')) {
             p.callback({
                 type: 'as-layer',
                 image: croppedImage
             });
 
-        } else if (result === "As Image") {
+        } else if (result === LANG('import-btn-as-image')) {
             if (p.image.type === 'psd') {
                 if (doFlatten) {
                     p.image.layers = null;
@@ -178,10 +179,10 @@ export function showImportImageDialog(p) {
     }
     popup({
         target: p.target,
-        message: "<b>Import Image</b>",
+        message: `<b>${LANG('import-title')}</b>`,
         div: div,
         style,
-        buttons: ["As Layer", "As Image", "Cancel"],
+        buttons: [LANG('import-btn-as-layer'), LANG('import-btn-as-image'), "Cancel"],
         callback: callback,
         autoFocus: 'As Image'
     });

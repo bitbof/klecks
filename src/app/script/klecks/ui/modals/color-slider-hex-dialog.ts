@@ -1,7 +1,9 @@
 import {BB} from '../../../bb/bb';
 import {input} from '../base-components/input';
 import {popup} from './popup';
-
+import {LANG} from '../../../language/language';
+// @ts-ignore
+import copyImg from 'url:~/src/app/img/ui/copy.svg';
 
 /**
  * dialog for manually inputting the color
@@ -36,9 +38,9 @@ export const HexColorDialog = function (p) {
         }
     });
     const hexLabel = BB.el({
-        content: 'Hex',
+        content: LANG('mci-hex'),
         css: {
-            width: '50px'
+            width: '60px'
         }
     });
     const hexInput = input({
@@ -63,7 +65,8 @@ export const HexColorDialog = function (p) {
     });
     const copyButton = BB.el({
         tagName: 'button',
-        content: 'Copy',
+        content: '<img src="' + copyImg + '" height="20"/>',
+        title: LANG('mci-copy'),
         css: {
             marginLeft: '10px'
         },
@@ -96,7 +99,7 @@ export const HexColorDialog = function (p) {
         const labelEl = BB.el({
             content: labelStr,
             css: {
-                width: '50px'
+                width: '60px'
             }
         });
 
@@ -131,14 +134,14 @@ export const HexColorDialog = function (p) {
         return result;
     }
     const rgbArr = [];
-    rgbArr.push(createRgbInputRow('Red', 'r'));
-    rgbArr.push(createRgbInputRow('Green', 'g'));
-    rgbArr.push(createRgbInputRow('Blue', 'b'));
+    rgbArr.push(createRgbInputRow(LANG('red'), 'r'));
+    rgbArr.push(createRgbInputRow(LANG('green'), 'g'));
+    rgbArr.push(createRgbInputRow(LANG('blue'), 'b'));
 
 
-    const pop = popup({
+    popup({
         target: document.body,
-        message: '<b>Manual Color Input</b>',
+        message: `<b>${LANG('manual-color-input')}</b>`,
         div: div,
         autoFocus: false,
         clickOnEnter: 'Ok',

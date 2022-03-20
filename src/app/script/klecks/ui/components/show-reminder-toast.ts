@@ -1,4 +1,5 @@
 import {BB} from '../../../bb/bb';
+import {LANG} from '../../../language/language';
 
 /**
  * fades in a little message that reminds user to save their draw
@@ -6,7 +7,7 @@ import {BB} from '../../../bb/bb';
  */
 export function showSaveReminderToast(remindersShowed) {
     let inner = BB.el({
-        content: 'Reminder to save<br>Unsaved work may get lost.'
+        content: LANG('save-reminder-title') + '<br>' + LANG('save-reminder-text'),
     });
     let div = BB.el({
         content: inner,

@@ -2,6 +2,7 @@ import {BB} from '../../../bb/bb';
 import {KlSlider} from '../base-components/kl-slider';
 import {Select} from '../base-components/select';
 import {Checkbox} from '../base-components/checkbox';
+import {LANG} from '../../../language/language';
 
 /**
  * Paint Bucket tab contents (color slider, opacity slider, etc)
@@ -29,7 +30,7 @@ export function FillUi(p) {
     });
 
     let opacitySlider = new KlSlider({
-        label: 'Opacity',
+        label: LANG('bucket-opacity'),
         width: 250,
         height: 30,
         min: 0,
@@ -44,7 +45,7 @@ export function FillUi(p) {
     div.appendChild(opacitySlider.getElement());
 
     let toleranceSlider = new KlSlider({
-        label: 'Tolerance',
+        label: LANG('bucket-tolerance'),
         width: 250,
         height: 30,
         min: 0,
@@ -72,17 +73,17 @@ export function FillUi(p) {
     let modeWrapper;
     let modeSelect;
     modeWrapper = BB.el({
-        content: 'Sample&nbsp;',
-        title: 'Which layers to sample color from',
+        content: LANG('bucket-sample') + '&nbsp;',
+        title: LANG('bucket-sample-title'),
         css: {
             fontSize: '15px'
         }
     });
     modeSelect = new Select({
         optionArr: [
-            ['all', 'All'],
-            ['current', 'Active'],
-            ['above', 'Above']
+            ['all', LANG('bucket-sample-all')],
+            ['current', LANG('bucket-sample-active')],
+            ['above', LANG('bucket-sample-above')]
         ],
         initValue: 'all',
         onChange: function(val) {}
@@ -99,8 +100,8 @@ export function FillUi(p) {
     let growWrapper;
     let growSelect;
     growWrapper = BB.el({
-        content: 'Grow&nbsp;',
-        title: 'Grow filled area (in pixels)',
+        content: LANG('bucket-grow') + '&nbsp;',
+        title: LANG('bucket-grow-title'),
         css: {
             fontSize: '15px',
             marginLeft: '10px'
@@ -133,8 +134,8 @@ export function FillUi(p) {
     let isContiguous = true;
     let contiguousToggle = new Checkbox({
         init: true,
-        label: 'Contiguous',
-        title: 'Only fill connected areas',
+        label: LANG('bucket-contiguous'),
+        title: LANG('bucket-contiguous-title'),
         callback: function (b) {
             isContiguous = b;
         },

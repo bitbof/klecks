@@ -9,11 +9,12 @@ import {penPressureToggle} from '../ui/base-components/pen-pressure-toggle';
 import brushIconImg from 'url:~/src/app/img/ui/brush-pen.svg';
 import {genBrushAlpha01, genBrushAlpha02} from '../brushes/alphas/brush-alphas';
 import {IBrushUi} from '../kl.types';
+import {LANG, languageStrings} from '../../language/language';
 
 export const penBrushUi = (function () {
     let brushInterface: IBrushUi = {
         image: brushIconImg,
-        tooltip: 'Pen',
+        tooltip: LANG('brush-pen'),
         sizeSlider: {
             min: 0.5,
             max: 100,
@@ -27,7 +28,21 @@ export const penBrushUi = (function () {
         Ui: null,
     };
 
-    let alphaNames = ['Circle', 'Chalk', 'Calligraphy', 'Square'];
+    let alphaNames = [
+        LANG('brush-pen-circle'),
+        LANG('brush-pen-chalk'),
+        LANG('brush-pen-calligraphy'),
+        LANG('brush-pen-square'),
+    ];
+    languageStrings.subscribe(() => {
+        brushInterface.tooltip = LANG('brush-pen');
+        alphaNames = [
+            LANG('brush-pen-circle'),
+            LANG('brush-pen-chalk'),
+            LANG('brush-pen-calligraphy'),
+            LANG('brush-pen-square'),
+        ];
+    });
 
     brushInterface.Ui = function (p) {
         let div = document.createElement("div"); // the gui
@@ -89,12 +104,12 @@ export const penBrushUi = (function () {
 
         let lockAlphaToggle = new Checkbox({
             init: brush.getLockAlpha(),
-            label: 'Lock Alpha',
+            label: LANG('brush-lock-alpha'),
             callback: function (b) {
                 brush.setLockAlpha(b);
             },
             doHighlight: true,
-            title: 'Locks layer\'s alpha channel',
+            title: LANG('brush-lock-alpha-title'),
             css: {
                 cssFloat: 'right',
                 textAlign: 'right',
@@ -110,7 +125,7 @@ export const penBrushUi = (function () {
 
         function init() {
             sizeSlider = new KlSlider({
-                label: 'Size',
+                label: LANG('brush-size'),
                 width: 225,
                 height: 30,
                 min: brushInterface.sizeSlider.min,
@@ -132,7 +147,7 @@ export const penBrushUi = (function () {
                 }
             });
             opacitySlider = new KlSlider({
-                label: 'Opacity',
+                label: LANG('brush-opacity'),
                 width: 225,
                 height: 30,
                 min: brushInterface.opacitySlider.min,

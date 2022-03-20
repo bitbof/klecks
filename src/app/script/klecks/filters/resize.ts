@@ -4,6 +4,7 @@ import {Select} from '../ui/base-components/select';
 // @ts-ignore
 import constrainImg from 'url:~/src/app/img/ui/constrain.svg';
 import {IFilterApply, IFilterGetDialogParam} from '../kl.types';
+import {LANG} from '../../language/language';
 
 export const resize = {
 
@@ -26,7 +27,7 @@ export const resize = {
         };
         let newWidth = canvas.getWidth(), newHeight = canvas.getHeight();
 
-        div.innerHTML = "Resizes the image.<br/><br/>";
+        div.innerHTML = LANG('filter-resize-description') + "<br/><br/>";
 
 
         let maxWidth = params.maxWidth, maxHeight = params.maxHeight;
@@ -89,8 +90,8 @@ export const resize = {
             heightChanged = true;
             update();
         };
-        widthWrapper.append("Width: ", widthInput);
-        heightWrapper.append("Height: ", heightInput);
+        widthWrapper.append(LANG('filter-resize-width') + ": ", widthInput);
+        heightWrapper.append(LANG('filter-resize-height') + ": ", heightInput);
         let inputWrapper = BB.el({
             css: {
                 background: "url(" + constrainImg + ") no-repeat 140px 5px",
@@ -119,7 +120,7 @@ export const resize = {
         let isConstrained = true;
         let constrainCheckbox = new Checkbox({
             init: true,
-            label: 'Constrain Proportions',
+            label: LANG('filter-resize-constrain'),
             allowTab: true,
             callback: function(b) {
                 isConstrained = b;
@@ -136,10 +137,10 @@ export const resize = {
         let algorithmSelect = new Select({
             isFocusable: true,
             optionArr: [
-                ['smooth', 'Smooth'],
-                ['pixelated', 'Pixelated']
+                ['smooth', LANG('algorithm-smooth')],
+                ['pixelated', LANG('algorithm-pixelated')]
             ],
-            title: 'Scaling algorithm',
+            title: LANG('scaling-algorithm'),
             initValue: 'smooth',
             onChange: function() {
                 update();

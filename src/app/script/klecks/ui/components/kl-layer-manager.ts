@@ -12,8 +12,12 @@ import duplicateLayerImg from 'url:~/src/app/img/ui/duplicate-layer.svg';
 import mergeLayerImg from 'url:~/src/app/img/ui/merge-layers.svg';
 // @ts-ignore
 import removeLayerImg from 'url:~/src/app/img/ui/remove-layer.svg';
+// @ts-ignore
+import renameLayerImg from 'url:~/src/app/img/ui/rename-layer.svg';
 import {KlCanvas} from '../../canvas/kl-canvas';
 import {IMixMode} from '../../kl.types';
+import {LANG} from '../../../language/language';
+import {translateBlending} from '../../canvas/translate-blending';
 
 
 export function klLayerManager(p_canvas: KlCanvas, p_func, p_rootDiv) {
@@ -77,7 +81,7 @@ export function klLayerManager(p_canvas: KlCanvas, p_func, p_rootDiv) {
         let div = document.createElement('div');
 
         let label = BB.el({
-            content: 'Name:',
+            content: LANG('layers-rename-name') + ':',
             css: {
                 marginRight: '5px'
             }
@@ -90,10 +94,11 @@ export function klLayerManager(p_canvas: KlCanvas, p_func, p_rootDiv) {
         });
         let input = document.createElement('input');
         input.value = klCanvas.getLayer(layer).name;
+        input.setAttribute('data-ignore-focus', 'true');
         const clearBtn = BB.el({
             tagName: 'Button',
             content: '<img src="' + removeLayerImg + '" height="20"/>',
-            title: 'Clear Name',
+            title: LANG('layers-rename-clear'),
             css: {
                 marginLeft: '10px',
             },
@@ -102,7 +107,13 @@ export function klLayerManager(p_canvas: KlCanvas, p_func, p_rootDiv) {
                 input.focus();
             }
         });
-        const suggestions = ['Sketch', 'Colors', 'Lines', 'Background', 'Foreground'];
+        const suggestions = [
+            LANG('layers-rename-sketch'),
+            LANG('layers-rename-colors'),
+            LANG('layers-rename-lines'),
+            LANG('background'),
+            LANG('layers-rename-foreground'),
+        ];
         const suggestionBtns = [];
         const row2 = BB.el({
             css: {
@@ -138,28 +149,28 @@ export function klLayerManager(p_canvas: KlCanvas, p_func, p_rootDiv) {
 
         popup({
             target: p_rootDiv,
-            message: "<b>Rename Layer</b>",
+            message: `<b>${LANG('layers-rename-title')}</b>`,
             div: div,
-            buttons: ['Rename', 'Cancel'],
-            primaries: ['Rename'],
+            buttons: [LANG('layers-rename'), 'Cancel'],
+            primaries: [LANG('layers-rename')],
             callback: function (val) {
                 BB.destroyEl(clearBtn);
                 suggestionBtns.forEach(item => {
                     BB.destroyEl(item);
                 });
                 suggestionBtns.splice(0, suggestionBtns.length);
-                if (val === "Rename") {
+                if (val === LANG('layers-rename')) {
                     if (input.value === klCanvas.getLayer(layer).name) {
                         return;
                     }
-                    klCanvas.renameLayer(layer, input.value.replace(/[^\w\s]/gi, ''));
+                    klCanvas.renameLayer(layer, input.value);
                     createLayerList();
                     klHistory.pause(true);
                     updatefunc(layer);
                     klHistory.pause(false);
                 }
             },
-            clickOnEnter: 'Rename'
+            clickOnEnter: LANG('layers-rename')
         });
     }
 
@@ -189,11 +200,11 @@ export function klLayerManager(p_canvas: KlCanvas, p_func, p_rootDiv) {
             removeBtn.style.cssFloat = 'left';
             renameBtn.style.cssFloat = 'left';
 
-            addnewBtn.title = "New Layer";
-            duplicateBtn.title = "Duplicate Layer";
-            removeBtn.title = "Remove Layer";
-            mergeBtn.title = "Merge with layer below";
-            renameBtn.title = "Rename layer";
+            addnewBtn.title = LANG('layers-new');
+            duplicateBtn.title = LANG('layers-duplicate');
+            removeBtn.title = LANG('layers-remove');
+            mergeBtn.title = LANG('layers-merge');
+            renameBtn.title = LANG('layers-rename-title');
 
             addnewBtn.style.paddingLeft = "5px";
             addnewBtn.style.paddingRight = "3px";
@@ -210,11 +221,11 @@ export function klLayerManager(p_canvas: KlCanvas, p_func, p_rootDiv) {
             renameBtn.style.height = "30px";
             renameBtn.style.lineHeight = "20px";
 
-            addnewBtn.innerHTML = "<img src='" + addLayerImg + "' height='20'/> ";
-            duplicateBtn.innerHTML = "<img src='" + duplicateLayerImg + "' height='20'/> ";
+            addnewBtn.innerHTML = "<img src='" + addLayerImg + "' height='20'/>";
+            duplicateBtn.innerHTML = "<img src='" + duplicateLayerImg + "' height='20'/>";
             mergeBtn.innerHTML = "<img src='" + mergeLayerImg + "' height='20'/>";
-            removeBtn.innerHTML = "<img src='" + removeLayerImg + "' height='20'/> ";
-            renameBtn.textContent = "Rename";
+            removeBtn.innerHTML = "<img src='" + removeLayerImg + "' height='20'/>";
+            renameBtn.innerHTML = "<img src='" + renameLayerImg + "' height='20'/>";
             addnewBtn.style.marginRight = "5px";
             removeBtn.style.marginRight = "5px";
             duplicateBtn.style.marginRight = "5px";
@@ -298,11 +309,11 @@ export function klLayerManager(p_canvas: KlCanvas, p_func, p_rootDiv) {
 
                 function mergeDialog(p) {
                     let div = document.createElement("div");
-                    div.innerHTML = "Merges the selected layer with the one underneath. Select the mix mode:";
+                    div.innerHTML = LANG('layers-merge-description');
 
                     let options = new Options({
                         optionArr: [
-                            {id: p.mixModeStr, label: p.mixModeStr === 'source-over' ? 'normal' : p.mixModeStr},
+                            {id: p.mixModeStr, label: translateBlending(p.mixModeStr)},
                             {id: 'source-in', label: 'source-in'},
                             {id: 'source-out', label: 'source-out'},
                             {id: 'source-atop', label: 'source-atop'},
@@ -381,7 +392,7 @@ export function klLayerManager(p_canvas: KlCanvas, p_func, p_rootDiv) {
 
                     popup({
                         target: p_rootDiv,
-                        message: "<b>Merge/Mix Layers</b>",
+                        message: `<b>${LANG('layers-merge-modal-title')}</b>`,
                         div: div,
                         buttons: ["Ok", "Cancel"],
                         clickOnEnter: 'Ok',
@@ -431,7 +442,7 @@ export function klLayerManager(p_canvas: KlCanvas, p_func, p_rootDiv) {
     let modeSelect;
     {
         modeWrapper = BB.el({
-            content: 'Blending&nbsp;',
+            content: LANG('layers-blending') + '&nbsp;',
             css: {
                 fontSize: '15px'
             }
@@ -439,28 +450,30 @@ export function klLayerManager(p_canvas: KlCanvas, p_func, p_rootDiv) {
 
         modeSelect = new Select({
             optionArr: [
-                ['source-over', 'normal'],
+                'source-over',
                 null,
-                ['darken', 'darken'],
-                ['multiply', 'multiply'],
-                ['color-burn', 'color burn'],
+                'darken',
+                'multiply',
+                'color-burn',
                 null,
-                ['lighten', 'lighten'],
-                ['screen', 'screen'],
-                ['color-dodge', 'color dodge'],
+                'lighten',
+                'screen',
+                'color-dodge',
                 null,
-                ['overlay', 'overlay'],
-                ['soft-light', 'soft light'],
-                ['hard-light', 'hard light'],
+                'overlay',
+                'soft-light',
+                'hard-light',
                 null,
-                ['difference', 'difference'],
-                ['exclusion', 'exclusion'],
+                'difference',
+                'exclusion',
                 null,
-                ['hue', 'hue'],
-                ['saturation', 'saturation'],
-                ['color', 'color'],
-                ['luminosity', 'luminosity']
-            ],
+                'hue',
+                'saturation',
+                'color',
+                'luminosity',
+            ].map((item: IMixMode) => {
+                return item ? [item, translateBlending(item)] : null;
+            }),
             onChange: function(val) {
                 klCanvas.setMixMode(selectedSpotIndex, val as IMixMode);
                 (div as any).update(selectedSpotIndex);

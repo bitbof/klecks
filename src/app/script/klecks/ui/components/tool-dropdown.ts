@@ -10,6 +10,7 @@ import toolTextImg from 'url:~/src/app/img/ui/tool-text.svg';
 import toolShapeImg from 'url:~/src/app/img/ui/tool-shape.svg';
 // @ts-ignore
 import caretDownImg from 'url:~/src/app/img/ui/caret-down.svg';
+import {LANG} from '../../../language/language';
 
 /**
  * Toolrow Dropdown. The button where you select: brush, fill, select, transform, etc.
@@ -32,7 +33,12 @@ export function ToolDropdown(p) {
         toolTextImg,
         toolShapeImg
     ];
-    let titleArr = ['Brush [B]', 'Paint Bucket [G]', 'Text [T]', 'Shape [U]'];
+    let titleArr = [
+        `${LANG('tool-brush')} [B]`,
+        `${LANG('tool-paint-bucket')} [G]`,
+        `${LANG('tool-text')} [T]`,
+        `${LANG('tool-shape')} [U]`,
+    ];
     let currentActiveIndex = 0;
     let isActive = true;
     let isOpen = false;
@@ -89,7 +95,7 @@ export function ToolDropdown(p) {
                                 closeDropdown();
                                 isActive = true;
                                 currentActiveIndex = i;
-                                updateImage();
+                                updateButton();
                                 p.onChange(optionArr[currentActiveIndex]);
                                 break;
                             }
@@ -253,9 +259,8 @@ export function ToolDropdown(p) {
 
         isActive = true;
         currentActiveIndex = index;
-        activeButton.title = titleArr[currentActiveIndex];
 
-        updateImage();
+        updateButton();
 
         p.onChange(optionArr[currentActiveIndex]);
     }
@@ -294,10 +299,11 @@ export function ToolDropdown(p) {
         div.removeChild(dropdownWrapper);
     }
 
-    function updateImage() {
+    function updateButton() {
+        activeButton.title = titleArr[currentActiveIndex];
         activeButtonIm.style.backgroundImage = 'url(\'' + imArr[currentActiveIndex] + '\')';
     }
-    updateImage();
+    updateButton();
 
 
     // --- interface ---
@@ -326,7 +332,7 @@ export function ToolDropdown(p) {
                 }
             }
             BB.addClassName(activeButton, 'toolspace-row-button-activated');
-            updateImage();
+            updateButton();
         } else {
             isActive = false;
             BB.removeClassName(activeButton, 'toolspace-row-button-activated');

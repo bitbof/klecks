@@ -3,6 +3,7 @@ import {Options} from '../ui/base-components/options';
 import {KlCanvasPreview} from '../canvas-ui/canvas-preview';
 import {getSharedFx} from './shared-gl-fx';
 import {IFilterApply, IFilterGetDialogParam, IKlBasicLayer} from '../kl.types';
+import {LANG} from '../../language/language';
 
 export const glCurves = {
 
@@ -42,7 +43,7 @@ export const glCurves = {
             let previewFactor = w / context.canvas.width;
             let brightness = 0, contrast = 0;
 
-            div.innerHTML = "Apply curves on the selected layer.<br/><br/>";
+            div.innerHTML = LANG('filter-curves-description') + "<br/><br/>";
 
             let curves = {
                 r: [[0, 0], [1 / 3, 1 / 3], [2 / 3, 2 / 3], [1, 1]],
@@ -83,19 +84,19 @@ export const glCurves = {
                     optionArr: [
                         {
                             id: 'All',
-                            label: 'All'
+                            label: LANG('filter-curves-all')
                         },
                         {
                             id: 'Red',
-                            label: 'Red'
+                            label: LANG('red')
                         },
                         {
                             id: 'Green',
-                            label: 'Green'
+                            label: LANG('green')
                         },
                         {
                             id: 'Blue',
-                            label: 'Blue'
+                            label: LANG('blue')
                         },
                     ],
                     initialId: 'All',

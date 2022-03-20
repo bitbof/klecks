@@ -4,6 +4,7 @@ import {KlCanvasPreview} from '../canvas-ui/canvas-preview';
 import {FreeTransform, ITransform} from '../ui/components/free-transform';
 import {Select} from '../ui/base-components/select';
 import {IFilterApply, IFilterGetDialogParam, IKlBasicLayer} from '../kl.types';
+import {LANG} from '../../language/language';
 
 interface IFilterTransformInput {
     bounds: {x: number, y: number, width: number, height: number};
@@ -74,7 +75,7 @@ export const transform = {
                 }
             }
             if (tempBounds.x1 === null || tempBounds.y1 === null) {
-                alert('Layer is empty.');
+                alert(LANG('filter-transform-empty'));
                 return false;
             }
             boundsObj.x = tempBounds.x1;
@@ -100,7 +101,7 @@ export const transform = {
         if (!isSmall) {
             result.width = 500;
         }
-        div.innerHTML = "Transforms selected layer. Hold Shift for additional behavior.";
+        div.innerHTML = LANG('filter-transform-description');
 
         let keyListener = new BB.KeyListener({
             onDown: function(keyStr) {
@@ -184,7 +185,7 @@ export const transform = {
         };
         leftWrapper.append("X: ", inputX);
         rightWrapper.append("Y: ", inputY);
-        rotWrapper.append('Rotation: ', inputR);
+        rotWrapper.append(LANG('filter-transform-rotation') + ': ', inputR);
         if (!isSmall) {
             const inputRow = BB.el({
                 parent: div,
@@ -211,7 +212,7 @@ export const transform = {
         const flipXBtn = BB.el ({
             parent: buttonRow,
             tagName: 'button',
-            content: 'Flip X',
+            content: LANG('filter-transform-flip') + ' X',
             onClick: () => {
                 const t = freeTransform.getTransform();
                 freeTransform.setSize(-t.width, t.height);
@@ -221,7 +222,7 @@ export const transform = {
         const flipYBtn = BB.el ({
             parent: buttonRow,
             tagName: 'button',
-            content: 'Flip Y',
+            content: LANG('filter-transform-flip') + ' Y',
             onClick: () => {
                 const t = freeTransform.getTransform();
                 freeTransform.setSize(t.width, -t.height);
@@ -283,7 +284,7 @@ export const transform = {
         const centerBtn = BB.el ({
             parent: buttonRow,
             tagName: 'button',
-            content: 'Center',
+            content: LANG('center'),
             onClick: () => {
                 const t = freeTransform.getTransform();
                 freeTransform.setPos({ x: context.canvas.width / 2, y: context.canvas.height / 2 });
@@ -300,8 +301,8 @@ export const transform = {
         let isConstrained = true;
         let constrainCheckbox = new Checkbox({
             init: true,
-            label: 'Constrain',
-            title: 'Constrain proportions',
+            label: LANG('filter-transform-constrain'),
+            title: LANG('filter-transform-constrain-title'),
             allowTab: true,
             callback: function(b) {
                 isConstrained = b;
@@ -314,8 +315,8 @@ export const transform = {
         let isSnapping = false;
         let snappingCheckbox = new Checkbox({
             init: true,
-            label: 'Snap',
-            title: 'Snap rotation and position',
+            label: LANG('filter-transform-snap'),
+            title: LANG('filter-transform-snap-title'),
             allowTab: true,
             callback: function(b) {
                 isSnapping = b;
@@ -347,11 +348,11 @@ export const transform = {
         let algorithmSelect = new Select({
             isFocusable: true,
             optionArr: [
-                ['smooth', 'Smooth'],
-                ['pixelated', 'Pixelated']
+                ['smooth', LANG('algorithm-smooth')],
+                ['pixelated', LANG('algorithm-pixelated')]
             ],
             initValue: 'smooth',
-            title: 'Scaling algorithm',
+            title: LANG('scaling-algorithm'),
             onChange: function() {
                 updatePreview(true);
             },

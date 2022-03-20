@@ -1,6 +1,7 @@
 import {BB} from '../../../bb/bb';
 import {popup} from './popup';
 import {CropCopy} from '../components/crop-copy';
+import {LANG} from '../../../language/language';
 
 /// <reference path="./types.d.ts" />
 
@@ -17,7 +18,7 @@ export function clipboardDialog(parent, fullCanvas, cropCallback, output, showCr
     const isSmall = window.innerWidth < 550 || window.innerHeight < 550;
 
     let topWrapper = BB.el({
-        content:'Drag to crop',
+        content: LANG('crop-drag-to-crop'),
         css: {
             textAlign: 'center'
         }
@@ -50,7 +51,7 @@ export function clipboardDialog(parent, fullCanvas, cropCallback, output, showCr
                     } as any) // todo check is possible?
                 ]);
                 setTimeout(function() {
-                    output.out('Copied', true);
+                    output.out(LANG('cropcopy-copied'), true);
                 }, 200);
             } catch (err) {
                 console.error(err.name, err.message);
@@ -74,17 +75,17 @@ export function clipboardDialog(parent, fullCanvas, cropCallback, output, showCr
     BB.addEventListener(window, "blur", blur);
     popup({
         target: parent,
-        message: showCrop ? "<b>Copy To Clipboard / Crop</b>" : '<b>Copy To Clipboard</b>',
+        message: showCrop ? `${LANG('cropcopy-title-copy')} / ${LANG('cropcopy-title-crop')}` : `${LANG('cropcopy-title-copy')}`,
         div: div,
         style: isSmall ? {} : {
             width: "500px"
         },
-        buttons: showCrop ? ['To Clipboard', 'Apply Crop', 'Cancel'] : ['To Clipboard', 'Cancel'],
-        primaries: ['To Clipboard'],
+        buttons: showCrop ? [LANG('cropcopy-btn-copy'), LANG('cropcopy-btn-crop'), 'Cancel'] : [LANG('cropcopy-btn-copy'), 'Cancel'],
+        primaries: [LANG('cropcopy-btn-copy')],
         callback: function (result) {
-            if (result === 'To Clipboard') {
+            if (result === LANG('cropcopy-btn-copy')) {
                 toClipboard();
-            } else if (result === 'Apply Crop') {
+            } else if (result === LANG('cropcopy-btn-crop')) {
                 let rectObj = cropCopy.getRect();
                 cropCallback({
                     left: Math.round(-rectObj.x),
@@ -97,7 +98,7 @@ export function clipboardDialog(parent, fullCanvas, cropCallback, output, showCr
             cropCopy.destroy();
             keyListener.destroy();
         },
-        clickOnEnter: 'To Clipboard',
+        clickOnEnter: LANG('cropcopy-btn-copy'),
         closefunc: function (func) {
             closefunc = func;
         }

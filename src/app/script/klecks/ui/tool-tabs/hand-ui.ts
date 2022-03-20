@@ -3,6 +3,7 @@ import {BB} from '../../../bb/bb';
 import angleImg from 'url:~/src/app/img/ui/angle.svg';
 // @ts-ignore
 import rotateImg from 'url:~/src/app/img/ui/edit-rotate.svg';
+import {LANG} from '../../../language/language';
 
 /**
  * Ui, when hand tool tab is open.
@@ -34,13 +35,18 @@ export function HandUi(p) {
             display: 'flex'
         }
     });
-    div.appendChild(row1);
     let row2 = BB.el({
+        css: {
+            display: 'flex',
+            marginBottom: '10px',
+        }
+    });
+    let row3 = BB.el({
         css: {
             display: 'flex'
         }
     });
-    div.appendChild(row2);
+    div.append(row1, row2, row3);
 
 
     let scaleEl = BB.el({
@@ -89,37 +95,30 @@ export function HandUi(p) {
 
     let resetButton = BB.el({
         tagName: 'button',
-        content: 'Reset',
+        content: LANG('hand-reset'),
         onClick: p.onReset
     });
     BB.makeUnfocusable(resetButton);
-    row2.appendChild(resetButton);
 
     let fitButton = BB.el({
         tagName: 'button',
-        content: 'Fit',
+        content: LANG('hand-fit'),
         css: {
             marginLeft: '10px'
         },
         onClick: p.onFit
     });
     BB.makeUnfocusable(fitButton);
-    row2.appendChild(fitButton);
-
-    row2.appendChild(BB.el({css: {flexGrow: '1'}}));
+    row2.append(resetButton, fitButton);
 
     let leftRotateButton = BB.el({
         tagName: 'button',
         content: '<img height="20" src="' + rotateImg + '" alt="Rotate" style="transform: scale(-1, 1)"/>',
-        css: {
-            marginLeft: '10px'
-        },
         onClick: function() {
             p.onAngleChange(-15, true);
         }
     });
     BB.makeUnfocusable(leftRotateButton);
-    row2.appendChild(leftRotateButton);
 
     let resetAngleButton = BB.el({
         tagName: 'button',
@@ -132,7 +131,6 @@ export function HandUi(p) {
         }
     });
     BB.makeUnfocusable(resetAngleButton);
-    row2.appendChild(resetAngleButton);
 
     let rightRotateButton = BB.el({
         tagName: 'button',
@@ -145,7 +143,7 @@ export function HandUi(p) {
         }
     });
     BB.makeUnfocusable(rightRotateButton);
-    row2.appendChild(rightRotateButton);
+    row3.append(leftRotateButton, resetAngleButton, rightRotateButton);
 
 
 

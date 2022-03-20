@@ -4,6 +4,7 @@ import {KlSlider} from '../ui/base-components/kl-slider';
 import {KlCanvasPreview} from '../canvas-ui/canvas-preview';
 import {getSharedFx} from './shared-gl-fx';
 import {IFilterApply, IFilterGetDialogParam, IKlBasicLayer} from '../kl.types';
+import {LANG} from '../../language/language';
 
 export const glHueSaturation = {
 
@@ -39,7 +40,7 @@ export const glHueSaturation = {
 
         function finishInit() {
             let hue = 0, Saturation = 0;
-            div.innerHTML = "Change hue and saturation for the selected layer.<br/><br/>";
+            div.innerHTML = LANG('filter-hue-sat-description') + "<br/><br/>";
 
             let glCanvas = getSharedFx();
             if (!glCanvas) {
@@ -49,7 +50,7 @@ export const glHueSaturation = {
             glCanvas.draw(texture).update(); // update glCanvas size
 
             let hueSlider = new KlSlider({
-                label: 'Hue',
+                label: LANG('filter-hue-sat-hue'),
                 width: 300,
                 height: 30,
                 min: -100,
@@ -63,7 +64,7 @@ export const glHueSaturation = {
                 }
             });
             let saturationSlider = new KlSlider({
-                label: 'Saturation',
+                label: LANG('filter-hue-sat-saturation'),
                 width: 300,
                 height: 30,
                 min: 0,

@@ -4,6 +4,7 @@ import {KlSlider} from '../ui/base-components/kl-slider';
 import {KlCanvasPreview} from '../canvas-ui/canvas-preview';
 import {getSharedFx} from './shared-gl-fx';
 import {IFilterApply, IFilterGetDialogParam, IKlBasicLayer} from '../kl.types';
+import {LANG} from '../../language/language';
 
 export const glUnsharpMask = {
 
@@ -41,7 +42,7 @@ export const glUnsharpMask = {
 
         function finishInit() {
             let radius = 2, strength = 5.1 / 10;
-            div.innerHTML = "Sharpens the selected layer by scaling pixels away from the average of their neighbors.<br/><br/>";
+            div.innerHTML = LANG('filter-unsharp-mask-description') + "<br/><br/>";
 
             let glCanvas = getSharedFx();
             if (!glCanvas) {
@@ -51,7 +52,7 @@ export const glUnsharpMask = {
             glCanvas.draw(texture).update(); // update glCanvas size
 
             let radiusSlider = new KlSlider({
-                label: 'Radius',
+                label: LANG('filter-unsharp-mask-radius'),
                 width: 300,
                 height: 30,
                 min: 0,
@@ -66,7 +67,7 @@ export const glUnsharpMask = {
                 curve: [[0, 0], [0.1, 2], [0.5, 50], [1, 200]]
             });
             let strengthSlider = new KlSlider({
-                label: 'Strength',
+                label: LANG('filter-unsharp-mask-strength'),
                 width: 300,
                 height: 30,
                 min: 0,

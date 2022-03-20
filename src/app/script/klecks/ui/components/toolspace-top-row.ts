@@ -11,6 +11,7 @@ import exportImg from 'url:~/src/app/img/ui/export.svg';
 import shareImg from 'url:~/src/app/img/ui/share.svg';
 // @ts-ignore
 import helpImg from 'url:~/src/app/img/ui/help.svg';
+import {LANG} from '../../../language/language';
 
 
 /**
@@ -75,7 +76,7 @@ export function ToolspaceTopRow(p) {
 
     let logoButton = createButton({
         onClick: p.onLogo,
-        title: 'Intro / Gallery / About',
+        title: LANG('home'),
         image: p.logoImg ? p.logoImg : klecksLogoImg,
         contain: true
     });
@@ -83,21 +84,21 @@ export function ToolspaceTopRow(p) {
     logoButton.style.borderRight = '1px solid rgb(212, 212, 212)';
     let newButton = createButton({
         onClick: p.onNew,
-        title: 'New Image',
+        title: LANG('file-new'),
         image: newImageImg,
         extraPadding: 1,
         contain: true
     });
     let importButton = createButton({
         onClick: p.onImport,
-        title: 'Import Image',
+        title: LANG('file-import'),
         image: importImg,
         extraPadding: 1,
         contain: true
     });
     let saveButton = createButton({
         onClick: p.onSave,
-        title: 'Save Image',
+        title: LANG('file-save'),
         image: exportImg,
         extraPadding: 1,
         contain: true
@@ -107,14 +108,14 @@ export function ToolspaceTopRow(p) {
     if (BB.canShareFiles()) {
         shareButton = createButton({
             onClick: p.onShare,
-            title: 'Share',
+            title: LANG('file-share'),
             image: shareImg,
             contain: true
         });
     }
     let helpButton = createButton({
         onClick: p.onHelp,
-        title: 'Help',
+        title: LANG('help'),
         image: helpImg,
         contain: true
     });

@@ -4,6 +4,7 @@ import {ColorOptions} from '../ui/base-components/color-options';
 import {KlCanvasPreview} from '../canvas-ui/canvas-preview';
 import {getSharedFx} from './shared-gl-fx';
 import {IFilterApply, IFilterGetDialogParam, IKlBasicLayer} from '../kl.types';
+import {LANG} from '../../language/language';
 
 export const toAlpha = {
 
@@ -39,7 +40,7 @@ export const toAlpha = {
         function finishInit() {
             let radius = 2, strength = 5.1 / 10;
             div.appendChild(BB.el({
-                content: 'Generates alpha channel for selected layer from:',
+                content: LANG('filter-to-alpha-description'),
                 css: {
                     marginBottom: '5px'
                 }
@@ -63,11 +64,11 @@ export const toAlpha = {
                 optionArr: [
                     {
                         id: 'inverted-luminance',
-                        label: 'Inverted Luminance'
+                        label: LANG('filter-to-alpha-inverted-lum')
                     },
                     {
                         id: 'luminance',
-                        label: 'Luminance'
+                        label: LANG('filter-to-alpha-lum')
                     }
                 ],
                 initialId: sourceId,
@@ -99,7 +100,7 @@ export const toAlpha = {
             });
 
             let colorOptions = new ColorOptions({
-                label: 'Replace RGB',
+                label: LANG('filter-to-alpha-replace'),
                 colorArr: colorOptionsArr,
                 initialIndex: 1,
                 onChange: function(rgbaObj) {

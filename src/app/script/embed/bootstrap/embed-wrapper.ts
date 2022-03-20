@@ -3,6 +3,7 @@ import {IKlProject} from '../../klecks/kl.types';
 // @ts-ignore
 import logoImg from 'url:~/src/app/img/klecks-logo.png';
 import {getEmbedUrl} from './get-embed-url';
+import {initLANG, LANG} from '../../language/language';
 
 let wrapperInstance: boolean = false;
 
@@ -18,46 +19,45 @@ export function EmbedWrapper(p: IEmbedParams) {
         embedUrl: p.embedUrl ? p.embedUrl : getEmbedUrl(),
     };
 
-    // loading screen
-    let loadingScreen = document.createElement('div');
-    const loadingStyleArr = [
-        ['position', 'fixed'],
-        ['left', '0'],
-        ['top', '0'],
-        ['width', '100vw'],
-        ['height', '100vh'],
-
-        ['display', 'flex'],
-        ['alignItems', 'center'],
-        ['justifyContent', 'center'],
-        ['flexDirection', 'column'],
-
-        ['background', 'rgb(158,158,158)'],
-
-        ['fontFamily', 'Arial, sans-serif'],
-        ['fontSize', '30px'],
-        ['color', '#e3e3e3'],
-    ];
-    for (let i = 0; i < loadingStyleArr.length; i++) {
-        loadingScreen.style[loadingStyleArr[i][0]] = loadingStyleArr[i][1];
-    }
-    loadingScreen.id = "loading-screen";
-    loadingScreen.innerHTML = '<img width="150" height="54" src="' + (p.logoImg ? p.logoImg : logoImg) + '" alt="Logo"/>\n' +
-        '<div style="margin: 15px 0 0 0; display: flex; align-items: center">\n' +
-        '<div class="spinner"></div>\n' +
-        '<span id="loading-screen-text">Loading app</span>' +
-        '</div>';
-    document.body.appendChild(loadingScreen)
-
-
-
     let project: IKlProject;
     let errorStr: string;
     let psds: IReadPSD[] = []; // if instance not loaded yet, these are psds to be read
     let instance; // instance of loaded Embed
 
-
     (async () => {
+        await initLANG();
+
+        // loading screen
+        let loadingScreen = document.createElement('div');
+        const loadingStyleArr = [
+            ['position', 'fixed'],
+            ['left', '0'],
+            ['top', '0'],
+            ['width', '100vw'],
+            ['height', '100vh'],
+
+            ['display', 'flex'],
+            ['alignItems', 'center'],
+            ['justifyContent', 'center'],
+            ['flexDirection', 'column'],
+
+            ['background', 'rgb(158,158,158)'],
+
+            ['fontFamily', 'Arial, sans-serif'],
+            ['fontSize', '30px'],
+            ['color', '#e3e3e3'],
+        ];
+        for (let i = 0; i < loadingStyleArr.length; i++) {
+            loadingScreen.style[loadingStyleArr[i][0]] = loadingStyleArr[i][1];
+        }
+        loadingScreen.id = "loading-screen";
+        loadingScreen.innerHTML = '<img width="150" height="54" src="' + (p.logoImg ? p.logoImg : logoImg) + '" alt="Logo"/>\n' +
+            '<div style="margin: 15px 0 0 0; display: flex; align-items: center">\n' +
+            '<div class="spinner"></div>\n' +
+            '<span id="loading-screen-text">' + LANG('embed-init-loading') + '</span>' +
+            '</div>';
+        document.body.appendChild(loadingScreen);
+
         const mainEmbed = await import('../../main-embed');
         instance = new mainEmbed.Embed(p);
 

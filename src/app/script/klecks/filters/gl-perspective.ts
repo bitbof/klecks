@@ -4,6 +4,7 @@ import {KlCanvasPreview} from '../canvas-ui/canvas-preview';
 import checkmarkImg from 'url:~/src/app/img/ui/checkmark.svg';
 import {getSharedFx} from './shared-gl-fx';
 import {IFilterApply, IFilterGetDialogParam, IKlBasicLayer} from '../kl.types';
+import {LANG} from '../../language/language';
 
 export const glPerspective = {
 
@@ -46,7 +47,7 @@ export const glPerspective = {
         let pointerListenerArr = [];
 
         function finishInit() {
-            div.innerHTML = "Transforms the selected layer. <br/><br/>";
+            div.innerHTML = LANG('filter-perspective-description') + "<br/><br/>";
 
             let glCanvas = getSharedFx();
             if (!glCanvas) {
@@ -146,7 +147,7 @@ export const glPerspective = {
             BB.setEventListener(beforeOption, 'onpointerdown', function () {
                 return false;
             });
-            beforeOption.textContent = "Before";
+            beforeOption.textContent = LANG('filter-perspective-before');
             beforeOption.style.width = "150px";
             beforeOption.style.height = "30px";
             beforeOption.style.marginLeft = isSmall ? '0' : "100px";
@@ -163,7 +164,7 @@ export const glPerspective = {
             BB.setEventListener(afterOption, 'onpointerdown', function () {
                 return false;
             });
-            afterOption.textContent = "After";
+            afterOption.textContent = LANG('filter-perspective-after');
             afterOption.style.width = "150px";
             afterOption.style.height = "30px";
             afterOption.style.paddingTop = "10px";

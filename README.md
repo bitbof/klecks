@@ -22,6 +22,24 @@ For a demo and list of features visit [kleki.com/home](https://kleki.com/home/).
 # Embed
 Example usage of the embed can be found under: `/examples/embed/`
 
+## Translations
+Are you a native speaker or have advanced skills in a language with no translation yet?
+Any contribution by you is highly encouraged and appreciated! These are the currently available languages:
+- English
+- German
+- Chinese (Work In Progress)
+
+Translations are edited via `src/languages`. Use CLI-commands to create resulting JSON & TS files.
+JSON5 is used for authoring for its convenient syntax that resembles JavaScript more closely.
+English (en-US) is the source of truth and the fallback if a key is not translated.
+- `npm run language:add <code>` - creates new language file (see language codes in `languages.json`)
+- `npm run language:sync <code>` - synchronizes with base file. (TODO)
+- `npm run language:build` - generates JSON & TS files in `src/app/languages`
+  - Problems are printed to the command line output
+
+A translation should try not to cause additional line-breaks in the UI if possible. Test to make sure translations
+fit the context of the application.
+
 # Contribute
 Klecks and Kleki are community funded. [Donate today](https://kleki.com/donate/)
 

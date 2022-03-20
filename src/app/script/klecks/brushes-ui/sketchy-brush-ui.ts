@@ -5,11 +5,12 @@ import {KlSlider} from '../ui/base-components/kl-slider';
 // @ts-ignore
 import brushIconImg from 'url:~/src/app/img/ui/brush-sketchy.png';
 import {IBrushUi} from '../kl.types';
+import {LANG, languageStrings} from '../../language/language';
 
 export const sketchyBrushUi = (function () {
     let brushInterface: IBrushUi = {
         image: brushIconImg,
-        tooltip: 'Sketchy',
+        tooltip: LANG('brush-sketchy'),
         sizeSlider: {
             min: 0.5,
             max: 10
@@ -20,6 +21,10 @@ export const sketchyBrushUi = (function () {
         },
         Ui: null,
     };
+
+    languageStrings.subscribe(() => {
+        brushInterface.tooltip = LANG('brush-sketchy');
+    });
 
     brushInterface.Ui = function (p) {
         let div = document.createElement("div"); // the gui
@@ -35,7 +40,7 @@ export const sketchyBrushUi = (function () {
 
         function init() {
             sizeSlider = new KlSlider({
-                label: 'Size',
+                label: LANG('brush-size'),
                 width: 250,
                 height: 30,
                 min: brushInterface.sizeSlider.min,
@@ -56,7 +61,7 @@ export const sketchyBrushUi = (function () {
                 }
             });
             opacitySlider = new KlSlider({
-                label: 'Opacity',
+                label: LANG('brush-opacity'),
                 width: 250,
                 height: 30,
                 min: brushInterface.opacitySlider.min,
@@ -72,7 +77,7 @@ export const sketchyBrushUi = (function () {
                 }
             });
             let blendSlider = new KlSlider({
-                label: 'Blending',
+                label: LANG('brush-blending'),
                 width: 250,
                 height: 30,
                 min: 0,
@@ -84,7 +89,7 @@ export const sketchyBrushUi = (function () {
                 }
             });
             let scaleSlider = new KlSlider({
-                label: 'Scale',
+                label: LANG('brush-sketchy-scale'),
                 width: 250,
                 height: 30,
                 min: 1,

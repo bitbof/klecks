@@ -8,11 +8,12 @@ import {penPressureToggle} from '../ui/base-components/pen-pressure-toggle';
 // @ts-ignore
 import brushIconImg from 'url:~/src/app/img/ui/brush-pixel.svg';
 import {IBrushUi} from '../kl.types';
+import {LANG, languageStrings} from '../../language/language';
 
 export const pixelBrushUi = (function () {
     let brushInterface: IBrushUi = {
         image: brushIconImg,
-        tooltip: 'Pixel',
+        tooltip: LANG('brush-pixel'),
         sizeSlider: {
             min: 0.5,
             max: 100,
@@ -26,6 +27,10 @@ export const pixelBrushUi = (function () {
         Ui: null,
     };
 
+    languageStrings.subscribe(() => {
+        brushInterface.tooltip = LANG('brush-pixel');
+    });
+
     brushInterface.Ui = function (p) {
         let div = document.createElement("div"); // the gui
         let brush = new brushes.PixelBrush();
@@ -36,12 +41,12 @@ export const pixelBrushUi = (function () {
 
         let lockAlphaToggle = new Checkbox({
             init: brush.getLockAlpha(),
-            label: 'Lock Alpha',
+            label: LANG('brush-lock-alpha'),
             callback: function (b) {
                 brush.setLockAlpha(b);
             },
             doHighlight: true,
-            title: 'Locks layer\'s alpha channel',
+            title: LANG('brush-lock-alpha-title'),
             css: {
                 marginRight: '10px',
             }
@@ -49,19 +54,18 @@ export const pixelBrushUi = (function () {
 
         let eraserToggle = new Checkbox({
             init: brush.getIsEraser(),
-            label: 'Eraser',
+            label: LANG('eraser'),
             callback: function (b) {
                 brush.setIsEraser(b);
             },
             css: {
-                width: '70px',
                 marginRight: '10px',
             }
         });
 
         let ditherToggle = new Checkbox({
             init: brush.getUseDither(),
-            label: 'Dither',
+            label: LANG('brush-pixel-dither'),
             callback: function (b) {
                 brush.setUseDither(b);
             }
@@ -76,7 +80,7 @@ export const pixelBrushUi = (function () {
 
         function init() {
             sizeSlider = new KlSlider({
-                label: 'Size',
+                label: LANG('brush-size'),
                 width: 225,
                 height: 30,
                 min: brushInterface.sizeSlider.min,
@@ -95,7 +99,7 @@ export const pixelBrushUi = (function () {
                 }
             });
             opacitySlider = new KlSlider({
-                label: 'Opacity',
+                label: LANG('brush-opacity'),
                 width: 225,
                 height: 30,
                 min: brushInterface.opacitySlider.min,

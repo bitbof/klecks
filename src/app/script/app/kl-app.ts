@@ -22,6 +22,19 @@ import {ProjectStore} from '../klecks/storage/project-store';
 import {SaveReminder} from "../klecks/ui/components/save-reminder";
 import {KlCanvasWorkspace} from '../klecks/canvas-ui/kl-canvas-workspace';
 import {KlCanvas} from '../klecks/canvas/kl-canvas';
+import {LANG} from '../language/language';
+// @ts-ignore
+import toolPaintImg from 'url:~/src/app/img/ui/tool-paint.svg';
+// @ts-ignore
+import toolMoveImg from 'url:~/src/app/img/ui/tool-move.svg';
+// @ts-ignore
+import toolFillImg from 'url:~/src/app/img/ui/tool-fill.svg';
+// @ts-ignore
+import toolTextImg from 'url:~/src/app/img/ui/tool-text.svg';
+// @ts-ignore
+import toolShapeImg from 'url:~/src/app/img/ui/tool-shape.svg';
+// @ts-ignore
+import tabSettingsImg from 'url:~/src/app/img/ui/tab-settings.svg';
 
 
 interface IKlAppOptions {
@@ -37,6 +50,7 @@ interface IKlAppOptions {
         filenameBase?: string; // part of filename when downloading drawing
         imgurKey?: string; // for imgur uploads
     };
+    aboutEl?: HTMLElement; // replaces info about Klecks in settings tab
 }
 
 importFilters();
@@ -289,14 +303,14 @@ export function KlApp(pProject: IKlProject | null, pOptions: IKlAppOptions) {
         onUndo: function() {
             if (klHistory.canUndo()) {
                 if (undoRedoCatchup.undo()) {
-                    statusOverlay.out('Undo', true);
+                    statusOverlay.out(LANG('undo'), true);
                 }
             }
         },
         onRedo: function() {
             if (klHistory.canRedo()) {
                 if (undoRedoCatchup.redo()) {
-                    statusOverlay.out('Redo', true);
+                    statusOverlay.out(LANG('redo'), true);
                 }
             }
         },
@@ -352,11 +366,11 @@ export function KlApp(pProject: IKlProject | null, pOptions: IKlAppOptions) {
                             setTimeout(() => {
                                 throw new Error('keyboard-shortcut: failed to store browser storage, ' + e);
                             }, 0);
-                            statusOverlay.out('❌ Failed to store to Browser Storage', true);
+                            statusOverlay.out('❌ ' + LANG('file-storage-failed'), true);
                         }
                         if (success) {
                             pOptions.saveReminder.reset();
-                            statusOverlay.out('Stored to Browser Storage', true);
+                            statusOverlay.out(LANG('file-storage-stored'), true);
                         }
                     })();
                 }
@@ -410,7 +424,7 @@ export function KlApp(pProject: IKlProject | null, pOptions: IKlAppOptions) {
             }
             if (comboStr === 'enter') {
                 klCanvas.layerFill(klCanvas.getLayerIndex(currentLayerCtx.canvas), klColorSlider.getColor());
-                statusOverlay.out('Filled', true);
+                statusOverlay.out(LANG('filled'), true);
             }
             if (['delete', 'backspace'].includes(comboStr)) {
                 let layerIndex = klCanvas.getLayerIndex(currentLayerCtx.canvas);
@@ -419,7 +433,7 @@ export function KlApp(pProject: IKlProject | null, pOptions: IKlAppOptions) {
                 } else {
                     klCanvas.clearLayer(layerIndex);
                 }
-                statusOverlay.out('Cleared layer', true);
+                statusOverlay.out(LANG('cleared-layer'), true);
             }
             if (comboStr === 'e') {
                 event.preventDefault();
@@ -489,7 +503,7 @@ export function KlApp(pProject: IKlProject | null, pOptions: IKlAppOptions) {
             KL.popup({
                 target: klRootEl,
                 type: "error",
-                message: "Couldn't load image. File might be corrupted.",
+                message: LANG('import-broken-file'),
                 buttons: ["Ok"],
             });
             return;
@@ -761,7 +775,7 @@ export function KlApp(pProject: IKlProject | null, pOptions: IKlAppOptions) {
             KL.popup({
                 target: klRootEl,
                 type: "warning",
-                message: "Unsupported features. PSD had to be flattened.<br /><br />",
+                message: LANG('import-psd-unsupported') + "<br /><br />",
                 buttons: ["Ok"],
             });
         }
@@ -794,7 +808,7 @@ export function KlApp(pProject: IKlProject | null, pOptions: IKlAppOptions) {
                     if (doShowLoader) {
                         KL.popup({
                             target: klRootEl,
-                            message: "Opening file...",
+                            message: LANG('import-opening') + "...",
                             callback: function (result) {
                                 loaderIsOpen = false;
                                 closeLoader = null;
@@ -833,9 +847,10 @@ export function KlApp(pProject: IKlProject | null, pOptions: IKlAppOptions) {
                                     KL.popup({
                                         target: klRootEl,
                                         type: "error",
-                                        message: "Image exceeds maximum dimensions of " + maxResolution + " x " + maxResolution + " pixels. Unable to import."
+                                        //message: "Image exceeds maximum dimensions of " + maxResolution + " x " + maxResolution + " pixels. Unable to import."
+                                        message: LANG('import-psd-too-large').replace(/{x}/g, '' + maxResolution)
                                             + "<br /><br />"
-                                            + "Image size: " + psd.width + " x " + psd.height + ' pixels'
+                                            + LANG('import-psd-size') + ": " + psd.width + " x " + psd.height + ' pixels'
                                             + "<br /><br />"
                                         ,
                                         buttons: ["Ok"],
@@ -887,7 +902,6 @@ export function KlApp(pProject: IKlProject | null, pOptions: IKlAppOptions) {
                                 if (closeLoader) {
                                     closeLoader();
                                 }
-                                console.log(e);
                                 KL.popup({
                                     target: klRootEl,
                                     type: "error",
@@ -926,7 +940,7 @@ export function KlApp(pProject: IKlProject | null, pOptions: IKlAppOptions) {
         if (hasUnsupportedFile) {
             KL.popup({
                 target: klRootEl,
-                message: 'Unsupported file type. See Help for supported types.',
+                message: LANG('import-unsupported-file'),
                 type: 'error',
                 buttons: ['OK'],
             });
@@ -1133,17 +1147,17 @@ export function KlApp(pProject: IKlProject | null, pOptions: IKlAppOptions) {
             onSubmit: () => {
                 KL.popup({
                     target: klRootEl,
-                    message: "Submit drawing?",
-                    buttons: ['Submit', 'Cancel'],
+                    message: LANG('submit-prompt'),
+                    buttons: [LANG('submit'), 'Cancel'],
                     callback: async (result) => {
-                        if (result !== 'Submit') {
+                        if (result !== LANG('submit')) {
                             return;
                         }
 
                         let overlay = BB.el({
                             parent: klRootEl,
                             className: 'upload-overlay',
-                            content: '<div class="spinner"></div> Submitting'
+                            content: '<div class="spinner"></div> ' + LANG('submit-submitting'),
                         });
 
                         pOptions.embed.onSubmit(
@@ -1549,12 +1563,15 @@ export function KlApp(pProject: IKlProject | null, pOptions: IKlAppOptions) {
         pOptions.saveReminder,
     );
 
+    const settingsTab = new KL.SettingsTab(pOptions.aboutEl);
+
     mainTabRow = new KL.TabRow({
         initialId: 'draw',
         tabArr: [
             {
                 id: 'draw',
-                label: 'Brush',
+                title: LANG('tool-brush'),
+                image: toolPaintImg,
                 onOpen: function() {
                     if (currentBrushId === 'eraserBrush') {
                         klColorSlider.enable(false);
@@ -1567,22 +1584,30 @@ export function KlApp(pProject: IKlProject | null, pOptions: IKlAppOptions) {
                 },
                 onClose: function() {
                     brushDiv.style.display = 'none';
+                },
+                css: {
+                    minWidth: '45px',
                 }
             },
             {
                 id: 'hand',
-                label: 'Hand',
+                title: LANG('tool-hand'),
+                image: toolMoveImg,
                 isVisible: false,
                 onOpen: function() {
                     handUi.setIsVisible(true);
                 },
                 onClose: function() {
                     handUi.setIsVisible(false);
+                },
+                css: {
+                    minWidth: '45px',
                 }
             },
             {
                 id: 'fill',
-                label: 'Fill',
+                title: LANG('tool-paint-bucket'),
+                image: toolFillImg,
                 isVisible: false,
                 onOpen: function() {
                     klColorSlider.enable(true);
@@ -1590,11 +1615,15 @@ export function KlApp(pProject: IKlProject | null, pOptions: IKlAppOptions) {
                 },
                 onClose: function() {
                     fillUi.setIsVisible(false);
+                },
+                css: {
+                    minWidth: '45px',
                 }
             },
             {
                 id: 'text',
-                label: 'Text',
+                title: LANG('tool-text'),
+                image: toolTextImg,
                 isVisible: false,
                 onOpen: function() {
                     klColorSlider.enable(true);
@@ -1602,11 +1631,15 @@ export function KlApp(pProject: IKlProject | null, pOptions: IKlAppOptions) {
                 },
                 onClose: function() {
                     textUi.setIsVisible(false);
+                },
+                css: {
+                    minWidth: '45px',
                 }
             },
             {
                 id: 'shape',
-                label: 'Shape',
+                title: LANG('tool-shape'),
+                image: toolShapeImg,
                 isVisible: false,
                 onOpen: function() {
                     klColorSlider.enable(true);
@@ -1614,11 +1647,14 @@ export function KlApp(pProject: IKlProject | null, pOptions: IKlAppOptions) {
                 },
                 onClose: function() {
                     shapeUi.setIsVisible(false);
+                },
+                css: {
+                    minWidth: '45px',
                 }
             },
             {
                 id: 'layers',
-                label: 'Layers',
+                label: LANG('tab-layers'),
                 onOpen: function() {
                     layerManager.update();
                     layerManager.style.display = 'block';
@@ -1629,7 +1665,7 @@ export function KlApp(pProject: IKlProject | null, pOptions: IKlAppOptions) {
             },
             {
                 id: 'edit',
-                label: 'Edit',
+                label: LANG('tab-edit'),
                 onOpen: function() {
                     filterTab.show();
                 },
@@ -1639,7 +1675,7 @@ export function KlApp(pProject: IKlProject | null, pOptions: IKlAppOptions) {
             },
             {
                 id: 'file',
-                label: 'File',
+                label: LANG('tab-file'),
                 isVisible: !!fileTab,
                 onOpen: function() {
                     if (!fileTab) {
@@ -1654,6 +1690,22 @@ export function KlApp(pProject: IKlProject | null, pOptions: IKlAppOptions) {
                     }
                     fileTab.getElement().style.display = 'none';
                     fileTab.setIsVisible(false);
+                }
+            },
+            {
+                id: 'settings',
+                title: 'Settings',
+                image: tabSettingsImg,
+                onOpen: function() {
+                    settingsTab.getElement().style.display = 'block';
+                    // settingsTab.setIsVisible(true);
+                },
+                onClose: function() {
+                    settingsTab.getElement().style.display = 'none';
+                    // settingsTab.setIsVisible(false);
+                },
+                css: {
+                    minWidth: '45px',
                 }
             }
         ]
@@ -1720,7 +1772,7 @@ export function KlApp(pProject: IKlProject | null, pOptions: IKlAppOptions) {
     } else {
         BB.el({
             parent: bottomBarWrapper,
-            content: 'powered by Klecks - <a href="https://kleki.com/donate" target="_blank">Donate</a>',
+            content: LANG('powered-by-klecks') + ` - <a href="https://kleki.com/donate" target="_blank">${LANG('donate')}</a>`,
             css: {
                 width: '100%',
                 textAlign: 'center',
@@ -1740,6 +1792,7 @@ export function KlApp(pProject: IKlProject | null, pOptions: IKlAppOptions) {
         layerManager,
         filterTab.getElement(),
         fileTab ? fileTab.getElement() : null,
+        settingsTab.getElement(),
         bottomBarWrapper ? bottomBarWrapper : null
     ]);
 

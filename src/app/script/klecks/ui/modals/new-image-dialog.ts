@@ -2,6 +2,7 @@ import {BB} from '../../../bb/bb';
 import {Select} from '../base-components/select';
 import {ColorOptions} from '../base-components/color-options';
 import {popup} from './popup';
+import {LANG} from '../../../language/language';
 
 /**
  * P = {
@@ -50,13 +51,13 @@ export function newImageDialog(p) {
     heightWrapper.style.height = "35px";
     heightWrapper.style.lineHeight = "30px";
 
-    widthUnit.innerText = 'px';
+    widthUnit.innerText = LANG('new-px');
     widthUnit.style.color = '#888';
     widthUnit.style.fontSize = "12px";
     widthUnit.style.marginLeft = "5px";
     widthUnit.style.cssFloat = "right";
 
-    heightUnit.innerText = 'px';
+    heightUnit.innerText = LANG('new-px');
     heightUnit.style.color = '#888';
     heightUnit.style.fontSize = "12px";
     heightUnit.style.marginLeft = "5px";
@@ -88,14 +89,13 @@ export function newImageDialog(p) {
     };
     widthWrapper.appendChild(widthUnit);
     widthWrapper.appendChild(widthInput);
-    BB.appendTextDiv(widthWrapper, "Width: ");
+    BB.appendTextDiv(widthWrapper, LANG('new-width') + ": ");
     heightWrapper.appendChild(heightUnit);
     heightWrapper.appendChild(heightInput);
-    BB.appendTextDiv(heightWrapper, "Height: ");
+    BB.appendTextDiv(heightWrapper, LANG('new-height') + ": ");
     let ratioWrapper = document.createElement("div");
     ratioWrapper.style.marginTop = '5px';
     ratioWrapper.style.color = '#888';
-    ratioWrapper.innerText = "Ratio: 23:12";
 
     // let swapButton = BB.div({
     //     tagName: 'button',
@@ -125,12 +125,12 @@ export function newImageDialog(p) {
     let presetPortraitBtn = document.createElement("button");
     let presetOversizeBtn = document.createElement("button");
 
-    presetCurrentBtn.textContent = "Current";
-    presetFitBtn.textContent = "Fit";
-    presetOversizeBtn.textContent = "Oversize";
-    presetLandscapeBtn.textContent = "Landscape";
-    presetPortraitBtn.textContent = "Portrait";
-    presetSquareBtn.textContent = "Square";
+    presetCurrentBtn.textContent = LANG('new-current');
+    presetFitBtn.textContent = LANG('new-fit');
+    presetOversizeBtn.textContent = LANG('new-oversize');
+    presetLandscapeBtn.textContent = LANG('new-landscape');
+    presetPortraitBtn.textContent = LANG('new-portrait');
+    presetSquareBtn.textContent = LANG('new-square');
 
     presetCurrentBtn.style.marginRight = "5px";
     presetFitBtn.style.marginRight = "5px";
@@ -186,12 +186,12 @@ export function newImageDialog(p) {
     let select = new Select({
         isFocusable: true,
         optionArr: [
-            ['screen', 'Screen'],
-            ['16 9', 'Video 16:9'],
+            ['screen', LANG('new-screen')],
+            ['16 9', LANG('new-video') + ' 16:9'],
             ['3 2', '3:2'],
             ['5 3', '5:3'],
             ['2 1', '2:1'],
-            ['paper', 'DIN Paper √2:1'],
+            ['paper', LANG('new-din-paper') + ' √2:1'],
             ['9 16', '9:16'],
             ['2 3', '2:3'],
             ['3 5', '3:5'],
@@ -215,6 +215,9 @@ export function newImageDialog(p) {
             updateRatio();
             select.setValue(null);
         }
+    });
+    BB.css(select.getElement(), {
+        width: '80px',
     });
     templateWrapper.appendChild(select.getElement());
 
@@ -338,9 +341,9 @@ export function newImageDialog(p) {
         }
         //display ratio
         if (closestDistance > 0 && closestDistance < 0.005) {
-            ratioWrapper.innerText = 'Ratio: ~' + closestRatio[0] + ':' + closestRatio[1];
+            ratioWrapper.innerText = LANG('new-ratio') + ': ~' + closestRatio[0] + ':' + closestRatio[1];
         } else {
-            ratioWrapper.innerText = 'Ratio: ' + reducedArr[0] + ':' + reducedArr[1];
+            ratioWrapper.innerText = LANG('new-ratio') + ': ' + reducedArr[0] + ':' + reducedArr[1];
         }
 
         prevW = w;
@@ -409,7 +412,7 @@ export function newImageDialog(p) {
 
     popup({
         target: document.body,
-        message: "<b>New Image</b>",
+        message: `<b>${LANG('new-title')}</b>`,
         div: newImDiv,
         buttons: ['Ok', 'Cancel'],
         callback: function (result) {

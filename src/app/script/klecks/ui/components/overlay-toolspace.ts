@@ -2,6 +2,7 @@ import {BB} from '../../../bb/bb';
 import {KlSmallColorSlider} from '../base-components/kl-color-slider-small';
 import {KlSlider} from '../base-components/kl-slider';
 import {BrushSettingService} from '../../brushes-ui/brush-setting-service';
+import {LANG} from '../../../language/language';
 
 /**
  * Compressed HUD toolspace. When you hold ctrl+alt.
@@ -85,7 +86,7 @@ export function OverlayToolspace(
     //brushsize slider
 
     const sizeSlider = new KlSlider({
-        label: 'Size',
+        label: LANG('brush-size'),
         width: sizeObj.width,
         height: sizeObj.sliderHeight,
         min: 0,
@@ -109,7 +110,7 @@ export function OverlayToolspace(
     div.appendChild(sizeSlider.getElement());
 
     const opacitySlider = new KlSlider({
-        label: 'Opacity',
+        label: LANG('brush-opacity'),
         width: sizeObj.width,
         height: sizeObj.sliderHeight,
         min: 0,

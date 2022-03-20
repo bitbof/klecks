@@ -8,11 +8,12 @@ import {Checkbox} from '../ui/base-components/checkbox';
 // @ts-ignore
 import brushIconImg from 'url:~/src/app/img/ui/brush-eraser.svg';
 import {IBrushUi} from '../kl.types';
+import {LANG, languageStrings} from '../../language/language';
 
 export const eraserBrushUi = (function () {
     let brushInterface: IBrushUi = {
         image: brushIconImg,
-        tooltip: 'Eraser [E]',
+        tooltip: LANG('eraser') + ' [E]',
         sizeSlider: {
             min: 0.5,
             max: 200,
@@ -24,6 +25,10 @@ export const eraserBrushUi = (function () {
         },
         Ui: null,
     };
+
+    languageStrings.subscribe(() => {
+        brushInterface.tooltip = LANG('eraser') + ' [E]';
+    });
 
     brushInterface.Ui = function (p) {
         let div = document.createElement("div"); // the gui
@@ -41,7 +46,7 @@ export const eraserBrushUi = (function () {
 
         function init() {
             sizeSlider = new KlSlider({
-                label: 'Size',
+                label: LANG('brush-size'),
                 width: 225,
                 height: 30,
                 min: brushInterface.sizeSlider.min,
@@ -63,7 +68,7 @@ export const eraserBrushUi = (function () {
                 }
             });
             opacitySlider = new KlSlider({
-                label: 'Opacity',
+                label: LANG('brush-opacity'),
                 width: 225,
                 height: 30,
                 min: brushInterface.opacitySlider.min,
@@ -100,7 +105,7 @@ export const eraserBrushUi = (function () {
 
             let transparencyToggle = new Checkbox({
                 init: false,
-                label: 'Transparent Background',
+                label: LANG('brush-eraser-transparent-bg'),
                 callback: function (b) {
                     isTransparentBg = b;
                     brush.setTransparentBG(b);

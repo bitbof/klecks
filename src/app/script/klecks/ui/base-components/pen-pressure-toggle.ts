@@ -1,6 +1,7 @@
 import {BB} from '../../../bb/bb';
 // @ts-ignore
 import iconImg from 'url:~/src/app/img/ui/brush-pressure.svg';
+import {LANG} from '../../../language/language';
 
 
 /**
@@ -47,7 +48,7 @@ export const penPressureToggle = function(isChecked, changeCallback) {
         }
     }
 
-    toggleDiv.title = 'Toggle Pressure Sensitivity';
+    toggleDiv.title = LANG('brush-toggle-pressure');
     toggleDiv.onclick = function() {
         isChecked = !isChecked;
         redraw();

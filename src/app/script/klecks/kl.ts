@@ -71,6 +71,7 @@ import {UndoRedoCatchup} from "./history/undo-redo-catchup";
 import {setDbName} from './storage/indexed-db';
 import {BrushSettingService} from './brushes-ui/brush-setting-service';
 import {BoxToggle} from './ui/base-components/box-toggle';
+import {SettingsTab} from './ui/tool-tabs/settings-tab';
 
 /**
  * paint tool functionality
@@ -173,6 +174,7 @@ export const KL = {
     ShapeUi,
     FileTab,
     FilterTab,
+    SettingsTab,
 
 
     klHistory,

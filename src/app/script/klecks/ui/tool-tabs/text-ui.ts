@@ -1,4 +1,5 @@
 import {BB} from '../../../bb/bb';
+import {LANG} from '../../../language/language';
 
 /**
  * Text Tool tab contents (color slider)
@@ -27,7 +28,7 @@ export function TextUi(p) {
 
     let hint = BB.el({
         parent: div,
-        content: 'Click canvas to place text'
+        content: LANG('text-instruction'),
     });
 
 

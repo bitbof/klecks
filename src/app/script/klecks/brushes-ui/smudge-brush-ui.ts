@@ -8,11 +8,12 @@ import {penPressureToggle} from '../ui/base-components/pen-pressure-toggle';
 // @ts-ignore
 import brushIconImg from 'url:~/src/app/img/ui/brush-smudge.svg';
 import {IBrushUi} from '../kl.types';
+import {LANG, languageStrings} from '../../language/language';
 
 export const smudgeBrushUi = (function () {
     let brushInterface: IBrushUi = {
         image: brushIconImg,
-        tooltip: 'Smudge',
+        tooltip: LANG('brush-smudge'),
         sizeSlider: {
             min: 0.5,
             max: 100,
@@ -26,6 +27,10 @@ export const smudgeBrushUi = (function () {
         Ui: null,
     };
 
+    languageStrings.subscribe(() => {
+        brushInterface.tooltip = LANG('brush-smudge');
+    });
+
     brushInterface.Ui = function (p) {
         let div = document.createElement("div"); // the gui
         let brush = new brushes.SmudgeBrush();
@@ -36,12 +41,12 @@ export const smudgeBrushUi = (function () {
 
         let lockAlphaToggle = new Checkbox({
             init: brush.getLockAlpha(),
-            label: 'Lock Alpha',
+            label: LANG('brush-lock-alpha'),
             callback: function (b) {
                 brush.setLockAlpha(b);
             },
             doHighlight: true,
-            title: 'Locks layer\'s alpha channel',
+            title: LANG('brush-lock-alpha-title'),
             css: {
                 cssFloat: 'right',
                 textAlign: 'right',
@@ -57,7 +62,7 @@ export const smudgeBrushUi = (function () {
 
         function init() {
             sizeSlider = new KlSlider({
-                label: 'Size',
+                label: LANG('brush-size'),
                 width: 225,
                 height: 30,
                 min: brushInterface.sizeSlider.min,
@@ -79,7 +84,7 @@ export const smudgeBrushUi = (function () {
                 }
             });
             opacitySlider = new KlSlider({
-                label: 'Opacity',
+                label: LANG('brush-opacity'),
                 width: 225,
                 height: 30,
                 min: brushInterface.opacitySlider.min,

@@ -15,7 +15,7 @@ export class Select {
     // --- public ---
     constructor (p: {
         isFocusable?: boolean; // default false
-        optionArr: ([string, string] | null)[],
+        optionArr: ([string, string] | null)[], // [value, label]
         initValue?: string; // default null
         onChange: (val: string) => void;
         css?: IKeyString;

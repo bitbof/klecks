@@ -5,6 +5,7 @@ import {IKeyString} from '../../../bb/bb.types';
 import {StatusOverlay} from '../components/status-overlay';
 import {KlCanvasWorkspace} from '../../canvas-ui/kl-canvas-workspace';
 import {KlCanvas} from '../../canvas/kl-canvas';
+import {LANG} from '../../../language/language';
 
 
 export class FilterTab {
@@ -46,8 +47,8 @@ export class FilterTab {
         function createButton(filterKey, filterArr) {
             let button = document.createElement("button");
             let buttonLabel = filterArr[filterKey].buttonLabel ? filterArr[filterKey].buttonLabel : filterArr[filterKey].name;
-            let name = filterArr[filterKey].name;
-            let im = '<img height="20" width="18" src="' + filterArr[filterKey].icon + '" alt="' + name + '" />';
+            let im = '<img height="20" width="18" src="' + filterArr[filterKey].icon + '" alt="icon" />';
+            let name = buttonLabel;
             if (name.length > 11) {
                 name = "<span style='font-size: 12px'>" + buttonLabel + "</span>";
             }
@@ -104,7 +105,7 @@ export class FilterTab {
                 if (filterArr[filterKey].isInstant){
                     button.blur();
                     applyFilter(null);
-                    _this.statusOverlay.out('"' + filterArr[filterKey].name + '" applied', true);
+                    _this.statusOverlay.out('"' + filterArr[filterKey].name + '" ' + LANG('filter-applied'), true);
                 } else {
                     let secondaryColorRGB = _this.klColorSlider.getSecondaryRGB();
                     let filterDialog = filterArr[filterKey].getDialog({

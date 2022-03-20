@@ -12,7 +12,10 @@
     "start": "parcel serve src/index.html --no-cache",
     "build": "parcel build src/index.html",
     "build:embed": "parcel build src/embed.ts",
-    "build:help": "parcel build src/help.html --public-url ."
+    "build:help": "parcel build src/help.html --public-url .",
+    "lang:add": "node src/languages/generate.js add",
+    "lang:sync": "node src/languages/generate.js sync",
+    "lang:build": "node src/languages/generate.js build"
   },
   "devDependencies": {
     "@parcel/transformer-sass": "^2.0.1",
@@ -21,6 +24,8 @@
   },
   "dependencies": {
     "@parcel/transformer-image": "^2.0.1",
+    "js-beautify": "^1.14.0",
+    "json5": "^1.0.1",
     "mdn-polyfills": "^5.20.0",
     "parcel": "^2.0.1"
   }

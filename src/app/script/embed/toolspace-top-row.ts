@@ -15,6 +15,7 @@ import {BB} from "../bb/bb";
 import uiSwapImg from 'url:~/src/app/img/ui/ui-swap-lr.svg';
 // @ts-ignore
 import helpImg from 'url:~/src/app/img/ui/help.svg';
+import {LANG} from '../language/language';
 
 export class ToolspaceTopRow {
     el: HTMLDivElement;
@@ -70,9 +71,9 @@ export class ToolspaceTopRow {
 
         let submitButton = createButton({
             onClick: p.onSubmit,
-            title: 'Submit drawing',
+            title: LANG('submit-title'),
             content: BB.el({
-                content: 'Submit',
+                content: LANG('submit'),
                 className: 'toolspace-row-button__submit',
                 css: {
                     display: 'flex',
@@ -88,44 +89,20 @@ export class ToolspaceTopRow {
 
         let helpButton = createButton({
             onClick: p.onHelp,
-            title: 'Help',
+            title: LANG('help'),
             image: helpImg,
             contain: true
         });
 
         let leftRightButton = createButton({
             onClick: p.onLeftRight,
-            title: 'Switch left/right UI',
+            title: LANG('switch-ui-left-right'),
             image: uiSwapImg,
             contain: true
         });
-        let fullButton = createButton({
-            onClick: function() {
-                parent.postMessage({type: 'toggleFull'}, '*');
-                fullButton.style.display = 'none';
-                minimizeButton.style.display = '';
-            },
-            title: 'Toggle Full Page',
-            image: '__version__/img/ui/ui-fullscreen.svg',
-            contain: true
-        });
-        let minimizeButton = createButton({
-            onClick: function() {
-                parent.postMessage({type: 'toggleFull'}, '*');
-                fullButton.style.display = '';
-                minimizeButton.style.display = 'none';
-            },
-            title: 'Toggle Full Page',
-            image: '__version__/img/ui/ui-minimize.svg',
-            contain: true
-        });
-        minimizeButton.style.display = 'none';
-
 
         div.appendChild(submitButton);
         div.appendChild(leftRightButton);
-        // div.appendChild(fullButton);
-        // div.appendChild(minimizeButton);
         div.appendChild(helpButton);
     }
 

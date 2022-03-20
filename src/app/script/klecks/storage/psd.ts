@@ -1,6 +1,7 @@
 import {createCanvas} from '../../bb/base/create-canvas';
 import {Psd} from 'ag-psd/dist/psd';
 import {IKlProject, IKlPsd, IMixMode} from '../kl.types';
+import {LANG} from '../../language/language';
 
 let kl2PsdMap;
 let psd2KlMap;
@@ -341,7 +342,7 @@ export function klPsdToKlProject(klPsd: IKlPsd): IKlProject {
     } else {
         // flattened
         result.layers.push({
-            name: 'Background',
+            name: LANG('background'),
             opacity: 1,
             mixModeStr: 'source-over',
             image: klPsd.canvas,

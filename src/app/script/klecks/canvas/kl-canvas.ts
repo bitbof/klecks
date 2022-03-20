@@ -5,6 +5,7 @@ import {IRenderTextParam, renderText} from '../image-operations/render-text';
 import {IKlProject, IMixMode, IRGB, IShapeToolObject} from '../kl.types';
 import {DecoyKlHistory, KlHistoryInterface} from '../history/kl-history';
 import {drawProject} from './draw-project';
+import {LANG} from '../../language/language';
 
 
 const allowedMixModes = [
@@ -191,7 +192,7 @@ export class KlCanvas {
                 this.layerOpacity(i, item.opacity);
             }
         } else {
-            this.layerCanvasArr[0].name = p.layerName ? p.layerName : "Layer 1";
+            this.layerCanvasArr[0].name = p.layerName ? p.layerName : LANG('layers-layer') + " 1";
             this.layerCanvasArr[0].width = this.width;
             this.layerCanvasArr[0].height = this.height;
             this.layerCanvasArr[0].mixModeStr = 'source-over';
@@ -369,7 +370,7 @@ export class KlCanvas {
             selected++;
         }
 
-        (canvas as any).name = "Layer " + (this.layerCanvasArr.length + this.layerNrOffset);
+        (canvas as any).name = LANG('layers-layer') + " " + (this.layerCanvasArr.length + this.layerNrOffset);
         this.history.pause(true);
         this.layerOpacity(selected, 1);
         this.history.pause(false);
@@ -389,7 +390,7 @@ export class KlCanvas {
         let canvas = BB.canvas(this.width, this.height);
         this.layerCanvasArr.splice(i + 1, 0, canvas as any);
 
-        (canvas as any).name = this.layerCanvasArr[i].name + " copy";
+        (canvas as any).name = this.layerCanvasArr[i].name + " " + LANG('layers-copy');
         (canvas as any).mixModeStr = this.layerCanvasArr[i].mixModeStr;
         canvas.getContext("2d").drawImage(this.layerCanvasArr[i], 0, 0);
         this.history.pause(true);

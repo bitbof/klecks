@@ -1,0 +1,1282 @@
+{
+    'switch-ui-left-right': {
+        original: 'Switch left/right UI',
+        value: ''
+    },
+    "toggle-show-tools": {
+        original: 'Show/Hide Tools',
+        value: '',
+    },
+    'powered-by-klecks': {
+        original: 'powered by Klecks',
+        value: 'powered by Klecks'
+    },
+    donate: {
+        original: 'Donate',
+        value: '$ 支持'
+    },
+    home: {
+        hint: 'button with logo, top left of tools',
+        original: 'Home',
+        value: '主页'
+    },
+    'modal-new-tab': {
+        original: 'Open in new tab',
+        value: '在新页面打开'
+    },
+    'tab-layers': {
+        original: 'Layers',
+        value: '图层'
+    },
+    'tab-edit': {
+        original: 'Edit',
+        value: '编辑'
+    },
+    'tab-file': {
+        original: 'File',
+        value: '文件'
+    },
+    'tool-brush': {
+        original: 'Brush',
+        value: '画笔工具'
+    },
+    'tool-paint-bucket': {
+        original: 'Paint Bucket',
+        value: '油漆桶'
+    },
+    'tool-shape': {
+        original: 'Shape',
+        value: '形状'
+    },
+    'tool-text': {
+        original: 'Text',
+        value: '文本'
+    },
+    'tool-hand': {
+        original: 'Hand Tool',
+        value: '手型工具'
+    },
+    'tool-zoom': {
+        original: 'Zoom',
+        value: '缩放工具'
+    },
+    'tool-zoom-in': {
+        original: 'Zoom In',
+        value: '放大'
+    },
+    'tool-zoom-out': {
+        original: 'Zoom Out',
+        value: '缩小'
+    },
+    'tool-undo-redo': {
+        original: 'Undo / Redo',
+        value: '撤销/重做'
+    },
+    undo: {
+        original: 'Undo',
+        value: '撤销'
+    },
+    redo: {
+        original: 'Redo',
+        value: '重做'
+    },
+    'brush-pen': {
+        original: 'Pen',
+        value: '画笔'
+    },
+    'brush-blend': {
+        original: 'Blend',
+        value: '水彩刷'
+    },
+    'brush-sketchy': {
+        hint: 'Made up brush name. Pictures drawn with this brush often look like sketches.',
+        original: 'Sketchy',
+        value: '素描笔'
+    },
+    'brush-pixel': {
+        original: 'Pixel',
+        value: '像素化'
+    },
+    'brush-chemy': {
+        hint: 'Made up brush name, derived from drawing applications "Webchemy" and "Alchemy"',
+        original: 'Chemy',
+        value: '异形图形'
+    },
+    'brush-smudge': {
+        hint: 'Common brush/tool in image editing software. Smudges colors around canvas.',
+        original: 'Smudge',
+        value: '晕染'
+    },
+    'brush-size': {
+        original: 'Size',
+        value: '粗细'
+    },
+    'brush-opacity': {
+        original: 'Opacity',
+        value: '透明度'
+    },
+    'brush-blending': {
+        original: 'Blending',
+        value: '湿润度'
+    },
+    'brush-toggle-pressure': {
+        original: 'Toggle Pressure Sensitivity',
+        value: '笔压敏度'
+    },
+    'brush-lock-alpha': {
+        original: 'Lock Alpha',
+        value: '锁定'
+    },
+    'brush-lock-alpha-title': {
+        original: "Locks layer's alpha channel",
+        value: '锁定图层透明度'
+    },
+    'brush-pen-circle': {
+        original: 'Circle',
+        value: '圆形'
+    },
+    'brush-pen-chalk': {
+        original: 'Chalk',
+        value: '粉笔'
+    },
+    'brush-pen-calligraphy': {
+        original: 'Calligraphy',
+        value: '斜角笔'
+    },
+    'brush-pen-square': {
+        original: 'Square',
+        value: '方形'
+    },
+    'brush-sketchy-scale': {
+        hint: 'How far the connecting lines of sketchy brush can reach.',
+        original: 'Scale',
+        value: '网格长度'
+    },
+    'brush-pixel-dither': {
+        original: 'Dither',
+        value: '像素抖动'
+    },
+    'brush-chemy-fill': {
+        original: 'Fill',
+        value: '填充'
+    },
+    'brush-chemy-stroke': {
+        original: 'Stroke',
+        value: '线条'
+    },
+    'brush-chemy-mirror-x': {
+        original: 'Horizontal Symmetry',
+        value: '水平对称'
+    },
+    'brush-chemy-mirror-y': {
+        original: 'Vertical Symmetry',
+        value: '垂直对称'
+    },
+    'brush-chemy-gradient': {
+        original: 'Gradient',
+        value: '渐变'
+    },
+    'brush-eraser-transparent-bg': {
+        original: 'Transparent Background',
+        value: '底层透明度'
+    },
+    stabilizer: {
+        hint: 'Common feature in drawing software to make lines smoother',
+        original: 'Stabilizer',
+        value: '抖动修正'
+    },
+    'stabilizer-title': {
+        hint: '-title keys are usually more verbose description. shown as a tooltip.',
+        original: 'Line Stabilizer',
+        value: '抖动修正线条'
+    },
+    eyedropper: {
+        original: 'Eyedropper',
+        value: '颜色选取'
+    },
+    'secondary-color': {
+        original: 'Secondary Color',
+        value: '二级色'
+    },
+    'manual-color-input': {
+        hint: 'A dialog where users can manually type the color, each channel a number. "mci" keys all related to this dialog.',
+        original: 'Manual Color Input',
+        value: '手动输入颜色'
+    },
+    'mci-hex': {
+        original: 'Hex',
+        value: '16进制'
+    },
+    'mci-copy': {
+        original: 'Copy',
+        value: '复制'
+    },
+    'modal-ok': {
+        original: 'Ok',
+        value: 'Ok'
+    },
+    'modal-cancel': {
+        original: 'Cancel',
+        value: '取消'
+    },
+    'modal-close': {
+        original: 'Close',
+        value: '关闭'
+    },
+    'layers-active-layer': {
+        hint: 'currently selected layer that user is drawing on',
+        original: 'Active Layer',
+        value: '当前图层'
+    },
+    'layers-opacity': {
+        original: 'Opacity',
+        value: '透明度'
+    },
+    'layers-layer': {
+        original: 'Layer',
+        value: '图层'
+    },
+    'layers-copy': {
+        hint: 'noun',
+        original: 'copy',
+        value: '副本'
+    },
+    'layers-blending': {
+        hint: 'Common feature in image editing & drawing software. All layers-blend- keys relate to this. https://en.wikipedia.org/wiki/Blend_modes',
+        original: 'Blending',
+        value: '混合模式'
+    },
+    'layers-new': {
+        original: 'New Layer',
+        value: '新建图层'
+    },
+    'layers-remove': {
+        original: 'Remove Layer',
+        value: '删除图层'
+    },
+    'layers-duplicate': {
+        original: 'Duplicate Layer',
+        value: '复制图层'
+    },
+    'layers-merge': {
+        original: 'Merge with layer below',
+        value: '向下合并'
+    },
+    'layers-rename': {
+        original: 'Rename',
+        value: '重命名'
+    },
+    'layers-blend-normal': {
+        original: 'normal',
+        value: '正常'
+    },
+    'layers-blend-darken': {
+        original: 'darken',
+        value: '变暗'
+    },
+    'layers-blend-multiply': {
+        original: 'multiply',
+        value: '正片叠底'
+    },
+    'layers-blend-color-burn': {
+        original: 'color burn',
+        value: '颜色加深'
+    },
+    'layers-blend-lighten': {
+        original: 'lighten',
+        value: '变亮'
+    },
+    'layers-blend-screen': {
+        original: 'screen',
+        value: '滤色'
+    },
+    'layers-blend-color-dodge': {
+        original: 'color dodge',
+        value: '颜色减淡'
+    },
+    'layers-blend-overlay': {
+        original: 'overlay',
+        value: '叠加'
+    },
+    'layers-blend-soft-light': {
+        original: 'soft light',
+        value: '柔光'
+    },
+    'layers-blend-hard-light': {
+        original: 'hard light',
+        value: '强光'
+    },
+    'layers-blend-difference': {
+        original: 'difference',
+        value: '差值'
+    },
+    'layers-blend-exclusion': {
+        original: 'exclusion',
+        value: '排除'
+    },
+    'layers-blend-hue': {
+        original: 'hue',
+        value: '色相'
+    },
+    'layers-blend-saturation': {
+        original: 'saturation',
+        value: '饱和度'
+    },
+    'layers-blend-color': {
+        original: 'color',
+        value: '颜色'
+    },
+    'layers-blend-luminosity': {
+        original: 'luminosity',
+        value: '明度'
+    },
+    'layers-rename-title': {
+        original: 'Rename Layer',
+        value: '重命名图层'
+    },
+    'layers-rename-name': {
+        original: 'Name',
+        value: '重命名'
+    },
+    'layers-rename-clear': {
+        hint: 'aka action of deleting entered name',
+        original: 'Clear Name',
+        value: '清除'
+    },
+    'layers-rename-sketch': {
+        hint: 'noun',
+        original: 'Sketch',
+        value: '草图'
+    },
+    'layers-rename-colors': {
+        original: 'Colors',
+        value: '色彩'
+    },
+    'layers-rename-lines': {
+        original: 'Lines',
+        value: '线条'
+    },
+    'layers-rename-foreground': {
+        original: 'Foreground',
+        value: '前景'
+    },
+    'layers-merge-modal-title': {
+        original: 'Merge/Mix Layers',
+        value: '向下合并'
+    },
+    'layers-merge-description': {
+        original: 'Merges the selected layer with the one underneath. Select the mix mode:',
+        value: '选中层与底下一层合并。选择混合模式：'
+    },
+    'file-no-autosave': {
+        hint: "let user know they can't autosave, and there's no cloud storage. Keep short so fits on one line",
+        original: 'No autosave, no cloud storage',
+        value: '不能自动保存，没有云存储'
+    },
+    'file-new': {
+        original: 'New',
+        value: '新建'
+    },
+    'file-import': {
+        original: 'Import',
+        value: '打开'
+    },
+    'file-save': {
+        original: 'Save',
+        value: '保存'
+    },
+    'file-save-png': {
+        original: 'Save PNG',
+        value: '保存为PNG'
+    },
+    'file-save-psd': {
+        original: 'Save PSD',
+        value: '保存为PSD'
+    },
+    'file-save-layers': {
+        original: 'Save Layers',
+        value: '保存图层'
+    },
+    'file-copy': {
+        original: 'Copy',
+        value: '复制'
+    },
+    'file-copy-title': {
+        original: 'Copy To Clipboard',
+        value: '复制到粘贴板'
+    },
+    'file-share': {
+        hint: 'Common feature on phones. Pressing share button allows to send data to a different app, e.g. as a text message to someone.',
+        original: 'Share',
+        value: '分享'
+    },
+    'file-storage': {
+        hint: 'Made up term. Allows users to store drawing in the browser. (not synced across devices)',
+        original: 'Browser Storage',
+        value: '保存至浏览器'
+    },
+    'file-storage-thumb-title': {
+        original: 'Restores when reopening page',
+        value: '重新打开页面时恢复'
+    },
+    'file-storage-about': {
+        original: 'About Browser Storage',
+        value: '关于保存至浏览器'
+    },
+    'file-storage-cant-access': {
+        original: "Can't access",
+        value: '无法获取'
+    },
+    'file-storage-empty': {
+        hint: 'nothing stored',
+        original: 'Empty',
+        value: '无内容'
+    },
+    'file-storage-store': {
+        hint: 'verb',
+        original: 'Store',
+        value: '保存'
+    },
+    'file-storage-clear': {
+        original: 'Clear',
+        value: '清除'
+    },
+    'file-storage-storing': {
+        original: 'Storing',
+        value: '保存中'
+    },
+    'file-storage-overwrite': {
+        original: 'Overwrite',
+        value: '覆盖'
+    },
+    'file-storage-min-ago': {
+        hint: "{x} <- needs to stay, it's a placeholder.",
+        original: '{x}min ago',
+        value: '{x}分钟前'
+    },
+    'file-storage-hours-ago': {
+        original: '{x}h ago',
+        value: '{x}小时前'
+    },
+    'file-storage-days-ago': {
+        original: '{x}d ago',
+        value: '{x}天前'
+    },
+    'file-storage-month-ago': {
+        original: '> 1month ago',
+        value: '>一个月前'
+    },
+    'file-storage-restored': {
+        original: 'Restored from Browser Storage',
+        value: '从浏览器内存中恢复'
+    },
+    'file-storage-stored': {
+        original: 'Stored to Browser Storage',
+        value: '保存至浏览器内存'
+    },
+    'file-storage-failed': {
+        original: 'Failed to store to Browser Storage',
+        value: '保存失败'
+    },
+    'file-storage-failed-1': {
+        original: 'Failed to store. Possible causes:',
+        value: '保存失败。可能是由于：'
+    },
+    'file-storage-failed-2': {
+        original: 'Out of disk space',
+        value: '磁盘空间不足'
+    },
+    'file-storage-failed-3': {
+        original: 'Storage disabled in incognito tab',
+        value: '隐身页面中禁用存储功能'
+    },
+    'file-storage-failed-4': {
+        original: "Browser doesn't support storage",
+        value: '浏览器不支持'
+    },
+    'file-storage-failed-clear': {
+        original: 'Failed to clear.',
+        value: '清除失败'
+    },
+    'file-upload': {
+        original: 'Upload',
+        value: '上传'
+    },
+    'cleared-layer': {
+        original: 'Cleared layer',
+        value: '图层已清除'
+    },
+    filled: {
+        hint: 'layer got filled with a color',
+        original: 'Filled',
+        value: '图层已填充'
+    },
+    'new-title': {
+        original: 'New Image',
+        value: '新建项目'
+    },
+    'new-current': {
+        original: 'Current',
+        value: '当前大小'
+    },
+    'new-fit': {
+        original: 'Fit',
+        value: '适应页面'
+    },
+    'new-oversize': {
+        original: 'Oversize',
+        value: '大画布'
+    },
+    'new-square': {
+        original: 'Square',
+        value: '正方形'
+    },
+    'new-landscape': {
+        original: 'Landscape',
+        value: '横向尺寸'
+    },
+    'new-portrait': {
+        original: 'Portrait',
+        value: '纵向尺寸'
+    },
+    'new-screen': {
+        original: 'Screen',
+        value: '显示分辨率'
+    },
+    'new-video': {
+        original: 'Video',
+        value: '视频'
+    },
+    'new-din-paper': {
+        original: 'DIN Paper',
+        value: '纸张大小'
+    },
+    'new-width': {
+        original: 'Width',
+        value: '宽度'
+    },
+    'new-height': {
+        original: 'Height',
+        value: '高度'
+    },
+    'new-px': {
+        hint: 'abbreviation of pixel',
+        original: 'px',
+        value: '像素'
+    },
+    'new-ratio': {
+        hint: 'aspect ratio',
+        original: 'Ratio',
+        value: '比例'
+    },
+    'upload-title': {
+        original: 'Upload to Imgur',
+        value: '上传到Imgur'
+    },
+    'upload-link-notice': {
+        original: 'Anyone with the link to your uploaded image will be able to view it.',
+        value: '他人可以通过生成的图片链接查看你的作品。'
+    },
+    'upload-name': {
+        original: 'Title',
+        value: '标题'
+    },
+    'upload-title-untitled': {
+        original: 'Untitled',
+        value: '未命名'
+    },
+    'upload-caption': {
+        original: 'Caption',
+        value: '描述'
+    },
+    'upload-tos': {
+        original: 'Terms of Service',
+        value: '服务条款'
+    },
+    'upload-tos-2': {
+        original: 'for imgur.com',
+        value: 'imgur.com'
+    },
+    'upload-submit': {
+        original: 'Upload',
+        value: '上传'
+    },
+    'upload-uploading': {
+        original: 'Uploading',
+        value: '上传中'
+    },
+    'upload-success': {
+        original: 'Upload Successful',
+        value: '上传成功'
+    },
+    'upload-failed': {
+        original: 'Upload failed.',
+        value: '上传失败'
+    },
+    'upload-delete': {
+        original: 'To delete your image from Imgur visit:',
+        value: '要从Imgur删除你的图片, 请访问:'
+    },
+    'cropcopy-title-copy': {
+        original: 'Copy To Clipboard',
+        value: '复制到粘贴板'
+    },
+    'cropcopy-title-crop': {
+        hint: 'Cropping is a common feature in image editing.',
+        original: 'Crop',
+        value: '裁剪'
+    },
+    'cropcopy-btn-copy': {
+        original: 'To Clipboard',
+        value: '至剪贴板'
+    },
+    'cropcopy-copied': {
+        original: 'Copied.',
+        value: '已粘贴'
+    },
+    'cropcopy-btn-crop': {
+        original: 'Apply Crop',
+        value: '应用裁剪'
+    },
+    'crop-drag-to-crop': {
+        original: 'Drag to crop',
+        value: '拖动裁剪'
+    },
+    'filter-crop-extend': {
+        original: 'Crop/Extend',
+        value: '画布大小'
+    },
+    'filter-flip': {
+        original: 'Flip',
+        value: '翻转'
+    },
+    'filter-perspective': {
+        original: 'Perspective',
+        value: '透视'
+    },
+    'filter-resize': {
+        original: 'Resize',
+        value: '图像大小'
+    },
+    'filter-rotate': {
+        original: 'Rotate',
+        value: '旋转'
+    },
+    'filter-transform': {
+        original: 'Transform',
+        value: '自由变换'
+    },
+    'filter-bright-contrast': {
+        original: 'Bright/Contrast',
+        value: '亮度/对比'
+    },
+    'filter-curves': {
+        original: 'Curves',
+        value: '曲线'
+    },
+    'filter-hue-sat': {
+        original: 'Hue/Saturation',
+        value: '色相/饱和度'
+    },
+    'filter-invert': {
+        original: 'Invert',
+        value: '反相'
+    },
+    'filter-tilt-shift': {
+        original: 'Tilt Shift',
+        value: '移轴'
+    },
+    'filter-to-alpha': {
+        hint: 'feature that can isolate linedrawings if it is a black and white image.',
+        original: 'To Alpha',
+        value: '转换至Alpha'
+    },
+    'filter-triangle-blur': {
+        original: 'Triangle Blur',
+        value: '模糊'
+    },
+    'filter-unsharp-mask': {
+        original: 'Unsharp Mask',
+        value: 'USM 锐化'
+    },
+    'filter-crop-title': {
+        original: 'Crop / Extend',
+        value: ''
+    },
+    'filter-crop-description': {
+        original: 'Crop or extend the image.',
+        value: ''
+    },
+    'filter-crop-left': {
+        original: 'Left',
+        value: ''
+    },
+    'filter-crop-right': {
+        original: 'Right',
+        value: ''
+    },
+    'filter-crop-top': {
+        original: 'Top',
+        value: ''
+    },
+    'filter-crop-bottom': {
+        original: 'Bottom',
+        value: ''
+    },
+    'filter-crop-rule-thirds': {
+        original: 'Rule of Thirds',
+        value: ''
+    },
+    'filter-crop-fill': {
+        original: 'Fill',
+        value: ''
+    },
+    'filter-flip-title': {
+        original: 'Flip',
+        value: ''
+    },
+    'filter-flip-description': {
+        original: 'Flips layer or whole image.',
+        value: ''
+    },
+    'filter-flip-horizontal': {
+        original: 'Horizontal',
+        value: ''
+    },
+    'filter-flip-vertical': {
+        original: 'Vertical',
+        value: ''
+    },
+    'filter-flip-image': {
+        original: 'Flip Image',
+        value: ''
+    },
+    'filter-flip-layer': {
+        original: 'Flip Layer',
+        value: ''
+    },
+    'filter-perspective-title': {
+        original: 'Perspective',
+        value: ''
+    },
+    'filter-perspective-description': {
+        original: 'Transforms the selected layer.',
+        value: ''
+    },
+    'filter-perspective-before': {
+        original: 'Before',
+        value: ''
+    },
+    'filter-perspective-after': {
+        original: 'After',
+        value: ''
+    },
+    'filter-resize-title': {
+        original: 'Resize',
+        value: ''
+    },
+    'filter-resize-description': {
+        original: 'Resizes the image.',
+        value: ''
+    },
+    'filter-resize-width': {
+        original: 'Width',
+        value: ''
+    },
+    'filter-resize-height': {
+        original: 'Height',
+        value: ''
+    },
+    'filter-resize-constrain': {
+        original: 'Constrain Proportions',
+        value: ''
+    },
+    'filter-rotate-title': {
+        original: 'Rotate',
+        value: ''
+    },
+    'filter-rotate-description': {
+        original: 'Rotates the image.',
+        value: ''
+    },
+    'filter-transform-empty': {
+        original: 'Layer is empty.',
+        value: ''
+    },
+    'filter-transform-title': {
+        original: 'Transform',
+        value: ''
+    },
+    'filter-transform-description': {
+        original: 'Transforms selected layer. Hold Shift for additional behavior.',
+        value: ''
+    },
+    'filter-transform-rotation': {
+        original: 'Rotation',
+        value: ''
+    },
+    'filter-transform-flip': {
+        original: 'Flip',
+        value: ''
+    },
+    'filter-transform-center': {
+        original: 'Center',
+        value: ''
+    },
+    'filter-transform-constrain': {
+        original: 'Constrain',
+        value: ''
+    },
+    'filter-transform-constrain-title': {
+        original: 'Constrain Proportions',
+        value: ''
+    },
+    'filter-transform-snap': {
+        original: 'Snap',
+        value: ''
+    },
+    'filter-transform-snap-title': {
+        original: 'Snap Rotation And Position',
+        value: ''
+    },
+    'filter-bright-contrast-title': {
+        original: 'Brightness / Contrast',
+        value: ''
+    },
+    'filter-bright-contrast-description': {
+        original: 'Change brightness and contrast for the selected layer.',
+        value: ''
+    },
+    'filter-bright-contrast-brightness': {
+        original: 'Brightness',
+        value: ''
+    },
+    'filter-bright-contrast-contrast': {
+        original: 'Contrast',
+        value: ''
+    },
+    'filter-curves-title': {
+        original: 'Curves',
+        value: ''
+    },
+    'filter-curves-description': {
+        original: 'Apply curves on the selected layer.',
+        value: ''
+    },
+    'filter-curves-all': {
+        original: 'All',
+        value: ''
+    },
+    'filter-hue-sat-title': {
+        original: 'Hue / Saturation',
+        value: ''
+    },
+    'filter-hue-sat-description': {
+        original: 'Change hue and saturation for the selected layer.',
+        value: ''
+    },
+    'filter-hue-sat-hue': {
+        original: 'Hue',
+        value: ''
+    },
+    'filter-hue-sat-saturation': {
+        original: 'Saturation',
+        value: ''
+    },
+    'filter-applied': {
+        original: 'applied',
+        value: ''
+    },
+    'filter-tilt-shift-title': {
+        original: 'Tilt Shift',
+        value: ''
+    },
+    'filter-tilt-shift-description': {
+        original: 'Applies tilt shift on the selected layer.',
+        value: ''
+    },
+    'filter-tilt-shift-blur': {
+        original: 'Blur Radius',
+        value: ''
+    },
+    'filter-tilt-shift-gradient': {
+        original: 'Gradient Radius',
+        value: ''
+    },
+    'filter-to-alpha-title': {
+        original: 'To Alpha',
+        value: ''
+    },
+    'filter-to-alpha-description': {
+        original: 'Generates alpha channel for selected layer from:',
+        value: ''
+    },
+    'filter-to-alpha-inverted-lum': {
+        original: 'Inverted Luminance',
+        value: ''
+    },
+    'filter-to-alpha-lum': {
+        original: 'Luminance',
+        value: ''
+    },
+    'filter-to-alpha-replace': {
+        original: 'Replace RGB',
+        value: ''
+    },
+    'filter-triangle-blur-title': {
+        original: 'Triangle Blur',
+        value: ''
+    },
+    'filter-triangle-blur-description': {
+        original: 'Applies triangle blur on the selected layer.',
+        value: ''
+    },
+    'filter-triangle-blur-radius': {
+        original: 'Radius',
+        value: ''
+    },
+    'filter-unsharp-mask-title': {
+        original: 'Unsharp Mask',
+        value: ''
+    },
+    'filter-unsharp-mask-description': {
+        original: 'Sharpens the selected layer by scaling pixels away from the average of their neighbors.',
+        value: ''
+    },
+    'filter-unsharp-mask-radius': {
+        original: 'Radius',
+        value: ''
+    },
+    'filter-unsharp-mask-strength': {
+        original: 'Strength',
+        value: ''
+    },
+    'import-opening': {
+        original: 'Opening file',
+        value: ''
+    },
+    'import-title': {
+        original: 'Import Image',
+        value: ''
+    },
+    'import-too-large': {
+        original: 'Image too large, will be downscaled.',
+        value: ''
+    },
+    'import-btn-as-layer': {
+        original: 'As Layer',
+        value: ''
+    },
+    'import-btn-as-image': {
+        original: 'As Image',
+        value: ''
+    },
+    'import-as-layer-title': {
+        original: 'Import Image as New Layer',
+        value: ''
+    },
+    'import-as-layer-description': {
+        original: 'Adjust the position of the imported image.',
+        value: ''
+    },
+    'import-as-layer-limit-reached': {
+        original: 'Layer limit reached. Image will be placed on existing layer.',
+        value: ''
+    },
+    'import-as-layer-fit': {
+        hint: 'verb. imported image made to fit inside canvas.',
+        original: 'Fit',
+        value: ''
+    },
+    'import-flatten': {
+        hint: 'Turn image that has multiple layers into an image that has only one layer.',
+        original: 'Flatten image',
+        value: ''
+    },
+    'import-unsupported-file': {
+        original: 'Unsupported file type. See Help for supported types.',
+        value: ''
+    },
+    'import-broken-file': {
+        original: "Couldn't load image. File might be corrupted.",
+        value: ''
+    },
+    'import-psd-unsupported': {
+        original: 'Unsupported features. PSD had to be flattened.',
+        value: ''
+    },
+    'import-psd-limited-support': {
+        original: 'PSD support is limited. Flattened will more likely look correct.',
+        value: ''
+    },
+    'import-psd-too-large': {
+        original: 'Image exceeds maximum dimensions of {x} x {x} pixels. Unable to import.',
+        value: ''
+    },
+    'import-psd-size': {
+        original: 'Image size',
+        value: ''
+    },
+    'hand-reset': {
+        hint: 'resets zoom (to 100%) and rotation (to 0°)',
+        original: 'Reset',
+        value: ''
+    },
+    'hand-fit': {
+        hint: 'makes canvas cover whole working area',
+        original: 'Fit',
+        value: ''
+    },
+    'bucket-opacity': {
+        original: 'Opacity',
+        value: ''
+    },
+    'bucket-tolerance': {
+        original: 'Tolerance',
+        value: ''
+    },
+    'bucket-sample': {
+        original: 'Sample',
+        value: ''
+    },
+    'bucket-sample-title': {
+        original: 'Which layers to sample color from',
+        value: ''
+    },
+    'bucket-sample-all': {
+        original: 'All',
+        value: ''
+    },
+    'bucket-sample-active': {
+        original: 'Active',
+        value: ''
+    },
+    'bucket-sample-above': {
+        original: 'Above',
+        value: ''
+    },
+    'bucket-grow': {
+        original: 'Grow',
+        value: ''
+    },
+    'bucket-grow-title': {
+        original: 'Grow filled area (in pixels)',
+        value: ''
+    },
+    'bucket-contiguous': {
+        hint: 'common setting for paint bucket in image editing software',
+        original: 'Contiguous',
+        value: ''
+    },
+    'bucket-contiguous-title': {
+        original: 'Only fill connected areas',
+        value: ''
+    },
+    'shape-stroke': {
+        original: 'Stroke',
+        value: ''
+    },
+    'shape-fill': {
+        original: 'Fill',
+        value: ''
+    },
+    'shape-rect': {
+        original: 'Rectangle',
+        value: ''
+    },
+    'shape-ellipse': {
+        original: 'Ellipse',
+        value: ''
+    },
+    'shape-line': {
+        original: 'Line',
+        value: ''
+    },
+    'shape-line-width': {
+        original: 'Line Width',
+        value: ''
+    },
+    'shape-opacity': {
+        original: 'Opacity',
+        value: ''
+    },
+    'shape-outwards': {
+        hint: 'grows shape from the center outwards',
+        original: 'Outwards',
+        value: ''
+    },
+    'shape-fixed': {
+        original: 'Fixed 1:1',
+        value: ''
+    },
+    'shape-snap': {
+        original: 'Snap',
+        value: ''
+    },
+    'shape-snap-title': {
+        original: '45° Angle Snapping',
+        value: ''
+    },
+    'text-instruction': {
+        original: 'Click canvas to place text',
+        value: ''
+    },
+    'text-title': {
+        original: 'Add Text',
+        value: ''
+    },
+    'text-placeholder': {
+        original: 'Your text (multiline Shift+Enter)',
+        value: ''
+    },
+    'text-opacity': {
+        original: 'Opacity',
+        value: ''
+    },
+    'text-color': {
+        original: 'Color',
+        value: ''
+    },
+    'text-size': {
+        original: 'Size',
+        value: ''
+    },
+    'text-left': {
+        original: 'Left',
+        value: ''
+    },
+    'text-center': {
+        original: 'Center',
+        value: ''
+    },
+    'text-right': {
+        original: 'Right',
+        value: ''
+    },
+    'text-italic': {
+        original: 'Italic',
+        value: ''
+    },
+    'text-bold': {
+        original: 'Bold',
+        value: ''
+    },
+    'text-zoom-in': {
+        original: 'Zoom In',
+        value: ''
+    },
+    'text-zoom-out': {
+        original: 'Zoom Out',
+        value: ''
+    },
+    'save-reminder-title': {
+        original: 'Reminder to save',
+        value: ''
+    },
+    'save-reminder-text': {
+        original: 'Unsaved work may get lost.',
+        value: ''
+    },
+    submit: {
+        original: 'Submit',
+        value: ''
+    },
+    'submit-title': {
+        original: 'Submit Drawing',
+        value: ''
+    },
+    'submit-prompt': {
+        original: 'Submit drawing?',
+        value: ''
+    },
+    'submit-submitting': {
+        original: 'Submitting',
+        value: ''
+    },
+    'embed-init-loading': {
+        original: 'Loading app',
+        value: ''
+    },
+    'embed-init-waiting': {
+        original: 'Waiting for image',
+        value: ''
+    },
+    unsaved: {
+        original: 'Unsaved',
+        value: ''
+    },
+    'paint-tool': {
+        original: 'Paint Tool',
+        value: ''
+    },
+    help: {
+        original: 'Help',
+        value: ''
+    },
+    'tab-settings': {
+        original: 'Settings',
+        value: ''
+    },
+    'settings-language': {
+        original: 'Language',
+        value: ''
+    },
+    'settings-preferred-language': {
+        original: 'Preferred Language',
+        value: ''
+    },
+    'settings-language-reload': {
+        original: 'Will update after reloading.',
+        value: ''
+    },
+    licenses: {
+        original: 'Licenses',
+        value: ''
+    },
+    'source-code': {
+        original: 'Source Code',
+        value: ''
+    },
+    auto: {
+        hint: 'automatically decided',
+        original: 'auto',
+        value: ''
+    },
+    red: {
+        original: 'Red',
+        value: ''
+    },
+    green: {
+        original: 'Green',
+        value: ''
+    },
+    blue: {
+        original: 'Blue',
+        value: ''
+    },
+    eraser: {
+        original: 'Eraser',
+        value: ''
+    },
+    center: {
+        hint: 'verb',
+        original: 'Center',
+        value: ''
+    },
+    background: {
+        original: 'Background',
+        value: '背景'
+    },
+    'scaling-algorithm': {
+        original: 'Scaling Algorithm',
+        value: ''
+    },
+    'algorithm-smooth': {
+        original: 'Smooth',
+        value: ''
+    },
+    'algorithm-pixelated': {
+        original: 'Pixelated',
+        value: ''
+    }
+}

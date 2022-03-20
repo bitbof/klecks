@@ -1,5 +1,6 @@
 import {BB} from '../../../bb/bb';
 import {Popup} from './popup';
+import {LANG} from '../../../language/language';
 
 export function showIframePopup(url, isEmbed) {
     if (!isEmbed && (window.innerHeight < 500 || window.innerWidth < 700)) {
@@ -24,7 +25,7 @@ export function showIframePopup(url, isEmbed) {
         linkEl = BB.el({
             tagName: 'a',
             parent: titleEl,
-            content: 'Open in new tab',
+            content: LANG('modal-new-tab'),
             custom: {
                 href: 'help',
                 target: '_blank',

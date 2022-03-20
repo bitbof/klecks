@@ -3,6 +3,7 @@ import {FreeTransformCanvas} from '../components/free-transform-canvas';
 import {popup} from './popup';
 import {KlCanvas} from '../../canvas/kl-canvas';
 import {IKlBasicLayer} from '../../kl.types';
+import {LANG} from '../../../language/language';
 
 export function showImportAsLayerDialog(
     params: {
@@ -17,10 +18,10 @@ export function showImportAsLayerDialog(
 ): void {
 
     let div = document.createElement("div");
-    BB.appendTextDiv(div, "Adjust the position of the imported image.");
+    BB.appendTextDiv(div, LANG('import-as-layer-description'));
     if (params.klCanvas.isLayerLimitReached()) {
         let noteEl = BB.el({
-            content: 'Layer limit reached. Image will be placed on existing layer.',
+            content: LANG('import-as-layer-limit-reached'),
             css: {
                 background: '#ff0',
                 padding: '10px',
@@ -51,7 +52,7 @@ export function showImportAsLayerDialog(
     });
     let fitSizeBtn = BB.el({
         tagName: 'button',
-        content: 'Fit',
+        content: LANG('import-as-layer-fit'),
         css: {
             marginRight: '10px'
         },
@@ -61,7 +62,7 @@ export function showImportAsLayerDialog(
     });
     let centerBtn = BB.el({
         tagName: 'button',
-        content: 'Center',
+        content: LANG('center'),
         css: {
             marginRight: '10px'
         },
@@ -131,7 +132,7 @@ export function showImportAsLayerDialog(
 
     popup({
         target: params.target,
-        message: "<b>Import Image as New Layer</b>",
+        message: `<b>${LANG('import-as-layer-title')}</b>`,
         div: div,
         style: isSmall ? {} : {
             width: '500px'

@@ -723,7 +723,7 @@ iframe {
     user-select: none;
     -webkit-user-select: none; // safari
     cursor: pointer;
-    flex: 1 1 0;
+    flex-grow: 1;
     height: 100%;
     text-align: center;
     opacity: 0.6;

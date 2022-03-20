@@ -1,5 +1,6 @@
 import {BB} from '../../bb/bb';
 import {IFilterApply, IFilterGetDialogParam} from '../kl.types';
+import {LANG} from '../../language/language';
 
 export const rotate = {
 
@@ -22,7 +23,7 @@ export const rotate = {
             element: div
         };
         let deg = 0;
-        div.innerHTML = "Rotates the image.<br/><br/>";
+        div.innerHTML = LANG('filter-rotate-description') + "<br/><br/>";
 
         let first = true;
 

@@ -1,6 +1,7 @@
 import {KL} from '../../kl';
 import {BB} from '../../../bb/bb';
 import {KlHistoryInterface} from '../../history/kl-history';
+import {LANG} from '../../../language/language';
 
 /**
  * remind user of saving, keep user aware of save state
@@ -66,14 +67,14 @@ export class SaveReminder {
                 } else {
                     let actionNumber = this.history.getActionNumber();
                     if (this.oldActionNumber !== actionNumber) {
-                        document.title = 'Unsaved - ' + this.title;
+                        document.title = LANG('unsaved') + ' - ' + this.title;
                         let state = 0;
                         this.unsavedInterval = setInterval(() => {
                             state = (state + 1) % 2;
                             if (state === 1) {
-                                document.title = 'Unsaved · ' + this.title;
+                                document.title = LANG('unsaved') + ' · ' + this.title;
                             } else {
-                                document.title = 'Unsaved - ' + this.title;
+                                document.title = LANG('unsaved') + ' - ' + this.title;
                             }
                         }, 1000 * 60 * 3);
                     }

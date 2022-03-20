@@ -4,6 +4,7 @@ import {KlSlider} from '../ui/base-components/kl-slider';
 import {KlCanvasPreview} from '../canvas-ui/canvas-preview';
 import {getSharedFx} from './shared-gl-fx';
 import {IFilterApply, IFilterGetDialogParam, IKlBasicLayer} from '../kl.types';
+import {LANG} from '../../language/language';
 
 export const glTiltShift = {
 
@@ -44,7 +45,7 @@ export const glTiltShift = {
 
         function finishInit() {
             let blur = 20, gradient = 200;
-            div.innerHTML = "Applies tilt shift on the selected layer.<br/><br/>";
+            div.innerHTML = LANG('filter-tilt-shift-description') + "<br/><br/>";
 
             let glCanvas = getSharedFx();
             if (!glCanvas) {
@@ -108,7 +109,7 @@ export const glTiltShift = {
             fb = nob(parseInt('' + (displayW - displayW / 6)), parseInt('' + (displayH - displayH / 3)));
 
             let blurSlider = new KlSlider({
-                label: 'Blur Radius',
+                label: LANG('filter-tilt-shift-blur'),
                 width: 300,
                 height: 30,
                 min: 0,
@@ -123,7 +124,7 @@ export const glTiltShift = {
             blurSlider.getElement().style.marginBottom = "10px";
             div.appendChild(blurSlider.getElement());
             let gradientSlider = new KlSlider({
-                label: 'Gradient Radius',
+                label: LANG('filter-tilt-shift-gradient'),
                 width: 300,
                 height: 30,
                 min: 0,

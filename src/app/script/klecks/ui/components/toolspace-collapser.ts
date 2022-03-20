@@ -1,6 +1,7 @@
 import {BB} from '../../../bb/bb';
 // @ts-ignore
 import collapseImg from 'url:~/src/app/img/ui/ui-collapse.svg';
+import {LANG} from "../../../language/language";
 
 /**
  * button that allows to collapse toolspace (for mobile)
@@ -39,7 +40,7 @@ export function ToolspaceCollapser(p) {
             padding: '6px',
             boxSizing: 'border-box'
         },
-        title: 'Show/hide tools',
+        title: LANG('toggle-show-tools'),
         onClick: function(e) {
             e.preventDefault();
             isOpen = !isOpen;

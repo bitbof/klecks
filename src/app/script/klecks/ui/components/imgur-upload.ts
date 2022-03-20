@@ -5,6 +5,7 @@ import loadingImg from 'url:~/src/app/img/ui/loading.gif';
 import {SaveReminder} from './save-reminder';
 import {base64ToBlob} from '../../storage/base-64-to-blob';
 import {KlCanvas} from '../../canvas/kl-canvas';
+import {LANG} from '../../../language/language';
 
 
 async function upload(canvas, title, description, type: 'png' | 'jpeg', imgurKey: string): Promise<{deletehash: string}> {
@@ -24,7 +25,7 @@ async function upload(canvas, title, description, type: 'png' | 'jpeg', imgurKey
     let labelText = w.document.createElement("div");
     labelText.style.marginTop = "10px";
     label.appendChild(labelText);
-    labelText.textContent = "Uploading...";
+    labelText.textContent = LANG('upload-uploading') + "...";
 
     w.document.body.appendChild(label);
     BB.css(label, {
@@ -79,21 +80,21 @@ export function imgurUpload(klCanvas: KlCanvas, klRootEl, saveReminder: SaveRemi
 
     let inputTitle = document.createElement("input");
     inputTitle.type = "text";
-    inputTitle.value = "Untitled";
+    inputTitle.value = LANG('upload-title-untitled');
     let inputDescription = document.createElement("textarea");
     inputDescription.cols = 30;
     inputDescription.rows = 2;
     let labelTitle = document.createElement("div");
-    labelTitle.textContent = "Title:";
+    labelTitle.textContent = LANG('upload-name') + ":";
     let labelDescription = BB.el({
-        content: 'Caption:',
+        content: LANG('upload-caption') + ':',
         css: {
             marginTop: '10px',
         }
     });
 
     let tos = document.createElement("div");
-    tos.innerHTML = "<br/><a href=\"https://imgur.com/tos\" target=\"_blank\" rel=\"noopener noreferrer\">Terms of Service</a> for imgur.com";
+    tos.innerHTML = `<br/><a href="https://imgur.com/tos" target="_blank" rel="noopener noreferrer">${LANG('upload-tos')}</a> ${LANG('upload-tos-2')}`;
 
     const typeRadio = new KL.RadioList({
         name: 'filetype',
@@ -112,7 +113,7 @@ export function imgurUpload(klCanvas: KlCanvas, klRootEl, saveReminder: SaveRemi
     let outDiv = document.createElement("div");
     let infoHint = document.createElement("div");
     infoHint.className = "info-hint";
-    infoHint.textContent = "Anyone with the link to your uploaded image will be able to view it.";
+    infoHint.textContent = LANG('upload-link-notice');
     outDiv.append(
         infoHint,
         typeRadio.getElement(),
@@ -124,14 +125,14 @@ export function imgurUpload(klCanvas: KlCanvas, klRootEl, saveReminder: SaveRemi
     );
     KL.popup({
         target: klRootEl,
-        message: "<b>Upload to Imgur</b>",
+        message: `<b>${LANG('upload-title')}</b>`,
         type: "upload",
         div: outDiv,
-        buttons: ["Upload", "Cancel"],
-        clickOnEnter: 'Upload',
-        primaries: ['Upload'],
+        buttons: [LANG('upload-submit'), "Cancel"],
+        clickOnEnter: LANG('upload-submit'),
+        primaries: [LANG('upload-submit')],
         callback: async function (val) {
-            if (val === "Upload" || val === "Yes" || val === "Ok") {
+            if (val === LANG('upload-submit') || val === "Yes" || val === "Ok") {
                 try {
                     const result = await upload(
                         klCanvas.getCompleteCanvas(1),
@@ -144,7 +145,7 @@ export function imgurUpload(klCanvas: KlCanvas, klRootEl, saveReminder: SaveRemi
                     KL.popup({
                         target: klRootEl,
                         type: "ok",
-                        message: "<h3>Upload Successful</h3><br>To delete your image from Imgur visit:<br><a target='_blank' rel=\"noopener noreferrer\" href='https://imgur.com/delete/" + result.deletehash + "'>imgur.com/<b>delete</b>/" + result.deletehash + "</a><br><br>",
+                        message: `<h3>${LANG('upload-success')}</h3><br>${LANG('upload-delete')}<br><a target='_blank' rel="noopener noreferrer" href='https://imgur.com/delete/${result.deletehash}'>imgur.com/<b>delete</b>/${result.deletehash}</a><br><br>`,
                         buttons: ["Ok"]
                     });
                     saveReminder.reset();
@@ -153,7 +154,7 @@ export function imgurUpload(klCanvas: KlCanvas, klRootEl, saveReminder: SaveRemi
                     KL.popup({
                         target: klRootEl,
                         type: "error",
-                        message: "Upload failed.",
+                        message: LANG('upload-failed'),
                         buttons: ["Ok"]
                     });
                 }

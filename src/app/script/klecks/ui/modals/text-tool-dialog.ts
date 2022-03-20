@@ -22,6 +22,7 @@ import toolZoomInImg from 'url:~/src/app/img/ui/tool-zoom-in.svg';
 import toolZoomOutImg from 'url:~/src/app/img/ui/tool-zoom-out.svg';
 import {IRGB} from '../../kl.types';
 import {KlCanvas} from '../../canvas/kl-canvas';
+import {LANG} from '../../../language/language';
 
 /**
  * Text Tool dialog
@@ -367,7 +368,7 @@ export function textToolDialog(
             updatePreview();
         }
     });
-    colorOptions.getElement().title = 'Color';
+    colorOptions.getElement().title = LANG('text-color');
     colorOptions.getElement().style.marginLeft = '-5px';
     row1.appendChild(colorOptions.getElement());
 
@@ -393,7 +394,7 @@ export function textToolDialog(
     let zoomInBtn = BB.el({
         parent: zoomWrapper,
         content: `<img height="20" src="${toolZoomInImg}">`,
-        title: 'Zoom In',
+        title: LANG('text-zoom-in'),
         tagName: 'button',
         onClick: function() {
             changeZoomFac(1);
@@ -405,7 +406,7 @@ export function textToolDialog(
     let zoomOutBtn = BB.el({
         parent: zoomWrapper,
         content: `<img height="20" src="${toolZoomOutImg}">`,
-        title: 'Zoom Out',
+        title: LANG('text-zoom-out'),
         tagName: 'button',
         onClick: function() {
             changeZoomFac(-1);
@@ -422,7 +423,7 @@ export function textToolDialog(
     let sizeInput = BB.el({
         parent: row2,
         tagName: 'input',
-        title: 'Size',
+        title: LANG('text-size'),
         custom: {
             type: 'number',
             min: 1,
@@ -489,17 +490,17 @@ export function textToolDialog(
         optionArr: [
             {
                 id: 'left',
-                title: 'Left',
+                title: LANG('text-left'),
                 image: alignLeftImg,
             },
             {
                 id: 'center',
-                title: 'Center',
+                title: LANG('text-center'),
                 image: alignCenterImg,
             },
             {
                 id: 'right',
-                title: 'Right',
+                title: LANG('text-right'),
                 image: alignRightImg,
             }
         ],
@@ -512,7 +513,7 @@ export function textToolDialog(
 
     let italicToggle = new ImageToggle({
         image: typoItalicImg,
-        title: 'Italic',
+        title: LANG('text-italic'),
         initValue: p.isItalic,
         onChange: function(b) {
             updatePreview();
@@ -522,7 +523,7 @@ export function textToolDialog(
 
     let boldToggle = new ImageToggle({
         image: typoBoldImg,
-        title: 'Bold',
+        title: LANG('text-bold'),
         initValue: p.isBold,
         onChange: function(b) {
             updatePreview();
@@ -533,7 +534,7 @@ export function textToolDialog(
 
 
     let opacitySlider = new KlSlider({
-        label: 'Opacity',
+        label: LANG('text-opacity'),
         width: 150,
         height: 30,
         min: 0,
@@ -556,7 +557,7 @@ export function textToolDialog(
         parent: div,
         tagName: 'textarea',
         custom: {
-            placeholder: 'Your text (multiline Shift+Enter)',
+            placeholder: LANG('text-placeholder'),
             'data-ignore-focus': 'true',
         },
         css: {
@@ -606,7 +607,7 @@ export function textToolDialog(
 
     popup({
         target: document.body,
-        message: "<b>Add Text</b>",
+        message: `<b>${LANG('text-title')}</b>`,
         div: div,
         buttons: ["Ok", "Cancel"],
         style: isSmallWidth ? {} : {

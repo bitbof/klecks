@@ -1,5 +1,6 @@
 import {BB} from '../../../bb/bb';
 import {Select} from '../base-components/select';
+import {LANG} from '../../../language/language';
 
 /**
  * Ui to select stabilizer level. 4 options. returned as 0-3
@@ -16,8 +17,8 @@ export function ToolspaceStabilizerRow(p) {
 
     let div = BB.el({
         tagName: 'label',
-        content: 'Stabilizer&nbsp;',
-        title: 'Line Stabilizer',
+        content: LANG('stabilizer') + '&nbsp;',
+        title: LANG('stabilizer-title'),
         css: {
             display: 'flex',
             alignItems: 'center',
@@ -28,16 +29,16 @@ export function ToolspaceStabilizerRow(p) {
 
     let strengthSelect = new Select({
         optionArr: [
-            [0, '0'],
-            [1, '1'],
-            [2, '2'],
-            [3, '3'],
-            [4, '4'],
-            [5, '5']
+            ['0', '0'],
+            ['1', '1'],
+            ['2', '2'],
+            ['3', '3'],
+            ['4', '4'],
+            ['5', '5']
         ],
         initValue: p.smoothing,
         onChange: function(val) {
-            p.onSelect(val);
+            p.onSelect(parseInt(val));
         }
     });
     div.appendChild(strengthSelect.getElement());

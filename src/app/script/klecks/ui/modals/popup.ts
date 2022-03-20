@@ -4,6 +4,7 @@ import {BB} from '../../../bb/bb';
 import checkImg from 'url:~/src/app/img/ui/check.svg';
 // @ts-ignore
 import cancelImg from 'url:~/src/app/img/ui/cancel.svg';
+import {LANG} from '../../../language/language';
 
 /**
  *
@@ -13,7 +14,7 @@ import cancelImg from 'url:~/src/app/img/ui/cancel.svg';
  *      div: node with content
  *      message:
  *      callback?:
- *      buttons: [string, ...]
+ *      buttons: [string, ...] // Ok, and Cancel will be translated
  *      primaries: [string, ...]
  *      type:
  *      closefunc:
@@ -24,7 +25,7 @@ import cancelImg from 'url:~/src/app/img/ui/cancel.svg';
  *
  * @param params
  */
-export const popup = function (params) {
+export const popup = function (params): void {
     dialogCounter.count++;
 
     const target = params.target;
@@ -113,7 +114,7 @@ export const popup = function (params) {
     } else {
         xButton.textContent = '╳';
     }
-    xButton.title = 'Close';
+    xButton.title = LANG('modal-close');
     xButton.onclick = function () {
         closePopup('Cancel');
     };
@@ -153,9 +154,9 @@ export const popup = function (params) {
             button.className = 'kl-button-primary';
         }
         if (label === 'Ok') {
-            button.innerHTML = '<img height="17" src="' + checkImg + '"/>' + label;
+            button.innerHTML = '<img height="17" src="' + checkImg + '"/>' + LANG('modal-ok');
         } else if (label === 'Cancel') {
-            button.innerHTML = '<img height="17" src="' + cancelImg + '"/>' + label;
+            button.innerHTML = '<img height="17" src="' + cancelImg + '"/>' + LANG('modal-cancel');
         } else {
             button.innerHTML = label;
         }
@@ -368,7 +369,7 @@ export const Popup = function(p) {
         parent: titleEl,
         className: 'popup-x',
         content: '╳',
-        title: 'Close',
+        title: LANG('modal-close'),
         onClick: close,
         css: {
             width: titleHeight + 'px',

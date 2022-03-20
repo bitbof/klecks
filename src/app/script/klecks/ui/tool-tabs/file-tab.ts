@@ -16,6 +16,7 @@ import {BrowserStorageUi} from '../components/browser-storage-ui';
 import {IKlProject} from '../../kl.types';
 import {SaveReminder} from '../components/save-reminder';
 import {ProjectStore} from '../../storage/project-store';
+import {LANG} from '../../../language/language';
 
 export type exportType = 'png' | 'layers' | 'psd';
 
@@ -73,12 +74,12 @@ export class FileTab {
             uploadImgurButton.tabIndex = -1;
             clipboardButton.tabIndex = -1;
 
-            newButton.innerHTML = "<img src='" + newImageImg + "' alt='New Image' height='20'/>New";
-            saveButton.innerHTML = "<img src='" + exportImg + "' alt='Save Image' height='20'/>Save";
-            shareButton.innerHTML = "<img src='" + shareImg + "' alt='Share Image' height='20'/>Share";
-            uploadImgurButton.innerHTML = "<img style='float:left' src='" + uploadImg + "' height='20' alt='Upload to Imgur'/>Upload";
-            clipboardButton.innerHTML = "<img src='" + copyImg + "' alt='Share Image' height='20'/>Copy";
-            clipboardButton.title = "Copy To Clipboard";
+            newButton.innerHTML = `<img src='${newImageImg}' alt='icon' height='20'/>${LANG('file-new')}`;
+            saveButton.innerHTML = `<img src='${exportImg}' alt='icon' height='20'/>${LANG('file-save')}`;
+            shareButton.innerHTML = `<img src='${shareImg}' alt='icon' height='20'/>${LANG('file-share')}`;
+            uploadImgurButton.innerHTML = `<img style='float:left' src='${uploadImg}' height='20' alt='icon'/>${LANG('file-upload')}`;
+            clipboardButton.innerHTML = `<img src='${copyImg}' alt='icon' height='20'/>${LANG('file-copy')}`;
+            clipboardButton.title = LANG('file-copy-title');
             newButton.className = "gridButton";
             saveButton.className = "gridButton";
             shareButton.className = "gridButton";
@@ -113,7 +114,7 @@ export class FileTab {
                 innerMask.appendChild(_this.importButton);
 
                 let importFakeButton = document.createElement("button");
-                importFakeButton.innerHTML = "<img style='float:left' height='20' src='" + importImg + "' alt='Import Image'/>Import";
+                importFakeButton.innerHTML = "<img style='float:left' height='20' src='" + importImg + "' alt='icon'/>" + LANG('file-import');
                 importFakeButton.tabIndex = -1;
 
                 BB.css(importFakeButton, {
@@ -159,9 +160,9 @@ export class FileTab {
                 });
                 exportTypeSelect = new KL.Select({
                     optionArr: [
-                        ['png', 'Save PNG'],
-                        ['psd', 'Save PSD'],
-                        ['layers', 'Save Layers'],
+                        ['png', LANG('file-save-png')],
+                        ['psd', LANG('file-save-psd')],
+                        ['layers', LANG('file-save-layers')],
                     ],
                     initValue: exportType,
                     onChange: function(val) {
@@ -200,7 +201,7 @@ export class FileTab {
             };
 
             let saveNote = document.createElement("div");
-            saveNote.textContent = "⚠️ No autosave, no cloud storage";
+            saveNote.textContent = "⚠️ " + LANG('file-no-autosave');
             BB.css(saveNote, {
                 textAlign: "center",
                 marginTop: "10px",
@@ -236,16 +237,6 @@ export class FileTab {
             BB.css(_this.fileBrowserStorage.getElement(), {
                 //background: 'red',
                 margin: '10px',
-            });
-
-
-            let headlineUpload = document.createElement("div");
-            headlineUpload.innerHTML = "Upload<br>";
-            BB.css(headlineUpload, {
-                marginLeft: "10px",
-                marginRight: "10px",
-                paddingTop: "5px",
-                marginBottom: "-5px"
             });
 
 

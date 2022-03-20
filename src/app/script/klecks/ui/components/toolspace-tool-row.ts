@@ -8,6 +8,7 @@ import toolZoomInImg from 'url:~/src/app/img/ui/tool-zoom-in.svg';
 import toolZoomOutImg from 'url:~/src/app/img/ui/tool-zoom-out.svg';
 // @ts-ignore
 import toolUndoImg from 'url:~/src/app/img/ui/tool-undo.svg';
+import {LANG} from '../../../language/language';
 
 
 /**
@@ -38,10 +39,6 @@ export function ToolspaceToolRow(p) {
     });
 
     let currentActiveStr = 'draw'; // 'draw' | 'hand' | 'fill'
-    let zoomInIsEnabled = true;
-    let zoomInOutEnabled = true;
-    let undoIsEnabled = false;
-    let redoIsEnabled = false;
 
     function setActive(activeStr, doEmit?) {
         if (currentActiveStr === activeStr) {
@@ -455,7 +452,7 @@ export function ToolspaceToolRow(p) {
         doLighten: true
     });
     handButton.style.borderRight = '1px solid rgb(212, 212, 212)';
-    handButton.title = 'Hand Tool';
+    handButton.title = LANG('tool-hand');
     div.appendChild(handButton);
 
     let zoomInNOutButton = createTriangleButton({
@@ -464,7 +461,7 @@ export function ToolspaceToolRow(p) {
         leftImage: toolZoomInImg,
         rightImage: toolZoomOutImg,
     });
-    zoomInNOutButton.title = 'Zoom';
+    zoomInNOutButton.title = LANG('tool-zoom');
     div.appendChild(zoomInNOutButton);
 
     let zoomInButton = createButton({
@@ -472,7 +469,7 @@ export function ToolspaceToolRow(p) {
         image: toolZoomInImg,
         contain: true
     });
-    zoomInButton.title = 'Zoom In';
+    zoomInButton.title = LANG('tool-zoom-in');
     div.appendChild(zoomInButton);
 
     let zoomOutButton = createButton({
@@ -480,7 +477,7 @@ export function ToolspaceToolRow(p) {
         image: toolZoomOutImg,
         contain: true
     });
-    zoomOutButton.title = 'Zoom Out';
+    zoomOutButton.title = LANG('tool-zoom-out');
     div.appendChild(zoomOutButton);
 
     let undoNRedoButton = createTriangleButton({
@@ -489,7 +486,7 @@ export function ToolspaceToolRow(p) {
         leftImage: toolUndoImg,
         rightImage: null,
     });
-    undoNRedoButton.title = 'Undo/Redo';
+    undoNRedoButton.title = LANG('tool-undo-redo');
     (undoNRedoButton as any).setIsEnabledLeft(false);
     (undoNRedoButton as any).setIsEnabledRight(false);
     div.appendChild(undoNRedoButton);

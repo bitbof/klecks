@@ -1,5 +1,4 @@
 import {BB} from '../../bb/bb';
-import {penPressureToggle} from '../ui/base-components/pen-pressure-toggle';
 import {eventResMs} from './brushes-consts';
 import {Checkbox} from '../ui/base-components/checkbox';
 import {brushes} from '../brushes/brushes';
@@ -10,11 +9,12 @@ import brushIconImg from 'url:~/src/app/img/ui/brush-chemy.svg';
 import {IBrushUi} from '../kl.types';
 import {Options} from '../ui/base-components/options';
 import {BoxToggle} from '../ui/base-components/box-toggle';
+import {LANG, languageStrings} from '../../language/language';
 
 export const chemyBrushUi = (function () {
     const brushInterface: IBrushUi = {
         image: brushIconImg,
-        tooltip: 'Chemy',
+        tooltip: LANG('brush-chemy'),
         sizeSlider: {
             min: 0.25,
             max: 25,
@@ -27,6 +27,10 @@ export const chemyBrushUi = (function () {
         },
         Ui: null,
     };
+
+    languageStrings.subscribe(() => {
+        brushInterface.tooltip = LANG('brush-chemy');
+    });
 
     brushInterface.Ui = function (p) {
         const div = document.createElement("div"); // the gui
@@ -43,7 +47,7 @@ export const chemyBrushUi = (function () {
 
         function init() {
             sizeSlider = new KlSlider({
-                label: 'Size',
+                label: LANG('brush-size'),
                 width: 250,
                 height: 30,
                 min: brushInterface.sizeSlider.min,
@@ -62,7 +66,7 @@ export const chemyBrushUi = (function () {
                 }
             });
             opacitySlider = new KlSlider({
-                label: 'Opacity',
+                label: LANG('brush-opacity'),
                 width: 250,
                 height: 30,
                 min: brushInterface.opacitySlider.min,
@@ -84,12 +88,12 @@ export const chemyBrushUi = (function () {
 
             const lockAlphaToggle = new Checkbox({
                 init: brush.getLockAlpha(),
-                label: 'Lock Alpha',
+                label: LANG('brush-lock-alpha'),
                 callback: function (b) {
                     brush.setLockAlpha(b);
                 },
                 doHighlight: true,
-                title: 'Locks layer\'s alpha channel',
+                title: LANG('brush-lock-alpha-title'),
                 css: {
                     marginTop: '10px',
                     display: 'inline-block',
@@ -125,7 +129,7 @@ export const chemyBrushUi = (function () {
                                 },
                             ],
                         }),
-                        title: 'Fill',
+                        title: LANG('brush-chemy-fill'),
                     },
                     {
                         id: 'stroke',
@@ -143,7 +147,7 @@ export const chemyBrushUi = (function () {
                                 },
                             ],
                         }),
-                        title: 'Stroke',
+                        title: LANG('brush-chemy-stroke'),
                     }
                 ],
                 initId: brush.getMode(),
@@ -172,7 +176,7 @@ export const chemyBrushUi = (function () {
                         },
                     ]
                 }),
-                title: 'Horizontal Symmetry',
+                title: LANG('brush-chemy-mirror-x'),
                 init: brush.getXSymmetry(),
                 onChange: (b) => {
                     brush.setXSymmetry(b);
@@ -194,7 +198,7 @@ export const chemyBrushUi = (function () {
                         },
                     ]
                 }),
-                title: 'Vertical Symmetry',
+                title: LANG('brush-chemy-mirror-y'),
                 init: brush.getYSymmetry(),
                 onChange: (b) => {
                     brush.setYSymmetry(b);
@@ -242,7 +246,7 @@ export const chemyBrushUi = (function () {
                         },
                     ]
                 }),
-                title: 'Gradient',
+                title: LANG('brush-chemy-gradient'),
                 init: brush.getGradient(),
                 onChange: (b) => {
                     brush.setGradient(b);

@@ -1,0 +1,464 @@
+/*
+Base Language File
+- contains hints - hints are not to be translated, they serve as help for the translator
+- is the source of truth
+- is in English
+*/
+{
+  "switch-ui-left-right": "Switch left/right UI",
+  "toggle-show-tools": "Show/Hide Tools",
+  "powered-by-klecks": "powered by Klecks",
+  "donate": "Donate",
+  "home": {
+    hint: 'button with logo, top left of tools',
+    value: 'Home',
+  },
+  "modal-new-tab": "Open in new tab",
+
+  "tab-layers": "Layers",
+  "tab-edit": "Edit",
+  "tab-file": "File",
+
+  "tool-brush": "Brush",
+  "tool-paint-bucket": "Paint Bucket",
+  "tool-shape": "Shape",
+  "tool-text": "Text",
+  "tool-hand": "Hand Tool",
+  "tool-zoom": "Zoom",
+  "tool-zoom-in": "Zoom In",
+  "tool-zoom-out": "Zoom Out",
+  "tool-undo-redo": "Undo / Redo",
+
+  "undo": 'Undo',
+  "redo": 'Redo',
+
+  "brush-pen": "Pen",
+  "brush-blend": "Blend",
+  "brush-sketchy": {
+    hint: 'Made up brush name. Pictures drawn with this brush often look like sketches.',
+    value: "Sketchy"
+  },
+  "brush-pixel": "Pixel",
+  "brush-chemy": {
+    hint: 'Made up brush name, derived from drawing applications "Webchemy" and "Alchemy"',
+    value: 'Chemy',
+  },
+  "brush-smudge": {
+    hint: 'Common brush/tool in image editing software. Smudges colors around canvas.',
+    value: 'Smudge',
+  },
+
+  "brush-size": "Size",
+  "brush-opacity": "Opacity",
+  "brush-blending": "Blending",
+  "brush-toggle-pressure": "Toggle Pressure Sensitivity",
+  "brush-lock-alpha": "Lock Alpha",
+  "brush-lock-alpha-title": "Locks layer's alpha channel",
+
+  "brush-pen-circle": "Circle",
+  "brush-pen-chalk": "Chalk",
+  "brush-pen-calligraphy": "Calligraphy",
+  "brush-pen-square": "Square",
+
+  "brush-sketchy-scale": {
+    hint: 'How far the connecting lines of sketchy brush can reach.',
+    value: 'Scale',
+  },
+
+  "brush-pixel-dither": "Dither",
+
+  "brush-chemy-fill": "Fill",
+  "brush-chemy-stroke": "Stroke",
+  "brush-chemy-mirror-x": "Horizontal Symmetry",
+  "brush-chemy-mirror-y": "Vertical Symmetry",
+  "brush-chemy-gradient": "Gradient",
+
+  "brush-eraser-transparent-bg": "Transparent Background",
+
+  "stabilizer": {
+    hint: 'Common feature in drawing software to make lines smoother',
+    value: 'Stabilizer'
+  },
+  "stabilizer-title": {
+    hint: '-title keys are usually more verbose description. shown as a tooltip.',
+    value: "Line Stabilizer",
+  },
+
+  "eyedropper": "Eyedropper",
+  "secondary-color": "Secondary Color",
+  "manual-color-input": {
+    hint: 'A dialog where users can manually type the color, each channel a number. "mci" keys all related to this dialog.',
+    value: 'Manual Color Input'
+  },
+  "mci-hex": "Hex",
+  "mci-copy": "Copy",
+
+  "modal-ok": "Ok",
+  "modal-cancel": "Cancel",
+  "modal-close": "Close",
+
+  "layers-active-layer": {
+    hint: 'currently selected layer that user is drawing on',
+    value: 'Active Layer'
+  },
+  "layers-opacity": "Opacity",
+  "layers-layer": "Layer",
+  "layers-copy": {
+    hint: 'noun',
+    value: 'copy',
+  },
+  "layers-blending": {
+    hint: 'Common feature in image editing & drawing software. All layers-blend- keys relate to this. https://en.wikipedia.org/wiki/Blend_modes',
+    value: 'Blending',
+  },
+  "layers-new": "New Layer",
+  "layers-remove": "Remove Layer",
+  "layers-duplicate": "Duplicate Layer",
+  "layers-merge": "Merge with layer below",
+  "layers-rename": "Rename",
+  "layers-blend-normal": "normal",
+  "layers-blend-darken": "darken",
+  "layers-blend-multiply": "multiply",
+  "layers-blend-color-burn": "color burn",
+  "layers-blend-lighten": "lighten",
+  "layers-blend-screen": "screen",
+  "layers-blend-color-dodge": "color dodge",
+  "layers-blend-overlay": "overlay",
+  "layers-blend-soft-light": "soft light",
+  "layers-blend-hard-light": "hard light",
+  "layers-blend-difference": "difference",
+  "layers-blend-exclusion": "exclusion",
+  "layers-blend-hue": "hue",
+  "layers-blend-saturation": "saturation",
+  "layers-blend-color": "color",
+  "layers-blend-luminosity": "luminosity",
+
+  "layers-rename-title": "Rename Layer",
+  "layers-rename-name": "Name",
+  "layers-rename-clear": {
+    hint: 'aka action of deleting entered name',
+    value: 'Clear Name',
+  },
+  "layers-rename-sketch": {
+    hint: 'noun',
+    value: 'Sketch'
+  },
+  "layers-rename-colors": "Colors",
+  "layers-rename-lines": "Lines",
+  "layers-rename-foreground": "Foreground",
+
+  "layers-merge-modal-title": "Merge/Mix Layers",
+  "layers-merge-description": "Merges the selected layer with the one underneath. Select the mix mode:",
+
+  "file-no-autosave": {
+    hint: "let user know they can't autosave, and there's no cloud storage. Keep short so fits on one line",
+    value: 'No autosave, no cloud storage',
+  },
+  "file-new": "New",
+  "file-import": "Import",
+  "file-save": "Save",
+  "file-save-png": "Save PNG",
+  "file-save-psd": "Save PSD",
+  "file-save-layers": "Save Layers",
+  "file-copy": "Copy",
+  "file-copy-title": "Copy To Clipboard",
+  "file-share": {
+    hint: 'Common feature on phones. Pressing share button allows to send data to a different app, e.g. as a text message to someone.',
+    value: 'Share',
+  },
+  "file-storage": {
+    hint: 'Made up term. Allows users to store drawing in the browser. (not synced across devices)',
+    value: 'Browser Storage',
+  },
+  "file-storage-thumb-title": "Restores when reopening page",
+  "file-storage-about": "About Browser Storage",
+  "file-storage-cant-access": "Can't access",
+  "file-storage-empty": {
+    hint: 'nothing stored',
+    value: 'Empty',
+  },
+  "file-storage-store": {
+    hint: 'verb',
+    value: 'Store',
+  },
+  "file-storage-clear": "Clear",
+  "file-storage-storing": "Storing",
+  "file-storage-overwrite": "Overwrite",
+  "file-storage-min-ago": {
+    hint: '{x} <- needs to stay, it\'s a placeholder.',
+    value: "{x}min ago",
+  },
+  "file-storage-hours-ago": "{x}h ago",
+  "file-storage-days-ago": "{x}d ago",
+  "file-storage-month-ago": "> 1month ago",
+  "file-storage-restored": "Restored from Browser Storage",
+  "file-storage-stored": "Stored to Browser Storage",
+  "file-storage-failed": "Failed to store to Browser Storage",
+  "file-storage-failed-1": "Failed to store. Possible causes:",
+  "file-storage-failed-2": "Out of disk space",
+  "file-storage-failed-3": "Storage disabled in incognito tab",
+  "file-storage-failed-4": "Browser doesn't support storage",
+  "file-storage-failed-clear": "Failed to clear.",
+  "file-upload": "Upload",
+
+  "cleared-layer": "Cleared layer",
+  "filled": {
+    hint: 'layer got filled with a color',
+    value: 'Filled',
+  },
+
+  "new-title": "New Image",
+  "new-current": "Current",
+  "new-fit": "Fit",
+  "new-oversize": "Oversize",
+  "new-square": "Square",
+  "new-landscape": "Landscape",
+  "new-portrait": "Portrait",
+  "new-screen": "Screen",
+  "new-video": "Video",
+  "new-din-paper": "DIN Paper",
+  "new-width": "Width",
+  "new-height": "Height",
+  "new-px": {
+    hint: 'abbreviation of pixel',
+    value: 'px',
+  },
+  "new-ratio": {
+    hint: 'aspect ratio',
+    value: 'Ratio',
+  },
+
+  "upload-title": "Upload to Imgur",
+  "upload-link-notice": "Anyone with the link to your uploaded image will be able to view it.",
+  "upload-name": "Title",
+  "upload-title-untitled": "Untitled",
+  "upload-caption": "Caption",
+  "upload-tos": "Terms of Service",
+  "upload-tos-2": "for imgur.com",
+  "upload-submit": "Upload",
+  "upload-uploading": "Uploading",
+  "upload-success": "Upload Successful",
+  "upload-failed": "Upload failed.",
+  "upload-delete": "To delete your image from Imgur visit:",
+
+  "cropcopy-title-copy": "Copy To Clipboard",
+  "cropcopy-title-crop": {
+    hint: 'Cropping is a common feature in image editing.',
+    value: 'Crop',
+  },
+  "cropcopy-btn-copy": "To Clipboard",
+  "cropcopy-copied": "Copied.",
+  "cropcopy-btn-crop": "Apply Crop",
+
+  "crop-drag-to-crop": "Drag to crop",
+
+  "filter-crop-extend": "Crop/Extend",
+  "filter-flip": "Flip",
+  "filter-perspective": "Perspective",
+  "filter-resize": "Resize",
+  "filter-rotate": "Rotate",
+  "filter-transform": "Transform",
+  "filter-bright-contrast": "Bright/Contrast",
+  "filter-curves": "Curves",
+  "filter-hue-sat": "Hue/Saturation",
+  "filter-invert": "Invert",
+  "filter-tilt-shift": "Tilt Shift",
+  "filter-to-alpha": {
+    hint: 'feature that can isolate linedrawings if it is a black and white image.',
+    value: 'To Alpha',
+  },
+  "filter-triangle-blur": "Triangle Blur",
+  "filter-unsharp-mask": "Unsharp Mask",
+
+  "filter-crop-title": "Crop / Extend",
+  "filter-crop-description": "Crop or extend the image.",
+  "filter-crop-left": "Left",
+  "filter-crop-right": "Right",
+  "filter-crop-top": "Top",
+  "filter-crop-bottom": "Bottom",
+  "filter-crop-rule-thirds": "Rule of Thirds",
+  "filter-crop-fill": "Fill",
+
+  "filter-flip-title": "Flip",
+  "filter-flip-description": "Flips layer or whole image.",
+  "filter-flip-horizontal": "Horizontal",
+  "filter-flip-vertical": "Vertical",
+  "filter-flip-image": "Flip Image",
+  "filter-flip-layer": "Flip Layer",
+
+  "filter-perspective-title": "Perspective",
+  "filter-perspective-description": "Transforms the selected layer.",
+  "filter-perspective-before": "Before",
+  "filter-perspective-after": "After",
+
+  "filter-resize-title": "Resize",
+  "filter-resize-description": "Resizes the image.",
+  "filter-resize-width": "Width",
+  "filter-resize-height": "Height",
+  "filter-resize-constrain": "Constrain Proportions",
+
+  "filter-rotate-title": "Rotate",
+  "filter-rotate-description": "Rotates the image.",
+
+  "filter-transform-empty": "Layer is empty.",
+  "filter-transform-title": "Transform",
+  "filter-transform-description": "Transforms selected layer. Hold Shift for additional behavior.",
+  "filter-transform-rotation": "Rotation",
+  "filter-transform-flip": "Flip",
+  "filter-transform-center": "Center",
+  "filter-transform-constrain": "Constrain",
+  "filter-transform-constrain-title": "Constrain Proportions",
+  "filter-transform-snap": "Snap",
+  "filter-transform-snap-title": "Snap Rotation And Position",
+
+  "filter-bright-contrast-title": "Brightness / Contrast",
+  "filter-bright-contrast-description": "Change brightness and contrast for the selected layer.",
+  "filter-bright-contrast-brightness": "Brightness",
+  "filter-bright-contrast-contrast": "Contrast",
+
+  "filter-curves-title": "Curves",
+  "filter-curves-description": "Apply curves on the selected layer.",
+  "filter-curves-all": "All",
+
+  "filter-hue-sat-title": "Hue / Saturation",
+  "filter-hue-sat-description": "Change hue and saturation for the selected layer.",
+  "filter-hue-sat-hue": "Hue",
+  "filter-hue-sat-saturation": "Saturation",
+
+  "filter-applied": "applied",
+
+  "filter-tilt-shift-title": "Tilt Shift",
+  "filter-tilt-shift-description": "Applies tilt shift on the selected layer.",
+  "filter-tilt-shift-blur": "Blur Radius",
+  "filter-tilt-shift-gradient": "Gradient Radius",
+
+  "filter-to-alpha-title": "To Alpha",
+  "filter-to-alpha-description": "Generates alpha channel for selected layer from:",
+  "filter-to-alpha-inverted-lum": "Inverted Luminance",
+  "filter-to-alpha-lum": "Luminance",
+  "filter-to-alpha-replace": "Replace RGB",
+
+  "filter-triangle-blur-title": "Triangle Blur",
+  "filter-triangle-blur-description": "Applies triangle blur on the selected layer.",
+  "filter-triangle-blur-radius": "Radius",
+
+  "filter-unsharp-mask-title": "Unsharp Mask",
+  "filter-unsharp-mask-description": "Sharpens the selected layer by scaling pixels away from the average of their neighbors.",
+  "filter-unsharp-mask-radius": "Radius",
+  "filter-unsharp-mask-strength": "Strength",
+
+  "import-opening": "Opening file",
+  "import-title": "Import Image",
+  "import-too-large": "Image too large, will be downscaled.",
+  "import-btn-as-layer": "As Layer",
+  "import-btn-as-image": "As Image",
+  "import-as-layer-title": "Import Image as New Layer",
+  "import-as-layer-description": "Adjust the position of the imported image.",
+  "import-as-layer-limit-reached": "Layer limit reached. Image will be placed on existing layer.",
+  "import-as-layer-fit": {
+    hint: 'verb. imported image made to fit inside canvas.',
+    value: 'Fit',
+  },
+  "import-flatten": {
+    hint: 'Turn image that has multiple layers into an image that has only one layer.',
+    value: 'Flatten image',
+  },
+  "import-unsupported-file": "Unsupported file type. See Help for supported types.",
+  "import-broken-file": "Couldn't load image. File might be corrupted.",
+  "import-psd-unsupported": "Unsupported features. PSD had to be flattened.",
+  "import-psd-limited-support": "PSD support is limited. Flattened will more likely look correct.",
+  "import-psd-too-large": "Image exceeds maximum dimensions of {x} x {x} pixels. Unable to import.",
+  "import-psd-size": "Image size",
+
+  "hand-reset": {
+    hint: 'resets zoom (to 100%) and rotation (to 0°)',
+    value: 'Reset',
+  },
+  "hand-fit": {
+    hint: 'makes canvas cover whole working area',
+    value: 'Fit',
+  },
+
+  "bucket-opacity": "Opacity",
+  "bucket-tolerance": "Tolerance",
+  "bucket-sample": "Sample",
+  "bucket-sample-title": "Which layers to sample color from",
+  "bucket-sample-all": "All",
+  "bucket-sample-active": "Active",
+  "bucket-sample-above": "Above",
+  "bucket-grow": "Grow",
+  "bucket-grow-title": "Grow filled area (in pixels)",
+  "bucket-contiguous": {
+    hint: 'common setting for paint bucket in image editing software',
+    value: 'Contiguous',
+  },
+  "bucket-contiguous-title": "Only fill connected areas",
+
+  "shape-stroke": "Stroke",
+  "shape-fill": "Fill",
+  "shape-rect": "Rectangle",
+  "shape-ellipse": "Ellipse",
+  "shape-line": "Line",
+  "shape-line-width": "Line Width",
+  "shape-opacity": "Opacity",
+  "shape-outwards": {
+    hint: 'grows shape from the center outwards',
+    value: 'Outwards',
+  },
+  "shape-fixed": "Fixed 1:1",
+  "shape-snap": "Snap",
+  "shape-snap-title": "45° Angle Snapping",
+
+  "text-instruction": "Click canvas to place text",
+  "text-title": "Add Text",
+  "text-placeholder": "Your text (multiline Shift+Enter)",
+  "text-opacity": "Opacity",
+  "text-color": "Color",
+  "text-size": "Size",
+  "text-left": "Left",
+  "text-center": "Center",
+  "text-right": "Right",
+  "text-italic": "Italic",
+  "text-bold": "Bold",
+  "text-zoom-in": "Zoom In",
+  "text-zoom-out": "Zoom Out",
+
+  "save-reminder-title": "Reminder to save",
+  "save-reminder-text": "Unsaved work may get lost.",
+
+  "submit": "Submit",
+  "submit-title": "Submit Drawing",
+  "submit-prompt": "Submit drawing?",
+  "submit-submitting": "Submitting",
+
+  "embed-init-loading": "Loading app",
+  "embed-init-waiting": "Waiting for image",
+
+  "unsaved": "Unsaved",
+  "paint-tool": "Paint Tool",
+  "help": "Help",
+
+  "tab-settings": 'Settings',
+  "settings-language": 'Language',
+  "settings-preferred-language": 'Preferred Language',
+  "settings-language-reload": 'Will update after reloading.',
+  "licenses": 'Licenses',
+  "source-code": 'Source Code',
+  "auto": {
+    hint: 'automatically decided',
+    value: 'auto'
+  },
+
+  "red": 'Red',
+  "green": 'Green',
+  "blue": 'Blue',
+  "eraser": 'Eraser',
+  "center": {
+    hint: 'verb',
+    value: 'Center',
+  },
+  "background": 'Background',
+  "scaling-algorithm": "Scaling Algorithm",
+  "algorithm-smooth": "Smooth",
+  "algorithm-pixelated": "Pixelated",
+}

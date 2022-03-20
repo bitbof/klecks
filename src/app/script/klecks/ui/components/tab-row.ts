@@ -14,7 +14,8 @@ import {BB} from '../../../bb/bb';
  *             title: string, // optional
  *             isVisible: boolean, // optional - default is true
  *             onOpen: function(),
- *             onClose: function()
+ *             onClose: function(),
+ *             css: {...},
  *         }
  *     ]
  * }
@@ -66,6 +67,9 @@ export function TabRow(p) {
                 backgroundImage: 'url(\'' + pTabObj.image + '\')',
                 backgroundSize: (height - 7) + 'px'
             });
+        }
+        if ('css' in pTabObj) {
+            BB.css(tabDiv, pTabObj.css);
         }
         div.appendChild(tabDiv);
 

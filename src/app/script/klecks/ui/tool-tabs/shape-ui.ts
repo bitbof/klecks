@@ -2,6 +2,7 @@ import {BB} from '../../../bb/bb';
 import {Options} from '../base-components/options';
 import {Checkbox} from '../base-components/checkbox';
 import {KlSlider} from '../base-components/kl-slider';
+import {LANG} from '../../../language/language';
 
 /**
  * Shape Tool tab contents
@@ -170,27 +171,27 @@ export function ShapeUi(p) {
             {
                 id: 'rect-stroke',
                 label: rectStrokeSvg,
-                title: 'Rectangle Stroke'
+                title: LANG('shape-rect') + ' ' + LANG('shape-stroke'),
             },
             {
                 id: 'ellipse-stroke',
                 label: ellipseStrokeSvg,
-                title: 'Ellipse Stroke'
+                title: LANG('shape-ellipse') + ' ' + LANG('shape-stroke'),
             },
             {
                 id: 'line',
                 label: lineSvg,
-                title: 'Line'
+                title: LANG('shape-line'),
             },
             {
                 id: 'rect-fill',
                 label: rectFilledSvg,
-                title: 'Rectangle Fill'
+                title: LANG('shape-rect') + ' ' + LANG('shape-fill'),
             },
             {
                 id: 'ellipse-fill',
                 label: ellipseFilledSvg,
-                title: 'Ellipse Fill'
+                title: LANG('shape-ellipse') + ' ' + LANG('shape-fill'),
             },
         ],
         initId: 'rect',
@@ -216,7 +217,7 @@ export function ShapeUi(p) {
 
     let eraserToggle = new Checkbox({
         init: false,
-        label: 'Eraser',
+        label: LANG('eraser'),
         callback: function(b) {
             updatePreviews();
         }
@@ -224,7 +225,7 @@ export function ShapeUi(p) {
     row1.appendChild(eraserToggle.getElement());
 
     let lineWidthSlider = new KlSlider({
-        label: 'Line Width',
+        label: LANG('shape-line-width'),
         width: 250,
         height: 30,
         min: 1,
@@ -244,7 +245,7 @@ export function ShapeUi(p) {
     div.appendChild(lineWidthSlider.getElement());
 
     let opacitySlider = new KlSlider({
-        label: 'Opacity',
+        label: LANG('shape-opacity'),
         width: 250,
         height: 30,
         min: 0,
@@ -272,7 +273,7 @@ export function ShapeUi(p) {
 
     let outwardsToggle = new Checkbox({
         init: false,
-        label: 'Outwards',
+        label: LANG('shape-outwards'),
         callback: function(b) {},
         css: {
             width: '50%',
@@ -283,7 +284,7 @@ export function ShapeUi(p) {
 
     let fixedToggle = new Checkbox({
         init: false,
-        label: 'Fixed 1:1',
+        label: LANG('shape-fixed'),
         callback: function(b) {
             updatePreviews();
         },
@@ -295,8 +296,8 @@ export function ShapeUi(p) {
 
     let snapToggle = new Checkbox({
         init: false,
-        label: 'Snap',
-        title: '45° Angle Snapping',
+        label: LANG('shape-snap'),
+        title: LANG('shape-snap-title'),
         callback: function(b) {
             updatePreviews();
         },

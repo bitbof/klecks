@@ -4,6 +4,7 @@ import {KlCanvasPreview} from '../canvas-ui/canvas-preview';
 // @ts-ignore
 import checkmarkImg from 'url:~/src/app/img/ui/checkmark.svg';
 import {IFilterApply, IFilterGetDialogParam, IKlBasicLayer, IMixMode} from '../kl.types';
+import {LANG} from '../../language/language';
 
 export const flip = {
 
@@ -27,12 +28,12 @@ export const flip = {
         let isHorizontal = true;
         let isVertical = false;
         let doFlipCanvas = true;
-        div.innerHTML = "Flips layer or whole image.<br/><br/>";
+        div.innerHTML = LANG('filter-flip-description') + "<br/><br/>";
 
 
         let horizontalCheckbox = new Checkbox({
             init: isHorizontal,
-            label: 'Horizontal ⟷',
+            label: LANG('filter-flip-horizontal') + ' ⟷',
             allowTab: true,
             callback: function(v) {
                 isHorizontal = v;
@@ -44,7 +45,7 @@ export const flip = {
         });
         let verticalCheckbox = new Checkbox({
             init: isVertical,
-            label: 'Vertical ↕',
+            label: LANG('filter-flip-horizontal') + ' ↕',
             allowTab: true,
             callback: function(v) {
                 isVertical = v;
@@ -65,7 +66,7 @@ export const flip = {
         BB.setEventListener(fcOption, 'onpointerdown', function () {
             return false;
         });
-        fcOption.textContent = "Flip Image";
+        fcOption.textContent = LANG('filter-flip-image');
         fcOption.style.width = "150px";
         fcOption.style.height = "30px";
         fcOption.style.paddingTop = "10px";
@@ -82,7 +83,7 @@ export const flip = {
         BB.setEventListener(flOption, 'onpointerdown', function () {
             return false;
         });
-        flOption.textContent = "Flip Layer";
+        flOption.textContent = LANG('filter-flip-layer');
         flOption.style.width = "150px";
         flOption.style.height = "30px";
         flOption.style.paddingTop = "10px";

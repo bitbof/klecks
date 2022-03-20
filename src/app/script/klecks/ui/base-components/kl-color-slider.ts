@@ -3,6 +3,7 @@ import {HexColorDialog} from '../modals/color-slider-hex-dialog';
 import {calcSliderFalloffFactor} from './slider-falloff';
 // @ts-ignore
 import eyedropperImg from 'url:~/src/app/img/ui/tool-picker.svg';
+import {LANG} from '../../../language/language';
 
 /**
  * big main HS+V color slider
@@ -225,7 +226,7 @@ export const KlColorSlider = function (p) {
 
 
     const pickerButton = BB.el({
-        title: 'Eyedropper [Alt]',
+        title: LANG('eyedropper') + ' [Alt]',
         className: 'color-picker-preview-button',
         css: {
             width: '30px',
@@ -269,7 +270,7 @@ export const KlColorSlider = function (p) {
     const hexButton = BB.el({
         content: '#',
         className: 'color-picker-preview-button',
-        title: 'Manual Color Input',
+        title: LANG('manual-color-input'),
         css: {
             height: '100%',
             width: height + 'px',
@@ -425,7 +426,7 @@ export const KlColorSlider = function (p) {
 
     const secondaryColorBtn = BB.el({
         parent: outputDiv,
-        title: 'Secondary Color [X]',
+        title: LANG('secondary-color') + ' [X]',
         css: {
             cursor: 'pointer',
             marginLeft: '5px',

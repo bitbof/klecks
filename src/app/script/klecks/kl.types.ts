@@ -1,5 +1,6 @@
 import {KlHistoryInterface} from './history/kl-history';
 import {KlCanvas} from './canvas/kl-canvas';
+import {TTranslationCode} from '../../languages/languages';
 
 export interface IFilterApply {
     context: CanvasRenderingContext2D;
@@ -18,6 +19,7 @@ export interface IFilterGetDialogParam {
 }
 
 export interface IFilter {
+    lang: {name: TTranslationCode; button: TTranslationCode};
     name: string;
     buttonLabel?: string;
     neededWithWebGL?: boolean;

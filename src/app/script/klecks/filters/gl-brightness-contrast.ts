@@ -4,6 +4,7 @@ import {eventResMs} from './filters-consts';
 import {KlCanvasPreview} from '../canvas-ui/canvas-preview';
 import {getSharedFx} from './shared-gl-fx';
 import {IFilterApply, IFilterGetDialogParam, IKlBasicLayer} from '../kl.types';
+import {LANG} from '../../language/language';
 
 export const glBrightnessContrast = {
     getDialog(params: IFilterGetDialogParam) {
@@ -41,7 +42,7 @@ export const glBrightnessContrast = {
         function finishInit() {
 
             let brightness = 0, contrast = 0;
-            div.innerHTML = "Change brightness and contrast for the selected layer.<br/><br/>";
+            div.innerHTML = LANG('filter-bright-contrast-description') + "<br/><br/>";
 
             let glCanvas = getSharedFx();
             if (!glCanvas) {
@@ -51,7 +52,7 @@ export const glBrightnessContrast = {
             glCanvas.draw(texture).update(); // update glCanvas size
 
             let brightnessSlider = new KlSlider({
-                label: 'Brightness',
+                label: LANG('filter-bright-contrast-brightness'),
                 width: 300,
                 height: 30,
                 min: 0,
@@ -65,7 +66,7 @@ export const glBrightnessContrast = {
                 }
             });
             let contrastSlider = new KlSlider({
-                label: 'Contrast',
+                label: LANG('filter-bright-contrast-contrast'),
                 width: 300,
                 height: 30,
                 min: 0,

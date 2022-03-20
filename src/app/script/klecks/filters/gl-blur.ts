@@ -4,6 +4,7 @@ import {eventResMs} from './filters-consts';
 import {KlCanvasPreview} from '../canvas-ui/canvas-preview';
 import {getSharedFx} from './shared-gl-fx';
 import {IFilterApply, IFilterGetDialogParam, IKlBasicLayer} from '../kl.types';
+import {LANG} from '../../language/language';
 
 export const glBlur = {
 
@@ -42,7 +43,7 @@ export const glBlur = {
 
         function finishInit() {
             let radius = 10;
-            div.innerHTML = "Applies triangle blur on the selected layer.<br/><br/>";
+            div.innerHTML = LANG('filter-triangle-blur-description') + "<br/><br/>";
 
             let glCanvas = getSharedFx();
             if (!glCanvas) {
@@ -52,7 +53,7 @@ export const glBlur = {
             glCanvas.draw(texture).update(); // update glCanvas size
 
             let radiusSlider = new KlSlider({
-                label: 'Radius',
+                label: LANG('filter-triangle-blur-radius'),
                 width: 300,
                 height: 30,
                 min: 1,

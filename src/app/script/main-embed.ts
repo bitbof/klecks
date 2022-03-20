@@ -4,6 +4,7 @@ import {IKlProject} from './klecks/kl.types';
 import {SaveReminder} from './klecks/ui/components/save-reminder';
 import {klHistory} from './klecks/history/kl-history';
 import {klPsdToKlProject, readPsd} from './klecks/storage/psd';
+import {LANG} from './language/language';
 
 export interface IEmbedParams {
     project?: IKlProject,
@@ -12,6 +13,7 @@ export interface IEmbedParams {
     embedUrl: string;
     logoImg?: any;
     bottomBar?: HTMLElement;
+    aboutEl?: HTMLElement;
 }
 
 export interface IReadPSD {
@@ -29,7 +31,7 @@ export function Embed(p: IEmbedParams) {
     let loadingScreenEl = document.getElementById("loading-screen");
     let loadingScreenTextEl = document.getElementById("loading-screen-text");
     if (loadingScreenTextEl) {
-        loadingScreenTextEl.textContent = 'Waiting for image';
+        loadingScreenTextEl.textContent = LANG('embed-init-waiting');
     }
 
     function onProjectReady(project: IKlProject) {
@@ -50,6 +52,7 @@ export function Embed(p: IEmbedParams) {
             {
                 saveReminder,
                 bottomBar: p.bottomBar,
+                aboutEl: p.aboutEl,
                 embed: {
                     url: p.embedUrl,
                     onSubmit: p.onSubmit,

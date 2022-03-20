@@ -29,6 +29,7 @@ import glBlurImg from 'url:~/src/app/img/ui/edit-triangle-blur.png';
 import glUnsharpMaskImg from 'url:~/src/app/img/ui/edit-unsharp-mask.png';
 // @ts-ignore
 import aImg from 'url:~/src/app/img/ui/';
+import {LANG, languageStrings} from '../../language/language';
 
 
 export const filterLibStatus = {
@@ -38,8 +39,9 @@ export const filterLib: {
     [key:string]: IFilter;
 } = {
     glBrightnessContrast: {
-        name: "Brightness / Contrast",
-        buttonLabel: "Bright/Contrast",
+        lang: {name: 'filter-bright-contrast-title', button: 'filter-bright-contrast'},
+        name: '',
+        buttonLabel: '',
         webgl: true,
         updateContext: true,
         icon: glBrightnessContrastImg,
@@ -49,8 +51,9 @@ export const filterLib: {
         inEmbed: true,
     },
     cropExtend: {
-        name: "Crop / Extend",
-        buttonLabel: "Crop/Extend",
+        lang: {name: 'filter-crop-title', button: 'filter-crop-extend'},
+        name: '',
+        buttonLabel: '',
         icon: cropExtendImg,
         webgl: false,
         neededWithWebGL: true,
@@ -61,7 +64,9 @@ export const filterLib: {
         inEmbed: false,
     },
     glCurves: {
-        name: "Curves",
+        lang: {name: 'filter-curves-title', button: 'filter-curves'},
+        name: '',
+        buttonLabel: '',
         icon: glCurvesImg,
         webgl: true,
         updateContext: true,
@@ -71,7 +76,9 @@ export const filterLib: {
         inEmbed: true,
     },
     flip: {
-        name: "Flip",
+        lang: {name: 'filter-flip-title', button: 'filter-flip'},
+        name: '',
+        buttonLabel: '',
         icon: flipImg,
         webgl: false,
         neededWithWebGL: true,
@@ -82,8 +89,9 @@ export const filterLib: {
         inEmbed: true,
     },
     glHueSaturation: {
-        name: "Hue / Saturation",
-        buttonLabel: "Hue/Saturation",
+        lang: {name: 'filter-hue-sat-title', button: 'filter-hue-sat'},
+        name: '',
+        buttonLabel: '',
         icon: glHueSaturationImg,
         webgl: true,
         updateContext: true,
@@ -93,7 +101,8 @@ export const filterLib: {
         inEmbed: true,
     },
     invert: {
-        name: "Invert",
+        lang: {name: 'filter-invert', button: 'filter-invert'},
+        name: '',
         icon: invertImg,
         webgl: true,
         updateContext: true,
@@ -104,7 +113,9 @@ export const filterLib: {
         inEmbed: true,
     },
     glPerspective: {
-        name: "Perspective",
+        lang: {name: 'filter-perspective-title', button: 'filter-perspective'},
+        name: '',
+        buttonLabel: '',
         icon: glPerspectiveImg,
         webgl: true,
         updateContext: true,
@@ -114,7 +125,9 @@ export const filterLib: {
         inEmbed: true,
     },
     resize: {
-        name: "Resize",
+        lang: {name: 'filter-resize-title', button: 'filter-resize'},
+        name: '',
+        buttonLabel: '',
         icon: resizeImg,
         webgl: false,
         neededWithWebGL: true,
@@ -125,7 +138,9 @@ export const filterLib: {
         inEmbed: false,
     },
     rotate: {
-        name: "Rotate",
+        lang: {name: 'filter-rotate-title', button: 'filter-rotate'},
+        name: '',
+        buttonLabel: '',
         icon: rotateImg,
         webgl: false,
         neededWithWebGL: true,
@@ -136,7 +151,9 @@ export const filterLib: {
         inEmbed: false,
     },
     glTiltShift: {
-        name: "Tilt Shift",
+        lang: {name: 'filter-tilt-shift-title', button: 'filter-tilt-shift'},
+        name: '',
+        buttonLabel: '',
         icon: glTiltShiftImg,
         webgl: true,
         updateContext: true,
@@ -146,7 +163,9 @@ export const filterLib: {
         inEmbed: true,
     },
     toAlpha: {
-        name: "To Alpha",
+        lang: {name: 'filter-to-alpha-title', button: 'filter-to-alpha'},
+        name: '',
+        buttonLabel: '',
         icon: toAlphaImg,
         webgl: true,
         updateContext: false,
@@ -156,7 +175,9 @@ export const filterLib: {
         inEmbed: true,
     },
     transform: {
-        name: "Transform",
+        lang: {name: 'filter-transform-title', button: 'filter-transform'},
+        name: '',
+        buttonLabel: '',
         icon: transformImg,
         webgl: false,
         neededWithWebGL: true,
@@ -168,7 +189,9 @@ export const filterLib: {
         inEmbed: true,
     },
     glBlur: {
-        name: "Triangle Blur",
+        lang: {name: 'filter-triangle-blur-title', button: 'filter-triangle-blur'},
+        name: '',
+        buttonLabel: '',
         icon: glBlurImg,
         webgl: true,
         updateContext: true,
@@ -178,7 +201,9 @@ export const filterLib: {
         inEmbed: true,
     },
     glUnsharpMask: {
-        name: "Unsharp Mask",
+        lang: {name: 'filter-unsharp-mask-title', button: 'filter-unsharp-mask'},
+        name: '',
+        buttonLabel: '',
         icon: glUnsharpMaskImg,
         webgl: true,
         updateContext: true,
@@ -188,3 +213,16 @@ export const filterLib: {
         inEmbed: true,
     }
 };
+
+function updateNames() {
+    const keys = Object.keys(filterLib);
+    keys.forEach(item => {
+        filterLib[item].name = LANG(filterLib[item].lang.name);
+        filterLib[item].buttonLabel = LANG(filterLib[item].lang.button);
+    });
+}
+updateNames();
+
+languageStrings.subscribe(() => {
+    updateNames();
+});

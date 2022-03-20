@@ -1,5 +1,6 @@
 import {BB} from '../../../bb/bb';
 import {klHistory} from '../../history/kl-history';
+import {LANG} from '../../../language/language';
 
 /**
  * Previews currently active layer
@@ -69,7 +70,7 @@ export function LayerPreview(p) {
     });
     let canvas = BB.canvas(canvasSize, canvasSize);
     let canvasCtx = canvas.getContext('2d');
-    canvas.title = 'Active Layer';
+    canvas.title = LANG('layers-active-layer');
     BB.css(canvas, {
         boxShadow: '0 0 0 1px #9e9e9e',
         colorScheme: 'only light',
@@ -120,7 +121,7 @@ export function LayerPreview(p) {
         });
     }
     let opacityEl = BB.el({
-        content: 'Opacity<br>100%',
+        content: LANG('layers-opacity') + '<br>100%',
         css: {
             minWidth: '60px',
             fontSize: '12px',
@@ -195,7 +196,7 @@ export function LayerPreview(p) {
         }
 
         nameLabelEl.textContent = layerObj.name;
-        opacityEl.innerHTML = 'Opacity<br>' + Math.round(layerObj.opacity * 100) + '%';
+        opacityEl.innerHTML = LANG('layers-opacity') + '<br>' + Math.round(layerObj.opacity * 100) + '%';
 
         let layerCanvas = layerObj.context.canvas;
 

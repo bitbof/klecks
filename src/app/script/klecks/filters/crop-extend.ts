@@ -4,6 +4,7 @@ import {Checkbox} from '../ui/base-components/checkbox';
 import {ColorOptions} from '../ui/base-components/color-options';
 import {Cropper} from '../ui/components/cropper';
 import {IFilterApply, IFilterGetDialogParam} from '../kl.types';
+import {LANG} from '../../language/language';
 
 export const cropExtend = {
 
@@ -26,7 +27,7 @@ export const cropExtend = {
         const result: any = {
             element: div
         };
-        div.innerHTML = "Crop or extend the image.<br/><br/>";
+        div.innerHTML = LANG('filter-crop-description') + "<br/><br/>";
         let left = 0, right = 0, top = 0, bottom = 0;
         let leftChanged = false, rightChanged = false, topChanged = false, bottomChanged = false;
         const maxWidth = params.maxWidth, maxHeight = params.maxHeight;
@@ -95,15 +96,15 @@ export const cropExtend = {
             width: '60px'
         };
         lrWrapper.append(
-            BB.el({content: 'Left:', css: labelStyle}),
+            BB.el({content: LANG('filter-crop-left') + ':', css: labelStyle}),
             leftInput,
-            BB.el({content: 'Right:', css: labelStyle}),
+            BB.el({content: LANG('filter-crop-right') + ':', css: labelStyle}),
             rightInput
         );
         tbWrapper.append(
-            BB.el({content: 'Top:', css: labelStyle}),
+            BB.el({content: LANG('filter-crop-top') + ':', css: labelStyle}),
             topInput,
-            BB.el({content: 'Bottom:', css: labelStyle}),
+            BB.el({content: LANG('filter-crop-bottom') + ':', css: labelStyle}),
             bottomInput
         );
 
@@ -176,7 +177,7 @@ export const cropExtend = {
         let useRuleOfThirds = true;
         let ruleOThirdsCheckbox = new Checkbox({
             init: true,
-            label: 'Rule of Thirds',
+            label: LANG('filter-crop-rule-thirds'),
             allowTab: true,
             callback: function(b) {
                 useRuleOfThirds = b;
@@ -209,7 +210,7 @@ export const cropExtend = {
         });
 
         const colorOptions = new ColorOptions({
-            label: 'fill',
+            label: LANG('filter-crop-fill'),
             colorArr: colorOptionsArr,
             onChange: function(rgbaObj) {
                 selectedRgbaObj = rgbaObj;

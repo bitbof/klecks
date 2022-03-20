@@ -7,6 +7,7 @@ import {showIframePopup} from '../modals/show-iframe-popup';
 import {SaveReminder} from './save-reminder';
 import {ProjectStore} from '../../storage/project-store';
 import {KL} from '../../kl';
+import {LANG} from '../../../language/language';
 
 export class BrowserStorageUi {
 
@@ -24,15 +25,15 @@ export class BrowserStorageUi {
         let age = new Date().getTime() - this.timestamp;
         let ageStr;
         age = Math.floor(age / 1000 / 60);
-        ageStr = age + 'min ago';
+        ageStr = LANG('file-storage-min-ago').replace('{x}', '' + age);
         if (age > 60) {
             age = Math.floor(age / 60);
-            ageStr = age + 'h ago';
+            ageStr = LANG('file-storage-hours-ago').replace('{x}', '' + age);
             if (age > 24) {
                 age = Math.floor(age / 24);
-                ageStr = age + 'd ago';
+                ageStr = LANG('file-storage-days-ago').replace('{x}', '' + age);
                 if (age > 31) {
-                    ageStr = '> 1month ago';
+                    ageStr = LANG('file-storage-month-ago');
                 }
             }
         }
@@ -41,11 +42,11 @@ export class BrowserStorageUi {
 
     private resetButtons() {
         if (this.timestamp) {
-            this.storeEl.textContent = 'Overwrite';
+            this.storeEl.textContent = LANG('file-storage-overwrite');
             this.storeEl.disabled = false;
             this.clearEl.disabled = false;
         } else {
-            this.storeEl.textContent = 'Store';
+            this.storeEl.textContent = LANG('file-storage-store');
             this.storeEl.disabled = false;
             this.clearEl.disabled = true;
         }
@@ -67,13 +68,13 @@ export class BrowserStorageUi {
             this.updateAge();
             this.previewEl.append(thumbnail, this.ageEl);
         } else {
-            this.previewEl.innerHTML = 'Empty';
+            this.previewEl.innerHTML = LANG('file-storage-empty');
         }
         this.resetButtons();
     }
 
     private async store() {
-        this.storeEl.textContent = 'Storing...';
+        this.storeEl.textContent = LANG('file-storage-storing');
         this.storeEl.disabled = true;
         this.clearEl.disabled = true;
         await new Promise((resolve) => {
@@ -87,7 +88,13 @@ export class BrowserStorageUi {
             KL.popup({
                 target: this.klRootEl,
                 type: 'error',
-                message: 'Failed to store. Possible causes:<ul><li>Out of disk space</li><li>Storage disabled in incognito tab</li><li>Browser doesn\'t support storage</li>',
+                message: [
+                    `${LANG('file-storage-failed-1')}<ul>`,
+                    `<li>${LANG('file-storage-failed-2')}</li>`,
+                    `<li>${LANG('file-storage-failed-3')}</li>`,
+                    `<li>${LANG('file-storage-failed-4')}</li>`,
+                    `</ul>`,
+                ].join(''),
                 buttons: ['Ok'],
             });
             setTimeout(() => {
@@ -106,7 +113,7 @@ export class BrowserStorageUi {
             KL.popup({
                 target: this.klRootEl,
                 type: 'error',
-                message: 'Failed to clear.',
+                message: LANG('file-storage-failed-clear'),
                 buttons: ['Ok'],
             });
             setTimeout(() => {
@@ -136,7 +143,7 @@ export class BrowserStorageUi {
 
         const title = BB.el({
             parent: this.element,
-            content: 'Browser Storage',
+            content: LANG('file-storage'),
             css: {
                 gridArea: 'title',
                 display: 'flex',
@@ -148,7 +155,7 @@ export class BrowserStorageUi {
         const infoEl = BB.el({
             parent: title,
             content: '?',
-            title: 'About Browser Storage',
+            title: LANG('file-storage-about'),
             css: {
                 cursor: 'pointer',
                 marginLeft: '5px',
@@ -168,14 +175,17 @@ export class BrowserStorageUi {
         if (this.projectStore.isBroken()) {
             BB.el({
                 parent: this.element,
-                content: "🔴 Can't access",
+                content: "🔴 " + LANG('file-storage-cant-access'),
+                css: {
+                    marginTop: '10px',
+                }
             });
             return;
         }
 
         this.previewEl = BB.el({
             parent: this.element,
-            title: 'Restores when reopening page',
+            title: LANG('file-storage-thumb-title'),
             css: {
                 gridArea: 'preview',
                 display: 'flex',
@@ -205,7 +215,7 @@ export class BrowserStorageUi {
             parent: this.element,
             tagName: 'button',
             className: 'gridButton',
-            content: 'Store',
+            content: LANG('file-storage-store'),
             css: {
                 gridArea: 'store',
                 //background: '#00f',
@@ -220,7 +230,7 @@ export class BrowserStorageUi {
             parent: this.element,
             tagName: 'button',
             className: 'gridButton',
-            content: '<img src="' + removeLayerImg + '" height="20"/> Clear',
+            content: '<img src="' + removeLayerImg + '" height="20"/> ' + LANG('file-storage-clear'),
             css: {
                 gridArea: 'clear',
                 //background: '#ff0',
