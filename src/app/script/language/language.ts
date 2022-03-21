@@ -1,6 +1,8 @@
 // @ts-ignore
 import {english, languages, loadLanguage, TTranslationCode} from '../../languages/languages';
 
+export const LS_LANGUAGE_KEY = 'klecks-language';
+
 export class LanguageStrings {
     private data: any;
     private listeners: (() => void)[] = [];
@@ -67,8 +69,8 @@ let activeLanguageCode: string = null; // active language code
             langs.push(split[0]);
         }
     });
-    if (localStorage.getItem('klecks-language')) {
-        langs.unshift(localStorage.getItem('klecks-language'));
+    if (localStorage.getItem(LS_LANGUAGE_KEY)) {
+        langs.unshift(localStorage.getItem(LS_LANGUAGE_KEY));
     }
     for (let i = 0; i < langs.length; i++) {
         const lang = langs[i];

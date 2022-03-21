@@ -1,5 +1,5 @@
 import {BB} from '../../../bb/bb';
-import {LANG, languageStrings} from '../../../language/language';
+import {LANG, languageStrings, LS_LANGUAGE_KEY} from '../../../language/language';
 import {KL} from '../../kl';
 import {languages} from '../../../../languages/languages';
 import {Popup} from '../modals/popup';
@@ -42,13 +42,13 @@ ${LANG('settings-language')}: ${language.name} (${language.code})
             })
         );
         const languageSelect = new KL.Select({
-            initValue: localStorage.getItem('klecks-language') ? localStorage.getItem('klecks-language') : 'auto',
+            initValue: localStorage.getItem(LS_LANGUAGE_KEY) ? localStorage.getItem(LS_LANGUAGE_KEY) : 'auto',
             optionArr: options,
             onChange: (val) => {
                 if (val === 'auto') {
-                    localStorage.removeItem('klecks-language');
+                    localStorage.removeItem(LS_LANGUAGE_KEY);
                 } else {
-                    localStorage.setItem('klecks-language', val);
+                    localStorage.setItem(LS_LANGUAGE_KEY, val);
                 }
                 languageHint.style.display = 'block';
             },
@@ -150,6 +150,15 @@ ${LANG('settings-language')}: ${language.name} (${language.code})
 
 
         }
+
+        window.addEventListener('storage', (e) => {
+            if (e.key !== LS_LANGUAGE_KEY) {
+                return;
+            }
+            languageSelect.setValue(
+                localStorage.getItem(LS_LANGUAGE_KEY) ? localStorage.getItem(LS_LANGUAGE_KEY) : 'auto'
+            );
+        });
 
     }
 
