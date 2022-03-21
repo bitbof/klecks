@@ -4,8 +4,21 @@ const JSON5 = require('json5');
 const beautify = require('js-beautify').js;
 const path = require('path');
 
+/**
+ * A translation (not base)
+ * @typedef {{code: string, data: Object.<string, {hint?: string, original:string, value: string}>}} KLTranslation
+ */
 
-function addNewLanguage (base, code) {
+/**
+ * Base language
+ * @typedef {Object.<string, (string|{hint:string, value: string})>} KLBase
+ */
+
+/**
+ * @param {KLBase} base
+ * @returns {KLTranslation}
+ */
+function addNewLanguage (base) {
     const lang = JSON.parse(JSON.stringify(base));
     const keys = Object.keys(lang);
     keys.forEach(item => {
@@ -31,8 +44,8 @@ function syncLanguages () {
 
 /**
  *
- * @param {*} baseEn
- * @param {{code: string, data: *}[]}translations
+ * @param {KLBase} baseEn
+ * @param {KLTranslation[]}translations
  */
 function buildLanguages (baseEn, translations) {
 
@@ -150,6 +163,10 @@ export type TTranslationCode = `;
     });
 }
 
+/**
+ * @param {string} code
+ * @returns {void}
+ */
 function cmdAdd(code) {
     if (!code) {
         console.log('error: argument missing for language code (ISO 639-1).');
@@ -167,10 +184,16 @@ function cmdAdd(code) {
     fs.writeFileSync(path, beautify(JSON5.stringify(lang)));
 }
 
+/**
+ * @returns {void}
+ */
 function cmdSync() {
     console.log('not implemented');
 }
 
+/**
+ * @returns {void}
+ */
 function cmdBuild() {
     const translations = [];
     fs.readdirSync('./src/languages').forEach(file => {
@@ -205,7 +228,6 @@ if (process.argv[1] === __filename) {
 
     } else if (process.argv[2] === 'sync') {
         cmdSync();
-
 
     } else if (process.argv[2] === 'build') {
         cmdBuild();
