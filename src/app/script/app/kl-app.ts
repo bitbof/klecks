@@ -1694,7 +1694,7 @@ export function KlApp(pProject: IKlProject | null, pOptions: IKlAppOptions) {
             },
             {
                 id: 'settings',
-                title: 'Settings',
+                title: LANG('tab-settings'),
                 image: tabSettingsImg,
                 onOpen: function() {
                     settingsTab.getElement().style.display = 'block';
