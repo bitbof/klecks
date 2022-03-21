@@ -14,6 +14,7 @@ For a demo and list of features visit [kleki.com/home](https://kleki.com/home/).
 
 # Commands
 - initialize via `npm install` (requires node and npm to be installed already)
+- `npm run lang:build` - generate language files necessary to run Klecks
 - `npm run start` - dev server (to run it locally)
 - `npm run build` - build standalone into `/dist/`
 - `npm run build:embed` - build of embed into `/dist/`
@@ -32,9 +33,9 @@ Any contribution by you is highly encouraged and appreciated! These are the curr
 Translations are edited via `src/languages`. Use CLI-commands to create resulting JSON & TS files.
 JSON5 is used for authoring for its convenient syntax that resembles JavaScript more closely.
 English (en-US) is the source of truth and the fallback if a key is not translated.
-- `npm run language:add <code>` - creates new language file (see language codes in `languages.json`)
-- `npm run language:sync <code>` - synchronizes with base file. (TODO)
-- `npm run language:build` - generates JSON & TS files in `src/app/languages`
+- `npm run lang:add <code>` - creates new language file (see language codes in `languages.json`)
+- `npm run lang:sync <code>` - synchronizes with base file. (TODO)
+- `npm run lang:build` - generates JSON & TS files in `src/app/languages`
   - Problems are printed to the command line output
 
 A translation should try not to cause additional line-breaks in the UI if possible. Test to make sure translations
