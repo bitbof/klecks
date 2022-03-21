@@ -153,6 +153,7 @@ export type TTranslationCode = `;
 function cmdAdd(code) {
     if (!code) {
         console.log('error: argument missing for language code (ISO 639-1).');
+        process.exit(1);
     }
     const path = `./src/languages/${code}.json5`;
     if (fs.existsSync(path)) {
