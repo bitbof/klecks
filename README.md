@@ -23,7 +23,7 @@ For a demo and list of features visit [kleki.com/home](https://kleki.com/home/).
 # Embed
 Example usage of the embed can be found under: `/examples/embed/`
 
-## Translations
+# Translations
 Are you a native speaker or have advanced skills in a language with no translation yet?
 Any contribution by you is highly encouraged and appreciated! These are the currently available languages:
 - English

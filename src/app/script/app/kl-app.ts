@@ -1769,16 +1769,6 @@ export function KlApp(pProject: IKlProject | null, pOptions: IKlAppOptions) {
     });
     if (pOptions.bottomBar) {
         bottomBarWrapper.append(pOptions.bottomBar);
-    } else {
-        BB.el({
-            parent: bottomBarWrapper,
-            content: LANG('powered-by-klecks') + ` - <a href="https://kleki.com/donate" target="_blank">${LANG('donate')}</a>`,
-            css: {
-                width: '100%',
-                textAlign: 'center',
-                paddingBottom: '3px',
-            }
-        });
     }
 
     BB.append(toolspace, [

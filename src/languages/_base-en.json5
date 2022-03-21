@@ -7,7 +7,6 @@ Base Language File
 {
   "switch-ui-left-right": "Switch left/right UI",
   "toggle-show-tools": "Show/Hide Tools",
-  "powered-by-klecks": "powered by Klecks",
   "donate": "Donate",
   "home": {
     hint: 'button with logo, top left of tools',

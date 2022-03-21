@@ -7,10 +7,6 @@
         original: 'Show/Hide Tools',
         value: 'Werkzeuge Anzeigen/Verbergen',
     },
-    'powered-by-klecks': {
-        original: 'powered by Klecks',
-        value: 'powered by Klecks'
-    },
     donate: {
         original: 'Donate',
         value: 'Spenden'
