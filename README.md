@@ -61,7 +61,7 @@ To **edit an existing translation**, simply edit one of the files in `src/langua
 source of truth. A translation cannot add new keys without them also being present in `_base-en.json5`.
 
 To **see your changes** in Klecks, run `npm run lang:build`. It needs to be run whenever changes to `src/languages` are
-made or it won't be up to date. Then build or start Klecks.
+made or it won't be up-to-date. Then build or start Klecks.
 
 A translation should try not to cause additional line-breaks in the UI if possible. Test to make sure translations
 fit the context of the application. Note, some texts are only visible in the standalone-version and vice versa with
