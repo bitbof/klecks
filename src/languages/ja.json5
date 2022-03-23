@@ -616,7 +616,7 @@
     },
     'cropcopy-btn-copy': {
         original: 'To Clipboard',
-        value: 'クリップボードにコピー'
+        value: 'コピー'
     },
     'cropcopy-copied': {
         original: 'Copied.',
@@ -991,7 +991,7 @@
     },
     'import-psd-unsupported': {
         original: 'Unsupported features. PSD had to be flattened.',
-        value: 'サポートされていない機能を使用したPSDです。レイヤーを結合してください。'
+        value: 'サポートされていない形式です。'
     },
     'import-psd-limited-support': {
         original: 'PSD support is limited. Flattened will more likely look correct.',
