@@ -45,7 +45,7 @@ export const flip = {
         });
         let verticalCheckbox = new Checkbox({
             init: isVertical,
-            label: LANG('filter-flip-horizontal') + ' ↕',
+            label: LANG('filter-flip-vertical') + ' ↕',
             allowTab: true,
             callback: function(v) {
                 isVertical = v;
