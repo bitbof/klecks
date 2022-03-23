@@ -1,5 +1,6 @@
 import {addEventListener} from '../input/event-listener';
 import {css} from './base';
+import {BB} from '../bb';
 
 
 export function appendTextDiv(target: HTMLElement, text: string): HTMLDivElement {
@@ -123,10 +124,8 @@ export function el(
         } else if (!params.content[0]) {
             div.appendChild(params.content as HTMLElement);
 
-        } else if (typeof params.content === typeof arr) {
-            for (let i = 0; i < (params.content as HTMLElement[]).length; i++) {
-                div.appendChild(params.content[i]);
-            }
+        } else if (Array.isArray(params.content)) {
+            BB.append(div, params.content);
         }
     }
     if (params.textContent) {

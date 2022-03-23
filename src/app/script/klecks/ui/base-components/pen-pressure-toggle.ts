@@ -15,10 +15,9 @@ export const penPressureToggle = function(isChecked, changeCallback) {
     const toggleDiv = BB.el({
         css: {
             cssFloat: 'right',
-            marginTop: '8px',
             borderRadius: '3px',
-            width: '15px',
-            height: '15px',
+            width: '18px',
+            height: '18px',
             backgroundImage: 'url("' + iconImg + '")',
             backgroundSize: 'contain',
             backgroundRepeat: 'no-repeat',

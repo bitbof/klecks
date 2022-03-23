@@ -108,17 +108,31 @@ export const smudgeBrushUi = (function () {
                 brush.opacityPressure(b);
             });
 
-            div.appendChild(pressureSizeToggle);
-            div.appendChild(sizeSlider.getElement());
-            BB.el({
-                parent: div,
-                css: {
-                    clear: 'both',
-                    marginBottom: '10px'
-                }
-            });
-            div.appendChild(pressureOpacityToggle);
-            div.appendChild(opacitySlider.getElement());
+            div.append(
+                BB.el({
+                    content: [
+                        sizeSlider.getElement(),
+                        pressureSizeToggle
+                    ],
+                    css: {
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        marginBottom: '10px',
+                    }
+                }),
+                BB.el({
+                    content: [
+                        opacitySlider.getElement(),
+                        pressureOpacityToggle
+                    ],
+                    css: {
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                    }
+                })
+            );
 
             let bottomRow = BB.el({
                 parent: div,
