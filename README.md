@@ -58,7 +58,7 @@ To **create a new translation** run `npm run lang:add <code>`, which creates `sr
 (ISO 639-1) language codes in `src/languages/languages.json`. The generated file will already include everything except `value`.
 To **edit an existing translation**, simply edit one of the files in `src/languages`. If a language file is out of sync with
 `src/languages/_base-en.json5` (English), whatever key is out of sync will be ignored and fall back on English. English is the
-source of truth. A translation cannot add new keys.
+source of truth. A translation cannot add new keys without it also being in `_base-en.json5`.
 
 To **see your changes** in Klecks, run `npm run lang:build`. It needs to be run whenever changes to `src/languages` are
 made or it won't be up to date. Then build or start Klecks.
