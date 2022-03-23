@@ -659,21 +659,26 @@ textarea:focus, input:focus {
     line-height: 17px;
     user-select: none;
     -webkit-user-select: none;
+    filter: brightness(0.7);
 }
 
 .dialog-closebtn:hover {
-    color: #000;
+    filter: brightness(0.4);
 }
 
 .popup-x {
+    display: flex;
+    justify-content: center;
+    align-items: center;
     color: #888;
     cursor: pointer;
-    text-align: center;
     user-select: none;
     -webkit-user-select: none; // safari
+    filter: brightness(0.7);
 }
 .popup-x:hover {
     color: #000;
+    filter: brightness(0.4);
 }
 
 .brush-alpha, .brush-alpha-selected {

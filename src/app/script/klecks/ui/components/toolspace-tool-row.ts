@@ -496,7 +496,7 @@ export function ToolspaceToolRow(p) {
         image: toolUndoImg,
         contain: true
     });
-    undoButton.title = 'Undo';
+    undoButton.title = LANG('undo');
     BB.addClassName(undoButton, 'toolspace-row-button-disabled');
     div.appendChild(undoButton);
 
@@ -506,7 +506,7 @@ export function ToolspaceToolRow(p) {
         contain: true,
         doMirror: true
     });
-    redoButton.title = 'Redo';
+    redoButton.title = LANG('redo');
     BB.addClassName(redoButton, 'toolspace-row-button-disabled');
     div.appendChild(redoButton);
 

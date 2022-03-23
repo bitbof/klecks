@@ -28,6 +28,7 @@ Are you a native speaker or have advanced skills in a language with no translati
 Any contribution by you is highly encouraged and appreciated! These are the currently available languages:
 - English
 - German
+- Japanese
 - Chinese (Work In Progress)
 
 ### Where are translation files?

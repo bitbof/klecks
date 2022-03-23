@@ -109,11 +109,7 @@ export const popup = function (params): void {
 
     const xButton = document.createElement('div');
     xButton.className = 'dialog-closebtn';
-    if (navigator.appName === 'Microsoft Internet Explorer') {
-        xButton.textContent = 'X';
-    } else {
-        xButton.textContent = '╳';
-    }
+    xButton.innerHTML = `<img alt="${LANG('modal-close')}" height="20" src="${cancelImg}">`;
     xButton.title = LANG('modal-close');
     xButton.onclick = function () {
         closePopup('Cancel');
@@ -368,7 +364,7 @@ export const Popup = function(p) {
     const xButton = BB.el({
         parent: titleEl,
         className: 'popup-x',
-        content: '╳',
+        content: `<img alt="${LANG('modal-close')}" height="20" src="${cancelImg}">`,
         title: LANG('modal-close'),
         onClick: close,
         css: {

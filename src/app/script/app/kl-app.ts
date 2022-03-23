@@ -35,6 +35,8 @@ import toolTextImg from 'url:~/src/app/img/ui/tool-text.svg';
 import toolShapeImg from 'url:~/src/app/img/ui/tool-shape.svg';
 // @ts-ignore
 import tabSettingsImg from 'url:~/src/app/img/ui/tab-settings.svg';
+// @ts-ignore
+import tabLayersImg from 'url:~/src/app/img/ui/tab-layers.svg';
 
 
 interface IKlAppOptions {
@@ -1654,13 +1656,17 @@ export function KlApp(pProject: IKlProject | null, pOptions: IKlAppOptions) {
             },
             {
                 id: 'layers',
-                label: LANG('tab-layers'),
+                title: LANG('tab-layers'),
+                image: tabLayersImg,
                 onOpen: function() {
                     layerManager.update();
                     layerManager.style.display = 'block';
                 },
                 onClose: function() {
                     layerManager.style.display = 'none';
+                },
+                css: {
+                    minWidth: '45px',
                 }
             },
             {
