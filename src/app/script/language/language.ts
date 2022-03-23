@@ -59,10 +59,11 @@ export class LanguageStrings {
     }
 }
 
-let activeLanguageCode: string = null; // active language code
+let activeLanguageCode: string = 'en'; // active language code
 {
     const langs: string[] = []; // from highest to lowest priority
-    navigator.languages.forEach(item => {
+    const navLangs = navigator.languages ? navigator.languages : [navigator.language];
+    navLangs.forEach(item => {
         const split = item.split('-');
         langs.push(item);
         if (split.length === 2) {
@@ -80,9 +81,6 @@ let activeLanguageCode: string = null; // active language code
             activeLanguageCode = lang;
             break;
         }
-    }
-    if (activeLanguageCode === null) {
-        activeLanguageCode = 'en';
     }
 }
 

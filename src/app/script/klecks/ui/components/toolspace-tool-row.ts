@@ -1,7 +1,7 @@
 import {BB} from '../../../bb/bb';
 import {ToolDropdown} from './tool-dropdown';
 // @ts-ignore
-import toolMoveImg from 'url:~/src/app/img/ui/tool-move.svg';
+import toolHandImg from 'url:~/src/app/img/ui/tool-hand.svg';
 // @ts-ignore
 import toolZoomInImg from 'url:~/src/app/img/ui/tool-zoom-in.svg';
 // @ts-ignore
@@ -447,7 +447,7 @@ export function ToolspaceToolRow(p) {
         onClick: function() {
             setActive('hand', true);
         },
-        image: toolMoveImg,
+        image: toolHandImg,
         contain: true,
         doLighten: true
     });

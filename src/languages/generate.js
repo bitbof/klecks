@@ -182,6 +182,7 @@ function cmdAdd(code) {
         code
     );
     fs.writeFileSync(path, beautify(JSON5.stringify(lang)));
+    console.log('Created: ' + path);
 }
 
 /**

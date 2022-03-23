@@ -26,7 +26,7 @@ import {LANG} from '../language/language';
 // @ts-ignore
 import toolPaintImg from 'url:~/src/app/img/ui/tool-paint.svg';
 // @ts-ignore
-import toolMoveImg from 'url:~/src/app/img/ui/tool-move.svg';
+import toolHandImg from 'url:~/src/app/img/ui/tool-hand.svg';
 // @ts-ignore
 import toolFillImg from 'url:~/src/app/img/ui/tool-fill.svg';
 // @ts-ignore
@@ -1592,7 +1592,7 @@ export function KlApp(pProject: IKlProject | null, pOptions: IKlAppOptions) {
             {
                 id: 'hand',
                 title: LANG('tool-hand'),
-                image: toolMoveImg,
+                image: toolHandImg,
                 isVisible: false,
                 onOpen: function() {
                     handUi.setIsVisible(true);
