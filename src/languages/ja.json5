@@ -793,7 +793,7 @@
     },
     'filter-transform-title': {
         original: 'Transform',
-        value: '変形変形'
+        value: '自由変形'
     },
     'filter-transform-description': {
         original: 'Transforms selected layer. Hold Shift for additional behavior.',
