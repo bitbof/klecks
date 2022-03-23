@@ -30,7 +30,7 @@ export function FillUi(p) {
     });
 
     let opacitySlider = new KlSlider({
-        label: LANG('bucket-opacity'),
+        label: LANG('opacity'),
         width: 250,
         height: 30,
         min: 0,

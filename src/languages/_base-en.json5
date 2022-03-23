@@ -48,7 +48,6 @@ Base Language File
   },
 
   "brush-size": "Size",
-  "brush-opacity": "Opacity",
   "brush-blending": "Blending",
   "brush-toggle-pressure": "Toggle Pressure Sensitivity",
   "brush-lock-alpha": "Lock Alpha",
@@ -100,7 +99,6 @@ Base Language File
     hint: 'currently selected layer that user is drawing on',
     value: 'Active Layer'
   },
-  "layers-opacity": "Opacity",
   "layers-layer": "Layer",
   "layers-copy": {
     hint: 'noun',
@@ -378,7 +376,6 @@ Base Language File
     value: 'Fit',
   },
 
-  "bucket-opacity": "Opacity",
   "bucket-tolerance": "Tolerance",
   "bucket-sample": "Sample",
   "bucket-sample-title": "Which layers to sample color from",
@@ -399,7 +396,6 @@ Base Language File
   "shape-ellipse": "Ellipse",
   "shape-line": "Line",
   "shape-line-width": "Line Width",
-  "shape-opacity": "Opacity",
   "shape-outwards": {
     hint: 'grows shape from the center outwards',
     value: 'Outwards',
@@ -411,7 +407,6 @@ Base Language File
   "text-instruction": "Click canvas to place text",
   "text-title": "Add Text",
   "text-placeholder": "Your text (multiline Shift+Enter)",
-  "text-opacity": "Opacity",
   "text-color": "Color",
   "text-size": "Size",
   "text-left": "Left",
@@ -448,6 +443,7 @@ Base Language File
     value: 'auto'
   },
 
+  "opacity": 'Opacity',
   "red": 'Red',
   "green": 'Green',
   "blue": 'Blue',

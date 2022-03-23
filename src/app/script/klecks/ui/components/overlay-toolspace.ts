@@ -110,7 +110,7 @@ export function OverlayToolspace(
     div.appendChild(sizeSlider.getElement());
 
     const opacitySlider = new KlSlider({
-        label: LANG('brush-opacity'),
+        label: LANG('opacity'),
         width: sizeObj.width,
         height: sizeObj.sliderHeight,
         min: 0,

@@ -66,7 +66,7 @@ export const chemyBrushUi = (function () {
                 }
             });
             opacitySlider = new KlSlider({
-                label: LANG('brush-opacity'),
+                label: LANG('opacity'),
                 width: 250,
                 height: 30,
                 min: brushInterface.opacitySlider.min,

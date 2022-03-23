@@ -104,10 +104,6 @@
         original: 'Size',
         value: 'Größe'
     },
-    'brush-opacity': {
-        original: 'Opacity',
-        value: 'Deckkraft'
-    },
     'brush-blending': {
         original: 'Blending',
         value: 'Mischung'
@@ -215,10 +211,6 @@
     'layers-active-layer': {
         original: 'Active Layer',
         value: 'Aktive Ebene'
-    },
-    'layers-opacity': {
-        original: 'Opacity',
-        value: 'Deckkraft'
     },
     'layers-layer': {
         original: 'Layer',
@@ -996,10 +988,6 @@
         original: 'Fit',
         value: 'Passen'
     },
-    'bucket-opacity': {
-        original: 'Opacity',
-        value: 'Deckkraft'
-    },
     'bucket-tolerance': {
         original: 'Tolerance',
         value: 'Toleranz'
@@ -1064,10 +1052,6 @@
         original: 'Line Width',
         value: 'Linienbreite'
     },
-    'shape-opacity': {
-        original: 'Opacity',
-        value: 'Deckkraft'
-    },
     'shape-outwards': {
         original: 'Outwards',
         value: 'Nach Außen'
@@ -1095,10 +1079,6 @@
     'text-placeholder': {
         original: 'Your text (multiline Shift+Enter)',
         value: 'Dein Text (mehrzeilig Shift+Enter)'
-    },
-    'text-opacity': {
-        original: 'Opacity',
-        value: 'Deckkraft'
     },
     'text-color': {
         original: 'Color',
@@ -1208,6 +1188,10 @@
         hint: 'automatically decided',
         original: 'auto',
         value: 'Automatisch'
+    },
+    opacity: {
+        original: 'Opacity',
+        value: 'Deckkraft'
     },
     red: {
         original: 'Red',

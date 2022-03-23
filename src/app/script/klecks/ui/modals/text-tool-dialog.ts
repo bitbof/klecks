@@ -534,7 +534,7 @@ export function textToolDialog(
 
 
     let opacitySlider = new KlSlider({
-        label: LANG('text-opacity'),
+        label: LANG('opacity'),
         width: 150,
         height: 30,
         min: 0,

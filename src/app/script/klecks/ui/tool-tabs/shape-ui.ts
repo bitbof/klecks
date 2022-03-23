@@ -245,7 +245,7 @@ export function ShapeUi(p) {
     div.appendChild(lineWidthSlider.getElement());
 
     let opacitySlider = new KlSlider({
-        label: LANG('shape-opacity'),
+        label: LANG('opacity'),
         width: 250,
         height: 30,
         min: 0,

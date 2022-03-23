@@ -121,7 +121,7 @@ export function LayerPreview(p) {
         });
     }
     let opacityEl = BB.el({
-        content: LANG('layers-opacity') + '<br>100%',
+        content: LANG('opacity') + '<br>100%',
         css: {
             minWidth: '60px',
             fontSize: '12px',
@@ -196,7 +196,7 @@ export function LayerPreview(p) {
         }
 
         nameLabelEl.textContent = layerObj.name;
-        opacityEl.innerHTML = LANG('layers-opacity') + '<br>' + Math.round(layerObj.opacity * 100) + '%';
+        opacityEl.innerHTML = LANG('opacity') + '<br>' + Math.round(layerObj.opacity * 100) + '%';
 
         let layerCanvas = layerObj.context.canvas;
 

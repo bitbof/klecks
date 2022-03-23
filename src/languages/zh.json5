@@ -107,10 +107,6 @@
         original: 'Size',
         value: '粗细'
     },
-    'brush-opacity': {
-        original: 'Opacity',
-        value: '透明度'
-    },
     'brush-blending': {
         original: 'Blending',
         value: '湿润度'
@@ -223,10 +219,6 @@
         hint: 'currently selected layer that user is drawing on',
         original: 'Active Layer',
         value: '当前图层'
-    },
-    'layers-opacity': {
-        original: 'Opacity',
-        value: '透明度'
     },
     'layers-layer': {
         original: 'Layer',
@@ -1023,10 +1015,6 @@
         original: 'Fit',
         value: ''
     },
-    'bucket-opacity': {
-        original: 'Opacity',
-        value: ''
-    },
     'bucket-tolerance': {
         original: 'Tolerance',
         value: ''
@@ -1092,10 +1080,6 @@
         original: 'Line Width',
         value: ''
     },
-    'shape-opacity': {
-        original: 'Opacity',
-        value: ''
-    },
     'shape-outwards': {
         hint: 'grows shape from the center outwards',
         original: 'Outwards',
@@ -1123,10 +1107,6 @@
     },
     'text-placeholder': {
         original: 'Your text (multiline Shift+Enter)',
-        value: ''
-    },
-    'text-opacity': {
-        original: 'Opacity',
         value: ''
     },
     'text-color': {
@@ -1236,6 +1216,10 @@
     auto: {
         hint: 'automatically decided',
         original: 'auto',
+        value: ''
+    },
+    Opacity: {
+        original: 'Opacity',
         value: ''
     },
     red: {

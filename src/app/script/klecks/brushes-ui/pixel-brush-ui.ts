@@ -99,7 +99,7 @@ export const pixelBrushUi = (function () {
                 }
             });
             opacitySlider = new KlSlider({
-                label: LANG('brush-opacity'),
+                label: LANG('opacity'),
                 width: 225,
                 height: 30,
                 min: brushInterface.opacitySlider.min,
