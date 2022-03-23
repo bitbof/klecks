@@ -1216,7 +1216,7 @@
     auto: {
         hint: 'automatically decided',
         original: 'auto',
-        value: 'オート'
+        value: '自動検出'
      },
     opacity: {
         original: 'Opacity',
