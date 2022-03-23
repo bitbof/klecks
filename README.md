@@ -1,5 +1,5 @@
 <p style="text-align:center">
-<img src="https://bitbof.com/stuff/2022-01-klecks/klecks-github.png" alt="Klecks"><br>
+<img src="https://bitbof.com/stuff/2022-01-klecks/2022-03-klecks-github.png" alt="Klecks"><br>
 </p>
 
 Klecks (German for "splash of color", pronounced "clex") is the official open-source release of the community-funded online painting app [Kleki](https://kleki.com).
