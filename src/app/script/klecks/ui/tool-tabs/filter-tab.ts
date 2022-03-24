@@ -48,12 +48,12 @@ export class FilterTab {
             let button = document.createElement("button");
             let buttonLabel = filterArr[filterKey].buttonLabel ? filterArr[filterKey].buttonLabel : filterArr[filterKey].name;
             let im = '<img height="20" width="18" src="' + filterArr[filterKey].icon + '" alt="icon" />';
-            let name = buttonLabel;
-            if (name.length > 11) {
-                name = "<span style='font-size: 12px'>" + buttonLabel + "</span>";
-            }
-            button.innerHTML = im + name;
+            button.innerHTML = im + buttonLabel;
             button.className = "gridButton";
+            BB.css(button, {
+                lineHeight: '20px',
+                fontSize: '12px',
+            });
             button.tabIndex = -1;
             button.onclick = function () {
 
