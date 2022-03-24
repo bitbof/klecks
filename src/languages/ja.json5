@@ -193,7 +193,7 @@
     'manual-color-input': {
         hint: 'A dialog where users can manually type the color, each channel a number. "mci" keys all related to this dialog.',
         original: 'Manual Color Input',
-        value: '16進数'
+        value: '数値入力'
     },
     'mci-hex': {
         original: 'Hex',
@@ -405,7 +405,7 @@
     },
     'file-storage-thumb-title': {
         original: 'Restores when reopening page',
-        value: '再読み込み時に復元します'
+        value: '再読み込み時に復元します。'
     },
     'file-storage-about': {
         original: 'About Browser Storage',
@@ -413,7 +413,7 @@
     },
     'file-storage-cant-access': {
         original: "Can't access",
-        value: 'アクセスできません'
+        value: 'アクセスできません。'
     },
     'file-storage-empty': {
         hint: 'nothing stored',
@@ -431,7 +431,7 @@
     },
     'file-storage-storing': {
         original: 'Storing',
-        value: '保管中'
+        value: '保管中。'
     },
     'file-storage-overwrite': {
         original: 'Overwrite',
@@ -456,15 +456,15 @@
     },
     'file-storage-restored': {
         original: 'Restored from Browser Storage',
-        value: 'ブラウザストレージから復元しました'
+        value: 'ブラウザストレージから復元しました。'
     },
     'file-storage-stored': {
         original: 'Stored to Browser Storage',
-        value: 'ブラウザストレージに保存します'
+        value: 'ブラウザストレージに保存します。'
     },
     'file-storage-failed': {
         original: 'Failed to store to Browser Storage',
-        value: 'ブラウザストレージへの保存に失敗しました'
+        value: 'ブラウザストレージへの保存に失敗しました。'
     },
     'file-storage-failed-1': {
         original: 'Failed to store. Possible causes:',
@@ -472,19 +472,19 @@
     },
     'file-storage-failed-2': {
         original: 'Out of disk space',
-        value: 'ディスク容量が不足しています'
+        value: 'ディスク容量が不足しています。'
     },
     'file-storage-failed-3': {
         original: 'Storage disabled in incognito tab',
-        value: 'シークレットタブのためストレージが使えません'
+        value: 'シークレットタブのためストレージが使えません。'
     },
     'file-storage-failed-4': {
         original: "Browser doesn't support storage",
-        value: 'このブラウザはストレージをサポートしていません'
+        value: 'このブラウザはストレージをサポートしていません。'
     },
     'file-storage-failed-clear': {
         original: 'Failed to clear.',
-        value: '削除に失敗しました'
+        value: '削除に失敗しました。'
     },
     'file-upload': {
         original: 'Upload',
@@ -492,7 +492,7 @@
     },
     'cleared-layer': {
         original: 'Cleared layer',
-        value: 'レイヤーをクリアしました'
+        value: 'レイヤーをクリアしました。'
     },
     filled: {
         hint: 'layer got filled with a color',
@@ -591,15 +591,15 @@
     },
     'upload-uploading': {
         original: 'Uploading',
-        value: 'アップロード中'
+        value: 'アップロードしています'
     },
     'upload-success': {
         original: 'Upload Successful',
-        value: 'アップロードに成功しました'
+        value: 'アップロードに成功しました。'
     },
     'upload-failed': {
         original: 'Upload failed.',
-        value: 'アップロードに失敗しました'
+        value: 'アップロードに失敗しました。'
     },
     'upload-delete': {
         original: 'To delete your image from Imgur visit:',
