@@ -571,7 +571,7 @@ export function klLayerManager(p_canvas: KlCanvas, p_func, p_rootDiv) {
                 });
 
                 (layer as any).label.ondblclick = function() {
-                    renameLayer(index);
+                    renameLayer((layer as any).spot);
                 };
             }
             //layerlabel
