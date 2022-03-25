@@ -1791,14 +1791,12 @@ export function KlApp(pProject: IKlProject | null, pOptions: IKlAppOptions) {
         fileTab ? fileTab.getElement() : null,
         settingsTab.getElement(),
         BB.el({
-           css: {
-               height: '10px', // a bit of spacing at the bottom
-           }
+            css: {
+                height: '10px', // a bit of spacing at the bottom
+            }
         }),
         bottomBarWrapper ? bottomBarWrapper : null
     ]);
-
-
 
     const toolspaceScroller = new KL.ToolspaceScroller({
         toolspace,

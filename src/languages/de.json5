@@ -635,11 +635,11 @@
     },
     'filter-transform': {
         original: 'Transform',
-        value: 'Transformieren'
+        value: 'Transformier.'
     },
     'filter-bright-contrast': {
         original: 'Bright/Contrast',
-        value: 'Helligk/Kontrast'
+        value: 'Hell/Kontrast'
     },
     'filter-curves': {
         original: 'Curves',
@@ -647,7 +647,7 @@
     },
     'filter-hue-sat': {
         original: 'Hue/Saturation',
-        value: 'Farbe/Sättigung'
+        value: 'Farbe/Sättig'
     },
     'filter-invert': {
         original: 'Invert',
@@ -667,7 +667,7 @@
     },
     'filter-unsharp-mask': {
         original: 'Unsharp Mask',
-        value: 'Unscharf mask.'
+        value: 'Unscharf mask'
     },
     'filter-crop-title': {
         original: 'Crop / Extend',

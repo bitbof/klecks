@@ -18,13 +18,13 @@ export class ToolspaceScroller {
     private upInterval: any;
 
     private update(): void {
-        if (this.toolspace.scrollHeight > this.toolspace.offsetHeight) {
+        if (this.toolspace.scrollHeight > this.toolspace.offsetHeight + 3) { // small buffer where it's not worth it
             if (!this.upInterval) {
                 this.upBtn.style.display = this.toolspace.scrollTop === 0 ? 'none' : 'block';
             }
             if (!this.downInterval) {
                 this.downBtn.style.display = (
-                    this.toolspace.scrollTop + this.toolspace.offsetHeight >= this.toolspace.scrollHeight ?
+                    this.toolspace.scrollTop + this.toolspace.offsetHeight + 1 >= this.toolspace.scrollHeight ?
                         'none' : 'block'
                 );
             }
@@ -47,6 +47,7 @@ export class ToolspaceScroller {
             backgroundSize: '60%',
             backgroundPosition: 'center',
             backgroundRepeat: 'no-repeat',
+            userSelect: 'none',
         };
 
         this.toolspace = p.toolspace;

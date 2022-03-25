@@ -81,9 +81,17 @@ export function imgurUpload(klCanvas: KlCanvas, klRootEl, saveReminder: SaveRemi
     let inputTitle = document.createElement("input");
     inputTitle.type = "text";
     inputTitle.value = LANG('upload-title-untitled');
-    let inputDescription = document.createElement("textarea");
-    inputDescription.cols = 30;
-    inputDescription.rows = 2;
+    let inputDescription = BB.el({
+        tagName: 'textarea',
+        custom: {
+            rows: 2,
+        },
+        css: {
+            width: '100%',
+            maxWidth: '100%',
+        },
+    });
+
     let labelTitle = document.createElement("div");
     labelTitle.textContent = LANG('upload-name') + ":";
     let labelDescription = BB.el({
