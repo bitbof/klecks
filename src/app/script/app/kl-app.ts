@@ -810,7 +810,7 @@ export function KlApp(pProject: IKlProject | null, pOptions: IKlAppOptions) {
                     if (doShowLoader) {
                         KL.popup({
                             target: klRootEl,
-                            message: LANG('import-opening') + "...",
+                            message: LANG('import-opening'),
                             callback: function (result) {
                                 loaderIsOpen = false;
                                 closeLoader = null;

@@ -590,8 +590,8 @@
         value: '上传'
     },
     'upload-uploading': {
-        original: 'Uploading',
-        value: '上传中'
+        original: 'Uploading...',
+        value: '上传中...'
     },
     'upload-success': {
         original: 'Upload Successful',
@@ -940,7 +940,7 @@
         value: ''
     },
     'import-opening': {
-        original: 'Opening file',
+        original: 'Opening file...',
         value: ''
     },
     'import-title': {

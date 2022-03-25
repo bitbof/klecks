@@ -569,8 +569,8 @@
         value: 'Hochladen'
     },
     'upload-uploading': {
-        original: 'Uploading',
-        value: 'Läd hoch'
+        original: 'Uploading...',
+        value: 'Läd hoch...'
     },
     'upload-success': {
         original: 'Upload Successful',
@@ -917,8 +917,8 @@
         value: 'Stärke'
     },
     'import-opening': {
-        original: 'Opening file',
-        value: 'Öffne Datei'
+        original: 'Opening file...',
+        value: 'Öffne Datei...'
     },
     'import-title': {
         original: 'Import Image',

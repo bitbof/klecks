@@ -233,7 +233,7 @@ Base Language File
   "upload-tos": "Terms of Service",
   "upload-tos-2": "for imgur.com",
   "upload-submit": "Upload",
-  "upload-uploading": "Uploading",
+  "upload-uploading": "Uploading...",
   "upload-success": "Upload Successful",
   "upload-failed": "Upload failed.",
   "upload-delete": "To delete your image from Imgur visit:",
@@ -344,7 +344,7 @@ Base Language File
   "filter-unsharp-mask-radius": "Radius",
   "filter-unsharp-mask-strength": "Strength",
 
-  "import-opening": "Opening file",
+  "import-opening": "Opening file...",
   "import-title": "Import Image",
   "import-too-large": "Image too large, will be downscaled.",
   "import-btn-as-layer": "As Layer",

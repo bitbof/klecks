@@ -590,8 +590,8 @@
         value: 'アップロード'
     },
     'upload-uploading': {
-        original: 'Uploading',
-        value: 'アップロードしています'
+        original: 'Uploading...',
+        value: 'アップロードしています...'
     },
     'upload-success': {
         original: 'Upload Successful',
@@ -940,7 +940,7 @@
         value: '強さ'
     },
     'import-opening': {
-        original: 'Opening file',
+        original: 'Opening file...',
         value: '画像を開いています。'
     },
     'import-title': {

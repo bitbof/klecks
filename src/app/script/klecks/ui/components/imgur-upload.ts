@@ -25,7 +25,7 @@ async function upload(canvas, title, description, type: 'png' | 'jpeg', imgurKey
     let labelText = w.document.createElement("div");
     labelText.style.marginTop = "10px";
     label.appendChild(labelText);
-    labelText.textContent = LANG('upload-uploading') + "...";
+    labelText.textContent = LANG('upload-uploading');
 
     w.document.body.appendChild(label);
     BB.css(label, {

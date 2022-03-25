@@ -27,7 +27,6 @@ import {KlCanvasPreview} from './canvas-ui/canvas-preview';
 import {FreeTransform} from './ui/components/free-transform';
 import {FreeTransformCanvas} from './ui/components/free-transform-canvas';
 import {Cropper} from './ui/components/cropper';
-import {ProgressPopup} from './ui/modals/progress-popup';
 import {LayerPreview} from './ui/components/layer-preview';
 import {showSaveReminderToast} from './ui/components/show-reminder-toast';
 import {FittedImage} from './ui/components/fitted-image';
@@ -160,7 +159,6 @@ export const KL = {
     Popup,
     exportDialog,
     clipboardDialog,
-    ProgressPopup,
     showImportAsLayerDialog,
     newImageDialog,
     textToolDialog,
