@@ -71,6 +71,7 @@ import {setDbName} from './storage/indexed-db';
 import {BrushSettingService} from './brushes-ui/brush-setting-service';
 import {BoxToggle} from './ui/base-components/box-toggle';
 import {SettingsTab} from './ui/tool-tabs/settings-tab';
+import {ToolspaceScroller} from './ui/components/toolspace-scroller';
 
 /**
  * paint tool functionality
@@ -152,6 +153,7 @@ export const KL = {
     BrowserStorageUi,
     imgurUpload,
     SaveReminder,
+    ToolspaceScroller,
 
     // --- ui - modals ---
     dialogCounter,

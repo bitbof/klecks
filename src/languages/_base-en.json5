@@ -7,6 +7,10 @@ Base Language File
 {
   "switch-ui-left-right": "Switch left/right UI",
   "toggle-show-tools": "Show/Hide Tools",
+  "scroll": {
+    hint: 'Verb. As in scrolling a page.',
+    value: 'Scroll',
+  },
   "donate": "Donate",
   "home": {
     hint: 'button with logo, top left of tools',

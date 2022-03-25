@@ -40,7 +40,7 @@ export const popup = function (params): void {
     BB.css(div, {
         width: '100%',
         height: '100%',
-        position: 'absolute',
+        position: 'fixed',
         left: '0',
         top: '0'
     });

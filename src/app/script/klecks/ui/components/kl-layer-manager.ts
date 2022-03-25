@@ -71,7 +71,6 @@ export function klLayerManager(p_canvas: KlCanvas, p_func, p_rootDiv) {
     let listdiv = document.createElement("div");
     BB.css(listdiv, {
         width: width + "px",
-        height: "500px",
         position: "relative"
 
     });
