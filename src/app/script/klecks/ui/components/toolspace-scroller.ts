@@ -12,19 +12,25 @@ import {LANG} from '../../../language/language';
 export class ToolspaceScroller {
 
     private toolspace: HTMLElement;
-    private downBtn: HTMLElement;
     private upBtn: HTMLElement;
+    private downBtn: HTMLElement;
+    private downInterval: any;
+    private upInterval: any;
 
     private update(): void {
         if (this.toolspace.scrollHeight > this.toolspace.offsetHeight) {
-            this.downBtn.style.display = (
-                this.toolspace.scrollTop + this.toolspace.offsetHeight === this.toolspace.scrollHeight ?
-                    'none' : 'block'
-            );
-            this.upBtn.style.display = this.toolspace.scrollTop === 0 ? 'none' : 'block';
+            if (!this.upInterval) {
+                this.upBtn.style.display = this.toolspace.scrollTop === 0 ? 'none' : 'block';
+            }
+            if (!this.downInterval) {
+                this.downBtn.style.display = (
+                    this.toolspace.scrollTop + this.toolspace.offsetHeight >= this.toolspace.scrollHeight ?
+                        'none' : 'block'
+                );
+            }
         } else {
-            this.downBtn.style.display = 'none';
             this.upBtn.style.display = 'none';
+            this.downBtn.style.display = 'none';
         }
     }
 
@@ -44,14 +50,6 @@ export class ToolspaceScroller {
         };
 
         this.toolspace = p.toolspace;
-        this.downBtn = BB.el({
-            parent: this.toolspace,
-            title: LANG('scroll'),
-            css: {
-                ...btnStyle,
-                bottom: '0',
-            }
-        });
         this.upBtn = BB.el({
             parent: this.toolspace,
             title: LANG('scroll'),
@@ -61,20 +59,31 @@ export class ToolspaceScroller {
                 transform: 'rotate(180deg)',
             }
         });
+        this.downBtn = BB.el({
+            parent: this.toolspace,
+            title: LANG('scroll'),
+            css: {
+                ...btnStyle,
+                bottom: '0',
+            }
+        });
         this.updateUiState(p.uiState);
 
-        let downInterval;
-        const downListener = new BB.PointerListener({
-            target: this.downBtn,
+        const upListener = new BB.PointerListener({
+            target: this.upBtn,
             onPointer: (e) => {
                 if (e.type === 'pointerdown') {
-                    downInterval = setInterval(() => {
-                        this.toolspace.scrollBy(0, 10);
+                    this.upInterval = setInterval(() => {
+                        this.toolspace.scrollBy(0, -10);
                         this.update();
                     }, 20);
                 }
                 if (e.type === 'pointerup') {
-                    clearInterval(downInterval);
+                    clearInterval(this.upInterval);
+                    setTimeout(() => { // prevent ff pressing anything underneath
+                        this.upInterval = null;
+                        this.update()
+                    }, 50);
                 }
             },
             onWheel: (e) => {
@@ -82,17 +91,21 @@ export class ToolspaceScroller {
                 this.update();
             },
         });
-        const upListener = new BB.PointerListener({
-            target: this.upBtn,
+        const downListener = new BB.PointerListener({
+            target: this.downBtn,
             onPointer: (e) => {
                 if (e.type === 'pointerdown') {
-                    downInterval = setInterval(() => {
-                        this.toolspace.scrollBy(0, -10);
+                    this.downInterval = setInterval(() => {
+                        this.toolspace.scrollBy(0, 10);
                         this.update();
                     }, 20);
                 }
                 if (e.type === 'pointerup') {
-                    clearInterval(downInterval);
+                    clearInterval(this.downInterval);
+                    setTimeout(() => { // prevent ff pressing anything underneath
+                        this.downInterval = null;
+                        this.update()
+                    }, 50);
                 }
             },
             onWheel: (e) => {
