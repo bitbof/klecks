@@ -1152,10 +1152,6 @@
         original: 'Unsaved',
         value: 'Ungespeichert'
     },
-    'paint-tool': {
-        original: 'Paint Tool',
-        value: 'Malprogramm'
-    },
     help: {
         original: 'Help',
         value: 'Hilfe'

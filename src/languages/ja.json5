@@ -1181,10 +1181,6 @@
         original: 'Unsaved',
         value: '未保存'
     },
-    'paint-tool': {
-        original: 'Paint Tool',
-        value: 'Paint Tool'
-    },
     help: {
         original: 'Help',
         value: 'ヘルプ'

@@ -1181,10 +1181,6 @@
         original: 'Unsaved',
         value: ''
     },
-    'paint-tool': {
-        original: 'Paint Tool',
-        value: ''
-    },
     help: {
         original: 'Help',
         value: ''
