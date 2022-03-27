@@ -1,16 +1,16 @@
 {
     'switch-ui-left-right': {
         original: 'Switch left/right UI',
-        value: ''
+        value: '向左/右切换'
     },
     "toggle-show-tools": {
         original: 'Show/Hide Tools',
-        value: '',
+        value: '显示/隐藏工具',
     },
     "scroll": {
         hint: 'Verb. As in scrolling a page.',
         original: 'Scroll',
-        value: '',
+        value: '上滑/下滑',
     },
     donate: {
         original: 'Donate',
@@ -60,14 +60,6 @@
     'tool-zoom': {
         original: 'Zoom',
         value: '缩放工具'
-    },
-    'tool-zoom-in': {
-        original: 'Zoom In',
-        value: '放大'
-    },
-    'tool-zoom-out': {
-        original: 'Zoom Out',
-        value: '缩小'
     },
     'tool-undo-redo': {
         original: 'Undo / Redo',
@@ -544,14 +536,6 @@
         original: 'DIN Paper',
         value: '纸张大小'
     },
-    'new-width': {
-        original: 'Width',
-        value: '宽度'
-    },
-    'new-height': {
-        original: 'Height',
-        value: '高度'
-    },
     'new-px': {
         hint: 'abbreviation of pixel',
         original: 'px',
@@ -694,555 +678,547 @@
     },
     'filter-crop-title': {
         original: 'Crop / Extend',
-        value: ''
+        value: '画布大小'
     },
     'filter-crop-description': {
         original: 'Crop or extend the image.',
-        value: ''
+        value: '裁剪图片'
     },
     'filter-crop-left': {
         original: 'Left',
-        value: ''
+        value: '左'
     },
     'filter-crop-right': {
         original: 'Right',
-        value: ''
+        value: '右'
     },
     'filter-crop-top': {
         original: 'Top',
-        value: ''
+        value: '上'
     },
     'filter-crop-bottom': {
         original: 'Bottom',
-        value: ''
+        value: '下'
     },
     'filter-crop-rule-thirds': {
         original: 'Rule of Thirds',
-        value: ''
+        value: '三分法'
     },
     'filter-crop-fill': {
         original: 'Fill',
-        value: ''
+        value: '填充'
     },
     'filter-flip-title': {
         original: 'Flip',
-        value: ''
+        value: '翻转'
     },
     'filter-flip-description': {
         original: 'Flips layer or whole image.',
-        value: ''
+        value: '翻转图层或整个图像'
     },
     'filter-flip-horizontal': {
         original: 'Horizontal',
-        value: ''
+        value: '水平'
     },
     'filter-flip-vertical': {
         original: 'Vertical',
-        value: ''
+        value: '垂直'
     },
     'filter-flip-image': {
         original: 'Flip Image',
-        value: ''
+        value: '翻转图像'
     },
     'filter-flip-layer': {
         original: 'Flip Layer',
-        value: ''
+        value: '翻转图层'
     },
     'filter-perspective-title': {
         original: 'Perspective',
-        value: ''
+        value: '透视'
     },
     'filter-perspective-description': {
         original: 'Transforms the selected layer.',
-        value: ''
+        value: '变换已选图层'
     },
     'filter-perspective-before': {
         original: 'Before',
-        value: ''
+        value: '之前'
     },
     'filter-perspective-after': {
         original: 'After',
-        value: ''
+        value: '之后'
     },
     'filter-resize-title': {
         original: 'Resize',
-        value: ''
+        value: '图像大小'
     },
     'filter-resize-description': {
         original: 'Resizes the image.',
-        value: ''
-    },
-    'filter-resize-width': {
-        original: 'Width',
-        value: ''
-    },
-    'filter-resize-height': {
-        original: 'Height',
-        value: ''
-    },
-    'filter-resize-constrain': {
-        original: 'Constrain Proportions',
-        value: ''
+        value: '更改图像大小'
     },
     'filter-rotate-title': {
         original: 'Rotate',
-        value: ''
+        value: '旋转'
     },
     'filter-rotate-description': {
         original: 'Rotates the image.',
-        value: ''
+        value: '旋转图像'
     },
     'filter-transform-empty': {
         original: 'Layer is empty.',
-        value: ''
+        value: '图层为空'
     },
     'filter-transform-title': {
         original: 'Transform',
-        value: ''
+        value: '变换'
     },
     'filter-transform-description': {
         original: 'Transforms selected layer. Hold Shift for additional behavior.',
-        value: ''
+        value: '变换已选图层。按住Shift操作。'
     },
     'filter-transform-rotation': {
         original: 'Rotation',
-        value: ''
+        value: '旋转'
     },
     'filter-transform-flip': {
         original: 'Flip',
-        value: ''
+        value: '翻转'
     },
     'filter-transform-center': {
         original: 'Center',
-        value: ''
+        value: '居中'
     },
     'filter-transform-constrain': {
         original: 'Constrain',
-        value: ''
-    },
-    'filter-transform-constrain-title': {
-        original: 'Constrain Proportions',
-        value: ''
+        value: '保持'
     },
     'filter-transform-snap': {
         original: 'Snap',
-        value: ''
+        value: '对齐'
     },
     'filter-transform-snap-title': {
         original: 'Snap Rotation And Position',
-        value: ''
+        value: '旋转对齐/水平对齐'
     },
     'filter-bright-contrast-title': {
         original: 'Brightness / Contrast',
-        value: ''
+        value: '亮度/对比'
     },
     'filter-bright-contrast-description': {
         original: 'Change brightness and contrast for the selected layer.',
-        value: ''
+        value: '更改已选图层的亮度和对比度。'
     },
     'filter-bright-contrast-brightness': {
         original: 'Brightness',
-        value: ''
+        value: '亮度'
     },
     'filter-bright-contrast-contrast': {
         original: 'Contrast',
-        value: ''
+        value: '对比'
     },
     'filter-curves-title': {
         original: 'Curves',
-        value: ''
+        value: '曲线'
     },
     'filter-curves-description': {
         original: 'Apply curves on the selected layer.',
-        value: ''
+        value: '应用曲线到已选图层。'
     },
     'filter-curves-all': {
         original: 'All',
-        value: ''
+        value: '全部'
     },
     'filter-hue-sat-title': {
         original: 'Hue / Saturation',
-        value: ''
+        value: '色相/饱和度'
     },
     'filter-hue-sat-description': {
         original: 'Change hue and saturation for the selected layer.',
-        value: ''
+        value: '更改已选图层的色相和饱和度。'
     },
     'filter-hue-sat-hue': {
         original: 'Hue',
-        value: ''
+        value: '色相'
     },
     'filter-hue-sat-saturation': {
         original: 'Saturation',
-        value: ''
+        value: '饱和度'
     },
     'filter-applied': {
         original: 'applied',
-        value: ''
+        value: '应用'
     },
     'filter-tilt-shift-title': {
         original: 'Tilt Shift',
-        value: ''
+        value: '移轴'
     },
     'filter-tilt-shift-description': {
         original: 'Applies tilt shift on the selected layer.',
-        value: ''
+        value: '应用移轴到已选图层。'
     },
     'filter-tilt-shift-blur': {
         original: 'Blur Radius',
-        value: ''
+        value: '模糊半径'
     },
     'filter-tilt-shift-gradient': {
         original: 'Gradient Radius',
-        value: ''
+        value: '梯度半径'
     },
     'filter-to-alpha-title': {
         original: 'To Alpha',
-        value: ''
+        value: '至Alpha'
     },
     'filter-to-alpha-description': {
         original: 'Generates alpha channel for selected layer from:',
-        value: ''
+        value: '对已选图层生成Alpha通道：'
     },
     'filter-to-alpha-inverted-lum': {
         original: 'Inverted Luminance',
-        value: ''
+        value: '亮度翻转'
     },
     'filter-to-alpha-lum': {
         original: 'Luminance',
-        value: ''
+        value: '亮度'
     },
     'filter-to-alpha-replace': {
         original: 'Replace RGB',
-        value: ''
+        value: '替换RGB'
     },
     'filter-triangle-blur-title': {
         original: 'Triangle Blur',
-        value: ''
+        value: '模糊'
     },
     'filter-triangle-blur-description': {
         original: 'Applies triangle blur on the selected layer.',
-        value: ''
-    },
-    'filter-triangle-blur-radius': {
-        original: 'Radius',
-        value: ''
+        value: '应用模糊到已选图层。'
     },
     'filter-unsharp-mask-title': {
         original: 'Unsharp Mask',
-        value: ''
+        value: 'USM锐化'
     },
     'filter-unsharp-mask-description': {
         original: 'Sharpens the selected layer by scaling pixels away from the average of their neighbors.',
-        value: ''
-    },
-    'filter-unsharp-mask-radius': {
-        original: 'Radius',
-        value: ''
+        value: '根据附近像素的均值应用锐化到已选图层。'
     },
     'filter-unsharp-mask-strength': {
         original: 'Strength',
-        value: ''
+        value: '强度'
     },
     'import-opening': {
         original: 'Opening file...',
-        value: ''
+        value: '打开文件...'
     },
     'import-title': {
         original: 'Import Image',
-        value: ''
+        value: '导入图像'
     },
     'import-too-large': {
         original: 'Image too large, will be downscaled.',
-        value: ''
+        value: '图像过大，将会进行缩小。'
     },
     'import-btn-as-layer': {
         original: 'As Layer',
-        value: ''
+        value: '作为图层'
     },
     'import-btn-as-image': {
         original: 'As Image',
-        value: ''
+        value: '作为图像'
     },
     'import-as-layer-title': {
         original: 'Import Image as New Layer',
-        value: ''
+        value: '导入图像作为新图层'
     },
     'import-as-layer-description': {
         original: 'Adjust the position of the imported image.',
-        value: ''
+        value: '调整导入图像的位置。'
     },
     'import-as-layer-limit-reached': {
         original: 'Layer limit reached. Image will be placed on existing layer.',
-        value: ''
+        value: '达到图层数量上限。图像将会应用到已有图层。'
     },
     'import-as-layer-fit': {
         hint: 'verb. imported image made to fit inside canvas.',
         original: 'Fit',
-        value: ''
+        value: '适应'
     },
     'import-flatten': {
         hint: 'Turn image that has multiple layers into an image that has only one layer.',
         original: 'Flatten image',
-        value: ''
+        value: '拼合图像'
     },
     'import-unsupported-file': {
         original: 'Unsupported file type. See Help for supported types.',
-        value: ''
+        value: '不支持此类文件类型。查看帮助。'
     },
     'import-broken-file': {
         original: "Couldn't load image. File might be corrupted.",
-        value: ''
+        value: '不能加载图像。文件可能受损。'
     },
     'import-psd-unsupported': {
         original: 'Unsupported features. PSD had to be flattened.',
-        value: ''
+        value: '不支持该功能。PSD需要拼合。'
     },
     'import-psd-limited-support': {
         original: 'PSD support is limited. Flattened will more likely look correct.',
-        value: ''
+        value: 'PSD支持受限。拼合功能将会更近原始图像。'
     },
     'import-psd-too-large': {
         original: 'Image exceeds maximum dimensions of {x} x {x} pixels. Unable to import.',
-        value: ''
+        value: '图像超过{x} x {x}个像素。不能导入。'
     },
     'import-psd-size': {
         original: 'Image size',
-        value: ''
+        value: '图像大小'
     },
     'hand-reset': {
         hint: 'resets zoom (to 100%) and rotation (to 0°)',
         original: 'Reset',
-        value: ''
+        value: '重置'
     },
     'hand-fit': {
         hint: 'makes canvas cover whole working area',
         original: 'Fit',
-        value: ''
+        value: '适应'
     },
     'bucket-tolerance': {
         original: 'Tolerance',
-        value: ''
+        value: '容差'
     },
     'bucket-sample': {
         original: 'Sample',
-        value: ''
+        value: '采样'
     },
     'bucket-sample-title': {
         original: 'Which layers to sample color from',
-        value: ''
+        value: '从特定图层进行色彩采样'
     },
     'bucket-sample-all': {
         original: 'All',
-        value: ''
+        value: '全部'
     },
     'bucket-sample-active': {
         original: 'Active',
-        value: ''
+        value: '当前'
     },
     'bucket-sample-above': {
         original: 'Above',
-        value: ''
+        value: '之前'
     },
     'bucket-grow': {
         original: 'Grow',
-        value: ''
+        value: '填充扩展'
     },
     'bucket-grow-title': {
         original: 'Grow filled area (in pixels)',
-        value: ''
+        value: '扩展填充的区域（像素）'
     },
     'bucket-contiguous': {
         hint: 'common setting for paint bucket in image editing software',
         original: 'Contiguous',
-        value: ''
+        value: '连续的'
     },
     'bucket-contiguous-title': {
         original: 'Only fill connected areas',
-        value: ''
+        value: '仅填充相连的区域'
     },
     'shape-stroke': {
         original: 'Stroke',
-        value: ''
+        value: '线条'
     },
     'shape-fill': {
         original: 'Fill',
-        value: ''
+        value: '填充'
     },
     'shape-rect': {
         original: 'Rectangle',
-        value: ''
+        value: '方形'
     },
     'shape-ellipse': {
         original: 'Ellipse',
-        value: ''
+        value: '圆形'
     },
     'shape-line': {
         original: 'Line',
-        value: ''
+        value: '线条'
     },
     'shape-line-width': {
         original: 'Line Width',
-        value: ''
+        value: '线条宽度'
     },
     'shape-outwards': {
         hint: 'grows shape from the center outwards',
         original: 'Outwards',
-        value: ''
+        value: '自中心向外'
     },
     'shape-fixed': {
         original: 'Fixed 1:1',
-        value: ''
+        value: '锁定 1:1'
     },
     'shape-snap': {
         original: 'Snap',
-        value: ''
+        value: '对齐'
     },
     'shape-snap-title': {
         original: '45° Angle Snapping',
-        value: ''
+        value: '以45°角度对齐'
     },
     'text-instruction': {
         original: 'Click canvas to place text',
-        value: ''
+        value: '点击画布添加文本'
     },
     'text-title': {
         original: 'Add Text',
-        value: ''
+        value: '添加文本'
     },
     'text-placeholder': {
         original: 'Your text (multiline Shift+Enter)',
-        value: ''
+        value: '请输入（换行 Shift+Enter）'
     },
     'text-color': {
         original: 'Color',
-        value: ''
+        value: '色彩'
     },
     'text-size': {
         original: 'Size',
-        value: ''
+        value: '大小'
     },
     'text-left': {
         original: 'Left',
-        value: ''
+        value: '左对齐'
     },
     'text-center': {
         original: 'Center',
-        value: ''
+        value: '居中'
     },
     'text-right': {
         original: 'Right',
-        value: ''
+        value: '右对齐'
     },
     'text-italic': {
         original: 'Italic',
-        value: ''
+        value: '斜体'
     },
     'text-bold': {
         original: 'Bold',
-        value: ''
-    },
-    'text-zoom-in': {
-        original: 'Zoom In',
-        value: ''
-    },
-    'text-zoom-out': {
-        original: 'Zoom Out',
-        value: ''
+        value: '加粗'
     },
     'save-reminder-title': {
         original: 'Reminder to save',
-        value: ''
+        value: '请及时保存'
     },
     'save-reminder-text': {
         original: 'Unsaved work may get lost.',
-        value: ''
+        value: '未保存的作品可能会丢失。'
     },
     submit: {
         original: 'Submit',
-        value: ''
+        value: '提交'
     },
     'submit-title': {
         original: 'Submit Drawing',
-        value: ''
+        value: '提交作品'
     },
     'submit-prompt': {
         original: 'Submit drawing?',
-        value: ''
+        value: '确认提交？'
     },
     'submit-submitting': {
         original: 'Submitting',
-        value: ''
+        value: '提交中'
     },
     'embed-init-loading': {
         original: 'Loading app',
-        value: ''
+        value: '加载app'
     },
     'embed-init-waiting': {
         original: 'Waiting for image',
-        value: ''
+        value: '图像上传中'
     },
     unsaved: {
         original: 'Unsaved',
-        value: ''
+        value: '未保存'
     },
     help: {
         original: 'Help',
-        value: ''
+        value: '帮助'
     },
     'tab-settings': {
         original: 'Settings',
-        value: ''
+        value: '设置'
     },
     'settings-language': {
         original: 'Language',
-        value: ''
+        value: '语言'
     },
     'settings-preferred-language': {
         original: 'Preferred Language',
-        value: ''
+        value: '首选语言'
     },
     'settings-language-reload': {
         original: 'Will update after reloading.',
-        value: ''
+        value: '刷新后更改语言'
     },
     licenses: {
         original: 'Licenses',
-        value: ''
+        value: '许可'
     },
     'source-code': {
         original: 'Source Code',
-        value: ''
+        value: '源代码'
     },
     auto: {
         hint: 'automatically decided',
         original: 'auto',
-        value: ''
+        value: '自动'
     },
-    Opacity: {
+    'zoom-in': {
+        original: 'Zoom In',
+        value: '放大'
+    },
+    'zoom-out': {
+        original: 'Zoom Out',
+        value: '缩小'
+    },
+    radius: {
+        original: 'Radius',
+        value: '半径'
+    },
+    'constrain-proportions': {
+        original: 'Constrain Proportions',
+        value: '保持纵横比'
+    },
+    width: {
+        original: 'Width',
+        value: '宽度'
+    },
+    height: {
+        original: 'Height',
+        value: '高度'
+    },
+    opacity: {
         original: 'Opacity',
-        value: ''
+        value: '不透明度'
     },
     red: {
         original: 'Red',
-        value: ''
+        value: '红'
     },
     green: {
         original: 'Green',
-        value: ''
+        value: '绿'
     },
     blue: {
         original: 'Blue',
-        value: ''
+        value: '蓝'
     },
     eraser: {
         original: 'Eraser',
-        value: ''
+        value: '橡皮擦'
     },
     center: {
         hint: 'verb',
         original: 'Center',
-        value: ''
+        value: '居中'
     },
     background: {
         original: 'Background',
@@ -1250,14 +1226,14 @@
     },
     'scaling-algorithm': {
         original: 'Scaling Algorithm',
-        value: ''
+        value: '缩放算法'
     },
     'algorithm-smooth': {
         original: 'Smooth',
-        value: ''
+        value: '平滑'
     },
     'algorithm-pixelated': {
         original: 'Pixelated',
-        value: ''
+        value: '像素化'
     }
 }

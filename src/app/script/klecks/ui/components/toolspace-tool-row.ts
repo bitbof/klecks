@@ -469,7 +469,7 @@ export function ToolspaceToolRow(p) {
         image: toolZoomInImg,
         contain: true
     });
-    zoomInButton.title = LANG('tool-zoom-in');
+    zoomInButton.title = LANG('zoom-in');
     div.appendChild(zoomInButton);
 
     let zoomOutButton = createButton({
@@ -477,7 +477,7 @@ export function ToolspaceToolRow(p) {
         image: toolZoomOutImg,
         contain: true
     });
-    zoomOutButton.title = LANG('tool-zoom-out');
+    zoomOutButton.title = LANG('zoom-out');
     div.appendChild(zoomOutButton);
 
     let undoNRedoButton = createTriangleButton({

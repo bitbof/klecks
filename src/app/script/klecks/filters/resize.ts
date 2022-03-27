@@ -90,8 +90,8 @@ export const resize = {
             heightChanged = true;
             update();
         };
-        widthWrapper.append(LANG('filter-resize-width') + ": ", widthInput);
-        heightWrapper.append(LANG('filter-resize-height') + ": ", heightInput);
+        widthWrapper.append(LANG('width') + ": ", widthInput);
+        heightWrapper.append(LANG('height') + ": ", heightInput);
         let inputWrapper = BB.el({
             css: {
                 background: "url(" + constrainImg + ") no-repeat 140px 5px",
@@ -120,7 +120,7 @@ export const resize = {
         let isConstrained = true;
         let constrainCheckbox = new Checkbox({
             init: true,
-            label: LANG('filter-resize-constrain'),
+            label: LANG('constrain-proportions'),
             allowTab: true,
             callback: function(b) {
                 isConstrained = b;

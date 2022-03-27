@@ -394,7 +394,7 @@ export function textToolDialog(
     let zoomInBtn = BB.el({
         parent: zoomWrapper,
         content: `<img height="20" src="${toolZoomInImg}">`,
-        title: LANG('text-zoom-in'),
+        title: LANG('zoom-in'),
         tagName: 'button',
         onClick: function() {
             changeZoomFac(1);
@@ -406,7 +406,7 @@ export function textToolDialog(
     let zoomOutBtn = BB.el({
         parent: zoomWrapper,
         content: `<img height="20" src="${toolZoomOutImg}">`,
-        title: LANG('text-zoom-out'),
+        title: LANG('zoom-out'),
         tagName: 'button',
         onClick: function() {
             changeZoomFac(-1);

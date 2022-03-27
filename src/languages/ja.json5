@@ -61,14 +61,6 @@
         original: 'Zoom',
         value: 'ズーム'
     },
-    'tool-zoom-in': {
-        original: 'Zoom In',
-        value: '拡大'
-    },
-    'tool-zoom-out': {
-        original: 'Zoom Out',
-        value: '縮小'
-    },
     'tool-undo-redo': {
         original: 'Undo / Redo',
         value: 'アンドゥ/リドゥ'
@@ -544,14 +536,6 @@
         original: 'DIN Paper',
         value: 'DIN Paper'
     },
-    'new-width': {
-        original: 'Width',
-        value: '幅'
-    },
-    'new-height': {
-        original: 'Height',
-        value: '高さ'
-    },
     'new-px': {
         hint: 'abbreviation of pixel',
         original: 'px',
@@ -772,18 +756,6 @@
         original: 'Resizes the image.',
         value: '画像のサイズを変更します。'
     },
-    'filter-resize-width': {
-        original: 'Width',
-        value: '幅'
-    },
-    'filter-resize-height': {
-        original: 'Height',
-        value: '高さ'
-    },
-    'filter-resize-constrain': {
-        original: 'Constrain Proportions',
-        value: '縦横比を保持'
-    },
     'filter-rotate-title': {
         original: 'Rotate',
         value: '回転'
@@ -819,10 +791,6 @@
     'filter-transform-constrain': {
         original: 'Constrain',
         value: '縦横比'
-    },
-    'filter-transform-constrain-title': {
-        original: 'Constrain Proportions',
-        value: '縦横比を保持'
     },
     'filter-transform-snap': {
         original: 'Snap',
@@ -924,10 +892,6 @@
         original: 'Applies triangle blur on the selected layer.',
         value: '選択中のレイヤーにぼかしをかけます。'
     },
-    'filter-triangle-blur-radius': {
-        original: 'Radius',
-        value: '半径'
-    },
     'filter-unsharp-mask-title': {
         original: 'Unsharp Mask',
         value: 'アンシャープマスク'
@@ -935,10 +899,6 @@
     'filter-unsharp-mask-description': {
         original: 'Sharpens the selected layer by scaling pixels away from the average of their neighbors.',
         value: '選択中のレイヤーの画像をシャープにします。'
-    },
-    'filter-unsharp-mask-radius': {
-        original: 'Radius',
-        value: '半径'
     },
     'filter-unsharp-mask-strength': {
         original: 'Strength',
@@ -1142,14 +1102,6 @@
         original: 'Bold',
         value: '太字'
     },
-    'text-zoom-in': {
-        original: 'Zoom In',
-        value: '拡大'
-    },
-    'text-zoom-out': {
-        original: 'Zoom Out',
-        value: '縮小'
-    },
     'save-reminder-title': {
         original: 'Reminder to save',
         value: 'リマインダーを保存'
@@ -1219,6 +1171,30 @@
         original: 'auto',
         value: '自動検出'
      },
+    'zoom-in': {
+        original: 'Zoom In',
+        value: '拡大'
+    },
+    'zoom-out': {
+        original: 'Zoom Out',
+        value: '縮小'
+    },
+    radius: {
+        original: 'Radius',
+        value: '半径'
+    },
+    'constrain-proportions': {
+        original: 'Constrain Proportions',
+        value: '縦横比を保持'
+    },
+    width: {
+        original: 'Width',
+        value: '幅'
+    },
+    height: {
+        original: 'Height',
+        value: '高さ'
+    },
     opacity: {
         original: 'Opacity',
         value: '不透明度'

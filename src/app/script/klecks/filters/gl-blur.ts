@@ -53,7 +53,7 @@ export const glBlur = {
             glCanvas.draw(texture).update(); // update glCanvas size
 
             let radiusSlider = new KlSlider({
-                label: LANG('filter-triangle-blur-radius'),
+                label: LANG('radius'),
                 width: 300,
                 height: 30,
                 min: 1,

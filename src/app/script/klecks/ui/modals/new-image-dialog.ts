@@ -89,10 +89,10 @@ export function newImageDialog(p) {
     };
     widthWrapper.appendChild(widthUnit);
     widthWrapper.appendChild(widthInput);
-    BB.appendTextDiv(widthWrapper, LANG('new-width') + ": ");
+    BB.appendTextDiv(widthWrapper, LANG('width') + ": ");
     heightWrapper.appendChild(heightUnit);
     heightWrapper.appendChild(heightInput);
-    BB.appendTextDiv(heightWrapper, LANG('new-height') + ": ");
+    BB.appendTextDiv(heightWrapper, LANG('height') + ": ");
     let ratioWrapper = document.createElement("div");
     ratioWrapper.style.marginTop = '5px';
     ratioWrapper.style.color = '#888';

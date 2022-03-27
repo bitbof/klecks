@@ -302,7 +302,7 @@ export const transform = {
         let constrainCheckbox = new Checkbox({
             init: true,
             label: LANG('filter-transform-constrain'),
-            title: LANG('filter-transform-constrain-title'),
+            title: LANG('constrain-proportions'),
             allowTab: true,
             callback: function(b) {
                 isConstrained = b;

@@ -28,8 +28,6 @@ Base Language File
   "tool-text": "Text",
   "tool-hand": "Hand Tool",
   "tool-zoom": "Zoom",
-  "tool-zoom-in": "Zoom In",
-  "tool-zoom-out": "Zoom Out",
   "tool-undo-redo": "Undo / Redo",
 
   "undo": 'Undo',
@@ -218,8 +216,6 @@ Base Language File
   "new-screen": "Screen",
   "new-video": "Video",
   "new-din-paper": "DIN Paper",
-  "new-width": "Width",
-  "new-height": "Height",
   "new-px": {
     hint: 'abbreviation of pixel',
     value: 'px',
@@ -294,9 +290,6 @@ Base Language File
 
   "filter-resize-title": "Resize",
   "filter-resize-description": "Resizes the image.",
-  "filter-resize-width": "Width",
-  "filter-resize-height": "Height",
-  "filter-resize-constrain": "Constrain Proportions",
 
   "filter-rotate-title": "Rotate",
   "filter-rotate-description": "Rotates the image.",
@@ -308,7 +301,6 @@ Base Language File
   "filter-transform-flip": "Flip",
   "filter-transform-center": "Center",
   "filter-transform-constrain": "Constrain",
-  "filter-transform-constrain-title": "Constrain Proportions",
   "filter-transform-snap": "Snap",
   "filter-transform-snap-title": "Snap Rotation And Position",
 
@@ -341,11 +333,9 @@ Base Language File
 
   "filter-triangle-blur-title": "Triangle Blur",
   "filter-triangle-blur-description": "Applies triangle blur on the selected layer.",
-  "filter-triangle-blur-radius": "Radius",
 
   "filter-unsharp-mask-title": "Unsharp Mask",
   "filter-unsharp-mask-description": "Sharpens the selected layer by scaling pixels away from the average of their neighbors.",
-  "filter-unsharp-mask-radius": "Radius",
   "filter-unsharp-mask-strength": "Strength",
 
   "import-opening": "Opening file...",
@@ -418,8 +408,6 @@ Base Language File
   "text-right": "Right",
   "text-italic": "Italic",
   "text-bold": "Bold",
-  "text-zoom-in": "Zoom In",
-  "text-zoom-out": "Zoom Out",
 
   "save-reminder-title": "Reminder to save",
   "save-reminder-text": "Unsaved work may get lost.",
@@ -446,6 +434,12 @@ Base Language File
     value: 'auto'
   },
 
+  'zoom-in': 'Zoom In',
+  'zoom-out': 'Zoom Out',
+  radius: 'Radius',
+  "constrain-proportions": 'Constrain Proportions',
+  width: 'Width',
+  height: 'Height',
   "opacity": 'Opacity',
   "red": 'Red',
   "green": 'Green',

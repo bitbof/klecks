@@ -31,7 +31,7 @@
     },
     'tab-edit': {
         original: 'Edit',
-        value: 'Edit'
+        value: 'Editieren'
     },
     'tab-file': {
         original: 'File',
@@ -60,14 +60,6 @@
     'tool-zoom': {
         original: 'Zoom',
         value: 'Zoom-Werkzeug'
-    },
-    'tool-zoom-in': {
-        original: 'Zoom In',
-        value: 'Vergrößern'
-    },
-    'tool-zoom-out': {
-        original: 'Zoom Out',
-        value: 'Verkleinern'
     },
     'tool-undo-redo': {
         original: 'Undo / Redo',
@@ -525,14 +517,6 @@
         original: 'DIN Paper',
         value: 'DIN Papier'
     },
-    'new-width': {
-        original: 'Width',
-        value: 'Breite'
-    },
-    'new-height': {
-        original: 'Height',
-        value: 'Höhe'
-    },
     'new-px': {
         original: 'px',
         value: 'Px'
@@ -749,18 +733,6 @@
         original: 'Resizes the image.',
         value: 'Ändert die Größe des Bildes.'
     },
-    'filter-resize-width': {
-        original: 'Width',
-        value: 'Breite'
-    },
-    'filter-resize-height': {
-        original: 'Height',
-        value: 'Höhe'
-    },
-    'filter-resize-constrain': {
-        original: 'Constrain Proportions',
-        value: 'Feste Proportionen'
-    },
     'filter-rotate-title': {
         original: 'Rotate',
         value: 'Drehen'
@@ -796,10 +768,6 @@
     'filter-transform-constrain': {
         original: 'Constrain',
         value: 'Fest'
-    },
-    'filter-transform-constrain-title': {
-        original: 'Constrain Proportions',
-        value: 'Festes Seitenverhältnis'
     },
     'filter-transform-snap': {
         original: 'Snap',
@@ -901,10 +869,6 @@
         original: 'Applies triangle blur on the selected layer.',
         value: 'Wendet Dreiecksunschärfe auf gewählte Ebene an.'
     },
-    'filter-triangle-blur-radius': {
-        original: 'Radius',
-        value: 'Radius'
-    },
     'filter-unsharp-mask-title': {
         original: 'Unsharp Mask',
         value: 'Unscharf maskieren'
@@ -912,10 +876,6 @@
     'filter-unsharp-mask-description': {
         original: 'Sharpens the selected layer by scaling pixels away from the average of their neighbors.',
         value: 'Schärft die ausgewählte Ebene durch Skalierung der Pixel weg vom Durchschnitt ihrer Nachbarn.'
-    },
-    'filter-unsharp-mask-radius': {
-        original: 'Radius',
-        value: 'Radius'
     },
     'filter-unsharp-mask-strength': {
         original: 'Strength',
@@ -1113,14 +1073,6 @@
         original: 'Bold',
         value: 'Fett'
     },
-    'text-zoom-in': {
-        original: 'Zoom In',
-        value: 'Vergößern'
-    },
-    'text-zoom-out': {
-        original: 'Zoom Out',
-        value: 'Verkleinern'
-    },
     'save-reminder-title': {
         original: 'Reminder to save',
         value: 'Erinnerung zum Speichern'
@@ -1189,6 +1141,30 @@
         hint: 'automatically decided',
         original: 'auto',
         value: 'Automatisch'
+    },
+    'zoom-in': {
+        original: 'Zoom In',
+        value: 'Vergrößern'
+    },
+    'zoom-out': {
+        original: 'Zoom Out',
+        value: 'Verkleinern'
+    },
+    radius: {
+        original: 'Radius',
+        value: 'Radius'
+    },
+    'constrain-proportions': {
+        original: 'Constrain Proportions',
+        value: 'Festes Seitenverhältnis'
+    },
+    width: {
+        original: 'Width',
+        value: 'Breite'
+    },
+    height: {
+        original: 'Height',
+        value: 'Höhe'
     },
     opacity: {
         original: 'Opacity',

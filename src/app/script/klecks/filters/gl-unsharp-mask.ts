@@ -52,7 +52,7 @@ export const glUnsharpMask = {
             glCanvas.draw(texture).update(); // update glCanvas size
 
             let radiusSlider = new KlSlider({
-                label: LANG('filter-unsharp-mask-radius'),
+                label: LANG('radius'),
                 width: 300,
                 height: 30,
                 min: 0,
