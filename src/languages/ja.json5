@@ -10,7 +10,7 @@
     "scroll": {
         hint: 'Verb. As in scrolling a page.',
         original: 'Scroll',
-        value: '',
+        value: 'スクロール',
     },
     donate: {
         original: 'Donate',
@@ -356,7 +356,7 @@
     'file-no-autosave': {
         hint: "let user know they can't autosave, and there's no cloud storage. Keep short so fits on one line",
         original: 'No autosave, no cloud storage',
-        value: '自動保存された画像はありません'
+        value: 'クラウドに自動保存できません'
     },
     'file-new': {
         original: 'New',
@@ -1064,7 +1064,7 @@
     },
     'text-instruction': {
         original: 'Click canvas to place text',
-        value: 'クリックしてテキストを入力'
+        value: 'クリックしてテキストを入力。'
     },
     'text-title': {
         original: 'Add Text',
@@ -1116,7 +1116,7 @@
     },
     'submit-title': {
         original: 'Submit Drawing',
-        value: '処理しています。'
+        value: '画像を送信します。'
     },
     'submit-prompt': {
         original: 'Submit drawing?',
