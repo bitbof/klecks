@@ -999,7 +999,10 @@ export function KlApp(pProject: IKlProject | null, pOptions: IKlAppOptions) {
 
     let statusOverlay = new KL.StatusOverlay();
 
-    let toolspace = document.createElement("div");
+    const toolspace = BB.el({});
+    const toolspaceInner = BB.el({
+        parent: toolspace,
+    });
     toolspace.oncontextmenu = function () {
         return false;
     };
@@ -1204,7 +1207,7 @@ export function KlApp(pProject: IKlProject | null, pOptions: IKlAppOptions) {
     }
     BB.addClassName(toolspaceTopRow.getElement(), 'toolspace-row-shadow');
     toolspaceTopRow.getElement().style.marginBottom = '10px';
-    toolspace.appendChild(toolspaceTopRow.getElement());
+    toolspaceInner.appendChild(toolspaceTopRow.getElement());
 
     let toolspaceToolRow = new KL.ToolspaceToolRow({
         onActivate: function(activeStr) {
@@ -1243,7 +1246,7 @@ export function KlApp(pProject: IKlProject | null, pOptions: IKlAppOptions) {
         toolspaceToolRow.setEnableRedo(klHistory.canRedo());
     });
     BB.addClassName(toolspaceToolRow.getElement(), 'toolspace-row-shadow');
-    toolspace.appendChild(toolspaceToolRow.getElement());
+    toolspaceInner.appendChild(toolspaceToolRow.getElement());
 
     let klColorSlider;
 
@@ -1776,9 +1779,31 @@ export function KlApp(pProject: IKlProject | null, pOptions: IKlAppOptions) {
     });
     if (pOptions.bottomBar) {
         bottomBarWrapper.append(pOptions.bottomBar);
+        const observer = new MutationObserver(() => updateBottomBar());
+        observer.observe(
+            toolspaceInner,
+            {
+                attributes: true,
+                childList: true,
+                subtree: true,
+            }
+        );
+    }
+    function updateBottomBar() {
+        if (!pOptions.bottomBar) {
+            return;
+        }
+        const threshold = 617; //590
+        const isVisible = (
+            threshold < window.innerHeight &&
+            toolspaceInner.scrollHeight + 50 < window.innerHeight
+        );
+        bottomBarWrapper.style.display = isVisible ? '' : 'none';
     }
 
-    BB.append(toolspace, [
+
+
+    BB.append(toolspaceInner, [
         layerPreview.getElement(),
         mainTabRow.getElement(),
         brushDiv,
@@ -1814,11 +1839,8 @@ export function KlApp(pProject: IKlProject | null, pOptions: IKlAppOptions) {
         uiHeight = Math.max(0, h);
 
         updateCollapse();
+        updateBottomBar();
 
-        if (bottomBarWrapper) {
-            let threshold = 617; //590
-            bottomBarWrapper.style.display = uiHeight >= threshold ? '' : 'none';
-        }
         layerPreview.setIsVisible(uiHeight >= 579);
         klColorSlider.setHeight(Math.max(163, Math.min(400, uiHeight - 505)));
         toolspaceToolRow.setIsSmall(uiHeight < 540);

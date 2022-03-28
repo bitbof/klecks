@@ -174,7 +174,7 @@ export function klLayerManager(p_canvas: KlCanvas, p_func, p_rootDiv) {
     }
 
 
-    let regularContainer = document.createElement("div");
+    let layerListEl = BB.el({});
 
     (div as any).disableButtons = function(){}; //probably remove
     (div as any).enableButtons = function(){}; //probably remove
@@ -742,23 +742,24 @@ export function klLayerManager(p_canvas: KlCanvas, p_func, p_rootDiv) {
                 onPointer: dragEventHandler
             });
 
-            regularContainer.appendChild(layer);
+            layerListEl.appendChild(layer);
         }
         layerElArr = [];
-        while (regularContainer.firstChild) {
-            let child = regularContainer.firstChild;
+        while (layerListEl.firstChild) {
+            let child = layerListEl.firstChild;
             (child as any).pointerListener.destroy();
             (child as any).opacitySlider.destroy();
-            regularContainer.removeChild(child);
+            layerListEl.removeChild(child);
         }
         for (let i = 0; i < klCanvasLayerArr.length; i++) {
             createLayerEntry(i);
         }
         (div as any).activateLayer(selectedSpotIndex);
+        updateHeight();
     }
 
 
-    listdiv.appendChild(regularContainer);
+    listdiv.appendChild(layerListEl);
     div.appendChild(listdiv);
 
 
@@ -852,7 +853,11 @@ export function klLayerManager(p_canvas: KlCanvas, p_func, p_rootDiv) {
 
     }, 1);
 
+    function updateHeight() {
+        layerListEl.style.height = (layerElArr.length * 35) + 'px';
+    }
 
+    // ---- interface ----
 
     (div as any).update = function (activeLayerSpotIndex) {
         klCanvasLayerArr = klCanvas.getLayers();

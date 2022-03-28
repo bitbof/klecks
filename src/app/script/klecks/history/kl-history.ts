@@ -50,7 +50,7 @@ export class KlHistory implements KlHistoryInterface {
     private dataArr: (IHistoryEntry | null)[]; // null if beyond max undo to trigger garbage collection
     private listeners: IHistoryListener[];
     private pauseStack: number; // how often paused without unpause
-    private readonly max: number = 14; // max number undo steps
+    private readonly max: number = 20; // max number undo steps
     private maxState: number; // can't go backwards -> max state is the buffer image(klCanvas)
     private actionNumber: number; // current action the user is on. untouched document = -1 because dataArr.length is 0
     
