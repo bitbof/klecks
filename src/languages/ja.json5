@@ -356,7 +356,7 @@
     'file-no-autosave': {
         hint: "let user know they can't autosave, and there's no cloud storage. Keep short so fits on one line",
         original: 'No autosave, no cloud storage',
-        value: '自動保存された画像はありません'
+        value: 'クラウドに自動保存できません'
     },
     'file-new': {
         original: 'New',
