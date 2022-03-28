@@ -2,6 +2,7 @@ import {createCanvas} from '../../bb/base/create-canvas';
 import {Psd} from 'ag-psd/dist/psd';
 import {IKlProject, IKlPsd, IMixMode} from '../kl.types';
 import {LANG} from '../../language/language';
+import {MAX_LAYERS} from '../canvas/kl-canvas';
 
 let kl2PsdMap;
 let psd2KlMap;
@@ -94,7 +95,7 @@ export function readPsd(psdObj: Psd): IKlPsd {
     }
 
     // count resulting layers
-    let maxLayers = 8;
+    let maxLayers = MAX_LAYERS;
     let layerCount = 0;
     function countWithinGroup(groupObj) {
         let result = 0;

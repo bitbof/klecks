@@ -41,6 +41,10 @@ export class LanguageStrings {
         })
     }
 
+    getCode (): string {
+        return this.code;
+    }
+
     // get notified on language change
     subscribe (subscriber: () => void) {
         if (this.listeners.includes(subscriber)) {

@@ -571,7 +571,7 @@
     },
     'upload-delete': {
         original: 'To delete your image from Imgur visit:',
-        value: 'Um dein Bild zu löschen öffne folgnden Link:'
+        value: 'Um dein Bild zu löschen öffne folgenden Link:'
     },
     'cropcopy-title-copy': {
         original: 'Copy To Clipboard',

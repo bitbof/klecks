@@ -273,7 +273,10 @@ Base Language File
   "filter-crop-right": "Right",
   "filter-crop-top": "Top",
   "filter-crop-bottom": "Bottom",
-  "filter-crop-rule-thirds": "Rule of Thirds",
+  "filter-crop-rule-thirds": {
+    hint: 'https://en.wikipedia.org/wiki/Rule_of_thirds',
+    value: 'Rule of Thirds',
+  },
   "filter-crop-fill": "Fill",
 
   "filter-flip-title": "Flip",

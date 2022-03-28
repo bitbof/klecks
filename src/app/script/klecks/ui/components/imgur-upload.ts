@@ -90,7 +90,7 @@ export function imgurUpload(klCanvas: KlCanvas, klRootEl, saveReminder: SaveRemi
             width: '100%',
             maxWidth: '100%',
         },
-    });
+    }) as HTMLTextAreaElement;
 
     let labelTitle = document.createElement("div");
     labelTitle.textContent = LANG('upload-name') + ":";
