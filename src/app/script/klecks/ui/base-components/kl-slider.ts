@@ -1,6 +1,7 @@
 import {BB} from '../../../bb/bb';
 import {calcSliderFalloffFactor} from './slider-falloff';
 import {IKlSliderConfig} from '../../kl.types';
+import {languageStrings} from '../../../language/language';
 
 
 
@@ -150,6 +151,7 @@ export const KlSlider = function (p) {
     function updateLabel() {
         let outVal = toValue(linearValue);
         outVal = formatFunc ? formatFunc(outVal) : parseInt(outVal);
+        outVal = outVal.toLocaleString(languageStrings.getCode());
         label.innerHTML = labelCaption + '&nbsp;&nbsp;<span style="font-weight:bold">' + outVal + '</span>';
         control.style.width = (linearValue * elementWidth) + 'px';
     }

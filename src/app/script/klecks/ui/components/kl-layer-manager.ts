@@ -14,7 +14,7 @@ import mergeLayerImg from 'url:~/src/app/img/ui/merge-layers.svg';
 import removeLayerImg from 'url:~/src/app/img/ui/remove-layer.svg';
 // @ts-ignore
 import renameLayerImg from 'url:~/src/app/img/ui/rename-layer.svg';
-import {KlCanvas} from '../../canvas/kl-canvas';
+import {KlCanvas, MAX_LAYERS} from '../../canvas/kl-canvas';
 import {IMixMode} from '../../kl.types';
 import {LANG} from '../../../language/language';
 import {translateBlending} from '../../canvas/translate-blending';
@@ -252,7 +252,7 @@ export function klLayerManager(p_canvas: KlCanvas, p_func, p_rootDiv) {
                 }
                 klCanvasLayerArr = klCanvas.getLayers();
 
-                if (klCanvasLayerArr.length === 8) {
+                if (klCanvasLayerArr.length === MAX_LAYERS) {
                     addnewBtn.disabled = true;
                     duplicateBtn.disabled = true;
                 }
@@ -268,7 +268,7 @@ export function klLayerManager(p_canvas: KlCanvas, p_func, p_rootDiv) {
                     return;
                 }
                 klCanvasLayerArr = klCanvas.getLayers();
-                if (klCanvasLayerArr.length === 8) {
+                if (klCanvasLayerArr.length === MAX_LAYERS) {
                     addnewBtn.disabled = true;
                     duplicateBtn.disabled = true;
                 }
@@ -296,7 +296,7 @@ export function klLayerManager(p_canvas: KlCanvas, p_func, p_rootDiv) {
                 if (klCanvasLayerArr.length === 1) {
                     removeBtn.disabled = true;
                 }
-                if (klCanvasLayerArr.length < 8) {
+                if (klCanvasLayerArr.length < MAX_LAYERS) {
                     addnewBtn.disabled = false;
                     duplicateBtn.disabled = false;
                 }
@@ -416,7 +416,7 @@ export function klLayerManager(p_canvas: KlCanvas, p_func, p_rootDiv) {
                         if (klCanvasLayerArr.length === 1) {
                             removeBtn.disabled = true;
                         }
-                        if (klCanvasLayerArr.length < 8) {
+                        if (klCanvasLayerArr.length < MAX_LAYERS) {
                             addnewBtn.disabled = false;
                             duplicateBtn.disabled = false;
                         }
@@ -860,7 +860,7 @@ export function klLayerManager(p_canvas: KlCanvas, p_func, p_rootDiv) {
             selectedSpotIndex = activeLayerSpotIndex;
         }
         removeBtn.disabled = klCanvasLayerArr.length === 1;
-        if (klCanvasLayerArr.length === 8) {
+        if (klCanvasLayerArr.length === MAX_LAYERS) {
             addnewBtn.disabled = true;
             duplicateBtn.disabled = true;
         } else {

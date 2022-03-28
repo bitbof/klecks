@@ -27,7 +27,7 @@ const allowedMixModes = [
     'luminosity',
 ];
 
-const maxLayers = 8;
+export const MAX_LAYERS = 8;
 
 interface KlCanvasLayer extends HTMLCanvasElement {
     name: string;
@@ -217,7 +217,7 @@ export class KlCanvas {
     }
 
     isLayerLimitReached (): boolean {
-        return this.layerCanvasArr.length >= maxLayers;
+        return this.layerCanvasArr.length >= MAX_LAYERS;
     }
 
     getWidth (): number {
