@@ -151,8 +151,13 @@
   },
   {
     "name-english": "Chinese (traditional)",
-    "name": "繁体中文",
+    "name": "繁體中文",
     "iso-639-1": "zh-HK"
+  },
+  {
+    "name-english": "Chinese (traditional)",
+    "name": "繁體中文",
+    "iso-639-1": "zh-TW"
   },
   {
     "name-english": "Chuvash",
