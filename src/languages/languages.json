@@ -145,6 +145,16 @@
     "iso-639-1": "zh"
   },
   {
+    "name-english": "Chinese (simplified)",
+    "name": "简体中文",
+    "iso-639-1": "zh-CN"
+  },
+  {
+    "name-english": "Chinese (traditional)",
+    "name": "繁体中文",
+    "iso-639-1": "zh-HK"
+  },
+  {
     "name-english": "Chuvash",
     "name": "чӑваш чӗлхи",
     "iso-639-1": "cv"
