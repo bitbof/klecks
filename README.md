@@ -29,7 +29,7 @@ Any contribution by you is highly encouraged and appreciated! These are the curr
 - English
 - German
 - Japanese
-- Chinese
+- Chinese (simplified)
 
 ### Where are translation files?
 Translations are located in `src/languages` where each translation is its own JSON5 file, e.g. `de.json5` for German.

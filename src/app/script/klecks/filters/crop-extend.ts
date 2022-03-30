@@ -276,6 +276,7 @@ export const cropExtend = {
                 overflow: "hidden",
                 userSelect: 'none',
                 colorScheme: 'only light',
+                touchAction: 'none',
             }
         });
         previewWrapper.oncontextmenu = function () {

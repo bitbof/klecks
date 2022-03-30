@@ -97,6 +97,7 @@ export const glPerspective = {
                     left: ((div as any).x - nobSize / 2) + "px",
                     top: ((div as any).y - nobSize / 2) + "px",
                     userSelect: 'none',
+                    touchAction: 'none',
                 });
 
                 let pointerListener = new BB.PointerListener({

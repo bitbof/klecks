@@ -169,7 +169,8 @@ export const glCurves = {
                         cursor: "move",
                         borderRadius: gripSize + "px",
                         boxShadow: "inset 0 0 0 2px #000",
-                        userSelect: 'none'
+                        userSelect: 'none',
+                        touchAction: 'none',
                     });
 
                     function update() {

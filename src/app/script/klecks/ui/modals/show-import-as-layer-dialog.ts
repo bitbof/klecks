@@ -134,7 +134,7 @@ export function showImportAsLayerDialog(
         target: params.target,
         message: `<b>${LANG('import-as-layer-title')}</b>`,
         div: div,
-        style: isSmall ? {} : {
+        style: isSmall ? null : {
             width: '500px'
         },
         buttons: ["Ok", "Cancel"],

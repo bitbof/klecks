@@ -72,21 +72,23 @@ export const glTiltShift = {
 
             function nob(x, y) {
                 let nobSize = 14;
-                let div = document.createElement("div");
+                let div = BB.el({
+                    css: {
+                        width: nobSize + "px",
+                        height: nobSize + "px",
+                        backgroundColor: '#fff',
+                        boxShadow: "inset 0 0 0 2px #000",
+                        borderRadius: nobSize + "px",
+                        position: "absolute",
+                        cursor: 'move',
+                        left: (x - nobSize / 2) + "px",
+                        top: (y - nobSize / 2) + "px",
+                        userSelect: 'none',
+                        touchAction: 'none',
+                    }
+                });
                 (div as any).x = x;
                 (div as any).y = y;
-                div.style.width = nobSize + "px";
-                div.style.height = nobSize + "px";
-                div.style.backgroundColor = "#fff";
-                div.style.boxShadow = "inset 0 0 0 2px #000";
-                div.style.borderRadius = nobSize + "px";
-                div.style.position = "absolute";
-                div.style.cursor = "move";
-                div.style.left = (x - nobSize / 2) + "px";
-                div.style.top = (y - nobSize / 2) + "px";
-                BB.css(div, {
-                    userSelect: 'none'
-                });
                 let pointerListener = new BB.PointerListener({
                     target: div,
                     maxPointers: 1,

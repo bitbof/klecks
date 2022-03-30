@@ -97,6 +97,7 @@ export function textToolDialog(
             marginLeft: '-20px',
             cursor: 'move',
             colorScheme: 'only light',
+            touchAction: 'none',
         },
         onClick: function() {
             textInput.focus();
