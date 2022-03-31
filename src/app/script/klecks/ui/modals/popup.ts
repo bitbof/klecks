@@ -151,7 +151,7 @@ export function popup (
             if (isClosed) {
                 return;
             }
-            if (clickOnEnterBtn !== null && comboStr === 'enter' && !BB.isInputFocused()) {
+            if (clickOnEnterBtn && comboStr === 'enter' && !BB.isInputFocused()) {
                 e.stopPropagation();
                 setTimeout(function() {
                     clickOnEnterBtn.click();
@@ -262,7 +262,9 @@ export function popup (
         });
         btnElArr.splice(0, btnElArr.length);
 
-        p.callback(value);
+        if (p.callback) {
+            p.callback(value);
+        }
     }
 
     if (p.closefunc) {
