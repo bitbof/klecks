@@ -19,7 +19,6 @@ import {StatusOverlay} from './ui/components/status-overlay';
 import {exportDialog} from './ui/modals/export-dialog-deprecated';
 import {CropCopy} from './ui/components/crop-copy';
 import {clipboardDialog} from './ui/modals/clipboard-dialog';
-import {TabMenu} from './ui/components/tab-menu-deprecated';
 import {klLayerManager} from './ui/components/kl-layer-manager';
 import {WorkspaceSvgOverlay} from './canvas-ui/workspace-svg-overlay';
 import {KlCanvasWorkspace} from './canvas-ui/kl-canvas-workspace';
@@ -134,7 +133,6 @@ export const KL = {
     // --- ui - components ---
     StatusOverlay,
     CropCopy,
-    TabMenu,
     klLayerManager,
     FreeTransform,
     FreeTransformCanvas,
