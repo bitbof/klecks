@@ -1,4 +1,6 @@
 import {BB} from '../../../bb/bb';
+// @ts-ignore
+import invertedBorderImg from 'url:~/src/app/img/ui/inverted-border.svg';
 
 /**
  * row of tabs. uses css class .tabrow-tab
@@ -36,8 +38,35 @@ export function TabRow(p) {
     let tabArr = []; //creates its own internal arr
     let openedTabObj = null;
 
+    const roundSize = 10;
+    const roundRight = BB.el({
+        css: {
+            width: roundSize + 'px',
+            height: roundSize + 'px',
+            backgroundImage: `url('${invertedBorderImg}')`,
+            backgroundSize: 'cover',
+            position: 'absolute',
+            right: -roundSize + 'px',
+            bottom: '0',
+            pointerEvents: 'none',
+        }
+    });
+    const roundLeft = BB.el({
+        css: {
+            width: roundSize + 'px',
+            height: roundSize + 'px',
+            backgroundImage: `url('${invertedBorderImg}')`,
+            backgroundSize: 'cover',
+            position: 'absolute',
+            left: -roundSize + 'px',
+            bottom: '0',
+            transform: 'scale(-1,1)',
+            pointerEvents: 'none',
+        }
+    });
+
     function createTab(pTabObj, initialId, useAccent) {
-        let result = {
+        let result: any = {
             id: pTabObj.id,
             isVisible: 'isVisible' in pTabObj ? pTabObj.isVisible : true,
             onOpen: pTabObj.onOpen,
@@ -53,7 +82,8 @@ export function TabRow(p) {
             className: initialId === result.id ? (useAccent ? 'tabrow-tab tabrow-tab-opened-accented' : 'tabrow-tab tabrow-tab-opened') : 'tabrow-tab',
             css: {
                 lineHeight: height + 'px',
-                display: result.isVisible ? 'block' : 'none'
+                display: result.isVisible ? 'block' : 'none',
+                zIndex: '0',
             },
             onClick: function() {
                 if (openedTabObj === result) {
@@ -62,6 +92,7 @@ export function TabRow(p) {
                 _this.open(result.id);
             }
         });
+        result.div = tabDiv;
         if ('image' in pTabObj) {
             BB.css(tabDiv, {
                 backgroundImage: 'url(\'' + pTabObj.image + '\')',
@@ -86,6 +117,8 @@ export function TabRow(p) {
 
         if (initialId === result.id) {
             result.onOpen();
+            result.div.appendChild(roundRight);
+            result.div.appendChild(roundLeft);
         } else {
             result.onClose();
         }
@@ -126,6 +159,8 @@ export function TabRow(p) {
                 openedTabObj.onClose();
                 openedTabObj = tabArr[i];
                 openedTabObj.onOpen();
+                openedTabObj.div.appendChild(roundRight);
+                openedTabObj.div.appendChild(roundLeft);
                 update();
                 return;
             }

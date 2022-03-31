@@ -75,7 +75,7 @@ export function clipboardDialog(parent, fullCanvas, cropCallback, output, showCr
     BB.addEventListener(window, "blur", blur);
     popup({
         target: parent,
-        message: showCrop ? `${LANG('cropcopy-title-copy')} / ${LANG('cropcopy-title-crop')}` : `${LANG('cropcopy-title-copy')}`,
+        message: '<b>' + (showCrop ? `${LANG('cropcopy-title-copy')} / ${LANG('cropcopy-title-crop')}` : `${LANG('cropcopy-title-copy')}`) + '</b>',
         div: div,
         style: isSmall ? {} : {
             width: "500px"

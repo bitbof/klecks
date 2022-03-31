@@ -139,6 +139,7 @@ export function imgurUpload(klCanvas: KlCanvas, klRootEl, saveReminder: SaveRemi
         buttons: [LANG('upload-submit'), "Cancel"],
         clickOnEnter: LANG('upload-submit'),
         primaries: [LANG('upload-submit')],
+        autoFocus: LANG('upload-submit'),
         callback: async function (val) {
             if (val === LANG('upload-submit') || val === "Yes" || val === "Ok") {
                 try {

@@ -175,7 +175,7 @@ export function ToolDropdown(p) {
     let overlay = BB.el({
         css: {
             position: 'absolute',
-            //background: 'rgba(255,0,0,0.5)'
+            //background: 'rgba(255,0,0,0.5)',
             left: '0',
             top: '0',
             right: '0',
@@ -204,7 +204,10 @@ export function ToolDropdown(p) {
             zIndex: '1',
             boxSizing: 'border-box',
             cursor: 'pointer',
-            transition: 'height 0.1s ease-in-out, opacity 0.1s ease-in-out'
+            transition: 'height 0.1s ease-in-out, opacity 0.1s ease-in-out',
+            borderBottomLeftRadius: '5px',
+            borderBottomRightRadius: '5px',
+            overflow: 'hidden',
         }
     });
 
@@ -276,7 +279,7 @@ export function ToolDropdown(p) {
     }
 
     function showDropdown() {
-        dialogCounter.count++;
+        dialogCounter.increase(0.5);
         isOpen = true;
 
         for (let i = 0; i < optionArr.length; i++) {
@@ -290,7 +293,7 @@ export function ToolDropdown(p) {
     }
 
     function closeDropdown() {
-        dialogCounter.count--;
+        dialogCounter.decrease(0.5);
         isOpen = false;
         arrowButton.style.removeProperty('display');
         div.style.removeProperty('z-index');

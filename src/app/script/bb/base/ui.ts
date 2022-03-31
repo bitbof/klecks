@@ -101,7 +101,7 @@ export function el(
         parent?: HTMLElement,
         css?: { [key: string]: string },
         custom?: { [key: string]: any },
-        content?: string | HTMLElement[] | HTMLElement | SVGElement,
+        content?: string | (HTMLElement | string | null)[] | HTMLElement | SVGElement,
         textContent?: string,
         className?: string,
         title?: string,
@@ -121,11 +121,12 @@ export function el(
         if (typeof params.content === typeof 'aa') {
             div.innerHTML = params.content as string;
 
-        } else if (!params.content[0]) {
-            div.appendChild(params.content as HTMLElement);
-
         } else if (Array.isArray(params.content)) {
             BB.append(div, params.content);
+
+        } else {
+            div.appendChild(params.content as HTMLElement);
+
         }
     }
     if (params.textContent) {

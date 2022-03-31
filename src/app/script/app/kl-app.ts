@@ -227,7 +227,7 @@ export function KlApp(pProject: IKlProject | null, pOptions: IKlAppOptions) {
             klCanvasWorkspace.requestFrame();
         },
         onText: function(canvasX, canvasY, angleRad) {
-            if (KL.dialogCounter.count > 0) {
+            if (KL.dialogCounter.get() > 0) {
                 return;
             }
 
@@ -319,7 +319,7 @@ export function KlApp(pProject: IKlProject | null, pOptions: IKlAppOptions) {
     });
     let keyListener = new BB.KeyListener({
         onDown: function(keyStr, event, comboStr) {
-            if (KL.dialogCounter.count > 0) {
+            if (KL.dialogCounter.get() > 0) {
                 return;
             }
             if (BB.isInputFocused(true)) {
@@ -689,7 +689,7 @@ export function KlApp(pProject: IKlProject | null, pOptions: IKlAppOptions) {
     }
 
     function onPaste(e) {
-        if (KL.dialogCounter.count > 0) {
+        if (KL.dialogCounter.get() > 0) {
             return;
         }
 
@@ -953,13 +953,13 @@ export function KlApp(pProject: IKlProject | null, pOptions: IKlAppOptions) {
         new KL.KlImageDropper({
             target: document.body,
             onDrop: function(files, optionStr) {
-                if (KL.dialogCounter.count > 0) {
+                if (KL.dialogCounter.get() > 0) {
                     return;
                 }
                 handleFileSelect(files, optionStr);
             },
             enabledTest: function() {
-                return !KL.dialogCounter.count;
+                return KL.dialogCounter.get() === 0;
             }
         });
 
@@ -1121,7 +1121,7 @@ export function KlApp(pProject: IKlProject | null, pOptions: IKlAppOptions) {
     setTimeout(function() {
         overlayToolspace = new KL.OverlayToolspace({
             enabledTest: function() {
-                return !KL.dialogCounter.count && !lineSanitizer.getIsDrawing();
+                return KL.dialogCounter.get() === 0 && !lineSanitizer.getIsDrawing();
             },
             brushSettingService,
         });

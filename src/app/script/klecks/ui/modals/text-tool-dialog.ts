@@ -302,6 +302,11 @@ export function textToolDialog(
         }
     });
 
+    const wheelPrevent = (event) => {
+        event.preventDefault();
+    }
+    BB.addEventListener(previewCanvas, 'wheel', wheelPrevent);
+
 
 
     let row1 = BB.el({
@@ -619,6 +624,7 @@ export function textToolDialog(
             previewPointerListener.destroy();
             sizePointerListener.destroy();
             fontPointerListener.destroy();
+            BB.removeEventListener(previewCanvas, 'wheel', wheelPrevent);
             keyListener.destroy();
             if (val === 'Ok') {
                 p.onConfirm({
@@ -637,6 +643,7 @@ export function textToolDialog(
         },
         autoFocus: false,
         clickOnEnter: 'Ok',
+        ignoreBackground: true,
         closefunc: function (func) {
             closefunc = func;
         },

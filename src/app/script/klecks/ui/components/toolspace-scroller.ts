@@ -3,6 +3,7 @@ import {BB} from '../../../bb/bb';
 import caretImg from 'url:~/src/app/img/ui/caret-down.svg';
 import {IKeyString} from '../../../bb/bb.types';
 import {LANG} from '../../../language/language';
+import {dialogCounter} from '../modals/modal-count';
 
 /**
  * Scroll buttons at the top and bottom of toolspace
@@ -127,6 +128,13 @@ export class ToolspaceScroller {
             }
         );
         window.addEventListener('resize', () => this.update());
+
+        // hide if in dialog because that can have its own scrollbar
+        dialogCounter.subscribe((v) => {
+            // ignores the 0.5 by tool dropdown
+            this.upBtn.style.opacity = v >= 1 ? '0' : '';
+            this.downBtn.style.opacity = v >= 1 ? '0' : '';
+        });
     }
 
     updateUiState (uiState: 'left' | 'right'): void {

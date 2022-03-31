@@ -406,7 +406,7 @@ button img {
     background-image: linear-gradient(
                     to top,
                     var(--kl-color) -50%,
-                    var(--active-highlight-color) 150%
+                    var(--active-highlight-color) 120%
     );
     color: #fff;
     box-shadow: unset;
@@ -418,32 +418,44 @@ button img {
     margin-top: 10px;
 }
 
-#popup {
+.kl-popup {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    overflow-y: auto;
     background: rgba(50, 50, 50, 0.5);
-    display: table;
     animation-name: consoleIn;
     animation-duration: 0.3s;
     animation-timing-function: ease-out;
 }
 
-.popup-content {
-    padding: 20px;
+.kl-popup-box {
+    position: relative;
     background-color: #ddd;
-    width: 300px;
-    margin-left: auto;
-    margin-right: auto;
+    border-radius: 10px;
+    padding: 20px;
+    margin: 10px 0;
     box-shadow: rgba(0, 0, 0, 0.45) 0 5px 60px;
 }
 
-.poperror, .popok, .popwarning, .popupload, .poptrash {
+.kl-popup-box--sm {
+    width: 300px;
+}
+
+.kl-popup__btn {
+    min-width: 80px;
+    margin-left: 8px;
+    margin-top: 8px;
+}
+
+.poperror, .popok, .popwarning, .popupload {
     padding-left: 104px;
-    border-radius: 10px;
     background-repeat: no-repeat;
     background-position: 20px 20px;
 }
 
 @media (max-width: 600px) {
-    .poperror, .popok, .popwarning, .popupload, .poptrash {
+    .poperror, .popok, .popwarning, .popupload {
         padding-left: 35px;
         background-position: 10px 20px;
         background-size: 20px 20px !important;
@@ -467,27 +479,8 @@ button img {
     background-size: 60px;
 }
 
-.popdefault {
-    border-radius: 10px;
-}
-
-.popchangelog {
-    border-radius: 10px;
-}
-
-#cell {
-    display: table-cell;
-    vertical-align: middle;
-    padding-bottom: 160px;
-    padding-top: 10px;
-}
-
 .canvasWrapper {
     transition: all 0.3s ease-in-out;
-}
-
-.canvasWrapper canvas {
-    /*image-rendering: pixelated;*/
 }
 
 @keyframes top-overlay-pulse {
@@ -733,8 +726,8 @@ iframe {
     height: 100%;
     text-align: center;
     opacity: 0.6;
-    border-top-left-radius: 4px;
-    border-top-right-radius: 4px;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
 
     background-repeat: no-repeat;
     background-position: center;
@@ -749,13 +742,38 @@ iframe {
 }
 
 .tabrow-tab-opened, .tabrow-tab-opened-accented {
-    background-color: #fff;
+    background-color: #f5f5f5;
     opacity: 1;
     cursor: default;
+    position: relative;
 }
 
 .tabrow-tab-opened-accented {
     box-shadow: inset 0 2px 0 0 var(--active-highlight-color);
+}
+
+.tabrow-tab-opened-accented:not(:first-child):before, .tabrow-tab-opened:not(:first-child):before {
+    content:" ";
+    width: 0;
+    height: 0;
+    border-left: 2px solid transparent;
+    border-right: 0px solid transparent;
+    border-bottom: 8px solid #f5f5f5;
+    position: absolute;
+    left: -1.5px;
+    bottom: 0px;
+}
+
+.tabrow-tab-opened-accented:not(:last-child):after, .tabrow-tab-opened:not(:last-child):after {
+    content:" ";
+    width: 0;
+    height: 0;
+    border-left: 0px solid transparent;
+    border-right: 2px solid transparent;
+    border-bottom: 8px solid #f5f5f5;
+    position: absolute;
+    right: -1.5px;
+    bottom: 0px;
 }
 
 .kl-option-wrapper {

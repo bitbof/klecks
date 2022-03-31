@@ -5,240 +5,273 @@ import checkImg from 'url:~/src/app/img/ui/check.svg';
 // @ts-ignore
 import cancelImg from 'url:~/src/app/img/ui/cancel.svg';
 import {LANG} from '../../../language/language';
+import {IKeyString} from '../../../bb/bb.types';
 
-/**
- *
- * params:
- * {
- *      target: DOM Element
- *      div: node with content
- *      message:
- *      callback?:
- *      buttons: [string, ...] // Ok, and Cancel will be translated
- *      primaries: [string, ...]
- *      type:
- *      closefunc:
- *      style:
- *      clickOnEnter: string //name of button
- *      autoFocus: string //name of button - default 'Ok' || 'Yes' || 'Upload' - false -> none
- * }
- *
- * @param params
- */
-export const popup = function (params): void {
-    dialogCounter.count++;
+window.onscroll = (e) => {
+    e.preventDefault();
+}
 
-    const target = params.target;
-    const callback = params.callback ? params.callback : () => {};
-    const buttons = params.buttons;
-    const type = params.type;
-    const div = document.createElement('div');
-    div.className = 'g-root';
-    div.id = 'popup';
-    div.style.cursor = 'default';
-    let destructed = false;
-    BB.css(div, {
-        width: '100%',
-        height: '100%',
-        position: 'fixed',
-        left: '0',
-        top: '0'
-    });
-    div.onclick = BB.handleClick;
-    // prevent ctrl scroll -> zooming page
-    const wheelPrevent = (event) => {
-        event.preventDefault();
+export function popup (
+    p: {
+        target: HTMLElement;
+        div?: HTMLElement; // node with content
+        message: string; // can be html
+        callback?: (result: string) => void;
+        buttons?: string[]; // "Ok", and "Cancel" will be automatically translated
+        primaries?: string[];
+        type?: 'error' | 'warning' | 'upload' | 'ok'; // todo
+        closefunc?: (f: () => void) => void; // returns a function you can call to close (Cancel) the dialog
+        style?: IKeyString;
+        clickOnEnter?: string; // name of button - will be clicked if enter key pressed
+        autoFocus?: false | string; // name of  to automatically focus - default 'Ok' - false -> none
+        ignoreBackground?: boolean; // deafult false; if true clicking on background doesn't close
     }
-    BB.addEventListener(div, 'wheel', wheelPrevent);
-
-    let autoFocusArr = [];
-    if (params.autoFocus) {
-        autoFocusArr = [params.autoFocus];
-    } else if (params.autoFocus === false) {
-        autoFocusArr = [];
-    } else {
-        autoFocusArr = ['Ok', 'Yes', 'Upload'];
-    }
-
-    //for closing dialog when clicking outside of it
-    const closingLayer = document.createElement('div');
-    BB.css(closingLayer, {
-        width: '100%',
-        height: '100%',
-        position: 'fixed',
-        left: '0',
-        top: '0'
-    });
-    div.appendChild(closingLayer);
-
-    const cell = document.createElement('div');
-    cell.id = 'cell';
-    div.appendChild(cell);
-    const content = document.createElement('div');
-    content.style.position = 'relative';
-    content.className = 'popup-content';
-
-    function closePopup(result) {
-        if (destructed) {
-            return;
-        }
-        dialogCounter.count--;
-        BB.clearSelection();
-        target.removeChild(div);
-        callback(result);
-        keyListener.destroy();
-        BB.removeEventListener(closingLayer, 'click', onClosingLayerClick);
-        document.body.style.overflow = '';
-
-        xButton.onclick = null;
-        buttonArr.forEach(item => {
-            item.onclick = null;
-        });
-        buttonArr.splice(0, buttonArr.length);
-        BB.removeEventListener(div, 'wheel', wheelPrevent);
-        div.onclick = null;
-
-        destructed = true;
-    }
-
-    function onClosingLayerClick() {
-        closePopup('Cancel');
-    }
-    BB.addEventListener(closingLayer, 'click', onClosingLayerClick);
+): void {
+    dialogCounter.increase();
+    let isClosed = false;
 
 
-    const xButton = document.createElement('div');
-    xButton.className = 'dialog-closebtn';
-    xButton.innerHTML = `<img alt="${LANG('modal-close')}" height="20" src="${cancelImg}">`;
-    xButton.title = LANG('modal-close');
-    xButton.onclick = function () {
-        closePopup('Cancel');
-    };
-    content.appendChild(xButton);
-
-
-    cell.appendChild(content);
-    target.appendChild(div);
-    const message = document.createElement('div');
-    content.appendChild(message);
-    if (params.div) {
-        content.appendChild(params.div);
-        if (params.buttons) {
-            params.div.style.marginBottom = '20px';
-        }
-    }
-    if (!params.message) {
-    } else if (typeof params.message === 'string') {
-        message.innerHTML = params.message;
-    } else {
-        message.appendChild(params.message);
-    }
-    message.style.marginRight = '15px';
-    message.style.marginBottom = '10px';
-    const buttonWrapper = document.createElement('div');
-    buttonWrapper.style.textAlign = 'right';
-    let clickOnEnterButton = null;
-    const buttonArr = [];
-    const addbutton = function (label, i) {
-        const button = document.createElement('button');
-        //button.style.cssFloat = "right";
-        button.style.minWidth = '80px';
-        button.style.display = 'inline-block';
-        button.style.marginLeft = '8px';
-
-        if (label === 'Ok' || (params.primaries && params.primaries.includes(label))) {
-            button.className = 'kl-button-primary';
-        }
-        if (label === 'Ok') {
-            button.innerHTML = '<img height="17" src="' + checkImg + '"/>' + LANG('modal-ok');
-        } else if (label === 'Cancel') {
-            button.innerHTML = '<img height="17" src="' + cancelImg + '"/>' + LANG('modal-cancel');
-        } else {
-            button.innerHTML = label;
-        }
-        buttonWrapper.appendChild(button);
-        //button.tabIndex = i + 1000;
-        button.onclick = function () {
-            closePopup(label);
-        };
-
-        if (autoFocusArr.includes(label)) {
-            setTimeout(function () {
-                button.focus();
-            }, 10);
-        }
-
-        if (label === params.clickOnEnter) {
-            clickOnEnterButton = button;
-        }
-
-        buttonArr.push(button);
-    };
-    /*for (let i = params.buttons.length - 1; i >= 0; i--) {
-        addbutton(params.buttons[i], i);
-    }*/
-    if (params.buttons) {
-        for (let i = 0; i < params.buttons.length; i++) {
-            addbutton(params.buttons[i], i);
-        }
-        content.appendChild(buttonWrapper);
-    }
-
-    content.appendChild(BB.el({
+    // need this extra layer because chrome mobile otherwise scrolls the page and then glitches as the address bar goes away
+    const rootRootEl = BB.el({
+        parent: document.body,
         css: {
-            clear: 'both'
+            position: 'absolute',
+            left: '0',
+            top: '0',
+            right: '0',
+            bottom: '0',
+            overflow: 'hidden',
         }
-    }));
+    });
+    const rootEl = BB.el({
+        parent: rootRootEl,
+        className: 'kl-popup',
+    });
+
+    const scrollContent = BB.el({
+        parent: rootEl,
+        css: {
+            width: '100%',
+            minHeight: '100%',
+            // padding: '10px 0',
+            position: 'relative',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+            alignItems: 'center',
+        }
+    });
+
+    const bgEl = BB.el({
+        parent: scrollContent,
+        onClick: () => {
+            if (p.ignoreBackground) {
+                return;
+            }
+            close('Cancel');
+        },
+        css: {
+            position: 'absolute',
+            left: '0',
+            top: '0',
+            zIndex: '0',
+            width: '100%',
+            height: '100%',
+        }
+    });
+
+    const titleHeight = 40;
+    const xButton = BB.el({
+        tagName: 'button',
+        className: 'popup-x',
+        content: `<img alt="${LANG('modal-close')}" height="20" src="${cancelImg}">`,
+        title: LANG('modal-close'),
+        onClick: () => {
+            close('Cancel');
+        },
+        css: {
+            width: titleHeight + 'px',
+            height: titleHeight + 'px',
+            lineHeight: titleHeight + 'px',
+            position: 'absolute',
+            right: '0',
+            top: '0',
+            background: 'none',
+            boxShadow: 'none',
+        }
+    });
+
+    const boxClasses = ['kl-popup-box'];
+    boxClasses.push('kl-popup-box--sm');
+    const boxEl = BB.el({
+        content: [
+            xButton,
+            BB.el({
+                content:p.message,
+                css: {
+                    marginBottom: p.div ? '10px' : null,
+                    marginRight: '15px',
+                }
+            }),
+            p.div,
+        ],
+        className: boxClasses.join(' '),
+        css: p.style ? p.style : null,
+    });
+
+    scrollContent.append(
+        BB.el({
+            css: {
+                flex: '0.5',
+            }
+        }),
+        boxEl,
+        BB.el({
+            css: {
+                flex: '1',
+            }
+        })
+    );
+
+    if (p.type === 'error') {
+        BB.addClassName(boxEl, 'poperror');
+    }
+    if (p.type === 'ok') {
+        BB.addClassName(boxEl, 'popok');
+    }
+    if (p.type === 'warning') {
+        BB.addClassName(boxEl, 'popwarning');
+    }
+    if (p.type === 'upload') {
+        BB.addClassName(boxEl, 'popupload');
+    }
 
     const keyListener = new BB.KeyListener({
         onDown: function(keyStr, e, comboStr) {
-            if (destructed) {
+            if (isClosed) {
                 return;
             }
-            if (clickOnEnterButton !== null && comboStr === 'enter' && !BB.isInputFocused()) {
+            if (clickOnEnterBtn !== null && comboStr === 'enter' && !BB.isInputFocused()) {
                 e.stopPropagation();
                 setTimeout(function() {
-                    clickOnEnterButton.click();
+                    clickOnEnterBtn.click();
                 }, 10);
             }
             if (comboStr === 'esc') {
                 e.stopPropagation();
-                closePopup('Cancel');
+                close('Cancel');
             }
         }
     });
+    // prevent ctrl scroll -> zooming page
+    const wheelPrevent = (event) => {
+        if (keyListener.isPressed('ctrl')) {
+            event.preventDefault();
+        }
+    };
+    BB.addEventListener(rootEl, 'wheel', wheelPrevent);
+    rootEl.onclick = BB.handleClick;
 
-    if (type === 'error') {
-        BB.addClassName(content, 'poperror');
+    let autoFocus = null;
+    if (p.autoFocus) {
+        autoFocus = p.autoFocus;
+    } else if (p.autoFocus === false) {
+        autoFocus = null;
+    } else {
+        autoFocus = 'Ok';
     }
-    if (type === 'ok') {
-        BB.addClassName(content, 'popok');
+
+    const buttonRowEl = p.buttons && p.buttons.length > 0 ? BB.el({
+        parent: boxEl,
+        css: {
+            display: 'flex',
+            flexWrap: 'wrap',
+            justifyContent: 'flex-end',
+            marginTop: '12px', // 8px already via buttons
+            marginLeft: '-8px',
+        }
+    }) : null;
+    let clickOnEnterBtn;
+    const btnElArr = [];
+    p.buttons.forEach(buttonName => {
+        const btnClasses = ['kl-popup__btn'];
+        if (buttonName === 'Ok' || (p.primaries && p.primaries.includes(buttonName))) {
+            btnClasses.push('kl-button-primary');
+        }
+        let iconUrl;
+        let label = buttonName;
+        if (buttonName === 'Ok') {
+            label = LANG('modal-ok');
+            iconUrl = checkImg;
+        }
+        if (buttonName === 'Cancel') {
+            label = LANG('modal-cancel');
+            iconUrl = cancelImg;
+        }
+        let iconImg = null;
+        if (iconUrl) {
+            iconImg = BB.el({
+                tagName: 'img',
+                custom: {
+                    src: iconUrl,
+                    height: '17',
+                }
+            });
+        }
+        const btn = BB.el({
+            parent: buttonRowEl,
+            tagName: 'button',
+            className: btnClasses.join(' '),
+            content: [iconImg, label],
+            onClick: () => {
+                close(buttonName);
+            },
+        });
+        btnElArr.push(btn);
+        if (autoFocus === buttonName) {
+            setTimeout(() => {
+                btn.focus();
+                rootEl.scrollTo(0, 0);
+            }, 10);
+            setTimeout(() => {
+                // safari needs a separate timeout
+                rootEl.scrollTo(0, 0);
+            }, 20);
+        }
+        if (buttonName === p.clickOnEnter) {
+            clickOnEnterBtn = btn;
+        }
+    });
+
+    function close (value: string) {
+        if (isClosed) {
+            return;
+        }
+
+        isClosed = true;
+        BB.clearSelection();
+        document.body.removeChild(rootRootEl);
+        dialogCounter.decrease();
+        BB.destroyEl(xButton);
+        BB.destroyEl(bgEl);
+        keyListener.destroy();
+        BB.removeEventListener(rootEl, 'wheel', wheelPrevent);
+        rootEl.onclick = null;
+        btnElArr.forEach(item => {
+            BB.destroyEl(item);
+        });
+        btnElArr.splice(0, btnElArr.length);
+
+        p.callback(value);
     }
-    if (type === 'warning') {
-        BB.addClassName(content, 'popwarning');
-    }
-    if (type === 'upload') {
-        BB.addClassName(content, 'popupload');
-    }
-    if (type === 'trash') {
-        BB.addClassName(content, 'poptrash');
-    }
-    if (!type) {
-        BB.addClassName(content, 'popdefault');
-    }
-    if (params.style) {
-        BB.css(content, params.style);
-    }
-    /*content.onclick = function() {
-    target.removeChild(div);
-}*/
-    if (params.closefunc) {
-        params.closefunc(function () {
-            closePopup('Cancel');
+
+    if (p.closefunc) {
+        p.closefunc(function () {
+            close('Cancel');
         });
     }
 
-};
+}
 
 
 /**
@@ -266,7 +299,7 @@ export const popup = function (params): void {
  * @constructor
  */
 export const Popup = function(p) {
-    dialogCounter.count++;
+    dialogCounter.increase();
     const parent = document.body;
     const div = BB.el({
         parent: parent,
@@ -289,7 +322,7 @@ export const Popup = function(p) {
     let updateInterval;
 
     function close() {
-        dialogCounter.count--;
+        dialogCounter.decrease();
         div.onclick = null;
         parent.removeChild(div);
         clearInterval(updateInterval);
@@ -363,6 +396,7 @@ export const Popup = function(p) {
     }
     const xButton = BB.el({
         parent: titleEl,
+        tagName: 'button',
         className: 'popup-x',
         content: `<img alt="${LANG('modal-close')}" height="20" src="${cancelImg}">`,
         title: LANG('modal-close'),
@@ -370,7 +404,12 @@ export const Popup = function(p) {
         css: {
             width: titleHeight + 'px',
             height: titleHeight + 'px',
-            lineHeight: titleHeight + 'px'
+            lineHeight: titleHeight + 'px',
+            background: 'none',
+            boxShadow: 'none',
+        },
+        custom: {
+            tabindex: '0',
         }
     });
 

@@ -1206,5 +1206,10 @@
     'algorithm-pixelated': {
         original: 'Pixelated',
         value: 'Pixelig'
+    },
+    'preview': {
+        original: 'Preview',
+        hint: 'subject. When applying a filter user sees a preview of what the result would look like.',
+        value: 'Vorschau'
     }
 }

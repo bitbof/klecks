@@ -91,10 +91,10 @@ export function removeClassName (el: HTMLElement | SVGElement, classStr: string)
  * @param target
  * @param els
  */
-export function append(target: HTMLElement, els: (HTMLElement | null)[]) {
+export function append(target: HTMLElement, els: (HTMLElement | string | null)[]) {
     const fragment = document.createDocumentFragment();
-    els.forEach(item => item ? fragment.appendChild(item) : null);
-    target.appendChild(fragment);
+    els.forEach(item => item ? fragment.append(item) : null);
+    target.append(fragment);
 }
 
 /**

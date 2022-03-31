@@ -456,4 +456,8 @@ Base Language File
   "scaling-algorithm": "Scaling Algorithm",
   "algorithm-smooth": "Smooth",
   "algorithm-pixelated": "Pixelated",
+  'preview': {
+    hint: 'subject. When applying a filter user sees a preview of what the result would look like.',
+    value: 'Preview',
+  }
 }

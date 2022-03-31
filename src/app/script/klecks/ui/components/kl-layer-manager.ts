@@ -331,6 +331,7 @@ export function klLayerManager(p_canvas: KlCanvas, p_func, p_rootDiv) {
                     div.appendChild(options.getElement());
 
                     let preview = document.createElement("canvas");
+                    preview.title = LANG('preview');
                     let spacer = document.createElement("div");
                     spacer.innerHTML = "<br/>";
                     spacer.style.clear = "both";

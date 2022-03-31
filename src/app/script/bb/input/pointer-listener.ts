@@ -173,7 +173,7 @@ const WheelCleaner = function (callback) {
  *     pageX: number,
  *     pageY: number,
  *     relX: number,
- *     relY: number
+ *     relY: number,
  * }
  *
  * isOver(): boolean - if pointer over the target
