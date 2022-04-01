@@ -427,6 +427,7 @@ button img {
     animation-name: consoleIn;
     animation-duration: 0.3s;
     animation-timing-function: ease-out;
+    touch-action: pan-y;
 }
 
 .kl-popup-box {
