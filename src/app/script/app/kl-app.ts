@@ -1681,7 +1681,10 @@ export function KlApp(pProject: IKlProject | null, pOptions: IKlAppOptions) {
                 },
                 onClose: function() {
                     filterTab.hide();
-                }
+                },
+                css: {
+                    padding: '0 7px',
+                },
             },
             {
                 id: 'file',
@@ -1700,7 +1703,10 @@ export function KlApp(pProject: IKlProject | null, pOptions: IKlAppOptions) {
                     }
                     fileTab.getElement().style.display = 'none';
                     fileTab.setIsVisible(false);
-                }
+                },
+                css: {
+                    padding: '0 7px',
+                },
             },
             {
                 id: 'settings',
