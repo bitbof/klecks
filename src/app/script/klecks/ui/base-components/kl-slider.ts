@@ -215,7 +215,7 @@ export const KlSlider = function (p) {
     }
 
     let pointerListener;
-    setTimeout(function() {
+    let pointerListenerTimeout = setTimeout(() => {
         pointerListener = new BB.PointerListener({
             target: div,
             maxPointers: 1,
@@ -273,7 +273,10 @@ export const KlSlider = function (p) {
     };
 
     this.destroy = function() {
-        pointerListener.destroy();
+        clearTimeout(pointerListenerTimeout);
+        if (pointerListener) {
+            pointerListener.destroy();
+        }
     };
 
     this.getElement = function() {
