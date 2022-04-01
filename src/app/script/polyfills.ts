@@ -9,3 +9,15 @@ if (!('scrollTo' in Element.prototype)) {
         }
     });
 }
+
+// sometimes Android WebView has no localStorage
+if (!('localStorage' in window)) {
+    try {
+        window['localStorage'] = {
+            getItem: () => null,
+            setItem: () => {},
+        } as any;
+    } catch (e) {
+        // maybe it doesn't let me set this
+    }
+}
