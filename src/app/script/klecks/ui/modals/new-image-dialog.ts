@@ -97,24 +97,6 @@ export function newImageDialog(p) {
     ratioWrapper.style.marginTop = '5px';
     ratioWrapper.style.color = '#888';
 
-    // let swapButton = BB.div({
-    //     tagName: 'button',
-    //     title: 'Swap',
-    //     content: '<img src=\'app/img/ui/swap-y.svg\' alt=\'Swap\' style="width: 20px; height: 20px"/>',
-    //     onClick: function() {
-    //         let temp = widthInput.value;
-    //         widthInput.value = heightInput.value;
-    //         heightInput.value = temp;
-    //         updateRatio();
-    //     },
-    //     css: {
-    //         position: 'absolute',
-    //         right: '-40px',
-    //         bottom: '-11px'
-    //     }
-    // });
-    //widthWrapper.appendChild(swapButton);
-
     let templateWrapper = document.createElement("div");
     //BB.appendTextDiv(templateWrapper, "Preset Resolutions: <br />");
     let presetFitBtn = document.createElement("button");
@@ -216,6 +198,10 @@ export function newImageDialog(p) {
             select.setValue(null);
         }
     });
+    setTimeout(() => {
+        // safari: not empty without also setting it to null via timeout
+        select.setValue(null);
+    }, 0);
     BB.css(select.getElement(), {
         width: '80px',
     });
