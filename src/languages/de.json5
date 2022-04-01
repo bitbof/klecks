@@ -1,7 +1,7 @@
 {
     'switch-ui-left-right': {
         original: 'Switch left/right UI',
-        value: 'Wechsel Oberfläche links / rechts'
+        value: 'Werkzeuge links / rechts'
     },
     "toggle-show-tools": {
         original: 'Show/Hide Tools',

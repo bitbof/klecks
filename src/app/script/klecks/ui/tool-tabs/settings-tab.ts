@@ -7,6 +7,8 @@ import {Popup} from '../modals/popup';
 import bitbofLogoImg from 'url:~/src/app/img/bitbof-logo.svg';
 // @ts-ignore
 import klecksLogoImg from 'url:~/src/app/img/klecks-logo.png';
+// @ts-ignore
+import uiSwapImg from 'url:~/src/app/img/ui/ui-swap-lr.svg';
 
 export class SettingsTab {
 
@@ -14,9 +16,14 @@ export class SettingsTab {
 
     // --- public ---
     constructor (
+        onLeftRight: () => void,
         customAbout?: HTMLElement,
     ) {
 
+
+
+
+        // ---- language ----
         const language = languageStrings.getLanguage();
 
         this.el = BB.el({
@@ -67,6 +74,20 @@ ${LANG('settings-language')}: ${language.name} (${language.code})
         );
 
         this.el.append(preferredLanguageRow);
+
+        // ---- flip ui ----
+        BB.el({
+            tagName: 'button',
+            parent: this.el,
+            content: '<img height="20" width="18" src="' + uiSwapImg + '" alt="icon" style="margin-right: 5px"/>' + LANG('switch-ui-left-right'),
+            onClick: () => onLeftRight(),
+            css: {
+                marginTop: '20px',
+            }
+        });
+
+
+        // ---- about ----
         this.el.append(BB.el({className: 'gridHr', css: {margin: '10px 0'}}));
 
         function makeLicenses() {

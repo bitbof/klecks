@@ -1569,7 +1569,16 @@ export function KlApp(pProject: IKlProject | null, pOptions: IKlAppOptions) {
         pOptions.saveReminder,
     );
 
-    const settingsTab = new KL.SettingsTab(pOptions.aboutEl);
+    const settingsTab = new KL.SettingsTab(
+        () => {
+            uiState = uiState === 'left' ? 'right' : 'left';
+            updateUi();
+            if (!pOptions.embed) {
+                localStorage.setItem('uiState', uiState);
+            }
+        },
+        pOptions.aboutEl
+    );
 
     mainTabRow = new KL.TabRow({
         initialId: 'draw',
