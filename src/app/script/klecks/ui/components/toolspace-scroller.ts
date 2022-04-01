@@ -37,26 +37,12 @@ export class ToolspaceScroller {
 
     // --- public ---
     constructor(p: {toolspace: HTMLElement, uiState: 'left' | 'right'}) {
-        const btnStyle: IKeyString = {
-            position: 'fixed',
-            cursor: 'pointer',
-            background: 'rgba(155, 155, 155, 0.9)',
-            filter: 'invert(1)',
-            width: '36px',
-            height: '36px',
-            backgroundImage: `url(${caretImg})`,
-            backgroundSize: '60%',
-            backgroundPosition: 'center',
-            backgroundRepeat: 'no-repeat',
-            userSelect: 'none',
-        };
-
         this.toolspace = p.toolspace;
         this.upBtn = BB.el({
             parent: this.toolspace,
             title: LANG('scroll'),
+            className: 'kl-scroller',
             css: {
-                ...btnStyle,
                 top: '0',
                 transform: 'rotate(180deg)',
             }
@@ -64,8 +50,8 @@ export class ToolspaceScroller {
         this.downBtn = BB.el({
             parent: this.toolspace,
             title: LANG('scroll'),
+            className: 'kl-scroller',
             css: {
-                ...btnStyle,
                 bottom: '0',
             }
         });

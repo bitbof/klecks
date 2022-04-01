@@ -913,3 +913,21 @@ iframe {
         margin-right: 10px;
     }
 }
+
+.kl-scroller {
+    position: fixed;
+    cursor: pointer;
+    background-color: rgba(155, 155, 155, 0.9);
+    filter: invert(1);
+    width: 36px;
+    height: 36px;
+    background-image: url(../img/ui/caret-down.svg);
+    background-size: 60%;
+    background-position: center;
+    background-repeat: no-repeat;
+    user-select: none;
+}
+
+.kl-scroller:active {
+    background-color: rgba(180, 180, 180, 0.9);
+}
