@@ -2,7 +2,7 @@ import {BB} from '../../../bb/bb';
 import {KL} from '../../kl';
 // @ts-ignore
 import loadingImg from 'url:~/src/app/img/ui/loading.gif';
-import {SaveReminder} from './save-reminder';
+import {SaveReminder} from '../components/save-reminder';
 import {base64ToBlob} from '../../storage/base-64-to-blob';
 import {KlCanvas} from '../../canvas/kl-canvas';
 import {LANG} from '../../../language/language';

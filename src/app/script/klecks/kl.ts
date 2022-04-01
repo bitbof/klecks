@@ -61,7 +61,7 @@ import {drawProject} from './canvas/draw-project';
 import {ProjectStore} from './storage/project-store';
 import {FileTab} from "./ui/tool-tabs/file-tab";
 import {FilterTab} from "./ui/tool-tabs/filter-tab";
-import {imgurUpload} from "./ui/components/imgur-upload";
+import {imgurUpload} from "./ui/modals/imgur-upload";
 import {loadAgPsd} from "./storage/ag-psd-wrapper";
 import {SaveReminder} from "./ui/components/save-reminder";
 import {SaveToComputer} from "./storage/save-to-computer";
