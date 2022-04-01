@@ -37,6 +37,7 @@
 body {
     overflow: hidden;
     font-size: 16px;
+    overscroll-behavior-x: none; // prevent back gesture in Chrome
 }
 
 body, html {
