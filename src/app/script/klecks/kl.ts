@@ -19,7 +19,7 @@ import {StatusOverlay} from './ui/components/status-overlay';
 import {exportDialog} from './ui/modals/export-dialog-deprecated';
 import {CropCopy} from './ui/components/crop-copy';
 import {clipboardDialog} from './ui/modals/clipboard-dialog';
-import {klLayerManager} from './ui/components/kl-layer-manager';
+import {klLayerManager} from './ui/tool-tabs/kl-layer-manager';
 import {WorkspaceSvgOverlay} from './canvas-ui/workspace-svg-overlay';
 import {KlCanvasWorkspace} from './canvas-ui/kl-canvas-workspace';
 import {KlCanvasPreview} from './canvas-ui/canvas-preview';
@@ -133,7 +133,6 @@ export const KL = {
     // --- ui - components ---
     StatusOverlay,
     CropCopy,
-    klLayerManager,
     FreeTransform,
     FreeTransformCanvas,
     Cropper,
@@ -149,7 +148,6 @@ export const KL = {
     TabRow,
     ToolspaceCollapser,
     BrowserStorageUi,
-    imgurUpload,
     SaveReminder,
     ToolspaceScroller,
 
@@ -164,6 +162,7 @@ export const KL = {
     textToolDialog,
     showImportImageDialog,
     showIframePopup,
+    imgurUpload,
 
     // --- ui - tool tabs ---
     HandUi,
@@ -173,6 +172,7 @@ export const KL = {
     FileTab,
     FilterTab,
     SettingsTab,
+    klLayerManager,
 
 
     klHistory,
