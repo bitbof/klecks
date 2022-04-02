@@ -10,6 +10,15 @@ if (!('scrollTo' in Element.prototype)) {
     });
 }
 
+if (!('scrollBy' in Element.prototype)) {
+    Object.defineProperty(Element.prototype, 'scrollBy', {
+        value: function (x, y) {
+            this.scrollLeft += x;
+            this.scrollTop += y;
+        }
+    });
+}
+
 // sometimes Android WebView has no localStorage
 if (!('localStorage' in window)) {
     try {
