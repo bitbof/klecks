@@ -215,7 +215,7 @@ export const KlSlider = function (p) {
     }
 
     let pointerListener;
-    let pointerListenerTimeout = setTimeout(() => {
+    const pointerListenerTimeout = setTimeout(() => {
         pointerListener = new BB.PointerListener({
             target: div,
             maxPointers: 1,
