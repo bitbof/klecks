@@ -37,6 +37,7 @@ import toolShapeImg from 'url:~/src/app/img/ui/tool-shape.svg';
 import tabSettingsImg from 'url:~/src/app/img/ui/tab-settings.svg';
 // @ts-ignore
 import tabLayersImg from 'url:~/src/app/img/ui/tab-layers.svg';
+import {LocalStorage} from '../bb/base/local-storage';
 
 
 interface IKlAppOptions {
@@ -62,7 +63,7 @@ export function KlApp(pProject: IKlProject | null, pOptions: IKlAppOptions) {
     // but not larger than 4096 - a fairly arbitrary decision
     let klMaxCanvasSize = Math.min(4096, Math.max(2048, Math.max(window.screen.width, window.screen.height)));
     let collapseThreshold = 820;
-    let uiState: 'left' | 'right' = (pOptions.embed ? 'left' : (localStorage.getItem('uiState') ? localStorage.getItem('uiState') : 'right')) as any;
+    let uiState: 'left' | 'right' = (pOptions.embed ? 'left' : (LocalStorage.getItem('uiState') ? LocalStorage.getItem('uiState') : 'right')) as any;
     const filenameBase = (pOptions.app && pOptions.app.filenameBase) ? pOptions.app.filenameBase : 'Klecks';
     const projectStore = pOptions.projectStore;
     let klRootEl = document.createElement("div");
@@ -1574,7 +1575,7 @@ export function KlApp(pProject: IKlProject | null, pOptions: IKlAppOptions) {
             uiState = uiState === 'left' ? 'right' : 'left';
             updateUi();
             if (!pOptions.embed) {
-                localStorage.setItem('uiState', uiState);
+                LocalStorage.setItem('uiState', uiState);
             }
         },
         pOptions.aboutEl
@@ -1876,7 +1877,7 @@ export function KlApp(pProject: IKlProject | null, pOptions: IKlAppOptions) {
     this.swapUiLeftRight = () => {
         uiState = uiState === 'left' ? 'right' : 'left';
         if (!pOptions.embed) {
-            localStorage.setItem('uiState', uiState);
+            LocalStorage.setItem('uiState', uiState);
         }
         updateUi();
     };

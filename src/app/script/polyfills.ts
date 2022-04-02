@@ -25,6 +25,7 @@ if (!('localStorage' in window)) {
         window['localStorage'] = {
             getItem: () => null,
             setItem: () => {},
+            removeItem: () => {},
         } as any;
     } catch (e) {
         // maybe it doesn't let me set this

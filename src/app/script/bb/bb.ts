@@ -45,6 +45,7 @@ import {
 } from './math/math';
 import {createCanvas} from './base/create-canvas';
 import {BbLog} from './base/bb-log';
+import {LocalStorage} from './base/local-storage';
 
 export const BB = {
 
@@ -79,6 +80,7 @@ export const BB = {
     handleClick,
     createSvg,
     BbLog,
+    LocalStorage,
 
     // ---- math ----
     mix,

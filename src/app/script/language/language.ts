@@ -74,8 +74,12 @@ let activeLanguageCode: string = 'en'; // active language code
             langs.push(split[0]);
         }
     });
-    if (localStorage.getItem(LS_LANGUAGE_KEY)) {
-        langs.unshift(localStorage.getItem(LS_LANGUAGE_KEY));
+    try {
+        if (localStorage.getItem(LS_LANGUAGE_KEY)) {
+            langs.unshift(localStorage.getItem(LS_LANGUAGE_KEY));
+        }
+    } catch (e) {
+        // likely cookies disabled in Safari
     }
     for (let i = 0; i < langs.length; i++) {
         const lang = langs[i];

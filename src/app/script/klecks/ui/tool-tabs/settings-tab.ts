@@ -9,6 +9,7 @@ import bitbofLogoImg from 'url:~/src/app/img/bitbof-logo.svg';
 import klecksLogoImg from 'url:~/src/app/img/klecks-logo.png';
 // @ts-ignore
 import uiSwapImg from 'url:~/src/app/img/ui/ui-swap-lr.svg';
+import {LocalStorage} from '../../../bb/base/local-storage';
 
 export class SettingsTab {
 
@@ -49,13 +50,13 @@ ${LANG('settings-language')}: ${language.name} (${language.code})
             })
         );
         const languageSelect = new KL.Select({
-            initValue: localStorage.getItem(LS_LANGUAGE_KEY) ? localStorage.getItem(LS_LANGUAGE_KEY) : 'auto',
+            initValue: LocalStorage.getItem(LS_LANGUAGE_KEY) ? LocalStorage.getItem(LS_LANGUAGE_KEY) : 'auto',
             optionArr: options,
             onChange: (val) => {
                 if (val === 'auto') {
-                    localStorage.removeItem(LS_LANGUAGE_KEY);
+                    LocalStorage.removeItem(LS_LANGUAGE_KEY);
                 } else {
-                    localStorage.setItem(LS_LANGUAGE_KEY, val);
+                    LocalStorage.setItem(LS_LANGUAGE_KEY, val);
                 }
                 languageHint.style.display = 'block';
             },
@@ -177,7 +178,7 @@ ${LANG('settings-language')}: ${language.name} (${language.code})
                 return;
             }
             languageSelect.setValue(
-                localStorage.getItem(LS_LANGUAGE_KEY) ? localStorage.getItem(LS_LANGUAGE_KEY) : 'auto'
+                LocalStorage.getItem(LS_LANGUAGE_KEY) ? LocalStorage.getItem(LS_LANGUAGE_KEY) : 'auto'
             );
         });
 

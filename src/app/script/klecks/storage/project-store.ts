@@ -1,6 +1,7 @@
 import {IKlProject, IKlStorageProject} from '../kl.types';
 import {ProjectConverter} from './project-converter';
 import {clear, getKlProjectObj, storeKlProjectObj} from './indexed-db';
+import {LocalStorage} from '../../bb/base/local-storage';
 
 
 export interface IProjectStoreListener {
@@ -44,7 +45,7 @@ export class ProjectStore {
     }
 
     private updateTimestamp() {
-        localStorage.setItem('indexedDbUpdatedAt', '' + new Date().getTime());
+        LocalStorage.setItem('indexedDbUpdatedAt', '' + new Date().getTime());
     }
 
     // --- public ---
