@@ -66,7 +66,7 @@ import {initLANG, LANG} from './language/language';
             }
             if (message) {
                 setTimeout(function() {
-                    klApp.out(message);
+                    klApp && klApp.out(message);
                     throw new Error('Initial browser storage error, ' + e);
                 }, 100);
             }
