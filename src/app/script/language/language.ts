@@ -80,7 +80,7 @@ let activeLanguageCode: string = 'en'; // active language code
     for (let i = 0; i < langs.length; i++) {
         const lang = langs[i];
         if (languages.find(item => {
-            return item.code === lang;
+            return item.code.toLowerCase() === lang.toLowerCase();
         })) {
             activeLanguageCode = lang;
             break;
