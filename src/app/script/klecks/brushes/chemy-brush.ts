@@ -100,7 +100,7 @@ export class ChemyBrush {
                         r: this.settingColor.r,
                         g: this.settingColor.g,
                         b: this.settingColor.b,
-                        a: 1,
+                        a: this.settingOpacity,
                     })
                 );
                 gradient.addColorStop(

@@ -1,6 +1,6 @@
 /**
  * LocalStorage wrapper that does not throw exceptions.
- * If cookies disabled in Safari localStorage interactions throws exception "insecure operation"
+ * If cookies disabled in Safari localStorage interactions throw exception "insecure operation"
  */
 export class LocalStorage {
 
