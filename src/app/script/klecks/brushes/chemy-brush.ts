@@ -12,6 +12,7 @@ export class ChemyBrush {
     private settingSize: number = 0.25; // radius - 0.5 - 99999
     private settingOpacity: number = 1; // 0-1
     private settingLockLayerAlpha: boolean = false;
+    private settingIsEraser: boolean = false;
     private settingMode: TChemyMode = 'fill';
     private settingDistort: number = 0; // 0 - 1
     private settingXSymmetry: boolean = false;
@@ -66,8 +67,20 @@ export class ChemyBrush {
         this.context.clearRect(0, 0, this.context.canvas.width, this.context.canvas.height);
         this.context.drawImage(this.copyCanvas, 0, 0);
 
-        if (this.settingLockLayerAlpha) {
-            this.context.globalCompositeOperation = "source-atop";
+        let color = {...this.settingColor};
+        if (this.settingIsEraser) {
+            color.r = 255;
+            color.g = 255;
+            color.b = 255;
+            if (this.settingLockLayerAlpha) {
+                this.context.globalCompositeOperation = "source-atop";
+            } else {
+                this.context.globalCompositeOperation = "destination-out";
+            }
+        } else {
+            if (this.settingLockLayerAlpha) {
+                this.context.globalCompositeOperation = "source-atop";
+            }
         }
 
         if (this.path) {
@@ -83,9 +96,9 @@ export class ChemyBrush {
             });
 
             let style: string | CanvasGradient = BB.ColorConverter.toRgbaStr({
-                r: this.settingColor.r,
-                g: this.settingColor.g,
-                b: this.settingColor.b,
+                r: color.r,
+                g: color.g,
+                b: color.b,
                 a: this.settingOpacity,
             });
             if (this.settingGradient) {
@@ -97,18 +110,18 @@ export class ChemyBrush {
                 gradient.addColorStop(
                     0,
                     BB.ColorConverter.toRgbaStr({
-                        r: this.settingColor.r,
-                        g: this.settingColor.g,
-                        b: this.settingColor.b,
+                        r: color.r,
+                        g: color.g,
+                        b: color.b,
                         a: this.settingOpacity,
                     })
                 );
                 gradient.addColorStop(
                     1,
                     BB.ColorConverter.toRgbaStr({
-                        r: this.settingColor.r,
-                        g: this.settingColor.g,
-                        b: this.settingColor.b,
+                        r: color.r,
+                        g: color.g,
+                        b: color.b,
                         a: 0,
                     })
                 );
@@ -242,6 +255,14 @@ export class ChemyBrush {
 
     setLockAlpha (b: boolean): void {
         this.settingLockLayerAlpha = !!b;
+    }
+
+    getIsEraser (): boolean {
+        return this.settingIsEraser;
+    }
+
+    setIsEraser (b: boolean): void {
+        this.settingIsEraser = !!b;
     }
 
     getIsDrawing (): boolean {

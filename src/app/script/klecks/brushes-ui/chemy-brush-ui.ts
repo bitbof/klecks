@@ -86,6 +86,18 @@ export const chemyBrushUi = (function () {
                 marginTop: '10px',
             });
 
+            let eraserToggle = new Checkbox({
+                init: brush.getIsEraser(),
+                label: LANG('eraser'),
+                callback: function (b) {
+                    brush.setIsEraser(b);
+                },
+                css: {
+                    marginTop: '10px',
+                    marginLeft: '10px',
+                }
+            });
+
             const lockAlphaToggle = new Checkbox({
                 init: brush.getLockAlpha(),
                 label: LANG('brush-lock-alpha'),
@@ -96,7 +108,6 @@ export const chemyBrushUi = (function () {
                 title: LANG('brush-lock-alpha-title'),
                 css: {
                     marginTop: '10px',
-                    display: 'inline-block',
                 }
             });
 
@@ -275,8 +286,16 @@ export const chemyBrushUi = (function () {
                 sizeSlider.getElement(),
                 opacitySlider.getElement(),
                 toggleRow,
+                BB.el({
+                    content: [
+                        lockAlphaToggle.getElement(),
+                        eraserToggle.getElement(),
+                    ],
+                    css: {
+                        display: 'flex',
+                    }
+                })
             );
-            div.appendChild(lockAlphaToggle.getElement());
         }
 
         init();
