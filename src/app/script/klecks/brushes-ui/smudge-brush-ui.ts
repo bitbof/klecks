@@ -47,10 +47,6 @@ export const smudgeBrushUi = (function () {
             },
             doHighlight: true,
             title: LANG('brush-lock-alpha-title'),
-            css: {
-                cssFloat: 'right',
-                textAlign: 'right',
-            }
         });
 
         let spacingSpline = new BB.SplineInterpolator([[0, 15], [8, 7], [14, 4], [30, 3], [50, 2.7], [100, 2]]);
