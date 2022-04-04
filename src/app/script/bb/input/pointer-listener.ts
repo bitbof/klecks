@@ -14,11 +14,10 @@ import {addEventListener, removeEventListener} from './event-listener';
  *
  * - also trackpads are painful to draw with. So supporting a trackpad-based workflow makes not much sense.
  *
- * @param callback - func({deltaY: number, pageX: number, pageY: number}
+ * @param callback - func({deltaY: number, pageX: number, pageY: number, clientX: number, clientY: number}
  * @constructor
  */
 import {eventUsesHighResTimeStamp, hasPointerEvents, isFirefox} from '../base/browser';
-import {getPageOffset} from '../base/base';
 import {mix} from '../math/math';
 
 const WheelCleaner = function (callback) {
@@ -36,7 +35,9 @@ const WheelCleaner = function (callback) {
         callback({
             deltaY: Math.round(delta / sequenceUnit),
             pageX: position.pageX,
-            pageY: position.pageY
+            pageY: position.pageY,
+            clientX: position.clientX,
+            clientY: position.clientY,
         });
     }
 
@@ -58,6 +59,8 @@ const WheelCleaner = function (callback) {
         position = {
             pageX: event.pageX,
             pageY: event.pageY,
+            clientX: event.clientX,
+            clientY: event.clientY,
         };
 
         clearTimeout(endSequenceTimeout);
@@ -146,6 +149,8 @@ const WheelCleaner = function (callback) {
  *     pointerType: 'touch'|'mouse'|'pen',
  *     pageX: number,
  *     pageY: number,
+ *     clientX: number,
+ *     clientY: number,
  *     relX: number, //position relative to top left of target
  *     relY: number,
  *     dX: number, //movementX not supported by safari on iOS, so need my own
@@ -155,6 +160,8 @@ const WheelCleaner = function (callback) {
  *     coalescedArr: Array of {
  *         pageX: number,
  *         pageY: number,
+ *         clientX: number,
+ *         clientY: number,
  *         relX: number, //position relative to top left of target
  *         relY: number,
  *         dX: number,
@@ -231,24 +238,14 @@ export const PointerListener = (function () {
                 return;
             }
             if (onWheelCallback) {
-                updateOffset();
-                wheelEvent.relX = wheelEvent.pageX - offsetObj.x;
-                wheelEvent.relY = wheelEvent.pageY - offsetObj.y;
+                const bounds = targetElement.getBoundingClientRect();
+                wheelEvent.relX = wheelEvent.clientX - bounds.left + targetElement.scrollLeft;
+                wheelEvent.relY = wheelEvent.clientY - bounds.top + targetElement.scrollTop;
                 onWheelCallback(wheelEvent);
             }
         });
         let isDestroyed = false;
 
-        let offsetObj = {x: 0, y: 0};
-
-        function updateOffset() {
-            if (targetElement === window) {
-                return;
-            }
-            offsetObj = getPageOffset(targetElement);
-        }
-
-        updateOffset();
         const timeStampOffset = eventUsesHighResTimeStamp() ? 0 : -performance.timing.navigationStart;
 
 
@@ -332,7 +329,7 @@ export const PointerListener = (function () {
          * returns a new object. this object also gets attached to the orig event. -> event.corrected
          *
          * @param event
-         * @returns {{pointerId: number, timeStamp: number, button, buttons, pointerType: (string|string|any), movementY: number, movementX: number, pressure, coalescedArr: [], pageY, pageX, eventPreventDefault: func, eventStopPropagation: func}
+         * @returns {{pointerId: number, timeStamp: number, button, buttons, pointerType: (string|string|any), movementY: number, movementX: number, pressure, coalescedArr: [], pageY, pageX, clientX, clientY, eventPreventDefault: func, eventStopPropagation: func}
          */
         function correctPointerEvent(event) {
             if (event.corrected) {
@@ -350,6 +347,8 @@ export const PointerListener = (function () {
                 pointerType: event.pointerType,
                 pageX: event.pageX,
                 pageY: event.pageY,
+                clientX: event.clientX,
+                clientY: event.clientY,
                 movementX: event.movementX,
                 movementY: event.movementY,
                 timeStamp: event.timeStamp + timeStampOffset,
@@ -405,6 +404,8 @@ export const PointerListener = (function () {
                 correctedObj.coalescedArr.push({
                     pageX: eventItem.pageX,
                     pageY: eventItem.pageY,
+                    clientX: eventItem.clientX,
+                    clientY: eventItem.clientY,
                     movementX: pointerObj.lastPageX === null ? 0 : eventItem.pageX - pointerObj.lastPageX,
                     movementY: pointerObj.lastPageY === null ? 0 : eventItem.pageY - pointerObj.lastPageY,
                     timeStamp: eventItem.timeStamp === 0 ? correctedObj.timeStamp : (eventItem.timeStamp + timeStampOffset), // 0 in firefox
@@ -433,14 +434,18 @@ export const PointerListener = (function () {
          * @returns {{pointerId: number, pointerType: *, dX: (*), relY: number, dY: (*), relX: number, type: *, event: *, pageY: *, pageX: *}}
          */
         function createPointerOutEvent(typeStr, correctedEvent, custom?) {
+
+            const bounds = targetElement.getBoundingClientRect();
             const result: any = {
                 type: typeStr,
                 pointerId: correctedEvent.pointerId,
                 pointerType: correctedEvent.pointerType,
                 pageX: correctedEvent.pageX,
                 pageY: correctedEvent.pageY,
-                relX: correctedEvent.pageX - offsetObj.x,
-                relY: correctedEvent.pageY - offsetObj.y,
+                clientX: correctedEvent.clientX,
+                clientY: correctedEvent.clientY,
+                relX: correctedEvent.clientX - bounds.left + targetElement.scrollLeft,
+                relY: correctedEvent.clientY - bounds.top + targetElement.scrollTop,
                 dX: correctedEvent.movementX,
                 dY: correctedEvent.movementY,
                 time: correctedEvent.timeStamp,
@@ -457,8 +462,10 @@ export const PointerListener = (function () {
                         result.coalescedArr.push({
                             pageX: coalescedItem.pageX,
                             pageY: coalescedItem.pageY,
-                            relX: coalescedItem.pageX - offsetObj.x,
-                            relY: coalescedItem.pageY - offsetObj.y,
+                            clientX: coalescedItem.clientX,
+                            clientY: coalescedItem.clientY,
+                            relX: coalescedItem.clientX - bounds.left + targetElement.scrollLeft,
+                            relY: coalescedItem.clientY - bounds.top + targetElement.scrollTop,
                             dX: coalescedItem.movementX,
                             dY: coalescedItem.movementY,
                             time: coalescedItem.timeStamp
@@ -487,14 +494,17 @@ export const PointerListener = (function () {
          * @returns {{pointerId: number, pointerType: string, relY: number, relX: number, type: *, event: *, pageY: *, pageX: *}}
          */
         function createTouchOutEvent(typeStr, touchListItem, touchEvent, custom) {
+            const bounds = targetElement.getBoundingClientRect();
             const result: any = {
                 type: typeStr,
                 pointerId: touchListItem.identifier,
                 pointerType: 'touch',
                 pageX: touchListItem.pageX,
                 pageY: touchListItem.pageY,
-                relX: touchListItem.pageX - offsetObj.x,
-                relY: touchListItem.pageY - offsetObj.y,
+                clientX: touchListItem.clientX,
+                clientY: touchListItem.clientY,
+                relX: touchListItem.pageX - bounds.left + targetElement.scrollLeft,
+                relY: touchListItem.pageY - bounds.top + targetElement.scrollTop,
                 time: touchEvent.timeStamp + timeStampOffset,
                 eventPreventDefault: function() { touchEvent.preventDefault(); },
                 eventStopPropagation: function() { touchEvent.stopPropagation(); }
@@ -549,7 +559,6 @@ export const PointerListener = (function () {
                 didSkip = false;
                 return;
             }
-            updateOffset();
 
             // chrome input glitch workaround - throws in a random mouse event with the wrong position when using a stylus
             if (!didSkip && event.pointerType === 'mouse' && tempLastPointerType === 'pen') {
@@ -571,7 +580,6 @@ export const PointerListener = (function () {
                 //BB.throwOut('pointerdown ignored');
                 return;
             }
-            updateOffset();
 
 
             //set up global listeners
@@ -610,7 +618,6 @@ export const PointerListener = (function () {
             if (!(dragPointerIdArr.includes(event.pointerId))) {
                 return;
             }
-            updateOffset();
 
             const dragObj = getDragObj(event.pointerId);
             clearTouchTimeout(dragObj);
@@ -669,7 +676,6 @@ export const PointerListener = (function () {
             if (!(dragPointerIdArr.includes(event.pointerId))) {
                 return;
             }
-            updateOffset();
 
             //remove listener
             if (dragObjArr.length === 1) {
@@ -693,7 +699,6 @@ export const PointerListener = (function () {
             if (!(dragPointerIdArr.includes(event.pointerId))) { //} || event.target !== document) {
                 return;
             }
-            updateOffset();
 
             //remove listener
             if (dragObjArr.length === 1) {
@@ -729,6 +734,8 @@ export const PointerListener = (function () {
                 timeStamp: performance.now(),
                 pageX: 0,
                 pageY: 0,
+                clientX: 0,
+                clientY: 0,
                 preventDefault: function () {
                 },
                 stopPropagation: function () {
@@ -780,7 +787,6 @@ export const PointerListener = (function () {
             onTouchstart = function (event) {
                 ////console.log('onTouchstart', event, event.changedTouches.length);
                 event.preventDefault(); // needs to stay, otherwise page scrolls on iOS12
-                updateOffset();
 
                 const touchArr = event.changedTouches;
                 for (let i = 0; i < touchArr.length && dragObjArr.length < maxPointers; i++) {
@@ -817,7 +823,6 @@ export const PointerListener = (function () {
 
             onTouchmove = function (event) {
                 event.preventDefault(); // needs to stay, otherwise page scrolls on iOS12
-                updateOffset();
 
 
                 const touchArr = event.changedTouches;
@@ -850,7 +855,6 @@ export const PointerListener = (function () {
                 if (event.type !== 'touchcancel') {
                     event.preventDefault(); // needs to stay, otherwise page scrolls on iOS12
                 }
-                updateOffset();
 
 
                 const touchArr = event.changedTouches;

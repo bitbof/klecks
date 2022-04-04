@@ -3,7 +3,7 @@ import {
     addClassName, append, centerWithin, copyObj, createSvg,
     css, dateDayDifference, decToFraction,
     fitInto, gcd, getDate,
-    getPageOffset, handleClick, imageBlobToUrl,
+    handleClick, imageBlobToUrl,
     insertAfter, loadImage,
     reduce,
     removeClassName, setAttributes, shareCanvas
@@ -59,7 +59,6 @@ export const BB = {
     canShareFiles,
 
     // ---- base ----
-    getPageOffset,
     insertAfter,
     loadImage,
     css,

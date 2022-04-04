@@ -1,18 +1,5 @@
 import {IKeyString, ISize2D, ISVG, IVector2D} from '../BB.types';
 
-export function getPageOffset (element: HTMLElement): IVector2D {
-    const result = {
-        x: 0,
-        y: 0
-    };
-    while (element != null) {
-        result.x += element.offsetLeft;
-        result.y += element.offsetTop;
-        element = element.offsetParent as HTMLElement;
-    }
-    return result;
-}
-
 export function insertAfter (referenceNode: Element, newNode: Element): void {
     if (referenceNode.parentNode) {
         referenceNode.parentNode.insertBefore(newNode, referenceNode.nextSibling);

@@ -284,9 +284,9 @@ export function LayerPreview(p) {
         largeCanvasCtx.drawImage(layerCanvas, 0, 0, largeCanvas.width, largeCanvas.height);
         largeCanvasCtx.restore();
 
-        let offset = BB.getPageOffset(div);
+        const bounds = div.getBoundingClientRect();
         BB.css(largeCanvasWrapper, {
-            top: Math.max(10, (offset.y + height / 2 - largeCanvas.height / 2)) + "px"
+            top: Math.max(10, (bounds.top + height / 2 - largeCanvas.height / 2)) + "px"
         });
 
     }

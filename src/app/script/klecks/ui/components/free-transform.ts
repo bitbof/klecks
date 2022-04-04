@@ -895,8 +895,12 @@ export class FreeTransform {
                 event.eventPreventDefault();
                 if (event.type === 'pointermove' && event.button === 'left') {
 
-                    const offset = BB.getPageOffset(this.rootEl);
-                    const iP = {x: (event.pageX - offset.x) / this.scale, y: (event.pageY - offset.y) / this.scale};
+                    const bounds = this.rootEl.getBoundingClientRect();
+                    const offset = {
+                        x: bounds.left - this.rootEl.scrollLeft,
+                        y: bounds.top - this.rootEl.scrollTop,
+                    };
+                    const iP = {x: (event.clientX - offset.x) / this.scale, y: (event.clientY - offset.y) / this.scale};
 
                     const a = BB.pointsToAngleDeg({x: this.transform.x, y: this.transform.y}, iP) + 90;
                     this.transform.angleDeg = a;
