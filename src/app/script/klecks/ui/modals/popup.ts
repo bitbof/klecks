@@ -193,55 +193,57 @@ export function popup (
     }) : null;
     let clickOnEnterBtn;
     const btnElArr = [];
-    p.buttons.forEach(buttonName => {
-        const btnClasses = ['kl-popup__btn'];
-        if (buttonName === 'Ok' || (p.primaries && p.primaries.includes(buttonName))) {
-            btnClasses.push('kl-button-primary');
-        }
-        let iconUrl;
-        let label = buttonName;
-        if (buttonName === 'Ok') {
-            label = LANG('modal-ok');
-            iconUrl = checkImg;
-        }
-        if (buttonName === 'Cancel') {
-            label = LANG('modal-cancel');
-            iconUrl = cancelImg;
-        }
-        let iconImg = null;
-        if (iconUrl) {
-            iconImg = BB.el({
-                tagName: 'img',
-                custom: {
-                    src: iconUrl,
-                    height: '17',
-                }
+    if (p.buttons) {
+        p.buttons.forEach(buttonName => {
+            const btnClasses = ['kl-popup__btn'];
+            if (buttonName === 'Ok' || (p.primaries && p.primaries.includes(buttonName))) {
+                btnClasses.push('kl-button-primary');
+            }
+            let iconUrl;
+            let label = buttonName;
+            if (buttonName === 'Ok') {
+                label = LANG('modal-ok');
+                iconUrl = checkImg;
+            }
+            if (buttonName === 'Cancel') {
+                label = LANG('modal-cancel');
+                iconUrl = cancelImg;
+            }
+            let iconImg = null;
+            if (iconUrl) {
+                iconImg = BB.el({
+                    tagName: 'img',
+                    custom: {
+                        src: iconUrl,
+                        height: '17',
+                    }
+                });
+            }
+            const btn = BB.el({
+                parent: buttonRowEl,
+                tagName: 'button',
+                className: btnClasses.join(' '),
+                content: [iconImg, label],
+                onClick: () => {
+                    close(buttonName);
+                },
             });
-        }
-        const btn = BB.el({
-            parent: buttonRowEl,
-            tagName: 'button',
-            className: btnClasses.join(' '),
-            content: [iconImg, label],
-            onClick: () => {
-                close(buttonName);
-            },
+            btnElArr.push(btn);
+            if (autoFocus === buttonName) {
+                setTimeout(() => {
+                    btn.focus();
+                    rootEl.scrollTo(0, 0);
+                }, 10);
+                setTimeout(() => {
+                    // safari needs a separate timeout
+                    rootEl.scrollTo(0, 0);
+                }, 20);
+            }
+            if (buttonName === p.clickOnEnter) {
+                clickOnEnterBtn = btn;
+            }
         });
-        btnElArr.push(btn);
-        if (autoFocus === buttonName) {
-            setTimeout(() => {
-                btn.focus();
-                rootEl.scrollTo(0, 0);
-            }, 10);
-            setTimeout(() => {
-                // safari needs a separate timeout
-                rootEl.scrollTo(0, 0);
-            }, 20);
-        }
-        if (buttonName === p.clickOnEnter) {
-            clickOnEnterBtn = btn;
-        }
-    });
+    }
 
     function close (value: string) {
         if (isClosed) {
