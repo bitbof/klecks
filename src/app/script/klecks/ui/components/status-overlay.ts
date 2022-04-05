@@ -67,13 +67,14 @@ export class StatusOverlay {
         this.innerEl.appendChild(this.angleIm);
         this.el.appendChild(this.innerEl);
         document.body.appendChild(this.el);
+        this.el.style.display = "none";
     }
 
 
     // --- public ---
 
     constructor () {
-
+        this.init();
     }
 
     setWide(b: boolean) {
@@ -98,9 +99,6 @@ export class StatusOverlay {
     }
 
     out(msg: string | {type: 'transform', angleDeg: number, scale: number}, doPulse?: boolean) {
-        if (!this.el) {
-            this.init();
-        }
 
         if (msg && typeof msg === 'object') {
 
