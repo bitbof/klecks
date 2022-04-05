@@ -81,7 +81,7 @@ Base Language File
   },
   "stabilizer-title": {
     hint: '-title keys are usually more verbose description. shown as a tooltip.',
-    value: "Line Stabilizer",
+    value: "Stroke Stabilizer",
   },
 
   "eyedropper": "Eyedropper",
