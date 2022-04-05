@@ -1242,6 +1242,7 @@ export function KlApp(pProject: IKlProject | null, pOptions: IKlAppOptions) {
             undoRedoCatchup.redo();
         }
     });
+    toolspaceToolRow.setIsSmall(uiHeight < 540);
     klHistory.addListener(function() {
         toolspaceToolRow.setEnableUndo(klHistory.canUndo());
         toolspaceToolRow.setEnableRedo(klHistory.canRedo());
@@ -1457,6 +1458,7 @@ export function KlApp(pProject: IKlProject | null, pOptions: IKlAppOptions) {
             mainTabRow.open('layers');
         }
     });
+    layerPreview.setIsVisible(uiHeight >= 579);
     layerPreview.setLayer(klCanvas.getLayer(klCanvas.getLayerIndex(currentLayerCtx.canvas)));
 
     const filterTab = new KL.FilterTab(
@@ -1855,6 +1857,10 @@ export function KlApp(pProject: IKlProject | null, pOptions: IKlAppOptions) {
         // iPad scrolls down when increasing text zoom
         if (window.scrollY > 0) {
             window.scrollTo(0, 0);
+        }
+
+        if (uiWidth === Math.max(0, w) && uiHeight === Math.max(0, h)) {
+            return;
         }
 
         uiWidth = Math.max(0, w);
