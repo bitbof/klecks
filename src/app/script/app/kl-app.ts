@@ -1851,6 +1851,12 @@ export function KlApp(pProject: IKlProject | null, pOptions: IKlAppOptions) {
     };
 
     this.resize = (w, h) => {
+
+        // iPad scrolls down when increasing text zoom
+        if (window.scrollY > 0) {
+            window.scrollTo(0, 0);
+        }
+
         uiWidth = Math.max(0, w);
         uiHeight = Math.max(0, h);
 
@@ -1894,6 +1900,24 @@ export function KlApp(pProject: IKlProject | null, pOptions: IKlAppOptions) {
         BB.addEventListener(window, 'orientationchange', () => {
             this.resize(window.innerWidth, window.innerHeight);
         });
+
+        // iPad doesn't trigger 'resize' event when using text zoom, although it's resizing the window.
+        // Workaround: place a div in the body that fills the window, and use a ResizeObserver
+        const windowResizeWatcher = BB.el({
+            parent: document.body,
+            css: {
+                position: 'fixed',
+                left: '0',
+                top: '0',
+                right: '0',
+                bottom: '0',
+                pointerEvents: 'none',
+                zIndex: '-1',
+            }
+        });
+        const observer = new ResizeObserver(() => this.resize(window.innerWidth, window.innerHeight));
+        observer.observe(windowResizeWatcher);
+
         // prevent ctrl scroll -> zooming page
         BB.addEventListener(this.getEl(), 'wheel', (event) => {
             event.preventDefault();
