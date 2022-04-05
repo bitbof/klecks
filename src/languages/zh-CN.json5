@@ -176,7 +176,7 @@
     },
     'stabilizer-title': {
         hint: '-title keys are usually more verbose description. shown as a tooltip.',
-        original: 'Line Stabilizer',
+        original: 'Stroke Stabilizer',
         value: '抖动修正线条'
     },
     eyedropper: {

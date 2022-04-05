@@ -170,7 +170,7 @@
         value: 'Stabilisierer'
     },
     'stabilizer-title': {
-        original: 'Line Stabilizer',
+        original: 'Stroke Stabilizer',
         value: 'Linien-Stabilisierer'
     },
     eyedropper: {
