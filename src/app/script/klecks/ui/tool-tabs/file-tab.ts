@@ -242,10 +242,16 @@ export class FileTab {
                 saveNote,
                 newButton,
                 importWrapper,
+                BB.el({css: {clear: 'both'}}),
+
                 saveButton,
                 exportTypeWrapper,
+                BB.el({css: {clear: 'both'}}),
+
                 clipboardButton,
                 BB.canShareFiles() ? shareButton : null,
+                BB.el({css: {clear: 'both'}}),
+
                 createSpacer(),
                 _this.fileBrowserStorage.getElement(),
                 createSpacer(),
