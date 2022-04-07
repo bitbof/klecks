@@ -196,9 +196,10 @@ export function copyObj (obj: any): any {
  */
 export function shareCanvas (p: {canvas: HTMLCanvasElement, fileName:string, title: string, callback: () => void}): void {
     const mimetype = 'image/png';
+    const err = () => alert('sharing not supported');
     p.canvas.toBlob(function(blob) {
         if (blob === null) {
-            alert('sharing not supported');
+            err();
             p.callback();
             return;
         }
@@ -207,9 +208,15 @@ export function shareCanvas (p: {canvas: HTMLCanvasElement, fileName:string, tit
             navigator.share({
                 title: p.title,
                 files: filesArray,
-            } as any);
+            } as any)
+                .then(r => {
+
+                })
+                .catch(e => {
+                    err();
+            });
         } catch(e) {
-            alert('sharing not supported');
+            err();
         }
         p.callback();
     }, mimetype);
