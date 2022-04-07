@@ -1919,6 +1919,7 @@ export function KlApp(pProject: IKlProject | null, pOptions: IKlAppOptions) {
                 bottom: '0',
                 pointerEvents: 'none',
                 zIndex: '-1',
+                userSelect: 'none',
             }
         });
         const observer = new ResizeObserver(() => this.resize(window.innerWidth, window.innerHeight));
