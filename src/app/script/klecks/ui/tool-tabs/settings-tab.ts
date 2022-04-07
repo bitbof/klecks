@@ -84,6 +84,9 @@ ${LANG('settings-language')}: ${language.name} (${language.code})
             onClick: () => onLeftRight(),
             css: {
                 marginTop: '20px',
+            },
+            custom: {
+                tabIndex: '-1',
             }
         });
 
@@ -132,7 +135,7 @@ ${LANG('settings-language')}: ${language.name} (${language.code})
                 });
                 minimalAbout.append(
                     BB.el({
-                        content: `<img alt="icon" height="20" style="vertical-align:middle" src="${bitbofLogoImg}"> <a href="https://bitbof.com" target="_blank">bitbof</a> © 2022<br>`,
+                        content: `<img alt="icon" height="20" style="vertical-align:middle" src="${bitbofLogoImg}"> <a href="https://bitbof.com" target="_blank" tabIndex="-1">bitbof</a> © 2022<br>`,
                     }),
                     makeLicenses(),
                 );
@@ -145,7 +148,7 @@ ${LANG('settings-language')}: ${language.name} (${language.code})
                 },
                 content: `
 <img alt="Klecks" height="25" src="${klecksLogoImg}"><br>
-<img alt="icon" height="20" style="vertical-align:middle" src="${bitbofLogoImg}"> <a href="https://bitbof.com" target="_blank">bitbof</a> © 2022<br>`
+<img alt="icon" height="20" style="vertical-align:middle" src="${bitbofLogoImg}"> <a href="https://bitbof.com" target="_blank" tabIndex="-1">bitbof</a> © 2022<br>`
             });
 
             versionEl.append(
