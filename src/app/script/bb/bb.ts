@@ -17,7 +17,7 @@ import {
     isCssMinMaxSupported,
     mouseEventHasMovement
 } from './base/browser';
-import {KeyListener} from './input/key-listener';
+import {KeyListener, sameKeys} from './input/key-listener';
 import {PointerListener} from './input/pointer-listener';
 import * as EventChain from './input/event-chain';
 import {
@@ -141,6 +141,7 @@ export const BB = {
 
     KeyListener,
     PointerListener,
+    sameKeys,
 
     EventChain,
 

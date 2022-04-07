@@ -145,8 +145,10 @@ const globalKey = (() => {
 
         const eventArr = [];
         for (let i = 0; i < keyToKeyStrArr.length; i++) {
-            isDownObj[keyToKeyStrArr[i]] = false;
-            eventArr.push(keyToKeyStrArr[i]);
+            if (isDownObj[keyToKeyStrArr[i]]) {
+                isDownObj[keyToKeyStrArr[i]] = false;
+                eventArr.push(keyToKeyStrArr[i]);
+            }
         }
         for (let i = 0; i < eventArr.length; i++) {
             emitUp(
@@ -257,4 +259,8 @@ export class KeyListener {
     destroy (): void {
         globalKey.remove(this.ref);
     }
+}
+
+export function sameKeys(comboAStr: string, comboBStr: string): boolean {
+    return comboAStr.split('+').sort().join('+')=== comboBStr.split('+').sort().join('+');
 }

@@ -348,7 +348,15 @@ export function KlApp(pProject: IKlProject | null, pOptions: IKlAppOptions) {
                 event.preventDefault();
                 undoRedoCatchup.undo();
             }
-            if (['ctrl+y', 'cmd+y'].includes(comboStr)) {
+            if (
+                ['ctrl+y', 'cmd+y'].includes(comboStr) ||
+                (
+                    (
+                        BB.sameKeys('ctrl+shift+z', comboStr) ||
+                        BB.sameKeys('cmd+shift+z', comboStr)
+                    ) && keyStr === 'z'
+                )
+            ) {
                 event.preventDefault();
                 undoRedoCatchup.redo();
             }
@@ -482,7 +490,7 @@ export function KlApp(pProject: IKlProject | null, pOptions: IKlAppOptions) {
 
 
         },
-        onUp: function(keyStr) {
+        onUp: function(keyStr, event) {
         }
     });
 
