@@ -62,7 +62,7 @@ export class ToolspaceScroller {
             onPointer: (e) => {
                 if (e.type === 'pointerdown') {
                     this.upInterval = setInterval(() => {
-                        this.toolspace.scrollBy(0, -10);
+                        this.toolspace.scrollBy(0, -13);
                         this.update();
                     }, 20);
                 }
@@ -74,17 +74,13 @@ export class ToolspaceScroller {
                     }, 50);
                 }
             },
-            onWheel: (e) => {
-                this.toolspace.scrollBy(0, 20 * e.deltaY);
-                this.update();
-            },
         });
         const downListener = new BB.PointerListener({
             target: this.downBtn,
             onPointer: (e) => {
                 if (e.type === 'pointerdown') {
                     this.downInterval = setInterval(() => {
-                        this.toolspace.scrollBy(0, 10);
+                        this.toolspace.scrollBy(0, 13);
                         this.update();
                     }, 20);
                 }
@@ -95,12 +91,15 @@ export class ToolspaceScroller {
                         this.update()
                     }, 50);
                 }
-            },
-            onWheel: (e) => {
-                this.toolspace.scrollBy(0, 20 * e.deltaY);
-                this.update();
-            },
+            }
         });
+
+        const wheelListener = (e: WheelEvent) => {
+            this.toolspace.scrollBy(0, Math.round(0.7 * e.deltaY));
+            this.update();
+        };
+        this.upBtn.addEventListener('wheel', wheelListener);
+        this.downBtn.addEventListener('wheel', wheelListener);
 
         this.update();
 
