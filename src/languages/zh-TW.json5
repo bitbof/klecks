@@ -596,7 +596,7 @@ filled: {
     },
     'cropcopy-title-copy': {
         original: 'Copy To Clipboard',
-        value: '複製到剪貼板'
+        value: '複製到剪貼簿'
     },
     'cropcopy-title-crop': {
         hint: 'Cropping is a common feature in image editing.',
@@ -605,11 +605,11 @@ filled: {
     },
     'cropcopy-btn-copy': {
         original: 'To Clipboard',
-        value: '至剪貼板'
+        value: '至剪貼簿'
     },
     'cropcopy-copied': {
         original: 'Copied.',
-        value: '已粘貼'
+        value: '複製了'
     },
     'cropcopy-btn-crop': {
         original: 'Apply Crop',
