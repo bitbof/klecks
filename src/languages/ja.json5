@@ -106,7 +106,7 @@
     },
     'brush-blending': {
         original: 'Blending',
-        value: '混色'
+        value: '水分量'
     },
     'brush-toggle-pressure': {
         original: 'Toggle Pressure Sensitivity',
