@@ -388,7 +388,7 @@
     },
     'file-copy-title': {
         original: 'Copy To Clipboard',
-        value: '複製到粘貼板'
+        value: '複製到剪貼簿'
     },
     'file-share': {
         hint: 'Common feature on phones. Pressing share button allows to send data to a different app, e.g. as a text message to someone.',
