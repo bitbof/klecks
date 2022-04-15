@@ -14,7 +14,7 @@
     },
     donate: {
         original: 'Donate',
-        value: '寄付'
+        value: '贊助'
     },
     home: {
         hint: 'button with logo, top left of tools',
@@ -609,7 +609,7 @@ filled: {
     },
     'cropcopy-copied': {
         original: 'Copied.',
-        value: '複製了'
+        value: '已複製'
     },
     'cropcopy-btn-crop': {
         original: 'Apply Crop',
@@ -1120,7 +1120,7 @@ filled: {
     },
     'submit-prompt': {
         original: 'Submit drawing?',
-        value: '您要送出嗎？ '
+        value: '確認送出？'
     },
     'submit-submitting': {
         original: 'Submitting',
