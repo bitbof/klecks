@@ -13,7 +13,7 @@ export class SaveToComputer {
         private filenameBase: string,
     ) {}
 
-    save() {
+    save(format?: 'psd' | 'layers' | 'png') {
         const _this = this;
 
         _this.saveReminder.reset();
@@ -33,7 +33,11 @@ export class SaveToComputer {
             saveAs(blob, filename);
         }
 
-        if (_this.getExportType() === 'png') {
+        if (!format) {
+            format = _this.getExportType();
+        }
+
+        if (format === 'png') {
             let extension = 'png';
             let mimeType = 'image/png';
             let filename = BB.getDate() + this.filenameBase + "." + extension;
@@ -57,7 +61,7 @@ export class SaveToComputer {
                 im.src = fullCanvas.toDataURL(mimeType);
                 KL.exportDialog(_this.klRootEl, im);
             }
-        } else if (_this.getExportType() === 'layers') {
+        } else if (format === 'layers') {
             let extension = 'png';
             let mimeType = 'image/png';
             let fileBase = BB.getDate() + this.filenameBase;
@@ -75,7 +79,7 @@ export class SaveToComputer {
                 ];
                 saveImage(item.canvas, fnameArr.join(''), mimeType);
             }
-        } else if (_this.getExportType() === 'psd') {
+        } else if (format === 'psd') {
 
             let layerArr = _this.getKlCanvas().getLayersFast();
 

@@ -30,7 +30,12 @@ import {initLANG, LANG} from './language/language';
             loadingScreenEl.parentNode.removeChild(loadingScreenEl);
         } catch(e) {}
 
-        const saveReminder = new KL.SaveReminder(klHistory, true, true);
+        const saveReminder = new KL.SaveReminder(
+            klHistory,
+            true,
+            true,
+            () => klApp.saveAsPsd(),
+        );
         klApp = new KlApp(
             project,
             {

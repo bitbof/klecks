@@ -27,7 +27,6 @@ import {FreeTransform} from './ui/components/free-transform';
 import {FreeTransformCanvas} from './ui/components/free-transform-canvas';
 import {Cropper} from './ui/components/cropper';
 import {LayerPreview} from './ui/components/layer-preview';
-import {showSaveReminderToast} from './ui/components/show-reminder-toast';
 import {FittedImage} from './ui/components/fitted-image';
 import {showImportAsLayerDialog} from './ui/modals/show-import-as-layer-dialog';
 import {KlImageDropper} from './ui/components/kl-image-dropper';
@@ -137,7 +136,6 @@ export const KL = {
     FreeTransformCanvas,
     Cropper,
     LayerPreview,
-    showSaveReminderToast,
     FittedImage,
     KlImageDropper,
     OverlayToolspace,

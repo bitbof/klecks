@@ -412,8 +412,16 @@ Base Language File
   "text-italic": "Italic",
   "text-bold": "Bold",
 
-  "save-reminder-title": "Reminder to save",
-  "save-reminder-text": "Unsaved work may get lost.",
+  "save-reminder-title": {
+    hint: 'Save Reminder is a popup that shows up after 20 minutes of not saving. Allows user to save on the spot.',
+    value: "Unsaved Work",
+  },
+  "save-reminder-text": {
+    hint: 'turns into: "...saved in <strong>12 minutes</strong>. Save..."',
+    value: "Image was not saved in {a} minutes{b}. Save now to prevent eventual loss."
+  },
+  "save-reminder-save-psd": "Save As PSD",
+  "save-reminder-psd-layers": "PSD will remember all layers.",
 
   "submit": "Submit",
   "submit-title": "Submit Drawing",

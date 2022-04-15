@@ -1103,12 +1103,22 @@ filled: {
         value: '加粗'
     },
     'save-reminder-title': {
-        original: 'Reminder to save',
-        value: '請及時保存'
+        hint: 'Save Reminder is a popup that shows up after 20 minutes of not saving. Allows user to save on the spot.',
+        original: 'Unsaved Work',
+        value: ''
     },
     'save-reminder-text': {
-        original: 'Unsaved work may get lost.',
-        value: '未保存的作品可能會丟失。 '
+        hint: 'turns into: "...saved in <strong>12 minutes</strong>. Save..."',
+        original: 'Image was not saved in {a} minutes{b}. Save now to prevent eventual loss.',
+        value: ''
+    },
+    'save-reminder-save-psd': {
+        original: 'Save As PSD',
+        value: ''
+    },
+    'save-reminder-psd-layers': {
+        original: 'PSD will remember all layers.',
+        value: ''
     },
     submit: {
         original: 'Submit',

@@ -1902,6 +1902,10 @@ export function KlApp(pProject: IKlProject | null, pOptions: IKlAppOptions) {
         updateUi();
     };
 
+    this.saveAsPsd = () => {
+        saveToComputer.save('psd');
+    };
+
     // --- end interface ---
 
     this.resize(uiWidth, uiHeight);

@@ -1074,12 +1074,22 @@
         value: 'Fett'
     },
     'save-reminder-title': {
-        original: 'Reminder to save',
-        value: 'Erinnerung zum Speichern'
+        hint: 'Save Reminder is a popup that shows up after 20 minutes of not saving. Allows user to save on the spot.',
+        original: 'Unsaved Work',
+        value: 'Ungespeicherter Fortschritt'
     },
     'save-reminder-text': {
-        original: 'Unsaved work may get lost.',
-        value: 'Nicht gespeicherte Arbeit kann verloren gehen.'
+        hint: 'turns into: "...saved in <strong>12 minutes</strong>. Save..."',
+        original: 'Image was not saved in {a} minutes{b}. Save now to prevent eventual loss.',
+        value: 'Dein Bild wurde seit {a} Minuten{b} nicht gespeichert. Speichere jetzt um Datenverlust zu vermeiden.'
+    },
+    'save-reminder-save-psd': {
+        original: 'Save As PSD',
+        value: 'Speichere als PSD'
+    },
+    'save-reminder-psd-layers': {
+        original: 'PSD will remember all layers.',
+        value: 'PSD merkt sich alle Ebenen.'
     },
     submit: {
         original: 'Submit',
