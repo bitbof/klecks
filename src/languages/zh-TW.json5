@@ -102,7 +102,7 @@
     },
     'brush-size': {
         original: 'Size',
-        value: '筆刷尺寸'
+        value: '畫筆大小'
     },
     'brush-blending': {
         original: 'Blending',
