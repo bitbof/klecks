@@ -1114,7 +1114,7 @@ filled: {
     },
     'save-reminder-save-psd': {
         original: 'Save As PSD',
-        value: 保存為PSD'
+        value: '保存為PSD'
     },
     'save-reminder-psd-layers': {
         original: 'PSD will remember all layers.',
