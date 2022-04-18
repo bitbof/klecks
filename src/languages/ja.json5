@@ -1105,20 +1105,20 @@
     'save-reminder-title': {
         hint: 'Save Reminder is a popup that shows up after 20 minutes of not saving. Allows user to save on the spot.',
         original: 'Unsaved Work',
-        value: ''
+        value: '作業を保存していません。'
     },
     'save-reminder-text': {
         hint: 'turns into: "...saved in <strong>12 minutes</strong>. Save..."',
         original: 'Image was not saved in {a} minutes{b}. Save now to prevent eventual loss.',
-        value: ''
+        value: '画像は{a}分間{b}保存されませんでした。作業を失わないように今すぐ保存してください。'
     },
     'save-reminder-save-psd': {
         original: 'Save As PSD',
-        value: ''
+        value: 'PSDで保存。'
     },
     'save-reminder-psd-layers': {
         original: 'PSD will remember all layers.',
-        value: ''
+        value: 'PSDは全レイヤーを保持します。'
     },
     submit: {
         original: 'Submit',
