@@ -14,7 +14,7 @@
     },
     donate: {
         original: 'Donate',
-        value: '$ 支持'
+        value: '赞助'
     },
     home: {
         hint: 'button with logo, top left of tools',
@@ -102,11 +102,11 @@
     },
     'brush-size': {
         original: 'Size',
-        value: '粗细'
+        value: '画笔大小'
     },
     'brush-blending': {
         original: 'Blending',
-        value: '湿润度'
+        value: '水分量'
     },
     'brush-toggle-pressure': {
         original: 'Toggle Pressure Sensitivity',
@@ -388,7 +388,7 @@
     },
     'file-copy-title': {
         original: 'Copy To Clipboard',
-        value: '复制到粘贴板'
+        value: '复制至剪贴板'
     },
     'file-share': {
         hint: 'Common feature on phones. Pressing share button allows to send data to a different app, e.g. as a text message to someone.',
@@ -548,7 +548,7 @@
     },
     'upload-title': {
         original: 'Upload to Imgur',
-        value: '上传到Imgur'
+        value: '上传至Imgur'
     },
     'upload-link-notice': {
         original: 'Anyone with the link to your uploaded image will be able to view it.',
@@ -596,7 +596,7 @@
     },
     'cropcopy-title-copy': {
         original: 'Copy To Clipboard',
-        value: '复制到粘贴板'
+        value: '复制至剪贴板'
     },
     'cropcopy-title-crop': {
         hint: 'Cropping is a common feature in image editing.',
@@ -609,7 +609,7 @@
     },
     'cropcopy-copied': {
         original: 'Copied.',
-        value: '已粘贴'
+        value: '已复制'
     },
     'cropcopy-btn-crop': {
         original: 'Apply Crop',
@@ -822,7 +822,7 @@
     },
     'filter-curves-description': {
         original: 'Apply curves on the selected layer.',
-        value: '应用曲线到已选图层。'
+        value: '应用曲线至已选图层。'
     },
     'filter-curves-all': {
         original: 'All',
@@ -854,7 +854,7 @@
     },
     'filter-tilt-shift-description': {
         original: 'Applies tilt shift on the selected layer.',
-        value: '应用移轴到已选图层。'
+        value: '应用移轴至已选图层。'
     },
     'filter-tilt-shift-blur': {
         original: 'Blur Radius',
@@ -890,7 +890,7 @@
     },
     'filter-triangle-blur-description': {
         original: 'Applies triangle blur on the selected layer.',
-        value: '应用模糊到已选图层。'
+        value: '应用模糊至已选图层。'
     },
     'filter-unsharp-mask-title': {
         original: 'Unsharp Mask',
@@ -898,7 +898,7 @@
     },
     'filter-unsharp-mask-description': {
         original: 'Sharpens the selected layer by scaling pixels away from the average of their neighbors.',
-        value: '根据附近像素的均值应用锐化到已选图层。'
+        value: '根据附近像素的均值应用锐化至已选图层。'
     },
     'filter-unsharp-mask-strength': {
         original: 'Strength',
@@ -934,7 +934,7 @@
     },
     'import-as-layer-limit-reached': {
         original: 'Layer limit reached. Image will be placed on existing layer.',
-        value: '达到图层数量上限。图像将会应用到已有图层。'
+        value: '达至图层数量上限。图像将会应用至已有图层。'
     },
     'import-as-layer-fit': {
         hint: 'verb. imported image made to fit inside canvas.',
@@ -1122,19 +1122,19 @@
     },
     submit: {
         original: 'Submit',
-        value: '提交'
+        value: '送出'
     },
     'submit-title': {
         original: 'Submit Drawing',
-        value: '提交作品'
+        value: '送出作品'
     },
     'submit-prompt': {
         original: 'Submit drawing?',
-        value: '确认提交？'
+        value: '确认送出？'
     },
     'submit-submitting': {
         original: 'Submitting',
-        value: '提交中'
+        value: '送出中'
     },
     'embed-init-loading': {
         original: 'Loading app',
