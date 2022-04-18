@@ -102,7 +102,7 @@
     },
     'brush-size': {
         original: 'Size',
-        value: '筆刷尺寸'
+        value: '画笔大小'
     },
     'brush-blending': {
         original: 'Blending',
@@ -1105,20 +1105,20 @@ filled: {
     'save-reminder-title': {
         hint: 'Save Reminder is a popup that shows up after 20 minutes of not saving. Allows user to save on the spot.',
         original: 'Unsaved Work',
-        value: ''
+        value: '作品未保存'
     },
     'save-reminder-text': {
         hint: 'turns into: "...saved in <strong>12 minutes</strong>. Save..."',
         original: 'Image was not saved in {a} minutes{b}. Save now to prevent eventual loss.',
-        value: ''
+        value: '圖畫已{a}分鐘{b}未保存。立刻保存以避免進度丟失。'
     },
     'save-reminder-save-psd': {
         original: 'Save As PSD',
-        value: ''
+        value: 保存為PSD'
     },
     'save-reminder-psd-layers': {
         original: 'PSD will remember all layers.',
-        value: ''
+        value: 'PSD可保留所有圖層。'
     },
     submit: {
         original: 'Submit',
