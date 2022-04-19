@@ -102,7 +102,7 @@
     },
     'brush-size': {
         original: 'Size',
-        value: '筆刷尺寸'
+        value: '畫筆大小'
     },
     'brush-blending': {
         original: 'Blending',
@@ -356,7 +356,7 @@
     'file-no-autosave': {
         hint: "let user know they can't autosave, and there's no cloud storage. Keep short so fits on one line",
         original: 'No autosave, no cloud storage',
-        value: '不能自動保存，沒有云存儲'
+        value: '不能自動保存，沒有雲端儲存'
     },
     'file-new': {
         original: 'New',
@@ -388,7 +388,7 @@
     },
     'file-copy-title': {
         original: 'Copy To Clipboard',
-        value: '複製至剪貼簿'
+        value: '複製到剪貼板'
     },
     'file-share': {
         hint: 'Common feature on phones. Pressing share button allows to send data to a different app, e.g. as a text message to someone.',
@@ -548,7 +548,7 @@ filled: {
     },
     'upload-title': {
         original: 'Upload to Imgur',
-        value: '上傳至Imgur'
+        value: '上傳到Imgur'
     },
     'upload-link-notice': {
         original: 'Anyone with the link to your uploaded image will be able to view it.',
@@ -596,7 +596,7 @@ filled: {
     },
     'cropcopy-title-copy': {
         original: 'Copy To Clipboard',
-        value: '複製至剪貼簿'
+        value: '複製到剪貼板'
     },
     'cropcopy-title-crop': {
         hint: 'Cropping is a common feature in image editing.',
@@ -605,7 +605,7 @@ filled: {
     },
     'cropcopy-btn-copy': {
         original: 'To Clipboard',
-        value: '至剪貼簿'
+        value: '至剪貼板'
     },
     'cropcopy-copied': {
         original: 'Copied.',
@@ -822,7 +822,7 @@ filled: {
     },
     'filter-curves-description': {
         original: 'Apply curves on the selected layer.',
-        value: '應用曲線至已選圖層。 '
+        value: '應用曲線到已選圖層。 '
     },
     'filter-curves-all': {
         original: 'All',
@@ -854,7 +854,7 @@ filled: {
     },
     'filter-tilt-shift-description': {
         original: 'Applies tilt shift on the selected layer.',
-        value: '應用移軸至已選圖層。 '
+        value: '應用移軸到已選圖層。 '
     },
     'filter-tilt-shift-blur': {
         original: 'Blur Radius',
@@ -890,7 +890,7 @@ filled: {
     },
 'filter-triangle-blur-description': {
         original: 'Applies triangle blur on the selected layer.',
-        value: '應用模糊至已選圖層。 '
+        value: '應用模糊到已選圖層。 '
     },
     'filter-unsharp-mask-title': {
         original: 'Unsharp Mask',
@@ -898,7 +898,7 @@ filled: {
     },
     'filter-unsharp-mask-description': {
         original: 'Sharpens the selected layer by scaling pixels away from the average of their neighbors.',
-        value: '根據附近像素的均值應用銳化至已選圖層。 '
+        value: '根據附近像素的均值應用銳化到已選圖層。 '
     },
     'filter-unsharp-mask-strength': {
         original: 'Strength',
@@ -934,7 +934,7 @@ filled: {
     },
     'import-as-layer-limit-reached': {
         original: 'Layer limit reached. Image will be placed on existing layer.',
-        value: '達至圖層數量上限。圖像將會應用至已有圖層。 '
+        value: '達到圖層數量上限。圖像將會應用到已有圖層。'
     },
     'import-as-layer-fit': {
         hint: 'verb. imported image made to fit inside canvas.',
@@ -1105,20 +1105,20 @@ filled: {
     'save-reminder-title': {
         hint: 'Save Reminder is a popup that shows up after 20 minutes of not saving. Allows user to save on the spot.',
         original: 'Unsaved Work',
-        value: ''
+        value: '作品未保存'
     },
     'save-reminder-text': {
         hint: 'turns into: "...saved in <strong>12 minutes</strong>. Save..."',
         original: 'Image was not saved in {a} minutes{b}. Save now to prevent eventual loss.',
-        value: ''
+        value: '圖畫已{a}分鐘{b}未保存。立刻保存以避免進度丟失。'
     },
     'save-reminder-save-psd': {
         original: 'Save As PSD',
-        value: ''
+        value: '保存為PSD'
     },
     'save-reminder-psd-layers': {
         original: 'PSD will remember all layers.',
-        value: ''
+        value: 'PSD可保留所有圖層。'
     },
     submit: {
         original: 'Submit',

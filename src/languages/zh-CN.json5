@@ -14,7 +14,7 @@
     },
     donate: {
         original: 'Donate',
-        value: '$ 支持'
+        value: '赞助'
     },
     home: {
         hint: 'button with logo, top left of tools',
@@ -102,11 +102,11 @@
     },
     'brush-size': {
         original: 'Size',
-        value: '粗细'
+        value: '画笔大小'
     },
     'brush-blending': {
         original: 'Blending',
-        value: '湿润度'
+        value: '水分量'
     },
     'brush-toggle-pressure': {
         original: 'Toggle Pressure Sensitivity',
@@ -388,7 +388,7 @@
     },
     'file-copy-title': {
         original: 'Copy To Clipboard',
-        value: '复制到粘贴板'
+        value: '复制到剪贴板'
     },
     'file-share': {
         hint: 'Common feature on phones. Pressing share button allows to send data to a different app, e.g. as a text message to someone.',
@@ -596,7 +596,7 @@
     },
     'cropcopy-title-copy': {
         original: 'Copy To Clipboard',
-        value: '复制到粘贴板'
+        value: '复制到剪贴板'
     },
     'cropcopy-title-crop': {
         hint: 'Cropping is a common feature in image editing.',
@@ -609,7 +609,7 @@
     },
     'cropcopy-copied': {
         original: 'Copied.',
-        value: '已粘贴'
+        value: '已复制'
     },
     'cropcopy-btn-crop': {
         original: 'Apply Crop',
