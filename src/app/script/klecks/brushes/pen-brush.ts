@@ -25,15 +25,9 @@ export function PenBrush() {
     let alphaOpacityArr = [1, 0.9, 1, 1];
 
     //mipmapping
-    let alphaCanvas128 = document.createElement("canvas");
-    alphaCanvas128.width = 128;
-    alphaCanvas128.height = 128;
-    let alphaCanvas64 = document.createElement("canvas");
-    alphaCanvas64.width = 64;
-    alphaCanvas64.height = 64;
-    let alphaCanvas32 = document.createElement("canvas");
-    alphaCanvas32.width = 32;
-    alphaCanvas32.height = 32;
+    let alphaCanvas128 = BB.canvas(128, 128);
+    let alphaCanvas64 = BB.canvas(64, 64);
+    let alphaCanvas32 = BB.canvas(32, 32);
 
     let bezierLine = null;
 

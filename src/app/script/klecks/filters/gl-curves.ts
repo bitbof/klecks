@@ -135,9 +135,7 @@ export const glCurves = {
                 div.appendChild(curveArea);
 
                 let areaw = 300, areah = 100;
-                let canvas = document.createElement("canvas");
-                canvas.width = areaw;
-                canvas.height = areah;
+                let canvas = BB.canvas(areaw, areah);
                 BB.css(canvas, {
                     background: "#c6c6c6",
                     boxShadow: "0 0 0 1px rgba(0,0,0,0.3)"

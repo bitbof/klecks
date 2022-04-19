@@ -50,10 +50,8 @@ export function klLayerManager(p_canvas: KlCanvas, p_func, p_rootDiv) {
     BB.createCheckerDataUrl(4, function(url) {
         largeThumbDiv.style.backgroundImage = "url(" + url + ")";
     });
-    let largeThumbCanvas = document.createElement("canvas");
+    let largeThumbCanvas = BB.canvas(200, 200);
     largeThumbCanvas.style.display = "block";
-    largeThumbCanvas.width = 200;
-    largeThumbCanvas.height = 200;
     largeThumbDiv.appendChild(largeThumbCanvas);
     let largeThumbTimeout, largeThumbInTimeout;
     let largeThumbInDocument = false;
@@ -330,16 +328,14 @@ export function klLayerManager(p_canvas: KlCanvas, p_func, p_rootDiv) {
                     options.getElement().style.marginTop = '5px';
                     div.appendChild(options.getElement());
 
-                    let preview = document.createElement("canvas");
+                    const thumbDimensions = BB.fitInto(p.topCanvas.width, p.topCanvas.height, 200, 200, 1);
+                    let preview = BB.canvas(thumbDimensions.width, thumbDimensions.height);
                     preview.title = LANG('preview');
                     let spacer = document.createElement("div");
                     spacer.innerHTML = "<br/>";
                     spacer.style.clear = "both";
                     div.appendChild(spacer);
                     div.appendChild(preview);
-                    let thumbDimensions = BB.fitInto(p.topCanvas.width, p.topCanvas.height, 200, 200, 1);
-                    preview.width = thumbDimensions.width;
-                    preview.height = thumbDimensions.height;
                     BB.css(preview, {
                         display: "block",
                         marginLeft: "auto",
