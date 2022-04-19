@@ -1122,19 +1122,19 @@ filled: {
     },
     submit: {
         original: 'Submit',
-        value: '提交'
+        value: '送出'
     },
     'submit-title': {
         original: 'Submit Drawing',
-        value: '提交圖像'
+        value: '送出圖像'
     },
     'submit-prompt': {
         original: 'Submit drawing?',
-        value: '確認提交？'
+        value: '確認送出？'
     },
     'submit-submitting': {
         original: 'Submitting',
-        value: '提交中'
+        value: '送出中'
     },
     'embed-init-loading': {
         original: 'Loading app',
