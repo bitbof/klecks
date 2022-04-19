@@ -356,7 +356,7 @@
     'file-no-autosave': {
         hint: "let user know they can't autosave, and there's no cloud storage. Keep short so fits on one line",
         original: 'No autosave, no cloud storage',
-        value: '不能自動保存，沒有云存儲'
+        value: '不能自動保存，沒有雲端儲存'
     },
     'file-new': {
         original: 'New',
