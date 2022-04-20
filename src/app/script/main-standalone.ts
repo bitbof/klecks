@@ -11,14 +11,30 @@ import {IKlProject} from './klecks/kl.types';
 import {ProjectStore} from './klecks/storage/project-store';
 import {initLANG, LANG} from './language/language';
 
+function initError(e) {
+    let el = document.createElement('div');
+    el.style.textAlign = 'center';
+    el.style.background = '#fff';
+    el.style.padding = '20px';
+    el.innerHTML = '<h1>App failed to initialize</h1>';
+    el.innerHTML += 'Error: ' + (e.message ? e.message : ('' + e));
+    document.body.append(el);
+    console.error(e);
+}
+
 (async () => {
     let klApp;
-
     let domIsLoaded = false;
-    BB.addEventListener(window, 'DOMContentLoaded', () => {
-        domIsLoaded = true;
-    });
-    await initLANG();
+
+    try {
+        BB.addEventListener(window, 'DOMContentLoaded', () => {
+            domIsLoaded = true;
+        });
+        await initLANG();
+    } catch (e) {
+        initError(e);
+        return;
+    }
 
     function onProjectLoaded(project: IKlProject, projectStore: ProjectStore) {
         if (klApp) {
@@ -54,29 +70,34 @@ import {initLANG, LANG} from './language/language';
     }
 
     async function onDomLoaded() {
-        BB.removeEventListener(window, 'DOMContentLoaded', onDomLoaded);
-        let projectStore = new KL.ProjectStore();
-        let project: IKlProject = null;
         try {
-            const readResult = await projectStore.read();
-            if (readResult) {
-                project = readResult.project;
+            BB.removeEventListener(window, 'DOMContentLoaded', onDomLoaded);
+            let projectStore = new KL.ProjectStore();
+            let project: IKlProject = null;
+            try {
+                const readResult = await projectStore.read();
+                if (readResult) {
+                    project = readResult.project;
+                }
+            } catch(e) {
+                let message;
+                if (e.message === 'db-error') {
+                    message = 'Failed to access Browser Storage';
+                } else if (e.message === 'format-error') {
+                    message = 'Failed to restore from Browser Storage';
+                }
+                if (message) {
+                    setTimeout(function() {
+                        klApp && klApp.out(message);
+                        throw new Error('Initial browser storage error, ' + e);
+                    }, 100);
+                }
             }
-        } catch(e) {
-            let message;
-            if (e.message === 'db-error') {
-                message = 'Failed to access Browser Storage';
-            } else if (e.message === 'format-error') {
-                message = 'Failed to restore from Browser Storage';
-            }
-            if (message) {
-                setTimeout(function() {
-                    klApp && klApp.out(message);
-                    throw new Error('Initial browser storage error, ' + e);
-                }, 100);
-            }
+            onProjectLoaded(project, projectStore);
+        } catch (e) {
+            initError(e);
         }
-        onProjectLoaded(project, projectStore);
+
     }
     if (domIsLoaded) {
         onDomLoaded();

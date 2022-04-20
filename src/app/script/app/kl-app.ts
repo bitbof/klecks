@@ -67,7 +67,7 @@ export function KlApp(pProject: IKlProject | null, pOptions: IKlAppOptions) {
     const filenameBase = (pOptions.app && pOptions.app.filenameBase) ? pOptions.app.filenameBase : 'Klecks';
     const projectStore = pOptions.projectStore;
     let klRootEl = document.createElement("div");
-    klRootEl.className = 'g-root kl-initialized';
+    klRootEl.className = 'g-root';
     let uiWidth: number = Math.max(0, window.innerWidth);
     let uiHeight: number = Math.max(0, window.innerHeight);
     const toolWidth = 271;
@@ -116,11 +116,18 @@ export function KlApp(pProject: IKlProject | null, pOptions: IKlAppOptions) {
         klCanvas.layerFill(0, { r: 255, g: 255, b: 255});
         klHistory.pause(false);
     }
-    initState = {
-        canvas: new KL.KlCanvas({copy: klCanvas}, pOptions.embed ? -1 : 0),
-        focus: klCanvas.getLayerCount() - 1,
-        brushes: {},
-    };
+    try {
+        initState = {
+            canvas: new KL.KlCanvas({copy: klCanvas}, pOptions.embed ? -1 : 0),
+            focus: klCanvas.getLayerCount() - 1,
+            brushes: {},
+        };
+    } catch (e) {
+        if (e.message === 'kl-create-canvas-error') {
+            klCanvas.destroy();
+        }
+        throw e;
+    }
     for (let b in KL.brushes) {
         if (KL.brushes.hasOwnProperty(b)) {
             initState.brushes[b] = new KL.brushes[b]();

@@ -25,7 +25,7 @@ import {
     copyCanvas,
     createCheckerCanvas, createCheckerDataUrl,
     drawTransformedImageOnCanvas,
-    drawTransformedImageWithBounds, resizeCanvas, testShouldPixelate
+    drawTransformedImageWithBounds, freeCanvas, resizeCanvas, testShouldPixelate
 } from './base/canvas';
 import {Matrix} from './math/matrix';
 import {Vec2} from './math/vec2';
@@ -116,6 +116,7 @@ export const BB = {
     createCheckerDataUrl,
     resizeCanvas,
     convertToAlphaChannelCanvas,
+    freeCanvas,
 
     // ---- color ----
     HSV,

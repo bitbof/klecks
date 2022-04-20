@@ -119,7 +119,12 @@ export class KlCanvas {
         this.changeListenerArr = [];
 
         if ('copy' in params) {
-            this.copy(params.copy);
+            try {
+                this.copy(params.copy);
+            } catch (e) {
+                this.destroy();
+                throw e;
+            }
         } else if ('projectObj' in params) {
             const origLayers = [].concat(params.projectObj.layers);
             this.init(params.projectObj.width, params.projectObj.height);
@@ -360,6 +365,10 @@ export class KlCanvas {
             return false;
         }
         let canvas = BB.canvas(this.width, this.height);
+        if (!canvas.getContext('2d')) {
+            throw new Error('kl-create-canvas-error');
+        }
+
         (canvas as any).mixModeStr = 'source-over';
 
         if (selected === undefined) {
@@ -955,6 +964,16 @@ export class KlCanvas {
             throw new Error('invalid layer');
         }
         this.layerCanvasArr[layerIndex].compositeObj = compositeObj;
+    }
+
+    destroy (): void {
+        if (this.layerCanvasArr === null) {
+            return;
+        }
+        this.layerCanvasArr.forEach(canvas => {
+            BB.freeCanvas(canvas);
+        });
+        this.layerCanvasArr = null;
     }
 
 }

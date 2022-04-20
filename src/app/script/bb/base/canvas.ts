@@ -356,3 +356,15 @@ export function convertToAlphaChannelCanvas(canvas: HTMLCanvasElement): void {
     }
     canvas.getContext('2d')!.putImageData(imdat, 0, 0);
 }
+
+/**
+ * Sometimes garbage collection is too slow, and canvases use up too much memory,
+ * or there is a hard to fix memory leak.
+ * This function manually makes the canvas use as little memory as possible.
+ */
+export function freeCanvas(canvas: HTMLCanvasElement): void {
+    canvas.width = 1;
+    canvas.height = 1;
+    const ctx = canvas.getContext('2d');
+    ctx && ctx.clearRect(0, 0, 1, 1);
+}
