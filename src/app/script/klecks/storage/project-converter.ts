@@ -16,6 +16,7 @@ function loadImage(blob: Blob): Promise<HTMLImageElement> {
             return;
         }
         im.onload = () => {
+            URL.revokeObjectURL(im.src);
             resolve(im);
         }
         im.onabort = function () {

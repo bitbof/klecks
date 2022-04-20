@@ -109,6 +109,9 @@ export function KlApp(pProject: IKlProject | null, pOptions: IKlAppOptions) {
     let isFirstImage = true;
 
     if (pProject) {
+        pProject.layers.forEach(layer => {
+            layer.image = null;
+        });
         pProject = null;
     } else {
         klHistory.pause(true);
@@ -746,6 +749,7 @@ export function KlApp(pProject: IKlProject | null, pOptions: IKlAppOptions) {
                 if (imageBlob) {
                     let img = new Image();
                     img.onload = function () {
+                        URL.revokeObjectURL(img.src);
                         importFinishedLoading({
                             type: 'image',
                             width: img.width,
