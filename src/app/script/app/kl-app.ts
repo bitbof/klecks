@@ -1913,6 +1913,10 @@ export function KlApp(pProject: IKlProject | null, pOptions: IKlAppOptions) {
         saveToComputer.save('psd');
     };
 
+    this.isDrawing = () => {
+        return lineSanitizer.getIsDrawing() || klCanvasWorkspace.getIsDrawing();
+    };
+
     // --- end interface ---
 
     this.resize(uiWidth, uiHeight);

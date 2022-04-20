@@ -17,11 +17,9 @@ export class SaveReminder {
 
     private lastReminderShownAt: number;
     private unsavedInterval;
-    private popupIsOpen = false;
     private closeFunc: () => void;
 
     showPopup (): void {
-        this.popupIsOpen = true;
         const min = Math.round((performance.now() - this.lastSavedAt) / 1000 / 60);
 
         const saveBtn = BB.el({
@@ -51,7 +49,6 @@ export class SaveReminder {
             ignoreBackground: true,
             callback: () => {
                 BB.destroyEl(saveBtn);
-                this.popupIsOpen = false;
                 this.closeFunc = null;
                 this.lastReminderShownAt = performance.now();
             },
@@ -69,6 +66,7 @@ export class SaveReminder {
         private showReminder: boolean,
         private changeTitle: boolean,
         private onSaveAsPsd: () => void,
+        private isDrawing: () => boolean,
         private title: string = 'Klecks',
     ) { }
 
@@ -89,7 +87,8 @@ export class SaveReminder {
                 let unsavedActions = Math.abs(this.history.getActionNumber() - this.lastSavedActionNumber);
 
                 if (
-                    !this.popupIsOpen &&
+                    KL.dialogCounter.get() === 0 &&
+                    !this.isDrawing() &&
                     this.lastReminderShownAt + reminderTimelimitMs < performance.now() &&
                     unsavedActions >= unsavedActionsLimit
                 ) {
