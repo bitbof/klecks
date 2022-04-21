@@ -94,6 +94,9 @@ const els: {
  *      id: "bla"
  * }
  *
+ *  If onClick or onChange is used, then BB.destroyEl MUST be called
+ *  to prevent a memory leak.
+ *
  * @param params
  */
 export function el(
