@@ -488,6 +488,13 @@ export const transform = {
             freeTransform.destroy();
             constrainCheckbox.destroy();
             snappingCheckbox.destroy();
+            BB.destroyEl(flipXBtn);
+            BB.destroyEl(flipYBtn);
+            BB.destroyEl(scaleRotLeftBtn);
+            BB.destroyEl(scaleRotRightBtn);
+            BB.destroyEl(scaleDoubleBtn);
+            BB.destroyEl(scaleHalfBtn);
+            BB.destroyEl(centerBtn);
         };
         result.getInput = function () {
             const transform = freeTransform.getTransform();
