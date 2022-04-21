@@ -635,6 +635,7 @@ export function textToolDialog(
 
             window.removeEventListener('scroll', onScroll);
             textInput.removeEventListener('input', updatePreview);
+            BB.destroyEl(textInput);
             previewPointerListener.destroy();
             sizePointerListener.destroy();
             fontPointerListener.destroy();
