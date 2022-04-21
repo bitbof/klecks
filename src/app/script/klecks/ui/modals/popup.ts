@@ -252,6 +252,31 @@ export function popup (
 
         isClosed = true;
         BB.clearSelection();
+        {
+            /*
+            Unfocus anything that is focused.
+
+            If an Input is focused in Firefox, and it gets detached from the DOM via a Node
+            that isn't its direct parent, then Firefox will keep anything attached to this
+            Input in memory. It will not be garbage collected until a new Input is focused.
+
+            Workaround: Temporarily create an input, focus it, detach it.
+             */
+            const focusEl = BB.el({
+                parent: document.body,
+                tagName: 'input',
+                css: {
+                    opacity: '0',
+                    width: '0',
+                    height: '0',
+                }
+            }) as HTMLInputElement;
+            setTimeout(() => {
+                focusEl.select();
+                focusEl.focus();
+                focusEl.parentNode.removeChild(focusEl);
+            }, 10);
+        }
         document.body.removeChild(rootRootEl);
         dialogCounter.decrease();
         BB.destroyEl(xButton);

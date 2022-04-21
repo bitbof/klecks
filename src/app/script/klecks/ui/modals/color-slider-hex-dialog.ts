@@ -131,6 +131,9 @@ export const HexColorDialog = function (p) {
         result.update = function() {
             inputEl.value = lastValidRgb[attributeStr];
         };
+        result.destroy = () => {
+            inputEl.onchange = null;
+        };
         return result;
     }
     const rgbArr = [];
@@ -147,11 +150,11 @@ export const HexColorDialog = function (p) {
         clickOnEnter: 'Ok',
         buttons: ['Ok', 'Cancel'],
         callback: function (resultStr) {
-            let rgbObj = null;
-            if (resultStr === 'Ok') {
-                rgbObj = BB.ColorConverter.hexToRGB(hexInput.value);
-            }
-            p.onClose(rgbObj);
+            BB.destroyEl(copyButton);
+            rgbArr.forEach(item => item.destroy());
+            rgbArr.splice(0, rgbArr.length);
+
+            p.onClose(resultStr === 'Ok' ? BB.ColorConverter.hexToRGB(hexInput.value) : null);
         }
     });
 
