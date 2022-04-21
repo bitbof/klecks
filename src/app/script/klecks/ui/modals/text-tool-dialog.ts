@@ -620,25 +620,38 @@ export function textToolDialog(
             width: '500px'
         },
         callback: function(val) {
+            let result = {
+                x: p.x,
+                y: p.y,
+                textStr: textInput.value,
+                align: alignRadioList.getValue(),
+                isItalic: italicToggle.getValue(),
+                isBold: boldToggle.getValue(),
+                color: p.color,
+                size: sizeInput.value,
+                font: fontSelect.getValue(),
+                opacity: opacitySlider.getValue()
+            };
+
             window.removeEventListener('scroll', onScroll);
+            textInput.removeEventListener('input', updatePreview);
             previewPointerListener.destroy();
             sizePointerListener.destroy();
             fontPointerListener.destroy();
             BB.removeEventListener(previewCanvas, 'wheel', wheelPrevent);
+            BB.destroyEl(previewWrapper);
+            BB.destroyEl(zoomInBtn);
+            BB.destroyEl(zoomOutBtn);
+            BB.destroyEl(sizeInput);
+            colorOptions.destroy();
+            fontSelect.destroy();
             keyListener.destroy();
+            alignRadioList.destroy();
+            italicToggle.destroy();
+            boldToggle.destroy();
+            opacitySlider.destroy();
             if (val === 'Ok') {
-                p.onConfirm({
-                    x: p.x,
-                    y: p.y,
-                    textStr: textInput.value,
-                    align: alignRadioList.getValue(),
-                    isItalic: italicToggle.getValue(),
-                    isBold: boldToggle.getValue(),
-                    color: p.color,
-                    size: sizeInput.value,
-                    font: fontSelect.getValue(),
-                    opacity: opacitySlider.getValue()
-                });
+                p.onConfirm(result);
             }
         },
         autoFocus: false,

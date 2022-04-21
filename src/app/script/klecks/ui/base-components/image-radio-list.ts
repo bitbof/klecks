@@ -68,4 +68,9 @@ export const ImageRadioList = function(p) {
     this.getValue = function() {
         return p.optionArr[activeIndex].id;
     };
+    this.destroy = () => {
+        optionArr.forEach(item => {
+            item.destroy();
+        })
+    };
 };

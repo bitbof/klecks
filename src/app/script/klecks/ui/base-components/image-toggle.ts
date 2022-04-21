@@ -53,6 +53,9 @@ export const ImageToggle = function(p) {
     };
     this.getValue = function() {
         return isActive;
-    }
+    };
+    this.destroy = () => {
+        BB.destroyEl(div);
+    };
 
 };

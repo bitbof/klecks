@@ -112,7 +112,6 @@ export function el(
     }
 ): HTMLElement {
     const div = document.createElement(params.tagName ? params.tagName : 'div');
-    const arr = [];
     if (params.css) {
         css(div, params.css);
     }
