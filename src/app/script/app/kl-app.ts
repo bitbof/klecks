@@ -1949,8 +1949,13 @@ export function KlApp(pProject: IKlProject | null, pOptions: IKlAppOptions) {
                 userSelect: 'none',
             }
         });
-        const observer = new ResizeObserver(() => this.resize(window.innerWidth, window.innerHeight));
-        observer.observe(windowResizeWatcher);
+        try {
+            // Not all browsers support ResizeObserver. Not critical though.
+            const observer = new ResizeObserver(() => this.resize(window.innerWidth, window.innerHeight));
+            observer.observe(windowResizeWatcher);
+        } catch (e) {
+            windowResizeWatcher.parentNode.removeChild(windowResizeWatcher);
+        }
 
         // prevent ctrl scroll -> zooming page
         BB.addEventListener(this.getEl(), 'wheel', (event) => {

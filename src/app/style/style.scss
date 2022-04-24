@@ -70,29 +70,6 @@ a:hover, a:not([href]):hover {
     text-decoration: underline;
 }
 
-.init-error {
-    position: fixed;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    background: var(--body-bg-color);
-    text-align: center;
-    padding-top: 30px;
-    color: #333;
-}
-
-.init-error > div {
-    background: white;
-    display: inline-block;
-    padding: 40px;
-}
-
-.init-error > div > img {
-    width: 200px;
-    margin-bottom: 20px;
-}
-
 .gridHr {
     border-top: 1px solid rgba(0, 0, 0, 0.15);
     margin-top: 10px;
