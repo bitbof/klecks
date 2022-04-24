@@ -35,33 +35,49 @@ export function Embed(p: IEmbedParams) {
     }
 
     function onProjectReady(project: IKlProject) {
-        if (isInitialized) {
-            throw new Error('Already called openProject');
-        }
-        isInitialized = true;
-
-        if (loadingScreenEl && loadingScreenEl.parentNode) {
-            loadingScreenEl.parentNode.removeChild(loadingScreenEl);
-        }
-        loadingScreenEl = null;
-        loadingScreenTextEl = null;
-
-        const saveReminder = new SaveReminder(klHistory, false, false);
-        klApp = new KlApp(
-            project,
-            {
-                saveReminder,
-                bottomBar: p.bottomBar,
-                aboutEl: p.aboutEl,
-                embed: {
-                    url: p.embedUrl,
-                    onSubmit: p.onSubmit,
-                }
+        try {
+            if (isInitialized) {
+                throw new Error('Already called openProject');
             }
-        );
-        saveReminder.init();
+            isInitialized = true;
 
-        document.body.appendChild(klApp.getEl());
+            const saveReminder = new SaveReminder(
+                klHistory,
+                false,
+                false,
+                () => {},
+                () => klApp ? klApp.isDrawing() : false,
+            );
+            klApp = new KlApp(
+                project,
+                {
+                    saveReminder,
+                    bottomBar: p.bottomBar,
+                    aboutEl: p.aboutEl,
+                    embed: {
+                        url: p.embedUrl,
+                        onSubmit: p.onSubmit,
+                    }
+                }
+            );
+            saveReminder.init();
+
+            if (loadingScreenEl && loadingScreenEl.parentNode) {
+                loadingScreenEl.parentNode.removeChild(loadingScreenEl);
+            }
+            loadingScreenEl = null;
+            loadingScreenTextEl = null;
+
+            document.body.appendChild(klApp.getEl());
+        } catch (e) {
+            if (loadingScreenTextEl) {
+                loadingScreenTextEl.textContent = '❌ ' + e;
+            }
+            if (loadingScreenEl) {
+                loadingScreenEl.className += 'loading-screen-error';
+            }
+            console.error(e);
+        }
     }
 
     if (p.project) {
