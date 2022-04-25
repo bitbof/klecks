@@ -1,5 +1,6 @@
 import 'core-js';
 import 'mdn-polyfills/Node.prototype.append';
+import 'mdn-polyfills/Node.prototype.prepend';
 
 if (!('scrollTo' in Element.prototype)) {
     Object.defineProperty(Element.prototype, 'scrollTo', {
