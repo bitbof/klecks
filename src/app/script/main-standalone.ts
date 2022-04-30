@@ -84,9 +84,11 @@ function initError(e) {
                 }
             } catch(e) {
                 let message;
-                if (e.message === 'db-error') {
+                if (e.message.indexOf('db-error') === 0) {
                     message = 'Failed to access Browser Storage';
-                } else if (e.message === 'format-error') {
+                } else if (e.message.indexOf('format-error') === 0) {
+                    message = 'Failed to restore from Browser Storage';
+                } else {
                     message = 'Failed to restore from Browser Storage';
                 }
                 if (message) {

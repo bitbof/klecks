@@ -71,6 +71,13 @@ export class ProjectConverter {
         timestamp: number,
         thumbnail: HTMLImageElement | HTMLCanvasElement
     }> {
+        if (
+            !storageProject.width || !storageProject.height ||
+            isNaN(storageProject.width) || isNaN(storageProject.height) ||
+            storageProject.width < 1 || storageProject.height < 1
+        ) {
+            throw new Error('readStorageProject invalid canvas size: ' + storageProject.width + ', ' + storageProject.height);
+        }
         const project: IKlProject = {
             width: storageProject.width,
             height: storageProject.height,

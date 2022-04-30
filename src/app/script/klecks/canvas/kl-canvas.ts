@@ -60,7 +60,7 @@ export class KlCanvas {
 
     private init (w: number, h: number): void {
         if (!w || !h || isNaN(w) || isNaN(h) || w < 1 || h < 1) {
-            throw new Error('init - invalid canvas size');
+            throw new Error('init - invalid canvas size: ' + w + ', ' + h);
         }
         this.width = w;
         this.height = h;
@@ -622,7 +622,7 @@ export class KlCanvas {
         let ctx = this.layerCanvasArr[layerIndex].getContext("2d");
         ctx.save();
         if (compositeOperation) {
-            ctx.globalCompositeOperation = compositeOperation;
+            ctx.globalCompositeOperation = compositeOperation as GlobalCompositeOperation;
         }
         ctx.fillStyle = "rgba(" + colorObj.r + "," + colorObj.g + "," + colorObj.b + ",1)";
         ctx.fillRect(0, 0, this.layerCanvasArr[layerIndex].width, this.layerCanvasArr[layerIndex].height);

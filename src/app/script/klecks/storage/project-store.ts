@@ -65,7 +65,7 @@ export class ProjectStore {
                     }
                 })();
             } catch (e) {
-                if (e.message === 'db-error') {
+                if (e.message.indexOf('db-error') === 0) {
                     this.accessHasFailed = true;
                 }
             }
@@ -83,7 +83,7 @@ export class ProjectStore {
             storageProject = await this.lowLevelRead();
         } catch (e) {
             this.accessHasFailed = true;
-            throw new Error('db-error');
+            throw new Error('db-error: ' + e);
         }
         if (!storageProject) {
             return null;
@@ -92,7 +92,7 @@ export class ProjectStore {
         try {
             result = await ProjectConverter.readStorageProject(storageProject);
         } catch (e) {
-            throw new Error('format-error');
+            throw new Error('format-error: ' + e);
         }
         return result;
     }
@@ -103,7 +103,7 @@ export class ProjectStore {
             await this.lowLevelStore(storageProject);
         } catch (e) {
             this.accessHasFailed = true;
-            throw new Error('db-error');
+            throw new Error('db-error: ' + e);
         }
         {
             // immediately test if it can be read
@@ -115,7 +115,7 @@ export class ProjectStore {
                 await this.lowLevelClear();
                 this.updateTimestamp();
                 setTimeout(() => this.emit(), 0);
-                throw new Error('format-error');
+                throw new Error('format-error: ' + e);
             }
             this.updateTimestamp();
             setTimeout(() => this.emit(readResult.timestamp, readResult.thumbnail), 0);

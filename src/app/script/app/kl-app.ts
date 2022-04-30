@@ -64,7 +64,7 @@ export function KlApp(pProject: IKlProject | null, pOptions: IKlAppOptions) {
     let klMaxCanvasSize = Math.min(4096, Math.max(2048, Math.max(window.screen.width, window.screen.height)));
     let collapseThreshold = 820;
     let uiState: 'left' | 'right' = (pOptions.embed ? 'left' : (LocalStorage.getItem('uiState') ? LocalStorage.getItem('uiState') : 'right')) as any;
-    const filenameBase = (pOptions.app && pOptions.app.filenameBase) ? pOptions.app.filenameBase : 'Klecks';
+    const filenameBase = pOptions.app?.filenameBase ? pOptions.app.filenameBase : 'Klecks';
     const projectStore = pOptions.projectStore;
     let klRootEl = document.createElement("div");
     klRootEl.className = 'g-root';
@@ -76,8 +76,8 @@ export function KlApp(pProject: IKlProject | null, pOptions: IKlAppOptions) {
         pProject ? {
             projectObj: pProject
         } : {
-            width: Math.min(klMaxCanvasSize, window.innerWidth < collapseThreshold ? uiWidth : uiWidth - toolWidth),
-            height: Math.min(klMaxCanvasSize, uiHeight)
+            width: Math.max(10, Math.min(klMaxCanvasSize, window.innerWidth < collapseThreshold ? uiWidth : uiWidth - toolWidth)),
+            height: Math.max(10, Math.min(klMaxCanvasSize, uiHeight)),
         }, pOptions.embed ? -1 : 0);
     klCanvas.setHistory(klHistory);
     let initState: IInitState = null;

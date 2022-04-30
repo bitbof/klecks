@@ -1,6 +1,7 @@
-import 'core-js';
+// import 'core-js';
 import 'mdn-polyfills/Node.prototype.append';
 import 'mdn-polyfills/Node.prototype.prepend';
+import 'mdn-polyfills/String.prototype.padStart';
 
 if (!('scrollTo' in Element.prototype)) {
     Object.defineProperty(Element.prototype, 'scrollTo', {

@@ -283,9 +283,11 @@ export function PenBrush() {
         let loopDist;
         let bdist = settingSize * settingSpacing;
         lineToolLastDot = settingSize * settingSpacing;
+        context.save();
         for (loopDist = lineToolLastDot; loopDist <= mouseDist; loopDist += bdist) {
             drawDot(x1 + eX * loopDist, y1 + eY * loopDist, settingSize, settingOpacity, angle);
         }
+        context.restore();
 
 
         let historyEntry = {

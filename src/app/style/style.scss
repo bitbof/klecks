@@ -553,40 +553,7 @@ button img {
     background-image: linear-gradient(to top, rgba(188, 188, 188, 0.1) 0%, rgba(255, 255, 255, 0.3) 100%);
 }
 
-.bottomBarLine1 {
-    height: 36px;
-    background: linear-gradient(rgba(255,255,255,0.32), rgba(255,255,255,0));
-    display: flex;
-    width: 100%;
-}
-.bottomBarLine1 > * {
-    flex-grow: 2;
-}
 
-.bottomBarLine1 > div {
-    height: 100%;
-    line-height: 36px;
-    padding-left: 27px;
-    box-sizing: border-box;
-    background-repeat: no-repeat;
-    cursor: pointer;
-    color: #666;
-    background-position: 3px center;
-    background-size: 22px;
-}
-.bottomBarLine1 div:not(:last-child) {
-    border-right: 1px solid rgba(0, 0, 0, 0.1);
-}
-
-
-.bottomBarLine1 div:hover {
-    background-color: #eee;
-}
-
-.bottomBarLine1 div:active {
-    background-color: #ddd;
-    box-shadow: inset 2px 2px 10px rgba(0, 0, 0, 0.2) !important;
-}
 
 .info-hint {
     background: rgb(255, 132, 115);

@@ -1638,7 +1638,7 @@ export class KlCanvasWorkspace {
 
         //fit bounds
         const padding = 40;
-        const fit = BB.fitInto(
+        const { width: fitWidth } = BB.fitInto(
             boundsWidth,
             boundsHeight, 
             this.renderWidth - padding, 
@@ -1647,7 +1647,7 @@ export class KlCanvasWorkspace {
         );
 
         //determine scale
-        const factor = fit.width / boundsWidth;
+        const factor = fitWidth / boundsWidth;
 
         //center
         this.targetTransformObj.x = (this.renderWidth / 2) - (canvasPointsArr[4][0] - canvasPointsArr[0][0]) * factor;

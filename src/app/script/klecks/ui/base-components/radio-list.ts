@@ -5,7 +5,7 @@ export class RadioList {
     el: HTMLDivElement;
     inputs: HTMLInputElement[] = [];
 
-    constructor(p: {
+    constructor({name, init, items, ignoreFocus}: {
         name: string;
         init?: string;
         items: {
@@ -18,7 +18,7 @@ export class RadioList {
             className: 'kl-radio'
         }) as HTMLDivElement;
 
-        p.items.forEach(item => {
+        items.forEach(item => {
             let label = BB.el({
                 tagName: 'label'
             });
@@ -26,15 +26,15 @@ export class RadioList {
                 tagName: 'input',
                 parent: label,
                 custom: {
-                    name: p.name,
+                    name: name,
                     value: item.value,
                     type: 'radio',
                 }
             }) as HTMLInputElement;
-            if (p.ignoreFocus) {
+            if (ignoreFocus) {
                 input.setAttribute('data-ignore-focus', 'true');
             }
-            if (p.init === item.value) {
+            if (init === item.value) {
                 input.checked = true;
             }
             label.append(item.label);

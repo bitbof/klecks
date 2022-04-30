@@ -236,8 +236,8 @@ export class FreeTransform {
             };
         }
         return {
-            x: snap.x === null ? iX : snap.x,
-            y: snap.y === null ? iY : snap.y,
+            x: snap.x ?? iX,
+            y: snap.y ?? iY,
         };
     }
 
