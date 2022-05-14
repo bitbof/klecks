@@ -5,16 +5,18 @@ import removeLayerImg from 'url:~/src/app/img/ui/remove-layer.svg';
 import {IKlProject} from '../../kl.types';
 import {showIframePopup} from '../modals/show-iframe-popup';
 import {SaveReminder} from './save-reminder';
-import {ProjectStore} from '../../storage/project-store';
+import {IProjectStoreListener, ProjectStore} from '../../storage/project-store';
 import {KL} from '../../kl';
 import {LANG} from '../../../language/language';
 
 export class BrowserStorageUi {
 
     private previewEl: HTMLDivElement;
+    private infoEl: HTMLDivElement;
     private ageEl: HTMLDivElement;
     private storeEl: HTMLButtonElement;
     private clearEl: HTMLButtonElement;
+    private storeListener: IProjectStoreListener;
 
     private timestamp: number;
 
@@ -129,6 +131,7 @@ export class BrowserStorageUi {
         private getProject: () => IKlProject,
         private saveReminder: SaveReminder,
         private klRootEl: HTMLDivElement,
+        private options?: { hideClearButton?: boolean },
     ) {
         this.element = BB.el({
             css: {
@@ -152,7 +155,7 @@ export class BrowserStorageUi {
             }
         });
 
-        const infoEl = BB.el({
+        this.infoEl = BB.el({
             parent: title,
             content: '?',
             title: LANG('file-storage-about'),
@@ -170,7 +173,7 @@ export class BrowserStorageUi {
             onClick: () => {
                 showIframePopup('./help/#help-browser-storage', false);
             }
-        });
+        }) as HTMLDivElement;
 
         if (this.projectStore.isBroken()) {
             BB.el({
@@ -197,6 +200,7 @@ export class BrowserStorageUi {
                 background: '#cdcdcd',
                 color: '#545454',
                 colorScheme: 'only light',
+                minHeight: '67px',
             }
         }) as HTMLDivElement;
         this.ageEl = BB.el({
@@ -241,11 +245,16 @@ export class BrowserStorageUi {
             onClick: () => this.clear(),
         }) as HTMLButtonElement;
 
-        this.projectStore.subscribe({
+        if (this.options?.hideClearButton) {
+            this.clearEl.style.display = 'none';
+        }
+
+        this.storeListener = {
             onUpdate: (timestamp, thumbnail) => {
                 this.updateThumb(timestamp, thumbnail);
             },
-        });
+        };
+        this.projectStore.subscribe(this.storeListener);
 
         setInterval(() => this.updateAge(), 1000 * 60);
 
@@ -276,5 +285,12 @@ export class BrowserStorageUi {
 
     hide () {
         // todo
+    }
+
+    destroy() {
+        BB.destroyEl(this.infoEl);
+        BB.destroyEl(this.storeEl);
+        BB.destroyEl(this.clearEl);
+        this.projectStore.unsubscribe(this.storeListener);
     }
 }

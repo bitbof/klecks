@@ -32,6 +32,13 @@ export function PenBrush() {
     let bezierLine = null;
 
     let twoPI = Math.PI * 2;
+    let hasDrawnDot = false; // current stroke has drawn at least one dot
+    let inputArr: {x: number, y: number, pressure: number}[];
+
+    // pressure: 0-1
+    function calcOpacity(pressure: number) {
+        return settingOpacity * (settingHasOpacityPressure ? pressure * pressure : 1);
+    }
 
     function updateAlphaCanvas() {
         if (settingAlphaId === ALPHA_CIRCLE || settingAlphaId === ALPHA_SQUARE) {
@@ -95,6 +102,7 @@ export function PenBrush() {
             context.arc(x, y, size, 0, twoPI);
             context.closePath();
             context.fill();
+            hasDrawnDot = true;
 
         } else if (settingAlphaId === ALPHA_SQUARE) {
             if (angle !== undefined) {
@@ -103,6 +111,7 @@ export function PenBrush() {
                 context.rotate(angle / 180 * Math.PI);
                 context.fillRect(-size, -size, size * 2, size * 2);
                 context.restore();
+                hasDrawnDot = true;
             }
 
         } else { // other brush alphas
@@ -121,6 +130,7 @@ export function PenBrush() {
             context.drawImage(targetMipmap, -1, -1, 2, 2);
 
             context.restore();
+            hasDrawnDot = true;
         }
     }
 
@@ -134,7 +144,7 @@ export function PenBrush() {
 
         function dotCallback(val) {
             let localPressure = BB.mix(lastInput2.pressure, pressure, val.t);
-            let localOpacity = settingOpacity * (settingHasOpacityPressure ? (localPressure * localPressure) : 1);
+            let localOpacity = calcOpacity(localPressure);
             let localSize = Math.max(0.1, settingSize * (settingHasSizePressure ? localPressure : 1));
             drawArr.push([val.x, val.y, localSize, localOpacity, val.angle]);
         }
@@ -199,8 +209,10 @@ export function PenBrush() {
         });
 
         p = BB.clamp(p, 0, 1);
-        let localOpacity = settingHasOpacityPressure ? (settingOpacity * p * p) : settingOpacity;
+        let localOpacity = calcOpacity(p);
         let localSize = settingHasSizePressure ? Math.max(0.1, p * settingSize) : Math.max(0.1, settingSize);
+
+        hasDrawnDot = false;
 
         isDrawing = true;
         context.save();
@@ -212,6 +224,12 @@ export function PenBrush() {
         lastInput.y = y;
         lastInput.pressure = p;
         lastInput2.pressure = p;
+
+        inputArr = [{
+            x,
+            y,
+            pressure: p,
+        }];
 
         historyEntry.actions.push({
             action: "startLine",
@@ -244,6 +262,12 @@ export function PenBrush() {
         lastInput.y = y;
         lastInput2.pressure = lastInput.pressure;
         lastInput.pressure = pressure;
+
+        inputArr.push({
+            x,
+            y,
+            pressure: p,
+        });
     };
 
     this.endLine = function (x, y) {
@@ -255,6 +279,22 @@ export function PenBrush() {
 
         isDrawing = false;
 
+        if (settingAlphaId === ALPHA_SQUARE && !hasDrawnDot) {
+            // find max pressure input, use that one
+            let maxInput = inputArr[0];
+            inputArr.forEach(item => {
+                if (item.pressure > maxInput.pressure) {
+                    maxInput = item;
+                }
+            })
+
+            context.save();
+            let p = BB.clamp(maxInput.pressure, 0, 1);
+            let localOpacity = calcOpacity(p);
+            drawDot(maxInput.x, maxInput.y, localSize, localOpacity, 0);
+            context.restore();
+        }
+
         bezierLine = null;
 
         if (historyEntry) {
@@ -265,6 +305,9 @@ export function PenBrush() {
             history.push(historyEntry);
             historyEntry = undefined;
         }
+
+        hasDrawnDot = false;
+        inputArr = [];
     };
     //cheap n' ugly
     this.drawLineSegment = function (x1, y1, x2, y2) {

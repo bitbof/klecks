@@ -47,6 +47,8 @@ export function Embed(p: IEmbedParams) {
                 false,
                 () => {},
                 () => klApp ? klApp.isDrawing() : false,
+                null,
+                null,
             );
             klApp = new KlApp(
                 project,

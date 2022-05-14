@@ -53,7 +53,9 @@ function initError(e) {
             () => klApp.saveAsPsd(),
             () => {
                 return klApp ? klApp.isDrawing() : false;
-            }
+            },
+            null,
+            null,
         );
         klApp = new KlApp(
             project,

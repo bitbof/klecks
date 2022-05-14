@@ -1905,6 +1905,8 @@ export function KlApp(pProject: IKlProject | null, pOptions: IKlAppOptions) {
         return await klCanvasToPsdBlob(klCanvas);
     };
 
+    this.getProject = () => klCanvas.getProject();
+
     this.swapUiLeftRight = () => {
         uiState = uiState === 'left' ? 'right' : 'left';
         if (!pOptions.embed) {

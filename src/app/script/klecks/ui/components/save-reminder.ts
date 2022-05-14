@@ -2,6 +2,9 @@ import {KL} from '../../kl';
 import {BB} from '../../../bb/bb';
 import {KlHistoryInterface} from '../../history/kl-history';
 import {LANG} from '../../../language/language';
+import {BrowserStorageUi} from './browser-storage-ui';
+import {ProjectStore} from '../../storage/project-store';
+import {IKlProject} from '../../kl.types';
 
 
 const reminderTimelimitMs = 1000 * 60 * 20; // 20 minutes
@@ -20,35 +23,84 @@ export class SaveReminder {
     private closeFunc: () => void;
 
     showPopup (): void {
+        if (!this.projectStore || !this.getProject) {
+            throw new Error('projectStore and getProject need to be set');
+        }
+
         const min = Math.round((performance.now() - this.lastSavedAt) / 1000 / 60);
 
-        const saveBtn = BB.el({
+        const contentEl = BB.el({});
+
+        contentEl.append(
+            BB.el({
+                content: LANG(
+                    'save-reminder-text',
+                    {
+                        a: '<strong>' + min,
+                        b: '</strong>',
+                    }
+                ),
+                css: {
+                    marginBottom: '20px',
+                }
+            }),
+        );
+
+        const psdWrapper = BB.el({
+            css: {
+                borderTop: '1px solid #aaa',
+                margin: '0 -20px',
+                padding: '20px',
+            }
+        });
+        const storageWrapper = BB.el({
+            css: {
+                borderTop: '1px solid #aaa',
+                margin: '0 -20px',
+                padding: '20px',
+                paddingBottom: '0',
+            }
+        });
+        contentEl.append(psdWrapper, storageWrapper);
+
+
+        const psdBtn = BB.el({
             tagName: 'button',
-            className: 'kl-button-primary',
+            className: 'kl-button',
             content: LANG('save-reminder-save-psd'),
             onClick: () => this.onSaveAsPsd(),
         });
+        psdWrapper.append(
+            psdBtn,
+            BB.el({
+                content: LANG('save-reminder-psd-layers'),
+                css: {
+                    marginTop: '10px',
+                }
+            }),
+        );
+
+
+        const storageUi = new BrowserStorageUi(
+            this.projectStore,
+            this.getProject,
+            this,
+            document.body as any,
+            {
+                hideClearButton: true,
+            }
+        );
+        storageWrapper.append(storageUi.getElement());
+
+
         KL.popup({
             target: document.body,
             message: `<b>${LANG('save-reminder-title')}</b>`,
-            div: BB.el({
-                content: [
-                    BB.el({
-                        content: LANG(
-                            'save-reminder-text',
-                            {
-                                a: '<strong>' + min,
-                                b: '</strong>',
-                            }
-                        ) + '<br><br>',
-                    }),
-                    saveBtn,
-                    BB.el({content:'<br>' + LANG('save-reminder-psd-layers')}),
-                ]
-            }),
+            div: contentEl,
             ignoreBackground: true,
             callback: () => {
-                BB.destroyEl(saveBtn);
+                storageUi.destroy();
+                BB.destroyEl(psdBtn);
                 this.closeFunc = null;
                 this.lastReminderShownAt = performance.now();
             },
@@ -57,7 +109,7 @@ export class SaveReminder {
             }
         });
         setTimeout(() => {
-            saveBtn.focus();
+            psdBtn.focus();
         }, 40);
     }
 
@@ -67,6 +119,8 @@ export class SaveReminder {
         private changeTitle: boolean,
         private onSaveAsPsd: () => void,
         private isDrawing: () => boolean,
+        private projectStore: ProjectStore | null, // needed if showReminder
+        private getProject: (() => IKlProject) | null, // needed if showReminder
         private title: string = 'Klecks',
     ) { }
 
