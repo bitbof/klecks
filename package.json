@@ -18,15 +18,16 @@
     "lang:build": "node src/languages/generate.js build"
   },
   "devDependencies": {
-    "@parcel/transformer-sass": "^2.0.1",
     "ag-psd": "^11.6.2",
+    "buffer": "^6.0.3",
     "file-saver": "^2.0.5"
   },
   "dependencies": {
     "@parcel/transformer-image": "^2.0.1",
+    "@parcel/transformer-sass": "^2.6.2",
     "js-beautify": "^1.14.0",
     "json5": "^1.0.1",
     "mdn-polyfills": "^5.20.0",
-    "parcel": "^2.0.1"
+    "parcel": "^2.6.2"
   }
 }

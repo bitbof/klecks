@@ -1,0 +1,8 @@
+version: '3'
+
+services:
+  klecks:
+    build: .
+    container_name: klecks
+    ports:
+     - 5050:3000
