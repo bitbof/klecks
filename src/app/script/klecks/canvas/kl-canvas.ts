@@ -778,6 +778,9 @@ export class KlCanvas {
      * @param shapeObj
      */
     drawShape (layerIndex: number, shapeObj: IShapeToolObject): void {
+        if (shapeObj.x1 === shapeObj.x2 && shapeObj.y1 === shapeObj.y2) {
+            return;
+        }
         drawShape(this.layerCanvasArr[layerIndex].getContext("2d"), shapeObj);
         this.history.push({
             tool: ["canvas"],

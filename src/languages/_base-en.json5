@@ -342,6 +342,9 @@ Base Language File
   "filter-unsharp-mask-description": "Sharpens the selected layer by scaling pixels away from the average of their neighbors.",
   "filter-unsharp-mask-strength": "Strength",
 
+  "filter-grid": "Grid",
+  "filter-grid-description": "Draws grid on selected layer.",
+
   "import-opening": "Opening file...",
   "import-title": "Import Image",
   "import-too-large": "Image too large, will be downscaled.",
