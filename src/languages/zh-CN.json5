@@ -603,6 +603,10 @@
         original: 'Crop',
         value: '裁剪'
     },
+    'cropcopy-click-hold': {
+        original: 'Right-click or press hold to copy.',
+        value: '点击右键或长按进行复制。',
+    },
     'cropcopy-btn-copy': {
         original: 'To Clipboard',
         value: '至剪贴板'

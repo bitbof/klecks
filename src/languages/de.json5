@@ -581,6 +581,10 @@
         original: 'Crop',
         value: 'zuschneiden'
     },
+    'cropcopy-click-hold': {
+        original: 'Right-click or press hold to copy.',
+        value: 'Rechtsklick oder gedrückt halten für kopieren.',
+    },
     'cropcopy-btn-copy': {
         original: 'To Clipboard',
         value: 'In Zwischenablage'
