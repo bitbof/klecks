@@ -220,6 +220,7 @@ export const filterLib: {
         buttonLabel: '',
         icon: gridImg,
         webgl: false,
+        neededWithWebGL: true,
         updateContext: true,
         updatePos: false,
         getDialog: null,
