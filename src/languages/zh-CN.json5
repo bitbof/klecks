@@ -908,6 +908,14 @@
         original: 'Strength',
         value: '强度'
     },
+    'filter-grid': {
+        original: 'Grid',
+        value: '网格'
+    },
+    'filter-grid-description': {
+        original: 'Draws grid on selected layer.',
+        value: '给当前层添加网格线。'
+    },
     'import-opening': {
         original: 'Opening file...',
         value: '打开文件...'

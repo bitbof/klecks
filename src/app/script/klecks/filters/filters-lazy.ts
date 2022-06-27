@@ -13,6 +13,7 @@ import {transform} from './transform';
 import {glBlur} from './gl-blur';
 import {glUnsharpMask} from './gl-unsharp-mask';
 import {toAlpha} from './to-alpha';
+import {grid} from './grid';
 
 let embed: boolean;
 function importFilter(libObj, moduleObj): void {
@@ -43,6 +44,7 @@ export function importFilters(isEmbed?: boolean) {
     importFilter(filterLib.glBlur, glBlur);
     importFilter(filterLib.glUnsharpMask, glUnsharpMask);
     importFilter(filterLib.toAlpha, toAlpha);
+    importFilter(filterLib.grid, grid);
 
     filterLibStatus.isLoaded = true;
 }

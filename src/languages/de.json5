@@ -885,6 +885,14 @@
         original: 'Strength',
         value: 'Stärke'
     },
+    'filter-grid': {
+        original: 'Grid',
+        value: 'Gitter'
+    },
+    'filter-grid-description': {
+        original: 'Draws grid on selected layer.',
+        value: 'Zeichnet Gitter auf gewählte Ebene.'
+    },
     'import-opening': {
         original: 'Opening file...',
         value: 'Öffne Datei...'

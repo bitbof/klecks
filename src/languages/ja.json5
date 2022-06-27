@@ -908,6 +908,14 @@
         original: 'Strength',
         value: '強さ'
     },
+    'filter-grid': {
+        original: 'Grid',
+        value: ''
+    },
+    'filter-grid-description': {
+        original: 'Draws grid on selected layer.',
+        value: ''
+    },
     'import-opening': {
         original: 'Opening file...',
         value: '画像を開いています。'

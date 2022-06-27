@@ -200,27 +200,34 @@ export class FilterTab {
             }
         }
 
-        let groupA = [
+        const groupA = [
             'cropExtend',
             'flip',
             'glPerspective',
             'resize',
             'rotate',
-            'transform'
+            'transform',
         ];
-        let groupB = [];
-        for (let filterKey in filters) {
-            if (filters.hasOwnProperty[filterKey] || groupA.includes(filterKey)) {
-                continue;
-            }
-            groupB.push(filterKey);
-        }
+        const groupB = [
+            'glBrightnessContrast',
+            'glCurves',
+            'glHueSaturation',
+            'invert',
+            'glTiltShift',
+            'toAlpha',
+            'glBlur',
+            'glUnsharpMask',
+        ];
+        const groupC = [
+            'grid',
+        ];
 
         addGroup(groupA, filters, _this.div);
-        let hrEl = document.createElement("div");
-        hrEl.className = "gridHr";
-        _this.div.appendChild(hrEl);
+
+        _this.div.appendChild(BB.el({className: 'gridHr'}));
         addGroup(groupB, filters, _this.div);
+        _this.div.appendChild(BB.el({className: 'gridHr'}));
+        addGroup(groupC, filters, _this.div);
 
 
         if (!hasWebGl) {

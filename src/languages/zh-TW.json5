@@ -908,6 +908,14 @@ filled: {
         original: 'Strength',
         value: '強度'
     },
+    'filter-grid': {
+        original: 'Grid',
+        value: ''
+    },
+    'filter-grid-description': {
+        original: 'Draws grid on selected layer.',
+        value: ''
+    },
     'import-opening': {
         original: 'Opening file...',
         value: '打開文件...'
