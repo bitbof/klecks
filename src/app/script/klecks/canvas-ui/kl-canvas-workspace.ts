@@ -1590,7 +1590,9 @@ export class KlCanvasWorkspace {
     }
 
     fitView (): void {
-        //fit into view. center. keep angle. margin of 10px
+        //fit into view. center. snap angle. margin of 10px
+
+        this.targetTransformObj.angle = this.snapAngleRad(this.targetTransformObj.angle, 90, 90);
 
         //calc width and height of bounds
         const canvasPointsArr = [
