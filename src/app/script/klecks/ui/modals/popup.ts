@@ -134,16 +134,16 @@ export function popup (
     );
 
     if (p.type === 'error') {
-        BB.addClassName(boxEl, 'poperror');
+        boxEl.classList.add('poperror');
     }
     if (p.type === 'ok') {
-        BB.addClassName(boxEl, 'popok');
+        boxEl.classList.add('popok');
     }
     if (p.type === 'warning') {
-        BB.addClassName(boxEl, 'popwarning');
+        boxEl.classList.add('popwarning');
     }
     if (p.type === 'upload') {
-        BB.addClassName(boxEl, 'popupload');
+        boxEl.classList.add('popupload');
     }
 
     const keyListener = new BB.KeyListener({

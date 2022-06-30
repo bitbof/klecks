@@ -42,7 +42,7 @@ export class Checkbox {
         }) as HTMLInputElement;
         this.check.checked = params.init;
         if (params.doHighlight && this.check.checked) {
-            BB.addClassName(this.element, 'kl-checkbox--highlight');
+            this.element.classList.add('kl-checkbox--highlight');
         }
         if (!params.allowTab) {
             this.check.tabIndex = -1;
@@ -60,11 +60,7 @@ export class Checkbox {
 
         this.check.onchange = () => {
             if (params.doHighlight) {
-                if (this.check.checked) {
-                    BB.addClassName(this.element, 'kl-checkbox--highlight');
-                } else {
-                    BB.removeClassName(this.element, 'kl-checkbox--highlight');
-                }
+                this.element.classList.toggle('kl-checkbox--highlight', this.check.checked);
             }
             params.callback(this.check.checked);
             setTimeout(() => {

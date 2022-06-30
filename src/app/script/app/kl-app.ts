@@ -1225,7 +1225,7 @@ export function KlApp(pProject: IKlProject | null, pOptions: IKlAppOptions) {
             },
         });
     }
-    BB.addClassName(toolspaceTopRow.getElement(), 'toolspace-row-shadow');
+    toolspaceTopRow.getElement().classList.add('toolspace-row-shadow');
     toolspaceTopRow.getElement().style.marginBottom = '10px';
     toolspaceInner.appendChild(toolspaceTopRow.getElement());
 
@@ -1266,7 +1266,7 @@ export function KlApp(pProject: IKlProject | null, pOptions: IKlAppOptions) {
         toolspaceToolRow.setEnableUndo(klHistory.canUndo());
         toolspaceToolRow.setEnableRedo(klHistory.canRedo());
     });
-    BB.addClassName(toolspaceToolRow.getElement(), 'toolspace-row-shadow');
+    toolspaceToolRow.getElement().classList.add('toolspace-row-shadow');
     toolspaceInner.appendChild(toolspaceToolRow.getElement());
 
     let klColorSlider;

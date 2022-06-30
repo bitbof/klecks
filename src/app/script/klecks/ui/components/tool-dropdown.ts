@@ -334,11 +334,11 @@ export function ToolDropdown(p) {
                     break;
                 }
             }
-            BB.addClassName(activeButton, 'toolspace-row-button-activated');
+            activeButton.classList.add('toolspace-row-button-activated');
             updateButton();
         } else {
             isActive = false;
-            BB.removeClassName(activeButton, 'toolspace-row-button-activated');
+            activeButton.classList.remove('toolspace-row-button-activated');
         }
     };
 
