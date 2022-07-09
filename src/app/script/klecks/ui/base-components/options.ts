@@ -72,11 +72,7 @@ export const Options = function(p) {
 
     function update() {
         for (let i = 0; i < optionArr.length; i++) {
-            if (optionArr[i].id === selectedId) {
-                BB.addClassName(optionArr[i].el, 'kl-option-selected');
-            } else {
-                BB.removeClassName(optionArr[i].el, 'kl-option-selected');
-            }
+            optionArr[i].el.classList.toggle('kl-option-selected', optionArr[i].id === selectedId);
         }
     }
 

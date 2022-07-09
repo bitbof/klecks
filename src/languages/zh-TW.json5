@@ -603,6 +603,10 @@ filled: {
         original: 'Crop',
         value: '裁剪'
     },
+    'cropcopy-click-hold': {
+        original: 'Right-click or press hold to copy.',
+        value: '',
+    },
     'cropcopy-btn-copy': {
         original: 'To Clipboard',
         value: '至剪貼板'
@@ -903,6 +907,14 @@ filled: {
     'filter-unsharp-mask-strength': {
         original: 'Strength',
         value: '強度'
+    },
+    'filter-grid': {
+        original: 'Grid',
+        value: ''
+    },
+    'filter-grid-description': {
+        original: 'Draws grid on selected layer.',
+        value: ''
     },
     'import-opening': {
         original: 'Opening file...',

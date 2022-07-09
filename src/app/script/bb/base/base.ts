@@ -48,31 +48,6 @@ export function setAttributes (el: HTMLElement, attrObj: IKeyString): void {
     }
 }
 
-export function addClassName (el: HTMLElement | SVGElement, classStr: string): void {
-    const classAttr = el.getAttribute('class');
-    const splitArr = classAttr === null ? [] : classAttr.split(' ');
-    if (splitArr.includes(classStr)) {
-        return;
-    }
-    splitArr.push(classStr);
-    el.setAttribute('class', splitArr.join(' '));
-}
-
-export function removeClassName (el: HTMLElement | SVGElement, classStr: string): void {
-    const classAttr = el.getAttribute('class');
-    const splitArr = classAttr === null ? [] : classAttr.split(' ');
-    if (!splitArr.includes(classStr)) {
-        return;
-    }
-    for (let i = 0; i < splitArr.length; i++) {
-        if (splitArr[i] === classStr) {
-            splitArr.splice(i, 1);
-            i--;
-        }
-    }
-    el.setAttribute('class', splitArr.join(' '));
-}
-
 /**
  * appendChild with an array
  * @param target

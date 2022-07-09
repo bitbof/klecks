@@ -1,12 +1,12 @@
 import * as BBEventListener from './input/event-listener';
 import {
-    addClassName, append, centerWithin, copyObj, createSvg,
+    append, centerWithin, copyObj, createSvg,
     css, dateDayDifference, decToFraction,
     fitInto, gcd, getDate,
     handleClick, imageBlobToUrl,
     insertAfter, loadImage,
     reduce,
-    removeClassName, setAttributes, shareCanvas
+    setAttributes, shareCanvas
 } from './base/base';
 import {
     canShareFiles,
@@ -63,8 +63,6 @@ export const BB = {
     loadImage,
     css,
     setAttributes,
-    addClassName,
-    removeClassName,
     append,
     fitInto,
     centerWithin,

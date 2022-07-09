@@ -34,11 +34,7 @@ export const ImageToggle = function(p) {
     });
 
     function update() {
-        if (isActive) {
-            BB.addClassName(div, 'image-toggle-active');
-        } else {
-            BB.removeClassName(div, 'image-toggle-active');
-        }
+        div.classList.toggle('image-toggle-active', isActive);
     }
 
     update();

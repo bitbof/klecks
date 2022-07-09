@@ -48,11 +48,7 @@ export function ToolspaceToolRow(p) {
         currentActiveStr = activeStr;
 
         toolDropdown.setActive(currentActiveStr);
-        if (currentActiveStr === 'hand') {
-            BB.addClassName(handButton, 'toolspace-row-button-activated');
-        } else {
-            BB.removeClassName(handButton, 'toolspace-row-button-activated');
-        }
+        handButton.classList.toggle('toolspace-row-button-activated', currentActiveStr === 'hand');
 
         if (doEmit) {
             p.onActivate(currentActiveStr);
@@ -88,11 +84,7 @@ export function ToolspaceToolRow(p) {
         (result as any).pointerListener = new BB.PointerListener({ // because :hover causes problems w touch
             target: result,
             onEnterLeave: function(isOver) {
-                if (isOver) {
-                    BB.addClassName(result, 'toolspace-row-button-hover');
-                } else {
-                    BB.removeClassName(result, 'toolspace-row-button-hover');
-                }
+                result.classList.toggle('toolspace-row-button-hover', isOver);
             }
         });
         (result as any).setIsSmall = function(b) {
@@ -217,7 +209,7 @@ export function ToolspaceToolRow(p) {
         });
         svgTriangleLeft.onclick = function() {
             p.onLeft();
-            BB.removeClassName(svgTriangleLeft, 'toolspace-svg-triangle-button-hover');
+            svgTriangleLeft.classList.remove('toolspace-svg-triangle-button-hover');
         };
 
         let svgTriangleRight = BB.createSvg({
@@ -229,28 +221,20 @@ export function ToolspaceToolRow(p) {
         });
         svgTriangleRight.onclick = function() {
             p.onRight();
-            BB.removeClassName(svgTriangleRight, 'toolspace-svg-triangle-button-hover');
+            svgTriangleRight.classList.remove('toolspace-svg-triangle-button-hover');
         };
 
         // because :hover causes problems w touch
         (result as any).leftPointerListener = new BB.PointerListener({
             target: svgTriangleLeft,
             onEnterLeave: function(isOver) {
-                if (isOver) {
-                    BB.addClassName(svgTriangleLeft, 'toolspace-svg-triangle-button-hover');
-                } else {
-                    BB.removeClassName(svgTriangleLeft, 'toolspace-svg-triangle-button-hover');
-                }
+                svgTriangleLeft.classList.toggle('toolspace-svg-triangle-button-hover', isOver);
             }
         });
         (result as any).rightPointerListener = new BB.PointerListener({
             target: svgTriangleRight,
             onEnterLeave: function(isOver) {
-                if (isOver) {
-                    BB.addClassName(svgTriangleRight, 'toolspace-svg-triangle-button-hover');
-                } else {
-                    BB.removeClassName(svgTriangleRight, 'toolspace-svg-triangle-button-hover');
-                }
+                svgTriangleRight.classList.toggle('toolspace-svg-triangle-button-hover', isOver);
             }
         });
 
@@ -299,22 +283,12 @@ export function ToolspaceToolRow(p) {
 
 
         (result as any).setIsEnabledLeft = function(b) {
-            if (b) {
-                BB.removeClassName(svgTriangleLeft, 'toolspace-row-button-disabled');
-                BB.removeClassName(leftIm, 'toolspace-row-button-disabled');
-            } else {
-                BB.addClassName(svgTriangleLeft, 'toolspace-row-button-disabled');
-                BB.addClassName(leftIm, 'toolspace-row-button-disabled');
-            }
+            svgTriangleLeft.classList.toggle('toolspace-row-button-disabled', !b);
+            leftIm.classList.toggle('toolspace-row-button-disabled', !b);
         };
         (result as any).setIsEnabledRight = function(b) {
-            if (b) {
-                BB.removeClassName(svgTriangleRight, 'toolspace-row-button-disabled');
-                BB.removeClassName(rightIm, 'toolspace-row-button-disabled');
-            } else {
-                BB.addClassName(svgTriangleRight, 'toolspace-row-button-disabled');
-                BB.addClassName(rightIm, 'toolspace-row-button-disabled');
-            }
+            svgTriangleRight.classList.toggle('toolspace-row-button-disabled', !b);
+            rightIm.classList.toggle('toolspace-row-button-disabled', !b);
         };
 
         return result;
@@ -388,53 +362,26 @@ export function ToolspaceToolRow(p) {
         (result as any).leftPointerListener = new BB.PointerListener({
             target: leftButton,
             onEnterLeave: function(isOver) {
-                if (isOver) {
-                    BB.addClassName(leftButton, 'toolspace-row-button-hover');
-                } else {
-                    BB.removeClassName(leftButton, 'toolspace-row-button-hover');
-                }
+                leftButton.classList.toggle('toolspace-row-button-hover', isOver);
             }
         });
         (result as any).rightPointerListener = new BB.PointerListener({
             target: rightButton,
             onEnterLeave: function(isOver) {
-                if (isOver) {
-                    BB.addClassName(rightButton, 'toolspace-row-button-hover');
-                } else {
-                    BB.removeClassName(rightButton, 'toolspace-row-button-hover');
-                }
+                rightButton.classList.toggle('toolspace-row-button-hover', isOver);
             }
         });
 
 
 
         (result as any).setIsEnabledLeft = function(b) {
-            if (b) {
-                BB.removeClassName(leftButton, 'toolspace-row-button-disabled');
-            } else {
-                BB.addClassName(leftButton, 'toolspace-row-button-disabled');
-            }
+            leftButton.classList.toggle('toolspace-row-button-disabled', !b);
         };
         (result as any).setIsEnabledRight = function(b) {
-            if (b) {
-                BB.removeClassName(rightButton, 'toolspace-row-button-disabled');
-            } else {
-                BB.addClassName(rightButton, 'toolspace-row-button-disabled');
-            }
+            rightButton.classList.toggle('toolspace-row-button-disabled', !b);
         };
         return result;
     }
-
-    /*let brushButton = createButton({
-        onClick: function() {
-            setActive('draw', true);
-        },
-        image: 'app/img/ui/paint.png',
-        contain: true,
-        doLighten: true
-    });
-    BB.addClassName(brushButton, 'toolspace-row-button-activated');
-    div.appendChild(brushButton);*/
 
     let toolDropdown = new ToolDropdown({
         onChange: function(activeStr) {
@@ -497,7 +444,7 @@ export function ToolspaceToolRow(p) {
         contain: true
     });
     undoButton.title = LANG('undo');
-    BB.addClassName(undoButton, 'toolspace-row-button-disabled');
+    undoButton.classList.add('toolspace-row-button-disabled');
     div.appendChild(undoButton);
 
     let redoButton = createButton({
@@ -507,7 +454,7 @@ export function ToolspaceToolRow(p) {
         doMirror: true
     });
     redoButton.title = LANG('redo');
-    BB.addClassName(redoButton, 'toolspace-row-button-disabled');
+    redoButton.classList.add('toolspace-row-button-disabled');
     div.appendChild(redoButton);
 
     zoomInButton.style.display = 'none';
@@ -555,35 +502,19 @@ export function ToolspaceToolRow(p) {
     };
 
     this.setEnableZoomIn = function(b) {
-        if (b) {
-            BB.removeClassName(zoomInButton, 'toolspace-row-button-disabled');
-        } else {
-            BB.addClassName(zoomInButton, 'toolspace-row-button-disabled');
-        }
+        zoomInButton.classList.toggle('toolspace-row-button-disabled', !b);
         (zoomInNOutButton as any).setIsEnabledLeft(b);
     };
     this.setEnableZoomOut = function(b) {
-        if (b) {
-            BB.removeClassName(zoomOutButton, 'toolspace-row-button-disabled');
-        } else {
-            BB.addClassName(zoomOutButton, 'toolspace-row-button-disabled');
-        }
+        zoomOutButton.classList.toggle('toolspace-row-button-disabled', !b);
         (zoomInNOutButton as any).setIsEnabledRight(b);
     };
     this.setEnableUndo = function(b) {
-        if (b) {
-            BB.removeClassName(undoButton, 'toolspace-row-button-disabled');
-        } else {
-            BB.addClassName(undoButton, 'toolspace-row-button-disabled');
-        }
+        undoButton.classList.toggle('toolspace-row-button-disabled', !b);
         (undoNRedoButton as any).setIsEnabledLeft(b);
     };
     this.setEnableRedo = function(b) {
-        if (b) {
-            BB.removeClassName(redoButton, 'toolspace-row-button-disabled');
-        } else {
-            BB.addClassName(redoButton, 'toolspace-row-button-disabled');
-        }
+        redoButton.classList.toggle('toolspace-row-button-disabled', !b);
         (undoNRedoButton as any).setIsEnabledRight(b);
     };
     this.setActive = function(activeStr) {

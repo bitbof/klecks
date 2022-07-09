@@ -242,8 +242,8 @@ export const KlColorSlider = function (p) {
 
     pickerButton.onclick = function () {
         if (isPicking === false) {
-            BB.removeClassName(pickerButton, 'color-picker-preview-button-hover');
-            BB.addClassName(pickerButton, 'color-picker-preview-button-active');
+            pickerButton.classList.remove('color-picker-preview-button-hover');
+            pickerButton.classList.add('color-picker-preview-button-active');
             isPicking = true;
             pickCallback(true);
         } else {
@@ -257,11 +257,7 @@ export const KlColorSlider = function (p) {
             if (isPicking) {
                 return;
             }
-            if (isOver) {
-                BB.addClassName(pickerButton, 'color-picker-preview-button-hover');
-            } else {
-                BB.removeClassName(pickerButton, 'color-picker-preview-button-hover');
-            }
+            pickerButton.classList.toggle('color-picker-preview-button-hover', isOver);
         }
     });
     divPreview.appendChild(pickerButton);
@@ -293,11 +289,7 @@ export const KlColorSlider = function (p) {
     const hexButtonPointerListener = new BB.PointerListener({
         target: hexButton,
         onEnterLeave: function(isOver) {
-            if (isOver) {
-                BB.addClassName(hexButton, 'color-picker-preview-button-hover');
-            } else {
-                BB.removeClassName(hexButton, 'color-picker-preview-button-hover');
-            }
+            hexButton.classList.toggle('color-picker-preview-button-hover', isOver);
         }
     });
     divPreview.appendChild(hexButton);
@@ -493,7 +485,7 @@ export const KlColorSlider = function (p) {
             return;
         }
         isPicking = false;
-        BB.removeClassName(pickerButton, 'color-picker-preview-button-active');
+        pickerButton.classList.remove('color-picker-preview-button-active');
     };
 
     this.enable = function (e) {

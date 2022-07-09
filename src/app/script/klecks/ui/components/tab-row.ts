@@ -107,11 +107,7 @@ export function TabRow(p) {
         let pointerListener = new BB.PointerListener({ // because :hover causes problems w touch
             target: tabDiv,
             onEnterLeave: function(isOver) {
-                if (isOver) {
-                    BB.addClassName(tabDiv, 'tabrow-tab-hover');
-                } else {
-                    BB.removeClassName(tabDiv, 'tabrow-tab-hover');
-                }
+                tabDiv.classList.toggle('tabrow-tab-hover', isOver);
             }
         });
 

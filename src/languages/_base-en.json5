@@ -243,6 +243,7 @@ Base Language File
     hint: 'Cropping is a common feature in image editing.',
     value: 'Crop',
   },
+  "cropcopy-click-hold": "Right-click or press hold to copy.",
   "cropcopy-btn-copy": "To Clipboard",
   "cropcopy-copied": "Copied.",
   "cropcopy-btn-crop": "Apply Crop",
@@ -340,6 +341,9 @@ Base Language File
   "filter-unsharp-mask-title": "Unsharp Mask",
   "filter-unsharp-mask-description": "Sharpens the selected layer by scaling pixels away from the average of their neighbors.",
   "filter-unsharp-mask-strength": "Strength",
+
+  "filter-grid": "Grid",
+  "filter-grid-description": "Draws grid on selected layer.",
 
   "import-opening": "Opening file...",
   "import-title": "Import Image",

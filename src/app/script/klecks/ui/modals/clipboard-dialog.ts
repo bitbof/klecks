@@ -14,11 +14,17 @@ import {LANG} from '../../../language/language';
  * @param showCrop - boolean - show crop button
  */
 export function clipboardDialog(parent, fullCanvas, cropCallback, output, showCrop) {
+
+    let clipboardItemIsSupported = false;
+    try {
+        clipboardItemIsSupported = !!ClipboardItem;
+    } catch (e) {}
+
     const div = document.createElement("div");
     const isSmall = window.innerWidth < 550 || window.innerHeight < 550;
 
     let topWrapper = BB.el({
-        content: LANG('crop-drag-to-crop'),
+        content: LANG('crop-drag-to-crop') + (clipboardItemIsSupported ? '' : '<br>' + LANG('cropcopy-click-hold')),
         css: {
             textAlign: 'center'
         }
@@ -29,7 +35,8 @@ export function clipboardDialog(parent, fullCanvas, cropCallback, output, showCr
     let cropCopy = new CropCopy({
         width: isSmall ? 340 : 540,
         height: isSmall ? 300 : 350,
-        canvas: fullCanvas
+        canvas: fullCanvas,
+        clipboardItemIsSupported
     });
     BB.css(cropCopy.getEl(), {
         marginTop: '10px',
@@ -73,6 +80,16 @@ export function clipboardDialog(parent, fullCanvas, cropCallback, output, showCr
         closefunc();
     }
     BB.addEventListener(window, "blur", blur);
+
+    const buttonArr = [];
+    if (clipboardItemIsSupported) {
+        buttonArr.push(LANG('cropcopy-btn-copy'));
+    }
+    if (showCrop) {
+        buttonArr.push(LANG('cropcopy-btn-crop'));
+    }
+    buttonArr.push('Cancel');
+
     popup({
         target: parent,
         message: '<b>' + (showCrop ? `${LANG('cropcopy-title-copy')} / ${LANG('cropcopy-title-crop')}` : `${LANG('cropcopy-title-copy')}`) + '</b>',
@@ -80,7 +97,7 @@ export function clipboardDialog(parent, fullCanvas, cropCallback, output, showCr
         style: isSmall ? {} : {
             width: "500px"
         },
-        buttons: showCrop ? [LANG('cropcopy-btn-copy'), LANG('cropcopy-btn-crop'), 'Cancel'] : [LANG('cropcopy-btn-copy'), 'Cancel'],
+        buttons: buttonArr,
         primaries: [LANG('cropcopy-btn-copy')],
         callback: function (result) {
             if (result === LANG('cropcopy-btn-copy')) {

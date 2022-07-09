@@ -603,6 +603,10 @@
         original: 'Crop',
         value: '裁剪'
     },
+    'cropcopy-click-hold': {
+        original: 'Right-click or press hold to copy.',
+        value: '点击右键或长按进行复制。',
+    },
     'cropcopy-btn-copy': {
         original: 'To Clipboard',
         value: '至剪贴板'
@@ -903,6 +907,14 @@
     'filter-unsharp-mask-strength': {
         original: 'Strength',
         value: '强度'
+    },
+    'filter-grid': {
+        original: 'Grid',
+        value: '网格'
+    },
+    'filter-grid-description': {
+        original: 'Draws grid on selected layer.',
+        value: '给当前层添加网格线。'
     },
     'import-opening': {
         original: 'Opening file...',

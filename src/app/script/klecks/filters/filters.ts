@@ -28,6 +28,8 @@ import glBlurImg from 'url:~/src/app/img/ui/edit-triangle-blur.png';
 // @ts-ignore
 import glUnsharpMaskImg from 'url:~/src/app/img/ui/edit-unsharp-mask.png';
 // @ts-ignore
+import gridImg from 'url:~/src/app/img/ui/edit-grid.svg';
+// @ts-ignore
 import aImg from 'url:~/src/app/img/ui/';
 import {LANG, languageStrings} from '../../language/language';
 
@@ -206,6 +208,19 @@ export const filterLib: {
         buttonLabel: '',
         icon: glUnsharpMaskImg,
         webgl: true,
+        updateContext: true,
+        updatePos: false,
+        getDialog: null,
+        apply: null,
+        inEmbed: true,
+    },
+    grid: {
+        lang: {name: 'filter-grid', button: 'filter-grid'},
+        name: '',
+        buttonLabel: '',
+        icon: gridImg,
+        webgl: false,
+        neededWithWebGL: true,
         updateContext: true,
         updatePos: false,
         getDialog: null,

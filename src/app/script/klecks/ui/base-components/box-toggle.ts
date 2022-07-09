@@ -5,11 +5,7 @@ export class BoxToggle {
     value: boolean;
 
     update (): void {
-        if (this.value) {
-            BB.addClassName(this.el, 'kl-box-toggle--active');
-        } else {
-            BB.removeClassName(this.el, 'kl-box-toggle--active');
-        }
+        this.el.classList.toggle('kl-box-toggle--active', this.value);
     }
 
     // --- public ---
