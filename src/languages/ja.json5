@@ -605,7 +605,7 @@
     },
     'cropcopy-click-hold': {
         original: 'Right-click or press hold to copy.',
-        value: '',
+        value: '右クリックまたは長押しでコピー。',
     },
     'cropcopy-btn-copy': {
         original: 'To Clipboard',
@@ -910,11 +910,11 @@
     },
     'filter-grid': {
         original: 'Grid',
-        value: ''
+        value: 'グリッド'
     },
     'filter-grid-description': {
         original: 'Draws grid on selected layer.',
-        value: ''
+        value: '選択レイヤーにグリッドを追加します。'
     },
     'import-opening': {
         original: 'Opening file...',

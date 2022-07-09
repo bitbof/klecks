@@ -605,7 +605,7 @@ filled: {
     },
     'cropcopy-click-hold': {
         original: 'Right-click or press hold to copy.',
-        value: '',
+        value: '點擊右鍵或長按進行複制。',
     },
     'cropcopy-btn-copy': {
         original: 'To Clipboard',
@@ -910,11 +910,11 @@ filled: {
     },
     'filter-grid': {
         original: 'Grid',
-        value: ''
+        value: '網格'
     },
     'filter-grid-description': {
         original: 'Draws grid on selected layer.',
-        value: ''
+        value: '給當前層添加網格線。'
     },
     'import-opening': {
         original: 'Opening file...',
