@@ -30,7 +30,7 @@ import glUnsharpMaskImg from 'url:~/src/app/img/ui/edit-unsharp-mask.png';
 // @ts-ignore
 import gridImg from 'url:~/src/app/img/ui/edit-grid.svg';
 // @ts-ignore
-import aImg from 'url:~/src/app/img/ui/';
+import noiseImg from 'url:~/src/app/img/ui/edit-noise.svg';
 import {LANG, languageStrings} from '../../language/language';
 
 
@@ -40,12 +40,8 @@ export const filterLibStatus = {
 export const filterLib: {
     [key:string]: IFilter;
 } = {
-    glBrightnessContrast: {
+    brightnessContrast: {
         lang: {name: 'filter-bright-contrast-title', button: 'filter-bright-contrast'},
-        name: '',
-        buttonLabel: '',
-        webgl: true,
-        updateContext: true,
         icon: glBrightnessContrastImg,
         updatePos: false,
         getDialog: null,
@@ -54,24 +50,15 @@ export const filterLib: {
     },
     cropExtend: {
         lang: {name: 'filter-crop-title', button: 'filter-crop-extend'},
-        name: '',
-        buttonLabel: '',
         icon: cropExtendImg,
-        webgl: false,
-        neededWithWebGL: true,
-        updateContext: true,
         updatePos: true,
         getDialog: null,
         apply: null,
         inEmbed: false,
     },
-    glCurves: {
+    curves: {
         lang: {name: 'filter-curves-title', button: 'filter-curves'},
-        name: '',
-        buttonLabel: '',
         icon: glCurvesImg,
-        webgl: true,
-        updateContext: true,
         updatePos: false,
         getDialog: null,
         apply: null,
@@ -79,24 +66,15 @@ export const filterLib: {
     },
     flip: {
         lang: {name: 'filter-flip-title', button: 'filter-flip'},
-        name: '',
-        buttonLabel: '',
         icon: flipImg,
-        webgl: false,
-        neededWithWebGL: true,
-        updateContext: true,
         updatePos: false,
         getDialog: null,
         apply: null,
         inEmbed: true,
     },
-    glHueSaturation: {
+    hueSaturation: {
         lang: {name: 'filter-hue-sat-title', button: 'filter-hue-sat'},
-        name: '',
-        buttonLabel: '',
         icon: glHueSaturationImg,
-        webgl: true,
-        updateContext: true,
         updatePos: false,
         getDialog: null,
         apply: null,
@@ -104,23 +82,16 @@ export const filterLib: {
     },
     invert: {
         lang: {name: 'filter-invert', button: 'filter-invert'},
-        name: '',
         icon: invertImg,
-        webgl: true,
-        updateContext: true,
         updatePos: false,
         isInstant: true,
         getDialog: null,
         apply: null,
         inEmbed: true,
     },
-    glPerspective: {
+    perspective: {
         lang: {name: 'filter-perspective-title', button: 'filter-perspective'},
-        name: '',
-        buttonLabel: '',
         icon: glPerspectiveImg,
-        webgl: true,
-        updateContext: true,
         updatePos: false,
         getDialog: null,
         apply: null,
@@ -128,12 +99,7 @@ export const filterLib: {
     },
     resize: {
         lang: {name: 'filter-resize-title', button: 'filter-resize'},
-        name: '',
-        buttonLabel: '',
         icon: resizeImg,
-        webgl: false,
-        neededWithWebGL: true,
-        updateContext: true,
         updatePos: true,
         getDialog: null,
         apply: null,
@@ -141,24 +107,15 @@ export const filterLib: {
     },
     rotate: {
         lang: {name: 'filter-rotate-title', button: 'filter-rotate'},
-        name: '',
-        buttonLabel: '',
         icon: rotateImg,
-        webgl: false,
-        neededWithWebGL: true,
-        updateContext: true,
         updatePos: true,
         getDialog: null,
         apply: null,
         inEmbed: false,
     },
-    glTiltShift: {
+    tiltShift: {
         lang: {name: 'filter-tilt-shift-title', button: 'filter-tilt-shift'},
-        name: '',
-        buttonLabel: '',
         icon: glTiltShiftImg,
-        webgl: true,
-        updateContext: true,
         updatePos: false,
         getDialog: null,
         apply: null,
@@ -166,11 +123,7 @@ export const filterLib: {
     },
     toAlpha: {
         lang: {name: 'filter-to-alpha-title', button: 'filter-to-alpha'},
-        name: '',
-        buttonLabel: '',
         icon: toAlphaImg,
-        webgl: true,
-        updateContext: false,
         updatePos: false,
         getDialog: null,
         apply: null,
@@ -178,37 +131,23 @@ export const filterLib: {
     },
     transform: {
         lang: {name: 'filter-transform-title', button: 'filter-transform'},
-        name: '',
-        buttonLabel: '',
         icon: transformImg,
-        webgl: false,
-        neededWithWebGL: true,
-        updateContext: true,
         updatePos: false,
-        ieFails: true,
         getDialog: null,
         apply: null,
         inEmbed: true,
     },
-    glBlur: {
+    blur: {
         lang: {name: 'filter-triangle-blur-title', button: 'filter-triangle-blur'},
-        name: '',
-        buttonLabel: '',
         icon: glBlurImg,
-        webgl: true,
-        updateContext: true,
         updatePos: false,
         getDialog: null,
         apply: null,
         inEmbed: true,
     },
-    glUnsharpMask: {
+    unsharpMask: {
         lang: {name: 'filter-unsharp-mask-title', button: 'filter-unsharp-mask'},
-        name: '',
-        buttonLabel: '',
         icon: glUnsharpMaskImg,
-        webgl: true,
-        updateContext: true,
         updatePos: false,
         getDialog: null,
         apply: null,
@@ -216,28 +155,18 @@ export const filterLib: {
     },
     grid: {
         lang: {name: 'filter-grid', button: 'filter-grid'},
-        name: '',
-        buttonLabel: '',
         icon: gridImg,
-        webgl: false,
-        neededWithWebGL: true,
-        updateContext: true,
         updatePos: false,
         getDialog: null,
         apply: null,
         inEmbed: true,
-    }
+    },
+    noise: {
+        lang: {name: 'filter-noise', button: 'filter-noise'},
+        icon: noiseImg,
+        updatePos: false,
+        getDialog: null,
+        apply: null,
+        inEmbed: true,
+    },
 };
-
-function updateNames() {
-    const keys = Object.keys(filterLib);
-    keys.forEach(item => {
-        filterLib[item].name = LANG(filterLib[item].lang.name);
-        filterLib[item].buttonLabel = LANG(filterLib[item].lang.button);
-    });
-}
-updateNames();
-
-languageStrings.subscribe(() => {
-    updateNames();
-});

@@ -13,6 +13,7 @@ import textImg from 'url:~/src/app/img/ui/cursor-text.png';
 import {IPressureInput, IVector2D} from '../../bb/bb.types';
 import {KlCanvas} from '../canvas/kl-canvas';
 import {KeyListener} from '../../bb/input/key-listener';
+import {KL} from '../kl';
 
 export interface IViewChangeEvent {
     changed: ('scale' | 'angle')[];
@@ -677,6 +678,9 @@ export class KlCanvasWorkspace {
         this.keyListener = new BB.KeyListener({
             onDown: (keyStr, event, comboStr, isRepeat) => {
 
+                if (KL.dialogCounter.get() > 0 || BB.isInputFocused(true)) {
+                    return;
+                }
                 if (keyStr === 'alt') {
                     event.preventDefault();
                 }
@@ -717,6 +721,11 @@ export class KlCanvasWorkspace {
 
             },
             onUp: (keyStr, event, oldComboStr) => {
+                // prevent menu bar in Firefox
+                if (keyStr === 'alt') {
+                    event.preventDefault();
+                }
+
                 if (this.currentInputProcessor) {
                     this.currentInputProcessor.onKeyUp(keyStr, event, oldComboStr);
                 }
@@ -1385,6 +1394,10 @@ export class KlCanvasWorkspace {
                         try {
                             e.eventPreventDefault();
                         } catch (e) {}
+                    }
+                    // prevent manual slider input keeping focus on iPad
+                    if (e.type === 'pointerdown') {
+                        BB.unfocusAnyInput();
                     }
                     /*if (e.type === 'pointermove') {
                         BB.throwOut(JSON.stringify(e));

@@ -10,6 +10,7 @@ import brushIconImg from 'url:~/src/app/img/ui/brush-pen.svg';
 import {genBrushAlpha01, genBrushAlpha02} from '../brushes/alphas/brush-alphas';
 import {IBrushUi} from '../kl.types';
 import {LANG, languageStrings} from '../../language/language';
+import {input} from '../ui/base-components/input';
 
 export const penBrushUi = (function () {
     let brushInterface: IBrushUi = {
@@ -21,9 +22,9 @@ export const penBrushUi = (function () {
             curve: BB.quadraticSplineInput(0.5, 100, 0.1)
         },
         opacitySlider: {
-            min: 0,
+            min: 1/100,
             max: 1,
-            curve: [[0, 1 / 100], [0.5, 0.3], [1, 1]]
+            curve: [[0, 1/100], [0.5, 30/100], [1, 1]]
         },
         Ui: null,
     };
@@ -130,21 +131,23 @@ export const penBrushUi = (function () {
                 height: 30,
                 min: brushInterface.sizeSlider.min,
                 max: brushInterface.sizeSlider.max,
-                initValue: brush.getSize(),
+                value: brush.getSize(),
+                curve: brushInterface.sizeSlider.curve,
                 eventResMs: eventResMs,
-                onChange: function (val) {
+                toDisplayValue: (val) => val * 2,
+                toValue: (displayValue) => displayValue / 2,
+                onChange: (val) => {
                     setSize(val);
                     p.onSizeChange(val);
                 },
-                curve: brushInterface.sizeSlider.curve,
-                formatFunc: function (v) {
-                    v *= 2;
-                    if (v < 10) {
-                        return Math.round(v * 10) / 10;
+                formatFunc: (displayValue) => {
+                    if (displayValue < 10) {
+                        return BB.round(displayValue, 1);
                     } else {
-                        return Math.round(v);
+                        return Math.round(displayValue);
                     }
-                }
+                },
+                manualInputRoundDigits: 1,
             });
             opacitySlider = new KlSlider({
                 label: LANG('opacity'),
@@ -152,16 +155,15 @@ export const penBrushUi = (function () {
                 height: 30,
                 min: brushInterface.opacitySlider.min,
                 max: brushInterface.opacitySlider.max,
-                initValue: brushInterface.opacitySlider.max,
+                value: brushInterface.opacitySlider.max,
+                curve: brushInterface.opacitySlider.curve,
                 eventResMs: eventResMs,
-                onChange: function (val) {
+                toDisplayValue: (val) => val * 100,
+                toValue: (displayValue) => displayValue / 100,
+                onChange: (val) => {
                     brush.setOpacity(val);
                     p.onOpacityChange(val);
                 },
-                curve: brushInterface.opacitySlider.curve,
-                formatFunc: function(v) {
-                    return Math.round(v * 100);
-                }
             });
 
             let pressureSizeToggle = penPressureToggle(true, function (b) {
@@ -211,12 +213,12 @@ export const penBrushUi = (function () {
 
         this.increaseSize = function (f) {
             if (!brush.isDrawing()) {
-                sizeSlider.increaseValue(f);
+                sizeSlider.changeSliderValue(f);
             }
         };
         this.decreaseSize = function (f) {
             if (!brush.isDrawing()) {
-                sizeSlider.decreaseValue(f);
+                sizeSlider.changeSliderValue(-f);
             }
         };
 

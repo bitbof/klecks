@@ -6,17 +6,17 @@ import {getSharedFx} from './shared-gl-fx';
 import {IFilterApply, IFilterGetDialogParam, IKlBasicLayer} from '../kl.types';
 import {LANG} from '../../language/language';
 
-export const glTiltShift = {
+export const filterTiltShift = {
 
     getDialog(params: IFilterGetDialogParam) {
         let context = params.context;
-        let canvas = params.canvas;
-        if (!context || !canvas) {
+        let klCanvas = params.klCanvas;
+        if (!context || !klCanvas) {
             return false;
         }
 
-        let layers = canvas.getLayers();
-        let selectedLayerIndex = canvas.getLayerIndex(context.canvas);
+        let layers = klCanvas.getLayers();
+        let selectedLayerIndex = klCanvas.getLayerIndex(context.canvas);
 
         let fit = BB.fitInto(context.canvas.width, context.canvas.height, 280, 200, 1);
         let displayW = parseInt('' + fit.width), displayH = parseInt('' + fit.height);
@@ -116,12 +116,12 @@ export const glTiltShift = {
                 height: 30,
                 min: 0,
                 max: 200,
-                initValue: blur,
+                value: blur,
                 eventResMs: eventResMs,
                 onChange: function (val) {
                     blur = val;
                     update();
-                }
+                },
             });
             blurSlider.getElement().style.marginBottom = "10px";
             div.appendChild(blurSlider.getElement());
@@ -131,12 +131,12 @@ export const glTiltShift = {
                 height: 30,
                 min: 0,
                 max: 1000,
-                initValue: gradient,
+                value: gradient,
                 eventResMs: eventResMs,
                 onChange: function (val) {
                     gradient = val;
                     update();
-                }
+                },
             });
             div.appendChild(gradientSlider.getElement());
 
@@ -240,7 +240,7 @@ export const glTiltShift = {
         texture.destroy();
         history.pause(false);
         history.push({
-            tool: ["filter", "glTiltShift"],
+            tool: ["filter", "tiltShift"],
             action: "apply",
             params: [{
                 input: params.input

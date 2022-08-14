@@ -916,6 +916,26 @@
         original: 'Draws grid on selected layer.',
         value: '给当前层添加网格线。'
     },
+    'filter-noise': {
+        original: 'Noise',
+        value: '噪音'
+    },
+    'filter-noise-description': {
+        original: 'Adds noise to selected layer.',
+        value: '应用噪音到已选图层。'
+    },
+    'filter-noise-scale': {
+        original: 'Scale',
+        value: '图案大小'
+    },
+    'filter-noise-alpha': {
+        original: 'Alpha',
+        value: 'Alpha'
+    },
+    'filter-noise-inverted': {
+        original: 'Inverted',
+        value: '反相'
+    },
     'import-opening': {
         original: 'Opening file...',
         value: '打开文件...'

@@ -1,19 +1,20 @@
 import {filterLib, filterLibStatus} from './filters';
-import {glBrightnessContrast} from './gl-brightness-contrast';
-import {cropExtend} from './crop-extend';
-import {glCurves} from './gl-curves';
-import {flip} from './flip';
-import {glHueSaturation} from './gl-hue-saturation';
-import {invert} from './invert';
-import {glPerspective} from './gl-perspective';
-import {resize} from './resize';
-import {rotate} from './rotate';
-import {glTiltShift} from './gl-tilt-shift';
-import {transform} from './transform';
-import {glBlur} from './gl-blur';
-import {glUnsharpMask} from './gl-unsharp-mask';
-import {toAlpha} from './to-alpha';
-import {grid} from './grid';
+import {filterBrightnessContrast} from './filter-brightness-contrast';
+import {filterCropExtend} from './filter-crop-extend';
+import {filterCurves} from './filter-curves';
+import {filterFlip} from './filter-flip';
+import {filterHueSaturation} from './filter-hue-saturation';
+import {filterInvert} from './filter-invert';
+import {filterPerspective} from './filter-perspective';
+import {filterResize} from './filter-resize';
+import {filterRotate} from './filter-rotate';
+import {filterTiltShift} from './filter-tilt-shift';
+import {filterTransform} from './filter-transform';
+import {filterBlur} from './filter-blur';
+import {filterUnsharpMask} from './filter-unsharp-mask';
+import {filterToAlpha} from './filter-to-alpha';
+import {filterGrid} from './filter-grid';
+import {filterNoise} from './filter-noise';
 
 let embed: boolean;
 function importFilter(libObj, moduleObj): void {
@@ -30,21 +31,22 @@ export function importFilters(isEmbed?: boolean) {
     }
     embed = isEmbed
 
-    importFilter(filterLib.glBrightnessContrast, glBrightnessContrast);
-    importFilter(filterLib.cropExtend, cropExtend);
-    importFilter(filterLib.glCurves, glCurves);
-    importFilter(filterLib.flip, flip);
-    importFilter(filterLib.glHueSaturation, glHueSaturation);
-    importFilter(filterLib.invert, invert);
-    importFilter(filterLib.glPerspective, glPerspective);
-    importFilter(filterLib.resize, resize);
-    importFilter(filterLib.rotate, rotate);
-    importFilter(filterLib.glTiltShift, glTiltShift);
-    importFilter(filterLib.transform, transform);
-    importFilter(filterLib.glBlur, glBlur);
-    importFilter(filterLib.glUnsharpMask, glUnsharpMask);
-    importFilter(filterLib.toAlpha, toAlpha);
-    importFilter(filterLib.grid, grid);
+    importFilter(filterLib.brightnessContrast, filterBrightnessContrast);
+    importFilter(filterLib.cropExtend, filterCropExtend);
+    importFilter(filterLib.curves, filterCurves);
+    importFilter(filterLib.flip, filterFlip);
+    importFilter(filterLib.hueSaturation, filterHueSaturation);
+    importFilter(filterLib.invert, filterInvert);
+    importFilter(filterLib.perspective, filterPerspective);
+    importFilter(filterLib.resize, filterResize);
+    importFilter(filterLib.rotate, filterRotate);
+    importFilter(filterLib.tiltShift, filterTiltShift);
+    importFilter(filterLib.transform, filterTransform);
+    importFilter(filterLib.blur, filterBlur);
+    importFilter(filterLib.unsharpMask, filterUnsharpMask);
+    importFilter(filterLib.toAlpha, filterToAlpha);
+    importFilter(filterLib.grid, filterGrid);
+    importFilter(filterLib.noise, filterNoise);
 
     filterLibStatus.isLoaded = true;
 }

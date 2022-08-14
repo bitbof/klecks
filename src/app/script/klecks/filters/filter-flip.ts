@@ -6,17 +6,17 @@ import checkmarkImg from 'url:~/src/app/img/ui/checkmark.svg';
 import {IFilterApply, IFilterGetDialogParam, IKlBasicLayer, IMixMode} from '../kl.types';
 import {LANG} from '../../language/language';
 
-export const flip = {
+export const filterFlip = {
 
     getDialog(params: IFilterGetDialogParam) {
         let context = params.context;
-        let canvas = params.canvas;
-        if (!context || !canvas) {
+        let klCanvas = params.klCanvas;
+        if (!context || !klCanvas) {
             return false;
         }
 
-        let layers = canvas.getLayers();
-        let selectedLayerIndex = canvas.getLayerIndex(context.canvas);
+        let layers = klCanvas.getLayers();
+        let selectedLayerIndex = klCanvas.getLayerIndex(context.canvas);
 
         let fit = BB.fitInto(context.canvas.width, context.canvas.height, 280, 200, 1);
         let w = parseInt('' + fit.width), h = parseInt('' + fit.height);
@@ -250,17 +250,17 @@ export const flip = {
 
     apply(params: IFilterApply) {
         let context = params.context;
-        let canvas = params.canvas;
+        let klCanvas = params.klCanvas;
         let history = params.history;
         let horizontal = params.input.horizontal;
         let vertical = params.input.vertical;
         let flipCanvas = params.input.flipCanvas;
-        if (!context || !canvas || !history) {
+        if (!context || !klCanvas || !history) {
             return false;
         }
 
         history.pause(true);
-        canvas.flip(horizontal, vertical, flipCanvas ? null : canvas.getLayerIndex(context.canvas));
+        klCanvas.flip(horizontal, vertical, flipCanvas ? null : klCanvas.getLayerIndex(context.canvas));
         history.pause(false);
 
         history.push({

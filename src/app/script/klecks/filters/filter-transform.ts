@@ -12,19 +12,19 @@ interface IFilterTransformInput {
     isPixelated: boolean;
 }
 
-export const transform = {
+export const filterTransform = {
 
     getDialog(params: IFilterGetDialogParam) {
         let i;
         let context = params.context;
-        let canvas = params.canvas;
-        if (!context || !canvas) {
+        let klCanvas = params.klCanvas;
+        if (!context || !klCanvas) {
             return false;
         }
 
         let isSmall = window.innerWidth < 550;
-        let layers = canvas.getLayers();
-        let selectedLayerIndex = canvas.getLayerIndex(context.canvas);
+        let layers = klCanvas.getLayers();
+        let selectedLayerIndex = klCanvas.getLayerIndex(context.canvas);
 
         let fit = BB.fitInto(context.canvas.width, context.canvas.height, isSmall ? 280 : 490, isSmall ? 200 : 240, 1);
         let displayW = parseInt('' + fit.width), displayH = parseInt('' + fit.height);

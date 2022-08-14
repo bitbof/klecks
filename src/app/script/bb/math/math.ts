@@ -106,6 +106,20 @@ export function roundUneven(f: number) {
 }
 
 /**
+ * round number to certain precision.
+ * round(1.2345, 2) = 1.23
+ * round(1.2345, 0) = 0
+ * round(123, -1) = 120
+ *
+ * @param f
+ * @param digits
+ */
+export function round(f: number, digits: number): number {
+    const digitMult = Math.pow(10, digits);
+    return Math.round((f/* + Number.EPSILON*/) * digitMult) / digitMult;
+}
+
+/**
  * update target so it includes bounds
  * @param target
  * @param bounds

@@ -50,17 +50,15 @@ export const blendBrushUi = (function () {
                 height: 30,
                 min: brushInterface.sizeSlider.min,
                 max: brushInterface.sizeSlider.max,
-                initValue: 58 / 2,
+                value: 58,
+                curve: brushInterface.sizeSlider.curve,
                 eventResMs: eventResMs,
-                onChange: function (val) {
+                toDisplayValue: (val) => val * 2,
+                toValue: (displayValue) => displayValue / 2,
+                onChange: (val) => {
                     setSize(val);
                     p.onSizeChange(val);
                 },
-                curve: brushInterface.sizeSlider.curve,
-                formatFunc: function (v) {
-                    v *= 2;
-                    return Math.round(v);
-                }
             });
             opacitySlider = new KlSlider({
                 label: LANG('opacity'),
@@ -68,27 +66,29 @@ export const blendBrushUi = (function () {
                 height: 30,
                 min: brushInterface.opacitySlider.min,
                 max: brushInterface.opacitySlider.max,
-                initValue: brush.getOpacity(),
+                value: brush.getOpacity(),
+                curve: brushInterface.opacitySlider.curve,
                 eventResMs: eventResMs,
-                onChange: function (val) {
+                toDisplayValue: (val) => val * 100,
+                toValue: (displayValue) => displayValue / 100,
+                onChange: (val) => {
                     brush.setOpacity(val);
                     p.onOpacityChange(val);
                 },
-                formatFunc: function(v) {
-                    return Math.round(v * 100);
-                }
             });
             let blendingSlider = new KlSlider({
                 label: LANG('brush-blending'),
                 width: 225,
                 height: 30,
                 min: 0,
-                max: 100,
-                initValue: brush.getBlending() * 100,
+                max: 1,
+                value: brush.getBlending(),
                 eventResMs: eventResMs,
+                toDisplayValue: (val) => val * 100,
+                toValue: (displayValue) => displayValue / 100,
                 onChange: function (val) {
-                    brush.setBlending(val / 100);
-                }
+                    brush.setBlending(val);
+                },
             });
             blendingSlider.getElement().style.marginTop = "10px";
 
@@ -147,12 +147,12 @@ export const blendBrushUi = (function () {
 
         this.increaseSize = function (f) {
             if (!brush.getIsDrawing()) {
-                sizeSlider.increaseValue(f);
+                sizeSlider.changeSliderValue(f);
             }
         };
         this.decreaseSize = function (f) {
             if (!brush.getIsDrawing()) {
-                sizeSlider.decreaseValue(f);
+                sizeSlider.changeSliderValue(-f);
             }
         };
 

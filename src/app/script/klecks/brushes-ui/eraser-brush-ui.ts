@@ -51,21 +51,23 @@ export const eraserBrushUi = (function () {
                 height: 30,
                 min: brushInterface.sizeSlider.min,
                 max: brushInterface.sizeSlider.max,
-                initValue: 30,
+                value: 30,
+                curve: brushInterface.sizeSlider.curve,
                 eventResMs: eventResMs,
-                onChange: function (val) {
+                toDisplayValue: (val) => val * 2,
+                toValue: (displayValue) => displayValue / 2,
+                onChange: (val) => {
                     setSize(val);
                     p.onSizeChange(val);
                 },
-                curve: brushInterface.sizeSlider.curve,
-                formatFunc: function (v) {
-                    v *= 2;
-                    if (v < 10) {
-                        return Math.round(v * 10) / 10;
+                formatFunc: (displayValue) => {
+                    if (displayValue < 10) {
+                        return BB.round(displayValue, 1);
                     } else {
-                        return Math.round(v);
+                        return Math.round(displayValue);
                     }
-                }
+                },
+                manualInputRoundDigits: 1,
             });
             opacitySlider = new KlSlider({
                 label: LANG('opacity'),
@@ -73,15 +75,14 @@ export const eraserBrushUi = (function () {
                 height: 30,
                 min: brushInterface.opacitySlider.min,
                 max: brushInterface.opacitySlider.max,
-                initValue: 1,
+                value: brushInterface.opacitySlider.max,
                 eventResMs: eventResMs,
-                onChange: function (val) {
+                toDisplayValue: (val) => val * 100,
+                toValue: (displayValue) => displayValue / 100,
+                onChange: (val) => {
                     brush.setOpacity(val);
                     p.onOpacityChange(val);
                 },
-                formatFunc: function(v) {
-                    return Math.round(v * 100);
-                }
             });
 
             let pressureSizeToggle = penPressureToggle(true, function (b) {
@@ -139,12 +140,12 @@ export const eraserBrushUi = (function () {
 
         this.increaseSize = function (f) {
             if (!brush.isDrawing()) {
-                sizeSlider.increaseValue(f);
+                sizeSlider.changeSliderValue(f);
             }
         };
         this.decreaseSize = function (f) {
             if (!brush.isDrawing()) {
-                sizeSlider.decreaseValue(f);
+                sizeSlider.changeSliderValue(-f);
             }
         };
         this.getSize = function () {

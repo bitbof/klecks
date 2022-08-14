@@ -2,20 +2,20 @@ import {BB} from '../../bb/bb';
 import {IFilterApply, IFilterGetDialogParam} from '../kl.types';
 import {LANG} from '../../language/language';
 
-export const rotate = {
+export const filterRotate = {
 
     getDialog(params: IFilterGetDialogParam) {
-        let canvas = params.canvas;
-        if (!canvas)
+        let klCanvas = params.klCanvas;
+        if (!klCanvas)
             return false;
 
-        let fit = BB.fitInto(canvas.getWidth(), canvas.getHeight(), 280, 200, 1);
+        let fit = BB.fitInto(klCanvas.getWidth(), klCanvas.getHeight(), 280, 200, 1);
         let w = parseInt('' + fit.width), h = parseInt('' + fit.height);
 
-        let previewFactor = w / canvas.getWidth();
+        let previewFactor = w / klCanvas.getWidth();
         let tempCanvas = BB.canvas(w, h);
         tempCanvas.style.display = 'block';
-        tempCanvas.getContext("2d").drawImage(canvas.getCompleteCanvas(previewFactor), 0, 0, w, h);
+        tempCanvas.getContext("2d").drawImage(klCanvas.getCompleteCanvas(previewFactor), 0, 0, w, h);
 
 
         let div = document.createElement("div");
@@ -106,13 +106,13 @@ export const rotate = {
     },
 
     apply(params: IFilterApply) {
-        let canvas = params.canvas;
+        let klCanvas = params.klCanvas;
         let history = params.history;
         let deg = params.input.deg;
-        if (!canvas || !history)
+        if (!klCanvas || !history)
             return false;
         history.pause(true);
-        canvas.rotate(deg);
+        klCanvas.rotate(deg);
         history.pause(false);
         history.push({
             tool: ["filter", "rotate"],

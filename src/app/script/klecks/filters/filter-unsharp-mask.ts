@@ -1,36 +1,39 @@
 import {BB} from '../../bb/bb';
-import {Options} from '../ui/base-components/options';
-import {ColorOptions} from '../ui/base-components/color-options';
+import {eventResMs} from './filters-consts';
+import {KlSlider} from '../ui/base-components/kl-slider';
 import {KlCanvasPreview} from '../canvas-ui/canvas-preview';
 import {getSharedFx} from './shared-gl-fx';
 import {IFilterApply, IFilterGetDialogParam, IKlBasicLayer} from '../kl.types';
 import {LANG} from '../../language/language';
 
-export const toAlpha = {
+export const filterUnsharpMask = {
 
     getDialog(params: IFilterGetDialogParam) {
         let context = params.context;
-        let canvas = params.canvas;
-        if (!context || !canvas) {
+        let klCanvas = params.klCanvas;
+        if (!context || !klCanvas) {
             return false;
         }
 
-        let layers = canvas.getLayers();
-        let selectedLayerIndex = canvas.getLayerIndex(context.canvas);
+        let layers = klCanvas.getLayers();
+        let selectedLayerIndex = klCanvas.getLayerIndex(context.canvas);
 
         let fit = BB.fitInto(context.canvas.width, context.canvas.height, 280, 200, 1);
-        let w = parseInt('' + fit.width), h = parseInt('' + fit.height);
+        let displayW = parseInt('' + fit.width), displayH = parseInt('' + fit.height);
+        let w = Math.min(displayW, context.canvas.width);
+        let h = Math.min(displayH, context.canvas.height);
 
         let tempCanvas = BB.canvas(w, h);
         {
             const ctx = tempCanvas.getContext("2d");
             ctx.save();
-            if (tempCanvas.width > context.canvas.width) {
+            if (w > context.canvas.width) {
                 ctx.imageSmoothingEnabled = false;
             }
             ctx.drawImage(context.canvas, 0, 0, w, h);
             ctx.restore();
         }
+        let previewFactor = w / context.canvas.width;
 
         let div = document.createElement("div");
         let result: any = {
@@ -39,12 +42,7 @@ export const toAlpha = {
 
         function finishInit() {
             let radius = 2, strength = 5.1 / 10;
-            div.appendChild(BB.el({
-                content: LANG('filter-to-alpha-description'),
-                css: {
-                    marginBottom: '5px'
-                }
-            }));
+            div.innerHTML = LANG('filter-unsharp-mask-description') + "<br/><br/>";
 
             let glCanvas = getSharedFx();
             if (!glCanvas) {
@@ -53,63 +51,39 @@ export const toAlpha = {
             let texture = glCanvas.texture(tempCanvas);
             glCanvas.draw(texture).update(); // update glCanvas size
 
-            function updatePreview() {
-                glCanvas.draw(texture).toAlpha(sourceId === 'inverted-luminance', selectedRgbaObj).update();
-                klCanvasPreview.render();
-            }
-
-            // source
-            let sourceId = 'inverted-luminance';
-            let sourceOptions = new Options({
-                optionArr: [
-                    {
-                        id: 'inverted-luminance',
-                        label: LANG('filter-to-alpha-inverted-lum')
-                    },
-                    {
-                        id: 'luminance',
-                        label: LANG('filter-to-alpha-lum')
-                    }
-                ],
-                initialId: sourceId,
-                onChange: function(id) {
-                    sourceId = id;
-                    updatePreview();
-                }
+            let radiusSlider = new KlSlider({
+                label: LANG('radius'),
+                width: 300,
+                height: 30,
+                min: 0,
+                max: 200,
+                value: 2,
+                eventResMs: eventResMs,
+                onChange: function (val) {
+                    radius = val;
+                    glCanvas.draw(texture).unsharpMask(radius * previewFactor, strength).update();
+                    klCanvasPreview.render();
+                },
+                curve: [[0, 0], [0.1, 2], [0.5, 50], [1, 200]],
             });
-            div.appendChild(sourceOptions.getElement());
-
-            // color
-            let selectedRgbaObj = {r: 0, g: 0, b: 0, a: 1};
-            let colorOptionsArr = [
-                null,
-                {r: 0, g: 0, b: 0, a: 1},
-                {r: 255, g: 255, b: 255, a: 1}
-            ];
-            colorOptionsArr.push({
-                r: params.currentColorRgb.r,
-                g: params.currentColorRgb.g,
-                b: params.currentColorRgb.b,
-                a: 1,
+            let strengthSlider = new KlSlider({
+                label: LANG('filter-unsharp-mask-strength'),
+                width: 300,
+                height: 30,
+                min: 0,
+                max: 50,
+                value: 5.1,
+                eventResMs: eventResMs,
+                onChange: function (val) {
+                    strength = val / 10;
+                    glCanvas.draw(texture).unsharpMask(radius * previewFactor, strength).update();
+                    klCanvasPreview.render();
+                },
+                curve: [[0, 0], [0.1, 2], [0.5, 10], [1, 50]],
             });
-            colorOptionsArr.push({
-                r: params.secondaryColorRgb.r,
-                g: params.secondaryColorRgb.g,
-                b: params.secondaryColorRgb.b,
-                a: 1,
-            });
-
-            let colorOptions = new ColorOptions({
-                label: LANG('filter-to-alpha-replace'),
-                colorArr: colorOptionsArr,
-                initialIndex: 1,
-                onChange: function(rgbaObj) {
-                    selectedRgbaObj = rgbaObj;
-                    updatePreview();
-                }
-            });
-            colorOptions.getElement().style.marginTop = '10px';
-            div.appendChild(colorOptions.getElement());
+            radiusSlider.getElement().style.marginBottom = "10px";
+            div.appendChild(radiusSlider.getElement());
+            div.appendChild(strengthSlider.getElement());
 
 
             let previewWrapper = document.createElement("div");
@@ -140,8 +114,8 @@ export const toAlpha = {
                 }
             }
             let klCanvasPreview = new KlCanvasPreview({
-                width: parseInt('' + w),
-                height: parseInt('' + h),
+                width: parseInt('' + displayW),
+                height: parseInt('' + displayH),
                 layers: previewLayerArr
             });
 
@@ -149,8 +123,8 @@ export const toAlpha = {
                 css: {
                     position: 'relative',
                     boxShadow: '0 0 5px rgba(0,0,0,0.5)',
-                    width: parseInt('' + w) + 'px',
-                    height: parseInt('' + h) + 'px'
+                    width: parseInt('' + displayW) + 'px',
+                    height: parseInt('' + displayH) + 'px'
                 }
             });
             previewInnerWrapper.appendChild(klCanvasPreview.getElement());
@@ -159,23 +133,23 @@ export const toAlpha = {
 
             div.appendChild(previewWrapper);
 
-            setTimeout(function() { //ie has a problem otherwise...
-                try {
-                    updatePreview();
-                } catch(e) {
-                    (div as any).errorCallback(e);
-                }
-            }, 1);
+            try {
+                glCanvas.draw(texture).unsharpMask(radius * previewFactor, strength).update();
+                klCanvasPreview.render();
+            } catch(e) {
+                (div as any).errorCallback(e);
+            }
 
             result.destroy = () => {
+                radiusSlider.destroy();
+                strengthSlider.destroy();
                 texture.destroy();
-                sourceOptions.destroy();
             };
             result.getInput = function () {
                 result.destroy();
                 return {
-                    sourceId: sourceId,
-                    selectedRgbaObj: selectedRgbaObj
+                    radius: radius,
+                    strength: strength
                 };
             };
         }
@@ -189,9 +163,9 @@ export const toAlpha = {
     apply(params: IFilterApply) {
         let context = params.context;
         let history = params.history;
-        let sourceId = params.input.sourceId;
-        let selectedRgbaObj = params.input.selectedRgbaObj;
-        if (!context || !sourceId || !history)
+        let radius = params.input.radius;
+        let strength = params.input.strength;
+        if (!context || radius === null || strength === null || !history)
             return false;
         history.pause(true);
         let glCanvas = getSharedFx();
@@ -199,13 +173,13 @@ export const toAlpha = {
             return false; // todo more specific error?
         }
         let texture = glCanvas.texture(context.canvas);
-        glCanvas.draw(texture).toAlpha(sourceId === 'inverted-luminance', selectedRgbaObj).update();
+        glCanvas.draw(texture).unsharpMask(radius, strength).update();
         context.clearRect(0, 0, context.canvas.width, context.canvas.height);
         context.drawImage(glCanvas, 0, 0);
         texture.destroy();
         history.pause(false);
         history.push({
-            tool: ["filter", "toAlpha"],
+            tool: ["filter", "unsharpMask"],
             action: "apply",
             params: [{
                 input: params.input

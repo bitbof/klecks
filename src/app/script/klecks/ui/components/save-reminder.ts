@@ -88,6 +88,7 @@ export class SaveReminder {
             document.body as any,
             {
                 hideClearButton: true,
+                isFocusable: true,
             }
         );
         storageWrapper.append(storageUi.getElement());

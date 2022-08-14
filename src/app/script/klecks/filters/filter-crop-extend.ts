@@ -6,21 +6,21 @@ import {Cropper} from '../ui/components/cropper';
 import {IFilterApply, IFilterGetDialogParam} from '../kl.types';
 import {LANG} from '../../language/language';
 
-export const cropExtend = {
+export const filterCropExtend = {
 
     getDialog(params: IFilterGetDialogParam) {
-        const canvas = params.canvas;
-        if (!canvas)
+        const klCanvas = params.klCanvas;
+        if (!klCanvas)
             return false;
         const tempCanvas = BB.canvas();
         {
-            let fit = BB.fitInto(canvas.getWidth(), canvas.getHeight(), 560, 400, 1);
+            let fit = BB.fitInto(klCanvas.getWidth(), klCanvas.getHeight(), 560, 400, 1);
             let w = parseInt('' + fit.width), h = parseInt('' + fit.height);
-            let previewFactor = w / canvas.getWidth();
+            let previewFactor = w / klCanvas.getWidth();
             tempCanvas.width = w;
             tempCanvas.height = h;
             tempCanvas.style.display = 'block';
-            tempCanvas.getContext("2d").drawImage(canvas.getCompleteCanvas(previewFactor), 0, 0, w, h);
+            tempCanvas.getContext("2d").drawImage(klCanvas.getCompleteCanvas(previewFactor), 0, 0, w, h);
         }
 
         const div = document.createElement("div");
@@ -49,7 +49,7 @@ export const cropExtend = {
         const leftInput = input({
             init: 0,
             type: 'number',
-            min: -canvas.getWidth(),
+            min: -klCanvas.getWidth(),
             max: maxWidth,
             css: {width: '75px', marginRight: '20px'},
             callback: function(v) {
@@ -60,7 +60,7 @@ export const cropExtend = {
         const rightInput = input({
             init: 0,
             type: 'number',
-            min: -canvas.getWidth(),
+            min: -klCanvas.getWidth(),
             max: maxWidth,
             css: {width: '75px'},
             callback: function(v) {
@@ -71,7 +71,7 @@ export const cropExtend = {
         const topInput = input({
             init: 0,
             type: 'number',
-            min: -canvas.getHeight(),
+            min: -klCanvas.getHeight(),
             max: maxHeight,
             css: {width: '75px', marginRight: '20px'},
             callback: function(v) {
@@ -82,7 +82,7 @@ export const cropExtend = {
         const bottomInput = input({
             init: 0,
             type: 'number',
-            min: -canvas.getHeight(),
+            min: -klCanvas.getHeight(),
             max: maxHeight,
             css: {width: '75px'},
             callback: function(v) {
@@ -113,49 +113,49 @@ export const cropExtend = {
             right = parseInt(rightInput.value);
             top = parseInt(topInput.value);
             bottom = parseInt(bottomInput.value);
-            let newWidth = canvas.getWidth() + left + right;
-            let newHeight = canvas.getHeight() + top + bottom;
+            let newWidth = klCanvas.getWidth() + left + right;
+            let newHeight = klCanvas.getHeight() + top + bottom;
 
             if (newWidth <= 0) {
                 if (leftChanged) {
-                    left = -canvas.getWidth() - right + 1;
+                    left = -klCanvas.getWidth() - right + 1;
                     leftInput.value = '' + left;
                 }
                 if (rightChanged) {
-                    right = -canvas.getWidth() - left + 1;
+                    right = -klCanvas.getWidth() - left + 1;
                     rightInput.value = '' + right;
                 }
                 newWidth = 1;
             }
             if (newWidth > maxWidth) {
                 if (leftChanged) {
-                    left = -canvas.getWidth() - right + maxWidth;
+                    left = -klCanvas.getWidth() - right + maxWidth;
                     leftInput.value = '' + left;
                 }
                 if (rightChanged) {
-                    right = -canvas.getWidth() - left + maxWidth;
+                    right = -klCanvas.getWidth() - left + maxWidth;
                     rightInput.value = '' + right;
                 }
                 newWidth = maxWidth;
             }
             if (newHeight <= 0) {
                 if (topChanged) {
-                    top = -canvas.getHeight() - bottom + 1;
+                    top = -klCanvas.getHeight() - bottom + 1;
                     topInput.value = '' + top;
                 }
                 if (bottomChanged) {
-                    bottom = -canvas.getHeight() - top + 1;
+                    bottom = -klCanvas.getHeight() - top + 1;
                     bottomInput.value = '' + bottom;
                 }
                 newHeight = 1;
             }
             if (newHeight > maxHeight) {
                 if (topChanged) {
-                    top = -canvas.getHeight() - bottom + maxHeight;
+                    top = -klCanvas.getHeight() - bottom + maxHeight;
                     topInput.value = '' + top;
                 }
                 if (bottomChanged) {
-                    bottom = -canvas.getHeight() - top + maxHeight;
+                    bottom = -klCanvas.getHeight() - top + maxHeight;
                     bottomInput.value = '' + bottom;
                 }
                 newHeight = maxHeight;
@@ -238,16 +238,16 @@ export const cropExtend = {
 
             const offset = BB.centerWithin(340, 220, fit.width, fit.height);
 
-            tempCanvas.style.width = canvas.getWidth() * scale + "px";
-            tempCanvas.style.height = canvas.getHeight() * scale + "px";
+            tempCanvas.style.width = klCanvas.getWidth() * scale + "px";
+            tempCanvas.style.height = klCanvas.getHeight() * scale + "px";
 
             offsetWrapper.style.left = (offset.x - transform.x * scale) + "px";
             offsetWrapper.style.top = (offset.y - transform.y * scale) + "px";
 
             left = parseInt('' + -transform.x);
             top = parseInt('' + -transform.y);
-            right = parseInt('' + (transform.x + transform.width - canvas.getWidth()));
-            bottom = parseInt('' + (transform.y + transform.height - canvas.getHeight()));
+            right = parseInt('' + (transform.x + transform.width - klCanvas.getWidth()));
+            bottom = parseInt('' + (transform.y + transform.height - klCanvas.getHeight()));
             leftInput.value = '' + left;
             topInput.value = '' + top;
             rightInput.value = '' + right;
@@ -313,8 +313,8 @@ export const cropExtend = {
         const cropper = new Cropper({
             x: 0,
             y: 0,
-            width: canvas.getWidth(),
-            height: canvas.getHeight(),
+            width: klCanvas.getWidth(),
+            height: klCanvas.getHeight(),
             scale: scale,
             callback: update,
             maxW: maxWidth,
@@ -359,13 +359,13 @@ export const cropExtend = {
     },
 
     apply(params: IFilterApply) {
-        const canvas = params.canvas;
+        const klCanvas = params.klCanvas;
         const history = params.history;
-        if (!canvas || !history || isNaN(params.input.left) || isNaN(params.input.right) || isNaN(params.input.top) || isNaN(params.input.bottom)) {
+        if (!klCanvas || !history || isNaN(params.input.left) || isNaN(params.input.right) || isNaN(params.input.top) || isNaN(params.input.bottom)) {
             return false;
         }
         history.pause(true);
-        canvas.resizeCanvas(params.input);
+        klCanvas.resizeCanvas(params.input);
         history.pause(false);
         history.push({
             tool: ["filter", "cropExtend"],

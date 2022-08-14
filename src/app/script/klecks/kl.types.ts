@@ -3,33 +3,30 @@ import {KlCanvas} from './canvas/kl-canvas';
 import {TTranslationCode} from '../../languages/languages';
 
 export interface IFilterApply {
-    context: CanvasRenderingContext2D;
-    canvas: KlCanvas;
-    input: any;
+    context: CanvasRenderingContext2D; // context of selected layer
+    klCanvas: KlCanvas;
+    input: any; // parameters chosen in modal
     history: KlHistoryInterface;
 }
 
 export interface IFilterGetDialogParam {
-    context: CanvasRenderingContext2D;
-    canvas: KlCanvas;
-    maxWidth: number;
+    context: CanvasRenderingContext2D; // context of selected layer
+    klCanvas: KlCanvas;
+    maxWidth: number; // limit for klCanvas size
     maxHeight: number;
     currentColorRgb: IRGB;
     secondaryColorRgb: IRGB;
 }
 
 export interface IFilter {
-    lang: {name: TTranslationCode; button: TTranslationCode};
-    name: string;
-    buttonLabel?: string;
-    neededWithWebGL?: boolean;
-    webgl: boolean;
-    updateContext: boolean;
-    icon: string;
-    ieFails?: boolean;
-    isInstant?: boolean;
-    updatePos: boolean;
-    inEmbed: boolean;
+    lang: {
+        name: TTranslationCode; // title in modal
+        button: TTranslationCode; // text on button in filter tab
+    };
+    updatePos: boolean; // changes size/orientation of klCanvas
+    icon: string; // image url
+    isInstant?: boolean; // default false - if instant no modal
+    inEmbed: boolean; // is available in embed
     getDialog: null | ((p: IFilterGetDialogParam) => any);
     apply: null | ((p: IFilterApply) => boolean);
 }
@@ -41,6 +38,7 @@ export interface ITransform {
     angle: number; // rad
 }
 
+// a subset of CanvasRenderingContext2D.globalCompositeOperation
 export type IMixMode = (
     'source-over' | // default aka normal
     'darken' |
@@ -93,16 +91,16 @@ export type IKlStorageProject = {
 };
 
 export interface IRGB {
-    r: number;
+    r: number; // [0, 255]
     g: number;
     b: number;
 }
 
 export interface IRGBA {
-    r: number;
+    r: number; // [0, 255]
     g: number;
     b: number;
-    a: number;
+    a: number; // [0, 1]
 }
 
 export interface IInitState {

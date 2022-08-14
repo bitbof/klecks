@@ -306,6 +306,10 @@ export const KlColorSlider = function (p) {
             fixScribble: true,
             onPointer: function(event) {
                 if (event.type === 'pointerdown') {
+
+                    // prevent manual slider input keeping focus on iPad
+                    BB.unfocusAnyInput();
+
                     BB.css(SVContainer, {
                         boxShadow: '0px 0px 0px 1px rgb(255,255,255)',
                         zIndex: '1'
@@ -362,6 +366,10 @@ export const KlColorSlider = function (p) {
             onPointer: function(event) {
 
                 if (event.type === 'pointerdown') {
+
+                    // prevent manual slider input keeping focus on iPad
+                    BB.unfocusAnyInput();
+
                     BB.css(divH, {
                         boxShadow: '0px 0px 0px 1px rgba(255,255,255,1)'
                     });

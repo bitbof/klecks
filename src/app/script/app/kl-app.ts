@@ -330,10 +330,7 @@ export function KlApp(pProject: IKlProject | null, pOptions: IKlAppOptions) {
     });
     let keyListener = new BB.KeyListener({
         onDown: function(keyStr, event, comboStr) {
-            if (KL.dialogCounter.get() > 0) {
-                return;
-            }
-            if (BB.isInputFocused(true)) {
+            if (KL.dialogCounter.get() > 0 || BB.isInputFocused(true)) {
                 return;
             }
 
@@ -1484,7 +1481,7 @@ export function KlApp(pProject: IKlProject | null, pOptions: IKlAppOptions) {
         klRootEl,
         klColorSlider,
         layerManager,
-        setCurrentLayer,
+        // setCurrentLayer,
         klCanvasWorkspace,
         handUi,
         () => { //get current color
@@ -1793,13 +1790,12 @@ export function KlApp(pProject: IKlProject | null, pOptions: IKlAppOptions) {
                 return;
             }
             //do a crop
-            let p = {
+            KL.filterLib.cropExtend.apply({
                 context: currentLayerCtx,
-                canvas: klCanvas,
+                klCanvas: klCanvas,
                 input: inputObj, //{left,right,top,bottom}
                 history: klHistory
-            };
-            KL.filterLib.cropExtend.apply(p);
+            });
             layerManager.update();
             klCanvasWorkspace.resetView();
             handUi.update(klCanvasWorkspace.getScale(), klCanvasWorkspace.getAngleDeg());
@@ -1960,10 +1956,12 @@ export function KlApp(pProject: IKlProject | null, pOptions: IKlAppOptions) {
         }
 
         // prevent ctrl scroll -> zooming page
-        BB.addEventListener(this.getEl(), 'wheel', (event) => {
-            event.preventDefault();
+        BB.addEventListener(klRootEl, 'wheel', (event) => {
+            if (keyListener.isPressed('ctrl')) {
+                event.preventDefault();
+            }
         });
-        //maybe prevent zooming on safari mac os - I can't test it
+        //maybe prevent zooming on safari mac os - todo still needed?
         const prevent = (e) => {
             e.preventDefault();
         }

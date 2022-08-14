@@ -6,34 +6,32 @@ import {getSharedFx} from './shared-gl-fx';
 import {IFilterApply, IFilterGetDialogParam, IKlBasicLayer} from '../kl.types';
 import {LANG} from '../../language/language';
 
-export const glUnsharpMask = {
+export const filterHueSaturation = {
 
     getDialog(params: IFilterGetDialogParam) {
+
         let context = params.context;
-        let canvas = params.canvas;
-        if (!context || !canvas) {
+        let klCanvas = params.klCanvas;
+        if (!context || !klCanvas) {
             return false;
         }
 
-        let layers = canvas.getLayers();
-        let selectedLayerIndex = canvas.getLayerIndex(context.canvas);
+        let layers = klCanvas.getLayers();
+        let selectedLayerIndex = klCanvas.getLayerIndex(context.canvas);
 
-        let fit = BB.fitInto(context.canvas.width, context.canvas.height, 280, 200, 1);
-        let displayW = parseInt('' + fit.width), displayH = parseInt('' + fit.height);
-        let w = Math.min(displayW, context.canvas.width);
-        let h = Math.min(displayH, context.canvas.height);
+        let fit = BB.fitInto(context.canvas.width, context.canvas.height,280, 200,  1);
+        let w = parseInt('' + fit.width), h = parseInt('' + fit.height);
 
         let tempCanvas = BB.canvas(w, h);
         {
             const ctx = tempCanvas.getContext("2d");
             ctx.save();
-            if (w > context.canvas.width) {
+            if (tempCanvas.width > context.canvas.width) {
                 ctx.imageSmoothingEnabled = false;
             }
             ctx.drawImage(context.canvas, 0, 0, w, h);
             ctx.restore();
         }
-        let previewFactor = w / context.canvas.width;
 
         let div = document.createElement("div");
         let result: any = {
@@ -41,8 +39,8 @@ export const glUnsharpMask = {
         };
 
         function finishInit() {
-            let radius = 2, strength = 5.1 / 10;
-            div.innerHTML = LANG('filter-unsharp-mask-description') + "<br/><br/>";
+            let hue = 0, saturation = 0;
+            div.innerHTML = LANG('filter-hue-sat-description') + "<br/><br/>";
 
             let glCanvas = getSharedFx();
             if (!glCanvas) {
@@ -51,39 +49,37 @@ export const glUnsharpMask = {
             let texture = glCanvas.texture(tempCanvas);
             glCanvas.draw(texture).update(); // update glCanvas size
 
-            let radiusSlider = new KlSlider({
-                label: LANG('radius'),
+            let hueSlider = new KlSlider({
+                label: LANG('filter-hue-sat-hue'),
+                width: 300,
+                height: 30,
+                min: -100,
+                max: 100,
+                value: hue * 100,
+                eventResMs: eventResMs,
+                onChange: function (val) {
+                    hue = val / 100;
+                    glCanvas.draw(texture).hueSaturation(hue, saturation).update();
+                    klCanvasPreview.render();
+                },
+            });
+            let saturationSlider = new KlSlider({
+                label: LANG('filter-hue-sat-saturation'),
                 width: 300,
                 height: 30,
                 min: 0,
-                max: 200,
-                initValue: 2,
+                max: 100,
+                value: (saturation + 1) * 50,
                 eventResMs: eventResMs,
                 onChange: function (val) {
-                    radius = val;
-                    glCanvas.draw(texture).unsharpMask(radius * previewFactor, strength).update();
+                    saturation = val / 50 - 1;
+                    glCanvas.draw(texture).hueSaturation(hue, saturation).update();
                     klCanvasPreview.render();
                 },
-                curve: [[0, 0], [0.1, 2], [0.5, 50], [1, 200]]
             });
-            let strengthSlider = new KlSlider({
-                label: LANG('filter-unsharp-mask-strength'),
-                width: 300,
-                height: 30,
-                min: 0,
-                max: 50,
-                initValue: 5.1,
-                eventResMs: eventResMs,
-                onChange: function (val) {
-                    strength = val / 10;
-                    glCanvas.draw(texture).unsharpMask(radius * previewFactor, strength).update();
-                    klCanvasPreview.render();
-                },
-                curve: [[0, 0], [0.1, 2], [0.5, 10], [1, 50]]
-            });
-            radiusSlider.getElement().style.marginBottom = "10px";
-            div.appendChild(radiusSlider.getElement());
-            div.appendChild(strengthSlider.getElement());
+            hueSlider.getElement().style.marginBottom = "10px";
+            div.appendChild(hueSlider.getElement());
+            div.appendChild(saturationSlider.getElement());
 
 
             let previewWrapper = document.createElement("div");
@@ -114,8 +110,8 @@ export const glUnsharpMask = {
                 }
             }
             let klCanvasPreview = new KlCanvasPreview({
-                width: parseInt('' + displayW),
-                height: parseInt('' + displayH),
+                width: parseInt('' + w),
+                height: parseInt('' + h),
                 layers: previewLayerArr
             });
 
@@ -123,8 +119,8 @@ export const glUnsharpMask = {
                 css: {
                     position: 'relative',
                     boxShadow: '0 0 5px rgba(0,0,0,0.5)',
-                    width: parseInt('' + displayW) + 'px',
-                    height: parseInt('' + displayH) + 'px'
+                    width: parseInt('' + w) + 'px',
+                    height: parseInt('' + h) + 'px'
                 }
             });
             previewInnerWrapper.appendChild(klCanvasPreview.getElement());
@@ -134,38 +130,36 @@ export const glUnsharpMask = {
             div.appendChild(previewWrapper);
 
             try {
-                glCanvas.draw(texture).unsharpMask(radius * previewFactor, strength).update();
+                glCanvas.draw(texture).hueSaturation(hue, saturation).update();
                 klCanvasPreview.render();
             } catch(e) {
                 (div as any).errorCallback(e);
             }
 
             result.destroy = () => {
-                radiusSlider.destroy();
-                strengthSlider.destroy();
+                hueSlider.destroy();
+                saturationSlider.destroy();
                 texture.destroy();
             };
             result.getInput = function () {
                 result.destroy();
                 return {
-                    radius: radius,
-                    strength: strength
+                    hue: hue,
+                    Saturation: saturation
                 };
             };
         }
 
         setTimeout(finishInit, 1);
-
         return result;
     },
 
-
     apply(params: IFilterApply) {
         let context = params.context;
+        let hue = params.input.hue;
         let history = params.history;
-        let radius = params.input.radius;
-        let strength = params.input.strength;
-        if (!context || radius === null || strength === null || !history)
+        let Saturation = params.input.Saturation;
+        if (!context || hue === null || Saturation === null || !history)
             return false;
         history.pause(true);
         let glCanvas = getSharedFx();
@@ -173,13 +167,13 @@ export const glUnsharpMask = {
             return false; // todo more specific error?
         }
         let texture = glCanvas.texture(context.canvas);
-        glCanvas.draw(texture).unsharpMask(radius, strength).update();
+        glCanvas.draw(texture).hueSaturation(hue, Saturation).update();
         context.clearRect(0, 0, context.canvas.width, context.canvas.height);
         context.drawImage(glCanvas, 0, 0);
         texture.destroy();
         history.pause(false);
         history.push({
-            tool: ["filter", "glUnsharpMask"],
+            tool: ["filter", "hueSaturation"],
             action: "apply",
             params: [{
                 input: params.input

@@ -31,7 +31,15 @@ import {Matrix} from './math/matrix';
 import {Vec2} from './math/vec2';
 import {BezierLine, PointLine, projectPointOnLine, quadraticSplineInput, SplineInterpolator} from './math/line';
 import {CMYK, ColorConverter, HSV, RGB, testIsWhiteBestContrast} from './color/color';
-import {appendTextDiv, clearSelection, destroyEl, el, isInputFocused, makeUnfocusable} from './base/ui';
+import {
+    appendTextDiv,
+    clearSelection,
+    destroyEl,
+    el,
+    isInputFocused,
+    makeUnfocusable,
+    unfocusAnyInput
+} from './base/ui';
 import {
     pointsToAngleDeg,
     clamp,
@@ -41,7 +49,7 @@ import {
     rotate,
     rotateAround,
     intDxy,
-    roundEven, roundUneven, distSquared, lenSquared, updateBounds, boundsInArea
+    roundEven, roundUneven, distSquared, lenSquared, updateBounds, boundsInArea, round
 } from './math/math';
 import {createCanvas} from './base/create-canvas';
 import {BbLog} from './base/bb-log';
@@ -94,6 +102,7 @@ export const BB = {
     intDxy,
     roundEven,
     roundUneven,
+    round,
     updateBounds,
     boundsInArea,
 
@@ -129,7 +138,8 @@ export const BB = {
     makeUnfocusable,
     el,
     destroyEl,
-    isInputFocused: isInputFocused,
+    isInputFocused,
+    unfocusAnyInput,
 
 
     // ---- events / input ----

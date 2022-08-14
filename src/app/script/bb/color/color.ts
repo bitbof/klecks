@@ -219,7 +219,7 @@ export const ColorConverter = {
         }
     },
     toHexString: function (o: RGB): string {
-        if (o instanceof RGB) {
+        if (o instanceof RGB || ('r' in o && 'g' in o && 'b' in o)) {
             let ha = (parseInt('' + o.r)).toString(16);
             let hb = (parseInt('' + o.g)).toString(16);
             let hc = (parseInt('' + o.b)).toString(16);

@@ -89,7 +89,7 @@ export class UndoRedoCatchup {
                 } else if (actions[i].tool[0] === "filter") {
                     const p = [{
                         context: this.getCurrentLayerCtx(),
-                        canvas: this.getKlCanvas(),
+                        klCanvas: this.getKlCanvas(),
                         input: actions[i].params[0].input,
                         history: new KL.DecoyKlHistory(),
                     } as IFilterApply];
@@ -183,7 +183,7 @@ export class UndoRedoCatchup {
                 } else if (actions[i].tool[0] === "filter") {
                     const p = [{
                         context: this.getCurrentLayerCtx(),
-                        canvas: this.getKlCanvas(),
+                        klCanvas: this.getKlCanvas(),
                         input: actions[i].params[0].input,
                         history: new KL.DecoyKlHistory(),
                     } as IFilterApply];
@@ -269,7 +269,7 @@ export class UndoRedoCatchup {
                 } else if (actions[i].tool[0] === "filter") {
                     const p = [{
                         context: localCurrentLayerCtx,
-                        canvas: canvas,
+                        klCanvas: canvas,
                         input: actions[i].params[0].input,
                         history: new KL.DecoyKlHistory(),
                     } as IFilterApply];

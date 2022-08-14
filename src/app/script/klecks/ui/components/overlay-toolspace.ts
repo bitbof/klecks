@@ -91,18 +91,21 @@ export function OverlayToolspace(
         height: sizeObj.sliderHeight,
         min: 0,
         max: 500,
-        initValue: 50,
+        value: 50,
         resolution: 225,
         eventResMs: 1000 / 30,
+        toDisplayValue: (val) => val * 2,
+        toValue: (displayValue) => displayValue / 2,
         onChange: function(v) {
             p.brushSettingService.setSize(v);
         },
-        formatFunc: function(v) {
-            if (v * 2 < 10) {
-                return Math.round(v * 2 * 10) / 10;
+        formatFunc: (displayValue) => {
+            if (displayValue < 10) {
+                return BB.round(displayValue, 1);
+            } else {
+                return Math.round(displayValue);
             }
-            return Math.round(v * 2);
-        }
+        },
     });
     BB.css(sizeSlider.getElement(), {
         marginTop: '2px'
@@ -115,15 +118,14 @@ export function OverlayToolspace(
         height: sizeObj.sliderHeight,
         min: 0,
         max: 1,
-        initValue: 1,
+        value: 1,
         resolution: 225,
         eventResMs: 1000 / 30,
+        toDisplayValue: (val) => val * 100,
+        toValue: (displayValue) => displayValue / 100,
         onChange: function(v) {
             p.brushSettingService.setOpacity(v);
         },
-        formatFunc: function(v) {
-            return Math.round(v * 100);
-        }
     });
     BB.css(opacitySlider.getElement(), {
         margin: '2px 0'
@@ -171,6 +173,10 @@ export function OverlayToolspace(
     }
 
     function updateUI() {
+
+        // unfocus manual slider input
+        BB.unfocusAnyInput();
+
         div.style.display = isVisible ? 'block' : 'none';
         if (isVisible && mousePos) {
             div.style.left = (mousePos.x - Math.round(sizeObj.width / 2)) + 'px';

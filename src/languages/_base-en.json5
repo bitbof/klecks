@@ -345,6 +345,12 @@ Base Language File
   "filter-grid": "Grid",
   "filter-grid-description": "Draws grid on selected layer.",
 
+  "filter-noise": "Noise",
+  "filter-noise-description": "Adds noise to selected layer.",
+  "filter-noise-scale": "Scale",
+  "filter-noise-alpha": "Alpha",
+  "filter-noise-inverted": "Inverted",
+
   "import-opening": "Opening file...",
   "import-title": "Import Image",
   "import-too-large": "Image too large, will be downscaled.",

@@ -230,14 +230,11 @@ export function ShapeUi(p) {
         height: 30,
         min: 1,
         max: 200,
-        initValue: 4,
+        value: 4,
         curve: 'quadratic',
-        onChange: function (val) {
+        onChange: (val) => {
             updatePreviews();
         },
-        formatFunc: function (v) {
-            return Math.round(v);
-        }
     });
     BB.css(lineWidthSlider.getElement(), {
         marginTop: '10px'
@@ -248,14 +245,11 @@ export function ShapeUi(p) {
         label: LANG('opacity'),
         width: 250,
         height: 30,
-        min: 0,
+        min: 1 / 100,
         max: 1,
-        initValue: 1,
-        onChange: function (val) {
-        },
-        formatFunc: function (v) {
-            return Math.round(v * 100);
-        }
+        value: 1,
+        toValue: (displayValue) => displayValue / 100,
+        toDisplayValue: (value) => value * 100,
     });
     BB.css(opacitySlider.getElement(), {
         marginTop: '10px'

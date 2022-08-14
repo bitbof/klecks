@@ -543,17 +543,16 @@ export function textToolDialog(
         label: LANG('opacity'),
         width: 150,
         height: 30,
-        min: 0,
+        min: 1 / 100,
         max: 1,
-        initValue: p.opacity,
+        value: p.opacity,
         resolution: 225,
         eventResMs: 1000 / 30,
+        toValue: (displayValue) => displayValue / 100,
+        toDisplayValue: (value) => value * 100,
         onChange: function(v) {
             updatePreview();
         },
-        formatFunc: function(v) {
-            return Math.round(v * 100);
-        }
     });
     row3.appendChild(opacitySlider.getElement());
 
@@ -567,7 +566,7 @@ export function textToolDialog(
             'data-ignore-focus': 'true',
         },
         css: {
-            whiteSpace: 'nowrap',
+            whiteSpace: 'pre',
             overflow: 'auto',
             width: '100%',
             height: '70px',
@@ -630,7 +629,7 @@ export function textToolDialog(
                 color: p.color,
                 size: sizeInput.value,
                 font: fontSelect.getValue(),
-                opacity: opacitySlider.getValue()
+                opacity: opacitySlider.getValue(),
             };
 
             window.removeEventListener('scroll', onScroll);

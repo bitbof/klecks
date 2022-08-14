@@ -6,34 +6,8 @@ import {getSharedFx} from './shared-gl-fx';
 import {IFilterApply, IFilterGetDialogParam, IKlBasicLayer} from '../kl.types';
 import {LANG} from '../../language/language';
 
-export const glBlur = {
-
+export const filterBrightnessContrast = {
     getDialog(params: IFilterGetDialogParam) {
-        let canvas = params.canvas;
-        let context = params.context;
-        if (!canvas || !context) {
-            return false;
-        }
-
-        let layers = canvas.getLayers();
-        let selectedLayerIndex = canvas.getLayerIndex(context.canvas);
-
-        let fit = BB.fitInto(context.canvas.width, context.canvas.height, 280, 200, 1);
-        let displayW = parseInt('' + fit.width), displayH = parseInt('' + fit.height);
-        let w = Math.min(displayW, context.canvas.width);
-        let h = Math.min(displayH, context.canvas.height);
-
-        let tempCanvas = BB.canvas(w, h);
-        {
-            const ctx = tempCanvas.getContext("2d");
-            ctx.save();
-            if (w > context.canvas.width) {
-                ctx.imageSmoothingEnabled = false;
-            }
-            ctx.drawImage(context.canvas, 0, 0, w, h);
-            ctx.restore();
-        }
-        let previewFactor = w / context.canvas.width;
 
         let div = document.createElement("div");
         let result: any = {
@@ -41,9 +15,34 @@ export const glBlur = {
         };
 
 
+        let context = params.context;
+        let klCanvas = params.klCanvas;
+        if (!context || !klCanvas) {
+            return false;
+        }
+
+        let layers = klCanvas.getLayers();
+        let selectedLayerIndex = klCanvas.getLayerIndex(context.canvas);
+
+        let fit = BB.fitInto(context.canvas.width, context.canvas.height, 280, 200, 1);
+        let w = parseInt('' + fit.width), h = parseInt('' + fit.height);
+
+        let tempCanvas = BB.canvas(w, h);
+        {
+            const ctx = tempCanvas.getContext("2d");
+            ctx.save();
+            if (tempCanvas.width > context.canvas.width) {
+                ctx.imageSmoothingEnabled = false;
+            }
+            ctx.drawImage(context.canvas, 0, 0, w, h);
+            ctx.restore();
+        }
+
+
         function finishInit() {
-            let radius = 10;
-            div.innerHTML = LANG('filter-triangle-blur-description') + "<br/><br/>";
+
+            let brightness = 0, contrast = 0;
+            div.innerHTML = LANG('filter-bright-contrast-description') + "<br/><br/>";
 
             let glCanvas = getSharedFx();
             if (!glCanvas) {
@@ -52,21 +51,38 @@ export const glBlur = {
             let texture = glCanvas.texture(tempCanvas);
             glCanvas.draw(texture).update(); // update glCanvas size
 
-            let radiusSlider = new KlSlider({
-                label: LANG('radius'),
+            let brightnessSlider = new KlSlider({
+                label: LANG('filter-bright-contrast-brightness'),
                 width: 300,
                 height: 30,
-                min: 1,
-                max: 200,
-                initValue: radius,
+                min: 0,
+                max: 100,
+                value: (brightness + 1) * 50,
                 eventResMs: eventResMs,
                 onChange: function (val) {
-                    radius = val;
-                    glCanvas.draw(texture).triangleBlur(radius * previewFactor).update();
+                    brightness = val / 50 - 1;
+                    glCanvas.draw(texture).brightnessContrast(brightness, contrast).update();
                     klCanvasPreview.render();
-                }
+                },
             });
-            div.appendChild(radiusSlider.getElement());
+            let contrastSlider = new KlSlider({
+                label: LANG('filter-bright-contrast-contrast'),
+                width: 300,
+                height: 30,
+                min: 0,
+                max: 100,
+                value: (contrast + 1) * 50,
+                eventResMs: eventResMs,
+                onChange: function (val) {
+                    contrast = val / 50 - 1;
+                    glCanvas.draw(texture).brightnessContrast(brightness, contrast).update();
+                    klCanvasPreview.render();
+                },
+            });
+            brightnessSlider.getElement().style.marginBottom = "10px";
+            div.appendChild(brightnessSlider.getElement());
+            div.appendChild(contrastSlider.getElement());
+
 
 
             let previewWrapper = document.createElement("div");
@@ -97,8 +113,8 @@ export const glBlur = {
                 }
             }
             let klCanvasPreview = new KlCanvasPreview({
-                width: parseInt('' + displayW),
-                height: parseInt('' + displayH),
+                width: parseInt('' + w),
+                height: parseInt('' + h),
                 layers: previewLayerArr
             });
 
@@ -106,8 +122,8 @@ export const glBlur = {
                 css: {
                     position: 'relative',
                     boxShadow: '0 0 5px rgba(0,0,0,0.5)',
-                    width: parseInt('' + displayW) + 'px',
-                    height: parseInt('' + displayH) + 'px'
+                    width: parseInt('' + w) + 'px',
+                    height: parseInt('' + h) + 'px'
                 }
             });
             previewInnerWrapper.appendChild(klCanvasPreview.getElement());
@@ -116,34 +132,37 @@ export const glBlur = {
             div.appendChild(previewWrapper);
 
             try {
-                glCanvas.draw(texture).triangleBlur(radius * previewFactor).update();
+                glCanvas.draw(texture).brightnessContrast(brightness, contrast).update();
                 klCanvasPreview.render();
             } catch(e) {
                 (div as any).errorCallback(e);
             }
 
             result.destroy = () => {
+                brightnessSlider.destroy();
+                contrastSlider.destroy();
                 texture.destroy();
-                radiusSlider.destroy();
             };
             result.getInput = function () {
                 result.destroy();
                 return {
-                    radius: radius
+                    brightness: brightness,
+                    contrast: contrast
                 };
             };
         }
 
-        setTimeout(finishInit, 1);
+        setTimeout(finishInit, 1); // the canvas isn't ready for some reason
 
         return result;
     },
 
     apply(params: IFilterApply) {
         let context = params.context;
+        let brightness = params.input.brightness;
+        let contrast = params.input.contrast;
         let history = params.history;
-        let radius = params.input.radius;
-        if (!context || !radius || !history)
+        if (!context || brightness === null || contrast === null || !history)
             return false;
         history.pause(true);
         let glCanvas = getSharedFx();
@@ -151,19 +170,19 @@ export const glBlur = {
             return false; // todo more specific error?
         }
         let texture = glCanvas.texture(context.canvas);
-        glCanvas.draw(texture).triangleBlur(radius).update();
+        glCanvas.draw(texture).brightnessContrast(brightness, contrast).update();
         context.clearRect(0, 0, context.canvas.width, context.canvas.height);
         context.drawImage(glCanvas, 0, 0);
         texture.destroy();
         history.pause(false);
         history.push({
-            tool: ["filter", "glBlur"],
+            tool: ["filter", "brightnessContrast"],
             action: "apply",
             params: [{
                 input: params.input
             }]
         });
+
         return true;
     }
-
-};
+}

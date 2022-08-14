@@ -1,28 +1,22 @@
 import {BB} from '../../bb/bb';
-import {KlSlider} from '../ui/base-components/kl-slider';
-import {eventResMs} from './filters-consts';
+import {Options} from '../ui/base-components/options';
+import {ColorOptions} from '../ui/base-components/color-options';
 import {KlCanvasPreview} from '../canvas-ui/canvas-preview';
 import {getSharedFx} from './shared-gl-fx';
 import {IFilterApply, IFilterGetDialogParam, IKlBasicLayer} from '../kl.types';
 import {LANG} from '../../language/language';
 
-export const glBrightnessContrast = {
+export const filterToAlpha = {
+
     getDialog(params: IFilterGetDialogParam) {
-
-        let div = document.createElement("div");
-        let result: any = {
-            element: div
-        };
-
-
-        let context = params.context; //2d context of canvas
-        let canvas = params.canvas; //the klCanvas and dom element
-        if (!context || !canvas) {
+        let context = params.context;
+        let klCanvas = params.klCanvas;
+        if (!context || !klCanvas) {
             return false;
         }
 
-        let layers = canvas.getLayers();
-        let selectedLayerIndex = canvas.getLayerIndex(context.canvas);
+        let layers = klCanvas.getLayers();
+        let selectedLayerIndex = klCanvas.getLayerIndex(context.canvas);
 
         let fit = BB.fitInto(context.canvas.width, context.canvas.height, 280, 200, 1);
         let w = parseInt('' + fit.width), h = parseInt('' + fit.height);
@@ -38,11 +32,19 @@ export const glBrightnessContrast = {
             ctx.restore();
         }
 
+        let div = document.createElement("div");
+        let result: any = {
+            element: div
+        };
 
         function finishInit() {
-
-            let brightness = 0, contrast = 0;
-            div.innerHTML = LANG('filter-bright-contrast-description') + "<br/><br/>";
+            let radius = 2, strength = 5.1 / 10;
+            div.appendChild(BB.el({
+                content: LANG('filter-to-alpha-description'),
+                css: {
+                    marginBottom: '5px'
+                }
+            }));
 
             let glCanvas = getSharedFx();
             if (!glCanvas) {
@@ -51,38 +53,63 @@ export const glBrightnessContrast = {
             let texture = glCanvas.texture(tempCanvas);
             glCanvas.draw(texture).update(); // update glCanvas size
 
-            let brightnessSlider = new KlSlider({
-                label: LANG('filter-bright-contrast-brightness'),
-                width: 300,
-                height: 30,
-                min: 0,
-                max: 100,
-                initValue: (brightness + 1) * 50,
-                eventResMs: eventResMs,
-                onChange: function (val) {
-                    brightness = val / 50 - 1;
-                    glCanvas.draw(texture).brightnessContrast(brightness, contrast).update();
-                    klCanvasPreview.render();
-                }
-            });
-            let contrastSlider = new KlSlider({
-                label: LANG('filter-bright-contrast-contrast'),
-                width: 300,
-                height: 30,
-                min: 0,
-                max: 100,
-                initValue: (contrast + 1) * 50,
-                eventResMs: eventResMs,
-                onChange: function (val) {
-                    contrast = val / 50 - 1;
-                    glCanvas.draw(texture).brightnessContrast(brightness, contrast).update();
-                    klCanvasPreview.render();
-                }
-            });
-            brightnessSlider.getElement().style.marginBottom = "10px";
-            div.appendChild(brightnessSlider.getElement());
-            div.appendChild(contrastSlider.getElement());
+            function updatePreview() {
+                glCanvas.draw(texture).toAlpha(sourceId === 'inverted-luminance', selectedRgbaObj).update();
+                klCanvasPreview.render();
+            }
 
+            // source
+            let sourceId = 'inverted-luminance';
+            let sourceOptions = new Options({
+                optionArr: [
+                    {
+                        id: 'inverted-luminance',
+                        label: LANG('filter-to-alpha-inverted-lum')
+                    },
+                    {
+                        id: 'luminance',
+                        label: LANG('filter-to-alpha-lum')
+                    }
+                ],
+                initialId: sourceId,
+                onChange: function(id) {
+                    sourceId = id;
+                    updatePreview();
+                }
+            });
+            div.appendChild(sourceOptions.getElement());
+
+            // color
+            let selectedRgbaObj = {r: 0, g: 0, b: 0, a: 1};
+            let colorOptionsArr = [
+                null,
+                {r: 0, g: 0, b: 0, a: 1},
+                {r: 255, g: 255, b: 255, a: 1}
+            ];
+            colorOptionsArr.push({
+                r: params.currentColorRgb.r,
+                g: params.currentColorRgb.g,
+                b: params.currentColorRgb.b,
+                a: 1,
+            });
+            colorOptionsArr.push({
+                r: params.secondaryColorRgb.r,
+                g: params.secondaryColorRgb.g,
+                b: params.secondaryColorRgb.b,
+                a: 1,
+            });
+
+            let colorOptions = new ColorOptions({
+                label: LANG('filter-to-alpha-replace'),
+                colorArr: colorOptionsArr,
+                initialIndex: 1,
+                onChange: function(rgbaObj) {
+                    selectedRgbaObj = rgbaObj;
+                    updatePreview();
+                }
+            });
+            colorOptions.getElement().style.marginTop = '10px';
+            div.appendChild(colorOptions.getElement());
 
 
             let previewWrapper = document.createElement("div");
@@ -129,40 +156,42 @@ export const glBrightnessContrast = {
             previewInnerWrapper.appendChild(klCanvasPreview.getElement());
             previewWrapper.appendChild(previewInnerWrapper);
 
+
             div.appendChild(previewWrapper);
 
-            try {
-                glCanvas.draw(texture).brightnessContrast(brightness, contrast).update();
-                klCanvasPreview.render();
-            } catch(e) {
-                (div as any).errorCallback(e);
-            }
+            setTimeout(function() { //ie has a problem otherwise...
+                try {
+                    updatePreview();
+                } catch(e) {
+                    (div as any).errorCallback(e);
+                }
+            }, 1);
 
             result.destroy = () => {
-                brightnessSlider.destroy();
-                contrastSlider.destroy();
                 texture.destroy();
+                sourceOptions.destroy();
             };
             result.getInput = function () {
                 result.destroy();
                 return {
-                    brightness: brightness,
-                    contrast: contrast
+                    sourceId: sourceId,
+                    selectedRgbaObj: selectedRgbaObj
                 };
             };
         }
 
-        setTimeout(finishInit, 1); // the canvas isn't ready for some reason
+        setTimeout(finishInit, 1);
 
         return result;
     },
 
+
     apply(params: IFilterApply) {
         let context = params.context;
-        let brightness = params.input.brightness;
-        let contrast = params.input.contrast;
         let history = params.history;
-        if (!context || brightness === null || contrast === null || !history)
+        let sourceId = params.input.sourceId;
+        let selectedRgbaObj = params.input.selectedRgbaObj;
+        if (!context || !sourceId || !history)
             return false;
         history.pause(true);
         let glCanvas = getSharedFx();
@@ -170,19 +199,19 @@ export const glBrightnessContrast = {
             return false; // todo more specific error?
         }
         let texture = glCanvas.texture(context.canvas);
-        glCanvas.draw(texture).brightnessContrast(brightness, contrast).update();
+        glCanvas.draw(texture).toAlpha(sourceId === 'inverted-luminance', selectedRgbaObj).update();
         context.clearRect(0, 0, context.canvas.width, context.canvas.height);
         context.drawImage(glCanvas, 0, 0);
         texture.destroy();
         history.pause(false);
         history.push({
-            tool: ["filter", "glBrightnessContrast"],
+            tool: ["filter", "toAlpha"],
             action: "apply",
             params: [{
                 input: params.input
             }]
         });
-
         return true;
     }
-}
+
+};

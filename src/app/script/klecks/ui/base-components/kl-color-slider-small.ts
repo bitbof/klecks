@@ -136,6 +136,10 @@ export const KlSmallColorSlider = function (params) {
         onPointer: function(event) {
 
             if (event.type === 'pointerdown') {
+
+                // prevent manual slider input keeping focus on iPad
+                BB.unfocusAnyInput();
+
                 svPointerId = event.pointerId;
                 if (event.button === 'left') {
 

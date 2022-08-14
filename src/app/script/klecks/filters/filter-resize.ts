@@ -6,26 +6,26 @@ import constrainImg from 'url:~/src/app/img/ui/constrain.svg';
 import {IFilterApply, IFilterGetDialogParam} from '../kl.types';
 import {LANG} from '../../language/language';
 
-export const resize = {
+export const filterResize = {
 
     getDialog(params: IFilterGetDialogParam) {
         //BB.centerWithin
-        let canvas = params.canvas;
-        if (!canvas)
+        let klCanvas = params.klCanvas;
+        if (!klCanvas)
             return false;
 
-        let fit = BB.fitInto( canvas.getWidth(), canvas.getHeight(), 280, 200,1);
+        let fit = BB.fitInto( klCanvas.getWidth(), klCanvas.getHeight(), 280, 200,1);
         let w = parseInt('' + fit.width), h = parseInt('' + fit.height);
 
-        let previewFactor = w / canvas.getWidth();
-        let tempCanvas = canvas.getCompleteCanvas(1);
+        let previewFactor = w / klCanvas.getWidth();
+        let tempCanvas = klCanvas.getCompleteCanvas(1);
 
 
         let div = document.createElement("div");
         let result: any = {
             element: div
         };
-        let newWidth = canvas.getWidth(), newHeight = canvas.getHeight();
+        let newWidth = klCanvas.getWidth(), newHeight = klCanvas.getHeight();
 
         div.innerHTML = LANG('filter-resize-description') + "<br/><br/>";
 
@@ -56,7 +56,7 @@ export const resize = {
                 type: 'number',
                 min: '1',
                 max: '' + maxWidth,
-                value: '' + canvas.getWidth(),
+                value: '' + klCanvas.getWidth(),
             }
         }) as HTMLInputElement;
         let heightInput = BB.el({
@@ -69,7 +69,7 @@ export const resize = {
                 type: 'number',
                 min: '1',
                 max: '' + maxHeight,
-                value: '' + canvas.getHeight(),
+                value: '' + klCanvas.getHeight(),
             }
         }) as HTMLInputElement;
         widthInput.onclick = function () {
@@ -103,12 +103,12 @@ export const resize = {
 
         //contrain checkbox
         let heightChanged = false, widthChanged = false;
-        let ratio = canvas.getWidth() / canvas.getHeight();
+        let ratio = klCanvas.getWidth() / klCanvas.getHeight();
 
         function updateConstrain() {
             if (isConstrained) {
-                widthInput.value = '' + canvas.getWidth();
-                heightInput.value = '' + canvas.getHeight();
+                widthInput.value = '' + klCanvas.getWidth();
+                heightInput.value = '' + klCanvas.getHeight();
                 inputWrapper.style.background = "url(" + constrainImg + ") no-repeat 140px 5px";
                 inputWrapper.style.backgroundSize = '50px 52px';
                 update();
@@ -168,8 +168,8 @@ export const resize = {
             if (algorithmSelect.getValue() === 'smooth') {
                 previewCanvas.style.imageRendering = previewFactor > 1 ? 'pixelated' : '';
 
-                previewCanvas.width = canvas.getWidth();
-                previewCanvas.height = canvas.getHeight();
+                previewCanvas.width = klCanvas.getWidth();
+                previewCanvas.height = klCanvas.getHeight();
 
                 previewCtx.save();
                 previewCtx.imageSmoothingQuality = 'high';
@@ -287,16 +287,16 @@ export const resize = {
     },
 
     apply(params: IFilterApply) {
-        let canvas = params.canvas;
+        let klCanvas = params.klCanvas;
         let history = params.history;
         let width = params.input.width;
         let height = params.input.height;
         let algorithm = params.input.algorithm;
-        if (!canvas || !history) {
+        if (!klCanvas || !history) {
             return false;
         }
         history.pause(true);
-        canvas.resize(width, height, algorithm);
+        klCanvas.resize(width, height, algorithm);
         history.pause(false);
         history.push({
             tool: ["filter", "resize"],

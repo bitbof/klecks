@@ -9,17 +9,17 @@ import {drawGrid} from '../image-operations/draw-grid';
 
 
 
-export const grid = {
+export const filterGrid = {
 
     getDialog(params: IFilterGetDialogParam) {
         let context = params.context;
-        let canvas = params.canvas;
-        if (!context || !canvas) {
+        let klCanvas = params.klCanvas;
+        if (!context || !klCanvas) {
             return false;
         }
 
-        let layers = canvas.getLayers();
-        let selectedLayerIndex = canvas.getLayerIndex(context.canvas);
+        let layers = klCanvas.getLayers();
+        let selectedLayerIndex = klCanvas.getLayerIndex(context.canvas);
 
         let fit = BB.fitInto(context.canvas.width, context.canvas.height, 280, 200, 1);
         let w = parseInt('' + fit.width), h = parseInt('' + fit.height);
@@ -153,8 +153,8 @@ export const grid = {
 
         let previewLayer: IKlBasicLayer = {
             image: BB.canvas(renderW, renderH),
-            opacity: 1,
-            mixModeStr: 'source-over' as IMixMode,
+            opacity: layers[selectedLayerIndex].opacity,
+            mixModeStr: layers[selectedLayerIndex].mixModeStr,
         };
         let klCanvasPreview = new KlCanvasPreview({
             width: Math.round(w),
@@ -208,9 +208,9 @@ export const grid = {
 
     apply(params: IFilterApply) {
         let context = params.context;
-        let canvas = params.canvas;
+        let klCanvas = params.klCanvas;
         let history = params.history;
-        if (!context || !canvas || !history) {
+        if (!context || !klCanvas || !history) {
             return false;
         }
 

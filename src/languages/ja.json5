@@ -916,6 +916,26 @@
         original: 'Draws grid on selected layer.',
         value: '選択レイヤーにグリッドを追加します。'
     },
+    'filter-noise': {
+        original: 'Noise',
+        value: ''
+    },
+    'filter-noise-description': {
+        original: 'Adds noise to selected layer.',
+        value: ''
+    },
+    'filter-noise-scale': {
+        original: 'Scale',
+        value: ''
+    },
+    'filter-noise-alpha': {
+        original: 'Alpha',
+        value: ''
+    },
+    'filter-noise-inverted': {
+        original: 'Inverted',
+        value: ''
+    },
     'import-opening': {
         original: 'Opening file...',
         value: '画像を開いています。'

@@ -7,6 +7,7 @@ export class Checkbox {
 
     private element: HTMLElement;
     private check: HTMLInputElement;
+    private doHighlight: boolean;
 
     // --- public ---
 
@@ -19,6 +20,8 @@ export class Checkbox {
         doHighlight?: boolean; // default false
         css?: any;
     }) {
+        this.doHighlight = params.doHighlight;
+
         this.element = BB.el({
             className: 'kl-checkbox'
         });
@@ -41,7 +44,7 @@ export class Checkbox {
             }
         }) as HTMLInputElement;
         this.check.checked = params.init;
-        if (params.doHighlight && this.check.checked) {
+        if (this.doHighlight && this.check.checked) {
             this.element.classList.add('kl-checkbox--highlight');
         }
         if (!params.allowTab) {
@@ -59,7 +62,7 @@ export class Checkbox {
         innerEl.appendChild(label);
 
         this.check.onchange = () => {
-            if (params.doHighlight) {
+            if (this.doHighlight) {
                 this.element.classList.toggle('kl-checkbox--highlight', this.check.checked);
             }
             params.callback(this.check.checked);
@@ -74,6 +77,13 @@ export class Checkbox {
 
     getValue(): boolean {
         return this.check.checked;
+    }
+
+    setValue(b: boolean) {
+        this.check.checked = !!b;
+        if (this.doHighlight) {
+            this.element.classList.toggle('kl-checkbox--highlight', this.check.checked);
+        }
     }
 
     getElement(): HTMLElement {

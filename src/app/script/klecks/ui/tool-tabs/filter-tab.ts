@@ -6,6 +6,7 @@ import {StatusOverlay} from '../components/status-overlay';
 import {KlCanvasWorkspace} from '../../canvas-ui/kl-canvas-workspace';
 import {KlCanvas} from '../../canvas/kl-canvas';
 import {LANG} from '../../../language/language';
+import {IFilterApply, IFilterGetDialogParam} from '../../kl.types';
 
 
 export class FilterTab {
@@ -17,7 +18,7 @@ export class FilterTab {
         private klRootEl,
         private klColorSlider,
         private layerManager,
-        private setCurrentLayer,
+        // private setCurrentLayer,
         private klCanvasWorkspace: KlCanvasWorkspace,
         private handUi,
         private getCurrentColor,
@@ -32,7 +33,6 @@ export class FilterTab {
 
     private init() {
         const _this = this;
-        let hasWebGl = BB.hasWebGl();
         let filters = KL.filterLib;
         let buttons = [];
 
@@ -46,7 +46,7 @@ export class FilterTab {
 
         function createButton(filterKey, filterArr) {
             let button = document.createElement("button");
-            let buttonLabel = filterArr[filterKey].buttonLabel ? filterArr[filterKey].buttonLabel : filterArr[filterKey].name;
+            let buttonLabel = LANG(filterArr[filterKey].lang.button);
             let im = '<img height="20" width="18" src="' + filterArr[filterKey].icon + '" alt="icon" />';
             button.innerHTML = im + buttonLabel;
             button.className = "gridButton";
@@ -55,6 +55,9 @@ export class FilterTab {
                 fontSize: '12px',
             });
             button.tabIndex = -1;
+
+            const filterName = LANG(filterArr[filterKey].lang.name);
+
             button.onclick = function () {
 
                 function finishedDialog(result, filterDialog) {
@@ -69,7 +72,7 @@ export class FilterTab {
                         input = filterDialog.getInput(); // also destroys
                     } catch (e) {
                         if (e.message.indexOf('.getInput is not a function') !== -1) {
-                            throw 'filterDialog.getInput is not a function, filter: ' + filterArr[filterKey].name;
+                            throw 'filterDialog.getInput is not a function, filter: ' + filterName;
                         } else {
                             throw e;
                         }
@@ -85,16 +88,16 @@ export class FilterTab {
                 function applyFilter(input) {
                     let filterResult = filterArr[filterKey].apply({
                         context: _this.getCurrentLayerCtx(),
-                        canvas: _this.getKlCanvas(),
+                        klCanvas: _this.getKlCanvas(),
                         history: klHistory,
                         input: input
-                    });
+                    } as IFilterApply);
                     if (filterResult === false) {
                         alert("Couldn't apply the edit action");
                     }
-                    if (filterArr[filterKey].updateContext === true) {
-                        _this.setCurrentLayer(_this.getKlCanvas().getLayer(_this.layerManager.getSelected()));
-                    }
+                    /*
+                     _this.setCurrentLayer(_this.getKlCanvas().getLayer(_this.layerManager.getSelected()));
+                    */
                     if (filterArr[filterKey].updatePos === true) {
                         _this.klCanvasWorkspace.resetView();
                         _this.handUi.update(_this.klCanvasWorkspace.getScale(), _this.klCanvasWorkspace.getAngleDeg());
@@ -105,17 +108,17 @@ export class FilterTab {
                 if (filterArr[filterKey].isInstant){
                     button.blur();
                     applyFilter(null);
-                    _this.statusOverlay.out('"' + filterArr[filterKey].name + '" ' + LANG('filter-applied'), true);
+                    _this.statusOverlay.out('"' + filterName + '" ' + LANG('filter-applied'), true);
                 } else {
                     let secondaryColorRGB = _this.klColorSlider.getSecondaryRGB();
                     let filterDialog = filterArr[filterKey].getDialog({
                         context: _this.getCurrentLayerCtx(),
-                        canvas: _this.getKlCanvas(),
+                        klCanvas: _this.getKlCanvas(),
                         maxWidth: _this.getKlMaxCanvasSize(),
                         maxHeight: _this.getKlMaxCanvasSize(),
                         currentColorRgb: {r: _this.getCurrentColor().r, g: _this.getCurrentColor().g, b: _this.getCurrentColor().b},
                         secondaryColorRgb: {r: secondaryColorRGB.r, g: secondaryColorRGB.g, b: secondaryColorRGB.b}
-                    });
+                    } as IFilterGetDialogParam);
 
                     if (!filterDialog) {
                         return;
@@ -140,7 +143,7 @@ export class FilterTab {
 
                     KL.popup({
                         target: _this.klRootEl,
-                        message: "<b>" + filterArr[filterKey].name + "</b>",
+                        message: "<b>" + filterName + "</b>",
                         div: filterDialog.element,
                         style: style,
                         buttons: ["Ok", "Cancel"],
@@ -158,26 +161,6 @@ export class FilterTab {
             return button;
         }
 
-        function createDisabledButton(filterKey, filterArr) {
-            if (!filterArr[filterKey].webgl && !filterArr[filterKey].ieFails) {
-                return;
-            }
-            if (filterArr[filterKey].ieFails && navigator.appName !== 'Microsoft Internet Explorer') {
-                return;
-            }
-            let buttonLabel = filterArr[filterKey].buttonLabel ? filterArr[filterKey].buttonLabel : filterArr[filterKey].name;
-            let button = document.createElement("button");
-            let im = '<img style="opacity: 0.5" src="img/' + filterArr[filterKey].icon + '" />';
-            let name = filterArr[filterKey].name;
-            if (name.length > 11) {
-                name = "<span style='font-size: 12px'>" + buttonLabel + "</span>";
-            }
-            button.innerHTML = im + name;
-            button.className = "gridButton";
-            button.disabled = true;
-            return button;
-        }
-
         function addGroup(groupArr, filterArr, targetEl) {
             for (let filterKey in filterArr) {
                 if (filterArr.hasOwnProperty[filterKey] || !groupArr.includes(filterKey)) {
@@ -186,40 +169,31 @@ export class FilterTab {
                 if (_this.isEmbed && !filterArr[filterKey].inEmbed) {
                     continue;
                 }
-                if ((filterArr[filterKey].webgl && hasWebGl)
-                    || (filterArr[filterKey].neededWithWebGL)
-                    || (!filterArr[filterKey].webgl && !hasWebGl)
-                    && !(filterArr[filterKey].ieFails && navigator.appName == 'Microsoft Internet Explorer')) {
-
-                    targetEl.appendChild(createButton(filterKey, filterArr));
-
-                } else {
-                    targetEl.appendChild(createDisabledButton(filterKey, filterArr));
-                    filterArr[filterKey] = undefined;
-                }
+                targetEl.appendChild(createButton(filterKey, filterArr));
             }
         }
 
         const groupA = [
             'cropExtend',
             'flip',
-            'glPerspective',
+            'perspective',
             'resize',
             'rotate',
             'transform',
         ];
         const groupB = [
-            'glBrightnessContrast',
-            'glCurves',
-            'glHueSaturation',
+            'brightnessContrast',
+            'curves',
+            'hueSaturation',
             'invert',
-            'glTiltShift',
+            'tiltShift',
             'toAlpha',
-            'glBlur',
-            'glUnsharpMask',
+            'blur',
+            'unsharpMask',
         ];
         const groupC = [
             'grid',
+            'noise',
         ];
 
         addGroup(groupA, filters, _this.div);
@@ -228,20 +202,6 @@ export class FilterTab {
         addGroup(groupB, filters, _this.div);
         _this.div.appendChild(BB.el({className: 'gridHr'}));
         addGroup(groupC, filters, _this.div);
-
-
-        if (!hasWebGl) {
-            let webglnote = BB.appendTextDiv(_this.div, "Some actions are disabled because WebGL isn't working.");
-            webglnote.style.margin = "10px";
-            BB.css(webglnote, {
-                fontSize: "11px",
-                color: "#555",
-                background: "#ffe",
-                padding: "10px",
-                borderRadius: "10px",
-                textAlign: "center"
-            });
-        }
 
         this.isInit = true;
     }

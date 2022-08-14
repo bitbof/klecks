@@ -33,14 +33,11 @@ export function FillUi(p) {
         label: LANG('opacity'),
         width: 250,
         height: 30,
-        min: 0,
+        min: 1 / 100,
         max: 1,
-        initValue: 1,
-        onChange: function (val) {
-        },
-        formatFunc: function(v) {
-            return Math.round(v * 100);
-        }
+        value: 1,
+        toValue: (displayValue) => displayValue / 100,
+        toDisplayValue: (value) => value * 100,
     });
     div.appendChild(opacitySlider.getElement());
 
@@ -50,12 +47,9 @@ export function FillUi(p) {
         height: 30,
         min: 0,
         max: 255,
-        initValue: 255 / 100 * 20,
-        onChange: function (val) {
-        },
-        formatFunc: function(v) {
-            return Math.round(v / 255 * 100);
-        }
+        value: 20 * (255 / 100),
+        toValue: (displayValue) => displayValue * (255 / 100),
+        toDisplayValue: (value) => value / (255 / 100),
     });
     BB.css(toleranceSlider.getElement(), {
         marginTop: '10px'

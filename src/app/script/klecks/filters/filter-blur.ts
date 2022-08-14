@@ -1,46 +1,49 @@
 import {BB} from '../../bb/bb';
-import {eventResMs} from './filters-consts';
 import {KlSlider} from '../ui/base-components/kl-slider';
+import {eventResMs} from './filters-consts';
 import {KlCanvasPreview} from '../canvas-ui/canvas-preview';
 import {getSharedFx} from './shared-gl-fx';
 import {IFilterApply, IFilterGetDialogParam, IKlBasicLayer} from '../kl.types';
 import {LANG} from '../../language/language';
 
-export const glHueSaturation = {
+export const filterBlur = {
 
     getDialog(params: IFilterGetDialogParam) {
-
+        let klCanvas = params.klCanvas;
         let context = params.context;
-        let canvas = params.canvas;
-        if (!context || !canvas) {
+        if (!klCanvas || !context) {
             return false;
         }
 
-        let layers = canvas.getLayers();
-        let selectedLayerIndex = canvas.getLayerIndex(context.canvas);
+        let layers = klCanvas.getLayers();
+        let selectedLayerIndex = klCanvas.getLayerIndex(context.canvas);
 
-        let fit = BB.fitInto(context.canvas.width, context.canvas.height,280, 200,  1);
-        let w = parseInt('' + fit.width), h = parseInt('' + fit.height);
+        let fit = BB.fitInto(context.canvas.width, context.canvas.height, 280, 200, 1);
+        let displayW = parseInt('' + fit.width), displayH = parseInt('' + fit.height);
+        let w = Math.min(displayW, context.canvas.width);
+        let h = Math.min(displayH, context.canvas.height);
 
         let tempCanvas = BB.canvas(w, h);
         {
             const ctx = tempCanvas.getContext("2d");
             ctx.save();
-            if (tempCanvas.width > context.canvas.width) {
+            if (w > context.canvas.width) {
                 ctx.imageSmoothingEnabled = false;
             }
             ctx.drawImage(context.canvas, 0, 0, w, h);
             ctx.restore();
         }
+        let previewFactor = w / context.canvas.width;
 
         let div = document.createElement("div");
         let result: any = {
             element: div
         };
 
+
         function finishInit() {
-            let hue = 0, Saturation = 0;
-            div.innerHTML = LANG('filter-hue-sat-description') + "<br/><br/>";
+            let radius = 10;
+            div.innerHTML = LANG('filter-triangle-blur-description') + "<br/><br/>";
 
             let glCanvas = getSharedFx();
             if (!glCanvas) {
@@ -49,37 +52,21 @@ export const glHueSaturation = {
             let texture = glCanvas.texture(tempCanvas);
             glCanvas.draw(texture).update(); // update glCanvas size
 
-            let hueSlider = new KlSlider({
-                label: LANG('filter-hue-sat-hue'),
+            let radiusSlider = new KlSlider({
+                label: LANG('radius'),
                 width: 300,
                 height: 30,
-                min: -100,
-                max: 100,
-                initValue: hue * 100,
+                min: 1,
+                max: 200,
+                value: radius,
                 eventResMs: eventResMs,
                 onChange: function (val) {
-                    hue = val / 100;
-                    glCanvas.draw(texture).hueSaturation(hue, Saturation).update();
+                    radius = val;
+                    glCanvas.draw(texture).triangleBlur(radius * previewFactor).update();
                     klCanvasPreview.render();
-                }
+                },
             });
-            let saturationSlider = new KlSlider({
-                label: LANG('filter-hue-sat-saturation'),
-                width: 300,
-                height: 30,
-                min: 0,
-                max: 100,
-                initValue: (Saturation + 1) * 50,
-                eventResMs: eventResMs,
-                onChange: function (val) {
-                    Saturation = val / 50 - 1;
-                    glCanvas.draw(texture).hueSaturation(hue, Saturation).update();
-                    klCanvasPreview.render();
-                }
-            });
-            hueSlider.getElement().style.marginBottom = "10px";
-            div.appendChild(hueSlider.getElement());
-            div.appendChild(saturationSlider.getElement());
+            div.appendChild(radiusSlider.getElement());
 
 
             let previewWrapper = document.createElement("div");
@@ -110,8 +97,8 @@ export const glHueSaturation = {
                 }
             }
             let klCanvasPreview = new KlCanvasPreview({
-                width: parseInt('' + w),
-                height: parseInt('' + h),
+                width: parseInt('' + displayW),
+                height: parseInt('' + displayH),
                 layers: previewLayerArr
             });
 
@@ -119,47 +106,44 @@ export const glHueSaturation = {
                 css: {
                     position: 'relative',
                     boxShadow: '0 0 5px rgba(0,0,0,0.5)',
-                    width: parseInt('' + w) + 'px',
-                    height: parseInt('' + h) + 'px'
+                    width: parseInt('' + displayW) + 'px',
+                    height: parseInt('' + displayH) + 'px'
                 }
             });
             previewInnerWrapper.appendChild(klCanvasPreview.getElement());
             previewWrapper.appendChild(previewInnerWrapper);
 
-
             div.appendChild(previewWrapper);
 
             try {
-                glCanvas.draw(texture).hueSaturation(hue, Saturation).update();
+                glCanvas.draw(texture).triangleBlur(radius * previewFactor).update();
                 klCanvasPreview.render();
             } catch(e) {
                 (div as any).errorCallback(e);
             }
 
             result.destroy = () => {
-                hueSlider.destroy();
-                saturationSlider.destroy();
                 texture.destroy();
+                radiusSlider.destroy();
             };
             result.getInput = function () {
                 result.destroy();
                 return {
-                    hue: hue,
-                    Saturation: Saturation
+                    radius: radius
                 };
             };
         }
 
         setTimeout(finishInit, 1);
+
         return result;
     },
 
     apply(params: IFilterApply) {
         let context = params.context;
-        let hue = params.input.hue;
         let history = params.history;
-        let Saturation = params.input.Saturation;
-        if (!context || hue === null || Saturation === null || !history)
+        let radius = params.input.radius;
+        if (!context || !radius || !history)
             return false;
         history.pause(true);
         let glCanvas = getSharedFx();
@@ -167,13 +151,13 @@ export const glHueSaturation = {
             return false; // todo more specific error?
         }
         let texture = glCanvas.texture(context.canvas);
-        glCanvas.draw(texture).hueSaturation(hue, Saturation).update();
+        glCanvas.draw(texture).triangleBlur(radius).update();
         context.clearRect(0, 0, context.canvas.width, context.canvas.height);
         context.drawImage(glCanvas, 0, 0);
         texture.destroy();
         history.pause(false);
         history.push({
-            tool: ["filter", "glHueSaturation"],
+            tool: ["filter", "blur"],
             action: "apply",
             params: [{
                 input: params.input

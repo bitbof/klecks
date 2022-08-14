@@ -1,7 +1,7 @@
 import {getSharedFx} from './shared-gl-fx';
 import {IFilterApply} from '../kl.types';
 
-export const invert = {
+export const filterInvert = {
 
     apply(params: IFilterApply) {
         let context = params.context;

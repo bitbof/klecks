@@ -2,7 +2,7 @@ import {BB} from '../../../bb/bb';
 import {IKeyString} from '../../../bb/bb.types';
 
 export const input = function (params: {
-    type?: 'button' | 'checkbox' | 'number' | 'text'; // default text
+    type?: 'button' | 'checkbox' | 'number' | 'text' | 'color'; // default text
     min?: number;
     max?: number;
     callback: (val: string) => void;

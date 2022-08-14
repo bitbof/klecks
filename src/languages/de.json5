@@ -893,6 +893,26 @@
         original: 'Draws grid on selected layer.',
         value: 'Zeichnet Gitter auf gewählte Ebene.'
     },
+    'filter-noise': {
+        original: 'Noise',
+        value: 'Rauschen'
+    },
+    'filter-noise-description': {
+        original: 'Adds noise to selected layer.',
+        value: 'Zeichnet Rauschen auf gewählte Ebene.'
+    },
+    'filter-noise-scale': {
+        original: 'Scale',
+        value: 'Größe'
+    },
+    'filter-noise-alpha': {
+        original: 'Alpha',
+        value: 'Alpha'
+    },
+    'filter-noise-inverted': {
+        original: 'Inverted',
+        value: 'Umgekehrt'
+    },
     'import-opening': {
         original: 'Opening file...',
         value: 'Öffne Datei...'

@@ -21,9 +21,6 @@ export class SettingsTab {
         customAbout?: HTMLElement,
     ) {
 
-
-
-
         // ---- language ----
         const language = languageStrings.getLanguage();
 

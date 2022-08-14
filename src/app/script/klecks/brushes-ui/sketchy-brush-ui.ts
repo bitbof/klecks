@@ -6,6 +6,7 @@ import {KlSlider} from '../ui/base-components/kl-slider';
 import brushIconImg from 'url:~/src/app/img/ui/brush-sketchy.png';
 import {IBrushUi} from '../kl.types';
 import {LANG, languageStrings} from '../../language/language';
+import {BB} from '../../bb/bb';
 
 export const sketchyBrushUi = (function () {
     let brushInterface: IBrushUi = {
@@ -45,20 +46,22 @@ export const sketchyBrushUi = (function () {
                 height: 30,
                 min: brushInterface.sizeSlider.min,
                 max: brushInterface.sizeSlider.max,
-                initValue: brush.getSize(),
+                value: brush.getSize() * 2,
                 eventResMs: eventResMs,
+                toDisplayValue: (val) => val * 2,
+                toValue: (displayValue) => displayValue / 2,
                 onChange: function (val) {
                     brush.setSize(val);
-                    p.onSizeChange(brush.getSize());
+                    p.onSizeChange(val);
                 },
-                formatFunc: function (v) {
-                    v *= 2;
-                    if (v < 10) {
-                        return Math.round(v * 10) / 10;
+                formatFunc: (displayValue) => {
+                    if (displayValue < 10) {
+                        return BB.round(displayValue, 1);
                     } else {
-                        return Math.round(v);
+                        return Math.round(displayValue);
                     }
-                }
+                },
+                manualInputRoundDigits: 1,
             });
             opacitySlider = new KlSlider({
                 label: LANG('opacity'),
@@ -66,27 +69,28 @@ export const sketchyBrushUi = (function () {
                 height: 30,
                 min: brushInterface.opacitySlider.min,
                 max: brushInterface.opacitySlider.max,
-                initValue: brush.getOpacity(),
+                value: brush.getOpacity(),
                 eventResMs: eventResMs,
-                onChange: function (val) {
+                toDisplayValue: (val) => val * 100,
+                toValue: (displayValue) => displayValue / 100,
+                onChange: (val) => {
                     brush.setOpacity(val);
                     p.onOpacityChange(val);
                 },
-                formatFunc: function(v) {
-                    return Math.round(v * 100);
-                }
             });
             let blendSlider = new KlSlider({
                 label: LANG('brush-blending'),
                 width: 250,
                 height: 30,
                 min: 0,
-                max: 100,
-                initValue: brush.getBlending() * 100,
+                max: 1,
+                value: brush.getBlending(),
                 eventResMs: eventResMs,
+                toDisplayValue: (val) => val * 100,
+                toValue: (displayValue) => displayValue / 100,
                 onChange: function (val) {
-                    brush.setBlending(val / 100);
-                }
+                    brush.setBlending(val);
+                },
             });
             let scaleSlider = new KlSlider({
                 label: LANG('brush-sketchy-scale'),
@@ -94,11 +98,11 @@ export const sketchyBrushUi = (function () {
                 height: 30,
                 min: 1,
                 max: 20,
-                initValue: brush.getScale(),
+                value: brush.getScale(),
                 eventResMs: eventResMs,
                 onChange: function (val) {
                     brush.setScale(val);
-                }
+                },
             });
             opacitySlider.getElement().style.marginTop = "10px";
             blendSlider.getElement().style.marginTop = "10px";
@@ -113,12 +117,12 @@ export const sketchyBrushUi = (function () {
 
         this.increaseSize = function (f) {
             if (!brush.isDrawing()) {
-                sizeSlider.increaseValue(f);
+                sizeSlider.changeSliderValue(f);
             }
         };
         this.decreaseSize = function (f) {
             if (!brush.isDrawing()) {
-                sizeSlider.decreaseValue(f);
+                sizeSlider.changeSliderValue(-f);
             }
         };
         this.getSize = function () {

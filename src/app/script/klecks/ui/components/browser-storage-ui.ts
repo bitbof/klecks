@@ -14,8 +14,8 @@ export class BrowserStorageUi {
     private previewEl: HTMLDivElement;
     private infoEl: HTMLDivElement;
     private ageEl: HTMLDivElement;
-    private storeEl: HTMLButtonElement;
-    private clearEl: HTMLButtonElement;
+    private storeButtonEl: HTMLButtonElement;
+    private clearButtonEl: HTMLButtonElement;
     private storeListener: IProjectStoreListener;
 
     private timestamp: number;
@@ -44,13 +44,13 @@ export class BrowserStorageUi {
 
     private resetButtons() {
         if (this.timestamp) {
-            this.storeEl.textContent = LANG('file-storage-overwrite');
-            this.storeEl.disabled = false;
-            this.clearEl.disabled = false;
+            this.storeButtonEl.textContent = LANG('file-storage-overwrite');
+            this.storeButtonEl.disabled = false;
+            this.clearButtonEl.disabled = false;
         } else {
-            this.storeEl.textContent = LANG('file-storage-store');
-            this.storeEl.disabled = false;
-            this.clearEl.disabled = true;
+            this.storeButtonEl.textContent = LANG('file-storage-store');
+            this.storeButtonEl.disabled = false;
+            this.clearButtonEl.disabled = true;
         }
     }
 
@@ -76,9 +76,9 @@ export class BrowserStorageUi {
     }
 
     private async store() {
-        this.storeEl.textContent = LANG('file-storage-storing');
-        this.storeEl.disabled = true;
-        this.clearEl.disabled = true;
+        this.storeButtonEl.textContent = LANG('file-storage-storing');
+        this.storeButtonEl.disabled = true;
+        this.clearButtonEl.disabled = true;
         await new Promise((resolve) => {
             setTimeout(() => resolve(null), 20);
         });
@@ -106,8 +106,8 @@ export class BrowserStorageUi {
     }
 
     private async clear() {
-        this.storeEl.disabled = true;
-        this.clearEl.disabled = true;
+        this.storeButtonEl.disabled = true;
+        this.clearButtonEl.disabled = true;
         try {
             await this.projectStore.clear();
         } catch (e) {
@@ -131,7 +131,7 @@ export class BrowserStorageUi {
         private getProject: () => IKlProject,
         private saveReminder: SaveReminder,
         private klRootEl: HTMLDivElement,
-        private options?: { hideClearButton?: boolean },
+        private options?: { hideClearButton?: boolean; isFocusable?: boolean }, // isFocusable default = false
     ) {
         this.element = BB.el({
             css: {
@@ -215,7 +215,10 @@ export class BrowserStorageUi {
                 textSize: '13px',
             }
         }) as HTMLDivElement;
-        this.storeEl = BB.el({
+        const btnCustom = options?.isFocusable ?  {} : {
+            tabIndex: -1,
+        };
+        this.storeButtonEl = BB.el({
             parent: this.element,
             tagName: 'button',
             className: 'gridButton',
@@ -224,13 +227,10 @@ export class BrowserStorageUi {
                 gridArea: 'store',
                 //background: '#00f',
             },
-            custom: {
-                tabIndex: -1,
-            },
+            custom: btnCustom,
             onClick: () => this.store(),
         }) as HTMLButtonElement;
-        this.storeEl.tabIndex = -1;
-        this.clearEl = BB.el({
+        this.clearButtonEl = BB.el({
             parent: this.element,
             tagName: 'button',
             className: 'gridButton',
@@ -239,14 +239,12 @@ export class BrowserStorageUi {
                 gridArea: 'clear',
                 //background: '#ff0',
             },
-            custom: {
-                tabIndex: -1,
-            },
+            custom: btnCustom,
             onClick: () => this.clear(),
         }) as HTMLButtonElement;
 
         if (this.options?.hideClearButton) {
-            this.clearEl.style.display = 'none';
+            this.clearButtonEl.style.visibility = 'hidden';
         }
 
         this.storeListener = {
@@ -289,8 +287,8 @@ export class BrowserStorageUi {
 
     destroy() {
         BB.destroyEl(this.infoEl);
-        BB.destroyEl(this.storeEl);
-        BB.destroyEl(this.clearEl);
+        BB.destroyEl(this.storeButtonEl);
+        BB.destroyEl(this.clearButtonEl);
         this.projectStore.unsubscribe(this.storeListener);
     }
 }

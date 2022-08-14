@@ -442,7 +442,7 @@ export function PixelBrush() {
         history = l;
     };
     this.setSize = function (s) {
-        settingSize = s;
+        settingSize = Math.round(s * 2) / 2;
     };
     this.setOpacity = function (o) {
         settingOpacity = o;

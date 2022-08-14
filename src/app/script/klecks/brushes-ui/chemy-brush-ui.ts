@@ -38,8 +38,8 @@ export const chemyBrushUi = (function () {
         brush.setHistory(klHistory);
         p.onSizeChange(brush.getSize());
 
-        let sizeSlider;
-        let opacitySlider;
+        let sizeSlider: KlSlider;
+        let opacitySlider: KlSlider;
 
         function setSize(size) {
             brush.setSize(size);
@@ -52,18 +52,24 @@ export const chemyBrushUi = (function () {
                 height: 30,
                 min: brushInterface.sizeSlider.min,
                 max: brushInterface.sizeSlider.max,
-                initValue: brush.getSize(),
+                value: brush.getSize(),
+                curve: brushInterface.sizeSlider.curve,
                 eventResMs: eventResMs,
                 isEnabled: brush.getMode() === 'stroke',
-                onChange: function (val) {
+                toDisplayValue: (val) => val * 2,
+                toValue: (displayValue) => displayValue / 2,
+                onChange: (val) => {
                     setSize(val);
-                    p.onSizeChange(brush.getSize());
+                    p.onSizeChange(val);
                 },
-                curve: brushInterface.sizeSlider.curve,
-                formatFunc: function (v) {
-                    v *= 2;
-                    return v < 5 ? (Math.round(v * 10) / 10) : Math.round(v);
-                }
+                formatFunc: (displayValue) => {
+                    if (displayValue < 5) {
+                        return BB.round(displayValue, 1);
+                    } else {
+                        return Math.round(displayValue);
+                    }
+                },
+                manualInputRoundDigits: 1,
             });
             opacitySlider = new KlSlider({
                 label: LANG('opacity'),
@@ -71,15 +77,14 @@ export const chemyBrushUi = (function () {
                 height: 30,
                 min: brushInterface.opacitySlider.min,
                 max: brushInterface.opacitySlider.max,
-                initValue: brush.getOpacity(),
+                value: brush.getOpacity(),
                 eventResMs: eventResMs,
-                onChange: function (val) {
+                toDisplayValue: (val) => val * 100,
+                toValue: (displayValue) => displayValue / 100,
+                onChange: (val) => {
                     brush.setOpacity(val);
                     p.onOpacityChange(val);
                 },
-                formatFunc: function(v) {
-                    return Math.round(v * 100);
-                }
             });
 
             BB.css(opacitySlider.getElement(), {
@@ -166,8 +171,10 @@ export const chemyBrushUi = (function () {
                     brush.setMode(id as 'stroke' | 'fill');
                     brushInterface.sizeSlider.isDisabled = brush.getMode() === 'fill';
                     sizeSlider.setIsEnabled(!brushInterface.sizeSlider.isDisabled);
-                    sizeSlider.setValue(brush.getSize());
-                    p.onSizeChange(brush.getSize());
+
+                    const brushSize = brush.getSize();
+                    sizeSlider.setValue(brushSize);
+                    p.onSizeChange(brushSize);
                     p.onConfigChange();
                 }
             });
@@ -302,12 +309,12 @@ export const chemyBrushUi = (function () {
 
         this.increaseSize = function (f) {
             if (!brush.getIsDrawing() && brush.getMode() === 'stroke') {
-                sizeSlider.increaseValue(f);
+                sizeSlider.changeSliderValue(f);
             }
         };
         this.decreaseSize = function (f) {
             if (!brush.getIsDrawing() && brush.getMode() === 'stroke') {
-                sizeSlider.decreaseValue(f);
+                sizeSlider.changeSliderValue(-f);
             }
         };
 

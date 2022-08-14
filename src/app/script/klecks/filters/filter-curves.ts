@@ -5,18 +5,18 @@ import {getSharedFx} from './shared-gl-fx';
 import {IFilterApply, IFilterGetDialogParam, IKlBasicLayer} from '../kl.types';
 import {LANG} from '../../language/language';
 
-export const glCurves = {
+export const filterCurves = {
 
     getDialog(params: IFilterGetDialogParam) {
 
         let context = params.context;
-        let canvas = params.canvas;
-        if (!context || !canvas) {
+        let klCanvas = params.klCanvas;
+        if (!context || !klCanvas) {
             return false;
         }
 
-        let layers = canvas.getLayers();
-        let selectedLayerIndex = canvas.getLayerIndex(context.canvas);
+        let layers = klCanvas.getLayers();
+        let selectedLayerIndex = klCanvas.getLayerIndex(context.canvas);
 
         let fit = BB.fitInto(context.canvas.width, context.canvas.height, 280, 200, 1);
         let w = parseInt('' + fit.width), h = parseInt('' + fit.height);
@@ -412,7 +412,7 @@ export const glCurves = {
         texture.destroy();
         history.pause(false);
         history.push({
-            tool: ["filter", "glCurves"],
+            tool: ["filter", "curves"],
             action: "apply",
             params: [{
                 input: params.input
