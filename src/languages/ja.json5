@@ -918,23 +918,23 @@
     },
     'filter-noise': {
         original: 'Noise',
-        value: ''
+        value: 'ノイズ'
     },
     'filter-noise-description': {
         original: 'Adds noise to selected layer.',
-        value: ''
+        value: '選択レイヤーにノイズを追加します。'
     },
     'filter-noise-scale': {
         original: 'Scale',
-        value: ''
+        value: 'スケール'
     },
     'filter-noise-alpha': {
         original: 'Alpha',
-        value: ''
+        value: '透明'
     },
     'filter-noise-inverted': {
         original: 'Inverted',
-        value: ''
+        value: '反転'
     },
     'import-opening': {
         original: 'Opening file...',
