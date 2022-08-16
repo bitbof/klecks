@@ -918,23 +918,23 @@ filled: {
     },
     'filter-noise': {
         original: 'Noise',
-        value: ''
+        value: '噪聲'
     },
     'filter-noise-description': {
         original: 'Adds noise to selected layer.',
-        value: ''
+        value: '應用噪聲到達選擇層。'
     },
     'filter-noise-scale': {
         original: 'Scale',
-        value: ''
+        value: '圖案大小'
     },
     'filter-noise-alpha': {
         original: 'Alpha',
-        value: ''
+        value: 'Alpha'
     },
     'filter-noise-inverted': {
         original: 'Inverted',
-        value: ''
+        value: '反相'
     },
     'import-opening': {
         original: 'Opening file...',
