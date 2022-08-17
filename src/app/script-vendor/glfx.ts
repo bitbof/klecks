@@ -1949,7 +1949,7 @@ export const fx = (function () {
 ', 'toAlpha');
 
         simpleShader.call(this, gl.toAlpha, {
-            doInvert: isInverted ? 1 : 0,
+            isInverted: isInverted ? 1 : 0,
             replace: replaceRGBA ? [replaceRGBA.r / 255, replaceRGBA.g / 255, replaceRGBA.b / 255, replaceRGBA.a] : [0, 0, 0, 0],
             texSize: [this.width, this.height]
         });
