@@ -14,7 +14,7 @@ import uploadImg from 'url:~/src/app/img/ui/upload.svg';
 import importImg from 'url:~/src/app/img/ui/import.svg';
 import {exportType} from '../klecks/ui/tool-tabs/file-tab';
 import {ToolspaceTopRow} from "../embed/toolspace-top-row";
-import {IInitState, IKlProject, IKlPsd} from '../klecks/kl.types';
+import {IGradient, IInitState, IKlProject, IKlPsd} from '../klecks/kl.types';
 import {importFilters} from '../klecks/filters/filters-lazy';
 import {base64ToBlob} from '../klecks/storage/base-64-to-blob';
 import {klCanvasToPsdBlob} from '../klecks/storage/kl-canvas-to-psd-blob';
@@ -29,6 +29,8 @@ import toolPaintImg from 'url:~/src/app/img/ui/tool-paint.svg';
 import toolHandImg from 'url:~/src/app/img/ui/tool-hand.svg';
 // @ts-ignore
 import toolFillImg from 'url:~/src/app/img/ui/tool-fill.svg';
+// @ts-ignore
+import toolGradientImg from 'url:~/src/app/img/ui/tool-gradient.svg';
 // @ts-ignore
 import toolTextImg from 'url:~/src/app/img/ui/tool-text.svg';
 // @ts-ignore
@@ -234,8 +236,29 @@ export function KlApp(pProject: IKlProject | null, pOptions: IKlAppOptions) {
         },
         onFill: function(canvasX, canvasY) {
             let layerIndex = klCanvas.getLayerIndex(currentLayerCtx.canvas);
-            klCanvas.floodFill(layerIndex, canvasX, canvasY, klColorSlider.getColor(), fillUi.getOpacity(), fillUi.getTolerance(), fillUi.getSample(), fillUi.getGrow(), fillUi.getContiguous());
+            klCanvas.floodFill(
+                layerIndex,
+                canvasX,
+                canvasY,
+                fillUi.getIsEraser() ? null : klColorSlider.getColor(),
+                fillUi.getOpacity(),
+                fillUi.getTolerance(),
+                fillUi.getSample(),
+                fillUi.getGrow(),
+                fillUi.getContiguous()
+            );
             klCanvasWorkspace.requestFrame();
+        },
+        onGradient: function(typeStr, canvasX, canvasY, angleRad) {
+            if (typeStr === 'down') {
+                gradientTool.onDown(canvasX, canvasY, angleRad);
+            }
+            if (typeStr === 'move') {
+                gradientTool.onMove(canvasX, canvasY);
+            }
+            if (typeStr === 'up') {
+                gradientTool.onUp(canvasX, canvasY);
+            }
         },
         onText: function(canvasX, canvasY, angleRad) {
             if (KL.dialogCounter.get() > 0) {
@@ -471,9 +494,10 @@ export function KlApp(pProject: IKlProject | null, pOptions: IKlAppOptions) {
             }
             if (comboStr === 'g') {
                 event.preventDefault();
-                klCanvasWorkspace.setMode('fill');
-                toolspaceToolRow.setActive('fill');
-                mainTabRow.open('fill');
+                const newMode = klCanvasWorkspace.getMode() === 'fill' ? 'gradient' : 'fill';
+                klCanvasWorkspace.setMode(newMode);
+                toolspaceToolRow.setActive(newMode);
+                mainTabRow.open(newMode);
                 updateMainTabVisibility();
             }
             if (comboStr === 't') {
@@ -1234,6 +1258,8 @@ export function KlApp(pProject: IKlProject | null, pOptions: IKlAppOptions) {
                 klCanvasWorkspace.setMode('hand');
             } else if (activeStr === 'fill') {
                 klCanvasWorkspace.setMode('fill');
+            } else if (activeStr === 'gradient') {
+                klCanvasWorkspace.setMode('gradient');
             } else if (activeStr === 'text') {
                 klCanvasWorkspace.setMode('text');
             } else if (activeStr === 'shape') {
@@ -1407,12 +1433,48 @@ export function KlApp(pProject: IKlProject | null, pOptions: IKlAppOptions) {
         colorSlider: klColorSlider
     });
 
+    let gradientUi = new KL.GradientUi({
+        colorSlider: klColorSlider
+    });
+
     let textUi = new KL.TextUi({
         colorSlider: klColorSlider
     });
 
     let shapeUi = new KL.ShapeUi({
         colorSlider: klColorSlider
+    });
+
+    const gradientTool = new KL.GradientTool({
+        onGradient: (isDone, x1, y1, x2, y2, angleRad) => {
+            const layerIndex = klCanvas.getLayerIndex(currentLayerCtx.canvas);
+            const settings = gradientUi.getSettings();
+            const gradientObj: IGradient = {
+                type: settings.type,
+                color1: klColorSlider.getColor(),
+                isReversed: settings.isReversed,
+                opacity: settings.opacity,
+                doLockAlpha: settings.doLockAlpha,
+                doSnap: keyListener.isPressed('shift') || settings.doSnap,
+                x1,
+                y1,
+                x2,
+                y2,
+                angleRad,
+            };
+
+            if (isDone) {
+                klCanvas.setComposite(layerIndex, null);
+                klCanvas.drawGradient(layerIndex, gradientObj);
+            } else {
+                klCanvas.setComposite(layerIndex, {
+                    draw: function(ctx) {
+                        KL.drawGradient(ctx, gradientObj);
+                    }
+                });
+            }
+            klCanvasWorkspace.requestFrame();
+        }
     });
 
     let shapeTool = new KL.ShapeTool({
@@ -1429,7 +1491,8 @@ export function KlApp(pProject: IKlProject | null, pOptions: IKlAppOptions) {
                 angleRad: angleRad,
                 isOutwards: shapeUi.getIsOutwards(),
                 opacity: shapeUi.getOpacity(),
-                isEraser: shapeUi.getIsEraser()
+                isEraser: shapeUi.getIsEraser(),
+                doLockAlpha: shapeUi.getDoLockAlpha(),
             };
             if (shapeUi.getShape() === 'line') {
                 shapeObj.strokeRgb = klColorSlider.getColor();
@@ -1655,6 +1718,22 @@ export function KlApp(pProject: IKlProject | null, pOptions: IKlAppOptions) {
                 }
             },
             {
+                id: 'gradient',
+                title: LANG('tool-gradient'),
+                image: toolGradientImg,
+                isVisible: false,
+                onOpen: function() {
+                    klColorSlider.enable(true);
+                    gradientUi.setIsVisible(true);
+                },
+                onClose: function() {
+                    gradientUi.setIsVisible(false);
+                },
+                css: {
+                    minWidth: '45px',
+                }
+            },
+            {
                 id: 'text',
                 title: LANG('tool-text'),
                 image: toolTextImg,
@@ -1763,6 +1842,7 @@ export function KlApp(pProject: IKlProject | null, pOptions: IKlAppOptions) {
             'draw': {},
             'hand': {},
             'fill': {},
+            'gradient': {},
             'text': {},
             'shape': {}
         };
@@ -1842,6 +1922,7 @@ export function KlApp(pProject: IKlProject | null, pOptions: IKlAppOptions) {
         brushDiv,
         handUi.getElement(),
         fillUi.getElement(),
+        gradientUi.getElement(),
         textUi.getElement(),
         shapeUi.getElement(),
         layerManager,

@@ -134,14 +134,34 @@ export function FillUi(p) {
             isContiguous = b;
         },
         css: {
-            marginTop: '10px',
             paddingRight: '5px',
             display: 'inline-block',
+            width: '50%',
         }
     });
-    div.appendChild(contiguousToggle.getElement());
 
+    let eraserToggle = new Checkbox({
+        init: true,
+        label: LANG('eraser'),
+        callback: function (b) {},
+        css: {
 
+            paddingRight: '5px',
+            display: 'inline-block',
+            width: '50%',
+        }
+    });
+
+    div.append(BB.el({
+        content: [
+            contiguousToggle.getElement(),
+            eraserToggle.getElement(),
+        ],
+        css: {
+            display: 'flex',
+            marginTop: '10px',
+        }
+    }));
 
 
     // --- interface ---
@@ -178,8 +198,8 @@ export function FillUi(p) {
         return parseInt(growSelect.getValue(), 10);
     }
 
-    this.getContiguous = function() {
-        return isContiguous;
-    };
+    this.getContiguous = () => isContiguous;
+
+    this.getIsEraser = () => eraserToggle.getValue();
 
 }

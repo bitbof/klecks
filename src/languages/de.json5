@@ -1,1257 +1,1277 @@
 {
-    'switch-ui-left-right': {
-        original: 'Switch left/right UI',
-        value: 'Werkzeuge links / rechts'
-    },
-    "toggle-show-tools": {
-        original: 'Show/Hide Tools',
-        value: 'Werkzeuge Anzeigen/Verbergen',
-    },
-    "scroll": {
-        hint: 'Verb. As in scrolling a page.',
-        original: 'Scroll',
-        value: 'Scroll',
-    },
-    donate: {
-        original: 'Donate',
-        value: 'Spenden'
-    },
-    home: {
-        hint: 'button with logo, top left of tools',
-        original: 'Home',
-        value: 'Home'
-    },
-    'modal-new-tab': {
-        original: 'Open in new tab',
-        value: 'In neuem Tab öffnen'
-    },
-    'tab-layers': {
-        original: 'Layers',
-        value: 'Ebenen'
-    },
-    'tab-edit': {
-        original: 'Edit',
-        value: 'Editieren'
-    },
-    'tab-file': {
-        original: 'File',
-        value: 'Datei'
-    },
-    'tool-brush': {
-        original: 'Brush',
-        value: 'Pinsel'
-    },
-    'tool-paint-bucket': {
-        original: 'Paint Bucket',
-        value: 'Füllwerkzeug'
-    },
-    'tool-shape': {
-        original: 'Shape',
-        value: 'Form-Werkzeug'
-    },
-    'tool-text': {
-        original: 'Text',
-        value: 'Text-Werkzeug'
-    },
-    'tool-hand': {
-        original: 'Hand Tool',
-        value: 'Hand-Werkzeug'
-    },
-    'tool-zoom': {
-        original: 'Zoom',
-        value: 'Zoom-Werkzeug'
-    },
-    'tool-undo-redo': {
-        original: 'Undo / Redo',
-        value: 'Rückgängig / Wiederherstellen'
-    },
-    undo: {
-        original: 'Undo',
-        value: 'Rückgängig'
-    },
-    redo: {
-        original: 'Redo',
-        value: 'Wiederherstellen'
-    },
-    'brush-pen': {
-        original: 'Pen',
-        value: 'Stift'
-    },
-    'brush-blend': {
-        original: 'Blend',
-        value: 'Mischpinsel'
-    },
-    'brush-sketchy': {
-        original: 'Sketchy',
-        value: 'Skizzierer'
-    },
-    'brush-pixel': {
-        original: 'Pixel',
-        value: 'Pixel'
-    },
-    'brush-chemy': {
-        original: 'Chemy',
-        value: 'Chemy'
-    },
-    'brush-smudge': {
-        original: 'Smudge',
-        value: 'Wischfinger'
-    },
-    'brush-size': {
-        original: 'Size',
-        value: 'Größe'
-    },
-    'brush-blending': {
-        original: 'Blending',
-        value: 'Mischung'
-    },
-    'brush-toggle-pressure': {
-        original: 'Toggle Pressure Sensitivity',
-        value: 'Drucksensitivität an/aus'
-    },
-    'brush-lock-alpha': {
-        original: 'Lock Alpha',
-        value: 'Fixieren'
-    },
-    'brush-lock-alpha-title': {
-        original: "Locks layer's alpha channel",
-        value: 'Fixiert Alpha-Kanal der Ebene'
-    },
-    'brush-pen-circle': {
-        original: 'Circle',
-        value: 'Kreis'
-    },
-    'brush-pen-chalk': {
-        original: 'Chalk',
-        value: 'Kreide'
-    },
-    'brush-pen-calligraphy': {
-        original: 'Calligraphy',
-        value: 'Kalligraphie'
-    },
-    'brush-pen-square': {
-        original: 'Square',
-        value: 'Quadrat'
-    },
-    'brush-sketchy-scale': {
-        original: 'Scale',
-        value: 'Ausmaß'
-    },
-    'brush-pixel-dither': {
-        original: 'Dither',
-        value: 'Dither'
-    },
-    'brush-chemy-fill': {
-        original: 'Fill',
-        value: 'Füllen'
-    },
-    'brush-chemy-stroke': {
-        original: 'Stroke',
-        value: 'Linie'
-    },
-    'brush-chemy-mirror-x': {
-        original: 'Horizontal Symmetry',
-        value: 'Horizontale Symmetrie'
-    },
-    'brush-chemy-mirror-y': {
-        original: 'Vertical Symmetry',
-        value: 'Vertikale Symmetrie'
-    },
-    'brush-chemy-gradient': {
-        original: 'Gradient',
-        value: 'Verlauf'
-    },
-    'brush-eraser-transparent-bg': {
-        original: 'Transparent Background',
-        value: 'Transparenter Hintergrund'
-    },
-    stabilizer: {
-        original: 'Stabilizer',
-        value: 'Stabilisierer'
-    },
-    'stabilizer-title': {
-        original: 'Stroke Stabilizer',
-        value: 'Linien-Stabilisierer'
-    },
-    eyedropper: {
-        original: 'Eyedropper',
-        value: 'Pipette'
-    },
-    'secondary-color': {
-        original: 'Secondary Color',
-        value: 'Sekundäre Farbe'
-    },
-    'manual-color-input': {
-        original: 'Manual Color Input',
-        value: 'Manuelle Farbeingabe'
-    },
-    'mci-hex': {
-        original: 'Hex',
-        value: 'Hex'
-    },
-    'mci-copy': {
-        original: 'Copy',
-        value: 'Kopieren'
-    },
-    'modal-ok': {
-        original: 'Ok',
-        value: 'Ok'
-    },
-    'modal-cancel': {
-        original: 'Cancel',
-        value: 'Abbrechen'
-    },
-    'modal-close': {
-        original: 'Close',
-        value: 'Schließen'
-    },
-    'layers-active-layer': {
-        original: 'Active Layer',
-        value: 'Aktive Ebene'
-    },
-    'layers-layer': {
-        original: 'Layer',
-        value: 'Ebene'
-    },
-    'layers-copy': {
-        original: 'copy',
-        value: 'Kopie'
-    },
-    'layers-blending': {
-        original: 'Blending',
-        value: 'Modus'
-    },
-    'layers-new': {
-        original: 'New Layer',
-        value: 'Neue Ebene'
-    },
-    'layers-remove': {
-        original: 'Remove Layer',
-        value: 'Ebene löschen'
-    },
-    'layers-duplicate': {
-        original: 'Duplicate Layer',
-        value: 'Ebene duplizieren'
-    },
-    'layers-merge': {
-        original: 'Merge with layer below',
-        value: 'Auf untere Ebene reduzieren'
-    },
-    'layers-rename': {
-        original: 'Rename',
-        value: 'Umbenennen'
-    },
-    'layers-blend-normal': {
-        original: 'normal',
-        value: 'Normal'
-    },
-    'layers-blend-darken': {
-        original: 'darken',
-        value: 'Abdunkeln'
-    },
-    'layers-blend-multiply': {
-        original: 'multiply',
-        value: 'Multiplizieren'
-    },
-    'layers-blend-color-burn': {
-        original: 'color burn',
-        value: 'Farbig nachbel.'
-    },
-    'layers-blend-lighten': {
-        original: 'lighten',
-        value: 'Aufhellen'
-    },
-    'layers-blend-screen': {
-        original: 'screen',
-        value: 'Negativ multipl.'
-    },
-    'layers-blend-color-dodge': {
-        original: 'color dodge',
-        value: 'Farbig abwedeln'
-    },
-    'layers-blend-overlay': {
-        original: 'overlay',
-        value: 'Überlagern'
-    },
-    'layers-blend-soft-light': {
-        original: 'soft light',
-        value: 'Weiches Licht'
-    },
-    'layers-blend-hard-light': {
-        original: 'hard light',
-        value: 'Hartes Licht'
-    },
-    'layers-blend-difference': {
-        original: 'difference',
-        value: 'Differenz'
-    },
-    'layers-blend-exclusion': {
-        original: 'exclusion',
-        value: 'Ausschluss'
-    },
-    'layers-blend-hue': {
-        original: 'hue',
-        value: 'Farbton'
-    },
-    'layers-blend-saturation': {
-        original: 'saturation',
-        value: 'Sättigung'
-    },
-    'layers-blend-color': {
-        original: 'color',
-        value: 'Farbe'
-    },
-    'layers-blend-luminosity': {
-        original: 'luminosity',
-        value: 'Luminanz'
-    },
-    'layers-rename-title': {
-        original: 'Rename Layer',
-        value: 'Ebene umbenennen'
-    },
-    'layers-rename-name': {
-        original: 'Name',
-        value: 'Name'
-    },
-    'layers-rename-clear': {
-        original: 'Clear Name',
-        value: 'Namen leeren'
-    },
-    'layers-rename-sketch': {
-        original: 'Sketch',
-        value: 'Skizze'
-    },
-    'layers-rename-colors': {
-        original: 'Colors',
-        value: 'Farben'
-    },
-    'layers-rename-lines': {
-        original: 'Lines',
-        value: 'Linien'
-    },
-    'layers-rename-foreground': {
-        original: 'Foreground',
-        value: 'Vordergrund'
-    },
-    'layers-merge-modal-title': {
-        original: 'Merge/Mix Layers',
-        value: 'Ebene Reduzieren'
-    },
-    'layers-merge-description': {
-        original: 'Merges the selected layer with the one underneath. Select the mix mode:',
-        value: 'Reduziert gewählte Ebene auf die darunter liegende. Wähle den Mischmodus:'
-    },
-    'file-no-autosave': {
-        original: 'No autosave, no cloud storage',
-        value: 'Kein Autosave & Cloud-Speicher'
-    },
-    'file-new': {
-        original: 'New',
-        value: 'Neu'
-    },
-    'file-import': {
-        original: 'Import',
-        value: 'Öffnen'
-    },
-    'file-save': {
-        original: 'Save',
-        value: 'Speichern'
-    },
-    'file-save-png': {
-        original: 'Save PNG',
-        value: 'PNG speichern'
-    },
-    'file-save-psd': {
-        original: 'Save PSD',
-        value: 'PSD speichern'
-    },
-    'file-save-layers': {
-        original: 'Save Layers',
-        value: 'Ebenen speichern'
-    },
-    'file-copy': {
-        original: 'Copy',
-        value: 'Kopieren'
-    },
-    'file-copy-title': {
-        original: 'Copy To Clipboard',
-        value: 'Kopieren in Zwischenablage'
-    },
-    'file-share': {
-        original: 'Share',
-        value: 'Teilen'
-    },
-    'file-storage': {
-        original: 'Browser Storage',
-        value: 'Browser-Speicher'
-    },
-    'file-storage-thumb-title': {
-        original: 'Restores when reopening page',
-        value: 'Wiederhergestellt bei Neuladen'
-    },
-    'file-storage-about': {
-        original: 'About Browser Storage',
-        value: 'Über Browser-Speicher'
-    },
-    'file-storage-cant-access': {
-        original: "Can't access",
-        value: 'Kein Zugriff'
-    },
-    'file-storage-empty': {
-        original: 'Empty',
-        value: 'Leer'
-    },
-    'file-storage-store': {
-        original: 'Store',
-        value: 'Speichern'
-    },
-    'file-storage-clear': {
-        original: 'Clear',
-        value: 'Leeren'
-    },
-    'file-storage-storing': {
-        original: 'Storing',
-        value: 'Speichert'
-    },
-    'file-storage-overwrite': {
-        original: 'Overwrite',
-        value: 'Überschreiben'
-    },
-    'file-storage-min-ago': {
-        original: '{x}min ago',
-        value: 'vor {x} Min'
-    },
-    'file-storage-hours-ago': {
-        original: '{x}h ago',
-        value: 'vor {x} h'
-    },
-    'file-storage-days-ago': {
-        original: '{x}d ago',
-        value: 'vor {x} T'
-    },
-    'file-storage-month-ago': {
-        original: '> 1month ago',
-        value: 'vor >1 Monat'
-    },
-    'file-storage-restored': {
-        original: 'Restored from Browser Storage',
-        value: 'Wiederhergestellt (Browser-Speicher)'
-    },
-    'file-storage-stored': {
-        original: 'Stored to Browser Storage',
-        value: 'Gespeichert (Browser-Speicher)'
-    },
-    'file-storage-failed': {
-        original: 'Failed to store to Browser Storage',
-        value: 'Speichern fehlgeschlagen (Browser-Speicher)'
-    },
-    'file-storage-failed-1': {
-        original: 'Failed to store. Possible causes:',
-        value: 'Speichern fehlgeschlagen. Mögliche Gründe:'
-    },
-    'file-storage-failed-2': {
-        original: 'Out of disk space',
-        value: 'Ungenügend Speicherplatz vorhanden'
-    },
-    'file-storage-failed-3': {
-        original: 'Storage disabled in incognito tab',
-        value: 'Speicher deaktiviert in Inkognito-Tab'
-    },
-    'file-storage-failed-4': {
-        original: "Browser doesn't support storage",
-        value: 'Browser unterstützt Speicher nicht'
-    },
-    'file-storage-failed-clear': {
-        original: 'Failed to clear.',
-        value: 'Leeren fehlgeschlagen.'
-    },
-    'file-upload': {
-        original: 'Upload',
-        value: 'Hochladen'
-    },
-    'cleared-layer': {
-        original: 'Cleared layer',
-        value: 'Ebene geleert'
-    },
-    filled: {
-        original: 'Filled',
-        value: 'Ebene gefüllt'
-    },
-    'new-title': {
-        original: 'New Image',
-        value: 'Neues Bild'
-    },
-    'new-current': {
-        original: 'Current',
-        value: 'Aktuell'
-    },
-    'new-fit': {
-        original: 'Fit',
-        value: 'Passen'
-    },
-    'new-oversize': {
-        original: 'Oversize',
-        value: 'Übergroß'
-    },
-    'new-square': {
-        original: 'Square',
-        value: 'Quadrat'
-    },
-    'new-landscape': {
-        original: 'Landscape',
-        value: 'Querformat'
-    },
-    'new-portrait': {
-        original: 'Portrait',
-        value: 'Hochformat'
-    },
-    'new-screen': {
-        original: 'Screen',
-        value: 'Bildschirm'
-    },
-    'new-video': {
-        original: 'Video',
-        value: 'Video'
-    },
-    'new-din-paper': {
-        original: 'DIN Paper',
-        value: 'DIN Papier'
-    },
-    'new-px': {
-        original: 'px',
-        value: 'Px'
-    },
-    'new-ratio': {
-        original: 'Ratio',
-        value: 'Verhältnis'
-    },
-    'upload-title': {
-        original: 'Upload to Imgur',
-        value: 'Hochladen auf Imgur'
-    },
-    'upload-link-notice': {
-        original: 'Anyone with the link to your uploaded image will be able to view it.',
-        value: 'Jeder, der den Link zu Deinem hochgeladenen Bild hat, kann es sehen.'
-    },
-    'upload-name': {
-        original: 'Title',
-        value: 'Titel'
-    },
-    'upload-title-untitled': {
-        original: 'Untitled',
-        value: 'Ohne Titel'
-    },
-    'upload-caption': {
-        original: 'Caption',
-        value: 'Beschreibung'
-    },
-    'upload-tos': {
-        original: 'Terms of Service',
-        value: 'Nutzungsbedingungen'
-    },
-    'upload-tos-2': {
-        original: 'for imgur.com',
-        value: 'von imgur.com'
-    },
-    'upload-submit': {
-        original: 'Upload',
-        value: 'Hochladen'
-    },
-    'upload-uploading': {
-        original: 'Uploading...',
-        value: 'Läd hoch...'
-    },
-    'upload-success': {
-        original: 'Upload Successful',
-        value: 'Erfolgreich Hochgeladen'
-    },
-    'upload-failed': {
-        original: 'Upload failed.',
-        value: 'Fehlgeschlagenes Hochladen'
-    },
-    'upload-delete': {
-        original: 'To delete your image from Imgur visit:',
-        value: 'Um dein Bild zu löschen öffne folgenden Link:'
-    },
-    'cropcopy-title-copy': {
-        original: 'Copy To Clipboard',
-        value: 'Kopieren in Zwischenablage'
-    },
-    'cropcopy-title-crop': {
-        original: 'Crop',
-        value: 'zuschneiden'
-    },
-    'cropcopy-click-hold': {
-        original: 'Right-click or press hold to copy.',
-        value: 'Rechtsklick oder gedrückt halten für kopieren.',
-    },
-    'cropcopy-btn-copy': {
-        original: 'To Clipboard',
-        value: 'In Zwischenablage'
-    },
-    'cropcopy-copied': {
-        original: 'Copied.',
-        value: 'Kopiert.'
-    },
-    'cropcopy-btn-crop': {
-        original: 'Apply Crop',
-        value: 'Zuschneiden'
-    },
-    'crop-drag-to-crop': {
-        original: 'Drag to crop',
-        value: 'Ziehen um zuzuschneiden'
-    },
-    'filter-crop-extend': {
-        original: 'Crop/Extend',
-        value: 'Arbeitsfläche'
-    },
-    'filter-flip': {
-        original: 'Flip',
-        value: 'Spiegeln'
-    },
-    'filter-perspective': {
-        original: 'Perspective',
-        value: 'Perspektive'
-    },
-    'filter-resize': {
-        original: 'Resize',
-        value: 'Skalieren'
-    },
-    'filter-rotate': {
-        original: 'Rotate',
-        value: 'Drehen'
-    },
-    'filter-transform': {
-        original: 'Transform',
-        value: 'Transformier.'
-    },
-    'filter-bright-contrast': {
-        original: 'Bright/Contrast',
-        value: 'Hell/Kontrast'
-    },
-    'filter-curves': {
-        original: 'Curves',
-        value: 'Kurven'
-    },
-    'filter-hue-sat': {
-        original: 'Hue/Saturation',
-        value: 'Farbe/Sättig'
-    },
-    'filter-invert': {
-        original: 'Invert',
-        value: 'Umkehren'
-    },
-    'filter-tilt-shift': {
-        original: 'Tilt Shift',
-        value: 'Tilt Shift'
-    },
-    'filter-to-alpha': {
-        original: 'To Alpha',
-        value: 'Zu Alpha'
-    },
-    'filter-triangle-blur': {
-        original: 'Triangle Blur',
-        value: 'Weichzeichnen'
-    },
-    'filter-unsharp-mask': {
-        original: 'Unsharp Mask',
-        value: 'Unscharf mask'
-    },
-    'filter-crop-title': {
-        original: 'Crop / Extend',
-        value: 'Arbeitsfläche'
-    },
-    'filter-crop-description': {
-        original: 'Crop or extend the image.',
-        value: 'Schneidet das Bild zu oder erweitert es.'
-    },
-    'filter-crop-left': {
-        original: 'Left',
-        value: 'Links'
-    },
-    'filter-crop-right': {
-        original: 'Right',
-        value: 'Rechts'
-    },
-    'filter-crop-top': {
-        original: 'Top',
-        value: 'Oben'
-    },
-    'filter-crop-bottom': {
-        original: 'Bottom',
-        value: 'Unten'
-    },
-    'filter-crop-rule-thirds': {
-        original: 'Rule of Thirds',
-        value: 'Drittel-Regel'
-    },
-    'filter-crop-fill': {
-        original: 'Fill',
-        value: 'Füllung'
-    },
-    'filter-flip-title': {
-        original: 'Flip',
-        value: 'Spiegeln'
-    },
-    'filter-flip-description': {
-        original: 'Flips layer or whole image.',
-        value: 'Spiegelt Ebene oder gesamtes Bild.'
-    },
-    'filter-flip-horizontal': {
-        original: 'Horizontal',
-        value: 'Horizontal'
-    },
-    'filter-flip-vertical': {
-        original: 'Vertical',
-        value: 'Vertikal'
-    },
-    'filter-flip-image': {
-        original: 'Flip Image',
-        value: 'Bild'
-    },
-    'filter-flip-layer': {
-        original: 'Flip Layer',
-        value: 'Ebene'
-    },
-    'filter-perspective-title': {
-        original: 'Perspective',
-        value: 'Perspektive'
-    },
-    'filter-perspective-description': {
-        original: 'Transforms the selected layer.',
-        value: 'Transformiert die gewählte Ebene.'
-    },
-    'filter-perspective-before': {
-        original: 'Before',
-        value: 'Vorher'
-    },
-    'filter-perspective-after': {
-        original: 'After',
-        value: 'Danach'
-    },
-    'filter-resize-title': {
-        original: 'Resize',
-        value: 'Skalieren'
-    },
-    'filter-resize-description': {
-        original: 'Resizes the image.',
-        value: 'Ändert die Größe des Bildes.'
-    },
-    'filter-rotate-title': {
-        original: 'Rotate',
-        value: 'Drehen'
-    },
-    'filter-rotate-description': {
-        original: 'Rotates the image.',
-        value: 'Dreht das Bild.'
-    },
-    'filter-transform-empty': {
-        original: 'Layer is empty.',
-        value: 'Ebene ist leer.'
-    },
-    'filter-transform-title': {
-        original: 'Transform',
-        value: 'Transformieren'
-    },
-    'filter-transform-description': {
-        original: 'Transforms selected layer. Hold Shift for additional behavior.',
-        value: 'Transformiert die gewählte Ebene. Halte Shift für erweiterte Funktionalität.'
-    },
-    'filter-transform-rotation': {
-        original: 'Rotation',
-        value: 'Rotation'
-    },
-    'filter-transform-flip': {
-        original: 'Flip',
-        value: 'Spiegel'
-    },
-    'filter-transform-center': {
-        original: 'Center',
-        value: 'Zentrieren'
-    },
-    'filter-transform-constrain': {
-        original: 'Constrain',
-        value: 'Fest'
-    },
-    'filter-transform-snap': {
-        original: 'Snap',
-        value: 'Einrasten'
-    },
-    'filter-transform-snap-title': {
-        original: 'Snap Rotation And Position',
-        value: 'Rotation und Position einrasten'
-    },
-    'filter-bright-contrast-title': {
-        original: 'Brightness / Contrast',
-        value: 'Helligkeit / Kontrast'
-    },
-    'filter-bright-contrast-description': {
-        original: 'Change brightness and contrast for the selected layer.',
-        value: 'Ändert Helligkeit und Kontrast der gewählten Ebene.'
-    },
-    'filter-bright-contrast-brightness': {
-        original: 'Brightness',
-        value: 'Helligkeit'
-    },
-    'filter-bright-contrast-contrast': {
-        original: 'Contrast',
-        value: 'Kontrast'
-    },
-    'filter-curves-title': {
-        original: 'Curves',
-        value: 'Kurven'
-    },
-    'filter-curves-description': {
-        original: 'Apply curves on the selected layer.',
-        value: 'Wendet Kurven auf gewählte Ebene an.'
-    },
-    'filter-curves-all': {
-        original: 'All',
-        value: 'Alle'
-    },
-    'filter-hue-sat-title': {
-        original: 'Hue / Saturation',
-        value: 'Farbton / Sättigung'
-    },
-    'filter-hue-sat-description': {
-        original: 'Change hue and saturation for the selected layer.',
-        value: 'Ändert Farbton und Sättigung der gewählten Ebene.'
-    },
-    'filter-hue-sat-hue': {
-        original: 'Hue',
-        value: 'Farbton'
-    },
-    'filter-hue-sat-saturation': {
-        original: 'Saturation',
-        value: 'Sättigung'
-    },
-    'filter-applied': {
-        original: 'applied',
-        value: 'angewendet'
-    },
-    'filter-tilt-shift-title': {
-        original: 'Tilt Shift',
-        value: 'Tilt Shift'
-    },
-    'filter-tilt-shift-description': {
-        original: 'Applies tilt shift on the selected layer.',
-        value: 'Wendet Tilt Shift auf gewählte Ebene an.'
-    },
-    'filter-tilt-shift-blur': {
-        original: 'Blur Radius',
-        value: 'Unschärferadius'
-    },
-    'filter-tilt-shift-gradient': {
-        original: 'Gradient Radius',
-        value: 'Verlaufsradius'
-    },
-    'filter-to-alpha-title': {
-        original: 'To Alpha',
-        value: 'Zu Alpha'
-    },
-    'filter-to-alpha-description': {
-        original: 'Generates alpha channel for selected layer from:',
-        value: 'Erzeugt Alphakanal für gewählte Ebene aus:'
-    },
-    'filter-to-alpha-inverted-lum': {
-        original: 'Inverted Luminance',
-        value: 'Umgekehrte Luminanz'
-    },
-    'filter-to-alpha-lum': {
-        original: 'Luminance',
-        value: 'Luminanz'
-    },
-    'filter-to-alpha-replace': {
-        original: 'Replace RGB',
-        value: 'Ersetze RGB'
-    },
-    'filter-triangle-blur-title': {
-        original: 'Triangle Blur',
-        value: 'Dreiecksunschärfe'
-    },
-    'filter-triangle-blur-description': {
-        original: 'Applies triangle blur on the selected layer.',
-        value: 'Wendet Dreiecksunschärfe auf gewählte Ebene an.'
-    },
-    'filter-unsharp-mask-title': {
-        original: 'Unsharp Mask',
-        value: 'Unscharf maskieren'
-    },
-    'filter-unsharp-mask-description': {
-        original: 'Sharpens the selected layer by scaling pixels away from the average of their neighbors.',
-        value: 'Schärft die ausgewählte Ebene durch Skalierung der Pixel weg vom Durchschnitt ihrer Nachbarn.'
-    },
-    'filter-unsharp-mask-strength': {
-        original: 'Strength',
-        value: 'Stärke'
-    },
-    'filter-grid': {
-        original: 'Grid',
-        value: 'Gitter'
-    },
-    'filter-grid-description': {
-        original: 'Draws grid on selected layer.',
-        value: 'Zeichnet Gitter auf gewählte Ebene.'
-    },
-    'filter-noise': {
-        original: 'Noise',
-        value: 'Rauschen'
-    },
-    'filter-noise-description': {
-        original: 'Adds noise to selected layer.',
-        value: 'Zeichnet Rauschen auf gewählte Ebene.'
-    },
-    'filter-noise-scale': {
-        original: 'Scale',
-        value: 'Größe'
-    },
-    'filter-noise-alpha': {
-        original: 'Alpha',
-        value: 'Alpha'
-    },
-    'filter-noise-inverted': {
-        original: 'Inverted',
-        value: 'Umgekehrt'
-    },
-    'import-opening': {
-        original: 'Opening file...',
-        value: 'Öffne Datei...'
-    },
-    'import-title': {
-        original: 'Import Image',
-        value: 'Datei öffnen'
-    },
-    'import-too-large': {
-        original: 'Image too large, will be downscaled.',
-        value: 'Bild zu groß, es wird verkleinert.'
-    },
-    'import-btn-as-layer': {
-        original: 'As Layer',
-        value: 'Als Ebene'
-    },
-    'import-btn-as-image': {
-        original: 'As Image',
-        value: 'Als Bild'
-    },
-    'import-as-layer-title': {
-        original: 'Import Image as New Layer',
-        value: 'Öffne Bild als neue Ebene'
-    },
-    'import-as-layer-description': {
-        original: 'Adjust the position of the imported image.',
-        value: 'Passe die Position des importierten Bildes an.'
-    },
-    'import-as-layer-limit-reached': {
-        original: 'Layer limit reached. Image will be placed on existing layer.',
-        value: 'Maximale Ebenen erreicht, es wird auf vorhandene Ebene platziert.'
-    },
-    'import-as-layer-fit': {
-        original: 'Fit',
-        value: 'Passen'
-    },
-    'import-flatten': {
-        original: 'Flatten image',
-        value: 'Reduzieren'
-    },
-    'import-unsupported-file': {
-        original: 'Unsupported file type. See Help for supported types.',
-        value: 'Nicht unterstützter Dateityp. Siehe Hilfe für unterstützte Typen.'
-    },
-    'import-broken-file': {
-        original: "Couldn't load image. File might be corrupted.",
-        value: 'Bild konnte nicht geladen werden. Datei könnte beschädigt sein.'
-    },
-    'import-psd-unsupported': {
-        original: 'Unsupported features. PSD had to be flattened.',
-        value: 'Nicht unterstützte Funktionen. PSD musste auf eine Ebene reduziert werden.'
-    },
-    'import-psd-limited-support': {
-        original: 'PSD support is limited. Flattened will more likely look correct.',
-        value: 'Begrenzte Unterstützung für PSD. Reduziertes Bild sieht vermutlich korrekter aus.'
-    },
-    'import-psd-too-large': {
-        original: 'Image exceeds maximum dimensions of {x} x {x} pixels. Unable to import.',
-        value: 'Bild überschreitet Maximum von {x} x {x} Pixel, kann nicht geöffnet werden.'
-    },
-    'import-psd-size': {
-        original: 'Image size',
-        value: 'Bildgröße'
-    },
-    'hand-reset': {
-        original: 'Reset',
-        value: 'Zurücksetzen'
-    },
-    'hand-fit': {
-        original: 'Fit',
-        value: 'Passen'
-    },
-    'bucket-tolerance': {
-        original: 'Tolerance',
-        value: 'Toleranz'
-    },
-    'bucket-sample': {
-        original: 'Sample',
-        value: 'Quelle'
-    },
-    'bucket-sample-title': {
-        original: 'Which layers to sample color from',
-        value: 'Von welchen Ebenen wird Farbe gelesen'
-    },
-    'bucket-sample-all': {
-        original: 'All',
-        value: 'Alle'
-    },
-    'bucket-sample-active': {
-        original: 'Active',
-        value: 'Aktiv'
-    },
-    'bucket-sample-above': {
-        original: 'Above',
-        value: 'Über'
-    },
-    'bucket-grow': {
-        original: 'Grow',
-        value: 'Wachsen'
-    },
-    'bucket-grow-title': {
-        original: 'Grow filled area (in pixels)',
-        value: 'Erweitere gefüllten Bereich (in Pixel)'
-    },
-    'bucket-contiguous': {
-        original: 'Contiguous',
-        value: 'Benachbart'
-    },
-    'bucket-contiguous-title': {
-        original: 'Only fill connected areas',
-        value: 'Fülle nur miteinander verbundene Bereiche'
-    },
-    'shape-stroke': {
-        original: 'Stroke',
-        value: 'Linie'
-    },
-    'shape-fill': {
-        original: 'Fill',
-        value: 'Füllen'
-    },
-    'shape-rect': {
-        original: 'Rectangle',
-        value: 'Rechteck'
-    },
-    'shape-ellipse': {
-        original: 'Ellipse',
-        value: 'Ellipse'
-    },
-    'shape-line': {
-        original: 'Line',
-        value: 'Linie'
-    },
-    'shape-line-width': {
-        original: 'Line Width',
-        value: 'Linienbreite'
-    },
-    'shape-outwards': {
-        original: 'Outwards',
-        value: 'Nach Außen'
-    },
-    'shape-fixed': {
-        original: 'Fixed 1:1',
-        value: 'Fest 1:1'
-    },
-    'shape-snap': {
-        original: 'Snap',
-        value: 'Einrasten'
-    },
-    'shape-snap-title': {
-        original: '45° Angle Snapping',
-        value: '45° einrasten'
-    },
-    'text-instruction': {
-        original: 'Click canvas to place text',
-        value: 'Klicken um Text zu platzieren'
-    },
-    'text-title': {
-        original: 'Add Text',
-        value: 'Text Hinzufügen'
-    },
-    'text-placeholder': {
-        original: 'Your text (multiline Shift+Enter)',
-        value: 'Dein Text (mehrzeilig Shift+Enter)'
-    },
-    'text-color': {
-        original: 'Color',
-        value: 'Farbe'
-    },
-    'text-size': {
-        original: 'Size',
-        value: 'Größe'
-    },
-    'text-left': {
-        original: 'Left',
-        value: 'Linksbündig'
-    },
-    'text-center': {
-        original: 'Center',
-        value: 'Zentriert'
-    },
-    'text-right': {
-        original: 'Right',
-        value: 'Rechtsbündig'
-    },
-    'text-italic': {
-        original: 'Italic',
-        value: 'Kursiv'
-    },
-    'text-bold': {
-        original: 'Bold',
-        value: 'Fett'
-    },
-    'save-reminder-title': {
-        hint: 'Save Reminder is a popup that shows up after 20 minutes of not saving. Allows user to save on the spot.',
-        original: 'Unsaved Work',
-        value: 'Ungespeicherter Fortschritt'
-    },
-    'save-reminder-text': {
-        hint: 'turns into: "...saved in <strong>12 minutes</strong>. Save..."',
-        original: 'Image was not saved in {a} minutes{b}. Save now to prevent eventual loss.',
-        value: 'Dein Bild wurde seit {a} Minuten{b} nicht gespeichert. Speichere jetzt um Datenverlust zu vermeiden.'
-    },
-    'save-reminder-save-psd': {
-        original: 'Save As PSD',
-        value: 'Speichere als PSD'
-    },
-    'save-reminder-psd-layers': {
-        original: 'PSD will remember all layers.',
-        value: 'PSD merkt sich alle Ebenen.'
-    },
-    submit: {
-        original: 'Submit',
-        value: 'Senden'
-    },
-    'submit-title': {
-        original: 'Submit Drawing',
-        value: 'Bild senden'
-    },
-    'submit-prompt': {
-        original: 'Submit drawing?',
-        value: 'Bild senden?'
-    },
-    'submit-submitting': {
-        original: 'Submitting',
-        value: 'Läd hoch'
-    },
-    'embed-init-loading': {
-        original: 'Loading app',
-        value: 'Lade App'
-    },
-    'embed-init-waiting': {
-        original: 'Waiting for image',
-        value: 'Warten auf Bild'
-    },
-    unsaved: {
-        original: 'Unsaved',
-        value: 'Ungespeichert'
-    },
-    help: {
-        original: 'Help',
-        value: 'Hilfe'
-    },
-    'tab-settings': {
-        original: 'Settings',
-        value: 'Einstellungen'
-    },
-    'settings-language': {
-        original: 'Language',
-        value: 'Sprache'
-    },
-    'settings-preferred-language': {
-        original: 'Preferred Language',
-        value: 'Bevorzugte Sprache'
-    },
-    'settings-language-reload': {
-        original: 'Will update after reloading.',
-        value: 'Aktualisiert mit Neuladen.'
-    },
-    licenses: {
-        original: 'Licenses',
-        value: 'Lizenzen'
-    },
-    'source-code': {
-        original: 'Source Code',
-        value: 'Quellcode'
-    },
-    auto: {
-        hint: 'automatically decided',
-        original: 'auto',
-        value: 'Automatisch'
-    },
-    'zoom-in': {
-        original: 'Zoom In',
-        value: 'Vergrößern'
-    },
-    'zoom-out': {
-        original: 'Zoom Out',
-        value: 'Verkleinern'
-    },
-    radius: {
-        original: 'Radius',
-        value: 'Radius'
-    },
-    'constrain-proportions': {
-        original: 'Constrain Proportions',
-        value: 'Festes Seitenverhältnis'
-    },
-    width: {
-        original: 'Width',
-        value: 'Breite'
-    },
-    height: {
-        original: 'Height',
-        value: 'Höhe'
-    },
-    opacity: {
-        original: 'Opacity',
-        value: 'Deckkraft'
-    },
-    red: {
-        original: 'Red',
-        value: 'Rot'
-    },
-    green: {
-        original: 'Green',
-        value: 'Grün'
-    },
-    blue: {
-        original: 'Blue',
-        value: 'Blau'
-    },
-    eraser: {
-        original: 'Eraser',
-        value: 'Radierer'
-    },
-    center: {
-        hint: 'verb',
-        original: 'Center',
-        value: 'Zentrieren'
-    },
-    background: {
-        original: 'Background',
-        value: 'Hintergrund'
-    },
-    'scaling-algorithm': {
-        original: 'Scaling Algorithm',
-        value: 'Skalierungsalgorithmus'
-    },
-    'algorithm-smooth': {
-        original: 'Smooth',
-        value: 'Glatt'
-    },
-    'algorithm-pixelated': {
-        original: 'Pixelated',
-        value: 'Pixelig'
-    },
-    'preview': {
-        original: 'Preview',
-        hint: 'subject. When applying a filter user sees a preview of what the result would look like.',
-        value: 'Vorschau'
-    }
+  'switch-ui-left-right': {
+    original: 'Switch left/right UI',
+    value: 'Werkzeuge links / rechts'
+  },
+  "toggle-show-tools": {
+    original: 'Show/Hide Tools',
+    value: 'Werkzeuge Anzeigen/Verbergen',
+  },
+  "scroll": {
+    hint: 'Verb. As in scrolling a page.',
+    original: 'Scroll',
+    value: 'Scroll',
+  },
+  donate: {
+    original: 'Donate',
+    value: 'Spenden'
+  },
+  home: {
+    hint: 'button with logo, top left of tools',
+    original: 'Home',
+    value: 'Home'
+  },
+  'modal-new-tab': {
+    original: 'Open in new tab',
+    value: 'In neuem Tab öffnen'
+  },
+  'tab-layers': {
+    original: 'Layers',
+    value: 'Ebenen'
+  },
+  'tab-edit': {
+    original: 'Edit',
+    value: 'Editieren'
+  },
+  'tab-file': {
+    original: 'File',
+    value: 'Datei'
+  },
+  'tool-brush': {
+    original: 'Brush',
+    value: 'Pinsel'
+  },
+  'tool-paint-bucket': {
+    original: 'Paint Bucket',
+    value: 'Füllwerkzeug'
+  },
+  'tool-gradient': {
+    original: 'Gradient',
+    value: 'Verlauf'
+  },
+  'tool-shape': {
+    original: 'Shape',
+    value: 'Form-Werkzeug'
+  },
+  'tool-text': {
+    original: 'Text',
+    value: 'Text-Werkzeug'
+  },
+  'tool-hand': {
+    original: 'Hand Tool',
+    value: 'Hand-Werkzeug'
+  },
+  'tool-zoom': {
+    original: 'Zoom',
+    value: 'Zoom-Werkzeug'
+  },
+  'tool-undo-redo': {
+    original: 'Undo / Redo',
+    value: 'Rückgängig / Wiederherstellen'
+  },
+  undo: {
+    original: 'Undo',
+    value: 'Rückgängig'
+  },
+  redo: {
+    original: 'Redo',
+    value: 'Wiederherstellen'
+  },
+  'brush-pen': {
+    original: 'Pen',
+    value: 'Stift'
+  },
+  'brush-blend': {
+    original: 'Blend',
+    value: 'Mischpinsel'
+  },
+  'brush-sketchy': {
+    original: 'Sketchy',
+    value: 'Skizzierer'
+  },
+  'brush-pixel': {
+    original: 'Pixel',
+    value: 'Pixel'
+  },
+  'brush-chemy': {
+    original: 'Chemy',
+    value: 'Chemy'
+  },
+  'brush-smudge': {
+    original: 'Smudge',
+    value: 'Wischfinger'
+  },
+  'brush-size': {
+    original: 'Size',
+    value: 'Größe'
+  },
+  'brush-blending': {
+    original: 'Blending',
+    value: 'Mischung'
+  },
+  'brush-toggle-pressure': {
+    original: 'Toggle Pressure Sensitivity',
+    value: 'Drucksensitivität an/aus'
+  },
+  'brush-pen-circle': {
+    original: 'Circle',
+    value: 'Kreis'
+  },
+  'brush-pen-chalk': {
+    original: 'Chalk',
+    value: 'Kreide'
+  },
+  'brush-pen-calligraphy': {
+    original: 'Calligraphy',
+    value: 'Kalligraphie'
+  },
+  'brush-pen-square': {
+    original: 'Square',
+    value: 'Quadrat'
+  },
+  'brush-sketchy-scale': {
+    original: 'Scale',
+    value: 'Ausmaß'
+  },
+  'brush-pixel-dither': {
+    original: 'Dither',
+    value: 'Dither'
+  },
+  'brush-chemy-fill': {
+    original: 'Fill',
+    value: 'Füllen'
+  },
+  'brush-chemy-stroke': {
+    original: 'Stroke',
+    value: 'Linie'
+  },
+  'brush-chemy-mirror-x': {
+    original: 'Horizontal Symmetry',
+    value: 'Horizontale Symmetrie'
+  },
+  'brush-chemy-mirror-y': {
+    original: 'Vertical Symmetry',
+    value: 'Vertikale Symmetrie'
+  },
+  'brush-chemy-gradient': {
+    original: 'Gradient',
+    value: 'Verlauf'
+  },
+  'brush-eraser-transparent-bg': {
+    original: 'Transparent Background',
+    value: 'Transparenter Hintergrund'
+  },
+  stabilizer: {
+    original: 'Stabilizer',
+    value: 'Stabilisierer'
+  },
+  'stabilizer-title': {
+    original: 'Stroke Stabilizer',
+    value: 'Linien-Stabilisierer'
+  },
+  eyedropper: {
+    original: 'Eyedropper',
+    value: 'Pipette'
+  },
+  'secondary-color': {
+    original: 'Secondary Color',
+    value: 'Sekundäre Farbe'
+  },
+  'manual-color-input': {
+    original: 'Manual Color Input',
+    value: 'Manuelle Farbeingabe'
+  },
+  'mci-hex': {
+    original: 'Hex',
+    value: 'Hex'
+  },
+  'mci-copy': {
+    original: 'Copy',
+    value: 'Kopieren'
+  },
+  'modal-ok': {
+    original: 'Ok',
+    value: 'Ok'
+  },
+  'modal-cancel': {
+    original: 'Cancel',
+    value: 'Abbrechen'
+  },
+  'modal-close': {
+    original: 'Close',
+    value: 'Schließen'
+  },
+  'layers-active-layer': {
+    original: 'Active Layer',
+    value: 'Aktive Ebene'
+  },
+  'layers-layer': {
+    original: 'Layer',
+    value: 'Ebene'
+  },
+  'layers-copy': {
+    original: 'copy',
+    value: 'Kopie'
+  },
+  'layers-blending': {
+    original: 'Blending',
+    value: 'Modus'
+  },
+  'layers-new': {
+    original: 'New Layer',
+    value: 'Neue Ebene'
+  },
+  'layers-remove': {
+    original: 'Remove Layer',
+    value: 'Ebene löschen'
+  },
+  'layers-duplicate': {
+    original: 'Duplicate Layer',
+    value: 'Ebene duplizieren'
+  },
+  'layers-merge': {
+    original: 'Merge with layer below',
+    value: 'Auf untere Ebene reduzieren'
+  },
+  'layers-rename': {
+    original: 'Rename',
+    value: 'Umbenennen'
+  },
+  'layers-blend-normal': {
+    original: 'normal',
+    value: 'Normal'
+  },
+  'layers-blend-darken': {
+    original: 'darken',
+    value: 'Abdunkeln'
+  },
+  'layers-blend-multiply': {
+    original: 'multiply',
+    value: 'Multiplizieren'
+  },
+  'layers-blend-color-burn': {
+    original: 'color burn',
+    value: 'Farbig nachbel.'
+  },
+  'layers-blend-lighten': {
+    original: 'lighten',
+    value: 'Aufhellen'
+  },
+  'layers-blend-screen': {
+    original: 'screen',
+    value: 'Negativ multipl.'
+  },
+  'layers-blend-color-dodge': {
+    original: 'color dodge',
+    value: 'Farbig abwedeln'
+  },
+  'layers-blend-overlay': {
+    original: 'overlay',
+    value: 'Überlagern'
+  },
+  'layers-blend-soft-light': {
+    original: 'soft light',
+    value: 'Weiches Licht'
+  },
+  'layers-blend-hard-light': {
+    original: 'hard light',
+    value: 'Hartes Licht'
+  },
+  'layers-blend-difference': {
+    original: 'difference',
+    value: 'Differenz'
+  },
+  'layers-blend-exclusion': {
+    original: 'exclusion',
+    value: 'Ausschluss'
+  },
+  'layers-blend-hue': {
+    original: 'hue',
+    value: 'Farbton'
+  },
+  'layers-blend-saturation': {
+    original: 'saturation',
+    value: 'Sättigung'
+  },
+  'layers-blend-color': {
+    original: 'color',
+    value: 'Farbe'
+  },
+  'layers-blend-luminosity': {
+    original: 'luminosity',
+    value: 'Luminanz'
+  },
+  'layers-rename-title': {
+    original: 'Rename Layer',
+    value: 'Ebene umbenennen'
+  },
+  'layers-rename-name': {
+    original: 'Name',
+    value: 'Name'
+  },
+  'layers-rename-clear': {
+    original: 'Clear Name',
+    value: 'Namen leeren'
+  },
+  'layers-rename-sketch': {
+    original: 'Sketch',
+    value: 'Skizze'
+  },
+  'layers-rename-colors': {
+    original: 'Colors',
+    value: 'Farben'
+  },
+  'layers-rename-lines': {
+    original: 'Lines',
+    value: 'Linien'
+  },
+  'layers-rename-foreground': {
+    original: 'Foreground',
+    value: 'Vordergrund'
+  },
+  'layers-merge-modal-title': {
+    original: 'Merge/Mix Layers',
+    value: 'Ebene Reduzieren'
+  },
+  'layers-merge-description': {
+    original: 'Merges the selected layer with the one underneath. Select the mix mode:',
+    value: 'Reduziert gewählte Ebene auf die darunter liegende. Wähle den Mischmodus:'
+  },
+  'file-no-autosave': {
+    original: 'No autosave, no cloud storage',
+    value: 'Kein Autosave & Cloud-Speicher'
+  },
+  'file-new': {
+    original: 'New',
+    value: 'Neu'
+  },
+  'file-import': {
+    original: 'Import',
+    value: 'Öffnen'
+  },
+  'file-save': {
+    original: 'Save',
+    value: 'Speichern'
+  },
+  'file-save-png': {
+    original: 'Save PNG',
+    value: 'PNG speichern'
+  },
+  'file-save-psd': {
+    original: 'Save PSD',
+    value: 'PSD speichern'
+  },
+  'file-save-layers': {
+    original: 'Save Layers',
+    value: 'Ebenen speichern'
+  },
+  'file-copy': {
+    original: 'Copy',
+    value: 'Kopieren'
+  },
+  'file-copy-title': {
+    original: 'Copy To Clipboard',
+    value: 'Kopieren in Zwischenablage'
+  },
+  'file-share': {
+    original: 'Share',
+    value: 'Teilen'
+  },
+  'file-storage': {
+    original: 'Browser Storage',
+    value: 'Browser-Speicher'
+  },
+  'file-storage-thumb-title': {
+    original: 'Restores when reopening page',
+    value: 'Wiederhergestellt bei Neuladen'
+  },
+  'file-storage-about': {
+    original: 'About Browser Storage',
+    value: 'Über Browser-Speicher'
+  },
+  'file-storage-cant-access': {
+    original: "Can't access",
+    value: 'Kein Zugriff'
+  },
+  'file-storage-empty': {
+    original: 'Empty',
+    value: 'Leer'
+  },
+  'file-storage-store': {
+    original: 'Store',
+    value: 'Speichern'
+  },
+  'file-storage-clear': {
+    original: 'Clear',
+    value: 'Leeren'
+  },
+  'file-storage-storing': {
+    original: 'Storing',
+    value: 'Speichert'
+  },
+  'file-storage-overwrite': {
+    original: 'Overwrite',
+    value: 'Überschreiben'
+  },
+  'file-storage-min-ago': {
+    original: '{x}min ago',
+    value: 'vor {x} Min'
+  },
+  'file-storage-hours-ago': {
+    original: '{x}h ago',
+    value: 'vor {x} h'
+  },
+  'file-storage-days-ago': {
+    original: '{x}d ago',
+    value: 'vor {x} T'
+  },
+  'file-storage-month-ago': {
+    original: '> 1month ago',
+    value: 'vor >1 Monat'
+  },
+  'file-storage-restored': {
+    original: 'Restored from Browser Storage',
+    value: 'Wiederhergestellt (Browser-Speicher)'
+  },
+  'file-storage-stored': {
+    original: 'Stored to Browser Storage',
+    value: 'Gespeichert (Browser-Speicher)'
+  },
+  'file-storage-failed': {
+    original: 'Failed to store to Browser Storage',
+    value: 'Speichern fehlgeschlagen (Browser-Speicher)'
+  },
+  'file-storage-failed-1': {
+    original: 'Failed to store. Possible causes:',
+    value: 'Speichern fehlgeschlagen. Mögliche Gründe:'
+  },
+  'file-storage-failed-2': {
+    original: 'Out of disk space',
+    value: 'Ungenügend Speicherplatz vorhanden'
+  },
+  'file-storage-failed-3': {
+    original: 'Storage disabled in incognito tab',
+    value: 'Speicher deaktiviert in Inkognito-Tab'
+  },
+  'file-storage-failed-4': {
+    original: "Browser doesn't support storage",
+    value: 'Browser unterstützt Speicher nicht'
+  },
+  'file-storage-failed-clear': {
+    original: 'Failed to clear.',
+    value: 'Leeren fehlgeschlagen.'
+  },
+  'file-upload': {
+    original: 'Upload',
+    value: 'Hochladen'
+  },
+  'cleared-layer': {
+    original: 'Cleared layer',
+    value: 'Ebene geleert'
+  },
+  filled: {
+    original: 'Filled',
+    value: 'Ebene gefüllt'
+  },
+  'new-title': {
+    original: 'New Image',
+    value: 'Neues Bild'
+  },
+  'new-current': {
+    original: 'Current',
+    value: 'Aktuell'
+  },
+  'new-fit': {
+    original: 'Fit',
+    value: 'Passen'
+  },
+  'new-oversize': {
+    original: 'Oversize',
+    value: 'Übergroß'
+  },
+  'new-square': {
+    original: 'Square',
+    value: 'Quadrat'
+  },
+  'new-landscape': {
+    original: 'Landscape',
+    value: 'Querformat'
+  },
+  'new-portrait': {
+    original: 'Portrait',
+    value: 'Hochformat'
+  },
+  'new-screen': {
+    original: 'Screen',
+    value: 'Bildschirm'
+  },
+  'new-video': {
+    original: 'Video',
+    value: 'Video'
+  },
+  'new-din-paper': {
+    original: 'DIN Paper',
+    value: 'DIN Papier'
+  },
+  'new-px': {
+    original: 'px',
+    value: 'Px'
+  },
+  'new-ratio': {
+    original: 'Ratio',
+    value: 'Verhältnis'
+  },
+  'upload-title': {
+    original: 'Upload to Imgur',
+    value: 'Hochladen auf Imgur'
+  },
+  'upload-link-notice': {
+    original: 'Anyone with the link to your uploaded image will be able to view it.',
+    value: 'Jeder, der den Link zu Deinem hochgeladenen Bild hat, kann es sehen.'
+  },
+  'upload-name': {
+    original: 'Title',
+    value: 'Titel'
+  },
+  'upload-title-untitled': {
+    original: 'Untitled',
+    value: 'Ohne Titel'
+  },
+  'upload-caption': {
+    original: 'Caption',
+    value: 'Beschreibung'
+  },
+  'upload-tos': {
+    original: 'Terms of Service',
+    value: 'Nutzungsbedingungen'
+  },
+  'upload-tos-2': {
+    original: 'for imgur.com',
+    value: 'von imgur.com'
+  },
+  'upload-submit': {
+    original: 'Upload',
+    value: 'Hochladen'
+  },
+  'upload-uploading': {
+    original: 'Uploading...',
+    value: 'Läd hoch...'
+  },
+  'upload-success': {
+    original: 'Upload Successful',
+    value: 'Erfolgreich Hochgeladen'
+  },
+  'upload-failed': {
+    original: 'Upload failed.',
+    value: 'Fehlgeschlagenes Hochladen'
+  },
+  'upload-delete': {
+    original: 'To delete your image from Imgur visit:',
+    value: 'Um dein Bild zu löschen öffne folgenden Link:'
+  },
+  'cropcopy-title-copy': {
+    original: 'Copy To Clipboard',
+    value: 'Kopieren in Zwischenablage'
+  },
+  'cropcopy-title-crop': {
+    original: 'Crop',
+    value: 'zuschneiden'
+  },
+  'cropcopy-click-hold': {
+    original: 'Right-click or press hold to copy.',
+    value: 'Rechtsklick oder gedrückt halten für kopieren.',
+  },
+  'cropcopy-btn-copy': {
+    original: 'To Clipboard',
+    value: 'In Zwischenablage'
+  },
+  'cropcopy-copied': {
+    original: 'Copied.',
+    value: 'Kopiert.'
+  },
+  'cropcopy-btn-crop': {
+    original: 'Apply Crop',
+    value: 'Zuschneiden'
+  },
+  'crop-drag-to-crop': {
+    original: 'Drag to crop',
+    value: 'Ziehen um zuzuschneiden'
+  },
+  'filter-crop-extend': {
+    original: 'Crop/Extend',
+    value: 'Arbeitsfläche'
+  },
+  'filter-flip': {
+    original: 'Flip',
+    value: 'Spiegeln'
+  },
+  'filter-perspective': {
+    original: 'Perspective',
+    value: 'Perspektive'
+  },
+  'filter-resize': {
+    original: 'Resize',
+    value: 'Skalieren'
+  },
+  'filter-rotate': {
+    original: 'Rotate',
+    value: 'Drehen'
+  },
+  'filter-transform': {
+    original: 'Transform',
+    value: 'Transformier.'
+  },
+  'filter-bright-contrast': {
+    original: 'Bright/Contrast',
+    value: 'Hell/Kontrast'
+  },
+  'filter-curves': {
+    original: 'Curves',
+    value: 'Kurven'
+  },
+  'filter-hue-sat': {
+    original: 'Hue/Saturation',
+    value: 'Farbe/Sättig'
+  },
+  'filter-invert': {
+    original: 'Invert',
+    value: 'Umkehren'
+  },
+  'filter-tilt-shift': {
+    original: 'Tilt Shift',
+    value: 'Tilt Shift'
+  },
+  'filter-to-alpha': {
+    original: 'To Alpha',
+    value: 'Zu Alpha'
+  },
+  'filter-triangle-blur': {
+    original: 'Triangle Blur',
+    value: 'Weichzeichnen'
+  },
+  'filter-unsharp-mask': {
+    original: 'Unsharp Mask',
+    value: 'Unscharf mask'
+  },
+  'filter-crop-title': {
+    original: 'Crop / Extend',
+    value: 'Arbeitsfläche'
+  },
+  'filter-crop-description': {
+    original: 'Crop or extend the image.',
+    value: 'Schneidet das Bild zu oder erweitert es.'
+  },
+  'filter-crop-left': {
+    original: 'Left',
+    value: 'Links'
+  },
+  'filter-crop-right': {
+    original: 'Right',
+    value: 'Rechts'
+  },
+  'filter-crop-top': {
+    original: 'Top',
+    value: 'Oben'
+  },
+  'filter-crop-bottom': {
+    original: 'Bottom',
+    value: 'Unten'
+  },
+  'filter-crop-rule-thirds': {
+    original: 'Rule of Thirds',
+    value: 'Drittel-Regel'
+  },
+  'filter-crop-fill': {
+    original: 'Fill',
+    value: 'Füllung'
+  },
+  'filter-flip-title': {
+    original: 'Flip',
+    value: 'Spiegeln'
+  },
+  'filter-flip-description': {
+    original: 'Flips layer or whole image.',
+    value: 'Spiegelt Ebene oder gesamtes Bild.'
+  },
+  'filter-flip-horizontal': {
+    original: 'Horizontal',
+    value: 'Horizontal'
+  },
+  'filter-flip-vertical': {
+    original: 'Vertical',
+    value: 'Vertikal'
+  },
+  'filter-flip-image': {
+    original: 'Flip Image',
+    value: 'Bild'
+  },
+  'filter-flip-layer': {
+    original: 'Flip Layer',
+    value: 'Ebene'
+  },
+  'filter-perspective-title': {
+    original: 'Perspective',
+    value: 'Perspektive'
+  },
+  'filter-perspective-description': {
+    original: 'Transforms the selected layer.',
+    value: 'Transformiert die gewählte Ebene.'
+  },
+  'filter-perspective-before': {
+    original: 'Before',
+    value: 'Vorher'
+  },
+  'filter-perspective-after': {
+    original: 'After',
+    value: 'Danach'
+  },
+  'filter-resize-title': {
+    original: 'Resize',
+    value: 'Skalieren'
+  },
+  'filter-resize-description': {
+    original: 'Resizes the image.',
+    value: 'Ändert die Größe des Bildes.'
+  },
+  'filter-rotate-title': {
+    original: 'Rotate',
+    value: 'Drehen'
+  },
+  'filter-rotate-description': {
+    original: 'Rotates the image.',
+    value: 'Dreht das Bild.'
+  },
+  'filter-transform-empty': {
+    original: 'Layer is empty.',
+    value: 'Ebene ist leer.'
+  },
+  'filter-transform-title': {
+    original: 'Transform',
+    value: 'Transformieren'
+  },
+  'filter-transform-description': {
+    original: 'Transforms selected layer. Hold Shift for additional behavior.',
+    value: 'Transformiert die gewählte Ebene. Halte Shift für erweiterte Funktionalität.'
+  },
+  'filter-transform-rotation': {
+    original: 'Rotation',
+    value: 'Rotation'
+  },
+  'filter-transform-flip': {
+    original: 'Flip',
+    value: 'Spiegel'
+  },
+  'filter-transform-center': {
+    original: 'Center',
+    value: 'Zentrieren'
+  },
+  'filter-transform-constrain': {
+    original: 'Constrain',
+    value: 'Fest'
+  },
+  'filter-transform-snap': {
+    original: 'Snap',
+    value: 'Einrasten'
+  },
+  'filter-transform-snap-title': {
+    original: 'Snap Rotation And Position',
+    value: 'Rotation und Position einrasten'
+  },
+  'filter-bright-contrast-title': {
+    original: 'Brightness / Contrast',
+    value: 'Helligkeit / Kontrast'
+  },
+  'filter-bright-contrast-description': {
+    original: 'Change brightness and contrast for the selected layer.',
+    value: 'Ändert Helligkeit und Kontrast der gewählten Ebene.'
+  },
+  'filter-bright-contrast-brightness': {
+    original: 'Brightness',
+    value: 'Helligkeit'
+  },
+  'filter-bright-contrast-contrast': {
+    original: 'Contrast',
+    value: 'Kontrast'
+  },
+  'filter-curves-title': {
+    original: 'Curves',
+    value: 'Kurven'
+  },
+  'filter-curves-description': {
+    original: 'Apply curves on the selected layer.',
+    value: 'Wendet Kurven auf gewählte Ebene an.'
+  },
+  'filter-curves-all': {
+    original: 'All',
+    value: 'Alle'
+  },
+  'filter-hue-sat-title': {
+    original: 'Hue / Saturation',
+    value: 'Farbton / Sättigung'
+  },
+  'filter-hue-sat-description': {
+    original: 'Change hue and saturation for the selected layer.',
+    value: 'Ändert Farbton und Sättigung der gewählten Ebene.'
+  },
+  'filter-hue-sat-hue': {
+    original: 'Hue',
+    value: 'Farbton'
+  },
+  'filter-hue-sat-saturation': {
+    original: 'Saturation',
+    value: 'Sättigung'
+  },
+  'filter-applied': {
+    original: 'applied',
+    value: 'angewendet'
+  },
+  'filter-tilt-shift-title': {
+    original: 'Tilt Shift',
+    value: 'Tilt Shift'
+  },
+  'filter-tilt-shift-description': {
+    original: 'Applies tilt shift on the selected layer.',
+    value: 'Wendet Tilt Shift auf gewählte Ebene an.'
+  },
+  'filter-tilt-shift-blur': {
+    original: 'Blur Radius',
+    value: 'Unschärferadius'
+  },
+  'filter-tilt-shift-gradient': {
+    original: 'Gradient Radius',
+    value: 'Verlaufsradius'
+  },
+  'filter-to-alpha-title': {
+    original: 'To Alpha',
+    value: 'Zu Alpha'
+  },
+  'filter-to-alpha-description': {
+    original: 'Generates alpha channel for selected layer from:',
+    value: 'Erzeugt Alphakanal für gewählte Ebene aus:'
+  },
+  'filter-to-alpha-inverted-lum': {
+    original: 'Inverted Luminance',
+    value: 'Umgekehrte Luminanz'
+  },
+  'filter-to-alpha-lum': {
+    original: 'Luminance',
+    value: 'Luminanz'
+  },
+  'filter-to-alpha-replace': {
+    original: 'Replace RGB',
+    value: 'Ersetze RGB'
+  },
+  'filter-triangle-blur-title': {
+    original: 'Triangle Blur',
+    value: 'Dreiecksunschärfe'
+  },
+  'filter-triangle-blur-description': {
+    original: 'Applies triangle blur on the selected layer.',
+    value: 'Wendet Dreiecksunschärfe auf gewählte Ebene an.'
+  },
+  'filter-unsharp-mask-title': {
+    original: 'Unsharp Mask',
+    value: 'Unscharf maskieren'
+  },
+  'filter-unsharp-mask-description': {
+    original: 'Sharpens the selected layer by scaling pixels away from the average of their neighbors.',
+    value: 'Schärft die ausgewählte Ebene durch Skalierung der Pixel weg vom Durchschnitt ihrer Nachbarn.'
+  },
+  'filter-unsharp-mask-strength': {
+    original: 'Strength',
+    value: 'Stärke'
+  },
+  'filter-grid': {
+    original: 'Grid',
+    value: 'Gitter'
+  },
+  'filter-grid-description': {
+    original: 'Draws grid on selected layer.',
+    value: 'Zeichnet Gitter auf gewählte Ebene.'
+  },
+  'filter-noise': {
+    original: 'Noise',
+    value: 'Rauschen'
+  },
+  'filter-noise-description': {
+    original: 'Adds noise to selected layer.',
+    value: 'Zeichnet Rauschen auf gewählte Ebene.'
+  },
+  'filter-noise-scale': {
+    original: 'Scale',
+    value: 'Größe'
+  },
+  'filter-noise-alpha': {
+    original: 'Alpha',
+    value: 'Alpha'
+  },
+  'filter-noise-inverted': {
+    original: 'Inverted',
+    value: 'Umgekehrt'
+  },
+  'import-opening': {
+    original: 'Opening file...',
+    value: 'Öffne Datei...'
+  },
+  'import-title': {
+    original: 'Import Image',
+    value: 'Datei öffnen'
+  },
+  'import-too-large': {
+    original: 'Image too large, will be downscaled.',
+    value: 'Bild zu groß, es wird verkleinert.'
+  },
+  'import-btn-as-layer': {
+    original: 'As Layer',
+    value: 'Als Ebene'
+  },
+  'import-btn-as-image': {
+    original: 'As Image',
+    value: 'Als Bild'
+  },
+  'import-as-layer-title': {
+    original: 'Import Image as New Layer',
+    value: 'Öffne Bild als neue Ebene'
+  },
+  'import-as-layer-description': {
+    original: 'Adjust the position of the imported image.',
+    value: 'Passe die Position des importierten Bildes an.'
+  },
+  'import-as-layer-limit-reached': {
+    original: 'Layer limit reached. Image will be placed on existing layer.',
+    value: 'Maximale Ebenen erreicht, es wird auf vorhandene Ebene platziert.'
+  },
+  'import-as-layer-fit': {
+    original: 'Fit',
+    value: 'Passen'
+  },
+  'import-flatten': {
+    original: 'Flatten image',
+    value: 'Reduzieren'
+  },
+  'import-unsupported-file': {
+    original: 'Unsupported file type. See Help for supported types.',
+    value: 'Nicht unterstützter Dateityp. Siehe Hilfe für unterstützte Typen.'
+  },
+  'import-broken-file': {
+    original: "Couldn't load image. File might be corrupted.",
+    value: 'Bild konnte nicht geladen werden. Datei könnte beschädigt sein.'
+  },
+  'import-psd-unsupported': {
+    original: 'Unsupported features. PSD had to be flattened.',
+    value: 'Nicht unterstützte Funktionen. PSD musste auf eine Ebene reduziert werden.'
+  },
+  'import-psd-limited-support': {
+    original: 'PSD support is limited. Flattened will more likely look correct.',
+    value: 'Begrenzte Unterstützung für PSD. Reduziertes Bild sieht vermutlich korrekter aus.'
+  },
+  'import-psd-too-large': {
+    original: 'Image exceeds maximum dimensions of {x} x {x} pixels. Unable to import.',
+    value: 'Bild überschreitet Maximum von {x} x {x} Pixel, kann nicht geöffnet werden.'
+  },
+  'import-psd-size': {
+    original: 'Image size',
+    value: 'Bildgröße'
+  },
+  'hand-reset': {
+    original: 'Reset',
+    value: 'Zurücksetzen'
+  },
+  'hand-fit': {
+    original: 'Fit',
+    value: 'Passen'
+  },
+  'bucket-tolerance': {
+    original: 'Tolerance',
+    value: 'Toleranz'
+  },
+  'bucket-sample': {
+    original: 'Sample',
+    value: 'Quelle'
+  },
+  'bucket-sample-title': {
+    original: 'Which layers to sample color from',
+    value: 'Von welchen Ebenen wird Farbe gelesen'
+  },
+  'bucket-sample-all': {
+    original: 'All',
+    value: 'Alle'
+  },
+  'bucket-sample-active': {
+    original: 'Active',
+    value: 'Aktiv'
+  },
+  'bucket-sample-above': {
+    original: 'Above',
+    value: 'Über'
+  },
+  'bucket-grow': {
+    original: 'Grow',
+    value: 'Wachsen'
+  },
+  'bucket-grow-title': {
+    original: 'Grow filled area (in pixels)',
+    value: 'Erweitere gefüllten Bereich (in Pixel)'
+  },
+  'bucket-contiguous': {
+    original: 'Contiguous',
+    value: 'Benachbart'
+  },
+  'bucket-contiguous-title': {
+    original: 'Only fill connected areas',
+    value: 'Fülle nur miteinander verbundene Bereiche'
+  },
+  'gradient-linear': {
+    original: 'Linear',
+    value: 'Linear'
+  },
+  'gradient-linear-mirror': {
+    original: 'Linear-Mirror',
+    value: 'Linear Gespiegelt'
+  },
+  'gradient-radial': {
+    original: 'Radial',
+    value: 'Radial'
+  },
+  'gradient-reversed': {
+    original: 'Reversed',
+    value: 'Umgekehrt'
+  },
+  'shape-stroke': {
+    original: 'Stroke',
+    value: 'Linie'
+  },
+  'shape-fill': {
+    original: 'Fill',
+    value: 'Füllen'
+  },
+  'shape-rect': {
+    original: 'Rectangle',
+    value: 'Rechteck'
+  },
+  'shape-ellipse': {
+    original: 'Ellipse',
+    value: 'Ellipse'
+  },
+  'shape-line': {
+    original: 'Line',
+    value: 'Linie'
+  },
+  'shape-line-width': {
+    original: 'Line Width',
+    value: 'Linienbreite'
+  },
+  'shape-outwards': {
+    original: 'Outwards',
+    value: 'Nach Außen'
+  },
+  'shape-fixed': {
+    original: 'Fixed 1:1',
+    value: 'Fest 1:1'
+  },
+  'text-instruction': {
+    original: 'Click canvas to place text',
+    value: 'Klicken um Text zu platzieren'
+  },
+  'text-title': {
+    original: 'Add Text',
+    value: 'Text Hinzufügen'
+  },
+  'text-placeholder': {
+    original: 'Your text (multiline Shift+Enter)',
+    value: 'Dein Text (mehrzeilig Shift+Enter)'
+  },
+  'text-color': {
+    original: 'Color',
+    value: 'Farbe'
+  },
+  'text-size': {
+    original: 'Size',
+    value: 'Größe'
+  },
+  'text-left': {
+    original: 'Left',
+    value: 'Linksbündig'
+  },
+  'text-center': {
+    original: 'Center',
+    value: 'Zentriert'
+  },
+  'text-right': {
+    original: 'Right',
+    value: 'Rechtsbündig'
+  },
+  'text-italic': {
+    original: 'Italic',
+    value: 'Kursiv'
+  },
+  'text-bold': {
+    original: 'Bold',
+    value: 'Fett'
+  },
+  'save-reminder-title': {
+    hint: 'Save Reminder is a popup that shows up after 20 minutes of not saving. Allows user to save on the spot.',
+    original: 'Unsaved Work',
+    value: 'Ungespeicherter Fortschritt'
+  },
+  'save-reminder-text': {
+    hint: 'turns into: "...saved in <strong>12 minutes</strong>. Save..."',
+    original: 'Image was not saved in {a} minutes{b}. Save now to prevent eventual loss.',
+    value: 'Dein Bild wurde seit {a} Minuten{b} nicht gespeichert. Speichere jetzt um Datenverlust zu vermeiden.'
+  },
+  'save-reminder-save-psd': {
+    original: 'Save As PSD',
+    value: 'Speichere als PSD'
+  },
+  'save-reminder-psd-layers': {
+    original: 'PSD will remember all layers.',
+    value: 'PSD merkt sich alle Ebenen.'
+  },
+  submit: {
+    original: 'Submit',
+    value: 'Senden'
+  },
+  'submit-title': {
+    original: 'Submit Drawing',
+    value: 'Bild senden'
+  },
+  'submit-prompt': {
+    original: 'Submit drawing?',
+    value: 'Bild senden?'
+  },
+  'submit-submitting': {
+    original: 'Submitting',
+    value: 'Läd hoch'
+  },
+  'embed-init-loading': {
+    original: 'Loading app',
+    value: 'Lade App'
+  },
+  'embed-init-waiting': {
+    original: 'Waiting for image',
+    value: 'Warten auf Bild'
+  },
+  unsaved: {
+    original: 'Unsaved',
+    value: 'Ungespeichert'
+  },
+  help: {
+    original: 'Help',
+    value: 'Hilfe'
+  },
+  'tab-settings': {
+    original: 'Settings',
+    value: 'Einstellungen'
+  },
+  'settings-language': {
+    original: 'Language',
+    value: 'Sprache'
+  },
+  'settings-preferred-language': {
+    original: 'Preferred Language',
+    value: 'Bevorzugte Sprache'
+  },
+  'settings-language-reload': {
+    original: 'Will update after reloading.',
+    value: 'Aktualisiert mit Neuladen.'
+  },
+  licenses: {
+    original: 'Licenses',
+    value: 'Lizenzen'
+  },
+  'source-code': {
+    original: 'Source Code',
+    value: 'Quellcode'
+  },
+  auto: {
+    hint: 'automatically decided',
+    original: 'auto',
+    value: 'Automatisch'
+  },
+  'zoom-in': {
+    original: 'Zoom In',
+    value: 'Vergrößern'
+  },
+  'zoom-out': {
+    original: 'Zoom Out',
+    value: 'Verkleinern'
+  },
+  radius: {
+    original: 'Radius',
+    value: 'Radius'
+  },
+  'constrain-proportions': {
+    original: 'Constrain Proportions',
+    value: 'Festes Seitenverhältnis'
+  },
+  width: {
+    original: 'Width',
+    value: 'Breite'
+  },
+  height: {
+    original: 'Height',
+    value: 'Höhe'
+  },
+  opacity: {
+    original: 'Opacity',
+    value: 'Deckkraft'
+  },
+  red: {
+    original: 'Red',
+    value: 'Rot'
+  },
+  green: {
+    original: 'Green',
+    value: 'Grün'
+  },
+  blue: {
+    original: 'Blue',
+    value: 'Blau'
+  },
+  eraser: {
+    original: 'Eraser',
+    value: 'Radierer'
+  },
+  center: {
+    hint: 'verb',
+    original: 'Center',
+    value: 'Zentrieren'
+  },
+  background: {
+    original: 'Background',
+    value: 'Hintergrund'
+  },
+  'scaling-algorithm': {
+    original: 'Scaling Algorithm',
+    value: 'Skalierungsalgorithmus'
+  },
+  'algorithm-smooth': {
+    original: 'Smooth',
+    value: 'Glatt'
+  },
+  'algorithm-pixelated': {
+    original: 'Pixelated',
+    value: 'Pixelig'
+  },
+  'preview': {
+    original: 'Preview',
+    hint: 'subject. When applying a filter user sees a preview of what the result would look like.',
+    value: 'Vorschau'
+  },
+  'angle-snap': {
+    original: 'Snap',
+    value: 'Einrasten'
+  },
+  'angle-snap-title': {
+    original: '45° Angle Snapping',
+    value: '45° einrasten'
+  },
+  'lock-alpha': {
+    original: 'Lock Alpha',
+    value: 'Fixieren'
+  },
+  'lock-alpha-title': {
+    original: "Locks layer's alpha channel",
+    value: 'Fixiert Alpha-Kanal der Ebene'
+  }
 }

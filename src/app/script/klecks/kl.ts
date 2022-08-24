@@ -70,6 +70,8 @@ import {BrushSettingService} from './brushes-ui/brush-setting-service';
 import {BoxToggle} from './ui/base-components/box-toggle';
 import {SettingsTab} from './ui/tool-tabs/settings-tab';
 import {ToolspaceScroller} from './ui/components/toolspace-scroller';
+import {GradientUi} from './ui/tool-tabs/gradient-ui';
+import {drawGradient, GradientTool} from './image-operations/gradient-tool';
 
 /**
  * paint tool functionality
@@ -102,6 +104,8 @@ export const KL = {
     floodFillBits,
     ShapeTool,
     drawShape,
+    GradientTool,
+    drawGradient,
 
     // --- storage ---
     PSD,
@@ -165,6 +169,7 @@ export const KL = {
     // --- ui - tool tabs ---
     HandUi,
     FillUi,
+    GradientUi,
     TextUi,
     ShapeUi,
     FileTab,

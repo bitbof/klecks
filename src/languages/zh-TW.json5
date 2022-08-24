@@ -1,1286 +1,1306 @@
 {
-    'switch-ui-left-right': {
-        original: 'Switch left/right UI',
-        value: '向左/右切換'
-    },
-    "toggle-show-tools": {
-        original: 'Show/Hide Tools',
-        value: '顯示/隱藏工具',
-    },
-    "scroll": {
-        hint: 'Verb. As in scrolling a page.',
-        original: 'Scroll',
-        value: '上滑/下滑',
-    },
-    donate: {
-        original: 'Donate',
-        value: '贊助'
-    },
-    home: {
-        hint: 'button with logo, top left of tools',
-        original: 'Home',
-        value: '主頁'
-    },
-    'modal-new-tab': {
-        original: 'Open in new tab',
-        value: '在新頁面打開'
-    },
-    'tab-layers': {
-        original: 'Layers',
-        value: '圖層'
-    },
-    'tab-edit': {
-        original: 'Edit',
-        value: '編輯'
-    },
-    'tab-file': {
-        original: 'File',
-        value: '文件'
-    },
-    'tool-brush': {
-        original: 'Brush',
-        value: '畫筆工具'
-    },
-    'tool-paint-bucket': {
-        original: 'Paint Bucket',
-        value: '油漆桶'
-    },
-    'tool-shape': {
-        original: 'Shape',
-        value: '形狀'
-    },
-    'tool-text': {
-        original: 'Text',
-        value: '文本'
-    },
-    'tool-hand': {
-        original: 'Hand Tool',
-        value: '手型工具'
-    },
-    'tool-zoom': {
-        original: 'Zoom',
-        value: '縮放工具'
-    },
-    'tool-undo-redo': {
-        original: 'Undo / Redo',
-        value: '撤銷/重做'
-    },
-    undo: {
-        original: 'Undo',
-        value: '撤銷'
-    },
-    redo: {
-        original: 'Redo',
-        value: '重做'
-    },
-    'brush-pen': {
-        original: 'Pen',
-        value: '畫筆'
-    },
-    'brush-blend': {
-        original: 'Blend',
-        value: '水彩刷'
-    },
-    'brush-sketchy': {
-        hint: 'Made up brush name. Pictures drawn with this brush often look like sketches.',
-        original: 'Sketchy',
-        value: '素描筆'
-    },
-    'brush-pixel': {
-        original: 'Pixel',
-        value: '像素化'
-    },
-    'brush-chemy': {
-        hint: 'Made up brush name, derived from drawing applications "Webchemy" and "Alchemy"',
-        original: 'Chemy',
-        value: '異形圖形'
-    },
-    'brush-smudge': {
-        hint: 'Common brush/tool in image editing software. Smudges colors around canvas.',
-        original: 'Smudge',
-        value: '暈染'
-    },
-    'brush-size': {
-        original: 'Size',
-        value: '畫筆大小'
-    },
-    'brush-blending': {
-        original: 'Blending',
-        value: '水分量'
-    },
-    'brush-toggle-pressure': {
-        original: 'Toggle Pressure Sensitivity',
-        value: '筆壓敏度'
-    },
-    'brush-lock-alpha': {
-        original: 'Lock Alpha',
-        value: '鎖定'
-    },
-    'brush-lock-alpha-title': {
-        original: "Locks layer's alpha channel",
-        value: '鎖定圖層透明度'
-    },
-    'brush-pen-circle': {
-        original: 'Circle',
-        value: '圓形'
-    },
-    'brush-pen-chalk': {
-        original: 'Chalk',
-        value: '粉筆'
-    },
-    'brush-pen-calligraphy': {
-        original: 'Calligraphy',
-        value: '斜角筆'
-    },
-    'brush-pen-square': {
-        original: 'Square',
-        value: '方形'
-    },
-    'brush-sketchy-scale': {
-        hint: 'How far the connecting lines of sketchy brush can reach.',
-        original: 'Scale',
-        value: '網格長度'
-    },
-    'brush-pixel-dither': {
-        original: 'Dither',
-        value: '像素抖動'
-    },
-    'brush-chemy-fill': {
-        original: 'Fill',
-        value: '填充'
-    },
-    'brush-chemy-stroke': {
-        original: 'Stroke',
-        value: '線條'
-    },
-    'brush-chemy-mirror-x': {
-        original: 'Horizontal Symmetry',
-        value: '水平對稱'
-    },
-    'brush-chemy-mirror-y': {
-        original: 'Vertical Symmetry',
-        value: '垂直對稱'
-    },
-    'brush-chemy-gradient': {
-        original: 'Gradient',
-        value: '漸變'
-    },
-    'brush-eraser-transparent-bg': {
-        original: 'Transparent Background',
-        value: '底層透明度'
-    },
-    stabilizer: {
-        hint: 'Common feature in drawing software to make lines smoother',
-        original: 'Stabilizer',
-        value: '抖動修正'
-    },
-    'stabilizer-title': {
-        hint: '-title keys are usually more verbose description. shown as a tooltip.',
-        original: 'Stroke Stabilizer',
-        value: '抖動修正線條'
-    },
-    eyedropper: {
-        original: 'Eyedropper',
-        value: '顏色選取'
-    },
-    'secondary-color': {
-        original: 'Secondary Color',
-        value: '二級色'
-    },
-    'manual-color-input': {
-        hint: 'A dialog where users can manually type the color, each channel a number. "mci" keys all related to this dialog.',
-        original: 'Manual Color Input',
-        value: '手動輸入顏色'
-    },
-    'mci-hex': {
-        original: 'Hex',
-        value: '16進制'
-    },
-    'mci-copy': {
-        original: 'Copy',
-        value: '複製'
-    },
-    'modal-ok': {
-        original: 'Ok',
-        value: 'Ok'
-    },
-    'modal-cancel': {
-        original: 'Cancel',
-        value: '取消'
-    },
-    'modal-close': {
-        original: 'Close',
-        value: '關閉'
-    },
-'layers-active-layer': {
-        hint: 'currently selected layer that user is drawing on',
-        original: 'Active Layer',
-        value: '當前圖層'
-    },
-    'layers-layer': {
-        original: 'Layer',
-        value: '圖層'
-    },
-    'layers-copy': {
-        hint: 'noun',
-        original: 'copy',
-        value: '副本'
-    },
-    'layers-blending': {
-        hint: 'Common feature in image editing & drawing software. All layers-blend- keys relate to this. https://en.wikipedia.org/wiki/Blend_modes',
-        original: 'Blending',
-        value: '混合模式'
-    },
-    'layers-new': {
-        original: 'New Layer',
-        value: '新建圖層'
-    },
-    'layers-remove': {
-        original: 'Remove Layer',
-        value: '刪除圖層'
-    },
-    'layers-duplicate': {
-        original: 'Duplicate Layer',
-        value: '複製圖層'
-    },
-    'layers-merge': {
-        original: 'Merge with layer below',
-        value: '向下合併'
-    },
-    'layers-rename': {
-        original: 'Rename',
-        value: '重命名'
-    },
-    'layers-blend-normal': {
-        original: 'normal',
-        value: '正常'
-    },
-    'layers-blend-darken': {
-        original: 'darken',
-        value: '變暗'
-    },
-    'layers-blend-multiply': {
-        original: 'multiply',
-        value: '正片疊底'
-    },
-    'layers-blend-color-burn': {
-        original: 'color burn',
-        value: '顏色加深'
-    },
-    'layers-blend-lighten': {
-        original: 'lighten',
-        value: '變亮'
-    },
-    'layers-blend-screen': {
-        original: 'screen',
-        value: '濾色'
-    },
-    'layers-blend-color-dodge': {
-        original: 'color dodge',
-        value: '顏色減淡'
-    },
-    'layers-blend-overlay': {
-        original: 'overlay',
-        value: '疊加'
-    },
-    'layers-blend-soft-light': {
-        original: 'soft light',
-        value: '柔光'
-    },
-    'layers-blend-hard-light': {
-        original: 'hard light',
-        value: '強光'
-    },
-    'layers-blend-difference': {
-        original: 'difference',
-        value: '差值'
-    },
-    'layers-blend-exclusion': {
-        original: 'exclusion',
-        value: '排除'
-    },
-    'layers-blend-hue': {
-        original: 'hue',
-        value: '色相'
-    },
-    'layers-blend-saturation': {
-        original: 'saturation',
-        value: '飽和度'
-    },
-    'layers-blend-color': {
-        original: 'color',
-        value: '顏色'
-    },
-    'layers-blend-luminosity': {
-        original: 'luminosity',
-        value: '明度'
-    },
-    'layers-rename-title': {
-        original: 'Rename Layer',
-        value: '重命名圖層'
-    },
-    'layers-rename-name': {
-        original: 'Name',
-        value: '重命名'
-    },
-    'layers-rename-clear': {
-        hint: 'aka action of deleting entered name',
-        original: 'Clear Name',
-        value: '清除'
-    },
-    'layers-rename-sketch': {
-        hint: 'noun',
-        original: 'Sketch',
-        value: '草圖'
-    },
-    'layers-rename-colors': {
-        original: 'Colors',
-        value: '色彩'
-    },
-    'layers-rename-lines': {
-        original: 'Lines',
-        value: '線條'
-    },
-    'layers-rename-foreground': {
-        original: 'Foreground',
-        value: '前景'
-    },
-    'layers-merge-modal-title': {
-        original: 'Merge/Mix Layers',
-        value: '向下合併'
-    },
-    'layers-merge-description': {
-        original: 'Merges the selected layer with the one underneath. Select the mix mode:',
-        value: '選中層與底下一層合併。選擇混合模式：'
-    },
-    'file-no-autosave': {
-        hint: "let user know they can't autosave, and there's no cloud storage. Keep short so fits on one line",
-        original: 'No autosave, no cloud storage',
-        value: '不能自動保存，沒有雲端儲存'
-    },
-    'file-new': {
-        original: 'New',
-        value: '新建'
-    },
-    'file-import': {
-        original: 'Import',
-        value: '打開'
-    },
-    'file-save': {
-        original: 'Save',
-        value: '保存'
-    },
-    'file-save-png': {
-        original: 'Save PNG',
-        value: '保存為PNG'
-    },
-    'file-save-psd': {
-        original: 'Save PSD',
-        value: '保存為PSD'
-    },
-    'file-save-layers': {
-        original: 'Save Layers',
-        value: '保存圖層'
-    },
-    'file-copy': {
-        original: 'Copy',
-        value: '複製'
-    },
-    'file-copy-title': {
-        original: 'Copy To Clipboard',
-        value: '複製到剪貼板'
-    },
-    'file-share': {
-        hint: 'Common feature on phones. Pressing share button allows to send data to a different app, e.g. as a text message to someone.',
-        original: 'Share',
-        value: '分享'
-    },
-    'file-storage': {
-        hint: 'Made up term. Allows users to store drawing in the browser. (not synced across devices)',
-        original: 'Browser Storage',
-        value: '保存至瀏覽器'
-    },
-    'file-storage-thumb-title': {
-        original: 'Restores when reopening page',
-        value: '重新打開頁面時恢復'
-    },
-'file-storage-about': {
-        original: 'About Browser Storage',
-        value: '關於保存至瀏覽器'
-    },
-    'file-storage-cant-access': {
-        original: "Can't access",
-        value: '無法獲取'
-    },
-    'file-storage-empty': {
-        hint: 'nothing stored',
-        original: 'Empty',
-        value: '無內容'
-    },
-    'file-storage-store': {
-        hint: 'verb',
-        original: 'Store',
-        value: '保存'
-    },
-    'file-storage-clear': {
-        original: 'Clear',
-        value: '清除'
-    },
-    'file-storage-storing': {
-        original: 'Storing',
-        value: '保存中'
-    },
-    'file-storage-overwrite': {
-        original: 'Overwrite',
-        value: '覆蓋'
-    },
-    'file-storage-min-ago': {
-        hint: "{x} <- needs to stay, it's a placeholder.",
-        original: '{x}min ago',
-        value: '{x}分鐘前'
-    },
-    'file-storage-hours-ago': {
-        original: '{x}h ago',
-        value: '{x}小時前'
-    },
-    'file-storage-days-ago': {
-        original: '{x}d ago',
-        value: '{x}天前'
-    },
-    'file-storage-month-ago': {
-        original: '> 1month ago',
-        value: '>一個月前'
-    },
-    'file-storage-restored': {
-        original: 'Restored from Browser Storage',
-        value: '從瀏覽器內存中恢復'
-    },
-    'file-storage-stored': {
-        original: 'Stored to Browser Storage',
-        value: '保存至瀏覽器內存'
-    },
-    'file-storage-failed': {
-        original: 'Failed to store to Browser Storage',
-        value: '保存失敗'
-    },
-    'file-storage-failed-1': {
-        original: 'Failed to store. Possible causes:',
-        value: '保存失敗。可能是由於：'
-    },
-    'file-storage-failed-2': {
-        original: 'Out of disk space',
-        value: '磁盤空間不足'
-    },
-    'file-storage-failed-3': {
-        original: 'Storage disabled in incognito tab',
-        value: '隱身頁面中禁用存儲功能'
-    },
-    'file-storage-failed-4': {
-        original: "Browser doesn't support storage",
-        value: '瀏覽器不支持'
-    },
-    'file-storage-failed-clear': {
-        original: 'Failed to clear.',
-        value: '清除失敗'
-    },
-    'file-upload': {
-        original: 'Upload',
-        value: '上傳'
-    },
-    'cleared-layer': {
-        original: 'Cleared layer',
-        value: '圖層已清除'
-    },
-filled: {
-        hint: 'layer got filled with a color',
-        original: 'Filled',
-        value: '圖層已填充'
-    },
-    'new-title': {
-        original: 'New Image',
-        value: '新建項目'
-    },
-    'new-current': {
-        original: 'Current',
-        value: '當前大小'
-    },
-    'new-fit': {
-        original: 'Fit',
-        value: '適應頁面'
-    },
-    'new-oversize': {
-        original: 'Oversize',
-        value: '大畫布'
-    },
-    'new-square': {
-        original: 'Square',
-        value: '正方形'
-    },
-    'new-landscape': {
-        original: 'Landscape',
-        value: '橫向尺寸'
-    },
-    'new-portrait': {
-        original: 'Portrait',
-        value: '縱向尺寸'
-    },
-    'new-screen': {
-        original: 'Screen',
-        value: '顯示分辨率'
-    },
-    'new-video': {
-        original: 'Video',
-        value: '視頻'
-    },
-    'new-din-paper': {
-        original: 'DIN Paper',
-        value: '紙張大小'
-    },
-    'new-px': {
-        hint: 'abbreviation of pixel',
-        original: 'px',
-        value: '像素'
-    },
-    'new-ratio': {
-        hint: 'aspect ratio',
-        original: 'Ratio',
-        value: '比例'
-    },
-    'upload-title': {
-        original: 'Upload to Imgur',
-        value: '上傳到Imgur'
-    },
-    'upload-link-notice': {
-        original: 'Anyone with the link to your uploaded image will be able to view it.',
-        value: '他人可以通過生成的圖片鏈接查看你的作品。 '
-    },
-    'upload-name': {
-        original: 'Title',
-        value: '標題'
-    },
-    'upload-title-untitled': {
-        original: 'Untitled',
-        value: '未命名'
-    },
-    'upload-caption': {
-        original: 'Caption',
-        value: '描述'
-    },
-'upload-tos': {
-        original: 'Terms of Service',
-        value: '服務條款'
-    },
-    'upload-tos-2': {
-        original: 'for imgur.com',
-        value: 'imgur.com'
-    },
-    'upload-submit': {
-        original: 'Upload',
-        value: '上傳'
-    },
-    'upload-uploading': {
-        original: 'Uploading...',
-        value: '上傳中...'
-    },
-    'upload-success': {
-        original: 'Upload Successful',
-        value: '上傳成功'
-    },
-    'upload-failed': {
-        original: 'Upload failed.',
-        value: '上傳失敗'
-    },
-    'upload-delete': {
-        original: 'To delete your image from Imgur visit:',
-        value: '要從Imgur刪除你的圖片, 請訪問:'
-    },
-    'cropcopy-title-copy': {
-        original: 'Copy To Clipboard',
-        value: '複製到剪貼板'
-    },
-    'cropcopy-title-crop': {
-        hint: 'Cropping is a common feature in image editing.',
-        original: 'Crop',
-        value: '裁剪'
-    },
-    'cropcopy-click-hold': {
-        original: 'Right-click or press hold to copy.',
-        value: '點擊右鍵或長按進行複制。',
-    },
-    'cropcopy-btn-copy': {
-        original: 'To Clipboard',
-        value: '至剪貼板'
-    },
-    'cropcopy-copied': {
-        original: 'Copied.',
-        value: '已複製'
-    },
-    'cropcopy-btn-crop': {
-        original: 'Apply Crop',
-        value: '應用裁剪'
-    },
-    'crop-drag-to-crop': {
-        original: 'Drag to crop',
-        value: '拖動裁剪'
-    },
-    'filter-crop-extend': {
-        original: 'Crop/Extend',
-        value: '畫布大小'
-    },
-    'filter-flip': {
-        original: 'Flip',
-        value: '翻轉'
-    },
-    'filter-perspective': {
-        original: 'Perspective',
-        value: '透視'
-    },
-    'filter-resize': {
-        original: 'Resize',
-        value: '圖像大小'
-    },
-    'filter-rotate': {
-        original: 'Rotate',
-        value: '旋轉'
-    },
-    'filter-transform': {
-        original: 'Transform',
-        value: '自由變換'
-    },
-    'filter-bright-contrast': {
-        original: 'Bright/Contrast',
-        value: '亮度/對比'
-    },
-    'filter-curves': {
-        original: 'Curves',
-        value: '曲線'
-    },
-    'filter-hue-sat': {
-        original: 'Hue/Saturation',
-        value: '色相/飽和度'
-    },
-    'filter-invert': {
-        original: 'Invert',
-        value: '反相'
-    },
-    'filter-tilt-shift': {
-        original: 'Tilt Shift',
-        value: '移軸'
-    },
-    'filter-to-alpha': {
-        hint: 'feature that can isolate linedrawings if it is a black and white image.',
-        original: 'To Alpha',
-        value: '轉換至Alpha'
-    },
-    'filter-triangle-blur': {
-        original: 'Triangle Blur',
-        value: '模糊'
-    },
-    'filter-unsharp-mask': {
-        original: 'Unsharp Mask',
-        value: 'USM 銳化'
-    },
-    'filter-crop-title': {
-        original: 'Crop / Extend',
-        value: '畫布大小'
-    },
-    'filter-crop-description': {
-        original: 'Crop or extend the image.',
-        value: '裁剪圖片'
-    },
-    'filter-crop-left': {
-        original: 'Left',
-        value: '左'
-    },
-'filter-crop-right': {
-        original: 'Right',
-        value: '右'
-    },
-    'filter-crop-top': {
-        original: 'Top',
-        value: '上'
-    },
-    'filter-crop-bottom': {
-        original: 'Bottom',
-        value: '下'
-    },
-    'filter-crop-rule-thirds': {
-        original: 'Rule of Thirds',
-        value: '三分法'
-    },
-    'filter-crop-fill': {
-        original: 'Fill',
-        value: '填充'
-    },
-    'filter-flip-title': {
-        original: 'Flip',
-        value: '翻轉'
-    },
-    'filter-flip-description': {
-        original: 'Flips layer or whole image.',
-        value: '翻轉圖層或整個圖像'
-    },
-    'filter-flip-horizontal': {
-        original: 'Horizontal',
-        value: '水平'
-    },
-    'filter-flip-vertical': {
-        original: 'Vertical',
-        value: '垂直'
-    },
-    'filter-flip-image': {
-        original: 'Flip Image',
-        value: '翻轉圖像'
-    },
-    'filter-flip-layer': {
-        original: 'Flip Layer',
-        value: '翻轉圖層'
-    },
-    'filter-perspective-title': {
-        original: 'Perspective',
-        value: '透視'
-    },
-    'filter-perspective-description': {
-        original: 'Transforms the selected layer.',
-        value: '變換已選圖層'
-    },
-    'filter-perspective-before': {
-        original: 'Before',
-        value: '之前'
-    },
-    'filter-perspective-after': {
-        original: 'After',
-        value: '之後'
-    },
-    'filter-resize-title': {
-        original: 'Resize',
-        value: '圖像大小'
-    },
-    'filter-resize-description': {
-        original: 'Resizes the image.',
-        value: '更改圖像大小'
-    },
-    'filter-rotate-title': {
-        original: 'Rotate',
-        value: '旋轉'
-    },
-    'filter-rotate-description': {
-        original: 'Rotates the image.',
-        value: '旋轉圖像'
-    },
-    'filter-transform-empty': {
-        original: 'Layer is empty.',
-        value: '圖層為空'
-    },
-    'filter-transform-title': {
-        original: 'Transform',
-        value: '變換'
-    },
-    'filter-transform-description': {
-        original: 'Transforms selected layer. Hold Shift for additional behavior.',
-        value: '變換已選圖層。按住Shift操作。 '
-    },
-    'filter-transform-rotation': {
-        original: 'Rotation',
-        value: '旋轉'
-    },
-    'filter-transform-flip': {
-        original: 'Flip',
-        value: '翻轉'
-    },
-    'filter-transform-center': {
-        original: 'Center',
-        value: '居中'
-    },
-    'filter-transform-constrain': {
-        original: 'Constrain',
-        value: '保持'
-    },
-    'filter-transform-snap': {
-        original: 'Snap',
-        value: '對齊'
-    },
-    'filter-transform-snap-title': {
-        original: 'Snap Rotation And Position',
-        value: '旋轉對齊/水平對齊'
-    },
-    'filter-bright-contrast-title': {
-        original: 'Brightness / Contrast',
-        value: '亮度/對比'
-    },
-    'filter-bright-contrast-description': {
-        original: 'Change brightness and contrast for the selected layer.',
-        value: '更改已選圖層的亮度和對比度。 '
-    },
-    'filter-bright-contrast-brightness': {
-        original: 'Brightness',
-        value: '亮度'
-    },
-    'filter-bright-contrast-contrast': {
-        original: 'Contrast',
-        value: '對比'
-    },
-    'filter-curves-title': {
-        original: 'Curves',
-        value: '曲線'
-    },
-    'filter-curves-description': {
-        original: 'Apply curves on the selected layer.',
-        value: '應用曲線到已選圖層。 '
-    },
-    'filter-curves-all': {
-        original: 'All',
-        value: '全部'
-    },
-    'filter-hue-sat-title': {
-        original: 'Hue / Saturation',
-        value: '色相/飽和度'
-    },
-    'filter-hue-sat-description': {
-        original: 'Change hue and saturation for the selected layer.',
-        value: '更改已選圖層的色相和飽和度。 '
-    },
-    'filter-hue-sat-hue': {
-        original: 'Hue',
-        value: '色相'
-    },
-    'filter-hue-sat-saturation': {
-        original: 'Saturation',
-        value: '飽和度'
-    },
-    'filter-applied': {
-        original: 'applied',
-        value: '應用'
-    },
-    'filter-tilt-shift-title': {
-        original: 'Tilt Shift',
-        value: '移軸'
-    },
-    'filter-tilt-shift-description': {
-        original: 'Applies tilt shift on the selected layer.',
-        value: '應用移軸到已選圖層。 '
-    },
-    'filter-tilt-shift-blur': {
-        original: 'Blur Radius',
-        value: '模糊半徑'
-    },
-    'filter-tilt-shift-gradient': {
-        original: 'Gradient Radius',
-        value: '梯度半徑'
-    },
-    'filter-to-alpha-title': {
-        original: 'To Alpha',
-        value: '至Alpha'
-    },
-    'filter-to-alpha-description': {
-        original: 'Generates alpha channel for selected layer from:',
-        value: '對已選圖層生成Alpha通道：'
-    },
-    'filter-to-alpha-inverted-lum': {
-        original: 'Inverted Luminance',
-        value: '亮度翻轉'
-    },
-    'filter-to-alpha-lum': {
-        original: 'Luminance',
-        value: '亮度'
-    },
-    'filter-to-alpha-replace': {
-        original: 'Replace RGB',
-        value: '替換RGB'
-    },
-    'filter-triangle-blur-title': {
-        original: 'Triangle Blur',
-        value: '模糊'
-    },
-'filter-triangle-blur-description': {
-        original: 'Applies triangle blur on the selected layer.',
-        value: '應用模糊到已選圖層。 '
-    },
-    'filter-unsharp-mask-title': {
-        original: 'Unsharp Mask',
-        value: 'USM銳化'
-    },
-    'filter-unsharp-mask-description': {
-        original: 'Sharpens the selected layer by scaling pixels away from the average of their neighbors.',
-        value: '根據附近像素的均值應用銳化到已選圖層。 '
-    },
-    'filter-unsharp-mask-strength': {
-        original: 'Strength',
-        value: '強度'
-    },
-    'filter-grid': {
-        original: 'Grid',
-        value: '網格'
-    },
-    'filter-grid-description': {
-        original: 'Draws grid on selected layer.',
-        value: '給當前層添加網格線。'
-    },
-    'filter-noise': {
-        original: 'Noise',
-        value: '噪聲'
-    },
-    'filter-noise-description': {
-        original: 'Adds noise to selected layer.',
-        value: '應用噪聲到達選擇層。'
-    },
-    'filter-noise-scale': {
-        original: 'Scale',
-        value: '圖案大小'
-    },
-    'filter-noise-alpha': {
-        original: 'Alpha',
-        value: 'Alpha'
-    },
-    'filter-noise-inverted': {
-        original: 'Inverted',
-        value: '反相'
-    },
-    'import-opening': {
-        original: 'Opening file...',
-        value: '打開文件...'
-    },
-    'import-title': {
-        original: 'Import Image',
-        value: '導入圖像'
-    },
-    'import-too-large': {
-        original: 'Image too large, will be downscaled.',
-        value: '圖像過大，將會進行縮小。 '
-    },
-    'import-btn-as-layer': {
-        original: 'As Layer',
-        value: '作為圖層'
-    },
-    'import-btn-as-image': {
-        original: 'As Image',
-        value: '作為圖像'
-    },
-    'import-as-layer-title': {
-        original: 'Import Image as New Layer',
-        value: '導入圖像作為新圖層'
-    },
-    'import-as-layer-description': {
-        original: 'Adjust the position of the imported image.',
-        value: '調整導入圖像的位置。 '
-    },
-    'import-as-layer-limit-reached': {
-        original: 'Layer limit reached. Image will be placed on existing layer.',
-        value: '達到圖層數量上限。圖像將會應用到已有圖層。'
-    },
-    'import-as-layer-fit': {
-        hint: 'verb. imported image made to fit inside canvas.',
-        original: 'Fit',
-        value: '適應'
-    },
-    'import-flatten': {
-        hint: 'Turn image that has multiple layers into an image that has only one layer.',
-        original: 'Flatten image',
-        value: '拼合圖像'
-    },
-    'import-unsupported-file': {
-        original: 'Unsupported file type. See Help for supported types.',
-        value: '不支持此類文件類型。查看幫助。 '
-    },
-    'import-broken-file': {
-        original: "Couldn't load image. File might be corrupted.",
-        value: '不能加載圖像。文件可能受損。 '
-    },
-    'import-psd-unsupported': {
-        original: 'Unsupported features. PSD had to be flattened.',
-        value: '不支持該功能。 PSD需要拼合。 '
-    },
-    'import-psd-limited-support': {
-        original: 'PSD support is limited. Flattened will more likely look correct.',
-        value: 'PSD支持受限。拼合功能將會更近原始圖像。 '
-    },
-    'import-psd-too-large': {
-        original: 'Image exceeds maximum dimensions of {x} x {x} pixels. Unable to import.',
-        value: '圖像超過{x} x {x}個像素。不能導入。 '
-    },
-    'import-psd-size': {
-        original: 'Image size',
-        value: '圖像大小'
-    },
-    'hand-reset': {
-        hint: 'resets zoom (to 100%) and rotation (to 0°)',
-        original: 'Reset',
-        value: '重置'
-    },
-    'hand-fit': {
-        hint: 'makes canvas cover whole working area',
-        original: 'Fit',
-        value: '適應'
-    },
-    'bucket-tolerance': {
-        original: 'Tolerance',
-        value: '容差'
-    },
-    'bucket-sample': {
-        original: 'Sample',
-        value: '採樣'
-    },
-    'bucket-sample-title': {
-        original: 'Which layers to sample color from',
-        value: '從特定圖層進行色彩採樣'
-    },
-    'bucket-sample-all': {
-        original: 'All',
-        value: '全部'
-    },
-    'bucket-sample-active': {
-        original: 'Active',
-        value: '當前'
-    },
-    'bucket-sample-above': {
-        original: 'Above',
-        value: '之前'
-    },
-    'bucket-grow': {
-        original: 'Grow',
-        value: '填充擴張'
-    },
-    'bucket-grow-title': {
-        original: 'Grow filled area (in pixels)',
-        value: '擴張填充的區域（像素）'
-    },
-    'bucket-contiguous': {
-        hint: 'common setting for paint bucket in image editing software',
-        original: 'Contiguous',
-        value: '連續的'
-    },
-    'bucket-contiguous-title': {
-        original: 'Only fill connected areas',
-        value: '僅填充相連的區域'
-    },
-    'shape-stroke': {
-        original: 'Stroke',
-        value: '線條'
-    },
-    'shape-fill': {
-        original: 'Fill',
-        value: '填充'
-    },
-    'shape-rect': {
-        original: 'Rectangle',
-        value: '方形'
-    },
-    'shape-ellipse': {
-        original: 'Ellipse',
-        value: '圓形'
-    },
-    'shape-line': {
-        original: 'Line',
-        value: '線條'
-    },
-    'shape-line-width': {
-        original: 'Line Width',
-        value: '線條寬度'
-    },
-    'shape-outwards': {
-        hint: 'grows shape from the center outwards',
-        original: 'Outwards',
-        value: '自中心向外'
-    },
-    'shape-fixed': {
-        original: 'Fixed 1:1',
-        value: '鎖定 1:1'
-    },
-    'shape-snap': {
-        original: 'Snap',
-        value: '對齊'
-    },
-    'shape-snap-title': {
-        original: '45° Angle Snapping',
-        value: '以45°角度對齊'
-    },
-    'text-instruction': {
-        original: 'Click canvas to place text',
-        value: '點擊畫布添加文本'
-    },
-    'text-title': {
-        original: 'Add Text',
-        value: '添加文本'
-    },
-'text-placeholder': {
-        original: 'Your text (multiline Shift+Enter)',
-        value: '請輸入（換行 Shift+Enter）'
-    },
-    'text-color': {
-        original: 'Color',
-        value: '色彩'
-    },
-    'text-size': {
-        original: 'Size',
-        value: '大小'
-    },
-    'text-left': {
-        original: 'Left',
-        value: '左對齊'
-    },
-    'text-center': {
-        original: 'Center',
-        value: '居中'
-    },
-    'text-right': {
-        original: 'Right',
-        value: '右對齊'
-    },
-    'text-italic': {
-        original: 'Italic',
-        value: '斜體'
-    },
-    'text-bold': {
-        original: 'Bold',
-        value: '加粗'
-    },
-    'save-reminder-title': {
-        hint: 'Save Reminder is a popup that shows up after 20 minutes of not saving. Allows user to save on the spot.',
-        original: 'Unsaved Work',
-        value: '作品未保存'
-    },
-    'save-reminder-text': {
-        hint: 'turns into: "...saved in <strong>12 minutes</strong>. Save..."',
-        original: 'Image was not saved in {a} minutes{b}. Save now to prevent eventual loss.',
-        value: '圖畫已{a}分鐘{b}未保存。立刻保存以避免進度丟失。'
-    },
-    'save-reminder-save-psd': {
-        original: 'Save As PSD',
-        value: '保存為PSD'
-    },
-    'save-reminder-psd-layers': {
-        original: 'PSD will remember all layers.',
-        value: 'PSD可保留所有圖層。'
-    },
-    submit: {
-        original: 'Submit',
-        value: '送出'
-    },
-    'submit-title': {
-        original: 'Submit Drawing',
-        value: '送出圖像'
-    },
-    'submit-prompt': {
-        original: 'Submit drawing?',
-        value: '確認送出？'
-    },
-    'submit-submitting': {
-        original: 'Submitting',
-        value: '送出中'
-    },
-    'embed-init-loading': {
-        original: 'Loading app',
-        value: '加載app'
-    },
-    'embed-init-waiting': {
-        original: 'Waiting for image',
-        value: '圖像上傳中'
-    },
-    unsaved: {
-        original: 'Unsaved',
-        value: '未保存'
-    },
-    help: {
-        original: 'Help',
-        value: '幫助'
-    },
-    'tab-settings': {
-        original: 'Settings',
-        value: '設置'
-    },
-    'settings-language': {
-        original: 'Language',
-        value: '語言'
-    },
-    'settings-preferred-language': {
-        original: 'Preferred Language',
-        value: '首選語言'
-    },
-    'settings-language-reload': {
-        original: 'Will update after reloading.',
-        value: '刷新後更改語言'
-    },
-    licenses: {
-        original: 'Licenses',
-        value: '許可'
-    },
-    'source-code': {
-        original: 'Source Code',
-        value: '源代碼'
-    },
-    auto: {
-        hint: 'automatically decided',
-        original: 'auto',
-        value: '自動'
-    },
-    'zoom-in': {
-        original: 'Zoom In',
-        value: '放大'
-    },
-    'zoom-out': {
-        original: 'Zoom Out',
-        value: '縮小'
-    },
-    radius: {
-        original: 'Radius',
-        value: '半徑'
-    },
-    'constrain-proportions': {
-        original: 'Constrain Proportions',
-        value: '保持縱橫比'
-    },
-    width: {
-        original: 'Width',
-        value: '寬度'
-    },
-    height: {
-        original: 'Height',
-        value: '高度'
-    },
-    opacity: {
-        original: 'Opacity',
-        value: '不透明度'
-    },
-    red: {
-        original: 'Red',
-        value: '紅'
-    },
-    green: {
-        original: 'Green',
-        value: '綠'
-    },
-    blue: {
-        original: 'Blue',
-        value: '藍'
-    },
-    eraser: {
-        original: 'Eraser',
-        value: '橡皮擦'
-    },
-    center: {
-        hint: 'verb',
-        original: 'Center',
-        value: '居中'
-    },
-    background: {
-        original: 'Background',
-        value: '背景'
-    },
-    'scaling-algorithm': {
-        original: 'Scaling Algorithm',
-        value: '縮放算法'
-    },
-    'algorithm-smooth': {
-        original: 'Smooth',
-        value: '平滑'
-    },
-    'algorithm-pixelated': {
-        original: 'Pixelated',
-        value: '像素化'
-    },
-    'preview': {
-        original: 'Preview',
-        hint: 'subject. When applying a filter user sees a preview of what the result would look like.',
-        value: '預覽'
-    }
+  'switch-ui-left-right': {
+    original: 'Switch left/right UI',
+    value: '向左/右切換'
+  },
+  "toggle-show-tools": {
+    original: 'Show/Hide Tools',
+    value: '顯示/隱藏工具',
+  },
+  "scroll": {
+    hint: 'Verb. As in scrolling a page.',
+    original: 'Scroll',
+    value: '上滑/下滑',
+  },
+  donate: {
+    original: 'Donate',
+    value: '贊助'
+  },
+  home: {
+    hint: 'button with logo, top left of tools',
+    original: 'Home',
+    value: '主頁'
+  },
+  'modal-new-tab': {
+    original: 'Open in new tab',
+    value: '在新頁面打開'
+  },
+  'tab-layers': {
+    original: 'Layers',
+    value: '圖層'
+  },
+  'tab-edit': {
+    original: 'Edit',
+    value: '編輯'
+  },
+  'tab-file': {
+    original: 'File',
+    value: '文件'
+  },
+  'tool-brush': {
+    original: 'Brush',
+    value: '畫筆工具'
+  },
+  'tool-paint-bucket': {
+    original: 'Paint Bucket',
+    value: '油漆桶'
+  },
+  'tool-gradient': {
+    original: 'Gradient',
+    value: ''
+  },
+  'tool-shape': {
+    original: 'Shape',
+    value: '形狀'
+  },
+  'tool-text': {
+    original: 'Text',
+    value: '文本'
+  },
+  'tool-hand': {
+    original: 'Hand Tool',
+    value: '手型工具'
+  },
+  'tool-zoom': {
+    original: 'Zoom',
+    value: '縮放工具'
+  },
+  'tool-undo-redo': {
+    original: 'Undo / Redo',
+    value: '撤銷/重做'
+  },
+  undo: {
+    original: 'Undo',
+    value: '撤銷'
+  },
+  redo: {
+    original: 'Redo',
+    value: '重做'
+  },
+  'brush-pen': {
+    original: 'Pen',
+    value: '畫筆'
+  },
+  'brush-blend': {
+    original: 'Blend',
+    value: '水彩刷'
+  },
+  'brush-sketchy': {
+    hint: 'Made up brush name. Pictures drawn with this brush often look like sketches.',
+    original: 'Sketchy',
+    value: '素描筆'
+  },
+  'brush-pixel': {
+    original: 'Pixel',
+    value: '像素化'
+  },
+  'brush-chemy': {
+    hint: 'Made up brush name, derived from drawing applications "Webchemy" and "Alchemy"',
+    original: 'Chemy',
+    value: '異形圖形'
+  },
+  'brush-smudge': {
+    hint: 'Common brush/tool in image editing software. Smudges colors around canvas.',
+    original: 'Smudge',
+    value: '暈染'
+  },
+  'brush-size': {
+    original: 'Size',
+    value: '畫筆大小'
+  },
+  'brush-blending': {
+    original: 'Blending',
+    value: '水分量'
+  },
+  'brush-toggle-pressure': {
+    original: 'Toggle Pressure Sensitivity',
+    value: '筆壓敏度'
+  },
+  'brush-pen-circle': {
+    original: 'Circle',
+    value: '圓形'
+  },
+  'brush-pen-chalk': {
+    original: 'Chalk',
+    value: '粉筆'
+  },
+  'brush-pen-calligraphy': {
+    original: 'Calligraphy',
+    value: '斜角筆'
+  },
+  'brush-pen-square': {
+    original: 'Square',
+    value: '方形'
+  },
+  'brush-sketchy-scale': {
+    hint: 'How far the connecting lines of sketchy brush can reach.',
+    original: 'Scale',
+    value: '網格長度'
+  },
+  'brush-pixel-dither': {
+    original: 'Dither',
+    value: '像素抖動'
+  },
+  'brush-chemy-fill': {
+    original: 'Fill',
+    value: '填充'
+  },
+  'brush-chemy-stroke': {
+    original: 'Stroke',
+    value: '線條'
+  },
+  'brush-chemy-mirror-x': {
+    original: 'Horizontal Symmetry',
+    value: '水平對稱'
+  },
+  'brush-chemy-mirror-y': {
+    original: 'Vertical Symmetry',
+    value: '垂直對稱'
+  },
+  'brush-chemy-gradient': {
+    original: 'Gradient',
+    value: '漸變'
+  },
+  'brush-eraser-transparent-bg': {
+    original: 'Transparent Background',
+    value: '底層透明度'
+  },
+  stabilizer: {
+    hint: 'Common feature in drawing software to make lines smoother',
+    original: 'Stabilizer',
+    value: '抖動修正'
+  },
+  'stabilizer-title': {
+    hint: '-title keys are usually more verbose description. shown as a tooltip.',
+    original: 'Stroke Stabilizer',
+    value: '抖動修正線條'
+  },
+  eyedropper: {
+    original: 'Eyedropper',
+    value: '顏色選取'
+  },
+  'secondary-color': {
+    original: 'Secondary Color',
+    value: '二級色'
+  },
+  'manual-color-input': {
+    hint: 'A dialog where users can manually type the color, each channel a number. "mci" keys all related to this dialog.',
+    original: 'Manual Color Input',
+    value: '手動輸入顏色'
+  },
+  'mci-hex': {
+    original: 'Hex',
+    value: '16進制'
+  },
+  'mci-copy': {
+    original: 'Copy',
+    value: '複製'
+  },
+  'modal-ok': {
+    original: 'Ok',
+    value: 'Ok'
+  },
+  'modal-cancel': {
+    original: 'Cancel',
+    value: '取消'
+  },
+  'modal-close': {
+    original: 'Close',
+    value: '關閉'
+  },
+  'layers-active-layer': {
+    hint: 'currently selected layer that user is drawing on',
+    original: 'Active Layer',
+    value: '當前圖層'
+  },
+  'layers-layer': {
+    original: 'Layer',
+    value: '圖層'
+  },
+  'layers-copy': {
+    hint: 'noun',
+    original: 'copy',
+    value: '副本'
+  },
+  'layers-blending': {
+    hint: 'Common feature in image editing & drawing software. All layers-blend- keys relate to this. https://en.wikipedia.org/wiki/Blend_modes',
+    original: 'Blending',
+    value: '混合模式'
+  },
+  'layers-new': {
+    original: 'New Layer',
+    value: '新建圖層'
+  },
+  'layers-remove': {
+    original: 'Remove Layer',
+    value: '刪除圖層'
+  },
+  'layers-duplicate': {
+    original: 'Duplicate Layer',
+    value: '複製圖層'
+  },
+  'layers-merge': {
+    original: 'Merge with layer below',
+    value: '向下合併'
+  },
+  'layers-rename': {
+    original: 'Rename',
+    value: '重命名'
+  },
+  'layers-blend-normal': {
+    original: 'normal',
+    value: '正常'
+  },
+  'layers-blend-darken': {
+    original: 'darken',
+    value: '變暗'
+  },
+  'layers-blend-multiply': {
+    original: 'multiply',
+    value: '正片疊底'
+  },
+  'layers-blend-color-burn': {
+    original: 'color burn',
+    value: '顏色加深'
+  },
+  'layers-blend-lighten': {
+    original: 'lighten',
+    value: '變亮'
+  },
+  'layers-blend-screen': {
+    original: 'screen',
+    value: '濾色'
+  },
+  'layers-blend-color-dodge': {
+    original: 'color dodge',
+    value: '顏色減淡'
+  },
+  'layers-blend-overlay': {
+    original: 'overlay',
+    value: '疊加'
+  },
+  'layers-blend-soft-light': {
+    original: 'soft light',
+    value: '柔光'
+  },
+  'layers-blend-hard-light': {
+    original: 'hard light',
+    value: '強光'
+  },
+  'layers-blend-difference': {
+    original: 'difference',
+    value: '差值'
+  },
+  'layers-blend-exclusion': {
+    original: 'exclusion',
+    value: '排除'
+  },
+  'layers-blend-hue': {
+    original: 'hue',
+    value: '色相'
+  },
+  'layers-blend-saturation': {
+    original: 'saturation',
+    value: '飽和度'
+  },
+  'layers-blend-color': {
+    original: 'color',
+    value: '顏色'
+  },
+  'layers-blend-luminosity': {
+    original: 'luminosity',
+    value: '明度'
+  },
+  'layers-rename-title': {
+    original: 'Rename Layer',
+    value: '重命名圖層'
+  },
+  'layers-rename-name': {
+    original: 'Name',
+    value: '重命名'
+  },
+  'layers-rename-clear': {
+    hint: 'aka action of deleting entered name',
+    original: 'Clear Name',
+    value: '清除'
+  },
+  'layers-rename-sketch': {
+    hint: 'noun',
+    original: 'Sketch',
+    value: '草圖'
+  },
+  'layers-rename-colors': {
+    original: 'Colors',
+    value: '色彩'
+  },
+  'layers-rename-lines': {
+    original: 'Lines',
+    value: '線條'
+  },
+  'layers-rename-foreground': {
+    original: 'Foreground',
+    value: '前景'
+  },
+  'layers-merge-modal-title': {
+    original: 'Merge/Mix Layers',
+    value: '向下合併'
+  },
+  'layers-merge-description': {
+    original: 'Merges the selected layer with the one underneath. Select the mix mode:',
+    value: '選中層與底下一層合併。選擇混合模式：'
+  },
+  'file-no-autosave': {
+    hint: "let user know they can't autosave, and there's no cloud storage. Keep short so fits on one line",
+    original: 'No autosave, no cloud storage',
+    value: '不能自動保存，沒有雲端儲存'
+  },
+  'file-new': {
+    original: 'New',
+    value: '新建'
+  },
+  'file-import': {
+    original: 'Import',
+    value: '打開'
+  },
+  'file-save': {
+    original: 'Save',
+    value: '保存'
+  },
+  'file-save-png': {
+    original: 'Save PNG',
+    value: '保存為PNG'
+  },
+  'file-save-psd': {
+    original: 'Save PSD',
+    value: '保存為PSD'
+  },
+  'file-save-layers': {
+    original: 'Save Layers',
+    value: '保存圖層'
+  },
+  'file-copy': {
+    original: 'Copy',
+    value: '複製'
+  },
+  'file-copy-title': {
+    original: 'Copy To Clipboard',
+    value: '複製到剪貼板'
+  },
+  'file-share': {
+    hint: 'Common feature on phones. Pressing share button allows to send data to a different app, e.g. as a text message to someone.',
+    original: 'Share',
+    value: '分享'
+  },
+  'file-storage': {
+    hint: 'Made up term. Allows users to store drawing in the browser. (not synced across devices)',
+    original: 'Browser Storage',
+    value: '保存至瀏覽器'
+  },
+  'file-storage-thumb-title': {
+    original: 'Restores when reopening page',
+    value: '重新打開頁面時恢復'
+  },
+  'file-storage-about': {
+    original: 'About Browser Storage',
+    value: '關於保存至瀏覽器'
+  },
+  'file-storage-cant-access': {
+    original: "Can't access",
+    value: '無法獲取'
+  },
+  'file-storage-empty': {
+    hint: 'nothing stored',
+    original: 'Empty',
+    value: '無內容'
+  },
+  'file-storage-store': {
+    hint: 'verb',
+    original: 'Store',
+    value: '保存'
+  },
+  'file-storage-clear': {
+    original: 'Clear',
+    value: '清除'
+  },
+  'file-storage-storing': {
+    original: 'Storing',
+    value: '保存中'
+  },
+  'file-storage-overwrite': {
+    original: 'Overwrite',
+    value: '覆蓋'
+  },
+  'file-storage-min-ago': {
+    hint: "{x} <- needs to stay, it's a placeholder.",
+    original: '{x}min ago',
+    value: '{x}分鐘前'
+  },
+  'file-storage-hours-ago': {
+    original: '{x}h ago',
+    value: '{x}小時前'
+  },
+  'file-storage-days-ago': {
+    original: '{x}d ago',
+    value: '{x}天前'
+  },
+  'file-storage-month-ago': {
+    original: '> 1month ago',
+    value: '>一個月前'
+  },
+  'file-storage-restored': {
+    original: 'Restored from Browser Storage',
+    value: '從瀏覽器內存中恢復'
+  },
+  'file-storage-stored': {
+    original: 'Stored to Browser Storage',
+    value: '保存至瀏覽器內存'
+  },
+  'file-storage-failed': {
+    original: 'Failed to store to Browser Storage',
+    value: '保存失敗'
+  },
+  'file-storage-failed-1': {
+    original: 'Failed to store. Possible causes:',
+    value: '保存失敗。可能是由於：'
+  },
+  'file-storage-failed-2': {
+    original: 'Out of disk space',
+    value: '磁盤空間不足'
+  },
+  'file-storage-failed-3': {
+    original: 'Storage disabled in incognito tab',
+    value: '隱身頁面中禁用存儲功能'
+  },
+  'file-storage-failed-4': {
+    original: "Browser doesn't support storage",
+    value: '瀏覽器不支持'
+  },
+  'file-storage-failed-clear': {
+    original: 'Failed to clear.',
+    value: '清除失敗'
+  },
+  'file-upload': {
+    original: 'Upload',
+    value: '上傳'
+  },
+  'cleared-layer': {
+    original: 'Cleared layer',
+    value: '圖層已清除'
+  },
+  filled: {
+    hint: 'layer got filled with a color',
+    original: 'Filled',
+    value: '圖層已填充'
+  },
+  'new-title': {
+    original: 'New Image',
+    value: '新建項目'
+  },
+  'new-current': {
+    original: 'Current',
+    value: '當前大小'
+  },
+  'new-fit': {
+    original: 'Fit',
+    value: '適應頁面'
+  },
+  'new-oversize': {
+    original: 'Oversize',
+    value: '大畫布'
+  },
+  'new-square': {
+    original: 'Square',
+    value: '正方形'
+  },
+  'new-landscape': {
+    original: 'Landscape',
+    value: '橫向尺寸'
+  },
+  'new-portrait': {
+    original: 'Portrait',
+    value: '縱向尺寸'
+  },
+  'new-screen': {
+    original: 'Screen',
+    value: '顯示分辨率'
+  },
+  'new-video': {
+    original: 'Video',
+    value: '視頻'
+  },
+  'new-din-paper': {
+    original: 'DIN Paper',
+    value: '紙張大小'
+  },
+  'new-px': {
+    hint: 'abbreviation of pixel',
+    original: 'px',
+    value: '像素'
+  },
+  'new-ratio': {
+    hint: 'aspect ratio',
+    original: 'Ratio',
+    value: '比例'
+  },
+  'upload-title': {
+    original: 'Upload to Imgur',
+    value: '上傳到Imgur'
+  },
+  'upload-link-notice': {
+    original: 'Anyone with the link to your uploaded image will be able to view it.',
+    value: '他人可以通過生成的圖片鏈接查看你的作品。 '
+  },
+  'upload-name': {
+    original: 'Title',
+    value: '標題'
+  },
+  'upload-title-untitled': {
+    original: 'Untitled',
+    value: '未命名'
+  },
+  'upload-caption': {
+    original: 'Caption',
+    value: '描述'
+  },
+  'upload-tos': {
+    original: 'Terms of Service',
+    value: '服務條款'
+  },
+  'upload-tos-2': {
+    original: 'for imgur.com',
+    value: 'imgur.com'
+  },
+  'upload-submit': {
+    original: 'Upload',
+    value: '上傳'
+  },
+  'upload-uploading': {
+    original: 'Uploading...',
+    value: '上傳中...'
+  },
+  'upload-success': {
+    original: 'Upload Successful',
+    value: '上傳成功'
+  },
+  'upload-failed': {
+    original: 'Upload failed.',
+    value: '上傳失敗'
+  },
+  'upload-delete': {
+    original: 'To delete your image from Imgur visit:',
+    value: '要從Imgur刪除你的圖片, 請訪問:'
+  },
+  'cropcopy-title-copy': {
+    original: 'Copy To Clipboard',
+    value: '複製到剪貼板'
+  },
+  'cropcopy-title-crop': {
+    hint: 'Cropping is a common feature in image editing.',
+    original: 'Crop',
+    value: '裁剪'
+  },
+  'cropcopy-click-hold': {
+    original: 'Right-click or press hold to copy.',
+    value: '點擊右鍵或長按進行複制。',
+  },
+  'cropcopy-btn-copy': {
+    original: 'To Clipboard',
+    value: '至剪貼板'
+  },
+  'cropcopy-copied': {
+    original: 'Copied.',
+    value: '已複製'
+  },
+  'cropcopy-btn-crop': {
+    original: 'Apply Crop',
+    value: '應用裁剪'
+  },
+  'crop-drag-to-crop': {
+    original: 'Drag to crop',
+    value: '拖動裁剪'
+  },
+  'filter-crop-extend': {
+    original: 'Crop/Extend',
+    value: '畫布大小'
+  },
+  'filter-flip': {
+    original: 'Flip',
+    value: '翻轉'
+  },
+  'filter-perspective': {
+    original: 'Perspective',
+    value: '透視'
+  },
+  'filter-resize': {
+    original: 'Resize',
+    value: '圖像大小'
+  },
+  'filter-rotate': {
+    original: 'Rotate',
+    value: '旋轉'
+  },
+  'filter-transform': {
+    original: 'Transform',
+    value: '自由變換'
+  },
+  'filter-bright-contrast': {
+    original: 'Bright/Contrast',
+    value: '亮度/對比'
+  },
+  'filter-curves': {
+    original: 'Curves',
+    value: '曲線'
+  },
+  'filter-hue-sat': {
+    original: 'Hue/Saturation',
+    value: '色相/飽和度'
+  },
+  'filter-invert': {
+    original: 'Invert',
+    value: '反相'
+  },
+  'filter-tilt-shift': {
+    original: 'Tilt Shift',
+    value: '移軸'
+  },
+  'filter-to-alpha': {
+    hint: 'feature that can isolate linedrawings if it is a black and white image.',
+    original: 'To Alpha',
+    value: '轉換至Alpha'
+  },
+  'filter-triangle-blur': {
+    original: 'Triangle Blur',
+    value: '模糊'
+  },
+  'filter-unsharp-mask': {
+    original: 'Unsharp Mask',
+    value: 'USM 銳化'
+  },
+  'filter-crop-title': {
+    original: 'Crop / Extend',
+    value: '畫布大小'
+  },
+  'filter-crop-description': {
+    original: 'Crop or extend the image.',
+    value: '裁剪圖片'
+  },
+  'filter-crop-left': {
+    original: 'Left',
+    value: '左'
+  },
+  'filter-crop-right': {
+    original: 'Right',
+    value: '右'
+  },
+  'filter-crop-top': {
+    original: 'Top',
+    value: '上'
+  },
+  'filter-crop-bottom': {
+    original: 'Bottom',
+    value: '下'
+  },
+  'filter-crop-rule-thirds': {
+    original: 'Rule of Thirds',
+    value: '三分法'
+  },
+  'filter-crop-fill': {
+    original: 'Fill',
+    value: '填充'
+  },
+  'filter-flip-title': {
+    original: 'Flip',
+    value: '翻轉'
+  },
+  'filter-flip-description': {
+    original: 'Flips layer or whole image.',
+    value: '翻轉圖層或整個圖像'
+  },
+  'filter-flip-horizontal': {
+    original: 'Horizontal',
+    value: '水平'
+  },
+  'filter-flip-vertical': {
+    original: 'Vertical',
+    value: '垂直'
+  },
+  'filter-flip-image': {
+    original: 'Flip Image',
+    value: '翻轉圖像'
+  },
+  'filter-flip-layer': {
+    original: 'Flip Layer',
+    value: '翻轉圖層'
+  },
+  'filter-perspective-title': {
+    original: 'Perspective',
+    value: '透視'
+  },
+  'filter-perspective-description': {
+    original: 'Transforms the selected layer.',
+    value: '變換已選圖層'
+  },
+  'filter-perspective-before': {
+    original: 'Before',
+    value: '之前'
+  },
+  'filter-perspective-after': {
+    original: 'After',
+    value: '之後'
+  },
+  'filter-resize-title': {
+    original: 'Resize',
+    value: '圖像大小'
+  },
+  'filter-resize-description': {
+    original: 'Resizes the image.',
+    value: '更改圖像大小'
+  },
+  'filter-rotate-title': {
+    original: 'Rotate',
+    value: '旋轉'
+  },
+  'filter-rotate-description': {
+    original: 'Rotates the image.',
+    value: '旋轉圖像'
+  },
+  'filter-transform-empty': {
+    original: 'Layer is empty.',
+    value: '圖層為空'
+  },
+  'filter-transform-title': {
+    original: 'Transform',
+    value: '變換'
+  },
+  'filter-transform-description': {
+    original: 'Transforms selected layer. Hold Shift for additional behavior.',
+    value: '變換已選圖層。按住Shift操作。 '
+  },
+  'filter-transform-rotation': {
+    original: 'Rotation',
+    value: '旋轉'
+  },
+  'filter-transform-flip': {
+    original: 'Flip',
+    value: '翻轉'
+  },
+  'filter-transform-center': {
+    original: 'Center',
+    value: '居中'
+  },
+  'filter-transform-constrain': {
+    original: 'Constrain',
+    value: '保持'
+  },
+  'filter-transform-snap': {
+    original: 'Snap',
+    value: '對齊'
+  },
+  'filter-transform-snap-title': {
+    original: 'Snap Rotation And Position',
+    value: '旋轉對齊/水平對齊'
+  },
+  'filter-bright-contrast-title': {
+    original: 'Brightness / Contrast',
+    value: '亮度/對比'
+  },
+  'filter-bright-contrast-description': {
+    original: 'Change brightness and contrast for the selected layer.',
+    value: '更改已選圖層的亮度和對比度。 '
+  },
+  'filter-bright-contrast-brightness': {
+    original: 'Brightness',
+    value: '亮度'
+  },
+  'filter-bright-contrast-contrast': {
+    original: 'Contrast',
+    value: '對比'
+  },
+  'filter-curves-title': {
+    original: 'Curves',
+    value: '曲線'
+  },
+  'filter-curves-description': {
+    original: 'Apply curves on the selected layer.',
+    value: '應用曲線到已選圖層。 '
+  },
+  'filter-curves-all': {
+    original: 'All',
+    value: '全部'
+  },
+  'filter-hue-sat-title': {
+    original: 'Hue / Saturation',
+    value: '色相/飽和度'
+  },
+  'filter-hue-sat-description': {
+    original: 'Change hue and saturation for the selected layer.',
+    value: '更改已選圖層的色相和飽和度。 '
+  },
+  'filter-hue-sat-hue': {
+    original: 'Hue',
+    value: '色相'
+  },
+  'filter-hue-sat-saturation': {
+    original: 'Saturation',
+    value: '飽和度'
+  },
+  'filter-applied': {
+    original: 'applied',
+    value: '應用'
+  },
+  'filter-tilt-shift-title': {
+    original: 'Tilt Shift',
+    value: '移軸'
+  },
+  'filter-tilt-shift-description': {
+    original: 'Applies tilt shift on the selected layer.',
+    value: '應用移軸到已選圖層。 '
+  },
+  'filter-tilt-shift-blur': {
+    original: 'Blur Radius',
+    value: '模糊半徑'
+  },
+  'filter-tilt-shift-gradient': {
+    original: 'Gradient Radius',
+    value: '梯度半徑'
+  },
+  'filter-to-alpha-title': {
+    original: 'To Alpha',
+    value: '至Alpha'
+  },
+  'filter-to-alpha-description': {
+    original: 'Generates alpha channel for selected layer from:',
+    value: '對已選圖層生成Alpha通道：'
+  },
+  'filter-to-alpha-inverted-lum': {
+    original: 'Inverted Luminance',
+    value: '亮度翻轉'
+  },
+  'filter-to-alpha-lum': {
+    original: 'Luminance',
+    value: '亮度'
+  },
+  'filter-to-alpha-replace': {
+    original: 'Replace RGB',
+    value: '替換RGB'
+  },
+  'filter-triangle-blur-title': {
+    original: 'Triangle Blur',
+    value: '模糊'
+  },
+  'filter-triangle-blur-description': {
+    original: 'Applies triangle blur on the selected layer.',
+    value: '應用模糊到已選圖層。 '
+  },
+  'filter-unsharp-mask-title': {
+    original: 'Unsharp Mask',
+    value: 'USM銳化'
+  },
+  'filter-unsharp-mask-description': {
+    original: 'Sharpens the selected layer by scaling pixels away from the average of their neighbors.',
+    value: '根據附近像素的均值應用銳化到已選圖層。 '
+  },
+  'filter-unsharp-mask-strength': {
+    original: 'Strength',
+    value: '強度'
+  },
+  'filter-grid': {
+    original: 'Grid',
+    value: '網格'
+  },
+  'filter-grid-description': {
+    original: 'Draws grid on selected layer.',
+    value: '給當前層添加網格線。'
+  },
+  'filter-noise': {
+    original: 'Noise',
+    value: '噪聲'
+  },
+  'filter-noise-description': {
+    original: 'Adds noise to selected layer.',
+    value: '應用噪聲到達選擇層。'
+  },
+  'filter-noise-scale': {
+    original: 'Scale',
+    value: '圖案大小'
+  },
+  'filter-noise-alpha': {
+    original: 'Alpha',
+    value: 'Alpha'
+  },
+  'filter-noise-inverted': {
+    original: 'Inverted',
+    value: '反相'
+  },
+  'import-opening': {
+    original: 'Opening file...',
+    value: '打開文件...'
+  },
+  'import-title': {
+    original: 'Import Image',
+    value: '導入圖像'
+  },
+  'import-too-large': {
+    original: 'Image too large, will be downscaled.',
+    value: '圖像過大，將會進行縮小。 '
+  },
+  'import-btn-as-layer': {
+    original: 'As Layer',
+    value: '作為圖層'
+  },
+  'import-btn-as-image': {
+    original: 'As Image',
+    value: '作為圖像'
+  },
+  'import-as-layer-title': {
+    original: 'Import Image as New Layer',
+    value: '導入圖像作為新圖層'
+  },
+  'import-as-layer-description': {
+    original: 'Adjust the position of the imported image.',
+    value: '調整導入圖像的位置。 '
+  },
+  'import-as-layer-limit-reached': {
+    original: 'Layer limit reached. Image will be placed on existing layer.',
+    value: '達到圖層數量上限。圖像將會應用到已有圖層。'
+  },
+  'import-as-layer-fit': {
+    hint: 'verb. imported image made to fit inside canvas.',
+    original: 'Fit',
+    value: '適應'
+  },
+  'import-flatten': {
+    hint: 'Turn image that has multiple layers into an image that has only one layer.',
+    original: 'Flatten image',
+    value: '拼合圖像'
+  },
+  'import-unsupported-file': {
+    original: 'Unsupported file type. See Help for supported types.',
+    value: '不支持此類文件類型。查看幫助。 '
+  },
+  'import-broken-file': {
+    original: "Couldn't load image. File might be corrupted.",
+    value: '不能加載圖像。文件可能受損。 '
+  },
+  'import-psd-unsupported': {
+    original: 'Unsupported features. PSD had to be flattened.',
+    value: '不支持該功能。 PSD需要拼合。 '
+  },
+  'import-psd-limited-support': {
+    original: 'PSD support is limited. Flattened will more likely look correct.',
+    value: 'PSD支持受限。拼合功能將會更近原始圖像。 '
+  },
+  'import-psd-too-large': {
+    original: 'Image exceeds maximum dimensions of {x} x {x} pixels. Unable to import.',
+    value: '圖像超過{x} x {x}個像素。不能導入。 '
+  },
+  'import-psd-size': {
+    original: 'Image size',
+    value: '圖像大小'
+  },
+  'hand-reset': {
+    hint: 'resets zoom (to 100%) and rotation (to 0°)',
+    original: 'Reset',
+    value: '重置'
+  },
+  'hand-fit': {
+    hint: 'makes canvas cover whole working area',
+    original: 'Fit',
+    value: '適應'
+  },
+  'bucket-tolerance': {
+    original: 'Tolerance',
+    value: '容差'
+  },
+  'bucket-sample': {
+    original: 'Sample',
+    value: '採樣'
+  },
+  'bucket-sample-title': {
+    original: 'Which layers to sample color from',
+    value: '從特定圖層進行色彩採樣'
+  },
+  'bucket-sample-all': {
+    original: 'All',
+    value: '全部'
+  },
+  'bucket-sample-active': {
+    original: 'Active',
+    value: '當前'
+  },
+  'bucket-sample-above': {
+    original: 'Above',
+    value: '之前'
+  },
+  'bucket-grow': {
+    original: 'Grow',
+    value: '填充擴張'
+  },
+  'bucket-grow-title': {
+    original: 'Grow filled area (in pixels)',
+    value: '擴張填充的區域（像素）'
+  },
+  'bucket-contiguous': {
+    hint: 'common setting for paint bucket in image editing software',
+    original: 'Contiguous',
+    value: '連續的'
+  },
+  'bucket-contiguous-title': {
+    original: 'Only fill connected areas',
+    value: '僅填充相連的區域'
+  },
+  'gradient-linear': {
+    original: 'Linear',
+    value: ''
+  },
+  'gradient-linear-mirror': {
+    original: 'Linear-Mirror',
+    value: ''
+  },
+  'gradient-radial': {
+    original: 'Radial',
+    value: ''
+  },
+  'gradient-reversed': {
+    original: 'Reversed',
+    value: ''
+  },
+  'shape-stroke': {
+    original: 'Stroke',
+    value: '線條'
+  },
+  'shape-fill': {
+    original: 'Fill',
+    value: '填充'
+  },
+  'shape-rect': {
+    original: 'Rectangle',
+    value: '方形'
+  },
+  'shape-ellipse': {
+    original: 'Ellipse',
+    value: '圓形'
+  },
+  'shape-line': {
+    original: 'Line',
+    value: '線條'
+  },
+  'shape-line-width': {
+    original: 'Line Width',
+    value: '線條寬度'
+  },
+  'shape-outwards': {
+    hint: 'grows shape from the center outwards',
+    original: 'Outwards',
+    value: '自中心向外'
+  },
+  'shape-fixed': {
+    original: 'Fixed 1:1',
+    value: '鎖定 1:1'
+  },
+  'text-instruction': {
+    original: 'Click canvas to place text',
+    value: '點擊畫布添加文本'
+  },
+  'text-title': {
+    original: 'Add Text',
+    value: '添加文本'
+  },
+  'text-placeholder': {
+    original: 'Your text (multiline Shift+Enter)',
+    value: '請輸入（換行 Shift+Enter）'
+  },
+  'text-color': {
+    original: 'Color',
+    value: '色彩'
+  },
+  'text-size': {
+    original: 'Size',
+    value: '大小'
+  },
+  'text-left': {
+    original: 'Left',
+    value: '左對齊'
+  },
+  'text-center': {
+    original: 'Center',
+    value: '居中'
+  },
+  'text-right': {
+    original: 'Right',
+    value: '右對齊'
+  },
+  'text-italic': {
+    original: 'Italic',
+    value: '斜體'
+  },
+  'text-bold': {
+    original: 'Bold',
+    value: '加粗'
+  },
+  'save-reminder-title': {
+    hint: 'Save Reminder is a popup that shows up after 20 minutes of not saving. Allows user to save on the spot.',
+    original: 'Unsaved Work',
+    value: '作品未保存'
+  },
+  'save-reminder-text': {
+    hint: 'turns into: "...saved in <strong>12 minutes</strong>. Save..."',
+    original: 'Image was not saved in {a} minutes{b}. Save now to prevent eventual loss.',
+    value: '圖畫已{a}分鐘{b}未保存。立刻保存以避免進度丟失。'
+  },
+  'save-reminder-save-psd': {
+    original: 'Save As PSD',
+    value: '保存為PSD'
+  },
+  'save-reminder-psd-layers': {
+    original: 'PSD will remember all layers.',
+    value: 'PSD可保留所有圖層。'
+  },
+  submit: {
+    original: 'Submit',
+    value: '送出'
+  },
+  'submit-title': {
+    original: 'Submit Drawing',
+    value: '送出圖像'
+  },
+  'submit-prompt': {
+    original: 'Submit drawing?',
+    value: '確認送出？'
+  },
+  'submit-submitting': {
+    original: 'Submitting',
+    value: '送出中'
+  },
+  'embed-init-loading': {
+    original: 'Loading app',
+    value: '加載app'
+  },
+  'embed-init-waiting': {
+    original: 'Waiting for image',
+    value: '圖像上傳中'
+  },
+  unsaved: {
+    original: 'Unsaved',
+    value: '未保存'
+  },
+  help: {
+    original: 'Help',
+    value: '幫助'
+  },
+  'tab-settings': {
+    original: 'Settings',
+    value: '設置'
+  },
+  'settings-language': {
+    original: 'Language',
+    value: '語言'
+  },
+  'settings-preferred-language': {
+    original: 'Preferred Language',
+    value: '首選語言'
+  },
+  'settings-language-reload': {
+    original: 'Will update after reloading.',
+    value: '刷新後更改語言'
+  },
+  licenses: {
+    original: 'Licenses',
+    value: '許可'
+  },
+  'source-code': {
+    original: 'Source Code',
+    value: '源代碼'
+  },
+  auto: {
+    hint: 'automatically decided',
+    original: 'auto',
+    value: '自動'
+  },
+  'zoom-in': {
+    original: 'Zoom In',
+    value: '放大'
+  },
+  'zoom-out': {
+    original: 'Zoom Out',
+    value: '縮小'
+  },
+  radius: {
+    original: 'Radius',
+    value: '半徑'
+  },
+  'constrain-proportions': {
+    original: 'Constrain Proportions',
+    value: '保持縱橫比'
+  },
+  width: {
+    original: 'Width',
+    value: '寬度'
+  },
+  height: {
+    original: 'Height',
+    value: '高度'
+  },
+  opacity: {
+    original: 'Opacity',
+    value: '不透明度'
+  },
+  red: {
+    original: 'Red',
+    value: '紅'
+  },
+  green: {
+    original: 'Green',
+    value: '綠'
+  },
+  blue: {
+    original: 'Blue',
+    value: '藍'
+  },
+  eraser: {
+    original: 'Eraser',
+    value: '橡皮擦'
+  },
+  center: {
+    hint: 'verb',
+    original: 'Center',
+    value: '居中'
+  },
+  background: {
+    original: 'Background',
+    value: '背景'
+  },
+  'scaling-algorithm': {
+    original: 'Scaling Algorithm',
+    value: '縮放算法'
+  },
+  'algorithm-smooth': {
+    original: 'Smooth',
+    value: '平滑'
+  },
+  'algorithm-pixelated': {
+    original: 'Pixelated',
+    value: '像素化'
+  },
+  'preview': {
+    original: 'Preview',
+    hint: 'subject. When applying a filter user sees a preview of what the result would look like.',
+    value: '預覽'
+  },
+  'angle-snap': {
+    original: 'Snap',
+    value: '對齊'
+  },
+  'angle-snap-title': {
+    original: '45° Angle Snapping',
+    value: '以45°角度對齊'
+  },
+  'lock-alpha': {
+    original: 'Lock Alpha',
+    value: '鎖定'
+  },
+  'lock-alpha-title': {
+    original: "Locks layer's alpha channel",
+    value: '鎖定圖層透明度'
+  }
 }

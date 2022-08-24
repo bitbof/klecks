@@ -109,6 +109,20 @@ export interface IInitState {
     brushes: any; // todo type
 }
 
+export interface IGradient {
+    type: 'linear' | 'linear-mirror' | 'radial';
+    color1: IRGB;
+    isReversed: boolean; // color1 actually color2
+    opacity: number; // [0, 1]
+    doLockAlpha: boolean;
+    doSnap: boolean; // 45° deg angle snapping
+    x1: number;
+    y1: number;
+    x2: number;
+    y2: number;
+    angleRad: number; // angle of canvas
+}
+
 export interface IShapeToolObject {
     type: 'rect' | 'ellipse' | 'line';
     x1: number;
@@ -122,8 +136,9 @@ export interface IShapeToolObject {
     fillRgb?: { r: number; g: number; b: number }; // for rect or ellipse
     strokeRgb?: { r: number; g: number; b: number }; // needed for line
     lineWidth?: number; // needed for line
-    isAngleSnap?: boolean; // 45° angle snapping
+    isAngleSnap?: boolean; // 45° deg angle snapping
     isFixedRatio?: boolean; // 1:1 for rect or ellipse
+    doLockAlpha: boolean;
 }
 
 export interface IKlSliderConfig {

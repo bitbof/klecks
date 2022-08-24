@@ -1,5 +1,5 @@
 import {BB} from '../../bb/bb';
-import {IShapeToolObject} from '../kl.types';
+import {IRGB, IShapeToolObject} from '../kl.types';
 
 
 /**
@@ -44,6 +44,10 @@ export function drawShape(
         const lineWidth = Math.round(shapeObj.lineWidth);
         const angleDeg = shapeObj.angleRad * 180 / Math.PI;
 
+        // --- prep color ---
+        let colorRGB: IRGB = shapeObj.isEraser ? {r: 255, g: 255, b: 255} : (shapeObj.fillRgb ? shapeObj.fillRgb : shapeObj.strokeRgb);
+
+
         // --- prep canvas ---
         ctx.save();
         if (shapeObj.opacity) {
@@ -52,11 +56,14 @@ export function drawShape(
         if (shapeObj.isEraser) {
             ctx.globalCompositeOperation = 'destination-out';
         }
+        if (shapeObj.doLockAlpha) {
+            ctx.globalCompositeOperation = 'source-atop';
+        }
         ctx.rotate(-shapeObj.angleRad);
         if (shapeObj.fillRgb) {
-            ctx.fillStyle = BB.ColorConverter.toRgbStr(shapeObj.fillRgb);
+            ctx.fillStyle = BB.ColorConverter.toRgbStr(colorRGB);
         } else if (shapeObj.strokeRgb) {
-            ctx.strokeStyle = BB.ColorConverter.toRgbStr(shapeObj.strokeRgb);
+            ctx.strokeStyle = BB.ColorConverter.toRgbStr(colorRGB);
             ctx.lineWidth = lineWidth;
         }
 

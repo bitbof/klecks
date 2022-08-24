@@ -2,10 +2,11 @@ import {BB} from '../../bb/bb';
 import {floodFillBits} from '../image-operations/flood-fill';
 import {drawShape} from '../image-operations/shape-tool';
 import {IRenderTextParam, renderText} from '../image-operations/render-text';
-import {IKlProject, IMixMode, IRGB, IShapeToolObject} from '../kl.types';
+import {IGradient, IKlProject, IMixMode, IRGB, IShapeToolObject} from '../kl.types';
 import {DecoyKlHistory, KlHistoryInterface} from '../history/kl-history';
 import {drawProject} from './draw-project';
 import {LANG} from '../../language/language';
+import {drawGradient} from '../image-operations/gradient-tool';
 
 
 const allowedMixModes = [
@@ -676,7 +677,7 @@ export class KlCanvas {
         layerIndex: number, // index of layer to be filled
         x: number, // starting point
         y: number,
-        rgb: IRGB, // fill color
+        rgb: IRGB | null, // fill color, if null -> erase
         opacity: number,
         tolerance: number,
         sampleStr: 'current' | 'all' | 'above',
@@ -743,22 +744,38 @@ export class KlCanvas {
         }
 
         targetData = targetImageData.data;
-        if (opacity === 1) {
-            for (let i = 0; i < this.width * this.height; i++) {
-                if (result.data[i] === 255) {
-                    targetData[i * 4] = rgb.r;
-                    targetData[i * 4 + 1] = rgb.g;
-                    targetData[i * 4 + 2] = rgb.b;
-                    targetData[i * 4 + 3] = 255;
+        if (rgb) {
+            if (opacity === 1) {
+                for (let i = 0; i < this.width * this.height; i++) {
+                    if (result.data[i] === 255) {
+                        targetData[i * 4] = rgb.r;
+                        targetData[i * 4 + 1] = rgb.g;
+                        targetData[i * 4 + 2] = rgb.b;
+                        targetData[i * 4 + 3] = 255;
+                    }
+                }
+            } else {
+                for (let i = 0; i < this.width * this.height; i++) {
+                    if (result.data[i] === 255) {
+                        targetData[i * 4] = BB.mix(targetData[i * 4], rgb.r, opacity);
+                        targetData[i * 4 + 1] = BB.mix(targetData[i * 4 + 1], rgb.g, opacity);
+                        targetData[i * 4 + 2] = BB.mix(targetData[i * 4 + 2], rgb.b, opacity);
+                        targetData[i * 4 + 3] = BB.mix(targetData[i * 4 + 3], 255, opacity);
+                    }
                 }
             }
-        } else {
-            for (let i = 0; i < this.width * this.height; i++) {
-                if (result.data[i] === 255) {
-                    targetData[i * 4] = BB.mix(targetData[i * 4], rgb.r, opacity);
-                    targetData[i * 4 + 1] = BB.mix(targetData[i * 4 + 1], rgb.g, opacity);
-                    targetData[i * 4 + 2] = BB.mix(targetData[i * 4 + 2], rgb.b, opacity);
-                    targetData[i * 4 + 3] = BB.mix(targetData[i * 4 + 3], 255, opacity);
+        } else { // erase
+            if (opacity === 1) {
+                for (let i = 0; i < this.width * this.height; i++) {
+                    if (result.data[i] === 255) {
+                        targetData[i * 4 + 3] = 0;
+                    }
+                }
+            } else {
+                for (let i = 0; i < this.width * this.height; i++) {
+                    if (result.data[i] === 255) {
+                        targetData[i * 4 + 3] = BB.mix(targetData[i * 4 + 3], 0, opacity);
+                    }
                 }
             }
         }
@@ -786,6 +803,15 @@ export class KlCanvas {
             tool: ["canvas"],
             action: "drawShape",
             params: [layerIndex, BB.copyObj(shapeObj)],
+        });
+    }
+
+    drawGradient(layerIndex: number, gradientObj: IGradient): void {
+        drawGradient(this.layerCanvasArr[layerIndex].getContext("2d"), gradientObj);
+        this.history.push({
+            tool: ["canvas"],
+            action: "drawGradient",
+            params: [layerIndex, BB.copyObj(gradientObj)],
         });
     }
 

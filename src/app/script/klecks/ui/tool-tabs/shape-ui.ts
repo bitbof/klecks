@@ -215,14 +215,30 @@ export function ShapeUi(p) {
     shapeOptions.getElement().style.width = '120px';
     row1.appendChild(shapeOptions.getElement());
 
-    let eraserToggle = new Checkbox({
+    const eraserToggle = new Checkbox({
         init: false,
         label: LANG('eraser'),
         callback: function(b) {
             updatePreviews();
         }
     });
-    row1.appendChild(eraserToggle.getElement());
+
+    const lockAlphaToggle = new Checkbox({
+        init: false,
+        label: LANG('lock-alpha'),
+        title: LANG('lock-alpha-title'),
+        callback: (b) => {
+        },
+        doHighlight: true,
+    });
+    lockAlphaToggle.getElement().style.marginTop = '10px';
+
+    row1.append(BB.el({
+        content: [
+            eraserToggle.getElement(),
+            lockAlphaToggle.getElement(),
+        ]
+    }));
 
     let lineWidthSlider = new KlSlider({
         label: LANG('shape-line-width'),
@@ -290,8 +306,8 @@ export function ShapeUi(p) {
 
     let snapToggle = new Checkbox({
         init: false,
-        label: LANG('shape-snap'),
-        title: LANG('shape-snap-title'),
+        label: LANG('angle-snap'),
+        title: LANG('angle-snap-title'),
         callback: function(b) {
             updatePreviews();
         },
@@ -300,7 +316,6 @@ export function ShapeUi(p) {
         }
     });
     row2.appendChild(snapToggle.getElement());
-
 
 
     updatePreviews();
@@ -351,6 +366,10 @@ export function ShapeUi(p) {
 
     this.getIsSnap = function() {
         return (snapToggle as any).getValue();
+    };
+
+    this.getDoLockAlpha = () => {
+        return lockAlphaToggle.getValue();
     };
 
 }

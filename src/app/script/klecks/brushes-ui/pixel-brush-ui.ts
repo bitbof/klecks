@@ -41,12 +41,12 @@ export const pixelBrushUi = (function () {
 
         let lockAlphaToggle = new Checkbox({
             init: brush.getLockAlpha(),
-            label: LANG('brush-lock-alpha'),
+            label: LANG('lock-alpha'),
             callback: function (b) {
                 brush.setLockAlpha(b);
             },
             doHighlight: true,
-            title: LANG('brush-lock-alpha-title'),
+            title: LANG('lock-alpha-title'),
             css: {
                 marginRight: '10px',
             }

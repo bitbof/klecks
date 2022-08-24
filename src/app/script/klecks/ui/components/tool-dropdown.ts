@@ -5,6 +5,8 @@ import toolPaintImg from 'url:~/src/app/img/ui/tool-paint.svg';
 // @ts-ignore
 import toolFillImg from 'url:~/src/app/img/ui/tool-fill.svg';
 // @ts-ignore
+import toolGradientImg from 'url:~/src/app/img/ui/tool-gradient.svg';
+// @ts-ignore
 import toolTextImg from 'url:~/src/app/img/ui/tool-text.svg';
 // @ts-ignore
 import toolShapeImg from 'url:~/src/app/img/ui/tool-shape.svg';
@@ -19,23 +21,25 @@ import {LANG} from '../../../language/language';
  *     onChange: func(activeStr)
  * }
  *
- * activeStr = 'draw' | 'fill' | 'text'
+ * activeStr = 'draw' | 'fill' | 'text' | 'shape' | 'gradient'
  *
  * @param p
  * @constructor
  */
 export function ToolDropdown(p) {
 
-    let optionArr = ['draw', 'fill', 'text', 'shape'];
+    let optionArr = ['draw', 'fill', 'gradient', 'text', 'shape'];
     let imArr = [
         toolPaintImg,
         toolFillImg,
+        toolGradientImg,
         toolTextImg,
         toolShapeImg
     ];
     let titleArr = [
         `${LANG('tool-brush')} [B]`,
         `${LANG('tool-paint-bucket')} [G]`,
+        `${LANG('tool-gradient')} [G]`,
         `${LANG('tool-text')} [T]`,
         `${LANG('tool-shape')} [U]`,
     ];

@@ -41,12 +41,12 @@ export const smudgeBrushUi = (function () {
 
         let lockAlphaToggle = new Checkbox({
             init: brush.getLockAlpha(),
-            label: LANG('brush-lock-alpha'),
+            label: LANG('lock-alpha'),
             callback: function (b) {
                 brush.setLockAlpha(b);
             },
             doHighlight: true,
-            title: LANG('brush-lock-alpha-title'),
+            title: LANG('lock-alpha-title'),
         });
 
         let spacingSpline = new BB.SplineInterpolator([[0, 15], [8, 7], [14, 4], [30, 3], [50, 2.7], [100, 2]]);

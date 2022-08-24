@@ -24,6 +24,7 @@ Base Language File
 
   "tool-brush": "Brush",
   "tool-paint-bucket": "Paint Bucket",
+  "tool-gradient": "Gradient",
   "tool-shape": "Shape",
   "tool-text": "Text",
   "tool-hand": "Hand Tool",
@@ -52,8 +53,6 @@ Base Language File
   "brush-size": "Size",
   "brush-blending": "Blending",
   "brush-toggle-pressure": "Toggle Pressure Sensitivity",
-  "brush-lock-alpha": "Lock Alpha",
-  "brush-lock-alpha-title": "Locks layer's alpha channel",
 
   "brush-pen-circle": "Circle",
   "brush-pen-chalk": "Chalk",
@@ -397,6 +396,11 @@ Base Language File
   },
   "bucket-contiguous-title": "Only fill connected areas",
 
+  "gradient-linear": 'Linear',
+  "gradient-linear-mirror": 'Linear-Mirror',
+  "gradient-radial": 'Radial',
+  "gradient-reversed": 'Reversed',
+
   "shape-stroke": "Stroke",
   "shape-fill": "Fill",
   "shape-rect": "Rectangle",
@@ -408,8 +412,6 @@ Base Language File
     value: 'Outwards',
   },
   "shape-fixed": "Fixed 1:1",
-  "shape-snap": "Snap",
-  "shape-snap-title": "45° Angle Snapping",
 
   "text-instruction": "Click canvas to place text",
   "text-title": "Add Text",
@@ -477,5 +479,9 @@ Base Language File
   'preview': {
     hint: 'subject. When applying a filter user sees a preview of what the result would look like.',
     value: 'Preview',
-  }
+  },
+  "angle-snap": 'Snap',
+  "angle-snap-title": '45° Angle Snapping',
+  "lock-alpha": "Lock Alpha",
+  "lock-alpha-title": "Locks layer's alpha channel"
 }

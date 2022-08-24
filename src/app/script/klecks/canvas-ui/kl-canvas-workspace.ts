@@ -21,7 +21,7 @@ export interface IViewChangeEvent {
     scale: number;
 }
 
-type TModeStr = 'draw' | 'pick' | 'hand' | 'shape' | 'fill' | 'text'; // | 'transform' | 'select'
+type TModeStr = 'draw' | 'pick' | 'hand' | 'shape' | 'fill' | 'gradient' | 'text'; // | 'transform' | 'select'
 
 const MIN_SCALE = 1 / 16;
 const MAX_SCALE = 64;
@@ -34,6 +34,7 @@ enum TMode {
     Rotate,
     Rotating,
     Fill,
+    Gradient,
     Text,
     Shape,
 }
@@ -145,6 +146,8 @@ export class KlCanvasWorkspace {
             this.rootEl.style.cursor = "grabbing";
         } else if (this.currentMode === TMode.Fill) {
             this.rootEl.style.cursor = "url('" + fillImg + "') 1 12, crosshair";
+        } else if (this.currentMode === TMode.Gradient) {
+            this.rootEl.style.cursor = 'crosshair';
         } else if (this.currentMode === TMode.Text) {
             this.rootEl.style.cursor = "url('" + textImg + "') 1 12, crosshair";
         } else if (this.currentMode === TMode.Shape) {
@@ -585,6 +588,7 @@ export class KlCanvasWorkspace {
             onDraw: (val) => void; // todo
             onPick: (rgb: IRGB, isPointerup: boolean) => void;
             onFill: (canvasX: number, canvasY: number) => void;
+            onGradient: (type: 'down' | 'up' | 'move', canvasX: number, canvasY: number, angleRad: number) => void;
             onText: (canvasX: number, canvasY: number, angleRad: number) => void;
             onShape: (type: 'down' | 'up' | 'move', canvasX: number, canvasY: number, angleRad: number) => void;
             onViewChange: (e:  IViewChangeEvent) => void;
@@ -693,13 +697,13 @@ export class KlCanvasWorkspace {
 
                 } else {
 
-                    if ([TMode.Draw, TMode.Pick, TMode.Fill, TMode.Text, TMode.Shape].includes(this.globalMode) && comboStr === 'space') {
+                    if ([TMode.Draw, TMode.Pick, TMode.Fill, TMode.Gradient, TMode.Text, TMode.Shape].includes(this.globalMode) && comboStr === 'space') {
                         this.currentInputProcessor = this.inputProcessorObj.spaceHand;
                         this.currentInputProcessor.onKeyDown(keyStr, event, comboStr, isRepeat);
                         return;
                     }
 
-                    if ([TMode.Draw, TMode.Hand, TMode.Fill, TMode.Text, TMode.Shape].includes(this.globalMode) && comboStr === 'alt') {
+                    if ([TMode.Draw, TMode.Hand, TMode.Fill, TMode.Gradient, TMode.Text, TMode.Shape].includes(this.globalMode) && comboStr === 'alt') {
                         this.currentInputProcessor = this.inputProcessorObj.altPicker;
                         this.currentInputProcessor.onKeyDown(keyStr, event, comboStr, isRepeat);
                         return;
@@ -867,6 +871,34 @@ export class KlCanvasWorkspace {
 
                     }
 
+                },
+                onKeyDown: (keyStr, event, comboStr, isRepeat) => {
+
+                },
+                onKeyUp: (keyStr, event, oldComboStr) => {
+
+                }
+            },
+            gradient: {
+                onPointer: (event) => {
+
+                    this.reqFrame();
+                    this.updateCursor(TMode.Gradient);
+                    const coord = this.workspaceToCanvasCoord({x: event.relX, y: event.relY});
+
+                    if (event.type === 'pointerdown') {
+                        this.isDrawing = true;
+                        p.onGradient('down', coord.x, coord.y, this.renderedTransformObj.angle);
+
+                    } else if (event.type === 'pointermove') {
+                        p.onGradient('move', coord.x, coord.y, this.renderedTransformObj.angle);
+
+                    } else if (event.type === 'pointerup') {
+                        this.isDrawing = false;
+                        p.onGradient('up', coord.x, coord.y, this.renderedTransformObj.angle);
+                        this.resetInputProcessor();
+
+                    }
                 },
                 onKeyDown: (keyStr, event, comboStr, isRepeat) => {
 
@@ -1340,6 +1372,22 @@ export class KlCanvasWorkspace {
                         this.reqFrame();
                     }
 
+                } else if (this.globalMode === TMode.Gradient) {
+
+                    if (['', 'shift', 'ctrl'].includes(comboStr) && event.type === 'pointerdown' && event.button === 'left') {
+                        this.currentInputProcessor = this.inputProcessorObj.gradient;
+                        this.currentInputProcessor.onPointer(event);
+                    } else if ([''].includes(comboStr) && event.type === 'pointerdown' && event.button === 'right') {
+                        this.currentInputProcessor = this.inputProcessorObj.picker;
+                        this.currentInputProcessor.onPointer(event);
+                    } else if ([''].includes(comboStr) && event.type === 'pointerdown' && event.button === 'middle') {
+                        this.currentInputProcessor = this.inputProcessorObj.hand;
+                        this.currentInputProcessor.onPointer(event);
+                    } else {
+                        this.updateCursor(TMode.Gradient);
+                        this.reqFrame();
+                    }
+
                 } else if (this.globalMode === TMode.Text) {
 
                     if (event.type === 'pointerdown' && event.button === 'left') {
@@ -1515,6 +1563,10 @@ export class KlCanvasWorkspace {
             this.globalMode = TMode.Fill;
             this.mainDoubleTapper.setAllowedPointerTypeArr(['touch']);
         }
+        if (modeStr === 'gradient') {
+            this.globalMode = TMode.Gradient;
+            this.mainDoubleTapper.setAllowedPointerTypeArr(['touch']);
+        }
         if (modeStr === 'text') {
             this.globalMode = TMode.Text;
             this.mainDoubleTapper.setAllowedPointerTypeArr(['touch']);
@@ -1530,6 +1582,30 @@ export class KlCanvasWorkspace {
         if (modeStr === 'pick') {
             this.globalMode = TMode.Pick;
             this.mainDoubleTapper.setAllowedPointerTypeArr(['touch']);
+        }
+    }
+
+    getMode(): TModeStr {
+        if (this.globalMode === TMode.Draw) {
+            return 'draw';
+        }
+        if (this.globalMode === TMode.Fill) {
+            return 'fill';
+        }
+        if (this.globalMode === TMode.Gradient) {
+            return 'gradient';
+        }
+        if (this.globalMode === TMode.Text) {
+            return 'text';
+        }
+        if (this.globalMode === TMode.Shape) {
+            return 'shape';
+        }
+        if (this.globalMode === TMode.Hand) {
+            return 'hand';
+        }
+        if (this.globalMode === TMode.Pick) {
+            return 'pick';
         }
     }
 
