@@ -1047,11 +1047,11 @@
   },
   'gradient-linear': {
     original: 'Linear',
-    value: 'リニア'
+    value: '線状'
   },
   'gradient-linear-mirror': {
     original: 'Linear-Mirror',
-    value: 'バイリニア'
+    value: '反射形'
   },
   'gradient-radial': {
     original: 'Radial',
