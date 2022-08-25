@@ -1051,7 +1051,7 @@
   },
   'gradient-linear-mirror': {
     original: 'Linear-Mirror',
-    value: '镜像线性'
+    value: '对称'
   },
   'gradient-radial': {
     original: 'Radial',
