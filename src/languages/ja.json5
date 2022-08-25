@@ -1297,7 +1297,7 @@
   },
   'reverse': {
     hint: 'Reversing the direction of a color gradient',
-    original: '反転',
-    value: '',
+    original: 'Reverse',
+    value: '反転',
   },
 }
