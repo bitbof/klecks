@@ -47,7 +47,7 @@
   },
   'tool-gradient': {
     original: 'Gradient',
-    value: ''
+    value: '渐变'
   },
   'tool-shape': {
     original: 'Shape',
@@ -928,10 +928,6 @@
     original: 'Alpha',
     value: 'Alpha'
   },
-  'filter-noise-inverted': {
-    original: 'Inverted',
-    value: '反相'
-  },
   'import-opening': {
     original: 'Opening file...',
     value: '打开文件...'
@@ -1051,19 +1047,15 @@
   },
   'gradient-linear': {
     original: 'Linear',
-    value: ''
+    value: '线性'
   },
   'gradient-linear-mirror': {
     original: 'Linear-Mirror',
-    value: ''
+    value: '镜像线性'
   },
   'gradient-radial': {
     original: 'Radial',
-    value: ''
-  },
-  'gradient-reversed': {
-    original: 'Reversed',
-    value: ''
+    value: '径向'
   },
   'shape-stroke': {
     original: 'Stroke',
@@ -1302,5 +1294,10 @@
   'lock-alpha-title': {
     original: "Locks layer's alpha channel",
     value: '锁定图层透明度'
-  }
+  },
+  'reverse': {
+    hint: 'Reversing the direction of a color gradient',
+    original: 'Reverse',
+    value: '反向',
+  },
 }

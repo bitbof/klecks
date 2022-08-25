@@ -27,7 +27,7 @@ interface INoisePreset {
     peaks: number;
     brightness: number;
     contrast: number;
-    doInvert: boolean;
+    isReversed: boolean;
 }
 
 type TNoiseChannels = 'rgb' | 'alpha';
@@ -44,7 +44,7 @@ interface INoiseFilterInput {
     presetIndex: number; // which preset from presetArr
     scale: number; // applies to both scaleX and scaleX
     opacity: number; // aka strength
-    doInvert: boolean;
+    isReversed: boolean; // reverse direction of color gradient
     channels: TNoiseChannels;
 
     // only for channels = rgb
@@ -55,28 +55,28 @@ interface INoiseFilterInput {
 
 const presetArr: INoisePreset[] = [
     // each pixel random value
-    {type: 0, scaleX: 1, scaleY: 1, offsetX: 0, offsetY: 0, octaves: 1, samples: 1, peaks: 0, brightness: 0, contrast: 0, doInvert: true},
+    {type: 0, scaleX: 1, scaleY: 1, offsetX: 0, offsetY: 0, octaves: 1, samples: 1, peaks: 0, brightness: 0, contrast: 0, isReversed: true},
 
     // cloud
-    {type: 1, scaleX: 166, scaleY: 164, offsetX: 105, offsetY: 30, octaves: 6, samples: 1, peaks: 0, brightness: 0.055, contrast: 0.23, doInvert: true},
+    {type: 1, scaleX: 166, scaleY: 164, offsetX: 105, offsetY: 30, octaves: 6, samples: 1, peaks: 0, brightness: 0.055, contrast: 0.23, isReversed: true},
 
     // thin lines
-    {type: 1, scaleX: 235, scaleY: 190, offsetX: 3227, offsetY: 2156, octaves: 4, samples: 16, peaks: 22, brightness: -0.375, contrast: 1, doInvert: false},
+    {type: 1, scaleX: 235, scaleY: 190, offsetX: 3227, offsetY: 2156, octaves: 4, samples: 16, peaks: 22, brightness: -0.375, contrast: 1, isReversed: false},
 
     // soft large simplex, only 1 octave
-    {type: 1, scaleX: 40, scaleY: 40, offsetX: 0, offsetY: 0, octaves: 1, samples: 1, peaks: 0, brightness: 0, contrast: 0, doInvert: false},
+    {type: 1, scaleX: 40, scaleY: 40, offsetX: 0, offsetY: 0, octaves: 1, samples: 1, peaks: 0, brightness: 0, contrast: 0, isReversed: false},
 
     // two value large pixels
-    {type: 0, scaleX: 26, scaleY: 26, offsetX: 557, offsetY: 365, octaves: 1, samples: 1, peaks: 0, brightness: 0.02, contrast: 1, doInvert: true},
+    {type: 0, scaleX: 26, scaleY: 26, offsetX: 557, offsetY: 365, octaves: 1, samples: 1, peaks: 0, brightness: 0.02, contrast: 1, isReversed: true},
 
     // zebra
-    {type: 1, scaleX: 1500, scaleY: 1500, offsetX: 745, offsetY: 2871, octaves: 5, samples: 16, peaks: 156.02, brightness: 0.03, contrast: 1, doInvert: true},
+    {type: 1, scaleX: 1500, scaleY: 1500, offsetX: 745, offsetY: 2871, octaves: 5, samples: 16, peaks: 156.02, brightness: 0.03, contrast: 1, isReversed: true},
 
     // sparse dots / stars
-    {type: 1, scaleX: 11, scaleY: 11, offsetX: 2940, offsetY: 2045, octaves: 1, samples: 16, peaks: 1, brightness: -0.045, contrast: 1, doInvert: true},
+    {type: 1, scaleX: 11, scaleY: 11, offsetX: 2940, offsetY: 2045, octaves: 1, samples: 16, peaks: 1, brightness: -0.045, contrast: 1, isReversed: true},
 
     // pseudo marble
-    {type: 2, scaleX: 74, scaleY: 74, offsetX: 4816, offsetY: 1304, octaves: 3, samples: 1, peaks: 2.78, brightness: 0, contrast: 0, doInvert: false},
+    {type: 2, scaleX: 74, scaleY: 74, offsetX: 4816, offsetY: 1304, octaves: 3, samples: 1, peaks: 2.78, brightness: 0, contrast: 0, isReversed: false},
 ];
 
 function drawNoise(glCanvas, settings: INoiseSettings): void {
@@ -90,7 +90,7 @@ function drawNoise(glCanvas, settings: INoiseSettings): void {
         settings.peaks,
         settings.brightness,
         settings.contrast,
-        settings.doInvert,
+        settings.isReversed,
         settings.colA,
         settings.colB,
         settings.channels ? settings.channels : 'rgb',
@@ -162,7 +162,7 @@ export const filterNoise = {
             presetIndex: 0,
             scale: 50,
             opacity: 0.5,
-            doInvert: false,
+            isReversed: false,
             channels: 'rgb',
             mixModeStr: 'source-over' as GlobalCompositeOperation,
             colA: {r: 0, g: 0, b: 0},
@@ -255,10 +255,10 @@ export const filterNoise = {
             },
         });
 
-        const invertedToggle = new Checkbox({
-            label: LANG('filter-noise-inverted'),
+        const reverseToggle = new Checkbox({
+            label: LANG('reverse'),
             callback: (val) => {
-                settingsObj.doInvert = val;
+                settingsObj.isReversed = val;
                 updatePreview();
             },
             allowTab: true,
@@ -339,7 +339,7 @@ export const filterNoise = {
         row1El.append(
             channelsOptions.getElement(),
             BB.el({css:{flexGrow: '1',}}),
-            invertedToggle.getElement(),
+            reverseToggle.getElement(),
         );
 
         row2El.append(
@@ -420,7 +420,7 @@ export const filterNoise = {
             presetCopy.scaleY = presetCopy.scaleY  * settingsObj.scale / 50 * renderFactor;
             presetCopy.colA = settingsObj.colA;
             presetCopy.colB = settingsObj.colB;
-            presetCopy.doInvert = settingsObj.doInvert ? !presetCopy.doInvert : presetCopy.doInvert;
+            presetCopy.isReversed = settingsObj.isReversed ? !presetCopy.isReversed : presetCopy.isReversed;
             presetCopy.channels  = settingsObj.channels;
             drawNoise(glCanvas, presetCopy);
 
@@ -442,7 +442,7 @@ export const filterNoise = {
             presetOptions.destroy();
             scaleSlider.destroy();
             opacitySlider.destroy();
-            invertedToggle.destroy();
+            reverseToggle.destroy();
             channelsOptions.destroy();
             texture.destroy();
             blendSelect.destroy();
@@ -481,7 +481,7 @@ export const filterNoise = {
         presetCopy.scaleY = presetCopy.scaleY  * input.scale / 50;
         presetCopy.colA = input.colA;
         presetCopy.colB = input.colB;
-        presetCopy.doInvert = input.doInvert ? !presetCopy.doInvert : presetCopy.doInvert;
+        presetCopy.isReversed = input.isReversed ? !presetCopy.isReversed : presetCopy.isReversed;
         presetCopy.channels  = input.channels;
         drawNoise(glCanvas, presetCopy);
 

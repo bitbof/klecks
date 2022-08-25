@@ -928,10 +928,6 @@
     original: 'Alpha',
     value: '透明'
   },
-  'filter-noise-inverted': {
-    original: 'Inverted',
-    value: '反転'
-  },
   'import-opening': {
     original: 'Opening file...',
     value: '画像を開いています。'
@@ -1059,10 +1055,6 @@
   },
   'gradient-radial': {
     original: 'Radial',
-    value: ''
-  },
-  'gradient-reversed': {
-    original: 'Reversed',
     value: ''
   },
   'shape-stroke': {
@@ -1302,5 +1294,10 @@
   'lock-alpha-title': {
     original: "Locks layer's alpha channel",
     value: '透明部分の保護'
-  }
+  },
+  'reverse': {
+    hint: 'Reversing the direction of a color gradient',
+    original: 'Reverse',
+    value: '',
+  },
 }

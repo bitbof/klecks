@@ -140,9 +140,9 @@ export class GradientUi {
             }
         });
 
-        const isReversedToggle = new Checkbox({
+        const reverseToggle = new Checkbox({
             init: false,
-            label: LANG('gradient-reversed'),
+            label: LANG('reverse'),
             callback: (b) => {
                 this.settings.isReversed = b;
                 this.updateIcons();
@@ -165,7 +165,7 @@ export class GradientUi {
         });
 
         row1.append(
-            isReversedToggle.getElement(),
+            reverseToggle.getElement(),
             doSnapToggle.getElement(),
         );
 

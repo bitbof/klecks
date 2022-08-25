@@ -12,7 +12,7 @@ uniform float samples;
 uniform float peaks;
 uniform float contrast;
 uniform float brightness;
-uniform float doInvert;
+uniform float isReversed;
 
 uniform vec3 colA;
 uniform vec3 colB;
@@ -136,7 +136,7 @@ float render (vec2 pos) {
         result = clamp((result - 0.5) * (1.0 + contrast) + 0.5, 0.0, 1.0);
     }
 
-    if (doInvert == 1.0) {
+    if (isReversed == 1.0) {
         result = 1.0 - result;
     }
     return result;

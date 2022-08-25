@@ -1004,7 +1004,7 @@ export const fx = (function () {
      * @param peaks
      * @param brightness
      * @param contrast
-     * @param doInvert
+     * @param isReversed
      * @param colA
      * @param colB
      * @param channels
@@ -1019,7 +1019,7 @@ export const fx = (function () {
         peaks: number, // how often it will ramp *additionally* from 0 to 1
         brightness: number, // range [-1, 1]
         contrast: number, // range [-1, 1]
-        doInvert: boolean, // invert 0-1 range, will not invert colA, colB
+        isReversed: boolean, // reverse 0-1 range, will not invert colA, colB
         colA: {r: number, g: number, b: number}, // which color at 0, if rgb
         colB: {r: number, g: number, b: number}, // which color at 1, if rgb
         channels: 'rgb' | 'alpha', // which channel to target
@@ -1036,7 +1036,7 @@ export const fx = (function () {
             peaks,
             brightness,
             contrast,
-            doInvert: doInvert ? 1.0 : 0.0,
+            isReversed: isReversed ? 1.0 : 0.0,
             colA: colA ? [colA.r / 255, colA.g / 255, colA.b / 255] : [0, 0, 0],
             colB: colB ? [colB.r / 255, colB.g / 255, colB.b / 255] : [1, 1, 1],
             channels: channels === 'rgb' ? 0 : 1,

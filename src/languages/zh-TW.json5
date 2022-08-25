@@ -928,10 +928,6 @@
     original: 'Alpha',
     value: 'Alpha'
   },
-  'filter-noise-inverted': {
-    original: 'Inverted',
-    value: '反相'
-  },
   'import-opening': {
     original: 'Opening file...',
     value: '打開文件...'
@@ -1059,10 +1055,6 @@
   },
   'gradient-radial': {
     original: 'Radial',
-    value: ''
-  },
-  'gradient-reversed': {
-    original: 'Reversed',
     value: ''
   },
   'shape-stroke': {
@@ -1302,5 +1294,10 @@
   'lock-alpha-title': {
     original: "Locks layer's alpha channel",
     value: '鎖定圖層透明度'
-  }
+  },
+  'reverse': {
+    hint: 'Reversing the direction of a color gradient',
+    original: 'Reverse',
+    value: '',
+  },
 }

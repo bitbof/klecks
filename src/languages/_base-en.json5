@@ -348,7 +348,6 @@ Base Language File
   "filter-noise-description": "Adds noise to selected layer.",
   "filter-noise-scale": "Scale",
   "filter-noise-alpha": "Alpha",
-  "filter-noise-inverted": "Inverted",
 
   "import-opening": "Opening file...",
   "import-title": "Import Image",
@@ -399,7 +398,6 @@ Base Language File
   "gradient-linear": 'Linear',
   "gradient-linear-mirror": 'Linear-Mirror',
   "gradient-radial": 'Radial',
-  "gradient-reversed": 'Reversed',
 
   "shape-stroke": "Stroke",
   "shape-fill": "Fill",
@@ -483,5 +481,9 @@ Base Language File
   "angle-snap": 'Snap',
   "angle-snap-title": '45° Angle Snapping',
   "lock-alpha": "Lock Alpha",
-  "lock-alpha-title": "Locks layer's alpha channel"
+  "lock-alpha-title": "Locks layer's alpha channel",
+  "reverse": {
+    hint: 'Reversing the direction of a color gradient',
+    value: 'Reverse',
+  }
 }

@@ -905,10 +905,6 @@
     original: 'Alpha',
     value: 'Alpha'
   },
-  'filter-noise-inverted': {
-    original: 'Inverted',
-    value: 'Umgekehrt'
-  },
   'import-opening': {
     original: 'Opening file...',
     value: 'Öffne Datei...'
@@ -1032,10 +1028,6 @@
   'gradient-radial': {
     original: 'Radial',
     value: 'Radial'
-  },
-  'gradient-reversed': {
-    original: 'Reversed',
-    value: 'Umgekehrt'
   },
   'shape-stroke': {
     original: 'Stroke',
@@ -1273,5 +1265,10 @@
   'lock-alpha-title': {
     original: "Locks layer's alpha channel",
     value: 'Fixiert Alpha-Kanal der Ebene'
-  }
+  },
+  'reverse': {
+    hint: 'Reversing the direction of a color gradient',
+    original: 'Reverse',
+    value: 'Umkehren',
+  },
 }
