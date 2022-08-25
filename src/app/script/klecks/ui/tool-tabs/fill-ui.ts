@@ -141,7 +141,7 @@ export function FillUi(p) {
     });
 
     let eraserToggle = new Checkbox({
-        init: true,
+        init: false,
         label: LANG('eraser'),
         callback: function (b) {},
         css: {

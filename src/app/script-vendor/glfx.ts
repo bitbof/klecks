@@ -997,9 +997,7 @@ export const fx = (function () {
      * @param type
      * @param scale
      * @param offset
-     * @param angleDeg
      * @param octaves
-     * @param isMonochrome
      * @param samples
      * @param peaks
      * @param brightness
@@ -1019,7 +1017,7 @@ export const fx = (function () {
         peaks: number, // how often it will ramp *additionally* from 0 to 1
         brightness: number, // range [-1, 1]
         contrast: number, // range [-1, 1]
-        isReversed: boolean, // reverse 0-1 range, will not invert colA, colB
+        isReversed: boolean, // reverse 0-1 range
         colA: {r: number, g: number, b: number}, // which color at 0, if rgb
         colB: {r: number, g: number, b: number}, // which color at 1, if rgb
         channels: 'rgb' | 'alpha', // which channel to target
