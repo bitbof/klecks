@@ -47,7 +47,7 @@
   },
   'tool-gradient': {
     original: 'Gradient',
-    value: ''
+    value: 'グラデーション'
   },
   'tool-shape': {
     original: 'Shape',
@@ -1047,15 +1047,15 @@
   },
   'gradient-linear': {
     original: 'Linear',
-    value: ''
+    value: '線形'
   },
   'gradient-linear-mirror': {
     original: 'Linear-Mirror',
-    value: ''
+    value: '鏡映'
   },
   'gradient-radial': {
     original: 'Radial',
-    value: ''
+    value: '放射状'
   },
   'shape-stroke': {
     original: 'Stroke',
@@ -1297,7 +1297,7 @@
   },
   'reverse': {
     hint: 'Reversing the direction of a color gradient',
-    original: 'Reverse',
+    original: '反転',
     value: '',
   },
 }
