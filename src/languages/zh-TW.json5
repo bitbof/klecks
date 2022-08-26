@@ -1051,11 +1051,11 @@
   },
   'gradient-linear-mirror': {
     original: 'Linear-Mirror',
-    value: '對稱'
+    value: '反射性'
   },
   'gradient-radial': {
     original: 'Radial',
-    value: '徑向'
+    value: '放射狀'
   },
   'shape-stroke': {
     original: 'Stroke',
