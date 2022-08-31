@@ -99,7 +99,6 @@ export const filterDistort = {
             parent: rootEl,
             css: {
                 display: 'flex',
-                marginTop: '20px',
                 alignItems: 'center',
             }
         });
