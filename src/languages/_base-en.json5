@@ -288,8 +288,6 @@ Base Language File
 
   "filter-perspective-title": "Perspective",
   "filter-perspective-description": "Transforms the selected layer.",
-  "filter-perspective-before": "Before",
-  "filter-perspective-after": "After",
 
   "filter-resize-title": "Resize",
   "filter-resize-description": "Resizes the image.",
@@ -348,6 +346,15 @@ Base Language File
   "filter-noise-description": "Adds noise to selected layer.",
   "filter-noise-scale": "Scale",
   "filter-noise-alpha": "Alpha",
+
+  "filter-pattern": "Pattern",
+  "filter-pattern-description": "Generates pattern on selected layer. Drag the preview for further controls.",
+
+  "filter-distort": "Distort",
+  "filter-distort-description": "Distorts the selected layer.",
+  "filter-distort-phase": "Phase",
+  "filter-distort-stepsize": "Step Size",
+  "filter-distort-sync-xy": "Sync XY",
 
   "import-opening": "Opening file...",
   "import-title": "Import Image",
@@ -485,5 +492,7 @@ Base Language File
   "reverse": {
     hint: 'Reversing the direction of a color gradient',
     value: 'Reverse',
-  }
+  },
+  "compare-before": "Before",
+  "compare-after": "After",
 }

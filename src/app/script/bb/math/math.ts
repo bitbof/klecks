@@ -1,4 +1,4 @@
-import {IBounds, IVector2D} from '../BB.types';
+import {IBounds, IRect, IVector2D} from '../BB.types';
 
 export function mix (a: number, b: number, f: number): number {
     return a * (1 - f) + b * f;
@@ -24,6 +24,11 @@ export function pointsToAngleRad (p1: IVector2D, p2: IVector2D): number {
 
 export function pointsToAngleDeg (p1: IVector2D, p2: IVector2D): number {
     return pointsToAngleRad(p1, p2) * 180 / Math.PI;
+}
+
+export function isInsideRect(p: IVector2D, rect: IRect): boolean {
+    return rect.x <= p.x && p.x <= rect.x + rect.width &&
+        rect.y <= p.y && p.y <= rect.y + rect.height;
 }
 
 export function clamp (num: number, min: number, max: number): number {

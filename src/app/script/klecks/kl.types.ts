@@ -18,6 +18,14 @@ export interface IFilterGetDialogParam {
     secondaryColorRgb: IRGB;
 }
 
+export interface IFilterGetDialogResult {
+    element: HTMLElement; // contents of modal (excluding title, dialog buttons)
+    destroy: () => void; // called when modal closed
+    width?: number; // custom modal width
+    getInput: () => any; // called when Ok pressed
+    errorCallback?: (e: Error) => void; // dialog can call this if error happens and cancel dialog
+}
+
 export interface IFilter {
     lang: {
         name: TTranslationCode; // title in modal

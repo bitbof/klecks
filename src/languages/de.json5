@@ -31,7 +31,7 @@
   },
   'tab-edit': {
     original: 'Edit',
-    value: 'Editieren'
+    value: 'Edit'
   },
   'tab-file': {
     original: 'File',
@@ -717,14 +717,6 @@
     original: 'Transforms the selected layer.',
     value: 'Transformiert die gewählte Ebene.'
   },
-  'filter-perspective-before': {
-    original: 'Before',
-    value: 'Vorher'
-  },
-  'filter-perspective-after': {
-    original: 'After',
-    value: 'Danach'
-  },
   'filter-resize-title': {
     original: 'Resize',
     value: 'Skalieren'
@@ -904,6 +896,34 @@
   'filter-noise-alpha': {
     original: 'Alpha',
     value: 'Alpha'
+  },
+  'filter-pattern': {
+    original: 'Pattern',
+    value: 'Muster'
+  },
+  'filter-pattern-description': {
+    original: 'Generates pattern on selected layer. Drag the preview for further controls.',
+    value: 'Erzeugt Muster auf aktiver Ebene. Ziehe in der Vorschau um weitere Parameter zu steuern.'
+  },
+  'filter-distort': {
+    original: 'Distort',
+    value: 'Verzerren'
+  },
+  'filter-distort-description': {
+    original: 'Distorts the selected layer.',
+    value: 'Verzerrt aktive Ebene.'
+  },
+  'filter-distort-phase': {
+    original: 'Phase',
+    value: 'Phase'
+  },
+  'filter-distort-stepsize': {
+    original: 'Step Size',
+    value: 'Schrittgröße'
+  },
+  'filter-distort-sync-xy': {
+    original: 'Sync XY',
+    value: 'XY koppeln'
   },
   'import-opening': {
     original: 'Opening file...',
@@ -1271,4 +1291,12 @@
     original: 'Reverse',
     value: 'Umkehren',
   },
+  'compare-before': {
+    original: 'Before',
+    value: 'Vorher'
+  },
+  'compare-after': {
+    original: 'After',
+    value: 'Danach'
+  }
 }

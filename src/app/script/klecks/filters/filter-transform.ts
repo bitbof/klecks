@@ -5,6 +5,7 @@ import {FreeTransform, ITransform} from '../ui/components/free-transform';
 import {Select} from '../ui/base-components/select';
 import {IFilterApply, IFilterGetDialogParam, IKlBasicLayer} from '../kl.types';
 import {LANG} from '../../language/language';
+import {IRect} from '../../bb/bb.types';
 
 interface IFilterTransformInput {
     bounds: {x: number, y: number, width: number, height: number};
@@ -15,7 +16,6 @@ interface IFilterTransformInput {
 export const filterTransform = {
 
     getDialog(params: IFilterGetDialogParam) {
-        let i;
         let context = params.context;
         let klCanvas = params.klCanvas;
         if (!context || !klCanvas) {
@@ -34,56 +34,11 @@ export const filterTransform = {
         let displayPreviewFactor = displayW / context.canvas.width;
 
         // determine bounds and initial transformation
-        let boundsObj: {
-            x: number;
-            y: number;
-            width: number;
-            height: number;
-        } = { x: 0, y: 0, width: 0, height: 0 };
-        {
-            let tempBounds: any = {
-                x1: null,
-                y1: null,
-                x2: null,
-                y2: null
-            };
-            let imdat = context.getImageData(0, 0, context.canvas.width, context.canvas.height);
-
-            if (imdat.data[3] > 0 && imdat.data[imdat.data.length - 1] > 0) {
-                tempBounds.x1 = 0;
-                tempBounds.y1 = 0;
-                tempBounds.x2 = context.canvas.width - 1;
-                tempBounds.y2 = context.canvas.height - 1;
-            } else {
-                for (i = 3; i < imdat.data.length; i += 4) {
-                    if (imdat.data[i] > 0 ) {
-                        let x = ((i - 3) / 4) %  context.canvas.width;
-                        let y = Math.floor((i - 3) / 4 / context.canvas.width);
-                        if (tempBounds.x1 > x || tempBounds.x1 === null) {
-                            tempBounds.x1 = x;
-                        }
-                        if (tempBounds.y1 === null) {
-                            tempBounds.y1 = y;
-                        }
-                        if (tempBounds.x2 < x || tempBounds.x2 === null) {
-                            tempBounds.x2 = x;
-                        }
-                        if (tempBounds.y2 < y || tempBounds.y2 === null) {
-                            tempBounds.y2 = y;
-                        }
-                    }
-                }
-            }
-            if (tempBounds.x1 === null || tempBounds.y1 === null) {
-                alert(LANG('filter-transform-empty'));
-                return false;
-            }
-            boundsObj.x = tempBounds.x1;
-            boundsObj.y = tempBounds.y1;
-            boundsObj.width = tempBounds.x2 - tempBounds.x1 + 1;
-            boundsObj.height = tempBounds.y2 - tempBounds.y1 + 1;
+        const boundsObj: IRect = BB.canvasBounds(context);
+        if (boundsObj === null) {
+            alert(LANG('filter-transform-empty'));
+            return false;
         }
-
         const initTransform = {
             x: boundsObj.x + boundsObj.width / 2,
             y: boundsObj.y + boundsObj.height / 2,
@@ -91,7 +46,6 @@ export const filterTransform = {
             height: boundsObj.height,
             angleDeg: 0,
         };
-
 
 
         let div = document.createElement("div");

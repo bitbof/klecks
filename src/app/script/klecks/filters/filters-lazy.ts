@@ -15,6 +15,8 @@ import {filterUnsharpMask} from './filter-unsharp-mask';
 import {filterToAlpha} from './filter-to-alpha';
 import {filterGrid} from './filter-grid';
 import {filterNoise} from './filter-noise';
+import {filterPattern} from './filter-pattern';
+import {filterDistort} from './filter-distort';
 
 let embed: boolean;
 function importFilter(libObj, moduleObj): void {
@@ -47,6 +49,8 @@ export function importFilters(isEmbed?: boolean) {
     importFilter(filterLib.toAlpha, filterToAlpha);
     importFilter(filterLib.grid, filterGrid);
     importFilter(filterLib.noise, filterNoise);
+    importFilter(filterLib.pattern, filterPattern);
+    importFilter(filterLib.distort, filterDistort);
 
     filterLibStatus.isLoaded = true;
 }

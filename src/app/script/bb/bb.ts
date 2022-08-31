@@ -21,6 +21,7 @@ import {KeyListener, sameKeys} from './input/key-listener';
 import {PointerListener} from './input/pointer-listener';
 import * as EventChain from './input/event-chain';
 import {
+    canvasBounds,
     convertToAlphaChannelCanvas,
     copyCanvas,
     createCheckerCanvas, createCheckerDataUrl,
@@ -49,7 +50,7 @@ import {
     rotate,
     rotateAround,
     intDxy,
-    roundEven, roundUneven, distSquared, lenSquared, updateBounds, boundsInArea, round
+    roundEven, roundUneven, distSquared, lenSquared, updateBounds, boundsInArea, round, isInsideRect
 } from './math/math';
 import {createCanvas} from './base/create-canvas';
 import {BbLog} from './base/bb-log';
@@ -94,6 +95,7 @@ export const BB = {
     lenSquared,
     pointsToAngleRad,
     pointsToAngleDeg,
+    isInsideRect,
     clamp,
     rotate,
     rotateAround,
@@ -124,6 +126,7 @@ export const BB = {
     resizeCanvas,
     convertToAlphaChannelCanvas,
     freeCanvas,
+    canvasBounds,
 
     // ---- color ----
     HSV,

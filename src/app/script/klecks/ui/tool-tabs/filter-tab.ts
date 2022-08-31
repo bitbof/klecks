@@ -6,7 +6,7 @@ import {StatusOverlay} from '../components/status-overlay';
 import {KlCanvasWorkspace} from '../../canvas-ui/kl-canvas-workspace';
 import {KlCanvas} from '../../canvas/kl-canvas';
 import {LANG} from '../../../language/language';
-import {IFilterApply, IFilterGetDialogParam} from '../../kl.types';
+import {IFilterApply, IFilterGetDialogParam, IFilterGetDialogResult} from '../../kl.types';
 
 
 export class FilterTab {
@@ -118,7 +118,7 @@ export class FilterTab {
                         maxHeight: _this.getKlMaxCanvasSize(),
                         currentColorRgb: {r: _this.getCurrentColor().r, g: _this.getCurrentColor().g, b: _this.getCurrentColor().b},
                         secondaryColorRgb: {r: secondaryColorRGB.r, g: secondaryColorRGB.g, b: secondaryColorRGB.b}
-                    } as IFilterGetDialogParam);
+                    } as IFilterGetDialogParam) as IFilterGetDialogResult;
 
                     if (!filterDialog) {
                         return;
@@ -127,6 +127,7 @@ export class FilterTab {
                     }
 
                     let closefunc;
+                    // Todo should move into getDialogParams
                     filterDialog.errorCallback = function(e) {
                         setTimeout(function() {
                             alert('Error: could not perform action');
@@ -184,6 +185,7 @@ export class FilterTab {
         const groupB = [
             'brightnessContrast',
             'curves',
+            'distort',
             'hueSaturation',
             'invert',
             'tiltShift',
@@ -194,6 +196,7 @@ export class FilterTab {
         const groupC = [
             'grid',
             'noise',
+            'pattern',
         ];
 
         addGroup(groupA, filters, _this.div);

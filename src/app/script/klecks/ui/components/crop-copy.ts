@@ -68,8 +68,7 @@ export function CropCopy(param) {
             width: Math.round(crop.width * scaleW),
             height: Math.round(crop.height * scaleH)
         };
-        return rect.x <= p.x && p.x <= rect.x + rect.width &&
-            rect.y <= p.y && p.y <= rect.y + rect.height;
+        return BB.isInsideRect(p, rect);
     }
 
     const croppedCanvas = BB.canvas();

@@ -31,7 +31,10 @@ import glUnsharpMaskImg from 'url:~/src/app/img/ui/edit-unsharp-mask.png';
 import gridImg from 'url:~/src/app/img/ui/edit-grid.svg';
 // @ts-ignore
 import noiseImg from 'url:~/src/app/img/ui/edit-noise.svg';
-import {LANG, languageStrings} from '../../language/language';
+// @ts-ignore
+import patternImg from 'url:~/src/app/img/ui/edit-pattern.svg';
+// @ts-ignore
+import distortImg from 'url:~/src/app/img/ui/edit-distort.svg';
 
 
 export const filterLibStatus = {
@@ -59,6 +62,14 @@ export const filterLib: {
     curves: {
         lang: {name: 'filter-curves-title', button: 'filter-curves'},
         icon: glCurvesImg,
+        updatePos: false,
+        getDialog: null,
+        apply: null,
+        inEmbed: true,
+    },
+    distort: {
+        lang: {name: 'filter-distort', button: 'filter-distort'},
+        icon: distortImg,
         updatePos: false,
         getDialog: null,
         apply: null,
@@ -164,6 +175,14 @@ export const filterLib: {
     noise: {
         lang: {name: 'filter-noise', button: 'filter-noise'},
         icon: noiseImg,
+        updatePos: false,
+        getDialog: null,
+        apply: null,
+        inEmbed: true,
+    },
+    pattern: {
+        lang: {name: 'filter-pattern', button: 'filter-pattern'},
+        icon: patternImg,
         updatePos: false,
         getDialog: null,
         apply: null,

@@ -172,6 +172,10 @@ export function LayerPreview(p) {
 
     // --- update logic ---
 
+    // cross-fade done via 2 canvases (old and new state)
+    // both have checkerboard background drawn on them, both fully opaque
+    // -> no "lighter" is needed for accurate cross-fading
+
     function animate() {
         if (animationCount === 0) {
             return;

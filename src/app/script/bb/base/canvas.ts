@@ -1,4 +1,4 @@
-import {IKeyString} from '../BB.types';
+import {IKeyString, IRect} from '../BB.types';
 import {createCanvas} from './create-canvas';
 
 export function copyCanvas(canvas: HTMLCanvasElement): HTMLCanvasElement {
@@ -367,4 +367,62 @@ export function freeCanvas(canvas: HTMLCanvasElement): void {
     canvas.height = 1;
     const ctx = canvas.getContext('2d');
     ctx && ctx.clearRect(0, 0, 1, 1);
+}
+
+/**
+ * Determine bounding box that describes all pixels which are not fully transparent.
+ * Returns null if empty.
+ *
+ * @param context
+ */
+export function canvasBounds(context: CanvasRenderingContext2D): IRect | null {
+    let boundsObj: {
+        x: number;
+        y: number;
+        width: number;
+        height: number;
+    } = { x: 0, y: 0, width: 0, height: 0 };
+    {
+        let tempBounds: any = {
+            x1: null,
+            y1: null,
+            x2: null,
+            y2: null
+        };
+        let imdat = context.getImageData(0, 0, context.canvas.width, context.canvas.height);
+
+        if (imdat.data[3] > 0 && imdat.data[imdat.data.length - 1] > 0) {
+            tempBounds.x1 = 0;
+            tempBounds.y1 = 0;
+            tempBounds.x2 = context.canvas.width - 1;
+            tempBounds.y2 = context.canvas.height - 1;
+        } else {
+            for (let i = 3; i < imdat.data.length; i += 4) {
+                if (imdat.data[i] > 0 ) {
+                    let x = ((i - 3) / 4) %  context.canvas.width;
+                    let y = Math.floor((i - 3) / 4 / context.canvas.width);
+                    if (tempBounds.x1 > x || tempBounds.x1 === null) {
+                        tempBounds.x1 = x;
+                    }
+                    if (tempBounds.y1 === null) {
+                        tempBounds.y1 = y;
+                    }
+                    if (tempBounds.x2 < x || tempBounds.x2 === null) {
+                        tempBounds.x2 = x;
+                    }
+                    if (tempBounds.y2 < y || tempBounds.y2 === null) {
+                        tempBounds.y2 = y;
+                    }
+                }
+            }
+        }
+        if (tempBounds.x1 === null || tempBounds.y1 === null) {
+            return null;
+        }
+        boundsObj.x = tempBounds.x1;
+        boundsObj.y = tempBounds.y1;
+        boundsObj.width = tempBounds.x2 - tempBounds.x1 + 1;
+        boundsObj.height = tempBounds.y2 - tempBounds.y1 + 1;
+    }
+    return boundsObj;
 }

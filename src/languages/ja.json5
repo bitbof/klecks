@@ -740,14 +740,6 @@
     original: 'Transforms the selected layer.',
     value: '選択中のレイヤーを変形します。'
   },
-  'filter-perspective-before': {
-    original: 'Before',
-    value: 'ビフォア'
-  },
-  'filter-perspective-after': {
-    original: 'After',
-    value: 'アフター'
-  },
   'filter-resize-title': {
     original: 'Resize',
     value: 'リサイズ'
@@ -927,6 +919,34 @@
   'filter-noise-alpha': {
     original: 'Alpha',
     value: '透明'
+  },
+  'filter-pattern': {
+    original: 'Pattern',
+    value: ''
+  },
+  'filter-pattern-description': {
+    original: 'Generates pattern on selected layer. Drag the preview for further controls.',
+    value: ''
+  },
+  'filter-distort': {
+    original: 'Distort',
+    value: ''
+  },
+  'filter-distort-description': {
+    original: 'Distorts the selected layer.',
+    value: ''
+  },
+  'filter-distort-phase': {
+    original: 'Phase',
+    value: ''
+  },
+  'filter-distort-stepsize': {
+    original: 'Step Size',
+    value: ''
+  },
+  'filter-distort-sync-xy': {
+    original: 'Sync XY',
+    value: ''
   },
   'import-opening': {
     original: 'Opening file...',
@@ -1300,4 +1320,12 @@
     original: 'Reverse',
     value: '反転',
   },
+  'compare-before': {
+    original: 'Before',
+    value: 'ビフォア'
+  },
+  'compare-after': {
+    original: 'After',
+    value: 'アフター'
+  }
 }
