@@ -934,7 +934,7 @@
   },
   'filter-distort-description': {
     original: 'Distorts the selected layer.',
-    value: '選択レイヤーを屈折させます。'
+    value: '選択レイヤーにゆがみを適用します。'
   },
   'filter-distort-phase': {
     original: 'Phase',
