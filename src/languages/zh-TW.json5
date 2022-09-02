@@ -922,31 +922,31 @@
   },
   'filter-pattern': {
     original: 'Pattern',
-    value: ''
+    value: '圖案'
   },
   'filter-pattern-description': {
     original: 'Generates pattern on selected layer. Drag the preview for further controls.',
-    value: ''
+    value: '在選定圖層上生成圖案。 拖動預覽以獲得更多控制。'
   },
   'filter-distort': {
     original: 'Distort',
-    value: ''
+    value: '扭曲'
   },
   'filter-distort-description': {
     original: 'Distorts the selected layer.',
-    value: ''
+    value: '扭曲選定的圖層。'
   },
   'filter-distort-phase': {
     original: 'Phase',
-    value: ''
+    value: '階段'
   },
   'filter-distort-stepsize': {
     original: 'Step Size',
-    value: ''
+    value: '步長'
   },
   'filter-distort-sync-xy': {
     original: 'Sync XY',
-    value: ''
+    value: '同步 XY'
   },
   'import-opening': {
     original: 'Opening file...',

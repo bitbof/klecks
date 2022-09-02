@@ -922,31 +922,31 @@
   },
   'filter-pattern': {
     original: 'Pattern',
-    value: ''
+    value: 'パターン'
   },
   'filter-pattern-description': {
     original: 'Generates pattern on selected layer. Drag the preview for further controls.',
-    value: ''
+    value: '選択レイヤーにパターンを作ります。プレビューはドラッグできます。'
   },
   'filter-distort': {
     original: 'Distort',
-    value: ''
+    value: 'ゆがみ'
   },
   'filter-distort-description': {
     original: 'Distorts the selected layer.',
-    value: ''
+    value: '選択レイヤーにゆがみを適用します。'
   },
   'filter-distort-phase': {
     original: 'Phase',
-    value: ''
+    value: 'フェイズ'
   },
   'filter-distort-stepsize': {
     original: 'Step Size',
-    value: ''
+    value: 'ステップサイズ'
   },
   'filter-distort-sync-xy': {
     original: 'Sync XY',
-    value: ''
+    value: '同期 XY'
   },
   'import-opening': {
     original: 'Opening file...',
