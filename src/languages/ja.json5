@@ -926,11 +926,11 @@
   },
   'filter-pattern-description': {
     original: 'Generates pattern on selected layer. Drag the preview for further controls.',
-    value: '選択レイヤーからパターンを作ります。プレビューはドラッグできます。'
+    value: '選択レイヤーにパターンを作ります。プレビューはドラッグできます。'
   },
   'filter-distort': {
     original: 'Distort',
-    value: '歪み'
+    value: 'ゆがみ'
   },
   'filter-distort-description': {
     original: 'Distorts the selected layer.',
