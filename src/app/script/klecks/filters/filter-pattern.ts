@@ -411,6 +411,10 @@ export const filterPattern = {
         const keyListener = new BB.KeyListener({
         });
 
+        previewWrapper.oncontextmenu = function () {
+            return false;
+        };
+        previewInnerWrapper.style.touchAction = 'none';
         const pointerListener = new BB.PointerListener({
             target: previewInnerWrapper,
             onPointer: (event) => {
