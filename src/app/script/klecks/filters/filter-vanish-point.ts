@@ -147,7 +147,7 @@ export const filterVanishPoint = {
             yInput,
         );
         line2.append(
-            BB.el({content: LANG('brush-size') + ':', css: labelStyle}),
+            BB.el({content: LANG('shape-line-width') + ':', css: labelStyle}),
             thicknessInput,
             BB.el({css:{flexGrow: '1'}}),
             colorOptions.getElement(),
