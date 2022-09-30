@@ -222,6 +222,10 @@ export const filterVanishPoint = {
             xInput.value = '' + settingsObj.x;
             yInput.value = '' + settingsObj.y;
         }
+        previewWrapper.oncontextmenu = function () {
+            return false;
+        };
+        previewInnerWrapper.style.touchAction = 'none';
         const pointerListener = new BB.PointerListener({
             target: previewInnerWrapper,
             onPointer: (event) => {
