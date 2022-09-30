@@ -950,20 +950,20 @@
   },
   'filter-vanish-point': {
     original: 'Vanish Point',
-    value: ''
+    value: '消失點'
   },
   'filter-vanish-point-title': {
     original: 'Vanishing Point',
-    value: ''
+    value: '消失點'
   },
   'filter-vanish-point-description': {
     original: 'Adds vanishing point to selected layer. Drag preview to move.',
-    value: ''
+    value: '添加消失點至所選圖層。'
   },
   'filter-vanish-point-lines': {
     hint: 'As in: the number of lines',
     original: 'Lines',
-    value: ''
+    value: '線條數量'
   },
   'import-opening': {
     original: 'Opening file...',
