@@ -1455,6 +1455,7 @@ export function KlApp(pProject: IKlProject | null, pOptions: IKlAppOptions) {
                 isReversed: settings.isReversed,
                 opacity: settings.opacity,
                 doLockAlpha: settings.doLockAlpha,
+                isEraser: settings.isEraser,
                 doSnap: keyListener.isPressed('shift') || settings.doSnap,
                 x1,
                 y1,

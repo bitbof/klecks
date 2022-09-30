@@ -29,6 +29,14 @@ export function ShapeTool(p) {
     };
 }
 
+function applyDefaults(obj: any, defaults: any): void {
+    for (const property in defaults) {
+        if (!(property in obj)) {
+            obj[property] = defaults[property];
+        }
+    }
+}
+
 /**
  * Draw a shape (rectangle, ellipse, line)
  *
@@ -39,6 +47,14 @@ export function drawShape(
     ctx: CanvasRenderingContext2D,
     shapeObj: IShapeToolObject,
 ) {
+    shapeObj = BB.copyObj(shapeObj);
+    applyDefaults(shapeObj, {
+        angleRad: 0,
+        isOutwards: false,
+        opacity: 1,
+        isEraser: false,
+        doLockAlpha: false,
+    });
 
     if (['rect', 'ellipse', 'line'].includes(shapeObj.type)) {
         const lineWidth = Math.round(shapeObj.lineWidth);

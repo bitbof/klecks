@@ -34,6 +34,8 @@ import noiseImg from 'url:~/src/app/img/ui/edit-noise.svg';
 // @ts-ignore
 import patternImg from 'url:~/src/app/img/ui/edit-pattern.svg';
 // @ts-ignore
+import vanishPointImg from 'url:~/src/app/img/ui/edit-vanish-point.svg';
+// @ts-ignore
 import distortImg from 'url:~/src/app/img/ui/edit-distort.svg';
 
 
@@ -183,6 +185,14 @@ export const filterLib: {
     pattern: {
         lang: {name: 'filter-pattern', button: 'filter-pattern'},
         icon: patternImg,
+        updatePos: false,
+        getDialog: null,
+        apply: null,
+        inEmbed: true,
+    },
+    vanishPoint: {
+        lang: {name: 'filter-vanish-point-title', button: 'filter-vanish-point'},
+        icon: vanishPointImg,
         updatePos: false,
         getDialog: null,
         apply: null,

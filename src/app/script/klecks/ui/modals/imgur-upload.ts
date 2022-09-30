@@ -154,7 +154,7 @@ export function imgurUpload(klCanvas: KlCanvas, klRootEl, saveReminder: SaveRemi
                     KL.popup({
                         target: klRootEl,
                         type: "ok",
-                        message: `<h3>${LANG('upload-success')}</h3><br>${LANG('upload-delete')}<br><a target='_blank' rel="noopener noreferrer" href='https://imgur.com/delete/${result.deletehash}'>imgur.com/<b>delete</b>/${result.deletehash}</a><br><br>`,
+                        message: `<h3>${LANG('upload-success')}</h3><br>${LANG('upload-delete')}<br><a target='_blank' rel="noopener noreferrer" href='https://imgur.com/delete/${result.deletehash}'>imgur.com/delete/${result.deletehash}</a><br><br>`,
                         buttons: ["Ok"]
                     });
                     saveReminder.reset();

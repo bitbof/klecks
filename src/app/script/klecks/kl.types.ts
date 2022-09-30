@@ -129,6 +129,7 @@ export interface IGradient {
     x2: number;
     y2: number;
     angleRad: number; // angle of canvas
+    isEraser: boolean;
 }
 
 export interface IShapeToolObject {
@@ -137,16 +138,16 @@ export interface IShapeToolObject {
     y1: number;
     x2: number;
     y2: number;
-    angleRad: number; // angle of canvas
-    isOutwards: boolean; // center is x1 y1
-    opacity: number; // 0-1
-    isEraser: boolean;
+    angleRad?: number; // angle of canvas, default 0
+    isOutwards?: boolean; // center is x1 y1, default false
+    opacity?: number; // 0-1, default 1
+    isEraser?: boolean; // default false
     fillRgb?: { r: number; g: number; b: number }; // for rect or ellipse
     strokeRgb?: { r: number; g: number; b: number }; // needed for line
     lineWidth?: number; // needed for line
     isAngleSnap?: boolean; // 45° deg angle snapping
     isFixedRatio?: boolean; // 1:1 for rect or ellipse
-    doLockAlpha: boolean;
+    doLockAlpha?: boolean; // default false
 }
 
 export interface IKlSliderConfig {
@@ -184,10 +185,10 @@ export interface IKlPsd {
     width: number;
     height: number;
     layers?: { // not there if flattened
-            name: string;
-            mixModeStr: IMixMode;
-            opacity: number;
-            image: HTMLCanvasElement;
+        name: string;
+        mixModeStr: IMixMode;
+        opacity: number;
+        image: HTMLCanvasElement;
     }[];
     // if one of these features show up, they become a warning
     // because Klecks can't properly represent them (yet)

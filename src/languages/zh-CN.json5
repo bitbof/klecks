@@ -922,31 +922,48 @@
   },
   'filter-pattern': {
     original: 'Pattern',
-    value: ''
+    value: '图案'
   },
   'filter-pattern-description': {
     original: 'Generates pattern on selected layer. Drag the preview for further controls.',
-    value: ''
+    value: '为所选图层生成图案。拖动鼠标进行更多操作。'
   },
   'filter-distort': {
     original: 'Distort',
-    value: ''
+    value: '变形'
   },
   'filter-distort-description': {
     original: 'Distorts the selected layer.',
-    value: ''
+    value: '对所选图层进行变形操作。'
   },
   'filter-distort-phase': {
     original: 'Phase',
-    value: ''
+    value: '相位'
   },
   'filter-distort-stepsize': {
     original: 'Step Size',
-    value: ''
+    value: '步长'
   },
   'filter-distort-sync-xy': {
     original: 'Sync XY',
-    value: ''
+    value: '同步XY'
+  },
+  'filter-vanish-point': {
+    original: 'Vanish Point',
+    value: '消失点'
+  },
+  'filter-vanish-point-title': {
+    original: 'Vanishing Point',
+    value: '消失点'
+  },
+  'filter-vanish-point-description': {
+    original: 'Adds vanishing point to selected layer. Drag preview to move.',
+    value: '添加消失点至所选图层。 拖动鼠标移动消失点。'
+  },
+  'filter-vanish-point-lines': {
+    hint: 'As in: the number of lines',
+    original: 'Lines',
+    value: '线条数量'
   },
   'import-opening': {
     original: 'Opening file...',

@@ -11,6 +11,7 @@ interface IGradientUiSettings {
     doLockAlpha: boolean;
     doSnap: boolean;
     isReversed: boolean;
+    isEraser: boolean;
 }
 
 /**
@@ -37,6 +38,7 @@ export class GradientUi {
         doLockAlpha: false,
         doSnap: false,
         isReversed: false,
+        isEraser: false,
     };
 
     private updateIcons(): void {
@@ -179,6 +181,17 @@ export class GradientUi {
             }
         });
 
+        const eraserToggle = new Checkbox({
+            init: this.settings.isEraser,
+            label: LANG('eraser'),
+            callback: (b) => {
+                this.settings.isEraser = b;
+            },
+            css: {
+                width: '50%',
+            }
+        });
+
         const lockAlphaToggle = new Checkbox({
             init: false,
             label: LANG('lock-alpha'),
@@ -187,11 +200,14 @@ export class GradientUi {
                 this.settings.doLockAlpha = b;
             },
             doHighlight: true,
+            css: {
+                width: '50%',
+            }
         });
 
         row2.append(
+            eraserToggle.getElement(),
             lockAlphaToggle.getElement(),
-            BB.el({css: {flexGrow: '1'}}),
         );
 
 

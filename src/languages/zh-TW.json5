@@ -948,6 +948,23 @@
     original: 'Sync XY',
     value: '同步 XY'
   },
+  'filter-vanish-point': {
+    original: 'Vanish Point',
+    value: ''
+  },
+  'filter-vanish-point-title': {
+    original: 'Vanishing Point',
+    value: ''
+  },
+  'filter-vanish-point-description': {
+    original: 'Adds vanishing point to selected layer. Drag preview to move.',
+    value: ''
+  },
+  'filter-vanish-point-lines': {
+    hint: 'As in: the number of lines',
+    original: 'Lines',
+    value: ''
+  },
   'import-opening': {
     original: 'Opening file...',
     value: '打開文件...'

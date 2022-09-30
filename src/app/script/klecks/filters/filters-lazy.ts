@@ -17,6 +17,7 @@ import {filterGrid} from './filter-grid';
 import {filterNoise} from './filter-noise';
 import {filterPattern} from './filter-pattern';
 import {filterDistort} from './filter-distort';
+import {filterVanishPoint} from "./filter-vanish-point";
 
 let embed: boolean;
 function importFilter(libObj, moduleObj): void {
@@ -51,6 +52,7 @@ export function importFilters(isEmbed?: boolean) {
     importFilter(filterLib.noise, filterNoise);
     importFilter(filterLib.pattern, filterPattern);
     importFilter(filterLib.distort, filterDistort);
+    importFilter(filterLib.vanishPoint, filterVanishPoint);
 
     filterLibStatus.isLoaded = true;
 }

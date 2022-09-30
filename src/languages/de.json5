@@ -925,6 +925,22 @@
     original: 'Sync XY',
     value: 'XY koppeln'
   },
+  'filter-vanish-point': {
+    original: 'Vanish Point',
+    value: 'Fluchtpunkt'
+  },
+  'filter-vanish-point-title': {
+    original: 'Vanishing Point',
+    value: 'Fluchtpunkt'
+  },
+  'filter-vanish-point-description': {
+    original: 'Adds vanishing point to selected layer. Drag preview to move.',
+    value: 'Zeichnet Fluchtpunkt auf aktive Ebene. Ziehe Vorschau zum Verschieben.'
+  },
+  'filter-vanish-point-lines': {
+    original: 'Lines',
+    value: 'Linien'
+  },
   'import-opening': {
     original: 'Opening file...',
     value: 'Öffne Datei...'

@@ -72,10 +72,13 @@ export function drawGradient(
         }
     }
 
-
-    let color1 = BB.copyObj(gradientObj.color1);
+    let baseColor = gradientObj.color1;
+    if (gradientObj.isEraser && gradientObj.doLockAlpha) {
+        baseColor = {r: 255, g: 255, b: 255};
+    }
+    let color1 = BB.copyObj(baseColor);
     color1.a = gradientObj.opacity;
-    let color2 = BB.copyObj(gradientObj.color1);
+    let color2 = BB.copyObj(baseColor);
     color2.a = 0;
     if (gradientObj.isReversed) {
         const temp = color1;
@@ -110,6 +113,9 @@ export function drawGradient(
     }
 
     ctx.fillStyle = gradient;
+    if (gradientObj.isEraser) {
+        ctx.globalCompositeOperation = 'destination-out';
+    }
     if (gradientObj.doLockAlpha) {
         ctx.globalCompositeOperation = 'source-atop';
     }

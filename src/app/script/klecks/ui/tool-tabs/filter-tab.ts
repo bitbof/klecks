@@ -197,6 +197,7 @@ export class FilterTab {
             'grid',
             'noise',
             'pattern',
+            'vanishPoint'
         ];
 
         addGroup(groupA, filters, _this.div);

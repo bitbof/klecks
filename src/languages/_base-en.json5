@@ -356,6 +356,14 @@ Base Language File
   "filter-distort-stepsize": "Step Size",
   "filter-distort-sync-xy": "Sync XY",
 
+  "filter-vanish-point": "Vanish Point",
+  "filter-vanish-point-title": "Vanishing Point",
+  "filter-vanish-point-description": "Adds vanishing point to selected layer. Drag preview to move.",
+  "filter-vanish-point-lines": {
+    hint: 'As in: the number of lines',
+    value: 'Lines',
+  },
+
   "import-opening": "Opening file...",
   "import-title": "Import Image",
   "import-too-large": "Image too large, will be downscaled.",
