@@ -47,12 +47,13 @@ export class UndoRedoCatchup {
             return false;
         }
         const actions: IHistoryEntry[] = klHistory.undo();
+        const klCanvas = this.getKlCanvas();
         klHistory.pause(true);
         const initState: IInitState = this.getInitState();
-        const oldSize = {w: this.getKlCanvas().getWidth(), h: this.getKlCanvas().getHeight()};
-        this.getKlCanvas().copy(initState.canvas);
+        const oldSize = {w: klCanvas.getWidth(), h: klCanvas.getHeight()};
+        klCanvas.copy(initState.canvas);
         let layerIndex = initState.focus;
-        this.setCurrentLayerCtx(this.getKlCanvas().getLayerContext(layerIndex));
+        this.setCurrentLayerCtx(klCanvas.getLayerContext(layerIndex));
         const brushes: any = {};
         for (let b in KL.brushes) {
             if (KL.brushes.hasOwnProperty(b)) {
@@ -76,10 +77,10 @@ export class UndoRedoCatchup {
                     }
                 } else if (actions[i].tool[0] === "canvas") {
                     const p = actions[i].params;
-                    const id = this.getKlCanvas()[actions[i].action].apply(this.getKlCanvas(), p);
+                    const id = klCanvas[actions[i].action].apply(klCanvas, p);
                     if (typeof id === 'number') {
                         layerIndex = id;
-                        this.setCurrentLayerCtx(this.getKlCanvas().getLayerContext(layerIndex));
+                        this.setCurrentLayerCtx(klCanvas.getLayerContext(layerIndex));
                         for (let b in brushes) {
                             if (brushes.hasOwnProperty(b)) {
                                 brushes[b].setContext(this.getCurrentLayerCtx());
@@ -89,7 +90,7 @@ export class UndoRedoCatchup {
                 } else if (actions[i].tool[0] === "filter") {
                     const p = [{
                         context: this.getCurrentLayerCtx(),
-                        klCanvas: this.getKlCanvas(),
+                        klCanvas,
                         input: actions[i].params[0].input,
                         history: new KL.DecoyKlHistory(),
                     } as IFilterApply];
@@ -97,20 +98,20 @@ export class UndoRedoCatchup {
 
                 } else if (actions[i].tool[0] === "misc" && actions[i].action === "focusLayer") {
                     layerIndex = actions[i].params[0];
-                    this.setCurrentLayerCtx(this.getKlCanvas().getLayerContext(actions[i].params[0]));
+                    this.setCurrentLayerCtx(klCanvas.getLayerContext(actions[i].params[0]));
                     for (let b in brushes) {
                         if (brushes.hasOwnProperty(b)) {
                             brushes[b].setContext(this.getCurrentLayerCtx());
                         }
                     }
                 } else if (actions[i].tool[0] === "misc" && actions[i].action === "importImage") {
-                    const id = this.getKlCanvas().addLayer();
+                    const id = klCanvas.addLayer();
                     if (typeof id === 'number') {
                         layerIndex = id;
                         if (actions[i].params[1]) {
-                            this.getKlCanvas().renameLayer(layerIndex, actions[i].params[1]);
+                            klCanvas.renameLayer(layerIndex, actions[i].params[1]);
                         }
-                        this.setCurrentLayerCtx(this.getKlCanvas().getLayerContext(layerIndex));
+                        this.setCurrentLayerCtx(klCanvas.getLayerContext(layerIndex));
                         for (let b in brushes) {
                             if (brushes.hasOwnProperty(b)) {
                                 brushes[b].setContext(this.getCurrentLayerCtx());
@@ -121,12 +122,12 @@ export class UndoRedoCatchup {
                 }
             })(i);
         }
-        if (oldSize.w !== this.getKlCanvas().getWidth() || oldSize.h !== this.getKlCanvas().getHeight()) {
+        if (oldSize.w !== klCanvas.getWidth() || oldSize.h !== klCanvas.getHeight()) {
             this.klCanvasWorkspace.resetView();
             this.handUi.update(this.klCanvasWorkspace.getScale(), this.klCanvasWorkspace.getAngleDeg());
         }
         this.layerManager.update(layerIndex);
-        this.layerPreview.setLayer(this.getKlCanvas().getLayer(layerIndex));
+        this.layerPreview.setLayer(klCanvas.getLayer(layerIndex));
         this.brushUiObj.sketchyBrush.setSeed(brushes.SketchyBrush.getSeed());
         this.getCurrentBrush().setContext(this.getCurrentLayerCtx());
         this.klCanvasWorkspace.setLastDrawEvent(null);
@@ -144,8 +145,9 @@ export class UndoRedoCatchup {
             return false;
         }
         const actions = klHistory.redo();
+        const klCanvas = this.getKlCanvas();
         klHistory.pause(true);
-        const oldSize = {w: this.getKlCanvas().getWidth(), h: this.getKlCanvas().getHeight()};
+        const oldSize = {w: klCanvas.getWidth(), h: klCanvas.getHeight()};
         let layerIndex;
         const brushes: any = {};
         for (let b in KL.brushes) {
@@ -170,10 +172,10 @@ export class UndoRedoCatchup {
                     }
                 } else if (actions[i].tool[0] === "canvas") {
                     const p = actions[i].params;
-                    const id = this.getKlCanvas()[actions[i].action].apply(this.getKlCanvas(), p);
+                    const id = klCanvas[actions[i].action].apply(klCanvas, p);
                     if (typeof id === 'number') {
                         layerIndex = id;
-                        this.setCurrentLayerCtx(this.getKlCanvas().getLayerContext(layerIndex));
+                        this.setCurrentLayerCtx(klCanvas.getLayerContext(layerIndex));
                         for (let b in brushes) {
                             if (brushes.hasOwnProperty(b)) {
                                 brushes[b].setContext(this.getCurrentLayerCtx());
@@ -183,7 +185,7 @@ export class UndoRedoCatchup {
                 } else if (actions[i].tool[0] === "filter") {
                     const p = [{
                         context: this.getCurrentLayerCtx(),
-                        klCanvas: this.getKlCanvas(),
+                        klCanvas,
                         input: actions[i].params[0].input,
                         history: new KL.DecoyKlHistory(),
                     } as IFilterApply];
@@ -191,20 +193,20 @@ export class UndoRedoCatchup {
 
                 } else if (actions[i].tool[0] === "misc" && actions[i].action === "focusLayer") {
                     layerIndex = actions[i].params[0];
-                    this.setCurrentLayerCtx(this.getKlCanvas().getLayerContext(actions[i].params[0]));
+                    this.setCurrentLayerCtx(klCanvas.getLayerContext(actions[i].params[0]));
                     for (let b in brushes) {
                         if (brushes.hasOwnProperty(b)) {
                             brushes[b].setContext(this.getCurrentLayerCtx());
                         }
                     }
                 } else if (actions[i].tool[0] === "misc" && actions[i].action === "importImage") {
-                    const id = this.getKlCanvas().addLayer();
+                    const id = klCanvas.addLayer();
                     if (typeof id === 'number') {
                         layerIndex = id;
                         if (actions[i].params[1]) {
-                            this.getKlCanvas().renameLayer(layerIndex, actions[i].params[1]);
+                            klCanvas.renameLayer(layerIndex, actions[i].params[1]);
                         }
-                        this.setCurrentLayerCtx(this.getKlCanvas().getLayerContext(layerIndex));
+                        this.setCurrentLayerCtx(klCanvas.getLayerContext(layerIndex));
                         for (let b in brushes) {
                             if (brushes.hasOwnProperty(b)) {
                                 brushes[b].setContext(this.getCurrentLayerCtx());
@@ -216,13 +218,13 @@ export class UndoRedoCatchup {
             })(i);
         }
 
-        if (oldSize.w !== this.getKlCanvas().getWidth() || oldSize.h !== this.getKlCanvas().getHeight()) {
+        if (oldSize.w !== klCanvas.getWidth() || oldSize.h !== klCanvas.getHeight()) {
             this.klCanvasWorkspace.resetView();
             this.handUi.update(this.klCanvasWorkspace.getScale(), this.klCanvasWorkspace.getAngleDeg());
         }
-        const currentLayerIndex = this.getKlCanvas().getLayerIndex(this.getCurrentLayerCtx().canvas);
+        const currentLayerIndex = klCanvas.getLayerIndex(this.getCurrentLayerCtx().canvas);
         this.layerManager.update(currentLayerIndex);
-        this.layerPreview.setLayer(this.getKlCanvas().getLayer(currentLayerIndex));
+        this.layerPreview.setLayer(klCanvas.getLayer(currentLayerIndex));
         this.brushUiObj.sketchyBrush.setSeed(brushes.SketchyBrush.getSeed());
         this.getCurrentBrush().setContext(this.getCurrentLayerCtx());
         this.klCanvasWorkspace.setLastDrawEvent(null);
@@ -240,7 +242,7 @@ export class UndoRedoCatchup {
             const brushes = initState.brushes;
             const actions = [logParam.bufferUpdate];
             let localCurrentLayerCtx = initState.canvas.getLayerContext(initState.focus);
-            const canvas = initState.canvas;
+            const klCanvas = initState.canvas;
             let layerIndex = initState.focus;
             ((i) => {
                 if (actions[i].tool[0] === "brush") {
@@ -256,10 +258,10 @@ export class UndoRedoCatchup {
                     }
                 } else if (actions[i].tool[0] === "canvas") {
                     const p = actions[i].params;
-                    const id = canvas[actions[i].action].apply(canvas, p);
+                    const id = klCanvas[actions[i].action].apply(klCanvas, p);
                     if (typeof id === 'number') {
                         layerIndex = id;
-                        localCurrentLayerCtx = canvas.getLayerContext(layerIndex);
+                        localCurrentLayerCtx = klCanvas.getLayerContext(layerIndex);
                         for (let b in brushes) {
                             if (brushes.hasOwnProperty(b)) {
                                 brushes[b].setContext(localCurrentLayerCtx);
@@ -269,7 +271,7 @@ export class UndoRedoCatchup {
                 } else if (actions[i].tool[0] === "filter") {
                     const p = [{
                         context: localCurrentLayerCtx,
-                        klCanvas: canvas,
+                        klCanvas,
                         input: actions[i].params[0].input,
                         history: new KL.DecoyKlHistory(),
                     } as IFilterApply];
@@ -277,20 +279,20 @@ export class UndoRedoCatchup {
 
                 } else if (actions[i].tool[0] === "misc" && actions[i].action === "focusLayer") {
                     layerIndex = actions[i].params[0];
-                    localCurrentLayerCtx = canvas.getLayerContext(actions[i].params[0]);
+                    localCurrentLayerCtx = klCanvas.getLayerContext(actions[i].params[0]);
                     for (let b in brushes) {
                         if (brushes.hasOwnProperty(b)) {
                             brushes[b].setContext(localCurrentLayerCtx);
                         }
                     }
                 } else if (actions[i].tool[0] === "misc" && actions[i].action === "importImage") {
-                    const id = canvas.addLayer();
+                    const id = klCanvas.addLayer();
                     if (typeof id === 'number') {
                         layerIndex = id;
                         if (actions[i].params[1]) {
-                            this.getKlCanvas().renameLayer(layerIndex, actions[i].params[1]);
+                            klCanvas.renameLayer(layerIndex, actions[i].params[1]);
                         }
-                        localCurrentLayerCtx = canvas.getLayerContext(layerIndex);
+                        localCurrentLayerCtx = klCanvas.getLayerContext(layerIndex);
                         for (let b in brushes) {
                             if (brushes.hasOwnProperty(b)) {
                                 brushes[b].setContext(localCurrentLayerCtx);

@@ -84,7 +84,7 @@ export class KlHistory implements KlHistoryInterface {
      * for example a filter that does something crazy with two layers and then merges them
      * you want that to be one undo step, and prevent merging from causing its undo step.
      * so while that filter is doing its magic you should pause possible undo steps that
-     * that are caused by a part of its code(in this example: merging layers)
+     * are caused by a part of its code(in this example: merging layers)
      *
      * @param b
      */
