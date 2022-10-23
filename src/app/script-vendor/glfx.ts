@@ -333,6 +333,8 @@ export const fx = (function () {
         canvas.vibrance = wrap(vibrance);
         canvas.sepia = wrap(sepia);
         canvas.invert = wrap(invert);
+        canvas.multiplyAlpha = wrap(multiplyAlpha);
+        canvas.unmultiplyAlpha = wrap(unmultiplyAlpha);
         canvas.toAlpha = wrap(toAlpha);
         canvas.distort = wrap(distort);
 
@@ -777,11 +779,6 @@ export const fx = (function () {
         vec2 coord = texCoord * texSize;\
         ' + warp + '\
         gl_FragColor = texture2D(texture, coord / texSize);\
-        vec2 clampedCoord = clamp(coord, vec2(0.0), texSize);\
-        if (coord != clampedCoord) {\
-            /* fade to transparent if we are outside the image */\
-            gl_FragColor.a *= max(0.0, 1.0 - length(coord - clampedCoord));\
-        }\
     }', 'warp');
     }
 
@@ -1912,11 +1909,62 @@ export const fx = (function () {
     \
     void main() {\
         vec4 color = texture2D(texture, texCoord);\
-        gl_FragColor = vec4(1.0 - color.r, 1.0 - color.g, 1.0 - color.b, color.a);\
+        color.rgb = 1.0 - color.rgb;\
+        gl_FragColor = color;\
     }\
 ', 'invert');
 
         simpleShader.call(this, gl.invert, {
+            texSize: [this.width, this.height]
+        });
+
+        return this;
+    }
+
+    /**
+     * @filter        multiplyAlpha
+     * @description   applies alpha multiply
+     */
+    function multiplyAlpha() {
+        gl.multiplyAlpha = gl.multiplyAlpha || new Shader(null, '\
+    uniform sampler2D texture;\
+    uniform vec2 texSize;\
+    varying vec2 texCoord;\
+    \
+    void main() {\
+        vec4 color = texture2D(texture, texCoord);\
+        color.rgb *= color.a;\
+        gl_FragColor = color;\
+    }\
+', 'multiplyAlpha');
+
+        simpleShader.call(this, gl.multiplyAlpha, {
+            texSize: [this.width, this.height]
+        });
+
+        return this;
+    }
+
+    /**
+     * @filter        unmultiplyAlpha
+     * @description   reverses alpha multiply
+     */
+    function unmultiplyAlpha() {
+        gl.unmultiplyAlpha = gl.unmultiplyAlpha || new Shader(null, '\
+    uniform sampler2D texture;\
+    uniform vec2 texSize;\
+    varying vec2 texCoord;\
+    \
+    void main() {\
+        vec4 color = texture2D(texture, texCoord);\
+        if(color.a > 0.0) {\
+            color.rgb /= color.a;\
+        }\
+        gl_FragColor = color;\
+    }\
+', 'unmultiplyAlpha');
+
+        simpleShader.call(this, gl.unmultiplyAlpha, {
             texSize: [this.width, this.height]
         });
 

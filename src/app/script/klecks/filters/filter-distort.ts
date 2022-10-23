@@ -82,7 +82,7 @@ export const filterDistort = {
                 settingsCopy.scale.y /= scaleFactor;
                 settingsCopy.strength.x /= scaleFactor;
                 settingsCopy.strength.y /= scaleFactor;
-                glCanvas.draw(texture).distort(settingsCopy).update();
+                glCanvas.draw(texture).multiplyAlpha().distort(settingsCopy).unmultiplyAlpha().update();
                 ctx.clearRect(0, 0, thumbSize, thumbSize);
                 ctx.drawImage(glCanvas, 0, 0);
                 thumbImg.src = canvas.toDataURL('image/png');
@@ -344,7 +344,7 @@ export const filterDistort = {
         // ---------- rendering ---------------------
 
         function updatePreview() {
-            glCanvas.draw(texture).distort(settings).update();
+            glCanvas.draw(texture).multiplyAlpha().distort(settings).unmultiplyAlpha().update();
             klCanvasPreview.render();
         }
 
@@ -383,7 +383,7 @@ export const filterDistort = {
             return false; // todo more specific error?
         }
         let texture = glCanvas.texture(context.canvas);
-        glCanvas.draw(texture).distort(params.input).update();
+        glCanvas.draw(texture).multiplyAlpha().distort(params.input).unmultiplyAlpha().update();
         context.clearRect(0, 0, context.canvas.width, context.canvas.height);
         context.drawImage(glCanvas, 0, 0);
         texture.destroy();

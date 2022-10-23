@@ -58,7 +58,7 @@ export const filterPerspective = {
             let aa, ab, ac, ad; //after
             function update() {
                 try {
-                    glCanvas.draw(texture).perspective(
+                    glCanvas.draw(texture).multiplyAlpha().perspective(
                         [ba.x, ba.y, bb.x, bb.y, bc.x, bc.y, bd.x, bd.y].map((item, i) => {
                             if (i % 2 === 0) {
                                 return item / displayW * w;
@@ -73,7 +73,7 @@ export const filterPerspective = {
                                 return item / displayH * h;
                             }
                         })
-                    ).update();
+                    ).unmultiplyAlpha().update();
                     klCanvasPreview.render();
                 } catch(e) {
                     (div as any).errorCallback(e);
@@ -305,9 +305,7 @@ export const filterPerspective = {
             return false; // todo more specific error?
         }
         let texture = glCanvas.texture(context.canvas);
-        let w = context.canvas.width;
-        let h = context.canvas.height;
-        glCanvas.draw(texture).perspective(before, after).update();
+        glCanvas.draw(texture).multiplyAlpha().perspective(before, after).unmultiplyAlpha().update();
         context.clearRect(0, 0, context.canvas.width, context.canvas.height);
         context.drawImage(glCanvas, 0, 0);
         texture.destroy();
