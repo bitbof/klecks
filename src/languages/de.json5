@@ -321,9 +321,17 @@
     original: 'Colors',
     value: 'Farben'
   },
+  'layers-rename-shading': {
+    original: 'Shading',
+    value: 'Beleuchtung'
+  },
   'layers-rename-lines': {
     original: 'Lines',
     value: 'Linien'
+  },
+  'layers-rename-effects': {
+    original: 'Effects',
+    value: 'Effekte'
   },
   'layers-rename-foreground': {
     original: 'Foreground',

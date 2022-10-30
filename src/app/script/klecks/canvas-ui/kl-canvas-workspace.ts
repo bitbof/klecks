@@ -1244,22 +1244,28 @@ export class KlCanvasWorkspace {
             }
         });
 
-        const onDoubleTap = () => {
-            let oldTransform = JSON.parse(JSON.stringify(this.targetTransformObj));
-            _this.fitView();
-            //_this.resetView(true);
-            this.lastRenderedState = -1;
-            this.reqFrame();
+        const onDoubleTap = (event) => {
+            if (_this.fitView()) {
+                this.lastRenderedState = -1;
+                this.reqFrame();
+            } else {
+                // zoom 2 steps further
 
-            if (
-                oldTransform.scale !== this.targetTransformObj.scale ||
-                oldTransform.angle !== this.targetTransformObj.angle
-            ) {
-                this.onViewChange({
-                    changed: ['scale', 'angle'],
-                    angle: this.targetTransformObj.angle,
-                    scale: this.targetTransformObj.scale
-                });
+                let didZoom = this.internalZoomByStep(
+                    2,
+                    event.relX,
+                    event.relY,
+                );
+                if (didZoom) {
+                    this.onViewChange({
+                        changed: ['scale'],
+                        angle: this.targetTransformObj.angle,
+                        scale: this.targetTransformObj.scale
+                    });
+                }
+
+                //updateCursor(TMode.Draw, true);
+                this.lastRenderedState = -1;
             }
         }
 
@@ -1678,10 +1684,13 @@ export class KlCanvasWorkspace {
         }
     }
 
-    fitView (): void {
-        //fit into view. center. snap angle. margin of 10px
-
-        this.targetTransformObj.angle = this.snapAngleRad(this.targetTransformObj.angle, 90, 90);
+    /**
+     * fit into view. center. snap angle. padding
+     * returns true if transform changes
+     */
+    fitView (): boolean {
+        // determine new transform
+        const newAngle = this.snapAngleRad(this.targetTransformObj.angle, 90, 90);
 
         //calc width and height of bounds
         const canvasPointsArr = [
@@ -1694,7 +1703,7 @@ export class KlCanvasWorkspace {
 
         //setup transformation matrix
         let matrix = BB.Matrix.getIdentity();
-        matrix = BB.Matrix.multiplyMatrices(matrix, BB.Matrix.createRotationMatrix(this.targetTransformObj.angle));
+        matrix = BB.Matrix.multiplyMatrices(matrix, BB.Matrix.createRotationMatrix(newAngle));
 
         //rotate points
         for (let i = 0; i < canvasPointsArr.length; i++) {
@@ -1728,7 +1737,7 @@ export class KlCanvasWorkspace {
         const boundsHeight = boundsObj.y1 - boundsObj.y0;
 
         //fit bounds
-        const padding = 40;
+        const padding = 0;
         const { width: fitWidth } = BB.fitInto(
             boundsWidth,
             boundsHeight, 
@@ -1740,11 +1749,23 @@ export class KlCanvasWorkspace {
         //determine scale
         const factor = fitWidth / boundsWidth;
 
-        //center
-        this.targetTransformObj.x = (this.renderWidth / 2) - (canvasPointsArr[4][0] - canvasPointsArr[0][0]) * factor;
-        this.targetTransformObj.y = (this.renderHeight / 2) - (canvasPointsArr[4][1] - canvasPointsArr[0][1]) * factor;
+        const newTargetTransformObj = {
+            angle: newAngle,
+            x: (this.renderWidth / 2) - (canvasPointsArr[4][0] - canvasPointsArr[0][0]) * factor,
+            y: (this.renderHeight / 2) - (canvasPointsArr[4][1] - canvasPointsArr[0][1]) * factor,
+            scale: factor,
+        };
 
-        this.targetTransformObj.scale = factor;
+        if (
+            newTargetTransformObj.angle === this.targetTransformObj.angle &&
+            Math.abs(newTargetTransformObj.x - this.targetTransformObj.x) < 0.0000000001 &&
+            Math.abs(newTargetTransformObj.y - this.targetTransformObj.y) < 0.0000000001 &&
+            newTargetTransformObj.scale === this.targetTransformObj.scale
+        ) {
+            return false;
+        }
+        this.targetTransformObj = newTargetTransformObj;
+
         this.doAnimateTranslate = true;
         this.transformIsDirty = true;
         this.reqFrame();
@@ -1754,6 +1775,7 @@ export class KlCanvasWorkspace {
             scale: this.targetTransformObj.scale,
             angle: this.targetTransformObj.angle
         });
+        return true;
     }
 
     setAngle (angleDeg: number, isRelative?: boolean): void {

@@ -144,9 +144,20 @@ export function KlApp(pProject: IKlProject | null, pOptions: IKlAppOptions) {
 
 
     let currentColor = new BB.RGB(0, 0, 0);
-    let currentBrush, currentBrushId;
-    let lastNonEraserBrushId = 0;
+    let currentBrush;
+    let currentBrushId: string;
+    let lastNonEraserBrushId: string;
     let currentLayerCtx = klCanvas.getLayerContext(klCanvas.getLayerCount() - 1);
+
+    // when cycling through brushes you need to know the next non-eraser brush
+    function getNextBrushId(): string {
+        if (currentBrushId === 'eraserBrush') {
+            return lastNonEraserBrushId;
+        }
+        const keyArr = Object.keys(brushUiObj).filter(item => item !== 'eraserBrush');
+        const i = keyArr.findIndex(item => item === currentBrushId);
+        return keyArr[(i + 1) % keyArr.length];
+    }
 
     function sizeWatcher(val) {
         brushSettingService.emitSize(val);
@@ -490,7 +501,7 @@ export function KlApp(pProject: IKlProject | null, pOptions: IKlAppOptions) {
                 toolspaceToolRow.setActive('draw');
                 mainTabRow.open('draw');
                 updateMainTabVisibility();
-                brushTabRow.open(lastNonEraserBrushId);
+                brushTabRow.open(getNextBrushId());
             }
             if (comboStr === 'g') {
                 event.preventDefault();

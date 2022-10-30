@@ -129,7 +129,7 @@ export function newImageDialog(p) {
     templateWrapper.appendChild(presetLandscapeBtn);
     templateWrapper.appendChild(presetPortraitBtn);
 
-    let templatePadding = 50;
+    let templatePadding = 0;
 
     presetCurrentBtn.onclick = function () {
         widthInput.value = canvasWidth;

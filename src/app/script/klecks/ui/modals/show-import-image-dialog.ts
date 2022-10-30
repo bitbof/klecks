@@ -144,6 +144,7 @@ export function showImportImageDialog(p) {
     function callback(result) {
         const croppedImage = cropCopy.getCroppedImage();
         const cropRect = cropCopy.getRect();
+        const isCropped = p.image.width !== cropRect.width && p.image.height !== cropRect.height;
         cropCopy.destroy();
         if (flattenCheckbox) {
             flattenCheckbox.destroy();
@@ -152,7 +153,7 @@ export function showImportImageDialog(p) {
         if (result === LANG('import-btn-as-layer')) {
             p.callback({
                 type: 'as-layer',
-                image: croppedImage
+                image: isCropped ? croppedImage : p.image.canvas,
             });
 
         } else if (result === LANG('import-btn-as-image')) {
@@ -183,6 +184,7 @@ export function showImportImageDialog(p) {
         div: div,
         style,
         buttons: [LANG('import-btn-as-layer'), LANG('import-btn-as-image'), "Cancel"],
+        primaries: [LANG('import-btn-as-layer'), LANG('import-btn-as-image')],
         callback: callback,
         autoFocus: 'As Image'
     });

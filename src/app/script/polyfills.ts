@@ -2,6 +2,7 @@
 import 'mdn-polyfills/Node.prototype.append';
 import 'mdn-polyfills/Node.prototype.prepend';
 import 'mdn-polyfills/String.prototype.padStart';
+import 'mdn-polyfills/Array.prototype.findIndex';
 
 if (!('scrollTo' in Element.prototype)) {
     Object.defineProperty(Element.prototype, 'scrollTo', {

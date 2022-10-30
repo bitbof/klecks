@@ -333,9 +333,17 @@
     original: 'Colors',
     value: '色彩'
   },
+  'layers-rename-shading': {
+    original: 'Shading',
+    value: ''
+  },
   'layers-rename-lines': {
     original: 'Lines',
     value: '線條'
+  },
+  'layers-rename-effects': {
+    original: 'Effects',
+    value: ''
   },
   'layers-rename-foreground': {
     original: 'Foreground',

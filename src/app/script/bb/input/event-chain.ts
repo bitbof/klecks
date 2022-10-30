@@ -118,7 +118,12 @@ export const DoubleTapper = function (p) {
         eventQueueArr = []; // events get swallowed
         const lastSequenceItem = sequenceArr[sequenceArr.length - 1];
         sequenceArr = [];
-        p.onDoubleTap({pageX: lastSequenceItem.pageX, pageY: lastSequenceItem.pageY});
+        p.onDoubleTap({
+            pageX: lastSequenceItem.pageX,
+            pageY: lastSequenceItem.pageY,
+            relX: lastSequenceItem.relX,
+            relY: lastSequenceItem.relY,
+        });
     }
 
 
@@ -275,7 +280,9 @@ export const DoubleTapper = function (p) {
                 // only needs silence
                 sequenceArr.push({
                     pageX: event.pageX,
-                    pageY: event.pageY
+                    pageY: event.pageY,
+                    relX: event.relX,
+                    relY: event.relY,
                 });
                 if (!setupTimeout('success', success, event.time + minSilenceAfterMs)) {
                     fail();

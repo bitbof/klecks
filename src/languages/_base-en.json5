@@ -142,7 +142,9 @@ Base Language File
     value: 'Sketch'
   },
   "layers-rename-colors": "Colors",
+  "layers-rename-shading": "Shading",
   "layers-rename-lines": "Lines",
+  "layers-rename-effects": "Effects",
   "layers-rename-foreground": "Foreground",
 
   "layers-merge-modal-title": "Merge/Mix Layers",

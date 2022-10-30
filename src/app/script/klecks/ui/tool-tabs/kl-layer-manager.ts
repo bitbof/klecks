@@ -107,7 +107,9 @@ export function klLayerManager(p_canvas: KlCanvas, p_func, p_rootDiv) {
         const suggestions = [
             LANG('layers-rename-sketch'),
             LANG('layers-rename-colors'),
+            LANG('layers-rename-shading'),
             LANG('layers-rename-lines'),
+            LANG('layers-rename-effects'),
             LANG('background'),
             LANG('layers-rename-foreground'),
         ];
