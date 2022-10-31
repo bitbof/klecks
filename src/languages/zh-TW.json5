@@ -335,7 +335,7 @@
   },
   'layers-rename-shading': {
     original: 'Shading',
-    value: ''
+    value: '陰影'
   },
   'layers-rename-lines': {
     original: 'Lines',
@@ -343,7 +343,7 @@
   },
   'layers-rename-effects': {
     original: 'Effects',
-    value: ''
+    value: '效果'
   },
   'layers-rename-foreground': {
     original: 'Foreground',
