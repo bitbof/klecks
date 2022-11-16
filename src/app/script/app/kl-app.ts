@@ -497,11 +497,12 @@ export function KlApp(pProject: IKlProject | null, pOptions: IKlAppOptions) {
             }
             if (comboStr === 'b') {
                 event.preventDefault();
+                const prevMode = klCanvasWorkspace.getMode();
                 klCanvasWorkspace.setMode('draw');
                 toolspaceToolRow.setActive('draw');
                 mainTabRow.open('draw');
                 updateMainTabVisibility();
-                brushTabRow.open(getNextBrushId());
+                brushTabRow.open(prevMode === 'draw' ? getNextBrushId() : currentBrushId);
             }
             if (comboStr === 'g') {
                 event.preventDefault();
