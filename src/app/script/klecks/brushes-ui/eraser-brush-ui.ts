@@ -2,26 +2,25 @@ import {BB} from '../../bb/bb';
 import {brushes} from '../brushes/brushes';
 import {eventResMs} from './brushes-consts';
 import {klHistory} from '../history/kl-history';
-import {KlSlider} from '../ui/base-components/kl-slider';
-import {penPressureToggle} from '../ui/base-components/pen-pressure-toggle';
-import {Checkbox} from '../ui/base-components/checkbox';
-// @ts-ignore
-import brushIconImg from 'url:~/src/app/img/ui/brush-eraser.svg';
-import {IBrushUi} from '../kl.types';
+import {KlSlider} from '../ui/components/kl-slider';
+import {createPenPressureToggle} from '../ui/components/create-pen-pressure-toggle';
+import {Checkbox} from '../ui/components/checkbox';
+import brushIconImg from '/src/app/img/ui/brush-eraser.svg';
+import {IBrushUi} from '../kl-types';
 import {LANG, languageStrings} from '../../language/language';
 
 export const eraserBrushUi = (function () {
-    let brushInterface: IBrushUi = {
+    const brushInterface: IBrushUi = {
         image: brushIconImg,
         tooltip: LANG('eraser') + ' [E]',
         sizeSlider: {
             min: 0.5,
             max: 200,
-            curve: BB.quadraticSplineInput(0.5, 200, 0.1)
+            curve: BB.quadraticSplineInput(0.5, 200, 0.1),
         },
         opacitySlider: {
             min: 1 / 100,
-            max: 1
+            max: 1,
         },
         Ui: null,
     };
@@ -31,8 +30,8 @@ export const eraserBrushUi = (function () {
     });
 
     brushInterface.Ui = function (p) {
-        let div = document.createElement("div"); // the gui
-        let brush = new brushes.EraserBrush();
+        const div = document.createElement('div'); // the gui
+        const brush = new brushes.EraserBrush();
         brush.setHistory(klHistory);
         p.onSizeChange(brush.getSize());
 
@@ -40,11 +39,11 @@ export const eraserBrushUi = (function () {
         let opacitySlider;
         let isTransparentBg = false;
 
-        function setSize(size) {
+        function setSize (size) {
             brush.setSize(size);
         }
 
-        function init() {
+        function init () {
             sizeSlider = new KlSlider({
                 label: LANG('brush-size'),
                 width: 225,
@@ -85,10 +84,10 @@ export const eraserBrushUi = (function () {
                 },
             });
 
-            let pressureSizeToggle = penPressureToggle(true, function (b) {
+            const pressureSizeToggle = createPenPressureToggle(true, function (b) {
                 brush.sizePressure(b);
             });
-            let pressureOpacityToggle = penPressureToggle(false, function (b) {
+            const pressureOpacityToggle = createPenPressureToggle(false, function (b) {
                 brush.opacityPressure(b);
             });
 
@@ -96,29 +95,29 @@ export const eraserBrushUi = (function () {
                 BB.el({
                     content: [
                         sizeSlider.getElement(),
-                        pressureSizeToggle
+                        pressureSizeToggle,
                     ],
                     css: {
                         display: 'flex',
                         justifyContent: 'space-between',
                         alignItems: 'center',
                         marginBottom: '10px',
-                    }
+                    },
                 }),
                 BB.el({
                     content: [
                         opacitySlider.getElement(),
-                        pressureOpacityToggle
+                        pressureOpacityToggle,
                     ],
                     css: {
                         display: 'flex',
                         justifyContent: 'space-between',
                         alignItems: 'center',
-                    }
+                    },
                 })
             );
 
-            let transparencyToggle = new Checkbox({
+            const transparencyToggle = new Checkbox({
                 init: false,
                 label: LANG('brush-eraser-transparent-bg'),
                 callback: function (b) {
@@ -126,15 +125,15 @@ export const eraserBrushUi = (function () {
                     brush.setTransparentBG(b);
                 },
                 css: {
-                    marginTop: "10px",
-                }
+                    marginTop: '10px',
+                },
             });
-            div.appendChild(transparencyToggle.getElement());
+            div.append(transparencyToggle.getElement());
         }
 
         init();
 
-        function drawDot(x, y) {
+        function drawDot (x, y) {
             brush.drawDot(x, y);
         }
 
@@ -151,14 +150,14 @@ export const eraserBrushUi = (function () {
         this.getSize = function () {
             return brush.getSize();
         };
-        this.setSize = function(size) {
+        this.setSize = function (size) {
             setSize(size);
             sizeSlider.setValue(size);
         };
         this.getOpacity = function () {
             return brush.getOpacity();
         };
-        this.setOpacity = function(opacity) {
+        this.setOpacity = function (opacity) {
             brush.setOpacity(opacity);
             opacitySlider.setValue(opacity);
         };
@@ -188,7 +187,7 @@ export const eraserBrushUi = (function () {
         };
         this.getElement = function () {
             return div;
-        }
+        };
     };
 
     return brushInterface;

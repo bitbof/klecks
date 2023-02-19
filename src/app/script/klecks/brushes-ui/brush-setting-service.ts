@@ -1,4 +1,4 @@
-import {IRGB, ISliderConfig} from '../kl.types';
+import {IRGB, ISliderConfig} from '../kl-types';
 
 export type TBrushSettingEmit = { type: 'color'; value: IRGB } |
     { type: 'opacity'; value: number } |
@@ -45,7 +45,7 @@ export class BrushSettingService {
         this.emit(
             {
                 type: 'color',
-                value: color
+                value: color,
             },
             skipSubscriber
         );
@@ -55,7 +55,7 @@ export class BrushSettingService {
         this.emit(
             {
                 type: 'size',
-                value: size
+                value: size,
             },
             skipSubscriber
         );
@@ -65,7 +65,7 @@ export class BrushSettingService {
         this.emit(
             {
                 type: 'opacity',
-                value: opacity
+                value: opacity,
             },
             skipSubscriber
         );
@@ -75,7 +75,7 @@ export class BrushSettingService {
         this.emit(
             {
                 type: 'sliderConfig',
-                value: sliderConfig
+                value: sliderConfig,
             },
             skipSubscriber
         );

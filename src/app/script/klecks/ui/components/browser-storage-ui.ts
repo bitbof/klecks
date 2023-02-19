@@ -1,26 +1,28 @@
 import {BB} from '../../../bb/bb';
 
-// @ts-ignore
-import removeLayerImg from 'url:~/src/app/img/ui/remove-layer.svg';
-import {IKlProject} from '../../kl.types';
-import {showIframePopup} from '../modals/show-iframe-popup';
+import removeLayerImg from '/src/app/img/ui/remove-layer.svg';
+import {IKlProject} from '../../kl-types';
+import {showIframeModal} from '../modals/show-iframe-modal';
 import {SaveReminder} from './save-reminder';
 import {IProjectStoreListener, ProjectStore} from '../../storage/project-store';
 import {KL} from '../../kl';
 import {LANG} from '../../../language/language';
+import {addIsDarkListener, removeIsDarkListener} from '../../../bb/base/base';
 
 export class BrowserStorageUi {
 
     private previewEl: HTMLDivElement;
-    private infoEl: HTMLDivElement;
-    private ageEl: HTMLDivElement;
-    private storeButtonEl: HTMLButtonElement;
-    private clearButtonEl: HTMLButtonElement;
-    private storeListener: IProjectStoreListener;
+    private readonly infoEl: HTMLElement;
+    private readonly ageEl: HTMLElement;
+    private readonly storeButtonEl: HTMLButtonElement;
+    private readonly clearButtonEl: HTMLButtonElement;
+    private readonly storeListener: IProjectStoreListener;
+    private readonly updateCheckerboard: () => void;
 
     private timestamp: number;
+    private thumbnail: HTMLImageElement | HTMLCanvasElement | undefined;
 
-    private updateAge() {
+    private updateAge () {
         if (!this.timestamp) {
             return;
         }
@@ -42,7 +44,7 @@ export class BrowserStorageUi {
         this.ageEl.textContent = ageStr;
     }
 
-    private resetButtons() {
+    private resetButtons () {
         if (this.timestamp) {
             this.storeButtonEl.textContent = LANG('file-storage-overwrite');
             this.storeButtonEl.disabled = false;
@@ -54,18 +56,11 @@ export class BrowserStorageUi {
         }
     }
 
-    private updateThumb(timestamp?: number, thumbnail?: HTMLImageElement | HTMLCanvasElement) {
+    private updateThumb (timestamp?: number, thumbnail?: HTMLImageElement | HTMLCanvasElement) {
         this.timestamp = timestamp;
-        if (this.timestamp) {
-            BB.css(thumbnail, {
-                display: 'block',
-                maxWidth: 'calc(100% - 2px)',
-                maxHeight: 'calc(100% - 2px)',
-                margin: '0 auto',
-                background: "url('" + BB.createCheckerCanvas(4).toDataURL('image/png') + "')",
-                boxShadow: '0 0 0 1px #aaa',
-                pointerEvents: 'none',
-            });
+        this.thumbnail = thumbnail;
+        if (this.timestamp && thumbnail) {
+            thumbnail.classList.add('kl-storage-preview__im');
             this.previewEl.innerHTML = '';
             this.updateAge();
             this.previewEl.append(thumbnail, this.ageEl);
@@ -75,7 +70,7 @@ export class BrowserStorageUi {
         this.resetButtons();
     }
 
-    private async store() {
+    private async store () {
         this.storeButtonEl.textContent = LANG('file-storage-storing');
         this.storeButtonEl.disabled = true;
         this.clearButtonEl.disabled = true;
@@ -95,7 +90,7 @@ export class BrowserStorageUi {
                     `<li>${LANG('file-storage-failed-2')}</li>`,
                     `<li>${LANG('file-storage-failed-3')}</li>`,
                     `<li>${LANG('file-storage-failed-4')}</li>`,
-                    `</ul>`,
+                    '</ul>',
                 ].join(''),
                 buttons: ['Ok'],
             });
@@ -105,7 +100,7 @@ export class BrowserStorageUi {
         }
     }
 
-    private async clear() {
+    private async clear () {
         this.storeButtonEl.disabled = true;
         this.clearButtonEl.disabled = true;
         try {
@@ -130,7 +125,7 @@ export class BrowserStorageUi {
         private projectStore: ProjectStore,
         private getProject: () => IKlProject,
         private saveReminder: SaveReminder,
-        private klRootEl: HTMLDivElement,
+        private klRootEl: HTMLElement,
         private options?: { hideClearButton?: boolean; isFocusable?: boolean }, // isFocusable default = false
     ) {
         this.element = BB.el({
@@ -140,7 +135,7 @@ export class BrowserStorageUi {
                 gridTemplateRows: '0fr 0fr 0fr',
                 gap: '0 0',
                 gridTemplateAreas: '"title title" "preview store" "preview clear"',
-            }
+            },
         }) as HTMLDivElement;
 
 
@@ -152,36 +147,26 @@ export class BrowserStorageUi {
                 display: 'flex',
                 margin: '-5px 0',
                 //background: '#f00',
-            }
+            },
         });
 
         this.infoEl = BB.el({
             parent: title,
             content: '?',
+            className: 'kl-storage-about',
             title: LANG('file-storage-about'),
-            css: {
-                cursor: 'pointer',
-                marginLeft: '5px',
-                width: '19px',
-                height: '19px',
-                borderRadius: '100%',
-                textAlign: 'center',
-                lineHeight: '19px',
-                fontWeight: 'bold',
-                boxShadow: 'inset 0 0 0 1px #000',
-            },
             onClick: () => {
-                showIframePopup('./help/#help-browser-storage', false);
-            }
+                showIframeModal('./help/#help-browser-storage', false);
+            },
         }) as HTMLDivElement;
 
         if (this.projectStore.isBroken()) {
             BB.el({
                 parent: this.element,
-                content: "🔴 " + LANG('file-storage-cant-access'),
+                content: '🔴 ' + LANG('file-storage-cant-access'),
                 css: {
                     marginTop: '10px',
-                }
+                },
             });
             return;
         }
@@ -189,31 +174,19 @@ export class BrowserStorageUi {
         this.previewEl = BB.el({
             parent: this.element,
             title: LANG('file-storage-thumb-title'),
-            css: {
-                gridArea: 'preview',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                marginTop: '10px',
-                position: 'relative',
-                boxShadow: 'inset 0 0 0 1px #aaa',
-                background: '#cdcdcd',
-                color: '#545454',
-                colorScheme: 'only light',
-                minHeight: '67px',
-            }
+            className: 'kl-storage-preview',
         }) as HTMLDivElement;
         this.ageEl = BB.el({
             css: {
                 position: 'absolute',
-                right: '0',
-                bottom: '0',
-                width: '100%',
+                right: '1px',
+                bottom: '1px',
+                width: 'calc(100% - 2px)',
                 textAlign: 'center',
                 background: 'rgba(0,0,0,0.7)',
                 color: '#fff',
                 textSize: '13px',
-            }
+            },
         }) as HTMLDivElement;
         const btnCustom = options?.isFocusable ?  {} : {
             tabIndex: -1,
@@ -221,7 +194,7 @@ export class BrowserStorageUi {
         this.storeButtonEl = BB.el({
             parent: this.element,
             tagName: 'button',
-            className: 'gridButton',
+            className: 'grid-button',
             content: LANG('file-storage-store'),
             css: {
                 gridArea: 'store',
@@ -233,7 +206,7 @@ export class BrowserStorageUi {
         this.clearButtonEl = BB.el({
             parent: this.element,
             tagName: 'button',
-            className: 'gridButton',
+            className: 'grid-button',
             content: '<img src="' + removeLayerImg + '" height="20"/> ' + LANG('file-storage-clear'),
             css: {
                 gridArea: 'clear',
@@ -254,6 +227,16 @@ export class BrowserStorageUi {
         };
         this.projectStore.subscribe(this.storeListener);
 
+        this.updateCheckerboard = (): void => {
+            if (!this.thumbnail) {
+                return;
+            }
+            BB.css(this.thumbnail, {
+                background: "url('" + BB.createCheckerCanvas(4, BB.isDark()).toDataURL('image/png') + "')",
+            });
+        };
+        addIsDarkListener(this.updateCheckerboard);
+
         setInterval(() => this.updateAge(), 1000 * 60);
 
         (async () => {
@@ -273,7 +256,7 @@ export class BrowserStorageUi {
     }
 
 
-    getElement() {
+    getElement () {
         return this.element;
     }
 
@@ -285,10 +268,11 @@ export class BrowserStorageUi {
         // todo
     }
 
-    destroy() {
+    destroy () {
         BB.destroyEl(this.infoEl);
         BB.destroyEl(this.storeButtonEl);
         BB.destroyEl(this.clearButtonEl);
+        removeIsDarkListener(this.updateCheckerboard);
         this.projectStore.unsubscribe(this.storeListener);
     }
 }

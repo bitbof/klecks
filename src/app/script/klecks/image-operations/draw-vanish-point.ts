@@ -1,8 +1,8 @@
-import {drawShape} from "./shape-tool";
-import {BB} from "../../bb/bb";
-import {IRGB} from "../kl.types";
+import {drawShape} from './shape-tool';
+import {BB} from '../../bb/bb';
+import {IRGB} from '../kl-types';
 
-export function drawVanishPoint(
+export function drawVanishPoint (
     ctx: CanvasRenderingContext2D,
     x: number,
     y: number,

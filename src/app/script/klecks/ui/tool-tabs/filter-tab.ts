@@ -1,67 +1,66 @@
 import {BB} from '../../../bb/bb';
 import {KL} from '../../kl';
 import {klHistory} from '../../history/kl-history';
-import {IKeyString} from '../../../bb/bb.types';
+import {IKeyString} from '../../../bb/bb-types';
 import {StatusOverlay} from '../components/status-overlay';
 import {KlCanvasWorkspace} from '../../canvas-ui/kl-canvas-workspace';
 import {KlCanvas} from '../../canvas/kl-canvas';
 import {LANG} from '../../../language/language';
-import {IFilterApply, IFilterGetDialogParam, IFilterGetDialogResult} from '../../kl.types';
+import {IFilterApply, IFilterGetDialogParam, IFilterGetDialogResult} from '../../kl-types';
+import {KlColorSlider} from '../components/kl-color-slider';
+import {LayerManager} from './layer-manager/layer-manager';
+import {HandUi} from './hand-ui';
+import {RGB} from '../../../bb/color/color';
 
 
 export class FilterTab {
 
-    private readonly div: HTMLDivElement;
+    private readonly rootEl: HTMLDivElement;
     private isInit = false;
 
     constructor (
-        private klRootEl,
-        private klColorSlider,
-        private layerManager,
-        // private setCurrentLayer,
+        private klRootEl: HTMLElement,
+        private klColorSlider: KlColorSlider,
+        private layerManager: LayerManager,
         private klCanvasWorkspace: KlCanvasWorkspace,
-        private handUi,
-        private getCurrentColor,
-        private getKlMaxCanvasSize,
+        private handUi: HandUi,
+        private getCurrentColor: () => RGB,
+        private getKlMaxCanvasSize: () => number,
         private getKlCanvas: () => KlCanvas,
-        private getCurrentLayerCtx,
+        private getCurrentLayerCtx: () => CanvasRenderingContext2D | null,
         private isEmbed: boolean,
         private statusOverlay: StatusOverlay,
     ) {
-        this.div = document.createElement("div");
+        this.rootEl = document.createElement('div');
     }
 
-    private init() {
-        const _this = this;
-        let filters = KL.filterLib;
-        let buttons = [];
-
-        BB.BbLog.emit({
-            type: 'init-filters',
-        });
+    private init (): void {
+        const filters = KL.filterLib;
+        const buttons = [];
 
         if (!KL.filterLibStatus.isLoaded) {
             throw new Error('filters not loaded');
         }
 
-        function createButton(filterKey, filterArr) {
-            let button = document.createElement("button");
-            let buttonLabel = LANG(filterArr[filterKey].lang.button);
-            let im = '<img height="20" width="18" src="' + filterArr[filterKey].icon + '" alt="icon" />';
+        const createButton = (filterKey: string): HTMLElement => {
+            const button = document.createElement('button');
+            const buttonLabel = LANG(filters[filterKey].lang.button);
+            const imClass = filters[filterKey].darkNoInvert ? 'class="dark-no-invert"' : '';
+            const im = '<img ' + imClass + ' height="20" width="18" src="' + filters[filterKey].icon + '" alt="icon" />';
             button.innerHTML = im + buttonLabel;
-            button.className = "gridButton";
+            button.className = 'grid-button';
             BB.css(button, {
                 lineHeight: '20px',
                 fontSize: '12px',
             });
             button.tabIndex = -1;
 
-            const filterName = LANG(filterArr[filterKey].lang.name);
+            const filterName = LANG(filters[filterKey].lang.name);
 
-            button.onclick = function () {
+            button.onclick = () => {
 
-                function finishedDialog(result, filterDialog) {
-                    if (result == "Cancel") {
+                const finishedDialog = (result, filterDialog): void => {
+                    if (result == 'Cancel') {
                         if (filterDialog.destroy) {
                             filterDialog.destroy();
                         }
@@ -78,46 +77,43 @@ export class FilterTab {
                         }
                     }
                     applyFilter(input);
-                }
+                };
 
-                if (!('apply' in filterArr[filterKey])) {
+                if (!('apply' in filters[filterKey])) {
                     alert('Application not fully loaded');
                     return;
                 }
 
-                function applyFilter(input) {
-                    let filterResult = filterArr[filterKey].apply({
-                        context: _this.getCurrentLayerCtx(),
-                        klCanvas: _this.getKlCanvas(),
+                const applyFilter = (input: any) => {
+                    const filterResult = filters[filterKey].apply({
+                        context: this.getCurrentLayerCtx(),
+                        klCanvas: this.getKlCanvas(),
                         history: klHistory,
-                        input: input
+                        input: input,
                     } as IFilterApply);
                     if (filterResult === false) {
                         alert("Couldn't apply the edit action");
                     }
-                    /*
-                     _this.setCurrentLayer(_this.getKlCanvas().getLayer(_this.layerManager.getSelected()));
-                    */
-                    if (filterArr[filterKey].updatePos === true) {
-                        _this.klCanvasWorkspace.resetView();
-                        _this.handUi.update(_this.klCanvasWorkspace.getScale(), _this.klCanvasWorkspace.getAngleDeg());
+                    if (filters[filterKey].updatePos === true) {
+                        this.klCanvasWorkspace.resetView();
+                        this.handUi.update(this.klCanvasWorkspace.getScale(), this.klCanvasWorkspace.getAngleDeg());
                     }
-                    _this.layerManager.update();
-                }
+                    this.layerManager.update();
+                };
 
-                if (filterArr[filterKey].isInstant){
+                if (filters[filterKey].isInstant){
                     button.blur();
                     applyFilter(null);
-                    _this.statusOverlay.out('"' + filterName + '" ' + LANG('filter-applied'), true);
+                    this.statusOverlay.out('"' + filterName + '" ' + LANG('filter-applied'), true);
                 } else {
-                    let secondaryColorRGB = _this.klColorSlider.getSecondaryRGB();
-                    let filterDialog = filterArr[filterKey].getDialog({
-                        context: _this.getCurrentLayerCtx(),
-                        klCanvas: _this.getKlCanvas(),
-                        maxWidth: _this.getKlMaxCanvasSize(),
-                        maxHeight: _this.getKlMaxCanvasSize(),
-                        currentColorRgb: {r: _this.getCurrentColor().r, g: _this.getCurrentColor().g, b: _this.getCurrentColor().b},
-                        secondaryColorRgb: {r: secondaryColorRGB.r, g: secondaryColorRGB.g, b: secondaryColorRGB.b}
+                    const secondaryColorRGB = this.klColorSlider.getSecondaryRGB();
+                    const filterDialog = filters[filterKey].getDialog({
+                        context: this.getCurrentLayerCtx(),
+                        klCanvas: this.getKlCanvas(),
+                        maxWidth: this.getKlMaxCanvasSize(),
+                        maxHeight: this.getKlMaxCanvasSize(),
+                        currentColorRgb: {r: this.getCurrentColor().r, g: this.getCurrentColor().g, b: this.getCurrentColor().b},
+                        secondaryColorRgb: {r: secondaryColorRGB.r, g: secondaryColorRGB.g, b: secondaryColorRGB.b},
                     } as IFilterGetDialogParam) as IFilterGetDialogResult;
 
                     if (!filterDialog) {
@@ -126,53 +122,53 @@ export class FilterTab {
                         //throw('filter['+filterKey+'].getDialog returned '+filterDialog+'. ctx:' + currentLayerCtx + ' klCanvas:' + klCanvas);
                     }
 
-                    let closefunc;
+                    let closeFunc: () => void;
                     // Todo should move into getDialogParams
-                    filterDialog.errorCallback = function(e) {
-                        setTimeout(function() {
+                    filterDialog.errorCallback = (e) => {
+                        setTimeout(() => {
                             alert('Error: could not perform action');
                             throw e;
                         }, 0);
-                        closefunc();
+                        closeFunc();
                     };
 
 
-                    let style: IKeyString = {};
+                    const style: IKeyString = {};
                     if ('width' in filterDialog) {
-                        style.width = filterDialog.width + 'px'
+                        style.width = filterDialog.width + 'px';
                     }
 
                     KL.popup({
-                        target: _this.klRootEl,
-                        message: "<b>" + filterName + "</b>",
+                        target: this.klRootEl,
+                        message: '<b>' + filterName + '</b>',
                         div: filterDialog.element,
                         style: style,
-                        buttons: ["Ok", "Cancel"],
+                        buttons: ['Ok', 'Cancel'],
                         clickOnEnter: 'Ok',
-                        callback: function(result) {
+                        callback: (result) => {
                             finishedDialog(result, filterDialog);
                         },
-                        closefunc: function (func) {
-                            closefunc = func;
-                        }
+                        closeFunc: (func) => {
+                            closeFunc = func;
+                        },
                     });
                 }
-            }
+            };
             buttons[buttons.length] = button;
             return button;
-        }
+        };
 
-        function addGroup(groupArr, filterArr, targetEl) {
-            for (let filterKey in filterArr) {
-                if (filterArr.hasOwnProperty[filterKey] || !groupArr.includes(filterKey)) {
-                    continue;
+        const addGroup = (groupArr: string[]): void => {
+            Object.entries(filters).forEach(([filterKey, filter]) => {
+                if (!groupArr.includes(filterKey)) {
+                    return;
                 }
-                if (_this.isEmbed && !filterArr[filterKey].inEmbed) {
-                    continue;
+                if (this.isEmbed && !filter.inEmbed) {
+                    return;
                 }
-                targetEl.appendChild(createButton(filterKey, filterArr));
-            }
-        }
+                this.rootEl.append(createButton(filterKey));
+            });
+        };
 
         const groupA = [
             'cropExtend',
@@ -197,32 +193,31 @@ export class FilterTab {
             'grid',
             'noise',
             'pattern',
-            'vanishPoint'
+            'vanishPoint',
         ];
 
-        addGroup(groupA, filters, _this.div);
-
-        _this.div.appendChild(BB.el({className: 'gridHr'}));
-        addGroup(groupB, filters, _this.div);
-        _this.div.appendChild(BB.el({className: 'gridHr'}));
-        addGroup(groupC, filters, _this.div);
+        addGroup(groupA);
+        this.rootEl.append(BB.el({className: 'grid-hr'}));
+        addGroup(groupB);
+        this.rootEl.append(BB.el({className: 'grid-hr'}));
+        addGroup(groupC);
 
         this.isInit = true;
     }
 
-    getElement() {
-        return this.div;
+    getElement (): HTMLElement {
+        return this.rootEl;
     }
 
-    show() {
+    show (): void {
         if (!this.isInit) {
             this.init();
         }
-        this.div.style.display = 'block';
+        this.rootEl.style.display = 'block';
     }
 
-    hide() {
-        this.div.style.display = 'none';
+    hide (): void {
+        this.rootEl.style.display = 'none';
     }
 
 }

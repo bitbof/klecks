@@ -37,6 +37,7 @@ It is then accessible through: http://localhost:5050
 Are you a native speaker or have advanced skills in a language with no translation yet?
 Any contribution by you is highly encouraged and appreciated! These are the currently available languages:
 - English
+- French
 - German
 - Japanese
 - Chinese (simplified)

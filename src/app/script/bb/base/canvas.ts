@@ -1,7 +1,8 @@
-import {IKeyString, IRect} from '../BB.types';
+import {IBounds, IKeyString, IRect, TNullable} from '../bb-types';
 import {createCanvas} from './create-canvas';
+import {copyObj} from './base';
 
-export function copyCanvas(canvas: HTMLCanvasElement): HTMLCanvasElement {
+export function copyCanvas (canvas: HTMLCanvasElement): HTMLCanvasElement {
     const resultCanvas = createCanvas(canvas.width, canvas.height);
     const ctx = resultCanvas.getContext('2d');
     if (!ctx) {
@@ -11,12 +12,20 @@ export function copyCanvas(canvas: HTMLCanvasElement): HTMLCanvasElement {
     return resultCanvas;
 }
 
+export function ctx (canvas: HTMLCanvasElement): CanvasRenderingContext2D {
+    const ctx = canvas.getContext('2d');
+    if (!ctx) {
+        throw new Error("couldn't get 2d context");
+    }
+    return ctx;
+}
+
 /**
  * Determine if should disable imageSmoothing for transformation.
  * ImageSmoothing can make images blurry even when they're in the original scale and aligned with the pixelgrid.
  */
-export function testShouldPixelate(
-    transform: {x: number, y: number, width:number, height: number, angleDeg: number},
+export function testShouldPixelate (
+    transform: {x: number; y: number; width:number; height: number; angleDeg: number},
     scaleX: number,
     scaleY: number,
 ): boolean {
@@ -48,11 +57,11 @@ export function testShouldPixelate(
  * @param bounds object - optional {x, y, width, height} - crop of transformImage in transformImage image space
  * @param pixelated
  */
-export function drawTransformedImageWithBounds(
+export function drawTransformedImageWithBounds (
     destCtx: CanvasRenderingContext2D,
     transformImage: HTMLImageElement | HTMLCanvasElement,
-    transform: {x: number, y: number, width:number, height: number, angleDeg: number},
-    bounds?: {x: number, y: number, width: number, height: number},
+    transform: {x: number; y: number; width:number; height: number; angleDeg: number},
+    bounds?: {x: number; y: number; width: number; height: number},
     pixelated?: boolean,
 ): void {
     if (!bounds) {
@@ -60,7 +69,7 @@ export function drawTransformedImageWithBounds(
             x: 0,
             y: 0,
             width: transformImage.width,
-            height: transformImage.height
+            height: transformImage.height,
         };
     }
 
@@ -91,27 +100,27 @@ export function drawTransformedImageWithBounds(
  * @param transformImage image|canvas - image that will be drawn on canvas
  * @param transformObj {center: {x, y}, scale: {x, y}, translate: {x, y}, angleDegree}
  */
-export function drawTransformedImageOnCanvas(
+export function drawTransformedImageOnCanvas (
     baseCanvas: HTMLCanvasElement,
     transformImage: HTMLImageElement | HTMLCanvasElement,
     transformObj: {
-        center: {x: number, y: number},
-        scale: {x: number, y: number},
-        translate: {x: number, y: number},
-        angleDegree: number,
+        center: {x: number; y: number};
+        scale: {x: number; y: number};
+        translate: {x: number; y: number};
+        angleDegree: number;
     },
 ): void {
-    transformObj = JSON.parse(JSON.stringify(transformObj));
+    transformObj = copyObj(transformObj);
     if (!transformObj.center) {
         transformObj.center = {
             x: transformImage.width / 2,
-            y: transformImage.height / 2
-        }
+            y: transformImage.height / 2,
+        };
     }
     if (!transformObj.scale) {
         transformObj.scale = {
             x: 1,
-            y: 1
+            y: 1,
         };
     }
     if (!transformObj.angleDegree) {
@@ -120,7 +129,7 @@ export function drawTransformedImageOnCanvas(
     if (!transformObj.translate) {
         transformObj.translate = {
             x: 0,
-            y: 0
+            y: 0,
         };
     }
 
@@ -150,7 +159,7 @@ export function drawTransformedImageOnCanvas(
     ctx.restore();
 }
 
-export const createCheckerCanvas = function(size: number): HTMLCanvasElement {
+export const createCheckerCanvas = function (size: number, isDark?: boolean): HTMLCanvasElement {
     const canvas = createCanvas();
     let ctx;
     if (size < 1) {
@@ -172,9 +181,9 @@ export const createCheckerCanvas = function(size: number): HTMLCanvasElement {
         if (!ctx) {
             throw new Error('2d context not supported or canvas already initialized');
         }
-        ctx.fillStyle = 'rgb(255, 255, 255)';
+        ctx.fillStyle = isDark ? 'rgb(55, 55, 55)' : 'rgb(255, 255, 255)';
         ctx.fillRect(0, 0, size * 2, size * 2);
-        ctx.fillStyle = 'rgb(200, 200, 200)';
+        ctx.fillStyle = isDark ? 'rgb(0, 0, 0)': 'rgb(200, 200, 200)';
         ctx.fillRect(0, 0, size, size);
         ctx.fillRect(size, size, size * 2, size * 2);
     }
@@ -183,19 +192,21 @@ export const createCheckerCanvas = function(size: number): HTMLCanvasElement {
 
 export const createCheckerDataUrl = (function () {
     const cache: IKeyString = { // previously created dataUrls
-        '8': 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAMElEQVQ4T2M8ceLEfwY8wNzcHJ80A+OoAcMiDP7//483HZw8eRJ/Ohg1gIFx6IcBAIhJUqnarXQ1AAAAAElFTkSuQmCC',
-        '4': 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAYAAADED76LAAAAJ0lEQVQoU2M8ceLEfwYkYG5ujsxlYKSDgv///6O44eTJk6huoL0CAGsOKVVu8UYvAAAAAElFTkSuQmCC'
+        '8l': 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAMElEQVQ4T2M8ceLEfwY8wNzcHJ80A+OoAcMiDP7//483HZw8eRJ/Ohg1gIFx6IcBAIhJUqnarXQ1AAAAAElFTkSuQmCC',
+        '4l': 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAYAAADED76LAAAAJ0lEQVQoU2M8ceLEfwYkYG5ujsxlYKSDgv///6O44eTJk6huoL0CAGsOKVVu8UYvAAAAAElFTkSuQmCC',
     };
 
-    return function (size: number, callback?: (s: string) => void) {
-        function create(size: number): string {
+    return function (size: number, callback?: (s: string) => void, isDark?: boolean) {
+        const modeStr = isDark ? 'd' : 'l';
+
+        function create (size: number): string {
             size = parseInt('' + size);
-            if (cache['' + size]) {
-                return cache['' + size];
+            if (cache['' + size + modeStr]) {
+                return cache['' + size + modeStr];
             }
-            const canvas = createCheckerCanvas(size);
+            const canvas = createCheckerCanvas(size, isDark);
             const result = canvas.toDataURL('image/png');
-            cache['' + size] = result;
+            cache['' + size + modeStr] = result;
             return result;
         }
 
@@ -217,7 +228,7 @@ export const createCheckerDataUrl = (function () {
  * @param tmp1 canvas - optional, provide to save resources
  * @param tmp2 canvas - optional, provide to save resources
  */
-export function resizeCanvas(
+export function resizeCanvas (
     canvas: HTMLCanvasElement,
     w: number,
     h: number,
@@ -226,12 +237,12 @@ export function resizeCanvas(
 ): void {
 
     //determine base 2 exponents of old and new size
-    function getBase2Obj(oldW: number, oldH: number, newW: number, newH: number) {
+    function getBase2Obj (oldW: number, oldH: number, newW: number, newH: number) {
         const result = {
             oldWidthEx: Math.round(Math.log2(oldW)),
             oldHeightEx: Math.round(Math.log2(oldH)),
             newWidthEx: Math.ceil(Math.log2(newW)),
-            newHeightEx: Math.ceil(Math.log2(newH))
+            newHeightEx: Math.ceil(Math.log2(newH)),
         };
         result.oldWidthEx = Math.max(result.oldWidthEx, result.newWidthEx);
         result.oldHeightEx = Math.max(result.oldHeightEx, result.newHeightEx);
@@ -346,7 +357,7 @@ export function resizeCanvas(
  * only writes a, doesn't write rgb
  * @param canvas
  */
-export function convertToAlphaChannelCanvas(canvas: HTMLCanvasElement): void {
+export function convertToAlphaChannelCanvas (canvas: HTMLCanvasElement): void {
     const imdat = canvas.getContext('2d')!.getImageData(0, 0, canvas.width, canvas.height);
     for (let i = 0; i < imdat.data.length; i += 4) {
         if (imdat.data[i + 3] === 0) {
@@ -362,7 +373,7 @@ export function convertToAlphaChannelCanvas(canvas: HTMLCanvasElement): void {
  * or there is a hard to fix memory leak.
  * This function manually makes the canvas use as little memory as possible.
  */
-export function freeCanvas(canvas: HTMLCanvasElement): void {
+export function freeCanvas (canvas: HTMLCanvasElement): void {
     canvas.width = 1;
     canvas.height = 1;
     const ctx = canvas.getContext('2d');
@@ -375,21 +386,21 @@ export function freeCanvas(canvas: HTMLCanvasElement): void {
  *
  * @param context
  */
-export function canvasBounds(context: CanvasRenderingContext2D): IRect | null {
-    let boundsObj: {
+export function canvasBounds (context: CanvasRenderingContext2D): IRect | null {
+    const boundsObj: {
         x: number;
         y: number;
         width: number;
         height: number;
     } = { x: 0, y: 0, width: 0, height: 0 };
     {
-        let tempBounds: any = {
+        const tempBounds: TNullable<IBounds> = {
             x1: null,
             y1: null,
             x2: null,
-            y2: null
+            y2: null,
         };
-        let imdat = context.getImageData(0, 0, context.canvas.width, context.canvas.height);
+        const imdat = context.getImageData(0, 0, context.canvas.width, context.canvas.height);
 
         if (imdat.data[3] > 0 && imdat.data[imdat.data.length - 1] > 0) {
             tempBounds.x1 = 0;
@@ -399,30 +410,30 @@ export function canvasBounds(context: CanvasRenderingContext2D): IRect | null {
         } else {
             for (let i = 3; i < imdat.data.length; i += 4) {
                 if (imdat.data[i] > 0 ) {
-                    let x = ((i - 3) / 4) %  context.canvas.width;
-                    let y = Math.floor((i - 3) / 4 / context.canvas.width);
-                    if (tempBounds.x1 > x || tempBounds.x1 === null) {
+                    const x = ((i - 3) / 4) %  context.canvas.width;
+                    const y = Math.floor((i - 3) / 4 / context.canvas.width);
+                    if (tempBounds.x1 === null || tempBounds.x1 > x) {
                         tempBounds.x1 = x;
                     }
                     if (tempBounds.y1 === null) {
                         tempBounds.y1 = y;
                     }
-                    if (tempBounds.x2 < x || tempBounds.x2 === null) {
+                    if (tempBounds.x2 === null || tempBounds.x2 < x) {
                         tempBounds.x2 = x;
                     }
-                    if (tempBounds.y2 < y || tempBounds.y2 === null) {
+                    if (tempBounds.y2 === null || tempBounds.y2 < y) {
                         tempBounds.y2 = y;
                     }
                 }
             }
         }
-        if (tempBounds.x1 === null || tempBounds.y1 === null) {
+        if (tempBounds.x1 === null || tempBounds.y1 === null || tempBounds.x2 === null || tempBounds.y2 === null) {
             return null;
         }
         boundsObj.x = tempBounds.x1;
         boundsObj.y = tempBounds.y1;
-        boundsObj.width = tempBounds.x2 - tempBounds.x1 + 1;
-        boundsObj.height = tempBounds.y2 - tempBounds.y1 + 1;
+        boundsObj.width = tempBounds.x2! - tempBounds.x1 + 1;
+        boundsObj.height = tempBounds.y2! - tempBounds.y1 + 1;
     }
     return boundsObj;
 }

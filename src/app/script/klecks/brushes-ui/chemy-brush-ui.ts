@@ -1,14 +1,13 @@
 import {BB} from '../../bb/bb';
 import {eventResMs} from './brushes-consts';
-import {Checkbox} from '../ui/base-components/checkbox';
+import {Checkbox} from '../ui/components/checkbox';
 import {brushes} from '../brushes/brushes';
 import {klHistory} from '../history/kl-history';
-import {KlSlider} from '../ui/base-components/kl-slider';
-// @ts-ignore
-import brushIconImg from 'url:~/src/app/img/ui/brush-chemy.svg';
-import {IBrushUi} from '../kl.types';
-import {Options} from '../ui/base-components/options';
-import {BoxToggle} from '../ui/base-components/box-toggle';
+import {KlSlider} from '../ui/components/kl-slider';
+import brushIconImg from '/src/app/img/ui/brush-chemy.svg';
+import {IBrushUi} from '../kl-types';
+import {Options} from '../ui/components/options';
+import {BoxToggle} from '../ui/components/box-toggle';
 import {LANG, languageStrings} from '../../language/language';
 
 export const chemyBrushUi = (function () {
@@ -23,7 +22,7 @@ export const chemyBrushUi = (function () {
         },
         opacitySlider: {
             min: 1 / 100,
-            max: 1
+            max: 1,
         },
         Ui: null,
     };
@@ -33,7 +32,7 @@ export const chemyBrushUi = (function () {
     });
 
     brushInterface.Ui = function (p) {
-        const div = document.createElement("div"); // the gui
+        const div = document.createElement('div'); // the gui
         const brush = new brushes.ChemyBrush();
         brush.setHistory(klHistory);
         p.onSizeChange(brush.getSize());
@@ -41,11 +40,11 @@ export const chemyBrushUi = (function () {
         let sizeSlider: KlSlider;
         let opacitySlider: KlSlider;
 
-        function setSize(size) {
+        function setSize (size) {
             brush.setSize(size);
         }
 
-        function init() {
+        function init () {
             sizeSlider = new KlSlider({
                 label: LANG('brush-size'),
                 width: 250,
@@ -91,7 +90,7 @@ export const chemyBrushUi = (function () {
                 marginTop: '10px',
             });
 
-            let eraserToggle = new Checkbox({
+            const eraserToggle = new Checkbox({
                 init: brush.getIsEraser(),
                 label: LANG('eraser'),
                 callback: function (b) {
@@ -100,7 +99,7 @@ export const chemyBrushUi = (function () {
                 css: {
                     marginTop: '10px',
                     marginLeft: '10px',
-                }
+                },
             });
 
             const lockAlphaToggle = new Checkbox({
@@ -113,14 +112,14 @@ export const chemyBrushUi = (function () {
                 title: LANG('lock-alpha-title'),
                 css: {
                     marginTop: '10px',
-                }
+                },
             });
 
             const toggleRow = BB.el({
                 css: {
                     display: 'flex',
                     marginTop: '10px',
-                }
+                },
             });
 
             const iconSize = 35;
@@ -133,6 +132,7 @@ export const chemyBrushUi = (function () {
                     {
                         id: 'fill',
                         label: BB.createSvg({
+                            class: 'dark-invert',
                             elementType: 'svg',
                             width: iconSize + '',
                             height: iconSize + '',
@@ -150,6 +150,7 @@ export const chemyBrushUi = (function () {
                     {
                         id: 'stroke',
                         label: BB.createSvg({
+                            class: 'dark-invert',
                             elementType: 'svg',
                             width: iconSize + '',
                             height: iconSize + '',
@@ -164,7 +165,7 @@ export const chemyBrushUi = (function () {
                             ],
                         }),
                         title: LANG('brush-chemy-stroke'),
-                    }
+                    },
                 ],
                 initId: brush.getMode(),
                 onChange: (id: string): void => {
@@ -176,11 +177,12 @@ export const chemyBrushUi = (function () {
                     sizeSlider.setValue(brushSize);
                     p.onSizeChange(brushSize);
                     p.onConfigChange();
-                }
+                },
             });
 
             const mirrorXToggle = new BoxToggle({
                 label: BB.createSvg({
+                    class: 'dark-invert',
                     elementType: 'svg',
                     width: iconSize + '',
                     height: iconSize + '',
@@ -192,7 +194,7 @@ export const chemyBrushUi = (function () {
                             style: 'stroke-width: 1px',
                             d: `M ${halfSize + padding},${padding} ${halfSize + padding},${actualIconSize + padding}`,
                         },
-                    ]
+                    ],
                 }),
                 title: LANG('brush-chemy-mirror-x'),
                 init: brush.getXSymmetry(),
@@ -203,6 +205,7 @@ export const chemyBrushUi = (function () {
 
             const mirrorYToggle = new BoxToggle({
                 label: BB.createSvg({
+                    class: 'dark-invert',
                     elementType: 'svg',
                     width: iconSize + '',
                     height: iconSize + '',
@@ -214,7 +217,7 @@ export const chemyBrushUi = (function () {
                             style: 'stroke-width: 1px',
                             d: `M ${padding},${halfSize + padding} ${actualIconSize + padding},${halfSize + padding}`,
                         },
-                    ]
+                    ],
                 }),
                 title: LANG('brush-chemy-mirror-y'),
                 init: brush.getYSymmetry(),
@@ -225,6 +228,7 @@ export const chemyBrushUi = (function () {
 
             const gradientToggle = new BoxToggle({
                 label: BB.createSvg({
+                    class: 'dark-invert',
                     elementType: 'svg',
                     width: iconSize + '',
                     height: iconSize + '',
@@ -249,10 +253,10 @@ export const chemyBrushUi = (function () {
                                             elementType: 'stop',
                                             offset: '100%',
                                             'stop-color': 'rgba(0,0,0,1)',
-                                        }
-                                    ]
-                                }
-                            ]
+                                        },
+                                    ],
+                                },
+                            ],
                         },
                         {
                             elementType: 'rect',
@@ -262,7 +266,7 @@ export const chemyBrushUi = (function () {
                             width: '' + actualIconSize,
                             height: '' + actualIconSize,
                         },
-                    ]
+                    ],
                 }),
                 title: LANG('brush-chemy-gradient'),
                 init: brush.getGradient(),
@@ -300,7 +304,7 @@ export const chemyBrushUi = (function () {
                     ],
                     css: {
                         display: 'flex',
-                    }
+                    },
                 })
             );
         }
@@ -321,14 +325,14 @@ export const chemyBrushUi = (function () {
         this.getSize = function () {
             return brush.getSize();
         };
-        this.setSize = function(size) {
+        this.setSize = function (size) {
             setSize(size);
             sizeSlider.setValue(size);
         };
         this.getOpacity = function () {
             return brush.getOpacity();
         };
-        this.setOpacity = function(opacity) {
+        this.setOpacity = function (opacity) {
             brush.setOpacity(opacity);
             opacitySlider.setValue(opacity);
         };

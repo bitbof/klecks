@@ -1,14 +1,14 @@
-import './polyfills';
+import './polyfills/polyfills';
 import {KlApp} from './app/kl-app';
-import {IKlProject} from './klecks/kl.types';
+import {IKlProject} from './klecks/kl-types';
 import {SaveReminder} from './klecks/ui/components/save-reminder';
 import {klHistory} from './klecks/history/kl-history';
 import {klPsdToKlProject, readPsd} from './klecks/storage/psd';
 import {LANG} from './language/language';
 
 export interface IEmbedParams {
-    project?: IKlProject,
-    psdBlob?: Blob,
+    project?: IKlProject;
+    psdBlob?: Blob;
     onSubmit: (onSuccess: () => void, onError: () => void) => void;
     embedUrl: string;
     logoImg?: any;
@@ -21,20 +21,20 @@ export interface IReadPSD {
     callback: (k: IKlProject) => void;
 }
 
-export function Embed(p: IEmbedParams) {
+export function Embed (p: IEmbedParams) {
 
     let isInitialized: boolean = false;
     let klApp;
     const psdQueue: IReadPSD[] = []; // queue of psds waiting while ag-psd is loading
     let agPsd: any | 'error';
 
-    let loadingScreenEl = document.getElementById("loading-screen");
-    let loadingScreenTextEl = document.getElementById("loading-screen-text");
+    let loadingScreenEl = document.getElementById('loading-screen');
+    let loadingScreenTextEl = document.getElementById('loading-screen-text');
     if (loadingScreenTextEl) {
         loadingScreenTextEl.textContent = LANG('embed-init-waiting');
     }
 
-    function onProjectReady(project: IKlProject) {
+    function onProjectReady (project: IKlProject) {
         try {
             if (isInitialized) {
                 throw new Error('Already called openProject');
@@ -59,7 +59,7 @@ export function Embed(p: IEmbedParams) {
                     embed: {
                         url: p.embedUrl,
                         onSubmit: p.onSubmit,
-                    }
+                    },
                 }
             );
             saveReminder.init();
@@ -70,7 +70,7 @@ export function Embed(p: IEmbedParams) {
             loadingScreenEl = null;
             loadingScreenTextEl = null;
 
-            document.body.appendChild(klApp.getEl());
+            document.body.append(klApp.getEl());
         } catch (e) {
             if (loadingScreenTextEl) {
                 loadingScreenTextEl.textContent = '❌ ' + e;

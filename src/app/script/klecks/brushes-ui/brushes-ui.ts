@@ -5,7 +5,7 @@ import {pixelBrushUi} from './pixel-brush-ui';
 import {eraserBrushUi} from './eraser-brush-ui';
 import {smudgeBrushUi} from './smudge-brush-ui';
 import {chemyBrushUi} from './chemy-brush-ui';
-import {IBrushUi} from '../kl.types';
+import {IBrushUi} from '../kl-types';
 
 /**
  * UI for brushes.

@@ -1,167 +1,185 @@
 import {BB} from '../../bb/bb';
-import {IHistoryEntry, KlHistoryInterface} from '../history/kl-history';
+import {IHistoryEntry, KlHistoryInterface, THistoryInnerActions} from '../history/kl-history';
 import {KL} from '../kl';
+import {IRGB, TPressureInput} from '../kl-types';
+
+export interface ISketchyBrushHistoryEntry extends IHistoryEntry {
+    tool: ['brush', 'SketchyBrush'];
+    actions: THistoryInnerActions<SketchyBrush>[];
+}
 
 const sampleCanvas = BB.canvas(32, 32);
-const sampleCtx = sampleCanvas.getContext('2d');
+const sampleCtx = BB.ctx(sampleCanvas);
 
-export function SketchyBrush() {
-    let context;
-    let settingColor;
+export class SketchyBrush {
 
-    let settingSize = 1, settingOpacity = 0.2;
-    let settingBlending = 0.5;
-    let settingScale = 1;
-
-    let lastX, lastY;
-    let isDrawing = false;
-    let lastInput = {x: 0, y: 0, pressure: 0};
-    let history: KlHistoryInterface = new KL.DecoyKlHistory();
-    let historyEntry: IHistoryEntry;
-    let sketchySeed = 0;
-    this.setHistory = function (l: KlHistoryInterface) {
-        history = l;
-    };
-    this.setSeed = function (s) {
-        sketchySeed = parseInt(s);
-    };
-    this.getSeed = function () {
-        return parseInt('' + sketchySeed);
-    };
-
-    function rand() {
-        sketchySeed++;
-        return Math.sin(6324634.2345 * Math.cos(sketchySeed * 5342.3423)) * 0.5 + 0.5;
-    }
-
-    let points = [];
-    let count = 0;
-    let mixmode = [
-        function (c1, c2) {
+    private context: CanvasRenderingContext2D;
+    private settingColor: IRGB;
+    private settingSize: number = 1;
+    private settingOpacity: number = 0.2;
+    private settingBlending: number = 0.5;
+    private settingScale: number = 1;
+    private lastX: number = 0;
+    private lastY: number = 0;
+    private inputIsDrawing: boolean = false;
+    private lastInput: TPressureInput = {x: 0, y: 0, pressure: 0};
+    private history: KlHistoryInterface = new KL.DecoyKlHistory();
+    private historyEntry: ISketchyBrushHistoryEntry | undefined;
+    private sketchySeed: number = 0;
+    private points: [number, number][] = []; // x y
+    private count: number = 0;
+    private readonly mixmode = [
+        (c1: IRGB, c2: IRGB) => {
             return c1;
         },
-        function (c1, c2) {
-            let result = new BB.RGB(c1.r, c1.g, c1.b);
+        (c1: IRGB, c2: IRGB) => { // why
+            const result = new BB.RGB(c1.r, c1.g, c1.b);
             result.r *= c2.r / 255;
             result.g *= c2.g / 255;
             result.b *= c2.b / 255;
             return result;
         },
-        function (c1, c2) {
-            let result = new BB.RGB(c1.r, c1.g, c1.b);
-            result.r *= c2.r / 255;
-            result.g *= c2.g / 255;
-            result.b *= c2.b / 255;
-            return result;
-        }
     ];
 
-    this.getSize = function () {
-        return settingSize / 2;
-    };
-    this.setColor = function (c) {
-        settingColor = c;
-    };
-    this.getOpacity = function () {
-        return settingOpacity;
-    };
-    this.setOpacity = function (o) {
-        settingOpacity = o;
-    };
-    this.getBlending = function () {
-        return settingBlending;
-    };
-    this.setBlending = function (b) {
-        settingBlending = b;
-    };
-    this.setSize = function (s) {
-        settingSize = s * 2;
-    };
-    this.getScale = function () {
-        return settingScale;
-    };
-    this.setScale = function (s) {
-        settingScale = s;
-    };
-    this.setContext = function (c) {
-        context = c;
-    };
-    this.startLine = function (x, y, pressure, shift) {
-        if (shift && lastInput.x) {
-            let lx = lastInput.x, ly = lastInput.y;
-            isDrawing = true;
-            //this.goLine(x,y,pressure);
+
+    private rand (): number {
+        this.sketchySeed++;
+        return Math.sin(6324634.2345 * Math.cos(this.sketchySeed * 5342.3423)) * 0.5 + 0.5;
+    }
+
+    // ---- public ----
+    constructor () {}
+
+    // ---- interface ----
+
+    setHistory (l: KlHistoryInterface): void {
+        this.history = l;
+    }
+
+    setSeed (s: number): void {
+        this.sketchySeed = parseInt('' + s);
+    }
+
+    getSeed (): number {
+        return parseInt('' + this.sketchySeed);
+    }
+
+    getSize (): number {
+        return this.settingSize / 2;
+    }
+
+    setColor (c: IRGB): void {
+        this.settingColor = c;
+    }
+
+    getOpacity (): number {
+        return this.settingOpacity;
+    }
+
+    setOpacity (o: number): void {
+        this.settingOpacity = o;
+    }
+
+    getBlending (): number {
+        return this.settingBlending;
+    }
+
+    setBlending (b: number): void {
+        this.settingBlending = b;
+    }
+
+    setSize (s: number): void {
+        this.settingSize = s * 2;
+    }
+
+    getScale (): number {
+        return this.settingScale;
+    }
+
+    setScale (s: number): void {
+        this.settingScale = s;
+    }
+
+    setContext (c: CanvasRenderingContext2D): void {
+        this.context = c;
+    }
+
+    startLine (x: number, y: number, pressure: number, shift?: boolean): void {
+        if (shift && this.lastInput.x) {
+            this.inputIsDrawing = true;
             this.endLine();
         } else {
-            isDrawing = true;
-            lastX = x;
-            lastY = y;
-            lastInput.x = x;
-            lastInput.y = y;
-            historyEntry = {
-                tool: ["brush", "SketchyBrush"],
-                actions: []
+            this.inputIsDrawing = true;
+            this.lastX = x;
+            this.lastY = y;
+            this.lastInput.x = x;
+            this.lastInput.y = y;
+            this.historyEntry = {
+                tool: ['brush', 'SketchyBrush'],
+                actions: [
+                    {
+                        action: 'setScale',
+                        params: [this.settingScale],
+                    },
+                    {
+                        action: 'setSize',
+                        params: [this.settingSize / 2],
+                    },
+                    {
+                        action: 'setOpacity',
+                        params: [this.settingOpacity],
+                    },
+                    {
+                        action: 'setColor',
+                        params: [this.settingColor],
+                    },
+                    {
+                        action: 'setBlending',
+                        params: [this.settingBlending],
+                    },
+                    {
+                        action: 'startLine',
+                        params: [x, y, pressure],
+                    },
+                ],
             };
-            historyEntry.actions.push({
-                action: "setScale",
-                params: [settingScale]
-            });
-            historyEntry.actions.push({
-                action: "setSize",
-                params: [settingSize / 2]
-            });
-            historyEntry.actions.push({
-                action: "setOpacity",
-                params: [settingOpacity]
-            });
-            historyEntry.actions.push({
-                action: "setColor",
-                params: [settingColor]
-            });
-            historyEntry.actions.push({
-                action: "setBlending",
-                params: [settingBlending]
-            });
-            historyEntry.actions.push({
-                action: "startLine",
-                params: [x, y, pressure]
-            });
         }
 
-    };
-    this.goLine = function (p_x, p_y, pressure, preMixedColor) {
-        if (!isDrawing || (p_x === lastInput.x && p_y === lastInput.y)) {
+    }
+
+    goLine (p_x: number, p_y: number, pressure: number, preMixedColor: IRGB): void {
+        if (!this.inputIsDrawing || (p_x === this.lastInput.x && p_y === this.lastInput.y)) {
             return;
         }
 
         let e, b, a, g;
-        let x = parseInt(p_x);
-        let y = parseInt(p_y);
-        points.push([x, y]);
+        const x = parseInt('' + p_x);
+        const y = parseInt('' + p_y);
+        this.points.push([x, y]);
 
-        let mixr = settingColor.r;
-        let mixg = settingColor.g;
-        let mixb = settingColor.b;
+        let mixr = this.settingColor.r;
+        let mixg = this.settingColor.g;
+        let mixb = this.settingColor.b;
 
         if (preMixedColor !== null) {
             mixr = preMixedColor.r;
             mixg = preMixedColor.g;
             mixb = preMixedColor.b;
         } else {
-            if (settingBlending !== 0) {
-                if (x + 5 >= 0 && y + 5 >= 0 && x - 5 < context.canvas.width - 1 && y - 5 < context.canvas.height - 1) {
+            if (this.settingBlending !== 0) {
+                if (x + 5 >= 0 && y + 5 >= 0 && x - 5 < this.context.canvas.width - 1 && y - 5 < this.context.canvas.height - 1) {
                     mixr = 0;
                     mixg = 0;
                     mixb = 0;
-                    let mixx = Math.min(context.canvas.width - 1, Math.max(0, x - 5));
-                    let mixy = Math.min(context.canvas.height - 1, Math.max(0, y - 5));
-                    let mixw = Math.min(context.canvas.width - 1, Math.max(0, x + 5));
-                    let mixh = Math.min(context.canvas.height - 1, Math.max(0, y + 5));
+                    const mixx = Math.min(this.context.canvas.width - 1, Math.max(0, x - 5));
+                    const mixy = Math.min(this.context.canvas.height - 1, Math.max(0, y - 5));
+                    let mixw = Math.min(this.context.canvas.width - 1, Math.max(0, x + 5));
+                    let mixh = Math.min(this.context.canvas.height - 1, Math.max(0, y + 5));
                     mixw -= mixx;
                     mixh -= mixy;
 
                     if (mixw > 0 && mixh > 0) {
-                        let imdat = context.getImageData(mixx, mixy, mixw, mixh);
+                        const imdat = this.context.getImageData(mixx, mixy, mixw, mixh);
                         let countmix = 0;
                         for (let i = 0; i < imdat.data.length; i += 4) {
                             mixr += imdat.data[i + 0];
@@ -174,92 +192,94 @@ export function SketchyBrush() {
                         mixb /= countmix;
                     }
 
-                    let mixed = mixmode[0](new BB.RGB(mixr, mixg, mixb), settingColor);
-                    mixr = parseInt('' + BB.mix(settingColor.r, mixed.r, settingBlending));
-                    mixg = parseInt('' + BB.mix(settingColor.g, mixed.g, settingBlending));
-                    mixb = parseInt('' + BB.mix(settingColor.b, mixed.b, settingBlending));
+                    const mixed = this.mixmode[0](new BB.RGB(mixr, mixg, mixb), this.settingColor);
+                    mixr = parseInt('' + BB.mix(this.settingColor.r, mixed.r, this.settingBlending));
+                    mixg = parseInt('' + BB.mix(this.settingColor.g, mixed.g, this.settingBlending));
+                    mixb = parseInt('' + BB.mix(this.settingColor.b, mixed.b, this.settingBlending));
                 }
             }
         }
 
-        context.save();
-        context.strokeStyle = "rgba(" + mixr + ", " + mixg + ", " + mixb + ", " + settingOpacity + ")";
-        context.lineWidth = settingSize;
+        this.context.save();
+        this.context.strokeStyle = 'rgba(' + mixr + ', ' + mixg + ', ' + mixb + ', ' + this.settingOpacity + ')';
+        this.context.lineWidth = this.settingSize;
 
-        context.beginPath();
-        context.moveTo(lastX, lastY);
-        context.lineTo(x, y);
+        this.context.beginPath();
+        this.context.moveTo(this.lastX, this.lastY);
+        this.context.lineTo(x, y);
 
-        for (e = 0; e < points.length; e++) {
-            b = points[e][0] - points[count][0];
-            a = points[e][1] - points[count][1];
+        for (e = 0; e < this.points.length; e++) {
+            b = this.points[e][0] - this.points[this.count][0];
+            a = this.points[e][1] - this.points[this.count][1];
             g = b * b + a * a;
-            if (g < 4000 * settingScale * settingScale && rand() > g / 2000 / settingScale / settingScale) {
-                context.moveTo(points[count][0] + (b * 0.3), points[count][1] + (a * 0.3));
-                context.lineTo(points[e][0] - (b * 0.3), points[e][1] - (a * 0.3));
+            if (g < 4000 * this.settingScale * this.settingScale && this.rand() > g / 2000 / this.settingScale / this.settingScale) {
+                this.context.moveTo(this.points[this.count][0] + (b * 0.3), this.points[this.count][1] + (a * 0.3));
+                this.context.lineTo(this.points[e][0] - (b * 0.3), this.points[e][1] - (a * 0.3));
             }
         }
 
-        context.stroke();
-        context.restore();
+        this.context.stroke();
+        this.context.restore();
 
 
-        count++;
-        lastX = x;
-        lastY = y;
-        lastInput.x = x;
-        lastInput.y = y;
-        historyEntry.actions.push({
-            action: "goLine",
-            params: [p_x, p_y, pressure, {r: mixr, g: mixg, b: mixb}]
+        this.count++;
+        this.lastX = x;
+        this.lastY = y;
+        this.lastInput.x = x;
+        this.lastInput.y = y;
+        this.historyEntry!.actions!.push({
+            action: 'goLine',
+            params: [p_x, p_y, pressure, {r: mixr, g: mixg, b: mixb}],
         });
-    };
-    this.endLine = function () {
-        isDrawing = false;
-        count = 0;
-        points = [];
-        if (historyEntry) {
-            historyEntry.actions.push({
-                action: "endLine",
-                params: []
-            });
-            history.push(historyEntry);
-            historyEntry = undefined;
-        }
-    };
-    //cheap n' ugly
-    this.drawLineSegment = function (x1, y1, x2, y2) {
-        lastInput.x = x2;
-        lastInput.y = y2;
+    }
 
-        if (isDrawing || x1 === undefined) {
+    endLine (): void {
+        this.inputIsDrawing = false;
+        this.count = 0;
+        this.points = [];
+        if (this.historyEntry) {
+            this.historyEntry.actions!.push({
+                action: 'endLine',
+                params: [],
+            });
+            this.history.push(this.historyEntry);
+            this.historyEntry = undefined;
+        }
+    }
+    //cheap n' ugly
+
+    drawLineSegment (x1: number, y1: number, x2: number, y2: number): void {
+        this.lastInput.x = x2;
+        this.lastInput.y = y2;
+
+        if (this.inputIsDrawing || x1 === undefined) {
             return;
         }
 
 
-        context.save();
-        context.lineWidth = settingSize;
+        this.context.save();
+        this.context.lineWidth = this.settingSize;
 
-        let mixr = settingColor.r, mixg = settingColor.g, mixb = settingColor.b;
-        if (x1 + 5 >= 0 && y1 + 5 >= 0 && x1 - 5 < context.canvas.width - 1 && y1 - 5 < context.canvas.height - 1) {
+        let mixr = this.settingColor.r, mixg = this.settingColor.g, mixb = this.settingColor.b;
+        if (x1 + 5 >= 0 && y1 + 5 >= 0 && x1 - 5 < this.context.canvas.width - 1 && y1 - 5 < this.context.canvas.height - 1) {
             mixr = 0;
             mixg = 0;
             mixb = 0;
-            let mixx = Math.min(context.canvas.width - 1, Math.max(0, x1 - 5));
-            let mixy = Math.min(context.canvas.height - 1, Math.max(0, y1 - 5));
-            let mixw = Math.min(context.canvas.width - 1, Math.max(0, x1 + 5));
-            let mixh = Math.min(context.canvas.height - 1, Math.max(0, y1 + 5));
+            const mixx = Math.min(this.context.canvas.width - 1, Math.max(0, x1 - 5));
+            const mixy = Math.min(this.context.canvas.height - 1, Math.max(0, y1 - 5));
+            let mixw = Math.min(this.context.canvas.width - 1, Math.max(0, x1 + 5));
+            let mixh = Math.min(this.context.canvas.height - 1, Math.max(0, y1 + 5));
             mixw -= mixx;
             mixh -= mixy;
             if (mixw > 0 && mixh > 0) {
-                let w = Math.min(sampleCanvas.width, mixw);
-                let h = Math.min(sampleCanvas.height, mixh);
+                const w = Math.min(sampleCanvas.width, mixw);
+                const h = Math.min(sampleCanvas.height, mixh);
                 sampleCtx.save();
                 sampleCtx.globalCompositeOperation = 'copy';
-                sampleCtx.drawImage(context.canvas, mixx, mixy, mixw, mixh, 0, 0, w, h);
+                sampleCtx.drawImage(this.context.canvas, mixx, mixy, mixw, mixh, 0, 0, w, h);
                 sampleCtx.restore();
 
-                let imdat = sampleCtx.getImageData(mixx, mixy, mixw, mixh);
+                const imdat = sampleCtx.getImageData(mixx, mixy, mixw, mixh);
                 let countmix = 0;
                 for (let i = 0; i < imdat.data.length; i += 4) {
                     mixr += imdat.data[i + 0];
@@ -272,52 +292,52 @@ export function SketchyBrush() {
                 mixb /= countmix;
             }
         }
-        let mixed = mixmode[0](new BB.RGB(mixr, mixg, mixb), settingColor);
-        mixr = parseInt('' + (settingBlending * mixed.r + settingColor.r * (1 - settingBlending)));
-        mixg = parseInt('' + (settingBlending * mixed.g + settingColor.g * (1 - settingBlending)));
-        mixb = parseInt('' + (settingBlending * mixed.b + settingColor.b * (1 - settingBlending)));
-        context.strokeStyle = "rgba(" + mixr + ", " + mixg + ", " + mixb + ", " + settingOpacity + ")";
-        context.beginPath();
-        context.moveTo(x1, y1);
-        context.lineTo(x2, y2);
-        context.stroke();
-        context.strokeStyle = "rgba(" + mixr + ", " + mixg + ", " + mixb + ", " + settingOpacity + ")";
-        context.restore();
+        const mixed = this.mixmode[0](new BB.RGB(mixr, mixg, mixb), this.settingColor);
+        mixr = parseInt('' + (this.settingBlending * mixed.r + this.settingColor.r * (1 - this.settingBlending)));
+        mixg = parseInt('' + (this.settingBlending * mixed.g + this.settingColor.g * (1 - this.settingBlending)));
+        mixb = parseInt('' + (this.settingBlending * mixed.b + this.settingColor.b * (1 - this.settingBlending)));
+        this.context.strokeStyle = 'rgba(' + mixr + ', ' + mixg + ', ' + mixb + ', ' + this.settingOpacity + ')';
+        this.context.beginPath();
+        this.context.moveTo(x1, y1);
+        this.context.lineTo(x2, y2);
+        this.context.stroke();
+        this.context.strokeStyle = 'rgba(' + mixr + ', ' + mixg + ', ' + mixb + ', ' + this.settingOpacity + ')';
+        this.context.restore();
 
-
-        let historyEntry = {
-            tool: ["brush", "SketchyBrush"],
-            actions: []
+        const historyEntry: ISketchyBrushHistoryEntry = {
+            tool: ['brush', 'SketchyBrush'],
+            actions: [
+                {
+                    action: 'setScale',
+                    params: [this.settingScale],
+                },
+                {
+                    action: 'setSize',
+                    params: [this.settingSize / 2],
+                },
+                {
+                    action: 'setOpacity',
+                    params: [this.settingOpacity],
+                },
+                {
+                    action: 'setColor',
+                    params: [this.settingColor],
+                },
+                {
+                    action: 'setBlending',
+                    params: [this.settingBlending],
+                },
+                {
+                    action: 'drawLineSegment',
+                    params: [x1, y1, x2, y2],
+                },
+            ],
         };
-        historyEntry.actions.push({
-            action: "setScale",
-            params: [settingScale]
-        });
-        historyEntry.actions.push({
-            action: "setSize",
-            params: [settingSize / 2]
-        });
-        historyEntry.actions.push({
-            action: "setOpacity",
-            params: [settingOpacity]
-        });
-        historyEntry.actions.push({
-            action: "setColor",
-            params: [settingColor]
-        });
-        historyEntry.actions.push({
-            action: "setBlending",
-            params: [settingBlending]
-        });
+        this.history.push(historyEntry);
+    }
 
-        historyEntry.actions.push({
-            action: "drawLineSegment",
-            params: [x1, y1, x2, y2]
-        });
-        history.push(historyEntry);
-    };
 
-    this.isDrawing = function () {
-        return isDrawing;
-    };
+    isDrawing (): boolean {
+        return this.inputIsDrawing;
+    }
 }

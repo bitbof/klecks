@@ -1,553 +1,636 @@
 import {BB} from '../../../bb/bb';
+import {IRect, IVector2D} from '../../../bb/bb-types';
+import {KeyListener} from '../../../bb/input/key-listener';
+import {PointerListener} from '../../../bb/input/pointer-listener';
 
-/*
-	Cropper params
-	{
-		x: int, //pos in relation zum bild
-		y: int,
-		w: int,
-		h: int,
-		scale: float, //zoom
-		callback: function //wenn sich was ändert
-	}
-	the div that you append this to must be relative
-*/
-export function Cropper (params) {
-    let x = params.x,
-        y = params.y,
-        width = params.width,
-        height = params.height,
-        scale = params.scale,
-        callback = params.callback,
-        maxW = params.maxW,
-        maxH = params.maxH;
-    let div = document.createElement("div");
-    let gripCursors = ['nw', 'n', 'ne', 'e', 'se', 's', 'sw', 'w'];
 
-    let keyListener = new BB.KeyListener({});
+type TUpdateElement = {
+    el: HTMLElement;
+    update: () => void;
+};
 
-    BB.css(div, {
-        position: "absolute",
-        left: (x * scale) + "px",
-        top: (y * scale) + "px"
-    });
+/**
+ * Interactive preview for crop filter. Corners and edges can be dragged.
+ * the div that you append this to must be relative
+ */
+export class Cropper {
 
-    let outline = document.createElement("div");
-    BB.css(outline, {
-        position: "absolute",
-        border: "1px dashed #fff",
-        cursor: "move"
-    });
-    (outline as any).update = function () {
-        BB.css(outline, {
-            left: (grips[0].x * scale - 1) + "px",
-            top: (grips[0].y * scale - 1) + "px",
-            width: ((grips[2].x - grips[0].x) * scale) + "px",
-            height: ((grips[2].y - grips[0].y) * scale) + "px"
+    private readonly rootEl: HTMLElement;
+    private x: number;
+    private y: number;
+    private width: number;
+    private height: number;
+    private scale: number;
+    private readonly grips: IVector2D[]; // aka corner coordinates
+    private readonly edges: TUpdateElement[];
+    private readonly cornerElArr: TUpdateElement[];
+    private readonly darken: TUpdateElement[];
+    private readonly outline: TUpdateElement;
+    private readonly thirdsHorizontal: TUpdateElement;
+    private readonly thirdsVertical: TUpdateElement;
+    private readonly keyListener: KeyListener;
+    private readonly pointerRemainder: IVector2D;
+
+    private readonly outlinePointerListener: PointerListener;
+
+    private readonly corner0PointerListener: PointerListener;
+    private readonly corner1PointerListener: PointerListener;
+    private readonly corner2PointerListener: PointerListener;
+    private readonly corner3PointerListener: PointerListener;
+
+    private readonly edge0PointerListener: PointerListener;
+    private readonly edge1PointerListener: PointerListener;
+    private readonly edge2PointerListener: PointerListener;
+    private readonly edge3PointerListener: PointerListener;
+
+    private readonly callback: (val: IRect) => void;
+
+    private update (): void {
+        this.edges[0].update();
+        this.edges[1].update();
+        this.edges[2].update();
+        this.edges[3].update();
+        this.cornerElArr[0].update();
+        this.cornerElArr[1].update();
+        this.cornerElArr[2].update();
+        this.cornerElArr[3].update();
+        this.darken[0].update();
+        this.darken[1].update();
+        this.darken[2].update();
+        this.darken[3].update();
+        this.outline.update();
+        this.thirdsHorizontal.update();
+        this.thirdsVertical.update();
+    }
+
+    private commit (): void {
+        this.pointerRemainder.x = 0;
+        this.pointerRemainder.y = 0;
+        this.callback(this.getTransform());
+    }
+
+
+
+    // ---- public ----
+    constructor (
+        params: {
+            x: number; // int, pos in relation to image
+            y: number; // int
+            width: number; // int
+            height: number; // int
+            maxW: number;
+            maxH: number;
+            scale: number; // float, zoom
+            callback: (val: IRect) => void;
+        }
+    ) {
+
+        this.x = params.x;
+        this.y = params.y;
+        this.width = params.width;
+        this.height = params.height;
+        this.scale = params.scale;
+        this.callback = params.callback;
+
+        const maxW = params.maxW;
+        const maxH = params.maxW;
+        this.rootEl = BB.el();
+        const gripCursors = ['nw', 'n', 'ne', 'e', 'se', 's', 'sw', 'w'];
+
+        this.keyListener = new BB.KeyListener({});
+
+        BB.css(this.rootEl, {
+            position: 'absolute',
+            left: (this.x * this.scale) + 'px',
+            top: (this.y * this.scale) + 'px',
         });
-    };
-    let pointerRemainder = { // needs to be reset after dragging complete
-        x: 0,
-        y: 0,
-    };
-    let outlinePointerListener = new BB.PointerListener({
-        target: outline,
-        onPointer: function(event) {
-            event.eventPreventDefault();
-            if (event.type === 'pointermove' && event.button === 'left') {
 
-                const {dX, dY} = BB.intDxy(pointerRemainder, event.dX / scale, event.dY / scale);
-
-                grips[0].x += dX;
-                grips[0].y += dY;
-                grips[1].x += dX;
-                grips[1].y += dY;
-                grips[2].x += dX;
-                grips[2].y += dY;
-                grips[3].x += dX;
-                grips[3].y += dY;
-
-                update();
-            }
-            if (event.type === 'pointerup') {
-                commit();
-            }
-        }
-    });
-
-    let thirdsHorizontal = document.createElement("div");
-    BB.css(thirdsHorizontal, {
-        position: "absolute",
-        borderTop: "1px solid #0ff",
-        borderBottom: "1px solid #0ff"
-    });
-    (thirdsHorizontal as any).update = function () {
-        BB.css(thirdsHorizontal, {
-            left: (grips[0].x * scale) + "px",
-            top: ((grips[0].y + (grips[2].y - grips[0].y) / 3) * scale) + "px",
-            width: ((grips[2].x - grips[0].x) * scale) + "px",
-            height: ((grips[2].y - grips[0].y) / 3 * scale) + "px"
-
-        });
-    };
-    let thirdsVertical = document.createElement("div");
-    BB.css(thirdsVertical, {
-        position: "absolute",
-        borderLeft: "1px solid #0ff",
-        borderRight: "1px solid #0ff"
-    });
-    (thirdsVertical as any).update = function () {
-        BB.css(thirdsVertical, {
-            left: ((grips[0].x + (grips[2].x - grips[0].x) / 3) * scale) + "px",
-            top: (grips[0].y * scale) + "px",
-            width: ((grips[2].x - grips[0].x) / 3 * scale) + "px",
-            height: ((grips[2].y - grips[0].y) * scale) + "px"
-
-        });
-    };
-
-    const gripSize = 40;
-    const gripOverlay = 10;
-
-    let grips: {
-        x: number; // int
-        y: number;
-    }[] = [ // aka corner coordinates
-        {x: 0, y: 0}, // top left
-        {x: width, y: 0}, // top right
-        {x: width, y: height}, // bottom right
-        {x: 0, y: height}, //bottom left
-    ];
-
-    function transformTop(dY) {
-        grips[0].y += dY;
-        grips[0].y = Math.max(grips[3].y - maxH, Math.min(grips[3].y - 1, grips[0].y));
-        grips[1].y = grips[0].y;
-    }
-    function transformRight(dX) {
-        grips[1].x += dX;
-        grips[1].x = Math.min(grips[0].x + maxW, Math.max(grips[0].x + 1, grips[1].x));
-        grips[2].x = grips[1].x;
-    }
-    function transformBottom(dY) {
-        grips[2].y += dY;
-        grips[2].y = Math.min(grips[1].y + maxH, Math.max(grips[1].y + 1, grips[2].y));
-        grips[3].y = grips[2].y;
-    }
-    function transformLeft(dX) {
-        grips[0].x += dX;
-        grips[0].x = Math.max(grips[1].x - maxW, Math.min(grips[1].x - 1, grips[0].x));
-        grips[3].x = grips[0].x;
-    }
-
-    function commit() {
-        pointerRemainder.x = 0;
-        pointerRemainder.y = 0;
-        callback(getTransform());
-    }
-
-
-
-
-    let edges = [];
-    for (let i = 0; i < 4; i++) {
-        (function (i) {
-            edges[i] = document.createElement("div");
-            let g = edges[i];
-            g.style.width = gripSize + "px";
-            g.style.height = gripSize + "px";
-            //g.style.background = "#0f0";
-            g.style.position = "absolute";
-            g.update = function () {
-                if (i === 0) { //top
-                    g.style.left = (grips[0].x * scale + gripOverlay) + "px";
-                    g.style.top = (grips[0].y * scale - gripSize * 2 + gripOverlay) + "px";
-                    g.style.width = ((grips[1].x - grips[0].x) * scale - gripOverlay * 2) + "px";
-                    g.style.height = (gripSize * 2) + "px";
-                } else if (i === 1) { //right
-                    g.style.left = (grips[1].x * scale - gripOverlay) + "px";
-                    g.style.top = (grips[1].y * scale + gripOverlay) + "px";
-                    g.style.width = (gripSize * 2) + "px";
-                    g.style.height = ((grips[2].y - grips[1].y) * scale - gripOverlay * 2) + "px";
-                } else if (i === 2) { //bottom
-                    g.style.left = (grips[3].x * scale + gripOverlay) + "px";
-                    g.style.top = (grips[3].y * scale - gripOverlay) + "px";
-                    g.style.width = ((grips[2].x - grips[3].x) * scale - gripOverlay * 2) + "px";
-                    g.style.height = (gripSize * 2) + "px";
-                } else if (i === 3) { //left
-                    g.style.left = (grips[0].x * scale - gripSize * 2 + gripOverlay) + "px";
-                    g.style.top = (grips[0].y * scale + gripOverlay) + "px";
-                    g.style.width = (gripSize * 2) + "px";
-                    g.style.height = ((grips[3].y - grips[0].y) * scale - gripOverlay * 2) + "px";
-                }
-                let angleOffset = i * 2 + 1;
-                g.style.cursor = gripCursors[angleOffset] + "-resize";
-
-            };
-        })(i);
-    }
-
-    let darken = [];
-    for (let i = 0; i < 4; i++) {
-        (function (i) {
-            darken[i] = document.createElement("div");
-            let g = darken[i];
-            g.style.position = "absolute";
-            g.style.background = "#000";
-            g.style.opacity = "0.5";
-            g.update = function () {
-                if (i === 0) {
-                    g.style.left = (grips[0].x * scale) + "px";
-                    g.style.top = (grips[0].y * scale - 8000) + "px";
-                    g.style.width = ((grips[1].x - grips[0].x) * scale) + "px";
-                    g.style.height = "8000px";
-                } else if (i === 1) {
-                    g.style.left = (grips[1].x * scale) + "px";
-                    g.style.top = (grips[1].y * scale - 8000) + "px";
-                    g.style.width = "8000px";
-                    g.style.height = 16000 + "px";
-                } else if (i === 2) {
-                    g.style.left = (grips[3].x * scale) + "px";
-                    g.style.top = (grips[3].y * scale) + "px";
-                    g.style.width = ((grips[2].x - grips[3].x) * scale) + "px";
-                    g.style.height = "8000px";
-                } else if (i === 3) {
-                    g.style.left = (grips[0].x * scale - 8000) + "px";
-                    g.style.top = (grips[0].y * scale - 8000) + "px";
-                    g.style.width = "8000px";
-                    g.style.height = 16000 + "px";
-                }
-
-            };
-        })(i);
-    }
-
-    let edge0PointerListener = new BB.PointerListener({
-        target: edges[0],
-        fixScribble: true,
-        onPointer: function (event) {
-            event.eventPreventDefault();
-            if (event.type === 'pointermove' && event.button === 'left') {
-                const {dX, dY} = BB.intDxy(pointerRemainder, event.dX / scale, event.dY / scale);
-                transformTop(dY);
-                if (keyListener.isPressed('shift')) {
-                    transformBottom(-dY);
-                }
-                update();
-            }
-            if (event.type === 'pointerup') {
-                commit();
-            }
-        }
-    });
-    let edge1PointerListener = new BB.PointerListener({
-        target: edges[1],
-        fixScribble: true,
-        onPointer: function (event) {
-            event.eventPreventDefault();
-            if (event.type === 'pointermove' && event.button === 'left') {
-                const {dX, dY} = BB.intDxy(pointerRemainder, event.dX / scale, event.dY / scale);
-                transformRight(dX);
-                if (keyListener.isPressed('shift')) {
-                    transformLeft(-dX);
-                }
-                update();
-            }
-            if (event.type === 'pointerup') {
-                commit();
-            }
-        }
-    });
-    let edge2PointerListener = new BB.PointerListener({
-        target: edges[2],
-        fixScribble: true,
-        onPointer: function (event) {
-            event.eventPreventDefault();
-            if (event.type === 'pointermove' && event.button === 'left') {
-                const {dX, dY} = BB.intDxy(pointerRemainder, event.dX / scale, event.dY / scale);
-                transformBottom(dY);
-                if (keyListener.isPressed('shift')) {
-                    transformTop(-dY);
-                }
-                update();
-            }
-            if (event.type === 'pointerup') {
-                commit();
-            }
-        }
-    });
-    let edge3PointerListener = new BB.PointerListener({
-        target: edges[3],
-        fixScribble: true,
-        onPointer: function (event) {
-            event.eventPreventDefault();
-            if (event.type === 'pointermove' && event.button === 'left') {
-                const {dX, dY} = BB.intDxy(pointerRemainder, event.dX / scale, event.dY / scale);
-                transformLeft(dX);
-                if (keyListener.isPressed('shift')) {
-                    transformRight(-dX);
-                }
-                update();
-            }
-            if (event.type === 'pointerup') {
-                commit();
-            }
-        }
-    });
-
-
-    let cornerElArr = [];
-    (function() {
-        for (let i = 0; i < 4; i++) {
-            (function (i) {
-                cornerElArr[i] = document.createElement("div");
-                let g = cornerElArr[i];
-                BB.css(g, {
-                    //background: '#f00',
-                    width: (gripSize * 2) + 'px',
-                    height: (gripSize * 2) + 'px',
-                    position: 'absolute'
+        this.outline = {
+            el: BB.el({
+                css: {
+                    position: 'absolute',
+                    border: '1px dashed #fff',
+                    cursor: 'move',
+                },
+            }),
+            update: () => {
+                BB.css(this.outline.el, {
+                    left: (this.grips[0].x * this.scale - 1) + 'px',
+                    top: (this.grips[0].y * this.scale - 1) + 'px',
+                    width: ((this.grips[2].x - this.grips[0].x) * this.scale) + 'px',
+                    height: ((this.grips[2].y - this.grips[0].y) * this.scale) + 'px',
                 });
-                g.style.cursor = ['nwse-resize', 'nesw-resize'][i % 2];
-                g.update = function () {
-                    if (i === 0) { //top left
-                        BB.css(g, {
-                            left: (grips[0].x * scale - gripSize * 2 + gripOverlay) + "px",
-                            top: (grips[0].y * scale - gripSize * 2 + gripOverlay) + "px"
+            },
+        };
+
+        this.pointerRemainder = { // needs to be reset after dragging complete
+            x: 0,
+            y: 0,
+        };
+        this.outlinePointerListener = new BB.PointerListener({
+            target: this.outline.el,
+            onPointer: (event) => {
+                event.eventPreventDefault();
+                if (event.type === 'pointermove' && event.button === 'left') {
+
+                    const {dX, dY} = BB.intDxy(this.pointerRemainder, event.dX / this.scale, event.dY / this.scale);
+
+                    this.grips[0].x += dX;
+                    this.grips[0].y += dY;
+                    this.grips[1].x += dX;
+                    this.grips[1].y += dY;
+                    this.grips[2].x += dX;
+                    this.grips[2].y += dY;
+                    this.grips[3].x += dX;
+                    this.grips[3].y += dY;
+
+                    this.update();
+                }
+                if (event.type === 'pointerup') {
+                    this.commit();
+                }
+            },
+        });
+
+        this.thirdsHorizontal = {
+            el: BB.el({
+                css: {
+                    position: 'absolute',
+                    borderTop: '1px solid #0ff',
+                    borderBottom: '1px solid #0ff',
+                },
+            }),
+            update: () => {
+                BB.css(this.thirdsHorizontal.el, {
+                    left: (this.grips[0].x * this.scale) + 'px',
+                    top: ((this.grips[0].y + (this.grips[2].y - this.grips[0].y) / 3) * this.scale) + 'px',
+                    width: ((this.grips[2].x - this.grips[0].x) * this.scale) + 'px',
+                    height: ((this.grips[2].y - this.grips[0].y) / 3 * this.scale) + 'px',
+                });
+            },
+        };
+
+        this.thirdsVertical = {
+            el: BB.el({
+                css: {
+                    position: 'absolute',
+                    borderLeft: '1px solid #0ff',
+                    borderRight: '1px solid #0ff',
+                },
+            }),
+            update: () => {
+                BB.css(this.thirdsVertical.el, {
+                    left: ((this.grips[0].x + (this.grips[2].x - this.grips[0].x) / 3) * this.scale) + 'px',
+                    top: (this.grips[0].y * this.scale) + 'px',
+                    width: ((this.grips[2].x - this.grips[0].x) / 3 * this.scale) + 'px',
+                    height: ((this.grips[2].y - this.grips[0].y) * this.scale) + 'px',
+                });
+            },
+        };
+
+        const gripSize = 40;
+        const gripOverlay = 10;
+
+        this.grips = [
+            {x: 0, y: 0}, // top left
+            {x: this.width, y: 0}, // top right
+            {x: this.width, y: this.height}, // bottom right
+            {x: 0, y: this.height}, //bottom left
+        ];
+
+        const transformTop = (dY: number) => {
+            this.grips[0].y += dY;
+            this.grips[0].y = BB.clamp(this.grips[0].y, this.grips[3].y - maxH, this.grips[3].y - 1);
+            this.grips[1].y = this.grips[0].y;
+        };
+        const transformRight = (dX: number) => {
+            this.grips[1].x += dX;
+            this.grips[1].x = BB.clamp(this.grips[1].x, this.grips[0].x + 1, this.grips[0].x + maxW);
+            this.grips[2].x = this.grips[1].x;
+        };
+        const transformBottom = (dY: number) => {
+            this.grips[2].y += dY;
+            this.grips[2].y = BB.clamp(this.grips[2].y, this.grips[1].y + 1, this.grips[1].y + maxH);
+            this.grips[3].y = this.grips[2].y;
+        };
+        const transformLeft = (dX: number) => {
+            this.grips[0].x += dX;
+            this.grips[0].x = BB.clamp(this.grips[0].x, this.grips[1].x - maxW, this.grips[1].x - 1);
+            this.grips[3].x = this.grips[0].x;
+        };
+
+
+
+
+        this.edges = [];
+        for (let i = 0; i < 4; i++) {
+            ((i) => {
+
+                const el = BB.el({
+                    css: {
+                        width: gripSize + 'px',
+                        height: gripSize + 'px',
+                        //background: '#0f0',
+                        position: 'absolute',
+                    },
+                });
+
+                const update = () => {
+                    if (i === 0) { //top
+                        BB.css(el, {
+                            left: (this.grips[0].x * this.scale + gripOverlay) + 'px',
+                            top: (this.grips[0].y * this.scale - gripSize * 2 + gripOverlay) + 'px',
+                            width: ((this.grips[1].x - this.grips[0].x) * this.scale - gripOverlay * 2) + 'px',
+                            height: (gripSize * 2) + 'px',
                         });
-                    } else if (i === 1) { //top right
-                        BB.css(g, {
-                            left: (grips[1].x * scale - gripOverlay) + "px",
-                            top: (grips[1].y * scale - gripSize * 2 + gripOverlay) + "px"
+                    } else if (i === 1) { //right
+                        BB.css(el, {
+                            left: (this.grips[1].x * this.scale - gripOverlay) + 'px',
+                            top: (this.grips[1].y * this.scale + gripOverlay) + 'px',
+                            width: (gripSize * 2) + 'px',
+                            height: ((this.grips[2].y - this.grips[1].y) * this.scale - gripOverlay * 2) + 'px',
                         });
-                    } else if (i === 2) { //bottom right
-                        BB.css(g, {
-                            left: (grips[1].x * scale - gripOverlay) + "px",
-                            top: (grips[2].y * scale - gripOverlay) + "px"
+                    } else if (i === 2) { //bottom
+                        BB.css(el, {
+                            left: (this.grips[3].x * this.scale + gripOverlay) + 'px',
+                            top: (this.grips[3].y * this.scale - gripOverlay) + 'px',
+                            width: ((this.grips[2].x - this.grips[3].x) * this.scale - gripOverlay * 2) + 'px',
+                            height: (gripSize * 2) + 'px',
                         });
-                    } else if (i === 3) { //bottom left
-                        BB.css(g, {
-                            left: (grips[0].x * scale - gripSize * 2 + gripOverlay) + "px",
-                            top: (grips[2].y * scale - gripOverlay) + "px"
+                    } else if (i === 3) { //left
+                        BB.css(el, {
+                            left: (this.grips[0].x * this.scale - gripSize * 2 + gripOverlay) + 'px',
+                            top: (this.grips[0].y * this.scale + gripOverlay) + 'px',
+                            width: (gripSize * 2) + 'px',
+                            height: ((this.grips[3].y - this.grips[0].y) * this.scale - gripOverlay * 2) + 'px',
                         });
                     }
+                    const angleOffset = i * 2 + 1;
+                    el.style.cursor = gripCursors[angleOffset] + '-resize';
+
+                };
+
+                this.edges[i] = {
+                    el,
+                    update,
                 };
             })(i);
         }
-    })();
-    //top left
-    let corner0PointerListener = new BB.PointerListener({
-        target: cornerElArr[0],
-        fixScribble: true,
-        onPointer: function (event) {
-            event.eventPreventDefault();
-            if (event.type === 'pointermove' && event.button === 'left') {
-                const {dX, dY} = BB.intDxy(pointerRemainder, event.dX / scale, event.dY / scale);
-                transformLeft(dX);
-                transformTop(dY);
-                if (keyListener.isPressed('shift')) {
-                    transformRight(-dX);
-                    transformBottom(-dY);
-                }
-                update();
-            }
-            if (event.type === 'pointerup') {
-                commit();
-            }
+
+        this.darken = [];
+        for (let i = 0; i < 4; i++) {
+            ((i) => {
+                const g = BB.el({
+                    css: {
+                        position: 'absolute',
+                        background: '#000',
+                        opacity: '0.5',
+                    },
+                });
+                const update = () => {
+                    if (i === 0) {
+                        BB.css(g, {
+                            left: (this.grips[0].x * this.scale) + 'px',
+                            top: (this.grips[0].y * this.scale - 8000) + 'px',
+                            width: ((this.grips[1].x - this.grips[0].x) * this.scale) + 'px',
+                            height: '8000px',
+                        });
+                    } else if (i === 1) {
+                        BB.css(g, {
+                            left: (this.grips[1].x * this.scale) + 'px',
+                            top: (this.grips[1].y * this.scale - 8000) + 'px',
+                            width: '8000px',
+                            height: 16000 + 'px',
+                        });
+                    } else if (i === 2) {
+                        BB.css(g, {
+                            left: (this.grips[3].x * this.scale) + 'px',
+                            top: (this.grips[3].y * this.scale) + 'px',
+                            width: ((this.grips[2].x - this.grips[3].x) * this.scale) + 'px',
+                            height: '8000px',
+                        });
+                    } else if (i === 3) {
+                        BB.css(g, {
+                            left: (this.grips[0].x * this.scale - 8000) + 'px',
+                            top: (this.grips[0].y * this.scale - 8000) + 'px',
+                            width: '8000px',
+                            height: 16000 + 'px',
+                        });
+                    }
+
+                };
+
+                this.darken[i] = {
+                    el: g,
+                    update,
+                };
+            })(i);
         }
-    });
-    //top right
-    let corner1PointerListener = new BB.PointerListener({
-        target: cornerElArr[1],
-        fixScribble: true,
-        onPointer: function (event) {
-            event.eventPreventDefault();
-            if (event.type === 'pointermove' && event.button === 'left') {
-                const {dX, dY} = BB.intDxy(pointerRemainder, event.dX / scale, event.dY / scale);
-                transformRight(dX);
-                transformTop(dY);
-                if (keyListener.isPressed('shift')) {
-                    transformLeft(-dX);
-                    transformBottom(-dY);
+
+        this.edge0PointerListener = new BB.PointerListener({
+            target: this.edges[0].el,
+            fixScribble: true,
+            onPointer: (event) => {
+                event.eventPreventDefault();
+                if (event.type === 'pointermove' && event.button === 'left') {
+                    const {dY} = BB.intDxy(this.pointerRemainder, event.dX / this.scale, event.dY / this.scale);
+                    transformTop(dY);
+                    if (this.keyListener.isPressed('shift')) {
+                        transformBottom(-dY);
+                    }
+                    this.update();
                 }
-                update();
-            }
-            if (event.type === 'pointerup') {
-                commit();
-            }
-        }
-    });
-    //bottom right
-    let corner2PointerListener = new BB.PointerListener({
-        target: cornerElArr[2],
-        fixScribble: true,
-        onPointer: function (event) {
-            event.eventPreventDefault();
-            if (event.type === 'pointermove' && event.button === 'left') {
-                const {dX, dY} = BB.intDxy(pointerRemainder, event.dX / scale, event.dY / scale);
-                transformRight(dX);
-                transformBottom(dY);
-                if (keyListener.isPressed('shift')) {
-                    transformLeft(-dX);
-                    transformTop(-dY);
+                if (event.type === 'pointerup') {
+                    this.commit();
                 }
-                update();
-            }
-            if (event.type === 'pointerup') {
-                commit();
-            }
-        }
-    });
-    //bottom left
-    let corner3PointerListener = new BB.PointerListener({
-        target: cornerElArr[3],
-        fixScribble: true,
-        onPointer: function (event) {
-            event.eventPreventDefault();
-            if (event.type === 'pointermove' && event.button === 'left') {
-                const {dX, dY} = BB.intDxy(pointerRemainder, event.dX / scale, event.dY / scale);
-                transformLeft(dX);
-                transformBottom(dY);
-                if (keyListener.isPressed('shift')) {
-                    transformRight(-dX);
-                    transformTop(-dY);
+            },
+        });
+        this.edge1PointerListener = new BB.PointerListener({
+            target: this.edges[1].el,
+            fixScribble: true,
+            onPointer: (event) => {
+                event.eventPreventDefault();
+                if (event.type === 'pointermove' && event.button === 'left') {
+                    const {dX, dY} = BB.intDxy(this.pointerRemainder, event.dX / this.scale, event.dY / this.scale);
+                    transformRight(dX);
+                    if (this.keyListener.isPressed('shift')) {
+                        transformLeft(-dX);
+                    }
+                    this.update();
                 }
-                update();
-            }
-            if (event.type === 'pointerup') {
-                commit();
-            }
-        }
-    });
+                if (event.type === 'pointerup') {
+                    this.commit();
+                }
+            },
+        });
+        this.edge2PointerListener = new BB.PointerListener({
+            target: this.edges[2].el,
+            fixScribble: true,
+            onPointer: (event) => {
+                event.eventPreventDefault();
+                if (event.type === 'pointermove' && event.button === 'left') {
+                    const {dX, dY} = BB.intDxy(this.pointerRemainder, event.dX / this.scale, event.dY / this.scale);
+                    transformBottom(dY);
+                    if (this.keyListener.isPressed('shift')) {
+                        transformTop(-dY);
+                    }
+                    this.update();
+                }
+                if (event.type === 'pointerup') {
+                    this.commit();
+                }
+            },
+        });
+        this.edge3PointerListener = new BB.PointerListener({
+            target: this.edges[3].el,
+            fixScribble: true,
+            onPointer: (event) => {
+                event.eventPreventDefault();
+                if (event.type === 'pointermove' && event.button === 'left') {
+                    const {dX, dY} = BB.intDxy(this.pointerRemainder, event.dX / this.scale, event.dY / this.scale);
+                    transformLeft(dX);
+                    if (this.keyListener.isPressed('shift')) {
+                        transformRight(-dX);
+                    }
+                    this.update();
+                }
+                if (event.type === 'pointerup') {
+                    this.commit();
+                }
+            },
+        });
 
 
+        this.cornerElArr = [];
+        (() => {
+            for (let i = 0; i < 4; i++) {
+                ((i) => {
+                    const g = BB.el({
+                        css: {
+                            //background: '#f00',
+                            width: (gripSize * 2) + 'px',
+                            height: (gripSize * 2) + 'px',
+                            position: 'absolute',
+                            cursor: ['nwse-resize', 'nesw-resize'][i % 2],
+                        },
+                    });
+
+                    const update = () => {
+                        if (i === 0) { //top left
+                            BB.css(g, {
+                                left: (this.grips[0].x * this.scale - gripSize * 2 + gripOverlay) + 'px',
+                                top: (this.grips[0].y * this.scale - gripSize * 2 + gripOverlay) + 'px',
+                            });
+                        } else if (i === 1) { //top right
+                            BB.css(g, {
+                                left: (this.grips[1].x * this.scale - gripOverlay) + 'px',
+                                top: (this.grips[1].y * this.scale - gripSize * 2 + gripOverlay) + 'px',
+                            });
+                        } else if (i === 2) { //bottom right
+                            BB.css(g, {
+                                left: (this.grips[1].x * this.scale - gripOverlay) + 'px',
+                                top: (this.grips[2].y * this.scale - gripOverlay) + 'px',
+                            });
+                        } else if (i === 3) { //bottom left
+                            BB.css(g, {
+                                left: (this.grips[0].x * this.scale - gripSize * 2 + gripOverlay) + 'px',
+                                top: (this.grips[2].y * this.scale - gripOverlay) + 'px',
+                            });
+                        }
+                    };
+
+                    this.cornerElArr[i] = {
+                        el: g,
+                        update,
+                    };
+                })(i);
+            }
+        })();
+        //top left
+        this.corner0PointerListener = new BB.PointerListener({
+            target: this.cornerElArr[0].el,
+            fixScribble: true,
+            onPointer: (event) => {
+                event.eventPreventDefault();
+                if (event.type === 'pointermove' && event.button === 'left') {
+                    const {dX, dY} = BB.intDxy(this.pointerRemainder, event.dX / this.scale, event.dY / this.scale);
+                    transformLeft(dX);
+                    transformTop(dY);
+                    if (this.keyListener.isPressed('shift')) {
+                        transformRight(-dX);
+                        transformBottom(-dY);
+                    }
+                    this.update();
+                }
+                if (event.type === 'pointerup') {
+                    this.commit();
+                }
+            },
+        });
+        //top right
+        this.corner1PointerListener = new BB.PointerListener({
+            target: this.cornerElArr[1].el,
+            fixScribble: true,
+            onPointer: (event) => {
+                event.eventPreventDefault();
+                if (event.type === 'pointermove' && event.button === 'left') {
+                    const {dX, dY} = BB.intDxy(this.pointerRemainder, event.dX / this.scale, event.dY / this.scale);
+                    transformRight(dX);
+                    transformTop(dY);
+                    if (this.keyListener.isPressed('shift')) {
+                        transformLeft(-dX);
+                        transformBottom(-dY);
+                    }
+                    this.update();
+                }
+                if (event.type === 'pointerup') {
+                    this.commit();
+                }
+            },
+        });
+        //bottom right
+        this.corner2PointerListener = new BB.PointerListener({
+            target: this.cornerElArr[2].el,
+            fixScribble: true,
+            onPointer: (event) => {
+                event.eventPreventDefault();
+                if (event.type === 'pointermove' && event.button === 'left') {
+                    const {dX, dY} = BB.intDxy(this.pointerRemainder, event.dX / this.scale, event.dY / this.scale);
+                    transformRight(dX);
+                    transformBottom(dY);
+                    if (this.keyListener.isPressed('shift')) {
+                        transformLeft(-dX);
+                        transformTop(-dY);
+                    }
+                    this.update();
+                }
+                if (event.type === 'pointerup') {
+                    this.commit();
+                }
+            },
+        });
+        //bottom left
+        this.corner3PointerListener = new BB.PointerListener({
+            target: this.cornerElArr[3].el,
+            fixScribble: true,
+            onPointer: (event) => {
+                event.eventPreventDefault();
+                if (event.type === 'pointermove' && event.button === 'left') {
+                    const {dX, dY} = BB.intDxy(this.pointerRemainder, event.dX / this.scale, event.dY / this.scale);
+                    transformLeft(dX);
+                    transformBottom(dY);
+                    if (this.keyListener.isPressed('shift')) {
+                        transformRight(-dX);
+                        transformTop(-dY);
+                    }
+                    this.update();
+                }
+                if (event.type === 'pointerup') {
+                    this.commit();
+                }
+            },
+        });
 
 
-    function getTransform() {
-        grips[1].x -= grips[0].x;
-        grips[1].y -= grips[0].y;
-        grips[2].x -= grips[0].x;
-        grips[2].y -= grips[0].y;
-        grips[3].x -= grips[0].x;
-        grips[3].y -= grips[0].y;
-        x += grips[0].x;
-        y += grips[0].y;
-        grips[0].x = 0;
-        grips[0].y = 0;
+        this.rootEl.append(
+            this.darken[1].el,
+            this.darken[0].el,
+            this.darken[2].el,
+            this.darken[3].el,
+            this.thirdsHorizontal.el,
+            this.thirdsVertical.el,
+            this.outline.el,
+
+            this.edges[1].el,
+            this.edges[0].el,
+            this.edges[2].el,
+            this.edges[3].el,
+
+            this.cornerElArr[0].el,
+            this.cornerElArr[1].el,
+            this.cornerElArr[2].el,
+            this.cornerElArr[3].el,
+        );
+
+        this.update();
+
+    }
+
+    // ---- interface ----
+    getTransform (): IRect {
+        this.grips[1].x -= this.grips[0].x;
+        this.grips[1].y -= this.grips[0].y;
+        this.grips[2].x -= this.grips[0].x;
+        this.grips[2].y -= this.grips[0].y;
+        this.grips[3].x -= this.grips[0].x;
+        this.grips[3].y -= this.grips[0].y;
+        this.x += this.grips[0].x;
+        this.y += this.grips[0].y;
+        this.grips[0].x = 0;
+        this.grips[0].y = 0;
         return {
-            x: x,
-            y: y,
-            width: grips[1].x,
-            height: grips[2].y
+            x: this.x,
+            y: this.y,
+            width: this.grips[1].x,
+            height: this.grips[2].y,
         };
     }
 
+    setTransform (p: IRect): void {
+        this.x = p.x;
+        this.y = p.y;
+        this.width = p.width;
+        this.height = p.height;
 
-    div.append(
-        darken[1],
-        darken[0],
-        darken[2],
-        darken[3],
-        thirdsHorizontal,
-        thirdsVertical,
-        outline,
+        BB.css(this.rootEl, {
+            left: (this.x * this.scale) + 'px',
+            top: (this.y * this.scale) + 'px',
+        });
 
-        edges[1],
-        edges[0],
-        edges[2],
-        edges[3],
+        this.grips[0].x = 0;
+        this.grips[0].y = 0;
+        this.grips[1].x = this.width;
+        this.grips[1].y = 0;
+        this.grips[2].x = this.width;
+        this.grips[2].y = this.height;
+        this.grips[3].x = 0;
+        this.grips[3].y = this.height;
 
-        cornerElArr[0],
-        cornerElArr[1],
-        cornerElArr[2],
-        cornerElArr[3],
-    );
-
-
-    function update() {
-
-        edges[0].update();
-        edges[1].update();
-        edges[2].update();
-        edges[3].update();
-        cornerElArr[0].update();
-        cornerElArr[1].update();
-        cornerElArr[2].update();
-        cornerElArr[3].update();
-        darken[0].update();
-        darken[1].update();
-        darken[2].update();
-        darken[3].update();
-        (outline as any).update();
-        (thirdsHorizontal as any).update();
-        (thirdsVertical as any).update();
+        this.update();
+        this.commit();
     }
 
-    update();
-
-
-    // --- interface ---
-
-    this.getTransform = getTransform;
-
-    this.setTransform = function (p) {
-        x = p.x;
-        y = p.y;
-        width = p.width;
-        height = p.height;
-
-        BB.css(div, {
-            left: (x * scale) + "px",
-            top: (y * scale) + "px"
+    setScale (s: number): void {
+        this.scale = s;
+        BB.css(this.rootEl, {
+            left: (this.x * this.scale) + 'px',
+            top: (this.y * this.scale) + 'px',
         });
+        this.update();
+    }
 
-        grips[0].x = 0;
-        grips[0].y = 0;
-        grips[1].x = width;
-        grips[1].y = 0;
-        grips[2].x = width;
-        grips[2].y = height;
-        grips[3].x = 0;
-        grips[3].y = height;
+    showThirds (b: boolean): void {
 
-        update();
-        commit();
-    };
+        this.thirdsHorizontal.el.style.display = b ? 'block' : 'none';
+        this.thirdsVertical.el.style.display = b ? 'block' : 'none';
 
-    this.setScale = function (s) {
-        scale = s;
-        BB.css(div, {
-            left: (x * scale) + "px",
-            top: (y * scale) + "px"
-        });
-        update();
-    };
+    }
 
-    this.showThirds = function (b) {
-        if (b) {
-            thirdsHorizontal.style.display = "block";
-            thirdsVertical.style.display = "block";
-        } else {
-            thirdsHorizontal.style.display = "none";
-            thirdsVertical.style.display = "none";
-        }
-    };
+    getElement (): HTMLElement {
+        return this.rootEl;
+    }
 
-    this.getElement = function() {
-        return div;
-    };
-
-    this.destroy = function() {
-        keyListener.destroy();
-        outlinePointerListener.destroy();
-        corner0PointerListener.destroy();
-        corner1PointerListener.destroy();
-        corner2PointerListener.destroy();
-        corner3PointerListener.destroy();
-        edge0PointerListener.destroy();
-        edge1PointerListener.destroy();
-        edge2PointerListener.destroy();
-        edge3PointerListener.destroy();
-    };
-
+    destroy (): void {
+        this.keyListener.destroy();
+        this.outlinePointerListener.destroy();
+        this.corner0PointerListener.destroy();
+        this.corner1PointerListener.destroy();
+        this.corner2PointerListener.destroy();
+        this.corner3PointerListener.destroy();
+        this.edge0PointerListener.destroy();
+        this.edge1PointerListener.destroy();
+        this.edge2PointerListener.destroy();
+        this.edge3PointerListener.destroy();
+    }
 }
+

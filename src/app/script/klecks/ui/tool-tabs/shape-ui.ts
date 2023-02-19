@@ -1,375 +1,393 @@
 import {BB} from '../../../bb/bb';
-import {Options} from '../base-components/options';
-import {Checkbox} from '../base-components/checkbox';
-import {KlSlider} from '../base-components/kl-slider';
+import {Options} from '../components/options';
+import {Checkbox} from '../components/checkbox';
+import {KlSlider} from '../components/kl-slider';
 import {LANG} from '../../../language/language';
+import {TShapeToolMode, TShapeToolType} from '../../kl-types';
+import {KlColorSlider} from '../components/kl-color-slider';
 
 /**
  * Shape Tool tab contents
- *
- * p = {
- *     colorSlider: KlColorSlider// when opening tab, inserts it (snatches it from where else it was)
- * }
- *
- * @param p
- * @constructor
  */
-export function ShapeUi(p) {
-    let div = BB.el({
-        css: {
-            margin: '10px'
+export class ShapeUi {
+
+    private readonly rootEl: HTMLElement;
+    private isVisible: boolean;
+    private readonly colorDiv: HTMLElement;
+    private readonly colorSlider: KlColorSlider;
+    private shape: TShapeToolType = 'rect';
+    private mode: TShapeToolMode = 'stroke';
+    private readonly eraserToggle: Checkbox;
+    private readonly opacitySlider: KlSlider;
+    private readonly lineWidthSlider: KlSlider;
+    private readonly outwardsToggle: Checkbox;
+    private readonly fixedToggle: Checkbox;
+    private readonly snapToggle:Checkbox;
+    private readonly lockAlphaToggle: Checkbox;
+
+
+    // ---- public ----
+
+    constructor (
+        p: {
+            colorSlider: KlColorSlider; // when opening tab, inserts it (snatches it from where else it was)
         }
-    });
-    let isVisible = true;
+    ) {
+        this.rootEl = BB.el({
+            css: {
+                margin: '10px',
+            },
+        });
+        this.isVisible = true;
 
-    let colorDiv = BB.el({
-        parent: div,
-        css: {
-            marginBottom: '10px'
-        }
-    });
+        this.colorDiv = BB.el({
+            parent: this.rootEl,
+            css: {
+                marginBottom: '10px',
+            },
+        });
 
-    let previewSize = 35;
-    let previewPadding = 8;
-    let shape; // 'rect'|'ellipse'|'line'
-    let mode; // 'stroke'|'fill'
+        this.colorSlider = p.colorSlider;
 
-
-    let rectStrokeSvgRect = BB.createSvg({
-        elementType: 'rect',
-        x: '' + previewPadding,
-        width: '' + (previewSize - previewPadding * 2)
-    });
-    let rectStrokeSvg = BB.createSvg({
-        elementType: 'svg',
-        width: '' + previewSize,
-        height: '' + previewSize
-    });
-    rectStrokeSvg.appendChild(rectStrokeSvgRect);
-    BB.css(rectStrokeSvg, {
-        display: 'block'
-    });
-
-    let rectFilledSvgRect = BB.createSvg({
-        elementType: 'rect',
-        x: '' + previewPadding,
-        width: '' + (previewSize - previewPadding * 2)
-    });
-    let rectFilledSvg = BB.createSvg({
-        elementType: 'svg',
-        width: '' + previewSize,
-        height: '' + previewSize
-    });
-    rectFilledSvg.appendChild(rectFilledSvgRect);
-    BB.css(rectFilledSvg, {
-        display: 'block'
-    });
+        const previewSize = 35;
+        const previewPadding = 8;
 
 
-    let ellipseStrokeSvgEllipse = BB.createSvg({
-        elementType: 'ellipse',
-        cx: '' + (previewSize / 2),
-        cy: '' + (previewSize / 2),
-        rx: '' + (previewSize / 2 - previewPadding)
-    });
-    let ellipseStrokeSvg = BB.createSvg({
-        elementType: 'svg',
-        width: '' + previewSize,
-        height: '' + previewSize,
-    });
-    ellipseStrokeSvg.appendChild(ellipseStrokeSvgEllipse);
-    BB.css(ellipseStrokeSvg, {
-        display: 'block'
-    });
+        const rectStrokeSvgRect = BB.createSvg({
+            elementType: 'rect',
+            x: '' + previewPadding,
+            width: '' + (previewSize - previewPadding * 2),
+        });
+        const rectStrokeSvg = BB.createSvg({
+            elementType: 'svg',
+            width: '' + previewSize,
+            height: '' + previewSize,
+        });
+        rectStrokeSvg.classList.add('dark-invert');
+        rectStrokeSvg.append(rectStrokeSvgRect);
+        BB.css(rectStrokeSvg, {
+            display: 'block',
+        });
 
-    let ellipseFilledSvgEllipse = BB.createSvg({
-        elementType: 'ellipse',
-        cx: '' + (previewSize / 2),
-        cy: '' + (previewSize / 2),
-        rx: '' + (previewSize / 2 - previewPadding)
-    });
-    let ellipseFilledSvg = BB.createSvg({
-        elementType: 'svg',
-        width: '' + previewSize,
-        height: '' + previewSize,
-    });
-    ellipseFilledSvg.appendChild(ellipseFilledSvgEllipse);
-    BB.css(ellipseFilledSvg, {
-        display: 'block'
-    });
+        const rectFilledSvgRect = BB.createSvg({
+            elementType: 'rect',
+            x: '' + previewPadding,
+            width: '' + (previewSize - previewPadding * 2),
+        });
+        const rectFilledSvg = BB.createSvg({
+            elementType: 'svg',
+            width: '' + previewSize,
+            height: '' + previewSize,
+        });
+        rectFilledSvg.classList.add('dark-invert');
+        rectFilledSvg.append(rectFilledSvgRect);
+        BB.css(rectFilledSvg, {
+            display: 'block',
+        });
 
 
-    let lineSvgLine = BB.createSvg({
-        elementType: 'line',
-        x1: '' + previewPadding,
-        x2: '' + (previewSize - previewPadding)
-    });
-    let lineSvg = BB.createSvg({
-        elementType: 'svg',
-        width: '' + previewSize,
-        height: '' + previewSize
-    });
-    lineSvg.appendChild(lineSvgLine);
-    BB.css(lineSvg, {
-        display: 'block'
-    });
+        const ellipseStrokeSvgEllipse = BB.createSvg({
+            elementType: 'ellipse',
+            cx: '' + (previewSize / 2),
+            cy: '' + (previewSize / 2),
+            rx: '' + (previewSize / 2 - previewPadding),
+        });
+        const ellipseStrokeSvg = BB.createSvg({
+            elementType: 'svg',
+            width: '' + previewSize,
+            height: '' + previewSize,
+        });
+        ellipseStrokeSvg.classList.add('dark-invert');
+        ellipseStrokeSvg.append(ellipseStrokeSvgEllipse);
+        BB.css(ellipseStrokeSvg, {
+            display: 'block',
+        });
 
-    function updatePreviews() {
-        let strokeWidth = BB.clamp(Math.round(lineWidthSlider.getValue() / 10), 1, 10) + 'px';
+        const ellipseFilledSvgEllipse = BB.createSvg({
+            elementType: 'ellipse',
+            cx: '' + (previewSize / 2),
+            cy: '' + (previewSize / 2),
+            rx: '' + (previewSize / 2 - previewPadding),
+        });
+        const ellipseFilledSvg = BB.createSvg({
+            elementType: 'svg',
+            width: '' + previewSize,
+            height: '' + previewSize,
+        });
+        ellipseFilledSvg.classList.add('dark-invert');
+        ellipseFilledSvg.append(ellipseFilledSvgEllipse);
+        BB.css(ellipseFilledSvg, {
+            display: 'block',
+        });
 
-        let squish = 1.35;
 
-        BB.css(rectStrokeSvgRect, { fill: 'none', stroke: 'black', strokeWidth: strokeWidth });
-        BB.css(rectFilledSvgRect, { fill: 'black', stroke: 'none' });
+        const lineSvgLine = BB.createSvg({
+            elementType: 'line',
+            x1: '' + previewPadding,
+            x2: '' + (previewSize - previewPadding),
+        });
+        const lineSvg = BB.createSvg({
+            elementType: 'svg',
+            width: '' + previewSize,
+            height: '' + previewSize,
+        });
+        lineSvg.classList.add('dark-invert');
+        lineSvg.append(lineSvgLine);
+        BB.css(lineSvg, {
+            display: 'block',
+        });
 
-        BB.css(ellipseStrokeSvgEllipse, { fill: 'none', stroke: 'black', strokeWidth: strokeWidth });
-        BB.css(ellipseFilledSvgEllipse, { fill: 'black', stroke: 'none' });
+        const updatePreviews = () => {
+            const strokeWidth = BB.clamp(Math.round(this.lineWidthSlider.getValue() / 10), 1, 10) + 'px';
 
-        BB.css(
-            lineSvgLine,
-            { fill: 'none', stroke: 'black', strokeWidth: strokeWidth }
-        );
+            const squish = 1.35;
 
-        if ((fixedToggle as any).getValue()) {
-            rectStrokeSvgRect.setAttribute('y', '' + previewPadding);
-            rectStrokeSvgRect.setAttribute('height', '' + (previewSize - previewPadding * 2));
-            rectFilledSvgRect.setAttribute('y', '' + previewPadding);
-            rectFilledSvgRect.setAttribute('height', '' + (previewSize - previewPadding * 2));
+            BB.css(rectStrokeSvgRect, { fill: 'none', stroke: 'black', strokeWidth: strokeWidth });
+            BB.css(rectFilledSvgRect, { fill: 'black', stroke: 'none' });
 
-            ellipseStrokeSvgEllipse.setAttribute('ry', '' + (previewSize / 2 - previewPadding));
-            ellipseFilledSvgEllipse.setAttribute('ry', '' + (previewSize / 2 - previewPadding));
-        } else {
-            rectStrokeSvgRect.setAttribute('y', '' + (previewPadding * squish));
-            rectStrokeSvgRect.setAttribute('height', '' + (previewSize - previewPadding * squish * 2));
-            rectFilledSvgRect.setAttribute('y', '' + (previewPadding * squish));
-            rectFilledSvgRect.setAttribute('height', '' + (previewSize - previewPadding * squish * 2));
+            BB.css(ellipseStrokeSvgEllipse, { fill: 'none', stroke: 'black', strokeWidth: strokeWidth });
+            BB.css(ellipseFilledSvgEllipse, { fill: 'black', stroke: 'none' });
 
-            ellipseStrokeSvgEllipse.setAttribute('ry', '' + (previewSize / 2 - previewPadding * squish));
-            ellipseFilledSvgEllipse.setAttribute('ry', '' + (previewSize / 2 - previewPadding * squish));
-        }
+            BB.css(
+                lineSvgLine,
+                { fill: 'none', stroke: 'black', strokeWidth: strokeWidth }
+            );
 
-        if ((snapToggle as any).getValue()) {
-            lineSvgLine.setAttribute('y1', '' + (previewSize - previewPadding));
-            lineSvgLine.setAttribute('y2', '' + previewPadding);
-        } else {
-            lineSvgLine.setAttribute('y1', '' + (previewSize - previewPadding * squish));
-            lineSvgLine.setAttribute('y2', '' + (previewPadding * squish));
+            if (this.fixedToggle.getValue()) {
+                rectStrokeSvgRect.setAttribute('y', '' + previewPadding);
+                rectStrokeSvgRect.setAttribute('height', '' + (previewSize - previewPadding * 2));
+                rectFilledSvgRect.setAttribute('y', '' + previewPadding);
+                rectFilledSvgRect.setAttribute('height', '' + (previewSize - previewPadding * 2));
+
+                ellipseStrokeSvgEllipse.setAttribute('ry', '' + (previewSize / 2 - previewPadding));
+                ellipseFilledSvgEllipse.setAttribute('ry', '' + (previewSize / 2 - previewPadding));
+            } else {
+                rectStrokeSvgRect.setAttribute('y', '' + (previewPadding * squish));
+                rectStrokeSvgRect.setAttribute('height', '' + (previewSize - previewPadding * squish * 2));
+                rectFilledSvgRect.setAttribute('y', '' + (previewPadding * squish));
+                rectFilledSvgRect.setAttribute('height', '' + (previewSize - previewPadding * squish * 2));
+
+                ellipseStrokeSvgEllipse.setAttribute('ry', '' + (previewSize / 2 - previewPadding * squish));
+                ellipseFilledSvgEllipse.setAttribute('ry', '' + (previewSize / 2 - previewPadding * squish));
+            }
+
+            if (this.snapToggle.getValue()) {
+                lineSvgLine.setAttribute('y1', '' + (previewSize - previewPadding));
+                lineSvgLine.setAttribute('y2', '' + previewPadding);
+            } else {
+                lineSvgLine.setAttribute('y1', '' + (previewSize - previewPadding * squish));
+                lineSvgLine.setAttribute('y2', '' + (previewPadding * squish));
+            }
+        };
+
+        const row1 = BB.el({
+            parent: this.rootEl,
+            css: {
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'start',
+            },
+        });
+
+        const shapeOptions = new Options({
+            optionArr: [
+                {
+                    id: 'rect-stroke',
+                    label: rectStrokeSvg,
+                    title: LANG('shape-rect') + ' ' + LANG('shape-stroke'),
+                },
+                {
+                    id: 'ellipse-stroke',
+                    label: ellipseStrokeSvg,
+                    title: LANG('shape-ellipse') + ' ' + LANG('shape-stroke'),
+                },
+                {
+                    id: 'line',
+                    label: lineSvg,
+                    title: LANG('shape-line'),
+                },
+                {
+                    id: 'rect-fill',
+                    label: rectFilledSvg,
+                    title: LANG('shape-rect') + ' ' + LANG('shape-fill'),
+                },
+                {
+                    id: 'ellipse-fill',
+                    label: ellipseFilledSvg,
+                    title: LANG('shape-ellipse') + ' ' + LANG('shape-fill'),
+                },
+            ],
+            initId: this.shape + ' ' + this.mode,
+            onChange: (id) => {
+                const split = id.split('-');
+                this.shape = split[0] as TShapeToolType;
+                this.mode = split[1] as TShapeToolMode;
+
+                BB.css(this.fixedToggle.getElement(), {
+                    display: this.shape === 'line' ? 'none' : '',
+                });
+                BB.css(this.snapToggle.getElement(), {
+                    display: this.shape === 'line' ? '' : 'none',
+                });
+                BB.css(this.lineWidthSlider.getElement(), {
+                    display: (this.shape !== 'line' && this.mode === 'fill') ? 'none' : '',
+                });
+            },
+            changeOnInit: true,
+        });
+        shapeOptions.getElement().style.width = '120px';
+        row1.append(shapeOptions.getElement());
+
+        this.eraserToggle = new Checkbox({
+            init: false,
+            label: LANG('eraser'),
+            callback: () => {
+                updatePreviews();
+            },
+        });
+
+        this.lockAlphaToggle = new Checkbox({
+            init: false,
+            label: LANG('lock-alpha'),
+            title: LANG('lock-alpha-title'),
+            doHighlight: true,
+        });
+        this.lockAlphaToggle.getElement().style.marginTop = '10px';
+
+        row1.append(BB.el({
+            content: [
+                this.eraserToggle.getElement(),
+                this.lockAlphaToggle.getElement(),
+            ],
+        }));
+
+        this.lineWidthSlider = new KlSlider({
+            label: LANG('shape-line-width'),
+            width: 250,
+            height: 30,
+            min: 1,
+            max: 200,
+            value: 4,
+            curve: 'quadratic',
+            onChange: () => {
+                updatePreviews();
+            },
+        });
+        BB.css(this.lineWidthSlider.getElement(), {
+            marginTop: '10px',
+        });
+        this.rootEl.append(this.lineWidthSlider.getElement());
+
+        this.opacitySlider = new KlSlider({
+            label: LANG('opacity'),
+            width: 250,
+            height: 30,
+            min: 1 / 100,
+            max: 1,
+            value: 1,
+            toValue: (displayValue) => displayValue / 100,
+            toDisplayValue: (value) => value * 100,
+        });
+        BB.css(this.opacitySlider.getElement(), {
+            marginTop: '10px',
+        });
+        this.rootEl.append(this.opacitySlider.getElement());
+
+        const row2 = BB.el({
+            parent: this.rootEl,
+            css: {
+                display: 'flex',
+                alignItems: 'center',
+                marginTop: '10px',
+            },
+        });
+
+        this.outwardsToggle = new Checkbox({
+            init: false,
+            label: LANG('shape-outwards'),
+            css: {
+                width: '50%',
+                marginRight: '10px',
+            },
+        });
+        row2.append(this.outwardsToggle.getElement());
+
+        this.fixedToggle = new Checkbox({
+            init: false,
+            label: LANG('shape-fixed'),
+            callback: () => {
+                updatePreviews();
+            },
+            css: {
+                flexGrow: '1',
+            },
+        });
+        row2.append(this.fixedToggle.getElement());
+
+        this.snapToggle = new Checkbox({
+            init: false,
+            label: LANG('angle-snap'),
+            title: LANG('angle-snap-title'),
+            callback: () => {
+                updatePreviews();
+            },
+            css: {
+                flexGrow: '1',
+            },
+        });
+        row2.append(this.snapToggle.getElement());
+
+
+        updatePreviews();
+    }
+
+    getElement (): HTMLElement {
+        return this.rootEl;
+    }
+
+    setIsVisible (pIsVisible: boolean): void {
+        this.isVisible = !!pIsVisible;
+        this.rootEl.style.display = this.isVisible ? 'block' : 'none';
+        if (this.isVisible) {
+            this.colorDiv.append(this.colorSlider.getElement());
+            this.colorDiv.append(this.colorSlider.getOutputElement());
+            //update();
         }
     }
 
-    let row1 = BB.el({
-        parent: div,
-        css: {
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'start'
-        }
-    });
+    getShape (): TShapeToolType {
+        return this.shape;
+    }
 
-    let shapeOptions = new Options({
-        optionArr: [
-            {
-                id: 'rect-stroke',
-                label: rectStrokeSvg,
-                title: LANG('shape-rect') + ' ' + LANG('shape-stroke'),
-            },
-            {
-                id: 'ellipse-stroke',
-                label: ellipseStrokeSvg,
-                title: LANG('shape-ellipse') + ' ' + LANG('shape-stroke'),
-            },
-            {
-                id: 'line',
-                label: lineSvg,
-                title: LANG('shape-line'),
-            },
-            {
-                id: 'rect-fill',
-                label: rectFilledSvg,
-                title: LANG('shape-rect') + ' ' + LANG('shape-fill'),
-            },
-            {
-                id: 'ellipse-fill',
-                label: ellipseFilledSvg,
-                title: LANG('shape-ellipse') + ' ' + LANG('shape-fill'),
-            },
-        ],
-        initId: 'rect',
-        onChange: function(id) {
-            let split = id.split('-');
-            shape = split[0];
-            mode = split[1];
+    getMode (): TShapeToolMode {
+        return this.mode;
+    }
 
-            BB.css(fixedToggle.getElement(), {
-                display: shape === 'line' ? 'none' : null
-            });
-            BB.css(snapToggle.getElement(), {
-                display: shape === 'line' ? null : 'none'
-            });
-            BB.css(lineWidthSlider.getElement(), {
-                display: (shape !== 'line' && mode === 'fill') ? 'none' : null
-            });
-        },
-        changeOnInit: true
-    });
-    shapeOptions.getElement().style.width = '120px';
-    row1.appendChild(shapeOptions.getElement());
+    getIsEraser (): boolean {
+        return this.eraserToggle.getValue();
+    }
 
-    const eraserToggle = new Checkbox({
-        init: false,
-        label: LANG('eraser'),
-        callback: function(b) {
-            updatePreviews();
-        }
-    });
+    getOpacity (): number {
+        return this.opacitySlider.getValue();
+    }
 
-    const lockAlphaToggle = new Checkbox({
-        init: false,
-        label: LANG('lock-alpha'),
-        title: LANG('lock-alpha-title'),
-        callback: (b) => {
-        },
-        doHighlight: true,
-    });
-    lockAlphaToggle.getElement().style.marginTop = '10px';
+    getLineWidth (): number {
+        return this.lineWidthSlider.getValue();
+    }
 
-    row1.append(BB.el({
-        content: [
-            eraserToggle.getElement(),
-            lockAlphaToggle.getElement(),
-        ]
-    }));
+    getIsOutwards (): boolean {
+        return this.outwardsToggle.getValue();
+    }
 
-    let lineWidthSlider = new KlSlider({
-        label: LANG('shape-line-width'),
-        width: 250,
-        height: 30,
-        min: 1,
-        max: 200,
-        value: 4,
-        curve: 'quadratic',
-        onChange: (val) => {
-            updatePreviews();
-        },
-    });
-    BB.css(lineWidthSlider.getElement(), {
-        marginTop: '10px'
-    });
-    div.appendChild(lineWidthSlider.getElement());
+    getIsFixed (): boolean {
+        return this.fixedToggle.getValue();
+    }
 
-    let opacitySlider = new KlSlider({
-        label: LANG('opacity'),
-        width: 250,
-        height: 30,
-        min: 1 / 100,
-        max: 1,
-        value: 1,
-        toValue: (displayValue) => displayValue / 100,
-        toDisplayValue: (value) => value * 100,
-    });
-    BB.css(opacitySlider.getElement(), {
-        marginTop: '10px'
-    });
-    div.appendChild(opacitySlider.getElement());
+    getIsSnap (): boolean {
+        return this.snapToggle.getValue();
+    }
 
-    let row2 = BB.el({
-        parent: div,
-        css: {
-            display: 'flex',
-            alignItems: 'center',
-            marginTop: '10px'
-        }
-    });
-
-    let outwardsToggle = new Checkbox({
-        init: false,
-        label: LANG('shape-outwards'),
-        callback: function(b) {},
-        css: {
-            width: '50%',
-            marginRight: '10px',
-        }
-    });
-    row2.appendChild(outwardsToggle.getElement());
-
-    let fixedToggle = new Checkbox({
-        init: false,
-        label: LANG('shape-fixed'),
-        callback: function(b) {
-            updatePreviews();
-        },
-        css: {
-            flexGrow: '1',
-        }
-    });
-    row2.appendChild(fixedToggle.getElement());
-
-    let snapToggle = new Checkbox({
-        init: false,
-        label: LANG('angle-snap'),
-        title: LANG('angle-snap-title'),
-        callback: function(b) {
-            updatePreviews();
-        },
-        css: {
-            flexGrow: '1',
-        }
-    });
-    row2.appendChild(snapToggle.getElement());
-
-
-    updatePreviews();
-
-    // --- interface ---
-
-    this.getElement = function() {
-        return div;
-    };
-
-    this.setIsVisible = function(pIsVisible) {
-        isVisible = !!pIsVisible;
-        div.style.display = isVisible ? 'block' : 'none';
-        if (isVisible) {
-            colorDiv.appendChild(p.colorSlider.getElement());
-            colorDiv.appendChild(p.colorSlider.getOutputElement());
-            //update();
-        }
-    };
-
-    this.getShape = function() {
-        return shape;
-    };
-
-    this.getMode = function() {
-        return mode;
-    };
-
-    this.getIsEraser = function() {
-        return (eraserToggle as any).getValue();
-    };
-
-    this.getOpacity = function() {
-        return opacitySlider.getValue();
-    };
-
-    this.getLineWidth = function() {
-        return lineWidthSlider.getValue();
-    };
-
-    this.getIsOutwards = function() {
-        return (outwardsToggle as any).getValue();
-    };
-
-    this.getIsFixed = function() {
-        return (fixedToggle as any).getValue();
-    };
-
-    this.getIsSnap = function() {
-        return (snapToggle as any).getValue();
-    };
-
-    this.getDoLockAlpha = () => {
-        return lockAlphaToggle.getValue();
-    };
-
+    getDoLockAlpha (): boolean {
+        return this.lockAlphaToggle.getValue();
+    }
 }

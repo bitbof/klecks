@@ -1,51 +1,62 @@
 import {BB} from '../../bb/bb';
-import {IFilterApply, IFilterGetDialogParam} from '../kl.types';
+import {IFilterApply, IFilterGetDialogParam, IFilterGetDialogResult} from '../kl-types';
 import {LANG} from '../../language/language';
+import {TFilterHistoryEntry} from './filters';
+import {addIsDarkListener, removeIsDarkListener} from '../../bb/base/base';
+
+export type TFilterRotateInput = {
+    deg: number;
+}
+
+export type TFilterRotateHistoryEntry = TFilterHistoryEntry<
+    'rotate',
+    TFilterRotateInput>;
 
 export const filterRotate = {
 
-    getDialog(params: IFilterGetDialogParam) {
-        let klCanvas = params.klCanvas;
-        if (!klCanvas)
+    getDialog (params: IFilterGetDialogParam) {
+        const klCanvas = params.klCanvas;
+        if (!klCanvas) {
             return false;
+        }
 
-        let fit = BB.fitInto(klCanvas.getWidth(), klCanvas.getHeight(), 280, 200, 1);
-        let w = parseInt('' + fit.width), h = parseInt('' + fit.height);
+        const fit = BB.fitInto(klCanvas.getWidth(), klCanvas.getHeight(), 280, 200, 1);
+        const w = parseInt('' + fit.width), h = parseInt('' + fit.height);
 
-        let previewFactor = w / klCanvas.getWidth();
-        let tempCanvas = BB.canvas(w, h);
+        const previewFactor = w / klCanvas.getWidth();
+        const tempCanvas = BB.canvas(w, h);
         tempCanvas.style.display = 'block';
-        tempCanvas.getContext("2d").drawImage(klCanvas.getCompleteCanvas(previewFactor), 0, 0, w, h);
+        BB.ctx(tempCanvas).drawImage(klCanvas.getCompleteCanvas(previewFactor), 0, 0, w, h);
 
 
-        let div = document.createElement("div");
-        let result: any = {
-            element: div
+        const div = document.createElement('div');
+        const result: IFilterGetDialogResult<TFilterRotateInput> = {
+            element: div,
         };
         let deg = 0;
-        div.innerHTML = LANG('filter-rotate-description') + "<br/><br/>";
+        div.innerHTML = LANG('filter-rotate-description') + '<br/><br/>';
 
-        let first = true;
+        const first = true;
 
-        function update() {
-            (canvasWrapper.style as any).WebkitTransform = "rotate(" + deg + "deg)";
-            (canvasWrapper.style as any).MozTransform = "rotate(" + deg + "deg)";
-            (canvasWrapper.style as any).OTransform = "rotate(" + deg + "deg)";
-            (canvasWrapper.style as any).msTransform = "rotate(" + deg + "deg)";
+        function update (): void {
+            (canvasWrapper.style as any).WebkitTransform = 'rotate(' + deg + 'deg)';
+            (canvasWrapper.style as any).MozTransform = 'rotate(' + deg + 'deg)';
+            (canvasWrapper.style as any).OTransform = 'rotate(' + deg + 'deg)';
+            (canvasWrapper.style as any).msTransform = 'rotate(' + deg + 'deg)';
             if (Math.abs(deg % 180) === 90) {
                 //height has to fit width because of rotation
-                let fit = BB.fitInto(h, w, 280, 200, 1);
-                let scale = parseInt('' + fit.height) / w;
-                (canvasWrapper.style as any).WebkitTransform = "rotate(" + deg + "deg) scale(" + scale + ")";
-                (canvasWrapper.style as any).MozTransform = "rotate(" + deg + "deg) scale(" + scale + ")";
-                (canvasWrapper.style as any).OTransform = "rotate(" + deg + "deg) scale(" + scale + ")";
-                (canvasWrapper.style as any).msTransform = "rotate(" + deg + "deg) scale(" + scale + ")";
+                const fit = BB.fitInto(h, w, 280, 200, 1);
+                const scale = parseInt('' + fit.height) / w;
+                (canvasWrapper.style as any).WebkitTransform = 'rotate(' + deg + 'deg) scale(' + scale + ')';
+                (canvasWrapper.style as any).MozTransform = 'rotate(' + deg + 'deg) scale(' + scale + ')';
+                (canvasWrapper.style as any).OTransform = 'rotate(' + deg + 'deg) scale(' + scale + ')';
+                (canvasWrapper.style as any).msTransform = 'rotate(' + deg + 'deg) scale(' + scale + ')';
             }
         }
 
-        let btnPlus = document.createElement("button");
+        const btnPlus = document.createElement('button');
         btnPlus.innerHTML = "<span style='font-size: 1.3em'>⟳</span> 90°";
-        let btnMinus = document.createElement("button");
+        const btnMinus = document.createElement('button');
         btnMinus.innerHTML = "<span style='font-size: 1.3em'>⟲</span> 90°";
         btnMinus.style.marginRight = '5px';
 
@@ -59,69 +70,80 @@ export const filterRotate = {
             update();
         };
 
-        div.appendChild(btnMinus);
-        div.appendChild(btnPlus);
+        div.append(btnMinus, btnPlus);
 
-        let previewWrapper = document.createElement("div");
-        BB.css(previewWrapper, {
-            width: "340px",
-            marginLeft: "-20px",
-            height: "220px",
-            display: "table",
-            backgroundColor: "#9e9e9e",
-            marginTop: "10px",
-            boxShadow: "rgba(0, 0, 0, 0.2) 0px 1px inset, rgba(0, 0, 0, 0.2) 0px -1px inset",
-            overflow: "hidden",
-            position: "relative",
-            userSelect: 'none',
-            colorScheme: 'only light',
+        const previewWrapper = BB.el({
+            className: 'kl-preview-wrapper',
+            css: {
+                width: '340px',
+                height: '220px',
+                display: 'table',
+            },
         });
 
-        let previewcell = document.createElement("div");
-        previewcell.style.display = "table-cell";
-        previewcell.style.verticalAlign = "middle";
-        let canvasWrapper = BB.appendTextDiv(previewcell, "");
-        canvasWrapper.appendChild(tempCanvas);
-        previewWrapper.appendChild(previewcell);
-        canvasWrapper.style.width = w + "px";
-        canvasWrapper.style.height = h + "px";
-        canvasWrapper.style.marginLeft = "auto";
-        canvasWrapper.style.marginRight = "auto";
-        canvasWrapper.style.boxShadow = "0 0 5px rgba(0,0,0,0.8)";
-        canvasWrapper.style.overflow = "hidden";
-        BB.createCheckerDataUrl(4, function (url) {
-            canvasWrapper.style.background = "url(" + url + ")";
+        const previewcell = BB.el({
+            parent: previewWrapper,
+            css: {
+                display: 'table-cell',
+                verticalAlign: 'middle',
+            },
         });
-        canvasWrapper.style.transition = "all 0.2s ease-out";
+        const canvasWrapper = BB.el({
+            parent: previewcell,
+            content: tempCanvas,
+            className: 'kl-preview-wrapper__canvas',
+            css: {
+                width: w + 'px',
+                height: h + 'px',
+                marginLeft: 'auto',
+                marginRight: 'auto',
+                overflow: 'hidden',
+            },
+        });
 
-        div.appendChild(previewWrapper);
+
+        function updateCheckerboard (): void {
+            BB.createCheckerDataUrl(8, function (url) {
+                canvasWrapper.style.background = 'url(' + url + ')';
+            }, BB.isDark());
+        }
+        addIsDarkListener(updateCheckerboard);
+        updateCheckerboard();
+
+        canvasWrapper.style.transition = 'all 0.2s ease-out';
+
+        div.append(previewWrapper);
         update();
 
-        result.getInput = function () {
+        result.destroy = (): void => {
+            removeIsDarkListener(updateCheckerboard);
+        };
+        result.getInput = function (): TFilterRotateInput {
+            result.destroy();
             return {
-                deg: deg
+                deg: deg,
             };
         };
         return result;
     },
 
-    apply(params: IFilterApply) {
-        let klCanvas = params.klCanvas;
-        let history = params.history;
-        let deg = params.input.deg;
-        if (!klCanvas || !history)
+    apply (params: IFilterApply<TFilterRotateInput>): boolean {
+        const klCanvas = params.klCanvas;
+        const history = params.history;
+        if (!klCanvas || !history) {
             return false;
+        }
         history.pause(true);
-        klCanvas.rotate(deg);
+        klCanvas.rotate(params.input.deg);
         history.pause(false);
         history.push({
-            tool: ["filter", "rotate"],
-            action: "apply",
+            tool: ['filter', 'rotate'],
+            action: 'apply',
             params: [{
-                input: params.input
-            }]
-        });
+                input: params.input,
+            }],
+        } as TFilterRotateHistoryEntry);
         return true;
-    }
+    },
 
 };

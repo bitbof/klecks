@@ -1,75 +1,76 @@
 import {BB} from '../../../bb/bb';
 import {CropCopy} from '../components/crop-copy';
-import {Checkbox} from '../base-components/checkbox';
-import {popup} from './popup';
+import {Checkbox} from '../components/checkbox';
+import {showModal} from './base/showModal';
 import {LANG} from '../../../language/language';
+import {IKeyString, IRect} from '../../../bb/bb-types';
+import {IKlPsd, TKlPsdError} from '../../kl-types';
 
 /**
- *
- * p = {
- *     image: convertedPsd | {type: 'image', width: number, height: number, canvas: image | canvas},
- *     maxSize: number,
- *     target: htmlElement,
- *     callback: func(
- *         {
- *             type: 'as-image',
- *             image: image | canvas,
- *         } | {
- *             type: 'as-image-psd',
- *             image: convertedPsd,
- *             cropObj: {x: number, y: number, width: number, height: number}
- *         } | {
- *             type: 'as-layer',
- *             image: image | canvas,
- *         } | {
- *             type: 'cancel',
- *         }
- *     )
- * }
- *
- * @param p {}
+ * Shows first dialog when importing an image.
+ * Where you can crop, and select import as layer or as image.
  */
-export function showImportImageDialog(p) {
-    const div = BB.el({});
-
-    const isSmall = window.innerWidth < 550 || window.innerHeight < 550;
-    const style = isSmall ? {} : { width: '500px' };
-    let resolutionEl;
-    const cropCopy = new CropCopy({
-        width: isSmall ? 340 : 540,
-        height: isSmall ? 300 : 400,
-        canvas: p.image.canvas,
-        isNotCopy: true,
-        onChange: function(width, height) {
-            if (!resolutionEl) {
-                return;
+export function showImportImageDialog (
+    p: {
+        image: IKlPsd | {
+            type: 'image';
+            width: number;
+            height: number;
+            canvas: HTMLImageElement | HTMLCanvasElement;
+        };
+        maxSize: number;
+        target: HTMLElement;
+        callback: (
+            val: {
+                type: 'as-image' | 'as-layer';
+                image: HTMLImageElement | HTMLCanvasElement;
+            } | {
+                type: 'as-image-psd';
+                image: IKlPsd;
+                cropObj: IRect;
+            } | {
+                type: 'cancel';
             }
-            updateResolution(width, height);
-        }
-    });
-    BB.css(cropCopy.getEl(), {
-        marginLeft: '-20px',
-        borderTop: '1px solid #bbb',
-        borderBottom: '1px solid #bbb'
-    });
-    cropCopy.getEl().title = LANG('crop-drag-to-crop');
-    div.appendChild(cropCopy.getEl());
+        ) => void;
+    }
+): void {
+    const rootEl = BB.el();
+    const isSmall = window.innerWidth < 550 || window.innerHeight < 550;
+    const style: IKeyString = isSmall ? {} : { width: '500px' };
 
-
-    resolutionEl = BB.el({
-        parent: div,
+    const resolutionEl = BB.el({
         css: {
             marginTop: '10px',
             textAlign: 'center',
             color: '#888',
             lineHeight: '20px',
-        }
+        },
     });
-    function updateResolution(w: number, h: number) {
+
+    const cropCopy = new CropCopy({
+        width: isSmall ? 340 : 540,
+        height: isSmall ? 300 : 400,
+        canvas: p.image.canvas,
+        isNotCopy: true,
+        onChange: (width, height): void => {
+            if (!resolutionEl) {
+                return;
+            }
+            updateResolution(width, height);
+        },
+    });
+    BB.css(cropCopy.getEl(), {
+        marginLeft: '-20px',
+    });
+    cropCopy.getEl().title = LANG('crop-drag-to-crop');
+
+    rootEl.append(cropCopy.getEl(), resolutionEl);
+
+    function updateResolution (w: number, h: number): void {
         const fit = BB.fitInto(w, h, p.maxSize, p.maxSize);
 
         if (fit.width < w) {
-            resolutionEl.innerHTML = `<span style="color:#f00">${w} X ${h}</span> ⟶ ${Math.round(fit.width)} X ${Math.round(fit.height)}`;
+            resolutionEl.innerHTML = `<span class="kl-text-error">${w} X ${h}</span> ⟶ ${Math.round(fit.width)} X ${Math.round(fit.height)}`;
             resolutionEl.title = LANG('import-too-large');
         } else {
             resolutionEl.innerHTML = `${w} X ${h}`;
@@ -80,9 +81,9 @@ export function showImportImageDialog(p) {
 
 
     let doFlatten = false;
-    function showWarnings(psdWarningArr) {
-        let contentArr = [];
-        let warningMap = {
+    function showWarnings (psdWarningArr: TKlPsdError[]): void {
+        const contentArr = [];
+        const warningMap = {
             'mask': 'Masks not supported. Mask was applied.',
             'clipping': 'Clipping not supported. Clipping layers were merged.',
             'group': 'Groups not supported. Layers were ungrouped.',
@@ -95,57 +96,52 @@ export function showImportImageDialog(p) {
         for (let i = 0; i < psdWarningArr.length; i++) {
             contentArr.push('- ' + warningMap[psdWarningArr[i]]);
         }
-        alert(contentArr.join("\n"));
+        alert(contentArr.join('\n'));
     }
 
-    let flattenCheckbox;
+    let flattenCheckbox: Checkbox;
+    let warningsEl: HTMLElement | undefined;
     if (p.image.type === 'psd') {
-        const noteStyle = {
-            background: 'rgba(255,255,0,0.5)',
-            padding: '10px',
-            marginTop: '5px',
-            marginBottom: '5px',
-            border: '1px solid #e7d321',
-            borderRadius: '5px'
-        };
         if (p.image.layers) {
             flattenCheckbox = new Checkbox({
                 init: doFlatten,
                 label: LANG('import-flatten'),
-                callback: function(b) {
+                callback: (b): void => {
                     doFlatten = b;
-                }
+                },
             });
-            div.appendChild(flattenCheckbox.getElement());
+            rootEl.append(flattenCheckbox.getElement());
 
             if (p.image.warningArr) {
                 const noteEl = BB.el({
+                    className: 'kl-import-note',
                     content: LANG('import-psd-limited-support'),
-                    css: noteStyle
                 });
-                noteEl.appendChild(BB.el({
+                const warnings = p.image.warningArr;
+                warningsEl = BB.el({
+                    parent: noteEl,
                     tagName: 'a',
                     content: 'Details',
-                    onClick: function() {
-                        showWarnings(p.image.warningArr);
-                    }
-                }));
-                div.appendChild(noteEl);
+                    css: { marginLeft: '5px'},
+                    onClick: () => showWarnings(warnings),
+                });
+                rootEl.append(noteEl);
             }
         } else {
             const noteEl = BB.el({
+                className: 'kl-import-note',
                 content: LANG('import-psd-unsupported'),
-                css: noteStyle
             });
-            div.appendChild(noteEl);
+            rootEl.append(noteEl);
         }
     }
 
-    function callback(result) {
+    function callback (result: string): void {
         const croppedImage = cropCopy.getCroppedImage();
         const cropRect = cropCopy.getRect();
         const isCropped = p.image.width !== cropRect.width && p.image.height !== cropRect.height;
         cropCopy.destroy();
+        BB.destroyEl(warningsEl);
         if (flattenCheckbox) {
             flattenCheckbox.destroy();
         }
@@ -159,33 +155,33 @@ export function showImportImageDialog(p) {
         } else if (result === LANG('import-btn-as-image')) {
             if (p.image.type === 'psd') {
                 if (doFlatten) {
-                    p.image.layers = null;
+                    delete p.image.layers;
                 }
                 p.callback({
                     type: 'as-image-psd',
                     image: p.image,
-                    cropObj: cropRect
+                    cropObj: cropRect,
                 });
             } else if (p.image.type === 'image') {
                 p.callback({
                     type: 'as-image',
-                    image: croppedImage
+                    image: croppedImage,
                 });
             }
         } else {
             p.callback({
-                type: 'cancel'
+                type: 'cancel',
             });
         }
     }
-    popup({
+    showModal({
         target: p.target,
         message: `<b>${LANG('import-title')}</b>`,
-        div: div,
+        div: rootEl,
         style,
-        buttons: [LANG('import-btn-as-layer'), LANG('import-btn-as-image'), "Cancel"],
+        buttons: [LANG('import-btn-as-layer'), LANG('import-btn-as-image'), 'Cancel'],
         primaries: [LANG('import-btn-as-layer'), LANG('import-btn-as-image')],
-        callback: callback,
-        autoFocus: 'As Image'
+        callback,
+        autoFocus: 'As Image',
     });
 }

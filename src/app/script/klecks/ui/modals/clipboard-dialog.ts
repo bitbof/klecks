@@ -1,63 +1,59 @@
 import {BB} from '../../../bb/bb';
-import {popup} from './popup';
+import {showModal} from './base/showModal';
 import {CropCopy} from '../components/crop-copy';
 import {LANG} from '../../../language/language';
+import {StatusOverlay} from '../components/status-overlay';
+import {ICropRect} from '../../../bb/bb-types';
 
-/// <reference path="./types.d.ts" />
+export function clipboardDialog (
+    parent: HTMLElement,
+    fullCanvas: HTMLCanvasElement,
+    cropCallback: (crop: ICropRect) => void,
+    output: StatusOverlay,
+    showCrop: boolean, // show crop button
+): void {
 
-/**
- *
- * @param parent
- * @param fullCanvas
- * @param cropCallback
- * @param output - BB.Output
- * @param showCrop - boolean - show crop button
- */
-export function clipboardDialog(parent, fullCanvas, cropCallback, output, showCrop) {
-
-    let clipboardItemIsSupported = false;
+    let clipboardItemIsSupported: boolean = false;
     try {
         clipboardItemIsSupported = !!ClipboardItem;
     } catch (e) {}
 
-    const div = document.createElement("div");
+    const div = document.createElement('div');
     const isSmall = window.innerWidth < 550 || window.innerHeight < 550;
 
-    let topWrapper = BB.el({
+    const topWrapper = BB.el({
         content: LANG('crop-drag-to-crop') + (clipboardItemIsSupported ? '' : '<br>' + LANG('cropcopy-click-hold')),
         css: {
-            textAlign: 'center'
-        }
+            textAlign: 'center',
+        },
     });
-    div.appendChild(topWrapper);
+    div.append(topWrapper);
 
 
-    let cropCopy = new CropCopy({
+    const cropCopy = new CropCopy({
         width: isSmall ? 340 : 540,
         height: isSmall ? 300 : 350,
         canvas: fullCanvas,
-        clipboardItemIsSupported
+        isNotCopy: false,
     });
     BB.css(cropCopy.getEl(), {
         marginTop: '10px',
         marginLeft: '-20px',
-        borderTop: '1px solid #bbb',
-        borderBottom: '1px solid #bbb'
     });
-    div.appendChild(cropCopy.getEl());
+    div.append(cropCopy.getEl());
 
-    function toClipboard() {
+    function toClipboard () {
         const imgURL = cropCopy.getCroppedImage().toDataURL('image/png');
-        setTimeout(async function() {
+        setTimeout(async function () {
             try {
                 const data = await fetch(imgURL);
                 const blob = await data.blob();
                 await (navigator.clipboard as any).write([
                     new ClipboardItem({
-                        [blob.type]: blob
-                    } as any) // todo check is possible?
+                        [blob.type]: blob,
+                    } as any), // todo check is possible?
                 ]);
-                setTimeout(function() {
+                setTimeout(function () {
                     output.out(LANG('cropcopy-copied'), true);
                 }, 200);
             } catch (err) {
@@ -66,20 +62,20 @@ export function clipboardDialog(parent, fullCanvas, cropCallback, output, showCr
         }, 0);
     }
 
-    let keyListener = new BB.KeyListener({
-        onDown: function(keyStr, KeyEvent, comboStr) {
+    const keyListener = new BB.KeyListener({
+        onDown: function (keyStr, KeyEvent, comboStr) {
             if (comboStr === 'ctrl+c') {
                 toClipboard();
-                closefunc();
+                closeFunc && closeFunc();
             }
-        }
+        },
     });
 
-    let closefunc;
-    function blur() {
-        closefunc();
+    let closeFunc: () => void;
+    function blur () {
+        closeFunc && closeFunc();
     }
-    BB.addEventListener(window, "blur", blur);
+    window.addEventListener('blur', blur);
 
     const buttonArr = [];
     if (clipboardItemIsSupported) {
@@ -90,12 +86,12 @@ export function clipboardDialog(parent, fullCanvas, cropCallback, output, showCr
     }
     buttonArr.push('Cancel');
 
-    popup({
+    showModal({
         target: parent,
         message: '<b>' + (showCrop ? `${LANG('cropcopy-title-copy')} / ${LANG('cropcopy-title-crop')}` : `${LANG('cropcopy-title-copy')}`) + '</b>',
         div: div,
         style: isSmall ? {} : {
-            width: "500px"
+            width: '500px',
         },
         buttons: buttonArr,
         primaries: [LANG('cropcopy-btn-copy')],
@@ -103,21 +99,21 @@ export function clipboardDialog(parent, fullCanvas, cropCallback, output, showCr
             if (result === LANG('cropcopy-btn-copy')) {
                 toClipboard();
             } else if (result === LANG('cropcopy-btn-crop')) {
-                let rectObj = cropCopy.getRect();
+                const rectObj = cropCopy.getRect();
                 cropCallback({
                     left: Math.round(-rectObj.x),
                     right: Math.round(rectObj.x + rectObj.width - fullCanvas.width),
                     top: Math.round(-rectObj.y),
-                    bottom: Math.round(rectObj.y + rectObj.height - fullCanvas.height)
+                    bottom: Math.round(rectObj.y + rectObj.height - fullCanvas.height),
                 });
             }
-            BB.removeEventListener(window, "blur", blur);
+            window.removeEventListener('blur', blur);
             cropCopy.destroy();
             keyListener.destroy();
         },
         clickOnEnter: LANG('cropcopy-btn-copy'),
-        closefunc: function (func) {
-            closefunc = func;
-        }
+        closeFunc: function (func) {
+            closeFunc = func;
+        },
     });
 }

@@ -1,25 +1,25 @@
 import {DecoyKlHistory, klHistory} from './history/kl-history';
-import {Popup, popup} from './ui/modals/popup';
+import {showModal} from './ui/modals/base/showModal';
+import {DynamicModal} from './ui/modals/base/dynamic-modal';
 import {dialogCounter} from './ui/modals/modal-count';
-import {Checkbox} from './ui/base-components/checkbox';
-import {input} from './ui/base-components/input';
-import {Select} from './ui/base-components/select';
-import {ImageToggle} from './ui/base-components/image-toggle';
-import {ImageRadioList} from './ui/base-components/image-radio-list';
-import {penPressureToggle} from './ui/base-components/pen-pressure-toggle';
-import {KlSlider} from './ui/base-components/kl-slider';
-import {calcSliderFalloffFactor} from './ui/base-components/slider-falloff';
+import {Checkbox} from './ui/components/checkbox';
+import {input} from './ui/components/input';
+import {Select} from './ui/components/select';
+import {ImageToggle} from './ui/components/image-toggle';
+import {ImageRadioList} from './ui/components/image-radio-list';
+import {createPenPressureToggle} from './ui/components/create-pen-pressure-toggle';
+import {KlSlider} from './ui/components/kl-slider';
+import {calcSliderFalloffFactor} from './ui/components/slider-falloff';
 import {HexColorDialog} from './ui/modals/color-slider-hex-dialog';
-import {KlColorSlider} from './ui/base-components/kl-color-slider';
-import {KlSmallColorSlider} from './ui/base-components/kl-color-slider-small';
-import {PointSlider} from './ui/base-components/point-slider';
-import {ColorOptions} from './ui/base-components/color-options';
-import {Options} from './ui/base-components/options';
+import {KlColorSlider} from './ui/components/kl-color-slider';
+import {KlColorSliderSmall} from './ui/components/kl-color-slider-small';
+import {PointSlider} from './ui/components/point-slider';
+import {ColorOptions} from './ui/components/color-options';
+import {Options} from './ui/components/options';
 import {StatusOverlay} from './ui/components/status-overlay';
-import {exportDialog} from './ui/modals/export-dialog-deprecated';
 import {CropCopy} from './ui/components/crop-copy';
 import {clipboardDialog} from './ui/modals/clipboard-dialog';
-import {klLayerManager} from './ui/tool-tabs/kl-layer-manager';
+import {LayerManager} from './ui/tool-tabs/layer-manager/layer-manager';
 import {WorkspaceSvgOverlay} from './canvas-ui/workspace-svg-overlay';
 import {KlCanvasWorkspace} from './canvas-ui/kl-canvas-workspace';
 import {KlCanvasPreview} from './canvas-ui/canvas-preview';
@@ -27,7 +27,6 @@ import {FreeTransform} from './ui/components/free-transform';
 import {FreeTransformCanvas} from './ui/components/free-transform-canvas';
 import {Cropper} from './ui/components/cropper';
 import {LayerPreview} from './ui/components/layer-preview';
-import {FittedImage} from './ui/components/fitted-image';
 import {showImportAsLayerDialog} from './ui/modals/show-import-as-layer-dialog';
 import {KlImageDropper} from './ui/components/kl-image-dropper';
 import {OverlayToolspace} from './ui/components/overlay-toolspace';
@@ -50,24 +49,24 @@ import * as PSD from './storage/psd';
 import {drawShape, ShapeTool} from './image-operations/shape-tool';
 import {KlCanvas} from './canvas/kl-canvas';
 import * as indexedDb from './storage/indexed-db';
+import {setDbName} from './storage/indexed-db';
 import {filterLib, filterLibStatus} from './filters/filters';
 import {brushes} from './brushes/brushes';
 import {brushesUI} from './brushes-ui/brushes-ui';
-import {showIframePopup} from './ui/modals/show-iframe-popup';
-import {RadioList} from './ui/base-components/radio-list';
+import {showIframeModal} from './ui/modals/show-iframe-modal';
+import {RadioList} from './ui/components/radio-list';
 import {BrowserStorageUi} from './ui/components/browser-storage-ui';
 import {drawProject} from './canvas/draw-project';
 import {ProjectStore} from './storage/project-store';
-import {FileTab} from "./ui/tool-tabs/file-tab";
-import {FilterTab} from "./ui/tool-tabs/filter-tab";
-import {imgurUpload} from "./ui/modals/imgur-upload";
-import {loadAgPsd} from "./storage/ag-psd-wrapper";
-import {SaveReminder} from "./ui/components/save-reminder";
-import {SaveToComputer} from "./storage/save-to-computer";
-import {UndoRedoCatchup} from "./history/undo-redo-catchup";
-import {setDbName} from './storage/indexed-db';
+import {FileTab} from './ui/tool-tabs/file-tab';
+import {FilterTab} from './ui/tool-tabs/filter-tab';
+import {imgurUpload} from './ui/modals/imgur-upload';
+import {loadAgPsd} from './storage/ag-psd-wrapper';
+import {SaveReminder} from './ui/components/save-reminder';
+import {SaveToComputer} from './storage/save-to-computer';
+import {UndoRedoCatchup} from './history/undo-redo-catchup';
 import {BrushSettingService} from './brushes-ui/brush-setting-service';
-import {BoxToggle} from './ui/base-components/box-toggle';
+import {BoxToggle} from './ui/components/box-toggle';
 import {SettingsTab} from './ui/tool-tabs/settings-tab';
 import {ToolspaceScroller} from './ui/components/toolspace-scroller';
 import {GradientUi} from './ui/tool-tabs/gradient-ui';
@@ -114,8 +113,8 @@ export const KL = {
     ProjectStore,
     loadAgPsd,
     SaveToComputer,
-
-    // --- ui - base components ---
+    
+    // --- ui - components ---
     calcSliderFalloffFactor,
     Checkbox,
     input,
@@ -123,24 +122,21 @@ export const KL = {
     ImageToggle,
     ImageRadioList,
     RadioList,
-    penPressureToggle,
+    createPenPressureToggle,
     KlSlider,
     HexColorDialog,
     KlColorSlider,
-    KlSmallColorSlider,
+    KlColorSliderSmall,
     PointSlider,
     ColorOptions,
     Options,
     BoxToggle,
-
-    // --- ui - components ---
     StatusOverlay,
     CropCopy,
     FreeTransform,
     FreeTransformCanvas,
     Cropper,
     LayerPreview,
-    FittedImage,
     KlImageDropper,
     OverlayToolspace,
     ToolspaceTopRow,
@@ -155,15 +151,14 @@ export const KL = {
 
     // --- ui - modals ---
     dialogCounter,
-    popup,
-    Popup,
-    exportDialog,
+    popup: showModal,
+    Popup: DynamicModal,
     clipboardDialog,
     showImportAsLayerDialog,
     newImageDialog,
     textToolDialog,
     showImportImageDialog,
-    showIframePopup,
+    showIframePopup: showIframeModal,
     imgurUpload,
 
     // --- ui - tool tabs ---
@@ -175,8 +170,7 @@ export const KL = {
     FileTab,
     FilterTab,
     SettingsTab,
-    klLayerManager,
-
+    LayerManager,
 
     klHistory,
     DecoyKlHistory,

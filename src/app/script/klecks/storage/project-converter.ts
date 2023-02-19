@@ -1,12 +1,17 @@
-import {IKlProject, IKlStorageProject} from '../kl.types';
+import {IKlProject, IKlStorageProject} from '../kl-types';
 import {BB} from '../../bb/bb';
 import {drawProject} from '../canvas/draw-project';
 import {base64ToBlob} from './base-64-to-blob';
 
+export type TReadStorageProjectResult = {
+    project: IKlProject;
+    timestamp: number;
+    thumbnail: HTMLImageElement | HTMLCanvasElement;
+};
 
 const thumbSize = 240;
 
-function loadImage(blob: Blob): Promise<HTMLImageElement> {
+function loadImage (blob: Blob): Promise<HTMLImageElement> {
     return new Promise<HTMLImageElement>((resolve, reject) => {
         const im = new Image();
         try {
@@ -15,14 +20,14 @@ function loadImage(blob: Blob): Promise<HTMLImageElement> {
             reject('imageBlobToUrl, ' + e.message);
             return;
         }
-        im.onload = () => {
+        im.onload = (): void => {
             URL.revokeObjectURL(im.src);
             resolve(im);
-        }
-        im.onabort = function () {
+        };
+        im.onabort = (): void => {
             reject('layer image failed loading');
         };
-        im.onerror = function () {
+        im.onerror = (): void => {
             reject('layer image failed loading');
         };
     });
@@ -35,13 +40,13 @@ function loadImage(blob: Blob): Promise<HTMLImageElement> {
  */
 export class ProjectConverter {
 
-    private static createThumbnail(project): HTMLCanvasElement {
+    private static createThumbnail (project: IKlProject): HTMLCanvasElement {
         const size = BB.fitInto(project.width, project.height, thumbSize, thumbSize);
         const factor = size.width / project.width;
         return drawProject(project, factor);
     }
 
-    static createStorageProject(project: IKlProject): IKlStorageProject {
+    static createStorageProject (project: IKlProject): IKlStorageProject {
         return {
             id: 1,
             timestamp: new Date().getTime(),
@@ -61,16 +66,12 @@ export class ProjectConverter {
                     opacity: item.opacity,
                     mixModeStr: item.mixModeStr,
                     blob,
-                }
+                };
             }),
         };
     }
 
-    static async readStorageProject(storageProject: IKlStorageProject): Promise<{
-        project: IKlProject,
-        timestamp: number,
-        thumbnail: HTMLImageElement | HTMLCanvasElement
-    }> {
+    static async readStorageProject (storageProject: IKlStorageProject): Promise<TReadStorageProjectResult> {
         if (
             !storageProject.width || !storageProject.height ||
             isNaN(storageProject.width) || isNaN(storageProject.height) ||

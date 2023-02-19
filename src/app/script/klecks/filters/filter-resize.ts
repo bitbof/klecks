@@ -1,52 +1,65 @@
 import {BB} from '../../bb/bb';
-import {Checkbox} from '../ui/base-components/checkbox';
-import {Select} from '../ui/base-components/select';
-// @ts-ignore
-import constrainImg from 'url:~/src/app/img/ui/constrain.svg';
-import {IFilterApply, IFilterGetDialogParam} from '../kl.types';
+import {Checkbox} from '../ui/components/checkbox';
+import {Select} from '../ui/components/select';
+import constrainImg from '/src/app/img/ui/constrain.svg';
+import {IFilterApply, IFilterGetDialogParam, IFilterGetDialogResult} from '../kl-types';
 import {LANG} from '../../language/language';
+import {TFilterHistoryEntry} from './filters';
+import {table} from '../ui/components/table';
+import {addIsDarkListener, removeIsDarkListener} from '../../bb/base/base';
+
+export type TFilterResizeInput = {
+    width: number;
+    height: number;
+    algorithm: 'smooth' | 'pixelated';
+};
+
+export type TFilterResizeHistoryEntry = TFilterHistoryEntry<
+    'resize',
+    TFilterResizeInput>;
 
 export const filterResize = {
 
-    getDialog(params: IFilterGetDialogParam) {
+    getDialog (params: IFilterGetDialogParam) {
         //BB.centerWithin
-        let klCanvas = params.klCanvas;
-        if (!klCanvas)
+        const klCanvas = params.klCanvas;
+        if (!klCanvas) {
             return false;
+        }
 
-        let fit = BB.fitInto( klCanvas.getWidth(), klCanvas.getHeight(), 280, 200,1);
-        let w = parseInt('' + fit.width), h = parseInt('' + fit.height);
+        const fit = BB.fitInto( klCanvas.getWidth(), klCanvas.getHeight(), 280, 200,1);
+        const w = parseInt('' + fit.width), h = parseInt('' + fit.height);
 
         let previewFactor = w / klCanvas.getWidth();
-        let tempCanvas = klCanvas.getCompleteCanvas(1);
+        const tempCanvas = klCanvas.getCompleteCanvas(1);
 
 
-        let div = document.createElement("div");
-        let result: any = {
-            element: div
+        const div = document.createElement('div');
+        const result: IFilterGetDialogResult<TFilterResizeInput> = {
+            element: div,
         };
         let newWidth = klCanvas.getWidth(), newHeight = klCanvas.getHeight();
 
-        div.innerHTML = LANG('filter-resize-description') + "<br/><br/>";
+        div.innerHTML = LANG('filter-resize-description') + '<br/><br/>';
 
 
-        let maxWidth = params.maxWidth, maxHeight = params.maxHeight;
+        const maxWidth = params.maxWidth, maxHeight = params.maxHeight;
 
-        let widthWrapper = BB.el({
+        const widthWrapper = BB.el({
             css: {
                 width: '150px',
                 height: '35px',
                 lineHeight: '30px',
-            }
+            },
         });
-        let heightWrapper = BB.el({
+        const heightWrapper = BB.el({
             css: {
                 width: '150px',
                 height: '35px',
                 lineHeight: '30px',
-            }
+            },
         });
-        let widthInput = BB.el({
+        const widthInput = BB.el({
             tagName: 'input',
             css: {
                 cssFloat: 'right',
@@ -57,9 +70,9 @@ export const filterResize = {
                 min: '1',
                 max: '' + maxWidth,
                 value: '' + klCanvas.getWidth(),
-            }
+            },
         }) as HTMLInputElement;
-        let heightInput = BB.el({
+        const heightInput = BB.el({
             tagName: 'input',
             css: {
                 cssFloat: 'right',
@@ -70,7 +83,7 @@ export const filterResize = {
                 min: '1',
                 max: '' + maxHeight,
                 value: '' + klCanvas.getHeight(),
-            }
+            },
         }) as HTMLInputElement;
         widthInput.onclick = function () {
             (this as any).focus();
@@ -90,81 +103,104 @@ export const filterResize = {
             heightChanged = true;
             update();
         };
-        widthWrapper.append(LANG('width') + ": ", widthInput);
-        heightWrapper.append(LANG('height') + ": ", heightInput);
-        let inputWrapper = BB.el({
+        widthWrapper.append(LANG('width') + ': ', widthInput);
+        heightWrapper.append(LANG('height') + ': ', heightInput);
+        const inputWrapper = BB.el({
             css: {
-                background: "url(" + constrainImg + ") no-repeat 140px 5px",
+                background: 'url(' + constrainImg + ') no-repeat 140px 5px',
                 backgroundSize: '50px 52px',
-            }
+            },
         });
         inputWrapper.append(widthWrapper, heightWrapper);
-        div.appendChild(inputWrapper);
+        const constrainIm = new Image();
+        constrainIm.src = constrainImg;
+        constrainIm.height = 40;
+
+        const sizeTable = table([
+            [
+                LANG('width') + ':&nbsp;',
+                widthInput,
+                constrainIm,
+            ],
+            [
+                BB.el({css: {height: '5px'}}),
+                '',
+                '',
+            ],
+            [
+                LANG('height') + ':&nbsp;',
+                heightInput,
+            ],
+        ], {
+            '0.2': {rowspan: 3},
+        });
+        BB.css(sizeTable, {
+            marginBottom: '10px',
+        });
+
+        div.append(sizeTable);
 
         //contrain checkbox
         let heightChanged = false, widthChanged = false;
-        let ratio = klCanvas.getWidth() / klCanvas.getHeight();
+        const ratio = klCanvas.getWidth() / klCanvas.getHeight();
 
-        function updateConstrain() {
+        function updateConstrain (): void {
+            constrainIm.style.display = isConstrained ? '' : 'none';
             if (isConstrained) {
                 widthInput.value = '' + klCanvas.getWidth();
                 heightInput.value = '' + klCanvas.getHeight();
-                inputWrapper.style.background = "url(" + constrainImg + ") no-repeat 140px 5px";
-                inputWrapper.style.backgroundSize = '50px 52px';
                 update();
-            } else {
-                inputWrapper.style.background = "";
             }
         }
 
         let isConstrained = true;
-        let constrainCheckbox = new Checkbox({
+        const constrainCheckbox = new Checkbox({
             init: true,
             label: LANG('constrain-proportions'),
             allowTab: true,
-            callback: function(b) {
+            callback: function (b) {
                 isConstrained = b;
                 updateConstrain();
-            }
+            },
         });
-        div.appendChild(BB.el({
+        div.append(BB.el({
             css: {
-                clear: 'both'
-            }
+                clear: 'both',
+            },
         }));
 
 
-        let algorithmSelect = new Select({
+        const algorithmSelect = new Select({
             isFocusable: true,
             optionArr: [
                 ['smooth', LANG('algorithm-smooth')],
-                ['pixelated', LANG('algorithm-pixelated')]
+                ['pixelated', LANG('algorithm-pixelated')],
             ],
             title: LANG('scaling-algorithm'),
             initValue: 'smooth',
-            onChange: function() {
+            onChange: function () {
                 update();
             },
         });
 
-        let secondRowElement = BB.el({
+        const secondRowElement = BB.el({
             parent: div,
             css: {
                 display: 'flex',
-                justifyContent: 'space-between'
-            }
+                justifyContent: 'space-between',
+                'alignItems': 'center',
+            },
         });
-        secondRowElement.appendChild(constrainCheckbox.getElement());
-        secondRowElement.appendChild(algorithmSelect.getElement());
+        secondRowElement.append(constrainCheckbox.getElement(), algorithmSelect.getElement());
 
-        let previewCanvas = BB.canvas(w, h);
+        const previewCanvas = BB.canvas(w, h);
         previewCanvas.style.imageRendering = 'pixelated';
 
 
-        let previewCtx = previewCanvas.getContext('2d');
+        const previewCtx = BB.ctx(previewCanvas);
 
 
-        function draw() {
+        function draw (): void {
             if (algorithmSelect.getValue() === 'smooth') {
                 previewCanvas.style.imageRendering = previewFactor > 1 ? 'pixelated' : '';
 
@@ -190,7 +226,7 @@ export const filterResize = {
 
         }
 
-        function update() {
+        function update (): void {
             if ((widthInput.value.length === 0 && widthChanged) || (heightInput.value.length === 0 && heightChanged)) {
                 heightChanged = false;
                 widthChanged = false;
@@ -207,7 +243,7 @@ export const filterResize = {
                 }
 
                 if (parseInt(widthInput.value) > maxWidth || parseInt(heightInput.value) > maxHeight) {
-                    let fit = BB.fitInto(parseInt(widthInput.value), parseInt(heightInput.value), maxWidth, maxHeight, 1);
+                    const fit = BB.fitInto(parseInt(widthInput.value), parseInt(heightInput.value), maxWidth, maxHeight, 1);
                     widthInput.value = '' + parseInt('' + fit.width);
                     heightInput.value = '' + parseInt('' + fit.height);
                 }
@@ -226,72 +262,81 @@ export const filterResize = {
             newWidth = parseInt(widthInput.value);
             newHeight = parseInt(heightInput.value);
 
-            let preview = BB.fitInto(newWidth, newHeight, 280, 200, 1);
-            let previewW = parseInt('' + preview.width), previewH = parseInt('' + preview.height);
+            const preview = BB.fitInto(newWidth, newHeight, 280, 200, 1);
+            const previewW = parseInt('' + preview.width), previewH = parseInt('' + preview.height);
             previewFactor = previewW / newWidth;
 
-            let offset = BB.centerWithin(340, 220, previewW, previewH);
+            const offset = BB.centerWithin(340, 220, previewW, previewH);
 
             draw();
 
-            previewCanvas.style.width = Math.max(1, previewW) + "px";
-            previewCanvas.style.height = Math.max(1, previewH) + "px";
-            canvasWrapper.style.left = offset.x + "px";
-            canvasWrapper.style.top = offset.y + "px";
-            canvasWrapper.style.width = Math.max(1, previewW) + "px";
-            canvasWrapper.style.height = Math.max(1, previewH) + "px";
+            previewCanvas.style.width = Math.max(1, previewW) + 'px';
+            previewCanvas.style.height = Math.max(1, previewH) + 'px';
+            canvasWrapper.style.left = offset.x + 'px';
+            canvasWrapper.style.top = offset.y + 'px';
+            canvasWrapper.style.width = Math.max(1, previewW) + 'px';
+            canvasWrapper.style.height = Math.max(1, previewH) + 'px';
         }
 
-        let previewWrapper = document.createElement("div");
-        BB.css(previewWrapper, {
-            width: "340px",
-            marginLeft: "-20px",
-            height: "220px",
-            display: "table",
-            backgroundColor: "#9e9e9e",
-            marginTop: "10px",
-            boxShadow: "rgba(0, 0, 0, 0.2) 0px 1px inset, rgba(0, 0, 0, 0.2) 0px -1px inset",
-            position: "relative",
-            userSelect: 'none',
-            colorScheme: 'only light',
+        const previewWrapper = BB.el({
+            className: 'kl-transparent-preview',
+            css: {
+                width: '340px',
+                marginLeft: '-20px',
+                height: '220px',
+                display: 'table',
+                marginTop: '10px',
+                position: 'relative',
+                userSelect: 'none',
+                colorScheme: 'only light',
+            },
         });
 
-
-        let canvasWrapper = BB.appendTextDiv(previewWrapper, "");
-        canvasWrapper.appendChild(previewCanvas);
-        canvasWrapper.style.width = w + "px";
-        canvasWrapper.style.height = h + "px";
-        canvasWrapper.style.position = "absolute";
-        canvasWrapper.style.overflow = "hidden";
-        canvasWrapper.style.boxShadow = "0 0 5px rgba(0,0,0,0.8)";
-        canvasWrapper.style.overflow = "hidden";
-        BB.createCheckerDataUrl(8, function (url) {
-            previewWrapper.style.background = "url(" + url + ")";
+        const canvasWrapper = BB.el({
+            parent: previewWrapper,
+            content: previewCanvas,
+            className: 'kl-transparent-preview__canvas',
+            css: {
+                width: w + 'px',
+                height: h + 'px',
+                position: 'absolute',
+                overflow: 'hidden',
+            },
         });
 
-        div.appendChild(previewWrapper);
+        function updateCheckerboard (): void {
+            BB.createCheckerDataUrl(8, function (url) {
+                previewWrapper.style.background = 'url(' + url + ')';
+            }, BB.isDark());
+        }
+        addIsDarkListener(updateCheckerboard);
+        updateCheckerboard();
+
+
+        div.append(previewWrapper);
         update();
 
-        result.destroy = () => {
+        result.destroy = (): void => {
             constrainCheckbox.destroy();
+            removeIsDarkListener(updateCheckerboard);
         };
-        result.getInput = function () {
+        result.getInput = function (): TFilterResizeInput {
             result.destroy();
             return {
                 width: newWidth,
                 height: newHeight,
-                algorithm: algorithmSelect.getValue()
+                algorithm: algorithmSelect.getValue(),
             };
         };
         return result;
     },
 
-    apply(params: IFilterApply) {
-        let klCanvas = params.klCanvas;
-        let history = params.history;
-        let width = params.input.width;
-        let height = params.input.height;
-        let algorithm = params.input.algorithm;
+    apply (params: IFilterApply<TFilterResizeInput>): boolean {
+        const klCanvas = params.klCanvas;
+        const history = params.history;
+        const width = params.input.width;
+        const height = params.input.height;
+        const algorithm = params.input.algorithm;
         if (!klCanvas || !history) {
             return false;
         }
@@ -299,13 +344,13 @@ export const filterResize = {
         klCanvas.resize(width, height, algorithm);
         history.pause(false);
         history.push({
-            tool: ["filter", "resize"],
-            action: "apply",
+            tool: ['filter', 'resize'],
+            action: 'apply',
             params: [{
-                input: params.input
-            }]
-        });
+                input: params.input,
+            }],
+        } as TFilterResizeHistoryEntry);
         return true;
-    }
+    },
 
 };

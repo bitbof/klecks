@@ -47,46 +47,8 @@
             text-decoration: underline;
         }
 
-        .content {
-            max-width: 880px;
-            background: #fff;
-            margin-left: auto;
-            margin-right: auto;
-            padding: 20px 40px;
-            overflow: hidden;
-
-            display: flex;
-            min-height: 100vh;
-            flex-direction: column;
-        }
-
         .content-content {
             flex: 1 auto;
-        }
-
-        .iframe-overlay {
-            position: fixed;
-            left: 0;
-            top: 0;
-            bottom: 0;
-            right: 0;
-            background: linear-gradient(180deg, rgba(0, 0, 0, 0.1) 0px, rgba(0, 0, 0, 0) 30px);
-            pointer-events: none;
-            display: none;
-            transition: opacity 100ms ease-out;
-            opacity: 0;
-        }
-
-        .bv-checkbox {
-            display: inline-block;
-            cursor: pointer;
-            user-select: none;
-            webkit-user-select: none;
-            color: rgba(0, 0, 0, 0.75);
-        }
-
-        .bv-checkbox:hover {
-            color: rgba(0, 0, 0, 1);
         }
 
         li {
@@ -98,13 +60,6 @@
             padding-top: 0;
         }
 
-        .aboveList {
-            margin-bottom: 4px;
-        }
-
-        .w-290 {
-            width: 290px;
-        }
 
         /* --- help ---*/
         .key {
@@ -146,11 +101,6 @@
 
         .help-shortcut>div:last-child {
             line-height: 1.6em;
-        }
-
-        .help-shortcut-title {
-            display: inline-block;
-            width: 160px;
         }
 
         .help-ul {
@@ -195,90 +145,17 @@
             margin-bottom: 0;
         }
 
-        .pb0 {
-            padding-bottom: 0;
-        }
-
-        .bb0 {
-            border-bottom: none;
-        }
-
 
 
         /* --- mobile --- */
 
         @media (max-width: 640px) {
-            .nav-link.hide-in-iframe {
-                display: none;
-            }
         }
 
         @media (max-width: 590px) {
-
-
             body {
                 font-size: 15px;
             }
-
-            .content {
-                padding: 15px;
-            }
-
-            .header-logo img {
-                height: 20px;
-            }
-
-            .nav-link {
-                margin: 0;
-            }
-
-            .home-intro > iframe {
-                height: 250px;
-            }
-
-            .home-row {
-                display: block;
-                margin-bottom: 0;
-            }
-
-            .home-row>div {
-                margin-bottom: 40px;
-            }
-
-            .footer {
-                flex-wrap: wrap;
-            }
-
-            .footer > div {
-                min-width: 33%;
-
-            }
-
-            .footer-col {
-                margin-bottom: 20px;
-            }
-
-            .about-wrapper {
-                display:block;
-            }
-
-            .about-wrapper>img {
-                display: block;
-                margin-left: auto;
-                margin-right: auto;
-            }
-
-            #donate-title > div {
-                width: 450px;
-            }
-
-            #donate-swoosh-bottom {
-                width: 200px;
-                right: -222px;
-                top: 5px;
-            }
-
-
         }
 
         @media (max-width: 750px) {
@@ -298,13 +175,44 @@
                 margin-right: auto;
             }
         }
+
+        @media (prefers-color-scheme: dark) {
+            body {
+                color: #ccc;
+                background: rgb(33, 33, 33);
+            }
+
+            a:link, a:not([href]), a:visited {
+                color: #64acff;
+            }
+
+            a:link:hover, a:not([href]):hover, a:visited:hover {
+                color: #b2e8ff;
+            }
+
+            .help-ul > li:nth-child(even) {
+                background: rgb(44, 44, 44);
+            }
+
+            .help-ul > li {
+                border-bottom: 1px solid #666;
+            }
+
+            .help-block {
+                border-bottom: 1px solid #777;
+            }
+
+            .dark-invert {
+                filter: invert(1);
+            }
+        }
     </style>
 </head>
 <body>
 
 <div class="content-content">
     <div class="help-header">
-        <img src="./app/img/klecks-logo.png" data-allow-click="true" alt="Klecks Logo">
+        <img class="dark-invert" src="./app/img/klecks-logo.png" data-allow-click="true" alt="Klecks Logo">
         <div>Help</div>
         <div style="flex-grow: 1"></div>
         <a class="help-header__version" href="#about">About</a>
@@ -563,7 +471,7 @@
         //iframe styling - hiding and showing certain elements
         if(self !== parent) {
             let styleEl = document.createElement('style');
-            styleEl.innerHTML = '.hide-in-iframe { display: none !important; } .iframe-overlay { display: block; }';
+            styleEl.innerHTML = '.hide-in-iframe { display: none !important; }';
             document.head.appendChild(styleEl);
 
             //meta tag to prevent zooming on ipad, because of an ipados 13 bug. gets stuck zoomed in.

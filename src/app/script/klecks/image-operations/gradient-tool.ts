@@ -1,4 +1,4 @@
-import {IGradient} from '../kl.types';
+import {IGradient} from '../kl-types';
 import {BB} from '../../bb/bb';
 
 
@@ -13,10 +13,10 @@ export class GradientTool {
     private downX: number;
     private downY: number;
     private downAngleRad: number;
-    private onGradient: TOnGradient;
+    private readonly onGradient: TOnGradient;
 
     // ---- public ----
-    constructor(
+    constructor (
         p: {
             onGradient: TOnGradient;
         }
@@ -24,41 +24,41 @@ export class GradientTool {
         this.onGradient = p.onGradient;
     }
 
-    onDown(x: number, y: number, angleRad: number): void {
+    onDown (x: number, y: number, angleRad: number): void {
         this.downX = x;
         this.downY = y;
         this.downAngleRad = angleRad;
     }
 
-    onMove(x: number, y: number): void {
+    onMove (x: number, y: number): void {
         this.onGradient(false, this.downX, this.downY, x, y, this.downAngleRad);
     }
 
-    onUp(x: number, y: number): void {
+    onUp (x: number, y: number): void {
         this.onGradient(true, this.downX, this.downY, x, y, this.downAngleRad);
     }
 }
 
-export function drawGradient(
+export function drawGradient (
     ctx: CanvasRenderingContext2D,
     gradientObj: IGradient,
 ): void {
     ctx.save();
 
-    let x1 = gradientObj.x1;
-    let y1 = gradientObj.y1;
+    const x1 = gradientObj.x1;
+    const y1 = gradientObj.y1;
     let x2 = gradientObj.x2;
     let y2 = gradientObj.y2;
 
     if (gradientObj.doSnap) {
         const angleDeg = gradientObj.angleRad * 180 / Math.PI;
 
-        let r1 = BB.rotate(x1, y1, gradientObj.angleRad / Math.PI * 180);
-        let r2 = BB.rotate(x2, y2, gradientObj.angleRad / Math.PI * 180);
+        const r1 = BB.rotate(x1, y1, gradientObj.angleRad / Math.PI * 180);
+        const r2 = BB.rotate(x2, y2, gradientObj.angleRad / Math.PI * 180);
 
-        let pAngleDeg = BB.pointsToAngleDeg(r1, r2) + 90;
-        let pAngleDegSnapped = Math.round(pAngleDeg / 45) * 45;
-        let rotated = BB.rotateAround({x: x1, y: y1}, {x: x2, y: y2}, pAngleDegSnapped - pAngleDeg);
+        const pAngleDeg = BB.pointsToAngleDeg(r1, r2) + 90;
+        const pAngleDegSnapped = Math.round(pAngleDeg / 45) * 45;
+        const rotated = BB.rotateAround({x: x1, y: y1}, {x: x2, y: y2}, pAngleDegSnapped - pAngleDeg);
         x2 = rotated.x;
         y2 = rotated.y;
 
@@ -86,7 +86,7 @@ export function drawGradient(
         color2 = temp;
     }
 
-    let gradient;
+    let gradient: CanvasGradient;
     if (gradientObj.type === 'linear') {
         gradient = ctx.createLinearGradient(x1, y1, x2, y2);
         gradient.addColorStop(0, BB.ColorConverter.toRgbaStr(color1));
@@ -112,7 +112,7 @@ export function drawGradient(
         gradient.addColorStop(1, BB.ColorConverter.toRgbaStr(color2));
     }
 
-    ctx.fillStyle = gradient;
+    ctx.fillStyle = gradient!;
     if (gradientObj.isEraser) {
         ctx.globalCompositeOperation = 'destination-out';
     }

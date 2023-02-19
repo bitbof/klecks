@@ -1,7 +1,7 @@
 
 // ideas: padding, gutter, other shapes
 
-export function drawGrid(
+export function drawGrid (
     ctx: CanvasRenderingContext2D,
     cellsX: number,
     cellsY: number,

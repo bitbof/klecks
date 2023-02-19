@@ -1,78 +1,91 @@
 import {BB} from '../../bb/bb';
 import {alphaImArr} from './brushes-common';
-import {IHistoryEntry, KlHistoryInterface} from '../history/kl-history';
+import {IHistoryEntry, KlHistoryInterface, THistoryInnerActions} from '../history/kl-history';
 import {KL} from '../kl';
+import {IRGB, TPressureInput} from '../kl-types';
+import {BezierLine} from '../../bb/math/line';
+
+export interface IPenBrushHistoryEntry extends IHistoryEntry {
+    tool: ['brush', 'PenBrush'];
+    actions: THistoryInnerActions<PenBrush>[];
+}
+
+const ALPHA_CIRCLE = 0;
+const ALPHA_CHALK = 1;
+const ALPHA_CAL = 2; // calligraphy
+const ALPHA_SQUARE = 3;
+
+const TWO_PI = 2 * Math.PI;
+
+export class PenBrush {
+
+    private context: CanvasRenderingContext2D;
+    private history: KlHistoryInterface = new KL.DecoyKlHistory();
+    private historyEntry: IPenBrushHistoryEntry | undefined;
+
+    private settingHasOpacityPressure: boolean = false;
+    private settingHasSizePressure: boolean = true;
+    private settingSize: number = 2;
+    private settingSpacing: number = 0.8489;
+    private settingOpacity: number = 1;
+    private settingColor: IRGB;
+    private settingColorStr: string;
+    private settingAlphaId: number = ALPHA_CIRCLE;
+    private settingLockLayerAlpha: boolean = false;
+
+    private hasDrawnDot: boolean = false;
+    private lineToolLastDot: number;
+    private lastInput: TPressureInput = {x: 0, y: 0, pressure: 0};
+    private lastInput2: TPressureInput = {x: 0, y: 0, pressure: 0};
+    private inputArr: TPressureInput[];
+    private inputIsDrawing: boolean = false;
+    private bezierLine: BezierLine | null = null;
+
+    // mipmapping
+    private readonly alphaCanvas128: HTMLCanvasElement = BB.canvas(128, 128);
+    private readonly alphaCanvas64: HTMLCanvasElement = BB.canvas(64, 64);
+    private readonly alphaCanvas32: HTMLCanvasElement = BB.canvas(32, 32);
+    private readonly alphaOpacityArr: number[] = [1, 0.9, 1, 1];
 
 
-export function PenBrush() {
-
-    let context;
-    let history: KlHistoryInterface = new KL.DecoyKlHistory();
-    let historyEntry: IHistoryEntry;
-
-    let settingColor, settingSize = 2, settingSpacing = 0.8489, settingOpacity = 1;
-    let settingColorStr;
-    let settingHasSizePressure = true, settingHasOpacityPressure = false;
-    let settingLockLayerAlpha = false;
-    let ALPHA_CIRCLE = 0, ALPHA_CHALK = 1, ALPHA_CAL = 2, ALPHA_SQUARE = 3;
-    let settingAlphaId = ALPHA_CIRCLE;
-
-    let lineToolLastDot;
-    let lastInput = {x: 0, y: 0, pressure: 0};
-    let lastInput2 = {x: 0, y: 0, pressure: 0};
-
-    let isDrawing = false;
-    let alphaOpacityArr = [1, 0.9, 1, 1];
-
-    //mipmapping
-    let alphaCanvas128 = BB.canvas(128, 128);
-    let alphaCanvas64 = BB.canvas(64, 64);
-    let alphaCanvas32 = BB.canvas(32, 32);
-
-    let bezierLine = null;
-
-    let twoPI = Math.PI * 2;
-    let hasDrawnDot = false; // current stroke has drawn at least one dot
-    let inputArr: {x: number, y: number, pressure: number}[];
-
-    // pressure: 0-1
-    function calcOpacity(pressure: number) {
-        return settingOpacity * (settingHasOpacityPressure ? pressure * pressure : 1);
-    }
-
-    function updateAlphaCanvas() {
-        if (settingAlphaId === ALPHA_CIRCLE || settingAlphaId === ALPHA_SQUARE) {
+    private updateAlphaCanvas () {
+        if (this.settingAlphaId === ALPHA_CIRCLE || this.settingAlphaId === ALPHA_SQUARE) {
             return;
         }
 
-        let instructionArr = [
-            [alphaCanvas128, 128],
-            [alphaCanvas64, 64],
-            [alphaCanvas32, 32]
+        const instructionArr: [HTMLCanvasElement, number][] = [
+            [this.alphaCanvas128, 128],
+            [this.alphaCanvas64, 64],
+            [this.alphaCanvas32, 32],
         ];
 
         let ctx;
 
         for (let i = 0; i < instructionArr.length; i++) {
-            ctx = (instructionArr[i][0] as any).getContext("2d");
+            ctx = BB.ctx((instructionArr[i][0] as any));
 
             ctx.save();
             ctx.clearRect(0, 0, instructionArr[i][1], instructionArr[i][1]);
 
-            ctx.fillStyle = "rgba(" + settingColor.r + ", " + settingColor.g + ", " + settingColor.b + ", " + alphaOpacityArr[settingAlphaId] + ")";
+            ctx.fillStyle = 'rgba(' + this.settingColor.r
+                + ', ' + this.settingColor.g
+                + ', ' + this.settingColor.b
+                + ', ' + this.alphaOpacityArr[this.settingAlphaId] + ')';
             ctx.fillRect(0, 0, instructionArr[i][1], instructionArr[i][1]);
 
-            ctx.globalCompositeOperation = "destination-in";
+            ctx.globalCompositeOperation = 'destination-in';
             ctx.imageSmoothingQuality = 'high';
-            ctx.drawImage(alphaImArr[settingAlphaId], 0, 0, instructionArr[i][1], instructionArr[i][1]);
+            ctx.drawImage(alphaImArr[this.settingAlphaId], 0, 0, instructionArr[i][1], instructionArr[i][1]);
 
             ctx.restore();
         }
     }
 
+    private calcOpacity (pressure: number): number {
+        return this.settingOpacity * (this.settingHasOpacityPressure ? pressure * pressure : 1);
+    }
+
     /**
-     *
-     *
      * @param x
      * @param y
      * @param size
@@ -80,358 +93,398 @@ export function PenBrush() {
      * @param angle
      * @param before - [x, y, size, opacity, angle] the drawDot call before
      */
-    function drawDot(x, y, size, opacity, angle?, before?) {
+    private drawDot (
+        x: number,
+        y:number,
+        size: number,
+        opacity: number,
+        angle?: number,
+        before?: [number, number, number, number, (number | undefined)]
+    ): void {
         if (size <= 0) {
             return;
         }
 
-        if (settingLockLayerAlpha) {
-            context.globalCompositeOperation = "source-atop";
+        if (this.settingLockLayerAlpha) {
+            this.context.globalCompositeOperation = 'source-atop';
         }
 
         if (!before || before[3] !== opacity) {
-            context.globalAlpha = opacity;
+            this.context.globalAlpha = opacity;
         }
 
-        if (!before && (settingAlphaId === ALPHA_CIRCLE || settingAlphaId === ALPHA_SQUARE)) {
-            context.fillStyle = settingColorStr;
+        if (!before && (this.settingAlphaId === ALPHA_CIRCLE || this.settingAlphaId === ALPHA_SQUARE)) {
+            this.context.fillStyle = this.settingColorStr;
         }
 
-        if (settingAlphaId === ALPHA_CIRCLE) {
-            context.beginPath();
-            context.arc(x, y, size, 0, twoPI);
-            context.closePath();
-            context.fill();
-            hasDrawnDot = true;
+        if (this.settingAlphaId === ALPHA_CIRCLE) {
+            this.context.beginPath();
+            this.context.arc(x, y, size, 0, TWO_PI);
+            this.context.closePath();
+            this.context.fill();
+            this.hasDrawnDot = true;
 
-        } else if (settingAlphaId === ALPHA_SQUARE) {
+        } else if (this.settingAlphaId === ALPHA_SQUARE) {
             if (angle !== undefined) {
-                context.save();
-                context.translate(x, y);
-                context.rotate(angle / 180 * Math.PI);
-                context.fillRect(-size, -size, size * 2, size * 2);
-                context.restore();
-                hasDrawnDot = true;
+                this.context.save();
+                this.context.translate(x, y);
+                this.context.rotate(angle / 180 * Math.PI);
+                this.context.fillRect(-size, -size, size * 2, size * 2);
+                this.context.restore();
+                this.hasDrawnDot = true;
             }
 
         } else { // other brush alphas
-            context.save();
-            context.translate(x, y);
-            let targetMipmap = alphaCanvas128;
+            this.context.save();
+            this.context.translate(x, y);
+            let targetMipmap = this.alphaCanvas128;
             if (size <= 32 && size > 16) {
-                targetMipmap = alphaCanvas64;
+                targetMipmap = this.alphaCanvas64;
             } else if (size <= 16) {
-                targetMipmap = alphaCanvas32;
+                targetMipmap = this.alphaCanvas32;
             }
-            context.scale(size, size);
-            if (settingAlphaId === ALPHA_CHALK) {
-                context.rotate(((x + y) * 53123) % twoPI); // without mod it sometimes looks different
+            this.context.scale(size, size);
+            if (this.settingAlphaId === ALPHA_CHALK) {
+                this.context.rotate(((x + y) * 53123) % TWO_PI); // without mod it sometimes looks different
             }
-            context.drawImage(targetMipmap, -1, -1, 2, 2);
+            this.context.drawImage(targetMipmap, -1, -1, 2, 2);
 
-            context.restore();
-            hasDrawnDot = true;
+            this.context.restore();
+            this.hasDrawnDot = true;
         }
     }
 
-    function continueLine(x, y, size, pressure) {
-        if (bezierLine === null) {
-            bezierLine = new BB.BezierLine();
-            bezierLine.add(lastInput.x, lastInput.y, 0, function(){});
+    // continueLine
+    private continueLine (
+        x: number | null,
+        y: number | null,
+        size: number,
+        pressure: number,
+    ): void {
+        if (this.bezierLine === null) {
+            this.bezierLine = new BB.BezierLine();
+            this.bezierLine.add(this.lastInput.x, this.lastInput.y, 0, () => {});
         }
 
-        let drawArr = []; //draw instructions. will be all drawn at once
+        const drawArr: [number, number, number, number, (number | undefined)][] = []; //draw instructions. will be all drawn at once
 
-        function dotCallback(val) {
-            let localPressure = BB.mix(lastInput2.pressure, pressure, val.t);
-            let localOpacity = calcOpacity(localPressure);
-            let localSize = Math.max(0.1, settingSize * (settingHasSizePressure ? localPressure : 1));
+        const dotCallback = (val: {
+            x: number;
+            y: number;
+            t: number;
+            angle?: number;
+            dAngle: number;
+        }): void => {
+            const localPressure = BB.mix(this.lastInput2.pressure, pressure, val.t);
+            const localOpacity = this.calcOpacity(localPressure);
+            const localSize = Math.max(0.1, this.settingSize * (this.settingHasSizePressure ? localPressure : 1));
             drawArr.push([val.x, val.y, localSize, localOpacity, val.angle]);
-        }
+        };
 
-        let localSpacing = size * settingSpacing;
-        if (x === null) {
-            bezierLine.addFinal(localSpacing, dotCallback);
+        const localSpacing = size * this.settingSpacing;
+        if (x === null || y === null) {
+            this.bezierLine.addFinal(localSpacing, dotCallback);
         } else {
-            bezierLine.add(x, y, localSpacing, dotCallback);
+            this.bezierLine.add(x, y, localSpacing, dotCallback);
         }
 
         // execute draw instructions
-        context.save();
+        this.context.save();
         let before;
         for (let i = 0; i < drawArr.length; i++) {
-            let item = drawArr[i];
-            drawDot(item[0], item[1], item[2], item[3], item[4], before);
+            const item = drawArr[i];
+            this.drawDot(item[0], item[1], item[2], item[3], item[4], before);
             before = item;
         }
-        context.restore();
+        this.context.restore();
     }
 
-    //------------------ interface ---------------------------------------------------
 
+    // ---- public ----
+    constructor () {}
 
-    this.startLine = function (x, y, p) {
-        historyEntry = {
-            tool: ["brush", "PenBrush"],
-            actions: []
+    // ---- interface ----
+
+    startLine (x: number, y: number, p: number): void {
+        this.historyEntry = {
+            tool: ['brush', 'PenBrush'],
+            actions: [
+                {
+                    action: 'opacityPressure',
+                    params: [this.settingHasOpacityPressure],
+                },
+                {
+                    action: 'sizePressure',
+                    params: [this.settingHasSizePressure],
+                },
+                {
+                    action: 'setSize',
+                    params: [this.settingSize],
+                },
+                {
+                    action: 'setSpacing',
+                    params: [this.settingSpacing],
+                },
+                {
+                    action: 'setOpacity',
+                    params: [this.settingOpacity],
+                },
+                {
+                    action: 'setColor',
+                    params: [this.settingColor],
+                },
+                {
+                    action: 'setAlpha',
+                    params: [this.settingAlphaId],
+                },
+                {
+                    action: 'setLockAlpha',
+                    params: [this.settingLockLayerAlpha],
+                },
+            ],
         };
-        historyEntry.actions.push({
-            action: "opacityPressure",
-            params: [settingHasOpacityPressure]
-        });
-        historyEntry.actions.push({
-            action: "sizePressure",
-            params: [settingHasSizePressure]
-        });
-        historyEntry.actions.push({
-            action: "setSize",
-            params: [settingSize]
-        });
-        historyEntry.actions.push({
-            action: "setSpacing",
-            params: [settingSpacing]
-        });
-        historyEntry.actions.push({
-            action: "setOpacity",
-            params: [settingOpacity]
-        });
-        historyEntry.actions.push({
-            action: "setColor",
-            params: [settingColor]
-        });
-        historyEntry.actions.push({
-            action: "setAlpha",
-            params: [settingAlphaId]
-        });
-        historyEntry.actions.push({
-            action: "setLockAlpha",
-            params: [settingLockLayerAlpha]
-        });
 
         p = BB.clamp(p, 0, 1);
-        let localOpacity = calcOpacity(p);
-        let localSize = settingHasSizePressure ? Math.max(0.1, p * settingSize) : Math.max(0.1, settingSize);
+        const localOpacity = this.calcOpacity(p);
+        const localSize = this.settingHasSizePressure ? Math.max(0.1, p * this.settingSize) : Math.max(0.1, this.settingSize);
 
-        hasDrawnDot = false;
+        this.hasDrawnDot = false;
 
-        isDrawing = true;
-        context.save();
-        drawDot(x, y, localSize, localOpacity);
-        context.restore();
+        this.inputIsDrawing = true;
+        this.context.save();
+        this.drawDot(x, y, localSize, localOpacity);
+        this.context.restore();
 
-        lineToolLastDot = localSize * settingSpacing;
-        lastInput.x = x;
-        lastInput.y = y;
-        lastInput.pressure = p;
-        lastInput2.pressure = p;
+        this.lineToolLastDot = localSize * this.settingSpacing;
+        this.lastInput.x = x;
+        this.lastInput.y = y;
+        this.lastInput.pressure = p;
+        this.lastInput2.pressure = p;
 
-        inputArr = [{
+        this.inputArr = [{
             x,
             y,
             pressure: p,
         }];
 
-        historyEntry.actions.push({
-            action: "startLine",
-            params: [x, y, p]
+        this.historyEntry.actions!.push({
+            action: 'startLine',
+            params: [x, y, p],
         });
-    };
+    }
 
-    this.goLine = function (x, y, p) {
-        if (!isDrawing) {
+    goLine (x: number, y: number, p: number): void {
+        if (!this.inputIsDrawing) {
             return;
         }
-        historyEntry.actions.push({
-            action: "goLine",
-            params: [x, y, p]
+        this.historyEntry!.actions!.push({
+            action: 'goLine',
+            params: [x, y, p],
         });
 
-        let pressure = BB.clamp(p, 0, 1);
-        let localSize = settingHasSizePressure ? Math.max(0.1, lastInput.pressure * settingSize) : Math.max(0.1, settingSize);
+        const pressure = BB.clamp(p, 0, 1);
+        const localSize = this.settingHasSizePressure ? Math.max(0.1, this.lastInput.pressure * this.settingSize) : Math.max(0.1, this.settingSize);
 
-        context.save();
-        continueLine(x, y, localSize, lastInput.pressure);
+        this.context.save();
+        this.continueLine(x, y, localSize, this.lastInput.pressure);
 
         /*context.fillStyle = 'red';
         context.fillRect(Math.floor(x), Math.floor(y - 10), 1, 20);
         context.fillRect(Math.floor(x - 10), Math.floor(y), 20, 1);*/
 
-        context.restore();
+        this.context.restore();
 
-        lastInput.x = x;
-        lastInput.y = y;
-        lastInput2.pressure = lastInput.pressure;
-        lastInput.pressure = pressure;
+        this.lastInput.x = x;
+        this.lastInput.y = y;
+        this.lastInput2.pressure = this.lastInput.pressure;
+        this.lastInput.pressure = pressure;
 
-        inputArr.push({
+        this.inputArr.push({
             x,
             y,
             pressure: p,
         });
-    };
+    }
 
-    this.endLine = function (x, y) {
+    endLine (x: number, y: number): void {
 
-        let localSize = settingHasSizePressure ? Math.max(0.1, lastInput.pressure * settingSize) : Math.max(0.1, settingSize);
-        context.save();
-        continueLine(null, null, localSize, lastInput.pressure);
-        context.restore();
+        const localSize = this.settingHasSizePressure ? Math.max(0.1, this.lastInput.pressure * this.settingSize) : Math.max(0.1, this.settingSize);
+        this.context.save();
+        this.continueLine(null, null, localSize, this.lastInput.pressure);
+        this.context.restore();
 
-        isDrawing = false;
+        this.inputIsDrawing = false;
 
-        if (settingAlphaId === ALPHA_SQUARE && !hasDrawnDot) {
+        if (this.settingAlphaId === ALPHA_SQUARE && !this.hasDrawnDot) {
             // find max pressure input, use that one
-            let maxInput = inputArr[0];
-            inputArr.forEach(item => {
+            let maxInput = this.inputArr[0];
+            this.inputArr.forEach(item => {
                 if (item.pressure > maxInput.pressure) {
                     maxInput = item;
                 }
-            })
-
-            context.save();
-            let p = BB.clamp(maxInput.pressure, 0, 1);
-            let localOpacity = calcOpacity(p);
-            drawDot(maxInput.x, maxInput.y, localSize, localOpacity, 0);
-            context.restore();
-        }
-
-        bezierLine = null;
-
-        if (historyEntry) {
-            historyEntry.actions.push({
-                action: "endLine",
-                params: [x, y]
             });
-            history.push(historyEntry);
-            historyEntry = undefined;
+
+            this.context.save();
+            const p = BB.clamp(maxInput.pressure, 0, 1);
+            const localOpacity = this.calcOpacity(p);
+            this.drawDot(maxInput.x, maxInput.y, localSize, localOpacity, 0);
+            this.context.restore();
         }
 
-        hasDrawnDot = false;
-        inputArr = [];
-    };
-    //cheap n' ugly
-    this.drawLineSegment = function (x1, y1, x2, y2) {
-        lastInput.x = x2;
-        lastInput.y = y2;
-        lastInput.pressure = 1;
+        this.bezierLine = null;
 
-        if (isDrawing || x1 === undefined) {
+        if (this.historyEntry) {
+            this.historyEntry.actions!.push({
+                action: 'endLine',
+                params: [x, y],
+            });
+            this.history.push(this.historyEntry);
+            this.historyEntry = undefined;
+        }
+
+        this.hasDrawnDot = false;
+        this.inputArr = [];
+    }
+
+
+    drawLineSegment (x1: number, y1: number, x2: number, y2: number): void {
+        this.lastInput.x = x2;
+        this.lastInput.y = y2;
+        this.lastInput.pressure = 1;
+
+        if (this.inputIsDrawing || x1 === undefined) {
             return;
         }
 
-        let angle = BB.pointsToAngleDeg({x:x1, y:y1}, {x:x2, y:y2});
-        let mouseDist = Math.sqrt(Math.pow(x2 - x1, 2.0) + Math.pow(y2 - y1, 2.0));
-        let eX = (x2 - x1) / mouseDist;
-        let eY = (y2 - y1) / mouseDist;
+        const angle = BB.pointsToAngleDeg({x:x1, y:y1}, {x:x2, y:y2});
+        const mouseDist = Math.sqrt(Math.pow(x2 - x1, 2.0) + Math.pow(y2 - y1, 2.0));
+        const eX = (x2 - x1) / mouseDist;
+        const eY = (y2 - y1) / mouseDist;
         let loopDist;
-        let bdist = settingSize * settingSpacing;
-        lineToolLastDot = settingSize * settingSpacing;
-        context.save();
-        for (loopDist = lineToolLastDot; loopDist <= mouseDist; loopDist += bdist) {
-            drawDot(x1 + eX * loopDist, y1 + eY * loopDist, settingSize, settingOpacity, angle);
+        const bdist = this.settingSize * this.settingSpacing;
+        this.lineToolLastDot = this.settingSize * this.settingSpacing;
+        this.context.save();
+        for (loopDist = this.lineToolLastDot; loopDist <= mouseDist; loopDist += bdist) {
+            this.drawDot(x1 + eX * loopDist, y1 + eY * loopDist, this.settingSize, this.settingOpacity, angle);
         }
-        context.restore();
+        this.context.restore();
 
 
-        let historyEntry = {
-            tool: ["brush", "PenBrush"],
-            actions: []
+        const historyEntry: IPenBrushHistoryEntry = {
+            tool: ['brush', 'PenBrush'],
+            actions: [
+                {
+                    action: 'opacityPressure',
+                    params: [this.settingHasOpacityPressure],
+                },
+                {
+                    action: 'sizePressure',
+                    params: [this.settingHasSizePressure],
+                },
+                {
+                    action: 'setSize',
+                    params: [this.settingSize],
+                },
+                {
+                    action: 'setSpacing',
+                    params: [this.settingSpacing],
+                },
+                {
+                    action: 'setOpacity',
+                    params: [this.settingOpacity],
+                },
+                {
+                    action: 'setColor',
+                    params: [this.settingColor],
+                },
+                {
+                    action: 'setAlpha',
+                    params: [this.settingAlphaId],
+                },
+                {
+                    action: 'setLockAlpha',
+                    params: [this.settingLockLayerAlpha],
+                },
+                {
+                    action: 'drawLineSegment',
+                    params: [x1, y1, x2, y2],
+                },
+            ],
         };
-        historyEntry.actions.push({
-            action: "opacityPressure",
-            params: [settingHasOpacityPressure]
-        });
-        historyEntry.actions.push({
-            action: "sizePressure",
-            params: [settingHasSizePressure]
-        });
-        historyEntry.actions.push({
-            action: "setSize",
-            params: [settingSize]
-        });
-        historyEntry.actions.push({
-            action: "setSpacing",
-            params: [settingSpacing]
-        });
-        historyEntry.actions.push({
-            action: "setOpacity",
-            params: [settingOpacity]
-        });
-        historyEntry.actions.push({
-            action: "setColor",
-            params: [settingColor]
-        });
-        historyEntry.actions.push({
-            action: "setAlpha",
-            params: [settingAlphaId]
-        });
-        historyEntry.actions.push({
-            action: "setLockAlpha",
-            params: [settingLockLayerAlpha]
-        });
-
-        historyEntry.actions.push({
-            action: "drawLineSegment",
-            params: [x1, y1, x2, y2]
-        });
-        history.push(historyEntry);
-    };
+        this.history.push(historyEntry);
+    }
 
     //IS
-    this.isDrawing = function () {
-        return isDrawing;
-    };
+    isDrawing (): boolean {
+        return this.inputIsDrawing;
+    }
+
     //SET
-    this.setAlpha = function (a) {
-        if (settingAlphaId === a) {
+    setAlpha (a: number): void {
+        if (this.settingAlphaId === a) {
             return;
         }
-        settingAlphaId = a;
-        updateAlphaCanvas();
-    };
-    this.setColor = function (c) {
-        if (settingColor === c) {
+        this.settingAlphaId = a;
+        this.updateAlphaCanvas();
+    }
+
+    setColor (c: IRGB): void {
+        if (this.settingColor === c) {
             return;
         }
-        settingColor = {r: c.r, g: c.g, b: c.b};
-        settingColorStr = "rgb(" + settingColor.r + "," + settingColor.g + "," + settingColor.b + ")";
-        updateAlphaCanvas();
-    };
-    this.setContext = function (c) {
-        context = c;
-    };
-    this.setHistory = function (l: KlHistoryInterface) {
-        history = l;
-    };
-    this.setSize = function (s) {
-        settingSize = s;
-    };
-    this.setOpacity = function (o) {
-        settingOpacity = o;
-    };
-    this.setSpacing = function (s) {
-        settingSpacing = s;
-    };
-    this.sizePressure = function (b) {
-        settingHasSizePressure = b;
-    };
-    this.opacityPressure = function (b) {
-        settingHasOpacityPressure = b;
-    };
-    this.setLockAlpha = function (b) {
-        settingLockLayerAlpha = b;
-    };
+        this.settingColor = {r: c.r, g: c.g, b: c.b};
+        this.settingColorStr = 'rgb(' + this.settingColor.r + ',' + this.settingColor.g + ',' + this.settingColor.b + ')';
+        this.updateAlphaCanvas();
+    }
+
+    setContext (c: CanvasRenderingContext2D): void {
+        this.context = c;
+    }
+
+    setHistory (l: KlHistoryInterface): void {
+        this.history = l;
+    }
+
+    setSize (s: number, b?: string): void {
+        this.settingSize = s;
+    }
+
+    setOpacity (o: number): void {
+        this.settingOpacity = o;
+    }
+
+    setSpacing (s: number): void {
+        this.settingSpacing = s;
+    }
+
+    sizePressure (b: boolean): void {
+        this.settingHasSizePressure = b;
+    }
+
+    opacityPressure (b: boolean): void {
+        this.settingHasOpacityPressure = b;
+    }
+
+    setLockAlpha (b: boolean): void {
+        this.settingLockLayerAlpha = b;
+    }
+
     //GET
-    this.getSpacing = function () {
-        return settingSpacing;
-    };
-    this.getSize = function () {
-        return settingSize;
-    };
-    this.getOpacity = function () {
-        return settingOpacity;
-    };
-    this.getLockAlpha = function (b) {
-        return settingLockLayerAlpha;
-    };
+    getSpacing (): number {
+        return this.settingSpacing;
+    }
+
+    getSize (): number {
+        return this.settingSize;
+    }
+
+    getOpacity (): number {
+        return this.settingOpacity;
+    }
+
+    getLockAlpha (): boolean {
+        return this.settingLockLayerAlpha;
+    }
+
 }
+

@@ -1,43 +1,70 @@
 import {BB} from '../../../bb/bb';
 import {KL} from '../../kl';
-// @ts-ignore
-import loadingImg from 'url:~/src/app/img/ui/loading.gif';
 import {SaveReminder} from '../components/save-reminder';
 import {base64ToBlob} from '../../storage/base-64-to-blob';
 import {KlCanvas} from '../../canvas/kl-canvas';
 import {LANG} from '../../../language/language';
+import loadingImg from '/src/app/img/ui/loading.gif';
 
+type TImgurUploadResponse = {
+    // just a subset
+    id: string;
+    datetime: number;
+    type: string;
+    width: number;
+    height: number;
+    deletehash: string;
+    name: string;
+    link: string;
+};
 
-async function upload(canvas, title, description, type: 'png' | 'jpeg', imgurKey: string): Promise<{deletehash: string}> {
-    let img = base64ToBlob(canvas.toDataURL("image/" + type));
+/**
+ * uploads canvas, opens new tab with the upload progress & then opens the image page.
+ */
+async function upload (
+    canvas: HTMLCanvasElement,
+    title: string,
+    description: string,
+    type: 'png' | 'jpeg',
+    imgurKey: string,
+): Promise<TImgurUploadResponse> {
+    const img = base64ToBlob(canvas.toDataURL('image/' + type));
 
-    let w = window.open();
-    let label = w.document.createElement("div");
-    let gif = w.document.createElement("img");
+    const w = window.open();
+
+    if (!w) {
+        throw new Error('could not create new tab');
+    }
+
+    const label = w.document.createElement('div');
+    const gif = w.document.createElement('img');
     gif.src = loadingImg;
-    label.appendChild(gif);
+    label.append(gif);
     BB.css(gif, {
-        filter: "invert(1)"
+        filter: 'invert(1)',
     });
-    w.document.body.style.backgroundColor = "#121211";
-    w.document.body.style.backgroundImage = "linear-gradient(#2b2b2b 0%, #121211 50%)";
-    w.document.body.style.backgroundRepeat = "no-repeat";
-    let labelText = w.document.createElement("div");
-    labelText.style.marginTop = "10px";
-    label.appendChild(labelText);
+    BB.css(w.document.body, {
+        backgroundColor: '#121211',
+        backgroundImage: 'linear-gradient(#2b2b2b 0%, #121211 50%)',
+        backgroundRepeat: 'no-repeat',
+    });
+    
+    const labelText = w.document.createElement('div');
+    labelText.style.marginTop = '10px';
+    label.append(labelText);
     labelText.textContent = LANG('upload-uploading');
 
-    w.document.body.appendChild(label);
+    w.document.body.append(label);
     BB.css(label, {
-        marginLeft: "auto",
-        marginRight: "auto",
-        marginTop: "100px",
-        fontFamily: "Arial, sans-serif",
-        fontSize: "20px",
-        textAlign: "center",
-        transition: "opacity 0.3s ease-in-out",
+        marginLeft: 'auto',
+        marginRight: 'auto',
+        marginTop: '100px',
+        fontFamily: 'Arial, sans-serif',
+        fontSize: '20px',
+        textAlign: 'center',
+        transition: 'opacity 0.3s ease-in-out',
         opacity: '0',
-        color: "#ccc"
+        color: '#ccc',
     });
     setTimeout(function () {
         label.style.opacity = '1';
@@ -54,7 +81,7 @@ async function upload(canvas, title, description, type: 'png' | 'jpeg', imgurKey
             headers: {
                 Authorization: 'Client-ID ' + imgurKey,
             },
-            body: formData
+            body: formData,
         });
 
     } catch (e) {
@@ -65,23 +92,28 @@ async function upload(canvas, title, description, type: 'png' | 'jpeg', imgurKey
         w.close();
         throw new Error();
     }
-    let data = (await response.json()).data;
+    const data: TImgurUploadResponse = (await response.json()).data;
 
-    w.location.href = (data as any).link.replace(/\.(jpg|png)/, '');
+    w.location.href = data.link.replace(/\.(jpg|png)/, '');
 
     return data;
 }
 
 
-export function imgurUpload(klCanvas: KlCanvas, klRootEl, saveReminder: SaveReminder, imgurKey: string) {
+export function imgurUpload (
+    klCanvas: KlCanvas,
+    klRootEl: HTMLElement,
+    saveReminder: SaveReminder,
+    imgurKey: string, // API key
+): void {
     if (!imgurKey) {
         throw new Error('imgur key missing');
     }
 
-    let inputTitle = document.createElement("input");
-    inputTitle.type = "text";
+    const inputTitle = BB.el({tagName: 'input'}) as HTMLInputElement;
+    inputTitle.type = 'text';
     inputTitle.value = LANG('upload-title-untitled');
-    let inputDescription = BB.el({
+    const inputDescription = BB.el({
         tagName: 'textarea',
         custom: {
             rows: 2,
@@ -92,17 +124,19 @@ export function imgurUpload(klCanvas: KlCanvas, klRootEl, saveReminder: SaveRemi
         },
     }) as HTMLTextAreaElement;
 
-    let labelTitle = document.createElement("div");
-    labelTitle.textContent = LANG('upload-name') + ":";
-    let labelDescription = BB.el({
-        content: LANG('upload-caption') + ':',
+    const labelTitle =  BB.el({
+        textContent: LANG('upload-name') + ':',
+    });
+    const labelDescription = BB.el({
+        textContent: LANG('upload-caption') + ':',
         css: {
             marginTop: '10px',
-        }
+        },
     });
 
-    let tos = document.createElement("div");
-    tos.innerHTML = `<br/><a href="https://imgur.com/tos" target="_blank" rel="noopener noreferrer">${LANG('upload-tos')}</a> ${LANG('upload-tos-2')}`;
+    const tos = BB.el({
+        content: `<br/><a href="https://imgur.com/tos" target="_blank" rel="noopener noreferrer">${LANG('terms-of-service')}</a>`,
+    });
 
     const typeRadio = new KL.RadioList({
         name: 'filetype',
@@ -118,10 +152,11 @@ export function imgurUpload(klCanvas: KlCanvas, klRootEl, saveReminder: SaveRemi
     });
 
 
-    let outDiv = document.createElement("div");
-    let infoHint = document.createElement("div");
-    infoHint.className = "info-hint";
-    infoHint.textContent = LANG('upload-link-notice');
+    const outDiv = BB.el();
+    const infoHint = BB.el({
+        className: 'info-hint',
+        textContent: LANG('upload-link-notice'),
+    });
     outDiv.append(
         infoHint,
         typeRadio.getElement(),
@@ -134,14 +169,14 @@ export function imgurUpload(klCanvas: KlCanvas, klRootEl, saveReminder: SaveRemi
     KL.popup({
         target: klRootEl,
         message: `<b>${LANG('upload-title')}</b>`,
-        type: "upload",
+        type: 'upload',
         div: outDiv,
-        buttons: [LANG('upload-submit'), "Cancel"],
+        buttons: [LANG('upload-submit'), 'Cancel'],
         clickOnEnter: LANG('upload-submit'),
         primaries: [LANG('upload-submit')],
         autoFocus: LANG('upload-submit'),
         callback: async function (val) {
-            if (val === LANG('upload-submit') || val === "Yes" || val === "Ok") {
+            if (val === LANG('upload-submit') || val === 'Yes' || val === 'Ok') {
                 try {
                     const result = await upload(
                         klCanvas.getCompleteCanvas(1),
@@ -153,21 +188,21 @@ export function imgurUpload(klCanvas: KlCanvas, klRootEl, saveReminder: SaveRemi
 
                     KL.popup({
                         target: klRootEl,
-                        type: "ok",
+                        type: 'ok',
                         message: `<h3>${LANG('upload-success')}</h3><br>${LANG('upload-delete')}<br><a target='_blank' rel="noopener noreferrer" href='https://imgur.com/delete/${result.deletehash}'>imgur.com/delete/${result.deletehash}</a><br><br>`,
-                        buttons: ["Ok"]
+                        buttons: ['Ok'],
                     });
                     saveReminder.reset();
 
                 } catch(e) {
                     KL.popup({
                         target: klRootEl,
-                        type: "error",
+                        type: 'error',
                         message: LANG('upload-failed'),
-                        buttons: ["Ok"]
+                        buttons: ['Ok'],
                     });
                 }
             }
-        }
+        },
     });
 }

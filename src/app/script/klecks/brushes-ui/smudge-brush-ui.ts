@@ -2,27 +2,26 @@ import {BB} from '../../bb/bb';
 import {brushes} from '../brushes/brushes';
 import {eventResMs} from './brushes-consts';
 import {klHistory} from '../history/kl-history';
-import {Checkbox} from '../ui/base-components/checkbox';
-import {KlSlider} from '../ui/base-components/kl-slider';
-import {penPressureToggle} from '../ui/base-components/pen-pressure-toggle';
-// @ts-ignore
-import brushIconImg from 'url:~/src/app/img/ui/brush-smudge.svg';
-import {IBrushUi} from '../kl.types';
+import {Checkbox} from '../ui/components/checkbox';
+import {KlSlider} from '../ui/components/kl-slider';
+import {createPenPressureToggle} from '../ui/components/create-pen-pressure-toggle';
+import brushIconImg from '/src/app/img/ui/brush-smudge.svg';
+import {IBrushUi} from '../kl-types';
 import {LANG, languageStrings} from '../../language/language';
 
 export const smudgeBrushUi = (function () {
-    let brushInterface: IBrushUi = {
+    const brushInterface: IBrushUi = {
         image: brushIconImg,
         tooltip: LANG('brush-smudge'),
         sizeSlider: {
             min: 0.5,
             max: 100,
-            curve: BB.quadraticSplineInput(0.5, 100, 0.1)
+            curve: BB.quadraticSplineInput(0.5, 100, 0.1),
         },
         opacitySlider: {
             min: 1 / 100,
             max: 1,
-            curve: [[0, 1 / 100], [0.5, 0.3], [1, 1]]
+            curve: [[0, 1 / 100], [0.5, 0.3], [1, 1]],
         },
         Ui: null,
     };
@@ -32,14 +31,14 @@ export const smudgeBrushUi = (function () {
     });
 
     brushInterface.Ui = function (p) {
-        let div = document.createElement("div"); // the gui
-        let brush = new brushes.SmudgeBrush();
+        const div = document.createElement('div'); // the gui
+        const brush = new brushes.SmudgeBrush();
         brush.setHistory(klHistory);
         p.onSizeChange(brush.getSize());
         let sizeSlider;
         let opacitySlider;
 
-        let lockAlphaToggle = new Checkbox({
+        const lockAlphaToggle = new Checkbox({
             init: brush.getLockAlpha(),
             label: LANG('lock-alpha'),
             callback: function (b) {
@@ -49,14 +48,14 @@ export const smudgeBrushUi = (function () {
             title: LANG('lock-alpha-title'),
         });
 
-        let spacingSpline = new BB.SplineInterpolator([[0, 15], [8, 7], [14, 4], [30, 3], [50, 2.7], [100, 2]]);
+        const spacingSpline = new BB.SplineInterpolator([[0, 15], [8, 7], [14, 4], [30, 3], [50, 2.7], [100, 2]]);
 
-        function setSize(size) {
+        function setSize (size) {
             brush.setSize(size);
             brush.setSpacing(Math.max(2, spacingSpline.interpolate(size)) / 15);
         }
 
-        function init() {
+        function init () {
             sizeSlider = new KlSlider({
                 label: LANG('brush-size'),
                 width: 225,
@@ -98,10 +97,10 @@ export const smudgeBrushUi = (function () {
                 },
             });
 
-            let pressureSizeToggle = penPressureToggle(false, function (b) {
+            const pressureSizeToggle = createPenPressureToggle(false, function (b) {
                 brush.sizePressure(b);
             });
-            let pressureOpacityToggle = penPressureToggle(false, function (b) {
+            const pressureOpacityToggle = createPenPressureToggle(false, function (b) {
                 brush.opacityPressure(b);
             });
 
@@ -109,33 +108,33 @@ export const smudgeBrushUi = (function () {
                 BB.el({
                     content: [
                         sizeSlider.getElement(),
-                        pressureSizeToggle
+                        pressureSizeToggle,
                     ],
                     css: {
                         display: 'flex',
                         justifyContent: 'space-between',
                         alignItems: 'center',
                         marginBottom: '10px',
-                    }
+                    },
                 }),
                 BB.el({
                     content: [
                         opacitySlider.getElement(),
-                        pressureOpacityToggle
+                        pressureOpacityToggle,
                     ],
                     css: {
                         display: 'flex',
                         justifyContent: 'space-between',
                         alignItems: 'center',
-                    }
+                    },
                 })
             );
 
-            let bottomRow = BB.el({
+            const bottomRow = BB.el({
                 parent: div,
                 css: {
                     marginTop: '10px',
-                }
+                },
             });
             bottomRow.append(lockAlphaToggle.getElement());
 
@@ -157,14 +156,14 @@ export const smudgeBrushUi = (function () {
         this.getSize = function () {
             return brush.getSize();
         };
-        this.setSize = function(size) {
+        this.setSize = function (size) {
             setSize(size);
             sizeSlider.setValue(size);
         };
         this.getOpacity = function () {
             return brush.getOpacity();
         };
-        this.setOpacity = function(opacity) {
+        this.setOpacity = function (opacity) {
             brush.setOpacity(opacity);
             opacitySlider.setValue(opacity);
         };

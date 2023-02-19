@@ -1,18 +1,18 @@
 import {BB} from '../../../bb/bb';
 import {noise} from '../../../bb/math/perlin';
-import {IVector2D} from '../../../bb/bb.types';
+import {IVector2D} from '../../../bb/bb-types';
 
 // chalk
-export function genBrushAlpha01(w: number): HTMLCanvasElement {
+export function genBrushAlpha01 (w: number): HTMLCanvasElement {
 
     const scaleFac = w / 500;
     const h = w;
     const canvas = BB.canvas(w, h);
-    const ctx = canvas.getContext('2d');
+    const ctx = BB.ctx(canvas);
     const imData = ctx.createImageData(w, h);
     for (let x = 0; x < w; x++) {
         for (let y = 0; y < h; y++) {
-            let i = (y * w + x) * 4;
+            const i = (y * w + x) * 4;
 
             // base noise
             const sFac2 = scaleFac + noise.simplex2(x / 50 / scaleFac, y / 50 / scaleFac) * 0.04;
@@ -21,7 +21,7 @@ export function genBrushAlpha01(w: number): HTMLCanvasElement {
 
             // fade out in circular shape
             const centerDist = BB.dist(w / 2, h / 2, x, y);
-            let falloff = BB.clamp(
+            const falloff = BB.clamp(
                 1 - ((centerDist - (w / 2.5)) / (w / 14) + noise.simplex2(x / 22 / sFac2, y / 22 / sFac2)),
                 0,
                 1);
@@ -43,15 +43,15 @@ export function genBrushAlpha01(w: number): HTMLCanvasElement {
 }
 
 // https://www.shadertoy.com/view/3tdSDj
-function udSegment( p: IVector2D, a: IVector2D, b: IVector2D ) {
-    let ba = BB.Vec2.sub(b, a);
-    let pa = BB.Vec2.sub(p, a);
-    let h = BB.clamp( BB.Vec2.dot(pa,ba) / BB.Vec2.dot(ba,ba), 0.0, 1.0 );
+function udSegment ( p: IVector2D, a: IVector2D, b: IVector2D ) {
+    const ba = BB.Vec2.sub(b, a);
+    const pa = BB.Vec2.sub(p, a);
+    const h = BB.clamp( BB.Vec2.dot(pa,ba) / BB.Vec2.dot(ba,ba), 0.0, 1.0 );
     return BB.Vec2.len(BB.Vec2.sub(pa, BB.Vec2.mul(ba, h)));
 }
 
 // calligraphy
-export function genBrushAlpha02(w: number): HTMLCanvasElement {
+export function genBrushAlpha02 (w: number): HTMLCanvasElement {
 
     const pDist = 1 / 4;
     let centerSize = 2 / 3;
@@ -63,7 +63,7 @@ export function genBrushAlpha02(w: number): HTMLCanvasElement {
 
     const h = w;
     const canvas = BB.canvas(w, h);
-    let ctx = canvas.getContext('2d');
+    const ctx = BB.ctx(canvas);
     const imData = ctx.createImageData(w, h);
     for (let x = 0; x < w; x++) {
         for (let y = 0; y < h; y++) {

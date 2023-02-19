@@ -4,6 +4,8 @@ const JSON5 = require('json5');
 const beautify = require('js-beautify').js;
 const path = require('path');
 
+const JSON_INDENT_SIZE = 2;
+
 /**
  * A translation (not base)
  * @typedef {{code: string, data: Object.<string, {hint?: string, original:string, value: string}>}} KLTranslation
@@ -81,7 +83,6 @@ function buildLanguages (baseEn, translations) {
         name: '${lang.name}',
     }`);
         loadLanguage += `    } else if (code === '${item.code}') {
-        // @ts-ignore
         return await import('./${item.code}.json');
 `;
     });
@@ -90,7 +91,6 @@ function buildLanguages (baseEn, translations) {
     {
         let tsStr = `// generated from src/languages. "npm run lang:build" to update
 
-// @ts-ignore
 import dataEn from './en.json';
 
 export const english = dataEn;
@@ -99,9 +99,9 @@ export const languages: {code: string; name: string}[] = [
         code: 'en',
         name: 'English',
     },
-${langArray.join(`,\n`)}
+${langArray.join(`,\n`)},
 ];
-export const loadLanguage = async (code: string) => {
+export const loadLanguage = async (code: string): Promise<Record<TTranslationCode, string>> => {
     if (code === 'en') {
         return english;
 ${loadLanguage}    }
@@ -114,7 +114,7 @@ export type TTranslationCode = `;
             if (index > 0) {
                 tsStr += '    ';
             }
-            tsStr += `"${item}"`;
+            tsStr += `'${item}'`;
             if (index < keys.length - 1) {
                 tsStr += ` |`;
             } else {
@@ -157,6 +157,10 @@ export type TTranslationCode = `;
                 }
                 return;
             }
+            /*if (typeof item.value === 'string' && item.value.length > item.original.length + 10) {
+                const d = item.value.length - item.original.length;
+                console.log(`${translation.code}: "${key}"'s value longer than original by ${d} characters.`);
+            }*/
             json[key] = item.value;
         });
         fs.writeFileSync(`./src/app/languages/${translation.code}.json`, JSON.stringify(json));
@@ -181,7 +185,7 @@ function cmdAdd(code) {
         JSON5.parse(fs.readFileSync('./src/languages/_base-en.json5', {encoding: 'utf-8'})),
         code
     );
-    fs.writeFileSync(path, beautify(JSON5.stringify(lang)));
+    fs.writeFileSync(path, beautify(JSON5.stringify(lang), {indent_size: JSON_INDENT_SIZE}));
     console.log('Created: ' + path);
 }
 
@@ -193,20 +197,32 @@ function cmdSync() {
 }
 
 /**
- * @returns {void}
+ * @return {string[]}
  */
-function cmdBuild() {
-    const translations = [];
+function getCodes() {
+    const codes = [];
     fs.readdirSync('./src/languages').forEach(file => {
         if (file === '_base-en.json5') {
             return;
         }
         if (path.extname(file) === '.json5') {
-            translations.push({
-                code: path.parse(file).name,
-                data: JSON5.parse(fs.readFileSync('./src/languages/' + file, {encoding: 'utf-8'})),
-            });
+            codes.push(path.parse(file).name);
         }
+    });
+    return codes;
+}
+
+/**
+ * @returns {void}
+ */
+function cmdBuild() {
+    const translations = [];
+    const codes = getCodes();
+    codes.forEach(code => {
+        translations.push({
+            code,
+            data: JSON5.parse(fs.readFileSync('./src/languages/' + code + '.json5', {encoding: 'utf-8'})),
+        });
     });
     buildLanguages(
         JSON5.parse(fs.readFileSync('./src/languages/_base-en.json5', {encoding: 'utf-8'})),
@@ -220,7 +236,9 @@ exports.syncLanguages = syncLanguages;
 exports.buildLanguages = buildLanguages;
 exports.cmdAdd = cmdAdd;
 exports.cmdSync = cmdSync;
+exports.getCodes = getCodes;
 exports.cmdBuild = cmdBuild;
+exports.JSON_INDENT_SIZE = JSON_INDENT_SIZE;
 
 // --- cli ---
 if (process.argv[1] === __filename) {

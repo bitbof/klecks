@@ -1,356 +1,380 @@
 import {BB} from '../../../bb/bb';
 import {dialogCounter} from '../modals/modal-count';
-// @ts-ignore
-import toolPaintImg from 'url:~/src/app/img/ui/tool-paint.svg';
-// @ts-ignore
-import toolFillImg from 'url:~/src/app/img/ui/tool-fill.svg';
-// @ts-ignore
-import toolGradientImg from 'url:~/src/app/img/ui/tool-gradient.svg';
-// @ts-ignore
-import toolTextImg from 'url:~/src/app/img/ui/tool-text.svg';
-// @ts-ignore
-import toolShapeImg from 'url:~/src/app/img/ui/tool-shape.svg';
-// @ts-ignore
-import caretDownImg from 'url:~/src/app/img/ui/caret-down.svg';
+import toolPaintImg from '/src/app/img/ui/tool-paint.svg';
+import toolFillImg from '/src/app/img/ui/tool-fill.svg';
+import toolGradientImg from '/src/app/img/ui/tool-gradient.svg';
+import toolTextImg from '/src/app/img/ui/tool-text.svg';
+import toolShapeImg from '/src/app/img/ui/tool-shape.svg';
+import caretDownImg from '/src/app/img/ui/caret-down.svg';
 import {LANG} from '../../../language/language';
+import {TToolType} from '../../kl-types';
+
+
+type TDropdownButton = {
+    wrapper: HTMLElement;
+    show: (b: boolean) => void;
+    setIsSmall: (b: boolean) => void;
+};
 
 /**
  * Toolrow Dropdown. The button where you select: brush, fill, select, transform, etc.
- *
- * p = {
- *     onChange: func(activeStr)
- * }
- *
- * activeStr = 'draw' | 'fill' | 'text' | 'shape' | 'gradient'
- *
- * @param p
- * @constructor
  */
-export function ToolDropdown(p) {
+export class ToolDropdown {
 
-    let optionArr = ['draw', 'fill', 'gradient', 'text', 'shape'];
-    let imArr = [
-        toolPaintImg,
-        toolFillImg,
-        toolGradientImg,
-        toolTextImg,
-        toolShapeImg
-    ];
-    let titleArr = [
-        `${LANG('tool-brush')} [B]`,
-        `${LANG('tool-paint-bucket')} [G]`,
-        `${LANG('tool-gradient')} [G]`,
-        `${LANG('tool-text')} [T]`,
-        `${LANG('tool-shape')} [U]`,
-    ];
-    let currentActiveIndex = 0;
-    let isActive = true;
-    let isOpen = false;
+    private readonly rootEl: HTMLElement;
+    private readonly activeButton: HTMLElement;
+    private readonly smallMargin: string = '6px 0';
+    private readonly optionArr: TToolType[] = ['draw', 'fill', 'gradient', 'text', 'shape'];
+    private readonly dropdownBtnArr: TDropdownButton[];
+    private readonly arrowButton: HTMLElement;
+    private isActive: boolean;
+    private currentActiveIndex: number;
+    private readonly titleArr: string[];
+    private activeButtonIm: HTMLElement;
+    private readonly imArr;
 
-    //preload images
-    setTimeout(function() {
-        for (let i = 1; i < imArr.length; i++) {
-            let im = new Image();
-            im.src = imArr[i];
-        }
-    }, 100);
-
-    let smallMargin = '6px 0';
-    let div = BB.el({
-        css: {
-            position: 'relative',
-            flexGrow: '1'
-        }
-    });
-
-    let openTimeout;
-    let isDragging = false;
-    let startX, startY;
-    let pointerListener;
-    if (BB.hasPointerEvents) {
-        pointerListener = new BB.PointerListener({
-            target: div,
-            maxPointers: 1,
-            onPointer: function(event) {
-                if (event.type === 'pointerdown') {
-                    if (isOpen) {
-                        return;
-                    }
-
-                    openTimeout = setTimeout(function() {
-                        showDropdown();
-                    }, 400);
-                    isDragging = true;
-                    startX = event.pageX;
-                    startY = event.pageY;
-
-                } else if (event.type === 'pointermove') {
-                    if (isDragging && !isOpen && BB.dist(startX, startY, event.pageX, event.pageY) > 5) {
-                        clearTimeout(openTimeout);
-                        showDropdown();
-                    }
-
-                } else if (event.type === 'pointerup') {
-                    clearTimeout(openTimeout);
-                    if (isOpen && isDragging) {
-                        let target = document.elementFromPoint(event.pageX, event.pageY);
-                        for (let i = 0; i < dropdownBtnArr.length; i++) {
-                            if (target === dropdownBtnArr[i].wrapper) {
-                                closeDropdown();
-                                isActive = true;
-                                currentActiveIndex = i;
-                                updateButton();
-                                p.onChange(optionArr[currentActiveIndex]);
-                                break;
-                            }
-                        }
-                    }
-                    isDragging = false;
-                }
-            }
-        });
+    private updateButton () {
+        this.activeButton.title = this.titleArr[this.currentActiveIndex];
+        this.activeButtonIm.style.backgroundImage = 'url(\'' + this.imArr[this.currentActiveIndex] + '\')';
     }
 
-    let activeButton = BB.el({
-        parent: div,
-        className: 'toolspace-row-button nohighlight toolspace-row-button-activated',
-        title: titleArr[currentActiveIndex],
-        onClick: function(e) {
-            if (isActive && !isOpen) {
-                e.preventDefault();
-                e.stopPropagation();
-                showDropdown();
-                return;
+
+
+    // ---- public ----
+    constructor (
+        p: {
+            onChange: (activeStr: TToolType) => void;
+        }
+    ) {
+        this.imArr = [
+            toolPaintImg,
+            toolFillImg,
+            toolGradientImg,
+            toolTextImg,
+            toolShapeImg,
+        ];
+        this.titleArr = [
+            `${LANG('tool-brush')} [B]`,
+            `${LANG('tool-paint-bucket')} [G]`,
+            `${LANG('tool-gradient')} [G]`,
+            `${LANG('tool-text')} [T]`,
+            `${LANG('tool-shape')} [U]`,
+        ];
+        this.currentActiveIndex = 0;
+        this.isActive = true;
+        let isOpen = false;
+
+        //preload images
+        setTimeout(() => {
+            for (let i = 1; i < this.imArr.length; i++) {
+                const im = new Image();
+                im.src = this.imArr[i];
             }
+        }, 100);
 
-            isActive = true;
-            p.onChange(optionArr[currentActiveIndex]);
-            if (isOpen) {
-                closeDropdown();
-            }
-        },
-        css: {
-            padding: '10px 0',
-            pointerEvents: 'auto',
-            height: '100%',
-            boxSizing: 'border-box'
+        this.rootEl = BB.el({
+            css: {
+                position: 'relative',
+                flexGrow: '1',
+            },
+        });
+
+        let openTimeout: ReturnType<typeof setTimeout>;
+        let isDragging = false;
+        let startX: number;
+        let startY: number;
+        let pointerListener;
+        if (BB.hasPointerEvents) {
+            pointerListener = new BB.PointerListener({
+                target: this.rootEl,
+                onPointer: (event) => {
+                    if (event.type === 'pointerdown') {
+                        if (isOpen) {
+                            return;
+                        }
+
+                        openTimeout = setTimeout(() => {
+                            showDropdown();
+                        }, 400);
+                        isDragging = true;
+                        startX = event.pageX;
+                        startY = event.pageY;
+
+                    } else if (event.type === 'pointermove') {
+                        if (isDragging && !isOpen && BB.dist(startX, startY, event.pageX, event.pageY) > 5) {
+                            clearTimeout(openTimeout);
+                            showDropdown();
+                        }
+
+                    } else if (event.type === 'pointerup') {
+                        clearTimeout(openTimeout);
+                        if (isOpen && isDragging) {
+                            const target = document.elementFromPoint(event.pageX, event.pageY);
+                            for (let i = 0; i < this.dropdownBtnArr.length; i++) {
+                                if (target === this.dropdownBtnArr[i].wrapper) {
+                                    closeDropdown();
+                                    this.isActive = true;
+                                    this.currentActiveIndex = i;
+                                    this.updateButton();
+                                    p.onChange(this.optionArr[this.currentActiveIndex]);
+                                    break;
+                                }
+                            }
+                        }
+                        isDragging = false;
+                    }
+                },
+            });
         }
-    });
 
-    let activeButtonIm = BB.el({
-        parent: activeButton,
-        css: {
-            backgroundRepeat: 'no-repeat',
-            backgroundPosition: 'center',
-            backgroundSize: 'contain',
-            width: 'calc(100% - 7px)',
-            height: '100%',
-            pointerEvents: 'none',
-            opacity: '0.75',
-        }
-    });
+        this.activeButton = BB.el({
+            parent: this.rootEl,
+            className: 'toolspace-row-button nohighlight toolspace-row-button-activated',
+            title: this.titleArr[this.currentActiveIndex],
+            onClick: (e) => {
+                if (this.isActive && !isOpen) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    showDropdown();
+                    return;
+                }
 
-    let arrowButton = BB.el({
-        parent: activeButton,
-        css: {
-            position: 'absolute',
-            right: '1px',
-            bottom: '1px',
-            width: '18px',
-            height: '18px',
-            //background: '#aaa',
-            //borderRadius: '2px',
-            cursor: 'pointer',
-
-            backgroundImage: 'url(\'' + caretDownImg + '\')',
-            backgroundRepeat: 'no-repeat',
-            backgroundPosition: 'center',
-            backgroundSize: '60%'
-        },
-        title: 'More Tools',
-        onClick: function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            showDropdown();
-        }
-    });
-
-
-    let overlay = BB.el({
-        css: {
-            position: 'absolute',
-            //background: 'rgba(255,0,0,0.5)',
-            left: '0',
-            top: '0',
-            right: '0',
-            bottom: '0'
-        }
-    });
-    let overlayPointerListener = new BB.PointerListener({
-        target: overlay,
-        pointers: 1,
-        onPointer: function(e) {
-            if (e.type === 'pointerdown') {
-                e.eventPreventDefault();
-                closeDropdown();
-            }
-        }
-    });
-
-    let dropdownWrapper = BB.el({
-        className: 'tool-dropdown-wrapper',
-        css: {
-            position: 'absolute',
-            width: '100%',
-            height: (100 * (optionArr.length - 1)) + '%',
-            top: '100%',
-            left: '0',
-            zIndex: '1',
-            boxSizing: 'border-box',
-            cursor: 'pointer',
-            transition: 'height 0.1s ease-in-out, opacity 0.1s ease-in-out',
-            borderBottomLeftRadius: '5px',
-            borderBottomRightRadius: '5px',
-            overflow: 'hidden',
-        }
-    });
-
-    let dropdownBtnArr = [];
-
-    function createDropdownButton(p) {
-        let result = {};
-
-        let wrapper = BB.el({
-            parent: dropdownWrapper,
-            className: 'tool-dropdown-button',
-            title: p.title,
+                this.isActive = true;
+                p.onChange(this.optionArr[this.currentActiveIndex]);
+                if (isOpen) {
+                    closeDropdown();
+                }
+            },
             css: {
                 padding: '10px 0',
-                height: (100 / (optionArr.length - 1)) + '%',
-                boxSizing: 'border-box'
+                pointerEvents: 'auto',
+                height: '100%',
+                boxSizing: 'border-box',
             },
-            onClick: function(e) {
-                e.preventDefault();
-                e.stopPropagation();
-                p.onClick(p.index, p.id);
-            }
         });
-        (result as any).wrapper = wrapper;
-        let im = BB.el({
-            parent: wrapper,
+
+        this.activeButtonIm = BB.el({
+            parent: this.activeButton,
+            className: 'dark-invert',
             css: {
-                backgroundImage: 'url(\'' + p.image + '\')',
                 backgroundRepeat: 'no-repeat',
                 backgroundPosition: 'center',
                 backgroundSize: 'contain',
+                width: 'calc(100% - 7px)',
                 height: '100%',
                 pointerEvents: 'none',
-                opacity: '0.75'
-            }
+                opacity: '0.75',
+            },
         });
 
-        // --- interface ---
-        (result as any).show = function(b) {
-            wrapper.style.display = b ? 'block' : 'none';
+        this.arrowButton = BB.el({
+            parent: this.activeButton,
+            className: 'dark-invert',
+            css: {
+                position: 'absolute',
+                right: '1px',
+                bottom: '1px',
+                width: '18px',
+                height: '18px',
+                //background: '#aaa',
+                //borderRadius: '2px',
+                cursor: 'pointer',
+
+                backgroundImage: 'url(\'' + caretDownImg + '\')',
+                backgroundRepeat: 'no-repeat',
+                backgroundPosition: 'center',
+                backgroundSize: '60%',
+            },
+            title: 'More Tools',
+            onClick: (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                showDropdown();
+            },
+        });
+
+
+        const overlay = BB.el({
+            css: {
+                position: 'absolute',
+                //background: 'rgba(255,0,0,0.5)',
+                left: '0',
+                top: '0',
+                right: '0',
+                bottom: '0',
+            },
+        });
+        const overlayPointerListener = new BB.PointerListener({
+            target: overlay,
+            onPointer: (e) => {
+                if (e.type === 'pointerdown') {
+                    e.eventPreventDefault();
+                    closeDropdown();
+                }
+            },
+        });
+
+        const dropdownWrapper = BB.el({
+            className: 'tool-dropdown-wrapper',
+            css: {
+                position: 'absolute',
+                width: '100%',
+                height: (100 * (this.optionArr.length - 1)) + '%',
+                top: '100%',
+                left: '0',
+                zIndex: '1',
+                boxSizing: 'border-box',
+                cursor: 'pointer',
+                transition: 'height 0.1s ease-in-out, opacity 0.1s ease-in-out',
+                borderBottomLeftRadius: '5px',
+                borderBottomRightRadius: '5px',
+                overflow: 'hidden',
+            },
+        });
+
+        this.dropdownBtnArr = [];
+
+        const createDropdownButton = (
+            p: {
+                index: number;
+                id: TToolType;
+                image: string;
+                title: string;
+                onClick: (index: number) => void;
+            }
+        ): TDropdownButton => {
+            const wrapper = BB.el({
+                parent: dropdownWrapper,
+                className: 'tool-dropdown-button',
+                title: p.title,
+                css: {
+                    padding: '10px 0',
+                    height: (100 / (this.optionArr.length - 1)) + '%',
+                    boxSizing: 'border-box',
+                },
+                onClick: (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    p.onClick(p.index);
+                },
+            });
+
+            BB.el({
+                parent: wrapper,
+                className: 'dark-invert',
+                css: {
+                    backgroundImage: 'url(\'' + p.image + '\')',
+                    backgroundRepeat: 'no-repeat',
+                    backgroundPosition: 'center',
+                    backgroundSize: 'contain',
+                    height: '100%',
+                    pointerEvents: 'none',
+                    opacity: '0.75',
+                },
+            });
+
+            // --- interface ---
+            const show = (b: boolean) => {
+                wrapper.style.display = b ? 'block' : 'none';
+            };
+
+            const setIsSmall = (b: boolean) => {
+                wrapper.style.padding = b ? this.smallMargin : '10px 0';
+            };
+
+            return {
+                wrapper,
+                show,
+                setIsSmall,
+            };
         };
 
-        (result as any).setIsSmall = function(b) {
-            wrapper.style.padding = b ? smallMargin : '10px 0';
+        const onClickDropdownBtn = (index: number) => {
+            closeDropdown();
+
+            this.isActive = true;
+            this.currentActiveIndex = index;
+
+            this.updateButton();
+
+            p.onChange(this.optionArr[this.currentActiveIndex]);
         };
 
-        return result;
-    }
-
-    function onClickDropdownBtn(index, id) {
-        closeDropdown();
-
-        isActive = true;
-        currentActiveIndex = index;
-
-        updateButton();
-
-        p.onChange(optionArr[currentActiveIndex]);
-    }
-
-    for (let i = 0; i < optionArr.length; i++) {
-        dropdownBtnArr.push(createDropdownButton({
-            index: i,
-            id: optionArr[i],
-            image: imArr[i],
-            title: titleArr[i],
-            onClick: onClickDropdownBtn
-        }));
-    }
-
-    function showDropdown() {
-        dialogCounter.increase(0.5);
-        isOpen = true;
-
-        for (let i = 0; i < optionArr.length; i++) {
-            dropdownBtnArr[i].show(currentActiveIndex !== i);
+        for (let i = 0; i < this.optionArr.length; i++) {
+            this.dropdownBtnArr.push(createDropdownButton({
+                index: i,
+                id: this.optionArr[i],
+                image: this.imArr[i],
+                title: this.titleArr[i],
+                onClick: onClickDropdownBtn,
+            }));
         }
 
-        arrowButton.style.display = 'none';
-        div.style.zIndex = '1';
-        document.body.appendChild(overlay);
-        div.appendChild(dropdownWrapper);
+        const showDropdown = () => {
+            dialogCounter.increase(0.5);
+            isOpen = true;
+
+            for (let i = 0; i < this.optionArr.length; i++) {
+                this.dropdownBtnArr[i].show(this.currentActiveIndex !== i);
+            }
+
+            this.arrowButton.style.display = 'none';
+            this.rootEl.style.zIndex = '1';
+            document.body.append(overlay);
+            this.rootEl.append(dropdownWrapper);
+        };
+
+        const closeDropdown = () => {
+            dialogCounter.decrease(0.5);
+            isOpen = false;
+            this.arrowButton.style.removeProperty('display');
+            this.rootEl.style.removeProperty('z-index');
+            document.body.removeChild(overlay);
+
+            this.rootEl.removeChild(dropdownWrapper);
+        };
+
+        this.updateButton();
     }
 
-    function closeDropdown() {
-        dialogCounter.decrease(0.5);
-        isOpen = false;
-        arrowButton.style.removeProperty('display');
-        div.style.removeProperty('z-index');
-        document.body.removeChild(overlay);
+    // ---- interface ----
 
-        div.removeChild(dropdownWrapper);
-    }
-
-    function updateButton() {
-        activeButton.title = titleArr[currentActiveIndex];
-        activeButtonIm.style.backgroundImage = 'url(\'' + imArr[currentActiveIndex] + '\')';
-    }
-    updateButton();
-
-
-    // --- interface ---
-
-    this.setIsSmall = function(b) {
-        activeButton.style.padding = b ? smallMargin : '10px 0';
-        for (let i = 0; i < optionArr.length; i++) {
-            dropdownBtnArr[i].setIsSmall(b);
+    setIsSmall (b: boolean): void {
+        this.activeButton.style.padding = b ? this.smallMargin : '10px 0';
+        for (let i = 0; i < this.optionArr.length; i++) {
+            this.dropdownBtnArr[i].setIsSmall(b);
         }
         if (b) {
-            arrowButton.style.width = '14px';
-            arrowButton.style.height = '14px';
+            this.arrowButton.style.width = '14px';
+            this.arrowButton.style.height = '14px';
         } else {
-            arrowButton.style.width = '18px';
-            arrowButton.style.height = '18px';
+            this.arrowButton.style.width = '18px';
+            this.arrowButton.style.height = '18px';
         }
-    };
+    }
 
-    this.setActive = function(activeStr) {
-        if (optionArr.includes(activeStr)) {
-            isActive = true;
-            for (let i = 0; i < optionArr.length; i++) {
-                if (optionArr[i] === activeStr) {
-                    currentActiveIndex = i;
+    setActive (activeStr: TToolType): void {
+        if (this.optionArr.includes(activeStr)) {
+            this.isActive = true;
+            for (let i = 0; i < this.optionArr.length; i++) {
+                if (this.optionArr[i] === activeStr) {
+                    this.currentActiveIndex = i;
                     break;
                 }
             }
-            activeButton.classList.add('toolspace-row-button-activated');
-            updateButton();
+            this.activeButton.classList.add('toolspace-row-button-activated');
+            this.updateButton();
         } else {
-            isActive = false;
-            activeButton.classList.remove('toolspace-row-button-activated');
+            this.isActive = false;
+            this.activeButton.classList.remove('toolspace-row-button-activated');
         }
-    };
+    }
 
-    this.getActive = function() {
-        return optionArr[currentActiveIndex];
-    };
+    getActive (): TToolType {
+        return this.optionArr[this.currentActiveIndex];
+    }
 
-    this.getElement = function() {
-        return div;
-    };
+    getElement (): HTMLElement {
+        return this.rootEl;
+    }
 }

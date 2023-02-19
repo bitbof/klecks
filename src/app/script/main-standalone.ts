@@ -2,17 +2,16 @@
  * by bitbof (bitbof.com)
  */
 
-import './polyfills';
-import {BB} from './bb/bb';
+import './polyfills/polyfills';
 import {KL} from './klecks/kl';
 import {klHistory} from './klecks/history/kl-history';
 import {KlApp} from './app/kl-app';
-import {IKlProject} from './klecks/kl.types';
+import {IKlProject} from './klecks/kl-types';
 import {ProjectStore} from './klecks/storage/project-store';
 import {initLANG, LANG} from './language/language';
 
-function initError(e) {
-    let el = document.createElement('div');
+function initError (e) {
+    const el = document.createElement('div');
     el.style.textAlign = 'center';
     el.style.background = '#fff';
     el.style.padding = '20px';
@@ -27,7 +26,7 @@ function initError(e) {
     let domIsLoaded = false;
 
     try {
-        BB.addEventListener(window, 'DOMContentLoaded', () => {
+        window.addEventListener('DOMContentLoaded', () => {
             domIsLoaded = true;
         });
         await initLANG();
@@ -36,11 +35,11 @@ function initError(e) {
         return;
     }
 
-    function onProjectLoaded(project: IKlProject, projectStore: ProjectStore) {
+    function onProjectLoaded (project: IKlProject, projectStore: ProjectStore) {
         if (klApp) {
             throw 'onKlProjectObjLoaded called more than once';
         }
-        let loadingScreenEl = document.getElementById("loading-screen");
+        const loadingScreenEl = document.getElementById('loading-screen');
         try {
             // in case an extension screwed with the page
             loadingScreenEl.parentNode.removeChild(loadingScreenEl);
@@ -71,13 +70,13 @@ function initError(e) {
             }, 100);
         }
 
-        document.body.appendChild(klApp.getEl());
+        document.body.append(klApp.getEl());
     }
 
-    async function onDomLoaded() {
+    async function onDomLoaded () {
         try {
-            BB.removeEventListener(window, 'DOMContentLoaded', onDomLoaded);
-            let projectStore = new KL.ProjectStore();
+            window.removeEventListener('DOMContentLoaded', onDomLoaded);
+            const projectStore = new KL.ProjectStore();
             let project: IKlProject = null;
             try {
                 const readResult = await projectStore.read();
@@ -94,7 +93,7 @@ function initError(e) {
                     message = 'Failed to restore from Browser Storage';
                 }
                 if (message) {
-                    setTimeout(function() {
+                    setTimeout(function () {
                         klApp && klApp.out(message);
                         throw new Error('Initial browser storage error, ' + e);
                     }, 100);
@@ -109,7 +108,7 @@ function initError(e) {
     if (domIsLoaded) {
         onDomLoaded();
     } else {
-        BB.addEventListener(window, 'DOMContentLoaded', onDomLoaded);
+        window.addEventListener('DOMContentLoaded', onDomLoaded);
     }
 })();
 

@@ -1,205 +1,216 @@
 import {BB} from '../../../bb/bb';
-import {KlSlider} from '../base-components/kl-slider';
-import {Select} from '../base-components/select';
-import {Checkbox} from '../base-components/checkbox';
+import {KlSlider} from '../components/kl-slider';
+import {Select} from '../components/select';
+import {Checkbox} from '../components/checkbox';
 import {LANG} from '../../../language/language';
+import {TFillSampling} from '../../kl-types';
+import {KlColorSlider} from '../components/kl-color-slider';
 
 /**
  * Paint Bucket tab contents (color slider, opacity slider, etc)
- *
- * p = {
- *     colorSlider: KlColorSlider// when opening tab, inserts it (snatches it from where else it was)
- * }
- *
- * @param p
- * @constructor
  */
-export function FillUi(p) {
-    let div = BB.el({
-        css: {
-            margin: '10px'
+export class FillUi {
+
+    private readonly rootEl: HTMLElement;
+    private isVisible: boolean;
+    private readonly colorDiv: HTMLElement;
+    private readonly colorSlider: KlColorSlider;
+    private readonly toleranceSlider: KlSlider;
+    private readonly opacitySlider: KlSlider;
+    private readonly modeSelect: Select;
+    private readonly growSelect: Select;
+    private isContiguous: boolean;
+    private readonly eraserToggle: Checkbox;
+
+
+    // ---- public ----
+
+    constructor (
+        p: {
+            colorSlider: KlColorSlider; // when opening tab, inserts it (snatches it from where else it was)
         }
-    });
-    let isVisible = true;
+    ) {
+        this.rootEl = BB.el({
+            css: {
+                margin: '10px',
+            },
+        });
+        this.isVisible = true;
 
-    let colorDiv = BB.el({
-        parent: div,
-        css: {
-            marginBottom: '10px'
-        }
-    });
+        this.colorDiv = BB.el({
+            parent: this.rootEl,
+            css: {
+                marginBottom: '10px',
+            },
+        });
 
-    let opacitySlider = new KlSlider({
-        label: LANG('opacity'),
-        width: 250,
-        height: 30,
-        min: 1 / 100,
-        max: 1,
-        value: 1,
-        toValue: (displayValue) => displayValue / 100,
-        toDisplayValue: (value) => value * 100,
-    });
-    div.appendChild(opacitySlider.getElement());
+        this.colorSlider = p.colorSlider;
 
-    let toleranceSlider = new KlSlider({
-        label: LANG('bucket-tolerance'),
-        width: 250,
-        height: 30,
-        min: 0,
-        max: 255,
-        value: 20 * (255 / 100),
-        toValue: (displayValue) => displayValue * (255 / 100),
-        toDisplayValue: (value) => value / (255 / 100),
-    });
-    BB.css(toleranceSlider.getElement(), {
-        marginTop: '10px'
-    });
-    div.appendChild(toleranceSlider.getElement());
+        this.opacitySlider = new KlSlider({
+            label: LANG('opacity'),
+            width: 250,
+            height: 30,
+            min: 1 / 100,
+            max: 1,
+            value: 1,
+            toValue: (displayValue) => displayValue / 100,
+            toDisplayValue: (value) => value * 100,
+        });
+        this.rootEl.append(this.opacitySlider.getElement());
 
-    let selectRow = BB.el({
-        parent: div,
-        css: {
-            display: 'flex',
-            marginTop: '10px'
-        }
-    });
-
-    let modeWrapper;
-    let modeSelect;
-    modeWrapper = BB.el({
-        content: LANG('bucket-sample') + '&nbsp;',
-        title: LANG('bucket-sample-title'),
-        css: {
-            fontSize: '15px'
-        }
-    });
-    modeSelect = new Select({
-        optionArr: [
-            ['all', LANG('bucket-sample-all')],
-            ['current', LANG('bucket-sample-active')],
-            ['above', LANG('bucket-sample-above')]
-        ],
-        initValue: 'all',
-        onChange: function(val) {}
-    });
-    let modePointerListener = new BB.PointerListener({
-        target: modeSelect.getElement(),
-        onWheel: function(e) {
-            modeSelect.setDeltaValue(e.deltaY);
-        }
-    });
-    modeWrapper.appendChild(modeSelect.getElement());
-    selectRow.appendChild(modeWrapper);
-
-    let growWrapper;
-    let growSelect;
-    growWrapper = BB.el({
-        content: LANG('bucket-grow') + '&nbsp;',
-        title: LANG('bucket-grow-title'),
-        css: {
-            fontSize: '15px',
-            marginLeft: '10px'
-        }
-    });
-    growSelect = new Select({
-        optionArr: [
-            ['0', '0'],
-            ['1', '1'],
-            ['2', '2'],
-            ['3', '3'],
-            ['4', '4'],
-            ['5', '5'],
-            ['6', '6'],
-            ['7', '7'],
-        ],
-        initValue: '0',
-        onChange: function(val) {}
-    });
-    let growPointerListener = new BB.PointerListener({
-        target: growSelect.getElement(),
-        onWheel: function(e) {
-            growSelect.setDeltaValue(e.deltaY);
-        }
-    });
-    growWrapper.appendChild(growSelect.getElement());
-    selectRow.appendChild(growWrapper);
-
-
-    let isContiguous = true;
-    let contiguousToggle = new Checkbox({
-        init: true,
-        label: LANG('bucket-contiguous'),
-        title: LANG('bucket-contiguous-title'),
-        callback: function (b) {
-            isContiguous = b;
-        },
-        css: {
-            paddingRight: '5px',
-            display: 'inline-block',
-            width: '50%',
-        }
-    });
-
-    let eraserToggle = new Checkbox({
-        init: false,
-        label: LANG('eraser'),
-        callback: function (b) {},
-        css: {
-
-            paddingRight: '5px',
-            display: 'inline-block',
-            width: '50%',
-        }
-    });
-
-    div.append(BB.el({
-        content: [
-            contiguousToggle.getElement(),
-            eraserToggle.getElement(),
-        ],
-        css: {
-            display: 'flex',
+        this.toleranceSlider = new KlSlider({
+            label: LANG('bucket-tolerance'),
+            width: 250,
+            height: 30,
+            min: 0,
+            max: 255,
+            value: 20 * (255 / 100),
+            toValue: (displayValue) => displayValue * (255 / 100),
+            toDisplayValue: (value) => value / (255 / 100),
+        });
+        BB.css(this.toleranceSlider.getElement(), {
             marginTop: '10px',
-        }
-    }));
+        });
+        this.rootEl.append(this.toleranceSlider.getElement());
+
+        const selectRow = BB.el({
+            parent: this.rootEl,
+            css: {
+                display: 'flex',
+                marginTop: '10px',
+            },
+        });
+
+        const modeWrapper = BB.el({
+            content: LANG('bucket-sample') + '&nbsp;',
+            title: LANG('bucket-sample-title'),
+            css: {
+                fontSize: '15px',
+            },
+        });
+        this.modeSelect = new Select({
+            optionArr: [
+                ['all', LANG('bucket-sample-all')],
+                ['current', LANG('bucket-sample-active')],
+                ['above', LANG('bucket-sample-above')],
+            ],
+            initValue: 'all',
+        });
+        const modePointerListener = new BB.PointerListener({
+            target: this.modeSelect.getElement(),
+            onWheel: (e) => {
+                this.modeSelect.setDeltaValue(e.deltaY);
+            },
+        });
+        modeWrapper.append(this.modeSelect.getElement());
+        selectRow.append(modeWrapper);
+
+        const growWrapper = BB.el({
+            content: LANG('bucket-grow') + '&nbsp;',
+            title: LANG('bucket-grow-title'),
+            css: {
+                fontSize: '15px',
+                marginLeft: '10px',
+            },
+        });
+        this.growSelect = new Select({
+            optionArr: [
+                ['0', '0'],
+                ['1', '1'],
+                ['2', '2'],
+                ['3', '3'],
+                ['4', '4'],
+                ['5', '5'],
+                ['6', '6'],
+                ['7', '7'],
+            ],
+            initValue: '0',
+        });
+        const growPointerListener = new BB.PointerListener({
+            target: this.growSelect.getElement(),
+            onWheel: (e) => {
+                this.growSelect.setDeltaValue(e.deltaY);
+            },
+        });
+        growWrapper.append(this.growSelect.getElement());
+        selectRow.append(growWrapper);
 
 
-    // --- interface ---
+        this.isContiguous = true;
+        const contiguousToggle = new Checkbox({
+            init: true,
+            label: LANG('bucket-contiguous'),
+            title: LANG('bucket-contiguous-title'),
+            callback: (b) => {
+                this.isContiguous = b;
+            },
+            css: {
+                paddingRight: '5px',
+                display: 'inline-block',
+                width: '50%',
+            },
+        });
 
-    this.getElement = function() {
-        return div;
-    };
+        this.eraserToggle = new Checkbox({
+            init: false,
+            label: LANG('eraser'),
+            css: {
 
-    this.setIsVisible = function(pIsVisible) {
-        isVisible = !!pIsVisible;
-        div.style.display = isVisible ? 'block' : 'none';
-        if (isVisible) {
-            colorDiv.appendChild(p.colorSlider.getElement());
-            colorDiv.appendChild(p.colorSlider.getOutputElement());
-        }
-    };
+                paddingRight: '5px',
+                display: 'inline-block',
+                width: '50%',
+            },
+        });
 
-    this.getTolerance = function() {
-        return toleranceSlider.getValue();
-    };
-
-    this.getOpacity = function() {
-        return opacitySlider.getValue();
-    };
-
-    /**
-     * returns string 'current' | 'all' | 'above'
-     */
-    this.getSample = function() {
-        return modeSelect.getValue();
-    };
-
-    this.getGrow = function() {
-        return parseInt(growSelect.getValue(), 10);
+        this.rootEl.append(BB.el({
+            content: [
+                contiguousToggle.getElement(),
+                this.eraserToggle.getElement(),
+            ],
+            css: {
+                display: 'flex',
+                marginTop: '10px',
+            },
+        }));
     }
 
-    this.getContiguous = () => isContiguous;
+    getElement (): HTMLElement {
+        return this.rootEl;
+    }
 
-    this.getIsEraser = () => eraserToggle.getValue();
+    setIsVisible (pIsVisible: boolean): void {
+        this.isVisible = !!pIsVisible;
+        this.rootEl.style.display = this.isVisible ? 'block' : 'none';
+        if (this.isVisible) {
+            this.colorDiv.append(this.colorSlider.getElement(), this.colorSlider.getOutputElement());
+        }
+    }
+
+    /**
+     * [0, 1]
+     */
+    getTolerance (): number {
+        return this.toleranceSlider.getValue();
+    }
+
+    getOpacity (): number {
+        return this.opacitySlider.getValue();
+    }
+
+    getSample (): TFillSampling {
+        return this.modeSelect.getValue() as TFillSampling;
+    }
+
+    getGrow (): number {
+        return parseInt(this.growSelect.getValue(), 10);
+    }
+
+    getContiguous (): boolean {
+        return this.isContiguous;
+    }
+
+    getIsEraser (): boolean {
+        return this.eraserToggle.getValue();
+    }
 
 }

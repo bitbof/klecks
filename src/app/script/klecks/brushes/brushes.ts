@@ -14,4 +14,4 @@ export const brushes = {
     ChemyBrush,
     SmudgeBrush,
     EraserBrush,
-}
+};

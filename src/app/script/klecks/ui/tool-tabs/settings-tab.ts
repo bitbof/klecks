@@ -2,13 +2,10 @@ import {BB} from '../../../bb/bb';
 import {LANG, languageStrings, LS_LANGUAGE_KEY} from '../../../language/language';
 import {KL} from '../../kl';
 import {languages} from '../../../../languages/languages';
-import {Popup} from '../modals/popup';
-// @ts-ignore
-import bitbofLogoImg from 'url:~/src/app/img/bitbof-logo.svg';
-// @ts-ignore
-import klecksLogoImg from 'url:~/src/app/img/klecks-logo.png';
-// @ts-ignore
-import uiSwapImg from 'url:~/src/app/img/ui/ui-swap-lr.svg';
+import {DynamicModal} from '../modals/base/dynamic-modal';
+import bitbofLogoImg from '/src/app/img/bitbof-logo.svg';
+import klecksLogoImg from '/src/app/img/klecks-logo.png';
+import uiSwapImg from '/src/app/img/ui/ui-swap-lr.svg';
 import {LocalStorage} from '../../../bb/base/local-storage';
 
 export class SettingsTab {
@@ -30,22 +27,21 @@ ${LANG('settings-language')}: ${language.name} (${language.code})
             `,
             css: {
                 margin: '10px',
-            }
+            },
         });
 
         const preferredLanguageRow = BB.el({
             content: LANG('settings-preferred-language') + ':<br>',
             css: {
                 marginTop: '10px',
-            }
+            },
         });
         const options: [string, string][] = [
-            ['auto', LANG('auto')] as [string, string]
-        ].concat(
-            languages.map(item => {
-                return [item.code, item.name + ` (${item.code})`];
-            })
-        );
+            ['auto', LANG('auto')] as [string, string],
+            ...languages.map(item => {
+                return [item.code, item.name + ` (${item.code})`] as [string, string];
+            }),
+        ];
         const languageSelect = new KL.Select({
             initValue: LocalStorage.getItem(LS_LANGUAGE_KEY) ? LocalStorage.getItem(LS_LANGUAGE_KEY) : 'auto',
             optionArr: options,
@@ -58,12 +54,15 @@ ${LANG('settings-language')}: ${language.name} (${language.code})
                 languageHint.style.display = 'block';
             },
         });
+        BB.css(languageSelect.getElement(), {
+            marginTop: '5px',
+        });
         const languageHint = BB.el({
             content: LANG('settings-language-reload'),
             css: {
                 display: 'none',
                 marginTop: '5px',
-            }
+            },
         });
 
         preferredLanguageRow.append(
@@ -84,20 +83,20 @@ ${LANG('settings-language')}: ${language.name} (${language.code})
             },
             custom: {
                 tabIndex: '-1',
-            }
+            },
         });
 
 
         // ---- about ----
-        this.el.append(BB.el({className: 'gridHr', css: {margin: '10px 0'}}));
+        this.el.append(BB.el({className: 'grid-hr', css: {margin: '10px 0'}}));
 
-        function makeLicenses() {
+        function makeLicenses () {
             return BB.el({
                 tagName: 'a',
                 content: LANG('licenses'),
                 onClick: () => {
                     import('./licenses').then(result => {
-                        new Popup({
+                        new DynamicModal({
                             title: BB.el({
                                 content: LANG('licenses'),
                             }),
@@ -106,12 +105,12 @@ ${LANG('settings-language')}: ${language.name} (${language.code})
                                     content: result.licenses.replace(/\n/g, '<br>'),
                                     css: {
                                         padding: '20px',
-                                    }
+                                    },
                                 }),
                                 css: {
                                     height: '100%',
                                     overflowY: 'scroll',
-                                }
+                                },
                             }),
                             width: 800,
                             isMaxHeight: true,
@@ -128,7 +127,7 @@ ${LANG('settings-language')}: ${language.name} (${language.code})
                     parent: customAbout,
                     css: {
                        textAlign: 'center',
-                   }
+                   },
                 });
                 minimalAbout.append(
                     BB.el({
@@ -144,8 +143,8 @@ ${LANG('settings-language')}: ${language.name} (${language.code})
                     textAlign: 'center',
                 },
                 content: `
-<img alt="Klecks" height="25" src="${klecksLogoImg}"><br>
-<img alt="icon" height="20" style="vertical-align:middle" src="${bitbofLogoImg}"> <a href="https://bitbof.com" target="_blank" tabIndex="-1">bitbof</a> © 2022<br>`
+<img alt="Klecks" class="dark-invert" height="25" src="${klecksLogoImg}"><br>
+<img alt="icon" height="20" style="vertical-align:middle" src="${bitbofLogoImg}"> <a href="https://bitbof.com" target="_blank" tabIndex="-1">bitbof</a> © 2022<br>`,
             });
 
             versionEl.append(
@@ -157,7 +156,7 @@ ${LANG('settings-language')}: ${language.name} (${language.code})
                     custom: {
                         href: 'https://kleki.com/donate/',
                         target: '_blank',
-                    }
+                    },
                 }),
                 document.createTextNode(' | '),
                 BB.el({
@@ -166,7 +165,7 @@ ${LANG('settings-language')}: ${language.name} (${language.code})
                     custom: {
                         href: 'https://klecks.org',
                         target: '_blank',
-                    }
+                    },
                 }),
             );
 

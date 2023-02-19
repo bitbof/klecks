@@ -4,7 +4,7 @@ import {KlHistoryInterface} from '../../history/kl-history';
 import {LANG} from '../../../language/language';
 import {BrowserStorageUi} from './browser-storage-ui';
 import {ProjectStore} from '../../storage/project-store';
-import {IKlProject} from '../../kl.types';
+import {IKlProject} from '../../kl-types';
 
 
 const reminderTimelimitMs = 1000 * 60 * 20; // 20 minutes
@@ -29,7 +29,7 @@ export class SaveReminder {
 
         const min = Math.round((performance.now() - this.lastSavedAt) / 1000 / 60);
 
-        const contentEl = BB.el({});
+        const contentEl = BB.el();
 
         contentEl.append(
             BB.el({
@@ -42,7 +42,7 @@ export class SaveReminder {
                 ),
                 css: {
                     marginBottom: '20px',
-                }
+                },
             }),
         );
 
@@ -51,7 +51,7 @@ export class SaveReminder {
                 borderTop: '1px solid #aaa',
                 margin: '0 -20px',
                 padding: '20px',
-            }
+            },
         });
         const storageWrapper = BB.el({
             css: {
@@ -59,7 +59,7 @@ export class SaveReminder {
                 margin: '0 -20px',
                 padding: '20px',
                 paddingBottom: '0',
-            }
+            },
         });
         contentEl.append(psdWrapper, storageWrapper);
 
@@ -76,7 +76,7 @@ export class SaveReminder {
                 content: LANG('save-reminder-psd-layers'),
                 css: {
                     marginTop: '10px',
-                }
+                },
             }),
         );
 
@@ -105,9 +105,9 @@ export class SaveReminder {
                 this.closeFunc = null;
                 this.lastReminderShownAt = performance.now();
             },
-            closefunc: (f) => {
+            closeFunc: (f) => {
                 this.closeFunc = f;
-            }
+            },
         });
         setTimeout(() => {
             psdBtn.focus();
@@ -139,7 +139,7 @@ export class SaveReminder {
                     return;
                 }
 
-                let unsavedActions = Math.abs(this.history.getActionNumber() - this.lastSavedActionNumber);
+                const unsavedActions = Math.abs(this.history.getActionNumber() - this.lastSavedActionNumber);
 
                 if (
                     KL.dialogCounter.get() === 0 &&
@@ -153,27 +153,27 @@ export class SaveReminder {
         }
 
         // confirmation dialog when closing tab
-        function onBeforeUnload(e) {
+        function onBeforeUnload (e) {
             e.preventDefault();
             e.returnValue = '';
         }
 
         this.history.addListener(() => {
-            let actionNumber = this.history.getActionNumber();
+            const actionNumber = this.history.getActionNumber();
             if (this.lastSavedActionNumber !== actionNumber) {
-                BB.setEventListener(window, 'onbeforeunload', onBeforeUnload);
+                window.onbeforeunload =  onBeforeUnload;
             } else {
-                BB.setEventListener(window, 'onbeforeunload', null);
+                window.onbeforeunload = null;
             }
         });
 
         if (this.changeTitle) {
-            document.addEventListener("visibilitychange", () => {
+            document.addEventListener('visibilitychange', () => {
                 if (document.visibilityState === 'visible') {
                     document.title = this.title;
                     clearInterval(this.unsavedInterval);
                 } else {
-                    let actionNumber = this.history.getActionNumber();
+                    const actionNumber = this.history.getActionNumber();
                     if (this.lastSavedActionNumber !== actionNumber) {
                         document.title = LANG('unsaved') + ' - ' + this.title;
                         let state = 0;
@@ -199,7 +199,7 @@ export class SaveReminder {
         this.lastSavedActionNumber = this.history.getActionNumber();
         this.lastReminderShownAt = performance.now();
         this.lastSavedAt = performance.now();
-        BB.setEventListener(window, 'onbeforeunload', null);
+        window.onbeforeunload = null;
 
         if (this.closeFunc) {
             this.closeFunc();

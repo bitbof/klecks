@@ -1,48 +1,44 @@
 import {BB} from '../../../bb/bb';
 import {renderText} from '../../image-operations/render-text';
-import {ColorOptions} from '../base-components/color-options';
-import {Select} from '../base-components/select';
-import {ImageRadioList} from '../base-components/image-radio-list';
-import {ImageToggle} from '../base-components/image-toggle';
-import {KlSlider} from '../base-components/kl-slider';
-import {popup} from './popup';
-// @ts-ignore
-import alignLeftImg from 'url:~/src/app/img/ui/align-left.svg';
-// @ts-ignore
-import alignCenterImg from 'url:~/src/app/img/ui/align-center.svg';
-// @ts-ignore
-import alignRightImg from 'url:~/src/app/img/ui/align-right.svg';
-// @ts-ignore
-import typoItalicImg from 'url:~/src/app/img/ui/typo-italic.svg';
-// @ts-ignore
-import typoBoldImg from 'url:~/src/app/img/ui/typo-bold.svg';
-// @ts-ignore
-import toolZoomInImg from 'url:~/src/app/img/ui/tool-zoom-in.svg';
-// @ts-ignore
-import toolZoomOutImg from 'url:~/src/app/img/ui/tool-zoom-out.svg';
-import {IRGB} from '../../kl.types';
+import {ColorOptions} from '../components/color-options';
+import {Select} from '../components/select';
+import {ImageRadioList} from '../components/image-radio-list';
+import {ImageToggle} from '../components/image-toggle';
+import {KlSlider} from '../components/kl-slider';
+import {showModal} from './base/showModal';
+import alignLeftImg from '/src/app/img/ui/align-left.svg';
+import alignCenterImg from '/src/app/img/ui/align-center.svg';
+import alignRightImg from '/src/app/img/ui/align-right.svg';
+import typoItalicImg from '/src/app/img/ui/typo-italic.svg';
+import typoBoldImg from '/src/app/img/ui/typo-bold.svg';
+import toolZoomInImg from '/src/app/img/ui/tool-zoom-in.svg';
+import toolZoomOutImg from '/src/app/img/ui/tool-zoom-out.svg';
+import {IRGB} from '../../kl-types';
 import {KlCanvas} from '../../canvas/kl-canvas';
 import {LANG} from '../../../language/language';
+import {addIsDarkListener, removeIsDarkListener, throwIfNull} from '../../../bb/base/base';
+
+
+type TTextFormat = 'left' | 'center' | 'right';
+type TTextFont = 'serif' | 'monospace' | 'sans-serif' | 'cursive' | 'fantasy';
+
+export type TTextToolResult = {
+    x: number;
+    y: number;
+    textStr: string;
+    align: TTextFormat;
+    isItalic: boolean;
+    isBold: boolean;
+    color: IRGB;
+    size: number; // px
+    font: TTextFont;
+    opacity: number;
+};
 
 /**
  * Text Tool dialog
- *
- * confirmP = {
- *     x: number,
- *     y: number,
- *     textStr: string,
- *     align: 'left' | 'center' | 'right',
- *     isItalic: boolean,
- *     isBold: boolean,
- *     color: rgb,
- *     size: number, // px
- *     font: 'serif' | 'monospace' | 'sans-serif' | 'cursive' | 'fantasy',
- *     opacity: number, // 0 - 1
- * }
- *
- * @param p
  */
-export function textToolDialog(
+export function textToolDialog (
     p: {
         klCanvas: KlCanvas;
         layerIndex: number;
@@ -52,19 +48,19 @@ export function textToolDialog(
         color: IRGB;
         secondaryColor: IRGB;
         size: number; // px
-        align: 'left' | 'center' | 'right'; // default 'left'
+        align: TTextFormat; // default 'left'
         isBold: boolean; // default false
         isItalic: boolean; // default false
-        font: 'serif' | 'monospace' | 'sans-serif' | 'cursive' | 'fantasy'; // default sans-serif
-        opacity: number; // 0 - 1; default 1
-        onConfirm: (confirmP) => void;
+        font: TTextFont; // default sans-serif
+        opacity: number; // [0, 1] default 1
+        onConfirm: (confirmP: TTextToolResult) => void;
     }
-) {
+): void {
 
-    let div = BB.el({});
+    const div = BB.el();
 
-    let isSmallWidth = window.innerWidth < 550;
-    let isSmallHeight = window.innerHeight < 630;
+    const isSmallWidth = window.innerWidth < 550;
+    const isSmallHeight = window.innerHeight < 630;
 
     // --- preview ---
     // Text drawn on klCanvas-sized canvas: textCanvas
@@ -73,23 +69,23 @@ export function textToolDialog(
     // All layers and targetCanvas drawn on layersCanvas. transformed and size of final preview
     // Checkerboard, layersCanvas, and outline then drawn on previewCanvas
 
-    let width = isSmallWidth ? 340 : 540;
-    let height = isSmallWidth ? (isSmallHeight ? 210 : 260) : (isSmallHeight ? 230 : 350);
+    const width = isSmallWidth ? 340 : 540;
+    const height = isSmallWidth ? (isSmallHeight ? 210 : 260) : (isSmallHeight ? 230 : 350);
     let scale = 1;
 
-    let layerArr = p.klCanvas.getLayersFast();
-    let textCanvas = BB.canvas(p.klCanvas.getWidth(), p.klCanvas.getHeight());
-    let textCtx = textCanvas.getContext('2d');
-    let targetCanvas = BB.canvas(width, height);
-    let targetCtx = targetCanvas.getContext('2d');
-    let layersCanvas = BB.canvas(width, height);
-    let layersCtx = layersCanvas.getContext('2d');
-    let previewCanvas = BB.canvas(width, height); // the one that is visible
-    let previewCtx = previewCanvas.getContext('2d');
+    const layerArr = p.klCanvas.getLayersFast();
+    const textCanvas = BB.canvas(p.klCanvas.getWidth(), p.klCanvas.getHeight());
+    const textCtx = BB.ctx(textCanvas);
+    const targetCanvas = BB.canvas(width, height);
+    const targetCtx = BB.ctx(targetCanvas);
+    const layersCanvas = BB.canvas(width, height);
+    const layersCtx = BB.ctx(layersCanvas);
+    const previewCanvas = BB.canvas(width, height); // the one that is visible
+    const previewCtx = BB.ctx(previewCanvas);
     BB.css(previewCanvas, {
-        display: 'block'
+        display: 'block',
     });
-    let previewWrapper = BB.el({
+    const previewWrapper = BB.el({
         parent: div,
         css: {
             position: 'relative',
@@ -99,41 +95,42 @@ export function textToolDialog(
             colorScheme: 'only light',
             touchAction: 'none',
         },
-        onClick: function() {
-            textInput.focus();
-        }
+        onClick: () => textInput.focus(),
     });
     BB.el({ // inset shadow on preview
         parent: previewWrapper,
-        css: {
-            position: 'absolute',
-            left: '0',
-            top: '0',
-            right: '0',
-            bottom: '0',
-            boxShadow: 'rgba(0, 0, 0, 0.2) 0px 1px inset, rgba(0, 0, 0, 0.2) 0px -1px inset',
-            pointerEvents: 'none',
-        }
+        className: 'kl-text-preview-wrapper',
     });
-    previewWrapper.appendChild(previewCanvas);
-    let checkerPattern = previewCtx.createPattern(BB.createCheckerCanvas(8), 'repeat');
-    let emptyCanvas = BB.canvas(1, 1);
+    previewWrapper.append(previewCanvas);
+    let checkerPattern = throwIfNull(previewCtx.createPattern(BB.createCheckerCanvas(8, BB.isDark()), 'repeat'));
+    const emptyCanvas = BB.canvas(1, 1);
+    const emptyCanvasLight = BB.canvas(1, 1);
     {
-        let ctx = emptyCanvas.getContext('2d');
+        let ctx = BB.ctx(emptyCanvas);
+        ctx.fillRect(0, 0, 1, 1);
+
+        ctx = BB.ctx(emptyCanvasLight);
+        ctx.fillStyle = '#fff';
         ctx.fillRect(0, 0, 1, 1);
     }
 
-    function updatePreview() {
+    function updateCheckerboard (): void {
+        checkerPattern = throwIfNull(previewCtx.createPattern(BB.createCheckerCanvas(8, BB.isDark()), 'repeat'));
+        updatePreview();
+    }
+    addIsDarkListener(updateCheckerboard);
+
+    function updatePreview (): void {
 
         // try to draw very much like klCanvasWorkspace
 
         // --- draw text ---
         textCtx.clearRect(0, 0, textCanvas.width, textCanvas.height);
-        let colorRGBA = {
+        const colorRGBA = {
             ...p.color,
             a: opacitySlider.getValue(),
         };
-        let bounds = renderText(textCanvas, {
+        const bounds = renderText(textCanvas, {
             x: p.x,
             y: p.y,
             textStr: textInput.value,
@@ -143,7 +140,7 @@ export function textToolDialog(
             size: parseFloat(sizeInput.value),
             font: fontSelect.getValue(),
             color: BB.ColorConverter.toRgbaStr(colorRGBA),
-            angleRad: p.angleRad
+            angleRad: p.angleRad,
         });
 
 
@@ -151,13 +148,13 @@ export function textToolDialog(
         // text should always be visible
         bounds.width = Math.max(bounds.width, 1);
         bounds.height = Math.max(bounds.height, 1);
-        let rotatedXY = BB.rotate(bounds.x, bounds.y, -p.angleRad / Math.PI * 180);
-        let rotatedWH = BB.rotate(bounds.width, bounds.height, -p.angleRad / Math.PI * 180);
-        let centerX = p.x + rotatedXY.x + rotatedWH.x / 2;
-        let centerY = p.y + rotatedXY.y + rotatedWH.y / 2;
+        const rotatedXY = BB.rotate(bounds.x, bounds.y, -p.angleRad / Math.PI * 180);
+        const rotatedWH = BB.rotate(bounds.width, bounds.height, -p.angleRad / Math.PI * 180);
+        const centerX = p.x + rotatedXY.x + rotatedWH.x / 2;
+        const centerY = p.y + rotatedXY.y + rotatedWH.y / 2;
 
-        let padding = 100;
-        let fitBounds = BB.fitInto(bounds.width, bounds.height, width - padding, height - padding);
+        const padding = 100;
+        const fitBounds = BB.fitInto(bounds.width, bounds.height, width - padding, height - padding);
         scale = Math.min(1, fitBounds.width / bounds.width);
         scale = Math.min(4, scale * Math.pow(2, zoomFac));
 
@@ -180,11 +177,12 @@ export function textToolDialog(
         targetCtx.drawImage(textCanvas, -centerX, -centerY);
         targetCtx.restore();
 
+        const isDark = BB.isDark();
 
         // --- layers ---
         layersCtx.save();
 
-        layersCtx.fillStyle = 'rgb(158,158,158)';
+        layersCtx.fillStyle = isDark ? 'rgb(33,33,33)' : 'rgb(158,158,158)';
         layersCtx.fillRect(0, 0, width, height);
 
         { // bg
@@ -197,9 +195,9 @@ export function textToolDialog(
             layersCtx.imageSmoothingEnabled = false;
 
             //outline
-            let borderSize = 1 / scale;
-            layersCtx.globalAlpha = 0.2;
-            layersCtx.drawImage(emptyCanvas, -centerX - borderSize, -centerY - borderSize, textCanvas.width + borderSize * 2, textCanvas.height + borderSize * 2);
+            const borderSize = 1 / scale;
+            layersCtx.globalAlpha = isDark ? 0.25 : 0.2;
+            layersCtx.drawImage(isDark ? emptyCanvasLight : emptyCanvas, -centerX - borderSize, -centerY - borderSize, textCanvas.width + borderSize * 2, textCanvas.height + borderSize * 2);
             layersCtx.globalAlpha = 1;
 
             //erase
@@ -223,7 +221,7 @@ export function textToolDialog(
             layersCtx.translate(width / 2, height / 2);
             layersCtx.scale(scale, scale);
             layersCtx.rotate(p.angleRad);
-            for (var i = 0; i < p.layerIndex; i++) {
+            for (let i = 0; i < p.layerIndex; i++) {
                 if (layerArr[i].opacity > 0) {
                     layersCtx.globalAlpha = layerArr[i].opacity;
                     layersCtx.globalCompositeOperation = layerArr[i].mixModeStr;
@@ -281,77 +279,78 @@ export function textToolDialog(
 
     }
 
-    function move(x, y) {
-        let rotated = BB.rotate(x, y, -p.angleRad / Math.PI * 180);
+    addIsDarkListener(updatePreview);
+
+    /**
+     * Move text by x y
+     */
+    function move (x: number, y: number): void {
+        const rotated = BB.rotate(x, y, -p.angleRad / Math.PI * 180);
         p.x += rotated.x / scale;
         p.y += rotated.y / scale;
         updatePreview();
     }
 
-    let previewPointerListener = new BB.PointerListener({
+    const previewPointerListener = new BB.PointerListener({
         target: previewCanvas,
-        pointers: 1,
-        onPointer: function(e) {
+        onPointer: (e) => {
             if (e.type === 'pointermove' && e.button) {
                 e.eventPreventDefault();
                 move(-e.dX, -e.dY);
             }
         },
-        onWheel: function(e) {
+        onWheel: (e) => {
             changeZoomFac(-e.deltaY);
-        }
+        },
     });
 
-    const wheelPrevent = (event) => {
-        event.preventDefault();
-    }
-    BB.addEventListener(previewCanvas, 'wheel', wheelPrevent);
+    const wheelPrevent = (event: WheelEvent): void => event.preventDefault();
+    previewCanvas.addEventListener('wheel', wheelPrevent);
 
 
 
-    let row1 = BB.el({
+    const row1 = BB.el({
         parent: div,
         css: {
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center',
-            marginTop: '10px'
-        }
+            marginTop: '10px',
+        },
     });
-    let row2n3Wrapper = BB.el({
+    const row2n3Wrapper = BB.el({
         parent: div,
         css: isSmallWidth ? {} : {
             display: 'flex',
             alignItems: 'center',
-            justifyContent: 'space-between'
-        }
+            justifyContent: 'space-between',
+        },
     });
-    let row2 = BB.el({
+    const row2 = BB.el({
         parent: row2n3Wrapper,
         css: {
             display: 'flex',
             alignItems: 'center',
-            marginTop: '5px'
-        }
+            marginTop: '5px',
+        },
     });
-    let row3 = BB.el({
+    const row3 = BB.el({
         parent: row2n3Wrapper,
         css: {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
             marginTop: '5px',
-            width: isSmallWidth ? '' : '300px'
-        }
+            width: isSmallWidth ? '' : '300px',
+        },
     });
 
     // --- row 1 ---
 
     // color
-    let selectedRgbaObj = {r: 0, g: 0, b: 0, a: 1};
-    let colorOptionsArr = [
+    const colorOptionsArr = [
         {r: 0, g: 0, b: 0, a: 1},
-        {r: 255, g: 255, b: 255, a: 1}
+        {r: 255, g: 255, b: 255, a: 1},
     ];
     colorOptionsArr.unshift({
         r: p.secondaryColor.r,
@@ -366,67 +365,62 @@ export function textToolDialog(
         a: 1,
     });
 
-    let colorOptions = new ColorOptions({
+    const colorOptions = new ColorOptions({
         colorArr: colorOptionsArr,
         initialIndex: 0,
-        onChange: function(rgbaObj) {
+        onChange: (rgbaObj) => {
             p.color = rgbaObj;
             updatePreview();
-        }
+        },
     });
     colorOptions.getElement().title = LANG('text-color');
     colorOptions.getElement().style.marginLeft = '-5px';
-    row1.appendChild(colorOptions.getElement());
+    row1.append(colorOptions.getElement());
 
 
     let zoomFac = 0;
-    function changeZoomFac(d) {
+
+    function changeZoomFac (d: number): void {
         zoomFac = Math.min(2, Math.max(-2, zoomFac + d));
         updatePreview();
         zoomInBtn.disabled = !canZoom(1);
         zoomOutBtn.disabled = !canZoom(-1);
     }
-    function canZoom(d) {
+
+    function canZoom (d: number): boolean {
         return zoomFac !== Math.min(2, Math.max(-2, zoomFac + d));
     }
 
-    let zoomWrapper = BB.el({
+    const zoomWrapper = BB.el({
         parent: row1,
-        css: {
+    });
 
-        }
-    })
-
-    let zoomInBtn = BB.el({
+    const zoomInBtn = BB.el({
         parent: zoomWrapper,
         content: `<img height="20" src="${toolZoomInImg}">`,
         title: LANG('zoom-in'),
         tagName: 'button',
-        onClick: function() {
-            changeZoomFac(1);
-        },
+        onClick: () => changeZoomFac(1),
         css: {
-            fontWeight: 'bold'
-        }
+            fontWeight: 'bold',
+        },
     }) as HTMLButtonElement;
-    let zoomOutBtn = BB.el({
+    const zoomOutBtn = BB.el({
         parent: zoomWrapper,
         content: `<img height="20" src="${toolZoomOutImg}">`,
         title: LANG('zoom-out'),
         tagName: 'button',
-        onClick: function() {
-            changeZoomFac(-1);
-        },
+        onClick: () => changeZoomFac(-1),
         css: {
             fontWeight: 'bold',
-            marginLeft: '5px'
-        }
+            marginLeft: '5px',
+        },
     }) as HTMLButtonElement;
 
 
 
     // --- row 2 ---
-    let sizeInput = BB.el({
+    const sizeInput = BB.el({
         parent: row2,
         tagName: 'input',
         title: LANG('text-size'),
@@ -434,112 +428,103 @@ export function textToolDialog(
             type: 'number',
             min: 1,
             max: 10000,
-            value: p.size
+            value: p.size,
         },
         css: {
-            width: '60px'
+            width: '60px',
         },
-        onChange: function() {
+        onChange: () => {
             sizeInput.value = '' + Math.max(1, Math.min(10000, parseInt(sizeInput.value)));
             updatePreview();
-        }
+        },
     }) as HTMLInputElement;
-    let sizePointerListener = new BB.PointerListener({
+    const sizePointerListener = new BB.PointerListener({
         target: sizeInput,
-        onWheel: function(e) {
+        onWheel: (e) => {
             sizeInput.value = '' + Math.max(1, Math.min(1000, parseInt(sizeInput.value) - e.deltaY));
             updatePreview();
-        }
+        },
     });
 
-    let modeWrapper;
-    let fontSelect;
-    let fontPointerListener;
-    {
-        modeWrapper = BB.el({
-            css: {
-                fontSize: '15px',
-                marginLeft: '10px'
-            }
-        });
-        fontSelect = new Select({
-            isFocusable: true,
-            optionArr: [
-                ['sans-serif', 'Sans-serif'],
-                ['serif', 'Serif'],
-                ['monospace', 'Monospace'],
-                ['cursive', 'Cursive'],
-                ['fantasy', 'Fantasy'],
-            ],
-            initValue: p.font,
-            onChange: function(val) {
-                updatePreview();
-            },
-        });
 
-        modeWrapper.appendChild(fontSelect.getElement());
-        row2.appendChild(modeWrapper);
+    const modeWrapper = BB.el({
+        css: {
+            fontSize: '15px',
+            marginLeft: '10px',
+        },
+    });
 
-        fontPointerListener = new BB.PointerListener({
-            target: fontSelect.getElement(),
-            onWheel: function(e) {
-                fontSelect.setDeltaValue(e.deltaY);
-            }
-        });
+    const fontSelect = new Select<TTextFont>({
+        isFocusable: true,
+        optionArr: [
+            ['sans-serif', 'Sans-serif'],
+            ['serif', 'Serif'],
+            ['monospace', 'Monospace'],
+            ['cursive', 'Cursive'],
+            ['fantasy', 'Fantasy'],
+        ],
+        initValue: p.font,
+        onChange: () => updatePreview(),
+    });
 
-    }
+    modeWrapper.append(fontSelect.getElement());
+    row2.append(modeWrapper);
+
+    const fontPointerListener = new BB.PointerListener({
+        target: fontSelect.getElement(),
+        onWheel: (e) => fontSelect.setDeltaValue(e.deltaY),
+    });
 
 
     // --- row 3 ---
 
-    let alignRadioList = new ImageRadioList({
+    const alignRadioList = new ImageRadioList<TTextFormat>({
         optionArr: [
             {
                 id: 'left',
                 title: LANG('text-left'),
                 image: alignLeftImg,
+                darkInvert: true,
             },
             {
                 id: 'center',
                 title: LANG('text-center'),
                 image: alignCenterImg,
+                darkInvert: true,
             },
             {
                 id: 'right',
                 title: LANG('text-right'),
                 image: alignRightImg,
-            }
+                darkInvert: true,
+            },
         ],
         initId: p.align,
-        onChange: function(id) {
-            updatePreview();
-        }
+        onChange: () => updatePreview(),
     });
-    row3.appendChild(alignRadioList.getElement());
+    row3.append(alignRadioList.getElement());
 
-    let italicToggle = new ImageToggle({
+    const italicToggle = new ImageToggle({
         image: typoItalicImg,
         title: LANG('text-italic'),
         initValue: p.isItalic,
-        onChange: function(b) {
-            updatePreview();
-        }
+        onChange: () => updatePreview(),
+        darkInvert: true,
     });
-    row3.appendChild(italicToggle.getElement());
+    row3.append(italicToggle.getElement());
 
-    let boldToggle = new ImageToggle({
+    const boldToggle = new ImageToggle({
         image: typoBoldImg,
         title: LANG('text-bold'),
         initValue: p.isBold,
-        onChange: function(b) {
-            updatePreview();
-        }
+        onChange: () => updatePreview(),
+        darkInvert: true,
     });
-    row3.appendChild(boldToggle.getElement());
+    row3.append(boldToggle.getElement());
 
 
 
-    let opacitySlider = new KlSlider({
+    const opacitySlider = new KlSlider({
         label: LANG('opacity'),
         width: 150,
         height: 30,
@@ -550,15 +535,13 @@ export function textToolDialog(
         eventResMs: 1000 / 30,
         toValue: (displayValue) => displayValue / 100,
         toDisplayValue: (value) => value * 100,
-        onChange: function(v) {
-            updatePreview();
-        },
+        onChange: () => updatePreview(),
     });
-    row3.appendChild(opacitySlider.getElement());
+    row3.append(opacitySlider.getElement());
 
 
 
-    let textInput = BB.el({
+    const textInput = BB.el({
         parent: div,
         tagName: 'textarea',
         custom: {
@@ -571,20 +554,17 @@ export function textToolDialog(
             width: '100%',
             height: '70px',
             resize: 'vertical',
-            marginTop: '10px'
+            marginTop: '10px',
         },
-        onChange: function() {
-            updatePreview();
-        }
+        onChange: () => updatePreview(),
     }) as HTMLTextAreaElement;
     textInput.addEventListener('input', updatePreview);
-    setTimeout(function() {
+    setTimeout(() => {
         textInput.focus();
         textInput.select();
     });
-    let closefunc;
-    let keyListener = new BB.KeyListener({
-        onDown: function(keyStr, e, comboStr) {
+    const keyListener = new BB.KeyListener({
+        onDown: (keyStr) => {
             if (BB.isInputFocused(true)) {
                 return;
             }
@@ -600,26 +580,26 @@ export function textToolDialog(
             if (keyStr === 'down') {
                 move(0, 1);
             }
-        }
+        },
     });
 
     // prevent mobile keyboards scrolling page
-    function onScroll() {
+    function onScroll (): void {
         window.scrollTo(0, 0);
     }
     window.addEventListener('scroll', onScroll);
 
 
-    popup({
+    showModal({
         target: document.body,
         message: `<b>${LANG('text-title')}</b>`,
         div: div,
-        buttons: ["Ok", "Cancel"],
+        buttons: ['Ok', 'Cancel'],
         style: isSmallWidth ? {} : {
-            width: '500px'
+            width: '500px',
         },
-        callback: function(val) {
-            let result = {
+        callback: (val) => {
+            const result: TTextToolResult = {
                 x: p.x,
                 y: p.y,
                 textStr: textInput.value,
@@ -627,18 +607,19 @@ export function textToolDialog(
                 isItalic: italicToggle.getValue(),
                 isBold: boldToggle.getValue(),
                 color: p.color,
-                size: sizeInput.value,
+                size: Number(sizeInput.value),
                 font: fontSelect.getValue(),
                 opacity: opacitySlider.getValue(),
             };
 
+            removeIsDarkListener(updatePreview);
             window.removeEventListener('scroll', onScroll);
             textInput.removeEventListener('input', updatePreview);
             BB.destroyEl(textInput);
             previewPointerListener.destroy();
             sizePointerListener.destroy();
             fontPointerListener.destroy();
-            BB.removeEventListener(previewCanvas, 'wheel', wheelPrevent);
+            previewCanvas.removeEventListener('wheel', wheelPrevent);
             BB.destroyEl(previewWrapper);
             BB.destroyEl(zoomInBtn);
             BB.destroyEl(zoomOutBtn);
@@ -650,6 +631,7 @@ export function textToolDialog(
             italicToggle.destroy();
             boldToggle.destroy();
             opacitySlider.destroy();
+            removeIsDarkListener(updateCheckerboard);
             if (val === 'Ok') {
                 p.onConfirm(result);
             }
@@ -657,9 +639,6 @@ export function textToolDialog(
         autoFocus: false,
         clickOnEnter: 'Ok',
         ignoreBackground: true,
-        closefunc: function (func) {
-            closefunc = func;
-        },
     });
 
     updatePreview();

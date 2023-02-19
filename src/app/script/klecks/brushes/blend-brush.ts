@@ -1,7 +1,13 @@
 import {BB} from '../../bb/bb';
-import {IRGB, IRGBA} from '../kl.types';
-import {IBounds, IPressureInput} from '../../bb/bb.types';
-import {IHistoryEntry, KlHistoryInterface} from '../history/kl-history';
+import {IRGB, IRGBA} from '../kl-types';
+import {IBounds, IPressureInput} from '../../bb/bb-types';
+import {IHistoryEntry, KlHistoryInterface, THistoryInnerActions} from '../history/kl-history';
+import {clamp} from '../../bb/math/math';
+
+export interface IBlendBrushHistoryEntry extends IHistoryEntry {
+    tool: ['brush', 'BlendBrush'];
+    actions: THistoryInnerActions<BlendBrush>[];
+}
 
 const cellSize = 256;
 
@@ -17,15 +23,6 @@ interface IDrawBufferItem {
     r: number;
     g: number;
     b: number;
-}
-
-// faster than using BB.clamp somehow (in chrome)
-function clamp(num, min, max) {
-    return num <= min
-        ? min
-        : num >= max
-            ? max
-            : num
 }
 
 export class BlendBrush {
@@ -55,7 +52,7 @@ export class BlendBrush {
     private bezierLine: any; // todo type
 
     private history: KlHistoryInterface | null;
-    private historyEntry: IHistoryEntry;
+    private historyEntry: IBlendBrushHistoryEntry;
     private redrawBounds: IBounds;
     private cells: (ImageData | null)[];
     private drawBuffer: IDrawBufferItem[];
@@ -64,7 +61,7 @@ export class BlendBrush {
         this.redrawBounds = BB.updateBounds(this.redrawBounds, bounds);
     }
 
-    private getCellsWidth(): number {
+    private getCellsWidth (): number {
         return Math.ceil(this.context.canvas.width / cellSize);
     }
 
@@ -72,7 +69,7 @@ export class BlendBrush {
      * draw changed cells (changed by brushstroke) onto context
      * @private
      */
-    private drawChangedCells(): void {
+    private drawChangedCells (): void {
         const cells = this.cells.map(item => null);
         const touchedCells = this.getTouchedCells(this.redrawBounds);
         touchedCells.forEach((isTouched, index) => {
@@ -84,7 +81,7 @@ export class BlendBrush {
         this.redrawBounds = null;
     }
 
-    private getTouchedCells(bounds: IBounds): boolean[] {
+    private getTouchedCells (bounds: IBounds): boolean[] {
         const touchedCells = this.cells.map(item => false);
         const cellsW = this.getCellsWidth();
         bounds = {
@@ -106,7 +103,7 @@ export class BlendBrush {
      * @param bounds
      * @private
      */
-    private sliceBounds(bounds: IBounds): {index: number; bounds: IBounds}[] {
+    private sliceBounds (bounds: IBounds): {index: number; bounds: IBounds}[] {
         const cellsW = this.getCellsWidth();
         const result: {index: number; bounds: IBounds}[] = [];
         const touchedCells = this.getTouchedCells(bounds);
@@ -126,7 +123,7 @@ export class BlendBrush {
                 y1: Math.max(0, bounds.y1 - cellOffsetY),
                 x2: Math.min(cellWidth - 1, bounds.x2 - cellOffsetX),
                 y2: Math.min(cellHeight - 1, bounds.y2 - cellOffsetY),
-            }
+            };
             if (inCellBounds.x1 > inCellBounds.x2 || inCellBounds.y1 > inCellBounds.y2) {
                 return;
             }
@@ -142,7 +139,7 @@ export class BlendBrush {
     /**
      * update copyImageData. copy over new regions if needed
      */
-    private copyFromCanvas(bounds: IBounds) {
+    private copyFromCanvas (bounds: IBounds) {
         if (!bounds) {
             return;
         }
@@ -162,7 +159,7 @@ export class BlendBrush {
 
             // temp canvas to prevent main canvas from getting slowed down in chrome
             const tmpCanvas = BB.canvas(w, h);
-            const tmpCtx = tmpCanvas.getContext('2d');
+            const tmpCtx = BB.ctx(tmpCanvas);
             tmpCtx.drawImage(this.context.canvas, -x * cellSize, -y * cellSize);
 
             this.cells[i] = tmpCtx.getImageData(0, 0, w, h);
@@ -214,16 +211,16 @@ export class BlendBrush {
             r: ar,
             g: ag,
             b: ab,
-            a: aa
+            a: aa,
         };
     }
 
     private prepDot (x: number, y: number, size: number): IBounds {
         size = Math.max(0.5, size);
-        let x1 = Math.max(0, Math.floor(x - size));
-        let y1 = Math.max(0, Math.floor(y - size));
-        let x2 = Math.min(this.context.canvas.width - 1, Math.ceil(x + size));
-        let y2 = Math.min(this.context.canvas.height - 1, Math.ceil(y + size));
+        const x1 = Math.max(0, Math.floor(x - size));
+        const y1 = Math.max(0, Math.floor(y - size));
+        const x2 = Math.min(this.context.canvas.width - 1, Math.ceil(x + size));
+        const y2 = Math.min(this.context.canvas.height - 1, Math.ceil(y + size));
         if (x1 > x2 || y1 > y2) {
             return null;
         }
@@ -337,7 +334,7 @@ export class BlendBrush {
                         const underG = (params.g * alphaO) + ((data[e2 + 1] * alphaU) * invAlphaO);
                         const underB = (params.b * alphaO) + ((data[e2 + 2] * alphaU) * invAlphaO);
 
-                        let newAlpha = 1 - invAlphaO * (1 - alphaU);
+                        const newAlpha = 1 - invAlphaO * (1 - alphaU);
                         data[e2 + 3] = Math.floor(Math.min(255, newAlpha * 255) + 0.5);
                         if (newAlpha) {
                             data[e2] = Math.floor(underR / (newAlpha) + randArr[randI]);
@@ -357,7 +354,7 @@ export class BlendBrush {
         return BB.mix(
             (size * 2) / 2, // until size 5.3
             (size * 2) / 9, // at size 24
-            BB.clamp((size - 2.7) / (12 - 2.7), 0, 1)
+            clamp((size - 2.7) / (12 - 2.7), 0, 1)
         );
     }
 
@@ -369,7 +366,7 @@ export class BlendBrush {
         let localOpacity;
         let localSize = (this.settingSizePressure) ? Math.max(1, p * this.size) : Math.max(1, this.size);
 
-        let bdist = this.calcSpacing(localSize);
+        const bdist = this.calcSpacing(localSize);
 
         let avgX = x;
         let avgY = y;
@@ -431,7 +428,7 @@ export class BlendBrush {
             if (this.blending >= 1 && this.blendCol.a <= 0) {
                 return;
             }
-            let factor = val.t;
+            const factor = val.t;
             localPressure = this.lastInput2.pressure * (1 - factor) + p * factor;
             localOpacity = (this.settingOpacityPressure) ? (this.opacity * localPressure * localPressure) : this.opacity;
             localSize = (this.settingSizePressure) ? Math.max(0.1, localPressure * this.size) : Math.max(0.1, this.size);
@@ -460,7 +457,7 @@ export class BlendBrush {
                     r: BB.mix(this.color.r, this.mixr, this.blending),
                     g: BB.mix(this.color.g, this.mixg, this.blending),
                     b: BB.mix(this.color.b, this.mixb, this.blending),
-                })
+                });
             }
         };
 
@@ -549,8 +546,8 @@ export class BlendBrush {
 
     startLine (x: number, y: number, p: number): void {
         this.historyEntry = {
-            tool: ["brush", "BlendBrush"],
-            actions: []
+            tool: ['brush', 'BlendBrush'],
+            actions: [],
         };
 
 
@@ -560,8 +557,8 @@ export class BlendBrush {
         this.isDrawing = true;
 
         p = Math.max(0, Math.min(1, p));
-        let localOpacity = (this.settingOpacityPressure) ? (this.opacity * p * p) : this.opacity;
-        let localSize = (this.settingSizePressure) ? Math.max(0.1, p * this.size) : Math.max(0.1, this.size);
+        const localOpacity = (this.settingOpacityPressure) ? (this.opacity * p * p) : this.opacity;
+        const localSize = (this.settingSizePressure) ? Math.max(0.1, p * this.size) : Math.max(0.1, this.size);
         if (this.blending === 0) {
             this.mixr = this.color.r;
             this.mixg = this.color.g;
@@ -569,7 +566,7 @@ export class BlendBrush {
         } else {
             this.copyFromCanvas(this.prepDot(x, y, localSize));
 
-            let average = this.getAverage(
+            const average = this.getAverage(
                 x,
                 y,
                 ((this.settingSizePressure) ? Math.max(0.1, p * this.size) : Math.max(0.1, this.size))
@@ -616,7 +613,7 @@ export class BlendBrush {
                     r: BB.mix(this.color.r, this.mixr, this.blending),
                     g: BB.mix(this.color.g, this.mixg, this.blending),
                     b: BB.mix(this.color.b, this.mixb, this.blending),
-                })
+                });
             }
         }
 
@@ -670,7 +667,7 @@ export class BlendBrush {
 
         if (this.historyEntry && this.history && this.cells.find(item => !!item)) {
             this.historyEntry.actions.push({
-                action: "drawCells",
+                action: 'drawCells',
                 params: [this.cells],
             });
             this.history.push(this.historyEntry);
@@ -709,7 +706,7 @@ export class BlendBrush {
         this.drawBuffer = [];
 
         this.copyFromCanvas(this.prepDot(x1, y1, Math.max(0.1, this.size)));
-        let average = this.getAverage(x1, y1, Math.max(0.1, this.size));
+        const average = this.getAverage(x1, y1, Math.max(0.1, this.size));
 
         if (average.a === 0) {
             this.blendCol = {
@@ -757,7 +754,7 @@ export class BlendBrush {
                     r: BB.mix(this.color.r, this.mixr, this.blending),
                     g: BB.mix(this.color.g, this.mixg, this.blending),
                     b: BB.mix(this.color.b, this.mixb, this.blending),
-                })
+                });
             }
         }
         this.drawBuffer.forEach(item => {
@@ -768,9 +765,9 @@ export class BlendBrush {
         if (this.history && this.cells.find(item => !!item)) {
             this.drawCells(this.cells);
             this.historyEntry = {
-                tool: ["brush", "BlendBrush"],
+                tool: ['brush', 'BlendBrush'],
                 actions: [{
-                    action: "drawCells",
+                    action: 'drawCells',
                     params: [this.cells],
                 }],
             };

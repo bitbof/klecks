@@ -1,252 +1,252 @@
 import {BB} from '../../../bb/bb';
-import {KlSmallColorSlider} from '../base-components/kl-color-slider-small';
-import {KlSlider} from '../base-components/kl-slider';
-import {BrushSettingService} from '../../brushes-ui/brush-setting-service';
+import {KlColorSliderSmall} from './kl-color-slider-small';
+import {KlSlider} from './kl-slider';
+import {BrushSettingService, TBrushSettingEmit} from '../../brushes-ui/brush-setting-service';
 import {LANG} from '../../../language/language';
+import {IRGB} from '../../kl-types';
+import {IVector2D} from '../../../bb/bb-types';
 
 /**
  * Compressed HUD toolspace. When you hold ctrl+alt.
  * small color picker, brush settings
- *
- * @param p
- * @constructor
  */
-export function OverlayToolspace(
-    p: {
-        brushSettingService: BrushSettingService; // to sync with outside
-        enabledTest: () => boolean; // calls to see if it's allowed to show
-    }
-) {
+export class OverlayToolspace {
 
-    const sizeObj = {
-        width: 150,
-        svHeight: 90,
-        hHeight: 20,
-        sliderHeight: 25
-    };
+    private readonly rootEl: HTMLElement;
 
-    let isVisible = false;
-    const div = BB.el({
-        css: {
-            position: 'absolute',
-            left: '500px',
-            top: '500px',
-            background: 'rgb(221, 221, 221)',
-            display: 'none',
-            border: '1px solid #fff',
-            boxShadow: '0 0 10px rgba(0,0,0,0.5)',
-            colorScheme: 'only light',
+    // ---- public ----
+    constructor (
+        p: {
+            brushSettingService: BrushSettingService; // to sync with outside
+            enabledTest: () => boolean; // calls to see if it's allowed to show
         }
-    });
-    const queuedObj = {
-        color: null,
-        size: null,
-        opacity: null
-    };
-
-
-    // --- inputs ---
-
-    //color selection
-    const colorSlider = new KlSmallColorSlider({
-        width: sizeObj.width,
-        heightSV: sizeObj.svHeight,
-        heightH: sizeObj.hHeight,
-        color: p.brushSettingService.getColor(),
-        callback: function (rgbObj) {
-            selectedColorEl.style.backgroundColor = "rgb(" + rgbObj.r + "," + rgbObj.g + "," + rgbObj.b + ")";
-            p.brushSettingService.setColor(rgbObj, subscriptionFunc);
-        }
-    });
-    const selectedColorEl = BB.el({
-        css: {
-            width: sizeObj.width + 'px',
-            height: sizeObj.hHeight + 'px',
-            pointerEvents: 'none'
-        }
-    });
-    {
-        const initialColor = p.brushSettingService.getColor();
-        selectedColorEl.style.backgroundColor = "rgb(" + initialColor.r + "," + initialColor.g + "," + initialColor.b + ")";
-    }
-
-    div.appendChild(selectedColorEl);
-    div.appendChild(colorSlider.getElement());
-
-
-    function updateColor(rgbObj) {
-        colorSlider.setColor(rgbObj);
-        selectedColorEl.style.backgroundColor = "rgb(" + rgbObj.r + "," + rgbObj.g + "," + rgbObj.b + ")";
-    }
-
-
-
-
-
-    //brushsize slider
-
-    const sizeSlider = new KlSlider({
-        label: LANG('brush-size'),
-        width: sizeObj.width,
-        height: sizeObj.sliderHeight,
-        min: 0,
-        max: 500,
-        value: 50,
-        resolution: 225,
-        eventResMs: 1000 / 30,
-        toDisplayValue: (val) => val * 2,
-        toValue: (displayValue) => displayValue / 2,
-        onChange: function(v) {
-            p.brushSettingService.setSize(v);
-        },
-        formatFunc: (displayValue) => {
-            if (displayValue < 10) {
-                return BB.round(displayValue, 1);
-            } else {
-                return Math.round(displayValue);
-            }
-        },
-    });
-    BB.css(sizeSlider.getElement(), {
-        marginTop: '2px'
-    });
-    div.appendChild(sizeSlider.getElement());
-
-    const opacitySlider = new KlSlider({
-        label: LANG('opacity'),
-        width: sizeObj.width,
-        height: sizeObj.sliderHeight,
-        min: 0,
-        max: 1,
-        value: 1,
-        resolution: 225,
-        eventResMs: 1000 / 30,
-        toDisplayValue: (val) => val * 100,
-        toValue: (displayValue) => displayValue / 100,
-        onChange: function(v) {
-            p.brushSettingService.setOpacity(v);
-        },
-    });
-    BB.css(opacitySlider.getElement(), {
-        margin: '2px 0'
-    });
-    div.appendChild(opacitySlider.getElement());
-
-
-
-    // --- general setup ---
-
-    const subscriptionFunc = function(event) {
-        if (event.type === 'color') {
-            if (!isVisible) {
-                queuedObj.color = event.value;
-            } else {
-                updateColor(event.value);
-            }
-        }
-        if (event.type === 'size') {
-            if (!isVisible) {
-                queuedObj.size = event.value;
-            } else {
-                sizeSlider.setValue(event.value);
-            }
-        }
-        if (event.type === 'opacity') {
-            if (!isVisible) {
-                queuedObj.opacity = event.value;
-            } else {
-                opacitySlider.setValue(event.value);
-            }
-        }
-        if (event.type === 'sliderConfig') {
-            sizeSlider.update(event.value.sizeSlider);
-            opacitySlider.update(event.value.opacitySlider);
-        }
-    };
-    p.brushSettingService.subscribe(subscriptionFunc);
-    {
-        const sliderConfig = p.brushSettingService.getSliderConfig();
-        sizeSlider.update(sliderConfig.sizeSlider);
-        opacitySlider.update(sliderConfig.opacitySlider);
-        sizeSlider.setValue(p.brushSettingService.getSize());
-        opacitySlider.setValue(p.brushSettingService.getOpacity());
-    }
-
-    function updateUI() {
-
-        // unfocus manual slider input
-        BB.unfocusAnyInput();
-
-        div.style.display = isVisible ? 'block' : 'none';
-        if (isVisible && mousePos) {
-            div.style.left = (mousePos.x - Math.round(sizeObj.width / 2)) + 'px';
-            div.style.top = (mousePos.y - Math.round(sizeObj.svHeight + sizeObj.hHeight * 3 / 2)) + 'px';
-        }
-    }
-
-    let mousePos = null;
-    BB.addEventListener(document, 'pointermove', function(event) {
-        mousePos = {
-            x: event.pageX,
-            y: event.pageY,
+    ) {
+        const sizeObj = {
+            width: 150,
+            svHeight: 90,
+            hHeight: 20,
+            sliderHeight: 25,
         };
-    });
 
-    const keyListener = new BB.KeyListener({
-        onDown: function(keyStr, event, comboStr, isRepeat) {
-            if (isRepeat) {
-                return;
-            }
-            if (isVisible) {
-                isVisible = false;
-                updateUI();
-                return;
-            }
+        let isVisible = false;
+        this.rootEl = BB.el({
+            className: 'kl-overlay-toolspace',
+        });
+        const queuedObj: {
+            color: IRGB | null;
+            size: number | null;
+            opacity: number | null;
+        } = {
+            color: null,
+            size: null,
+            opacity: null,
+        };
 
-            if (!p.enabledTest() || !mousePos) {
-                return;
-            }
 
-            if (['ctrl+alt', 'cmd+alt', 'alt+ctrl', 'alt+cmd'].includes(comboStr)) {
-                event.preventDefault();
-                isVisible = true;
+        // --- inputs ---
 
-                if (queuedObj.color !== null) {
-                    updateColor(queuedObj.color);
-                    queuedObj.color = null;
-                }
-                if (queuedObj.size !== null) {
-                    sizeSlider.setValue(queuedObj.size);
-                    queuedObj.size = null;
-                }
-                if (queuedObj.opacity !== null) {
-                    opacitySlider.setValue(queuedObj.opacity);
-                    queuedObj.opacity = null;
-                }
-
-                updateUI();
-            }
-
-        },
-        onUp: function(keyStr, event, oldComboStr) {
-            if (['ctrl+alt', 'cmd+alt', 'alt+ctrl', 'alt+cmd'].includes(oldComboStr) && isVisible) {
-                isVisible = false;
-                colorSlider.end();
-                updateUI();
-            }
-        },
-        onBlur: function() {
-            if (isVisible) {
-                isVisible = false;
-                colorSlider.end();
-                updateUI();
-            }
+        //color selection
+        const colorEl = BB.el({
+            parent: this.rootEl,
+            className: 'kl-overlay-toolspace__color',
+        })
+        const colorSlider = new KlColorSliderSmall({
+            width: sizeObj.width,
+            heightSV: sizeObj.svHeight,
+            heightH: sizeObj.hHeight,
+            color: p.brushSettingService.getColor(),
+            callback: (rgbObj: IRGB) => {
+                selectedColorEl.style.backgroundColor = 'rgb(' + rgbObj.r + ',' + rgbObj.g + ',' + rgbObj.b + ')';
+                p.brushSettingService.setColor(rgbObj, subscriptionFunc);
+            },
+        });
+        const selectedColorEl = BB.el({
+            css: {
+                width: sizeObj.width + 'px',
+                height: sizeObj.hHeight + 'px',
+                pointerEvents: 'none',
+            },
+        });
+        {
+            const initialColor = p.brushSettingService.getColor();
+            selectedColorEl.style.backgroundColor = 'rgb(' + initialColor.r + ',' + initialColor.g + ',' + initialColor.b + ')';
         }
-    });
 
-    // --- interface ---
-    this.getElement = function() {
-        return div;
-    };
+        colorEl.append(selectedColorEl, colorSlider.getElement());
 
+
+        const updateColor = (rgbObj: IRGB) => {
+            colorSlider.setColor(rgbObj);
+            selectedColorEl.style.backgroundColor = 'rgb(' + rgbObj.r + ',' + rgbObj.g + ',' + rgbObj.b + ')';
+        };
+
+
+
+        //brushsize slider
+
+        const sizeSlider = new KlSlider({
+            label: LANG('brush-size'),
+            width: sizeObj.width,
+            height: sizeObj.sliderHeight,
+            min: 0,
+            max: 500,
+            value: 50,
+            resolution: 225,
+            eventResMs: 1000 / 30,
+            toDisplayValue: (val) => val * 2,
+            toValue: (displayValue) => displayValue / 2,
+            onChange: (v) => {
+                p.brushSettingService.setSize(v);
+            },
+            formatFunc: (displayValue) => {
+                if (displayValue < 10) {
+                    return BB.round(displayValue, 1);
+                } else {
+                    return Math.round(displayValue);
+                }
+            },
+        });
+        BB.css(sizeSlider.getElement(), {
+            marginTop: '2px',
+        });
+
+        const opacitySlider = new KlSlider({
+            label: LANG('opacity'),
+            width: sizeObj.width,
+            height: sizeObj.sliderHeight,
+            min: 0,
+            max: 1,
+            value: 1,
+            resolution: 225,
+            eventResMs: 1000 / 30,
+            toDisplayValue: (val) => val * 100,
+            toValue: (displayValue) => displayValue / 100,
+            onChange: (v) => {
+                p.brushSettingService.setOpacity(v);
+            },
+        });
+        BB.css(opacitySlider.getElement(), {
+            margin: '2px 0',
+        });
+        this.rootEl.append(sizeSlider.getElement(), opacitySlider.getElement());
+
+
+
+        // --- general setup ---
+
+        const subscriptionFunc = (event: TBrushSettingEmit) => {
+            if (event.type === 'color') {
+                if (!isVisible) {
+                    queuedObj.color = event.value;
+                } else {
+                    updateColor(event.value);
+                }
+            }
+            if (event.type === 'size') {
+                if (!isVisible) {
+                    queuedObj.size = event.value;
+                } else {
+                    sizeSlider.setValue(event.value);
+                }
+            }
+            if (event.type === 'opacity') {
+                if (!isVisible) {
+                    queuedObj.opacity = event.value;
+                } else {
+                    opacitySlider.setValue(event.value);
+                }
+            }
+            if (event.type === 'sliderConfig') {
+                sizeSlider.update(event.value.sizeSlider);
+                opacitySlider.update(event.value.opacitySlider);
+            }
+        };
+        p.brushSettingService.subscribe(subscriptionFunc);
+        {
+            const sliderConfig = p.brushSettingService.getSliderConfig();
+            sizeSlider.update(sliderConfig.sizeSlider);
+            opacitySlider.update(sliderConfig.opacitySlider);
+            sizeSlider.setValue(p.brushSettingService.getSize());
+            opacitySlider.setValue(p.brushSettingService.getOpacity());
+        }
+
+        const updateUI = () => {
+
+            // unfocus manual slider input
+            BB.unfocusAnyInput();
+
+            this.rootEl.style.display = isVisible ? 'block' : 'none';
+            if (isVisible && mousePos) {
+                BB.css(this.rootEl, {
+                    left: (mousePos.x - Math.round(sizeObj.width / 2)) + 'px',
+                    top: (mousePos.y - Math.round(sizeObj.svHeight + sizeObj.hHeight * 3 / 2)) + 'px',
+                });
+            }
+        };
+
+        let mousePos: IVector2D | null = null;
+        document.addEventListener('pointermove', (event) => {
+            mousePos = {
+                x: event.pageX,
+                y: event.pageY,
+            };
+        });
+
+        const keyListener = new BB.KeyListener({
+            onDown: (keyStr, event, comboStr, isRepeat) => {
+                if (isRepeat) {
+                    return;
+                }
+                if (isVisible) {
+                    isVisible = false;
+                    updateUI();
+                    return;
+                }
+
+                if (!p.enabledTest() || !mousePos) {
+                    return;
+                }
+
+                if (['ctrl+alt', 'cmd+alt', 'alt+ctrl', 'alt+cmd'].includes(comboStr)) {
+                    event.preventDefault();
+                    isVisible = true;
+
+                    if (queuedObj.color !== null) {
+                        updateColor(queuedObj.color);
+                        queuedObj.color = null;
+                    }
+                    if (queuedObj.size !== null) {
+                        sizeSlider.setValue(queuedObj.size);
+                        queuedObj.size = null;
+                    }
+                    if (queuedObj.opacity !== null) {
+                        opacitySlider.setValue(queuedObj.opacity);
+                        queuedObj.opacity = null;
+                    }
+
+                    updateUI();
+                }
+
+            },
+            onUp: (keyStr, event, oldComboStr) => {
+                if (['ctrl+alt', 'cmd+alt', 'alt+ctrl', 'alt+cmd'].includes(oldComboStr) && isVisible) {
+                    isVisible = false;
+                    colorSlider.end();
+                    updateUI();
+                }
+            },
+            onBlur: () => {
+                if (isVisible) {
+                    isVisible = false;
+                    colorSlider.end();
+                    updateUI();
+                }
+            },
+        });
+    }
+
+    // ---- interface ----
+    getElement (): HTMLElement {
+        return this.rootEl;
+    }
 }

@@ -1,6 +1,6 @@
 
 /**
- * Flood fill. Tried https://github.com/binarymax/floodfill.js/ but it implemented tolerance wrong, and had bugs.
+ * Flood fill. Tried https://github.com/binarymax/floodfill.js/, but it implemented tolerance wrong, and had bugs.
  * So, my own implementation. can handle tolerance, grow, opacity.
  * Needs to be optimized.
  */
@@ -15,7 +15,7 @@
  * @param x1 int >x0
  * @param y1 int >y0
  */
-function fillRect(data, width, x0, y0, x1, y1) {
+function fillRect (data: Uint8Array, width: number, x0: number, y0: number, x1: number, y1: number): void {
     for (let x = x0; x <= x1; x++) {
         for (let y = y0; y <= y1; y++) {
             if (data[y * width + x] === 255) {
@@ -37,14 +37,13 @@ let mx, my;
  * @param i int
  * @param dX int
  * @param dY int
- * @returns {null|*}
  */
-function moveIndex(width, height, i, dX, dY) {
+function moveIndex (width: number, height: number, i: number, dX: number, dY: number): (undefined | number) {
     mx = i % width + dX;
     my = Math.floor(i / width) + dY;
 
     if (mx < 0 || my < 0 || mx >= width || my >= height) {
-        return null;
+        return undefined;
     }
 
     return my * width + mx;
@@ -54,7 +53,7 @@ function moveIndex(width, height, i, dX, dY) {
  * If pixel can be filled (within tolerance) will be set 255 and returns true.
  * returns false if already filled, or i is null
  *
- * @param srcArr Uint8Array rgba
+ * @param srcArr Uint8ClampedArray rgba
  * @param targetArr Uint8Array
  * @param width int
  * @param height int
@@ -63,8 +62,16 @@ function moveIndex(width, height, i, dX, dY) {
  * @param i int - srcArr index
  * @returns {boolean}
  */
-function testAndFill(srcArr, targetArr, width, height, initRgba, tolerance, i) {
-    if (i === null || targetArr[i] === 255) {
+function testAndFill (
+    srcArr: Uint8ClampedArray,
+    targetArr: Uint8Array,
+    width: number,
+    height: number,
+    initRgba: [number, number, number, number],
+    tolerance: number,
+    i: number | undefined,
+): boolean {
+    if (i === undefined || targetArr[i] === 255) {
         return false;
     }
 
@@ -95,7 +102,7 @@ function testAndFill(srcArr, targetArr, width, height, initRgba, tolerance, i) {
 
 /**
  *
- * @param srcArr Uint8Array rgba
+ * @param srcArr Uint8ClampedArray rgba
  * @param targetArr Uint8Array
  * @param width int
  * @param height int
@@ -105,43 +112,53 @@ function testAndFill(srcArr, targetArr, width, height, initRgba, tolerance, i) {
  * @param grow int >= 0
  * @param isContiguous boolean
  */
-function floodFill(srcArr, targetArr, width, height, px, py, tolerance, grow, isContiguous) {
+function floodFill (
+    srcArr: Uint8ClampedArray,
+    targetArr: Uint8Array,
+    width: number,
+    height: number,
+    px: number,
+    py: number,
+    tolerance: number,
+    grow: number,
+    isContiguous: boolean,
+): void {
 
-    let initRgba = [
+    const initRgba: [number, number, number, number] = [
         srcArr[(py * width + px) * 4],
         srcArr[(py * width + px) * 4 + 1],
         srcArr[(py * width + px) * 4 + 2],
-        srcArr[(py * width + px) * 4 + 3]
+        srcArr[(py * width + px) * 4 + 3],
     ];
 
     if (isContiguous) {
-        let q = [];
+        const q: number[] = [];
         q.push(py * width + px);
         targetArr[py * width + px] = 255;
 
-        let i, e;
+        let i: number, e: number | undefined;
         while (q.length) {
-            i = q.pop();
+            i = q.pop() as number; // a test would slow down the code
 
             // queue up unfilled neighbors
             e = moveIndex(width, height, i, -1, 0); // left
-            testAndFill(srcArr, targetArr, width, height, initRgba, tolerance, e) && q.push(e);
+            // test will return false if e is undefined -> only numbers will be pushed to q
+            testAndFill(srcArr, targetArr, width, height, initRgba, tolerance, e) && q.push(e as number);
 
             e = moveIndex(width, height, i, 1, 0); // right
-            testAndFill(srcArr, targetArr, width, height, initRgba, tolerance, e) && q.push(e);
+            testAndFill(srcArr, targetArr, width, height, initRgba, tolerance, e) && q.push(e as number);
 
             e = moveIndex(width, height, i, 0, -1); // up
-            testAndFill(srcArr, targetArr, width, height, initRgba, tolerance, e) && q.push(e);
+            testAndFill(srcArr, targetArr, width, height, initRgba, tolerance, e) && q.push(e as number);
 
             e = moveIndex(width, height, i, 0, 1); // bottom
-            testAndFill(srcArr, targetArr, width, height, initRgba, tolerance, e) && q.push(e);
+            testAndFill(srcArr, targetArr, width, height, initRgba, tolerance, e) && q.push(e as number);
         }
     } else {
         for (let i = 0; i < width * height; i++) {
             testAndFill(srcArr, targetArr, width, height, initRgba, tolerance, i);
         }
     }
-
 
     // grow
     if (grow === 0) {
@@ -150,7 +167,7 @@ function floodFill(srcArr, targetArr, width, height, px, py, tolerance, grow, is
 
     // how does it grow? it finds all pixel at the edge.
     // then depending on what kind of edge it is, it draws a rectangle into target
-    // the rectangle has the value 254, or else it mess it all up.
+    // the rectangle has the value 254, or else it will mess it all up.
     // after it's all done, replaces it with 255
     let x0, x1, y0, y1;
     let l, tl, t, tr, r, br, b, bl; // left, top left, top, top right, etc.
@@ -190,18 +207,18 @@ function floodFill(srcArr, targetArr, width, height, px, py, tolerance, grow, is
                 x1 = x + grow;
             }
             if (r) { // right
-                x1 = Math.max(x1, x + 1 * grow);
+                x1 = Math.max(x1, x + grow);
             }
             if (r && br && b) { // bottom right
-                x1 = Math.max(x1, x + 1 * grow);
-                y1 = Math.max(y1, y + 1 * grow);
+                x1 = Math.max(x1, x + grow);
+                y1 = Math.max(y1, y + grow);
             }
             if (b) { // bottom
-                y1 = Math.max(y1, y + 1 * grow);
+                y1 = Math.max(y1, y + grow);
             }
             if (b && bl && l) { // bottom left
-                x0 = Math.min(x0, x - 1 * grow);
-                y1 = Math.max(y1, y + 1 * grow);
+                x0 = Math.min(x0, x - grow);
+                y1 = Math.max(y1, y + grow);
             }
 
             if (!l && !tl && !t && !tr && !r && !br && !b && !bl) {
@@ -229,12 +246,8 @@ function floodFill(srcArr, targetArr, width, height, px, py, tolerance, grow, is
 
 /**
  * Does flood fill, and returns that. an array - 0 not filled. 255 filled
- *
- * returns {
- *     data: Uint8Array
- * }
- *
- * @param rgbaArr Uint8Array rgba
+
+ * @param rgbaArr Uint8ClampedArray rgba
  * @param width int
  * @param height int
  * @param x int
@@ -242,17 +255,27 @@ function floodFill(srcArr, targetArr, width, height, px, py, tolerance, grow, is
  * @param tolerance int 0 - 255
  * @param grow int >= 0
  * @param isContiguous boolean
- * @returns {{data: Uint8Array}}
  */
-export function floodFillBits(rgbaArr, width, height, x, y, tolerance, grow, isContiguous) {
+export function floodFillBits (
+    rgbaArr: Uint8ClampedArray,
+    width: number,
+    height: number,
+    x: number,
+    y: number,
+    tolerance: number,
+    grow: number,
+    isContiguous: boolean,
+): {
+    data: Uint8Array;
+} {
     x = Math.round(x);
     y = Math.round(y);
 
-    let resultArr = new Uint8Array(new ArrayBuffer(width * height));
+    const resultArr = new Uint8Array(new ArrayBuffer(width * height));
 
     floodFill(rgbaArr, resultArr, width, height, x, y, tolerance, grow, isContiguous);
 
     return {
-        data: resultArr
-    }
+        data: resultArr,
+    };
 }

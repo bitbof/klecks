@@ -1,27 +1,26 @@
 import {BB} from '../../bb/bb';
-import {penPressureToggle} from '../ui/base-components/pen-pressure-toggle';
+import {createPenPressureToggle} from '../ui/components/create-pen-pressure-toggle';
 import {eventResMs} from './brushes-consts';
-import {Checkbox} from '../ui/base-components/checkbox';
+import {Checkbox} from '../ui/components/checkbox';
 import {brushes} from '../brushes/brushes';
 import {klHistory} from '../history/kl-history';
-import {KlSlider} from '../ui/base-components/kl-slider';
-// @ts-ignore
-import brushIconImg from 'url:~/src/app/img/ui/brush-blend.svg';
-import {IBrushUi} from '../kl.types';
+import {KlSlider} from '../ui/components/kl-slider';
+import brushIconImg from '/src/app/img/ui/brush-blend.svg';
+import {IBrushUi} from '../kl-types';
 import {LANG, languageStrings} from '../../language/language';
 
 export const blendBrushUi = (function () {
-    let brushInterface: IBrushUi = {
+    const brushInterface: IBrushUi = {
         image: brushIconImg,
         tooltip: LANG('brush-blend'),
         sizeSlider: {
             min: 0.5,
             max: 100,
-            curve: BB.quadraticSplineInput(0.5, 100, 0.1)
+            curve: BB.quadraticSplineInput(0.5, 100, 0.1),
         },
         opacitySlider: {
             min: 1 / 100,
-            max: 1
+            max: 1,
         },
         Ui: null,
     };
@@ -31,19 +30,19 @@ export const blendBrushUi = (function () {
     });
 
     brushInterface.Ui = function (p) {
-        let div = document.createElement("div"); // the gui
-        let brush = new brushes.BlendBrush();
+        const div = document.createElement('div'); // the gui
+        const brush = new brushes.BlendBrush();
         brush.setHistory(klHistory);
         p.onSizeChange(brush.getSize());
 
         let sizeSlider;
         let opacitySlider;
 
-        function setSize(size) {
+        function setSize (size) {
             brush.setSize(size);
         }
 
-        function init() {
+        function init () {
             sizeSlider = new KlSlider({
                 label: LANG('brush-size'),
                 width: 225,
@@ -76,7 +75,7 @@ export const blendBrushUi = (function () {
                     p.onOpacityChange(val);
                 },
             });
-            let blendingSlider = new KlSlider({
+            const blendingSlider = new KlSlider({
                 label: LANG('brush-blending'),
                 width: 225,
                 height: 30,
@@ -90,16 +89,16 @@ export const blendBrushUi = (function () {
                     brush.setBlending(val);
                 },
             });
-            blendingSlider.getElement().style.marginTop = "10px";
+            blendingSlider.getElement().style.marginTop = '10px';
 
-            let pressureSizeToggle = penPressureToggle(true, function (b) {
+            const pressureSizeToggle = createPenPressureToggle(true, function (b) {
                 brush.setSizePressure(b);
             });
-            let pressureOpacityToggle = penPressureToggle(false, function (b) {
+            const pressureOpacityToggle = createPenPressureToggle(false, function (b) {
                 brush.setOpacityPressure(b);
             });
 
-            let lockAlphaToggle = new Checkbox({
+            const lockAlphaToggle = new Checkbox({
                 init: brush.getLockAlpha(),
                 label: LANG('lock-alpha'),
                 callback: function (b) {
@@ -110,7 +109,7 @@ export const blendBrushUi = (function () {
                 css: {
                     marginTop: '10px',
                     display: 'inline-block',
-                }
+                },
             });
 
 
@@ -118,25 +117,25 @@ export const blendBrushUi = (function () {
                 BB.el({
                     content: [
                         sizeSlider.getElement(),
-                        pressureSizeToggle
+                        pressureSizeToggle,
                     ],
                     css: {
                         display: 'flex',
                         justifyContent: 'space-between',
                         alignItems: 'center',
                         marginBottom: '10px',
-                    }
+                    },
                 }),
                 BB.el({
                     content: [
                         opacitySlider.getElement(),
-                        pressureOpacityToggle
+                        pressureOpacityToggle,
                     ],
                     css: {
                         display: 'flex',
                         justifyContent: 'space-between',
                         alignItems: 'center',
-                    }
+                    },
                 }),
                 blendingSlider.getElement(),
                 lockAlphaToggle.getElement()
@@ -159,14 +158,14 @@ export const blendBrushUi = (function () {
         this.getSize = function () {
             return brush.getSize();
         };
-        this.setSize = function(size) {
+        this.setSize = function (size) {
             setSize(size);
             sizeSlider.setValue(size);
         };
         this.getOpacity = function () {
             return brush.getOpacity();
         };
-        this.setOpacity = function(opacity) {
+        this.setOpacity = function (opacity) {
             brush.setOpacity(opacity);
             opacitySlider.setValue(opacity);
         };

@@ -1,5 +1,5 @@
 import {BB} from '../../bb/bb';
-import {IRGB} from '../kl.types';
+import {IRGB} from '../kl-types';
 
 /**
  * Overlay for KlCanvasWorkspace.
@@ -8,18 +8,18 @@ import {IRGB} from '../kl.types';
  * - compass needle (rotation hud)
  */
 export class WorkspaceSvgOverlay {
-    private rootElement: SVGElement;
-    private brushCircleOuter: SVGElement;
-    private brushCircleInner: SVGElement;
-    private pickerPreviewBorder: SVGElement;
-    private pickerPreviewCol: SVGElement;
+    private readonly rootElement: SVGElement;
+    private readonly brushCircleOuter: SVGElement;
+    private readonly brushCircleInner: SVGElement;
+    private readonly pickerPreviewBorder: SVGElement;
+    private readonly pickerPreviewCol: SVGElement;
     private readonly compassSize: number;
-    private compass: SVGElement;
-    private compassInner: SVGElement;
-    private compassBaseCircle: SVGElement;
-    private compassLineCircle: SVGElement;
-    private compassUpperTriangle: SVGElement;
-    private compassLowerTriangle: SVGElement;
+    private readonly compass: SVGElement;
+    private readonly compassInner: SVGElement;
+    private readonly compassBaseCircle: SVGElement;
+    private readonly compassLineCircle: SVGElement;
+    private readonly compassUpperTriangle: SVGElement;
+    private readonly compassLowerTriangle: SVGElement;
 
     // ---- public ----
 
@@ -39,7 +39,7 @@ export class WorkspaceSvgOverlay {
             left: '0',
             top: '0',
             pointerEvents: 'none',
-            userSelect: 'none'
+            userSelect: 'none',
         });
 
         //brush circles
@@ -149,19 +149,19 @@ export class WorkspaceSvgOverlay {
         radius?: number;
         isVisible?: boolean;
     }): void {
-        if ('x' in p) {
+        if (p.x !== undefined) {
             this.brushCircleOuter.setAttribute('cx', '' + p.x);
             this.brushCircleInner.setAttribute('cx', '' + p.x);
         }
-        if ('y' in p) {
+        if (p.y !== undefined) {
             this.brushCircleOuter.setAttribute('cy', '' + p.y);
             this.brushCircleInner.setAttribute('cy', '' + p.y);
         }
-        if ('radius' in p) {
+        if (p.radius !== undefined) {
             this.brushCircleOuter.setAttribute('r', '' + Math.max(0, p.radius));
             this.brushCircleInner.setAttribute('r', '' + Math.max(0, p.radius - 1));
         }
-        if ('isVisible' in p) {
+        if (p.isVisible !== undefined) {
             this.brushCircleOuter.style.opacity = p.isVisible ? '1' : '0';
             this.brushCircleInner.style.opacity = p.isVisible ? '1' : '0';
         }
@@ -173,20 +173,20 @@ export class WorkspaceSvgOverlay {
         color?: IRGB;
         isVisible?: boolean;
     }): void {
-        if ('x' in p) {
+        if (p.x !== undefined) {
             this.pickerPreviewCol.setAttribute('cx', '' + p.x);
             this.pickerPreviewBorder.setAttribute('cx', '' + p.x);
         }
-        if ('y' in p) {
+        if (p.y !== undefined) {
             this.pickerPreviewCol.setAttribute('cy', '' + p.y);
             this.pickerPreviewBorder.setAttribute('cy', '' + p.y);
         }
-        if ('color' in p) {
+        if (p.color) {
             this.pickerPreviewCol.setAttribute('stroke', BB.ColorConverter.toRgbStr(p.color));
-            let borderColor = BB.testIsWhiteBestContrast(p.color) ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.5)'
+            const borderColor = BB.testIsWhiteBestContrast(p.color) ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.5)';
             this.pickerPreviewBorder.setAttribute('stroke', borderColor);
         }
-        if ('isVisible' in p) {
+        if (p.isVisible !== undefined) {
             this.pickerPreviewCol.style.opacity = p.isVisible ? '1' : '0';
             this.pickerPreviewBorder.style.opacity = p.isVisible ? '1' : '0';
         }
@@ -196,11 +196,11 @@ export class WorkspaceSvgOverlay {
         angleDeg?: number;
         isVisible?: boolean;
     }): void {
-        if ('angleDeg' in p) {
+        if (p.angleDeg !== undefined) {
             this.compassInner.setAttribute('transform', 'rotate(' + p.angleDeg + ')');
             this.compassLineCircle.style.opacity = p.angleDeg % 90 === 0 ? '1' : '0';
         }
-        if ('isVisible' in p) {
+        if (p.isVisible !== undefined) {
             this.compass.style.opacity = p.isVisible ? '1' : '0';
         }
     }

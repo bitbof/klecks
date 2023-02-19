@@ -1,7 +1,31 @@
-import {addEventListener, removeEventListener} from './event-listener';
+import {IKeyString} from '../bb-types';
+
+type TGlobalKey = {
+    add: (keyListenerRef: TKeyListenerRef) => void;
+    remove: (keyListenerRef: TKeyListenerRef) => void;
+    getIsDown: () => TIsDown;
+    getCombo: () => string[];
+}
+
+type TIsDown = {
+    [key: string]: boolean;
+};
+
+type TOnDown = (keyStr: string, e: KeyboardEvent, comboStr: string, isRepeat?: boolean) => void;
+type TOnUp = (keyStr: string, e: KeyboardEvent, oldComboStr: string) => void;
+type TOnBlur = () => void;
+type TKeyListenerRef = [
+    TOnDown | undefined,
+    TOnUp | undefined,
+    TOnBlur | undefined,
+];
 
 
-const globalKey = (() => {
+const globalKey = ((): TGlobalKey => {
+
+    // keyStr - our key naming system
+    // key - KeyboardEvent.key
+    // code - KeyboardEvent.code
 
     const keyStrToKeyObj = { // keyStr not to contain a '+', because that's used for the comboStr
         'space': [' ', 'Spacebar'], // Spacebar in IE
@@ -35,59 +59,71 @@ const globalKey = (() => {
         'up': 'ArrowUp',
         'down': 'ArrowDown',
         'home': 'Home',
-        'end': 'End'
+        'end': 'End',
     };
-    const keyToKeyStrArr = Object.keys(keyStrToKeyObj);
-    const isDownObj = {};
-    const keyToKeyStrObj = {}; // event.key to keyStr { ArrowLeft: 'left', ... }
-    let comboArr = [];
-    //a physical key's "key" can change as other keys get pressed. to keep track, need to also track the code
-    let codeIsDownObj = {}; // { KeyE: 'e', KeyF: null } - null not down, string, the associated keyStr
-    const listenerArr = [];
 
-    for (let i = 0; i < keyToKeyStrArr.length; i++) {
-        isDownObj[keyToKeyStrArr[i]] = false;
+    // ['space', 'alt', ... ]
+    const keyStrArr = Object.keys(keyStrToKeyObj);
 
-        const code = keyStrToKeyObj[keyToKeyStrArr[i]];
+    // { space: false, ... }
+    const isDownObj: TIsDown = Object.entries(keyStrToKeyObj).reduce((acc, [key]) => {
+        acc[key] = false;
+        return acc;
+    }, {} as TIsDown);
+
+    // event.key to keyStr
+    // { ArrowLeft: 'left', ... }
+    const keyToKeyStrObj = Object.entries(keyStrToKeyObj).reduce((acc, [key, code]) => {
         if (typeof code === 'string') {
-            keyToKeyStrObj[keyStrToKeyObj[keyToKeyStrArr[i]]] = keyToKeyStrArr[i];
+            acc[code] = key;
         } else {
-            for (let e = 0; e < code.length; e++) {
-                keyToKeyStrObj[code[e]] = keyToKeyStrArr[i];
-            }
+            code.forEach(item => {
+                acc[item] = key;
+            });
         }
-    }
+        return acc;
+    }, {} as IKeyString);
 
-    function emitDown(a, b, c, d?) {
+    let comboArr: string[] = [];
+
+    // a physical key's "key" can change as other keys get pressed. to keep track, need to also track the code
+    // { KeyE: 'e', KeyF: undefined } - undefined - not down, string - the associated keyStr
+    let codeIsDownObj: {
+        [key: string]: string | undefined;
+    } = {};
+    const listenerArr: TKeyListenerRef[] = [];
+
+
+    const emitDown: TOnDown = function (a, b, c, d?): void {
         listenerArr.forEach(item => {
             if (!item[0]) {
                 return;
             }
             item[0](a, b, c, d);
         });
-    }
+    };
 
-    function emitUp(a, b, c) {
+    const emitUp: TOnUp = function (a, b, c): void {
         listenerArr.forEach(item => {
             if (!item[1]) {
                 return;
             }
             item[1](a, b, c);
         });
-    }
+    };
 
-    function emitBlur() {
+    const emitBlur: TOnBlur = function (): void {
         listenerArr.forEach(item => {
             if (!item[2]) {
                 return;
             }
             item[2]();
         });
-    }
+    };
 
-    function keyDown(e) {
+    function keyDown (e: KeyboardEvent): void {
         const key = e.key;
-        const code = 'code' in e ? e.code : e.keyCode; // ie doesn't have code
+        const code = e.code;
 
         if (key in keyToKeyStrObj) {
             const keyStr = keyToKeyStrObj[key];
@@ -106,9 +142,8 @@ const globalKey = (() => {
     }
 
 
-    function keyUp(e) {
-        const key = e.key;
-        const code = 'code' in e ? e.code : e.keyCode; // ie doesn't have code
+    function keyUp (e: KeyboardEvent): void {
+        const code = e.code;
         const oldComboStr = comboArr.join('+');
 
         // because of a macOS bug: when meta key is down, keyup of other keys does not fire.
@@ -117,16 +152,16 @@ const globalKey = (() => {
             'Meta', 'MetaLeft', 'MetaRight',
             'OSLeft', 'OSRight', // Firefox
         ].includes(code)) {
-            blur(null);
+            blur();
             return;
         }
 
-        if (code in codeIsDownObj && codeIsDownObj[code] !== null) {
-            const keyStr = codeIsDownObj[code];
+        const keyStr = codeIsDownObj[code];
+        if (keyStr !== undefined) {
             isDownObj[keyStr] = false;
-            codeIsDownObj[code] = null;
+            codeIsDownObj[code] = undefined;
 
-            //remove from combo
+            // remove from combo
             for (let i = 0; i < comboArr.length; i++) {
                 if (comboArr[i] == keyStr) {
                     comboArr.splice(i, 1);
@@ -138,25 +173,25 @@ const globalKey = (() => {
         }
     }
 
-    function blur(event) {
+    function blur (): void {
         const oldComboStr = comboArr.join('+');
         comboArr = [];
         codeIsDownObj = {};
 
-        const eventArr = [];
-        for (let i = 0; i < keyToKeyStrArr.length; i++) {
-            if (isDownObj[keyToKeyStrArr[i]]) {
-                isDownObj[keyToKeyStrArr[i]] = false;
-                eventArr.push(keyToKeyStrArr[i]);
+        const eventArr: string[] = [];
+        keyStrArr.forEach(keyStr => {
+            if (isDownObj[keyStr]) {
+                isDownObj[keyStr] = false;
+                eventArr.push(keyStr);
             }
-        }
+        });
         for (let i = 0; i < eventArr.length; i++) {
             emitUp(
                 eventArr[i],
                 {
                     preventDefault: function () {},
                     stopPropagation: function () {},
-                },
+                } as KeyboardEvent,
                 oldComboStr,
             );
         }
@@ -166,42 +201,38 @@ const globalKey = (() => {
 
 
     return {
-        add: (keyListener) => {
-            if (listenerArr.includes(keyListener)) {
+        add: (keyListenerRef: TKeyListenerRef): void => {
+            if (listenerArr.includes(keyListenerRef)) {
                 return;
             }
             const first = listenerArr.length === 0;
-            listenerArr.push(keyListener);
+            listenerArr.push(keyListenerRef);
 
             if (first) {
-                addEventListener(document, 'keydown', keyDown);
-                addEventListener(document, 'keyup', keyUp);
-                addEventListener(window, 'blur', blur);
+                document.addEventListener('keydown', keyDown);
+                document.addEventListener('keyup', keyUp);
+                window.addEventListener('blur', blur);
             }
         },
-        remove: (keyListener) => {
-            if (!listenerArr.includes(keyListener)) {
+        remove: (keyListenerRef: TKeyListenerRef): void => {
+            if (!listenerArr.includes(keyListenerRef)) {
                 return;
             }
             const last = listenerArr.length === 1;
             for (let i = 0; i < listenerArr.length; i++) {
-                if (listenerArr[i] === keyListener) {
+                if (listenerArr[i] === keyListenerRef) {
                     listenerArr.splice(i, 1);
                     break;
                 }
             }
             if (last) {
-                removeEventListener(document, 'keydown', keyDown);
-                removeEventListener(document, 'keyup', keyUp);
-                removeEventListener(window, 'blur', blur);
+                document.removeEventListener('keydown', keyDown);
+                document.removeEventListener('keyup', keyUp);
+                window.removeEventListener('blur', blur);
             }
         },
-        getIsDown: () => {
-            return isDownObj;
-        },
-        getCombo: () => {
-            return comboArr;
-        },
+        getIsDown: (): TIsDown => isDownObj,
+        getCombo: (): string[] => comboArr,
     };
 })();
 
@@ -217,16 +248,16 @@ const globalKey = (() => {
  */
 export class KeyListener {
 
-    private readonly onDown;
-    private readonly onUp;
-    private readonly onBlur;
-    private readonly ref;
+    private readonly onDown: TOnDown | undefined;
+    private readonly onUp: TOnUp | undefined;
+    private readonly onBlur: TOnBlur | undefined;
+    private readonly ref: TKeyListenerRef;
 
     constructor (
         p: {
-            onDown?: (keyStr: string, e: KeyboardEvent, comboStr: string, isRepeat?: boolean) => void;
-            onUp?: (keyStr: string, e: KeyboardEvent, oldComboStr: string) => void;
-            onBlur?: () => void;
+            onDown?: TOnDown;
+            onUp?: TOnUp;
+            onBlur?: TOnBlur;
         },
     ) {
         this.onDown = p.onDown;
@@ -261,6 +292,9 @@ export class KeyListener {
     }
 }
 
-export function sameKeys(comboAStr: string, comboBStr: string): boolean {
-    return comboAStr.split('+').sort().join('+')=== comboBStr.split('+').sort().join('+');
+/**
+ * Test, are the same keys pressed. Order does not matter.
+ */
+export function sameKeys (comboAStr: string, comboBStr: string): boolean {
+    return comboAStr.split('+').sort().join('+') === comboBStr.split('+').sort().join('+');
 }

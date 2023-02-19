@@ -1,15 +1,16 @@
 import {BB} from '../../bb/bb';
-import {IFilterApply, IFilterGetDialogParam, IFilterGetDialogResult, IKlBasicLayer} from '../kl.types';
-import {input} from '../ui/base-components/input';
-import {KlSlider} from '../ui/base-components/kl-slider';
+import {IFilterApply, IFilterGetDialogParam, IFilterGetDialogResult, IKlBasicLayer} from '../kl-types';
+import {input} from '../ui/components/input';
+import {KlSlider} from '../ui/components/kl-slider';
 import {LANG} from '../../language/language';
 import {eventResMs} from './filters-consts';
 import {KlCanvasPreview} from '../canvas-ui/canvas-preview';
 import {TwoTabs} from '../ui/components/two-tabs';
-import {IVector2D} from '../../bb/bb.types';
+import {IVector2D} from '../../bb/bb-types';
+import {TFilterHistoryEntry} from './filters';
 
 
-interface IPatternSettings {
+export type TFilterPatternInput = {
     x: number;
     y: number;
     width: number;
@@ -17,7 +18,11 @@ interface IPatternSettings {
     blend?: number; // [0, 1] - 1 will blend linearly across whole length
     offsetX: number;
     offsetY: number;
-}
+};
+
+export type TFilterPatternHistoryEntry = TFilterHistoryEntry<
+    'pattern',
+    TFilterPatternInput>;
 
 /**
  * Draws pattern onto context. Pattern generated from context.
@@ -26,7 +31,7 @@ interface IPatternSettings {
  * @param context
  * @param settings
  */
-function drawPattern(context: CanvasRenderingContext2D, settings: IPatternSettings): void {
+function drawPattern (context: CanvasRenderingContext2D, settings: TFilterPatternInput): void {
 
     // keep bounds in center via offset
     // because blending done towards bottom right
@@ -39,7 +44,7 @@ function drawPattern(context: CanvasRenderingContext2D, settings: IPatternSettin
         // construct pattern via linear blending
 
         const blendCanvas = BB.canvas(settings.width * 2, settings.height * 2);
-        const blendCtx = blendCanvas.getContext('2d');
+        const blendCtx = BB.ctx(blendCanvas);
         const colTransparent = '#0000';
         const colOpaque = '#000';
 
@@ -111,10 +116,10 @@ function drawPattern(context: CanvasRenderingContext2D, settings: IPatternSettin
         blendCtx.restore();
 
         // transfer to pattern canvas
-        finalPatternCanvas.getContext('2d').drawImage(blendCanvas, 0, 0);
+        BB.ctx(finalPatternCanvas).drawImage(blendCanvas, 0, 0);
 
     } else {
-        finalPatternCanvas.getContext('2d').drawImage(
+        BB.ctx(finalPatternCanvas).drawImage(
             context.canvas,
             -settings.x,
             -settings.y,
@@ -134,7 +139,7 @@ function drawPattern(context: CanvasRenderingContext2D, settings: IPatternSettin
 
 export const filterPattern = {
 
-    getDialog(params: IFilterGetDialogParam) {
+    getDialog (params: IFilterGetDialogParam) {
 
         const isSmall = window.innerWidth < 550;
         const maxSize = 1024;
@@ -145,7 +150,7 @@ export const filterPattern = {
         const width = context.canvas.width;
         const height = context.canvas.height;
 
-        let settings: IPatternSettings = {
+        let settings: TFilterPatternInput = {
             x: 0,
             y: 0,
             width: width <= 250 ? Math.round(width / 4) : 200,
@@ -181,10 +186,10 @@ export const filterPattern = {
             min: 0,
             max: width,
             css: {width: '100%'},
-            callback: function(v) {
+            callback: function (v) {
                 settings.x = Number(v);
                 updatePreview();
-            }
+            },
         });
         const yInput = input({
             init: settings.y,
@@ -192,10 +197,10 @@ export const filterPattern = {
             min: 0,
             max: height,
             css: {width: '100%'},
-            callback: function(v) {
+            callback: function (v) {
                 settings.y = Number(v);
                 updatePreview();
-            }
+            },
         });
         const widthInput = input({
             init: settings.width,
@@ -203,10 +208,10 @@ export const filterPattern = {
             min: 1,
             max: Math.min(maxSize, width),
             css: {width: '100%'},
-            callback: function(v) {
+            callback: function (v) {
                 settings.width = Number(v);
                 updatePreview();
-            }
+            },
         });
         const heightInput = input({
             init: settings.height,
@@ -214,10 +219,10 @@ export const filterPattern = {
             min: 1,
             max: Math.min(maxSize, height),
             css: {width: '100%'},
-            callback: function(v) {
+            callback: function (v) {
                 settings.height = Number(v);
                 updatePreview();
-            }
+            },
         });
 
         const inputStyle = {
@@ -267,7 +272,7 @@ export const filterPattern = {
                css: {
                    display: 'flex',
                    marginLeft: '-5px',
-               }
+               },
             }),
         );
 
@@ -291,7 +296,7 @@ export const filterPattern = {
         });
         BB.css(blendSlider.getElement(), {
             margin: '10px 0',
-        })
+        });
 
         rootEl.append(
             blendSlider.getElement(),
@@ -325,20 +330,12 @@ export const filterPattern = {
         const previewFactor = w / context.canvas.width;
 
         const previewWrapper = BB.el({
+            className: 'kl-preview-wrapper',
             css: {
                 width: isSmall ? '340px' : '540px',
-                marginLeft: "-20px",
                 height: isSmall ? '260px' : '300px',
-                backgroundColor: "#9e9e9e",
-                boxShadow: "rgba(0, 0, 0, 0.2) 0px 1px inset, rgba(0, 0, 0, 0.2) 0px -1px inset",
-                overflow: "hidden",
-                position: "relative",
-                userSelect: 'none',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                colorScheme: 'only light',
-            }
+                marginTop: '0',
+            },
         });
 
         const previewLayer: IKlBasicLayer = {
@@ -373,12 +370,11 @@ export const filterPattern = {
         });
 
         const previewInnerWrapper = BB.el({
+            className: 'kl-preview-wrapper__canvas',
             css: {
-                position: 'relative',
-                boxShadow: '0 0 5px rgba(0,0,0,0.5)',
                 width: parseInt('' + w) + 'px',
-                height: parseInt('' + h) + 'px'
-            }
+                height: parseInt('' + h) + 'px',
+            },
         });
         previewInnerWrapper.append(
             klCanvasPreview.getElement(),
@@ -392,7 +388,7 @@ export const filterPattern = {
         const inputs: {
             start: IVector2D;
             end: IVector2D;
-            oldSettings: IPatternSettings;
+            oldSettings: TFilterPatternInput;
             state: null | 'move' | 'select';
         } = {
             start: null,
@@ -401,7 +397,7 @@ export const filterPattern = {
             state: null,
         };
 
-        function syncInputs(): void {
+        function syncInputs (): void {
             xInput.value = '' + settings.x;
             yInput.value = '' + settings.y;
             widthInput.value = '' + settings.width;
@@ -513,9 +509,9 @@ export const filterPattern = {
 
         // ---------- rendering ---------------------
         const fullSizeCanvas = BB.canvas(width, height);
-        const fullSizeCtx = fullSizeCanvas.getContext('2d');
+        const fullSizeCtx = BB.ctx(fullSizeCanvas);
 
-        function sharpStrokeRect(
+        function sharpStrokeRect (
             context: CanvasRenderingContext2D,
             x: number,
             y: number,
@@ -529,7 +525,7 @@ export const filterPattern = {
             context.strokeRect(drawX, drawY, drawWidth, drawHeight);
         }
 
-        function updatePreview(doForce?: boolean) {
+        function updatePreview (doForce?: boolean) {
             if (!doForce && lastDrawnSettings && JSON.stringify(lastDrawnSettings) === JSON.stringify(settings)) {
                 return;
             }
@@ -539,7 +535,7 @@ export const filterPattern = {
                 fullSizeCtx.drawImage(context.canvas, 0, 0);
 
                 const previewCanvas = previewLayer.image as HTMLCanvasElement;
-                const previewCtx = previewCanvas.getContext('2d');
+                const previewCtx = BB.ctx(previewCanvas);
                 previewCtx.save();
                 previewCtx.clearRect(0, 0, renderW, renderH);
                 previewCtx.drawImage(fullSizeCanvas, 0, 0, renderW, renderH);
@@ -548,7 +544,7 @@ export const filterPattern = {
                 const pW = settings.width * previewFactor;
                 const pH = settings.height * previewFactor;
 
-                const overlayCtx = overlayCanvas.getContext('2d');
+                const overlayCtx = BB.ctx(overlayCanvas);
                 overlayCtx.save();
                 overlayCtx.clearRect(0, 0, w, h);
                 overlayCtx.strokeStyle = '#fff';
@@ -579,7 +575,7 @@ export const filterPattern = {
                 drawPattern(fullSizeCtx, settings);
 
                 const previewCanvas = previewLayer.image as HTMLCanvasElement;
-                const previewCtx = previewCanvas.getContext('2d');
+                const previewCtx = BB.ctx(previewCanvas);
                 previewCtx.clearRect(0, 0, renderW, renderH);
                 previewCtx.drawImage(fullSizeCanvas, 0, 0, renderW, renderH);
             }
@@ -593,12 +589,13 @@ export const filterPattern = {
 
 
         // ----- result -------------------
-        const result: IFilterGetDialogResult = {
+        const result: IFilterGetDialogResult<TFilterPatternInput> = {
             element: rootEl,
-            destroy: () => {
+            destroy: (): void => {
                 blendSlider.destroy();
                 keyListener.destroy();
                 pointerListener.destroy();
+                klCanvasPreview.destroy();
             },
             getInput: () => BB.copyObj(settings),
         };
@@ -608,7 +605,7 @@ export const filterPattern = {
         return result;
     },
 
-    apply(params: IFilterApply) {
+    apply (params: IFilterApply<TFilterPatternInput>): boolean {
         const klCanvas = params.klCanvas;
         const ctx = params.context;
         const history = params.history;
@@ -621,13 +618,13 @@ export const filterPattern = {
 
         history.pause(false);
         history.push({
-            tool: ["filter", "pattern"],
-            action: "apply",
+            tool: ['filter', 'pattern'],
+            action: 'apply',
             params: [{
-                input: params.input
-            }]
-        });
+                input: params.input,
+            }],
+        } as TFilterPatternHistoryEntry);
         return true;
-    }
+    },
 
 };

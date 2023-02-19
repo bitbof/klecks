@@ -1,6 +1,10 @@
 import {BB} from '../../../bb/bb';
 import {klHistory} from '../../history/kl-history';
 import {LANG} from '../../../language/language';
+import {TKlCanvasLayer, TUiLayout} from '../../kl-types';
+import {ISize2D} from '../../../bb/bb-types';
+import {addIsDarkListener} from '../../../bb/base/base';
+
 
 /**
  * Previews currently active layer
@@ -10,373 +14,391 @@ import {LANG} from '../../../language/language';
  * but you need to update it when the active layer changed. (different canvas object)
  *
  * update visibility for performance
- *
- * p = {
- *     onClick: function() // when clicking on layer name
- *     klRootEl: klRootEl,
- * }
- *
- * @param p
- * @constructor
  */
-export function LayerPreview(p) {
+export class LayerPreview {
 
-    // internally redraws with in an interval. checks history is something changed
-    // this update will be animated
-    // it will not be animated if the resolution changed
-    // also redraws when you call updateLayer - not animated
+    private readonly rootEl: HTMLElement;
+    private readonly contentWrapperEl: HTMLElement;
+    private readonly height: number;
+    private layerObj: TKlCanvasLayer;
+    private isVisible: boolean;
+    private uiState: TUiLayout;
 
-    // syncs via updateLayer, and internally updates layer opacity via a hack
+    private readonly nameLabelEl: HTMLElement;
+    private readonly opacityEl: HTMLElement;
+    private lastDrawnSize: ISize2D;
+    private lastDrawnState: number; // from KlHistory
 
-    let div = BB.el({});
-    let layerObj;
-    let isVisible = true;
-    const height = 40;
-    const canvasSize = height - 10;
-    const largeCanvasSize = 300;
-    let lastDrawnState = -2;
-    let lastDrawnSize = {
-        width: 0,
-        height: 0
-    };
-    let animationCanvas = BB.canvas(); // to help animate the transition
-    let animationCanvasCtx = animationCanvas.getContext('2d');
-    const animationLength = 30;
-    let animationCount = 0; // >0 means it's animating
-    let largeCanvasIsVisible = false;
-    let largeCanvasAnimationTimeout;
-    const largeCanvasAnimationDurationMs = 300;
-    let uiState = 'right'; // 'left' | 'right'
+    private readonly canvasSize: number;
+    private readonly canvas: HTMLCanvasElement;
+    private readonly canvasCtx: CanvasRenderingContext2D;
+
+    private animationCount: number; // >0 means it's animating
+    private readonly animationLength: number;
+
+    private readonly animationCanvas: HTMLCanvasElement;
+    private readonly animationCanvasCtx: CanvasRenderingContext2D;
+    private animationCanvasCheckerPattern: CanvasPattern;
+
+    private largeCanvasIsVisible: boolean;
+    private readonly largeCanvasWrapper: HTMLElement;
+    private readonly largeCanvasSize: number;
+    private readonly largeCanvas: HTMLCanvasElement;
+    private readonly largeCanvasCtx: CanvasRenderingContext2D;
+    private largeCanvasCheckerPattern: CanvasPattern;
 
 
-    // --- setup dom ---
-    let contentWrapperEl = BB.el({
-        css: {
-            display: 'flex',
-            alignItems: 'center',
-            height: height + 'px',
-            color: '#666',
-        }
-    });
-    let canvasWrapperEl = BB.el({
-        css: {
-            //background: '#f00',
-            minWidth: height + 'px',
-            height: height + 'px',
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center'
-        }
-    });
-    let canvas = BB.canvas(canvasSize, canvasSize);
-    let canvasCtx = canvas.getContext('2d');
-    canvas.title = LANG('layers-active-layer');
-    BB.css(canvas, {
-        boxShadow: '0 0 0 1px #9e9e9e',
-        colorScheme: 'only light',
-    });
-    let nameWrapper = BB.el({
-        css: {
-            //background: '#ff0',
-            flexGrow: '1',
-            paddingLeft: '10px',
-            fontSize: '13px',
-            overflow: 'hidden',
-            position: 'relative'
-        }
-    });
-    let nameLabelEl = BB.el({
-        content: '',
-        css: {
-            cssFloat: 'left',
-            whiteSpace: 'nowrap'
-        }
-    });
-    let nameFadeEl = BB.el({
-        css: {
-            backgroundImage: 'linear-gradient(to right, rgba(221,221,221,0) 0%, rgba(221,221,221,0.8) 100%)',
-            position: 'absolute',
-            right: "0",
-            top: "0",
-            width: "50px",
-            height: '100%'
-        }
-    });
-    let clickableEl = BB.el({
-        css: {
-            //background: 'rgba(0,255,0,0.6)',
-            position: 'absolute',
-            left: "10px",
-            top: "0",
-            width: "90px",
-            height: '100%'
-        }
-    });
-    if (p.onClick) {
-        BB.addEventListener(clickableEl,'click', function() {
-            p.onClick();
-        });
-        BB.addEventListener(canvas,'click', function() {
-            p.onClick();
-        });
+    private updateCheckerPatterns (): void {
+        const checker = BB.createCheckerCanvas(4, BB.isDark());
+        this.animationCanvasCheckerPattern = this.animationCanvasCtx.createPattern(checker, 'repeat');
+        this.largeCanvasCheckerPattern = this.canvasCtx.createPattern(checker, 'repeat');
     }
-    let opacityEl = BB.el({
-        content: LANG('opacity') + '<br>100%',
-        css: {
-            minWidth: '60px',
-            fontSize: '12px',
-            textAlign: 'center',
-            background: '#dddddd',
-            color: '#555'
-        }
-    });
-
-    const largeCanvasWrapper = BB.el({
-        onClick: BB.handleClick,
-        css: {
-            pointerEvents: 'none',
-            background: '#fff',
-            position: 'absolute',
-            right: '280px',
-            top: '10px',
-            border: '1px solid #aaa',
-            boxShadow: '1px 1px 3px rgba(0,0,0,0.3)',
-            transition: 'opacity '+largeCanvasAnimationDurationMs+'ms ease-in-out',
-            userSelect: 'none',
-            display: 'block',
-            webkitTouchCallout: 'none',
-            colorScheme: 'only light',
-        }
-    });
-    let largeCanvas = BB.canvas(largeCanvasSize, largeCanvasSize);
-    largeCanvasWrapper.append(largeCanvas);
-    let largeCanvasCtx = largeCanvas.getContext('2d');
-    BB.css(largeCanvas, {
-        display: 'block',
-    });
-
-    div.appendChild(contentWrapperEl);
-    contentWrapperEl.appendChild(canvasWrapperEl);
-    canvasWrapperEl.appendChild(canvas);
-    contentWrapperEl.appendChild(nameWrapper);
-    nameWrapper.appendChild(nameLabelEl);
-    nameWrapper.appendChild(nameFadeEl);
-    nameWrapper.appendChild(clickableEl);
-    contentWrapperEl.appendChild(opacityEl);
-
-
-    let animationCanvasCheckerPattern = animationCanvasCtx.createPattern(BB.createCheckerCanvas(4), 'repeat');
-    let largeCanvasCheckerPattern = canvasCtx.createPattern(BB.createCheckerCanvas(4), 'repeat');
-
-
-
-    // --- update logic ---
-
-    // cross-fade done via 2 canvases (old and new state)
-    // both have checkerboard background drawn on them, both fully opaque
-    // -> no "lighter" is needed for accurate cross-fading
-
-    function animate() {
-        if (animationCount === 0) {
+    
+    private animate (): void {
+        if (this.animationCount === 0) {
             return;
         }
 
-        animationCount--;
+        this.animationCount--;
 
-        canvasCtx.save();
-        canvasCtx.globalAlpha = Math.pow((animationLength - animationCount) / animationLength, 2);
-        canvasCtx.drawImage(animationCanvas, 0, 0);
-        canvasCtx.restore();
+        this.canvasCtx.save();
+        this.canvasCtx.globalAlpha = Math.pow((this.animationLength - this.animationCount) / this.animationLength, 2);
+        this.canvasCtx.drawImage(this.animationCanvas, 0, 0);
+        this.canvasCtx.restore();
 
-        if (animationCount > 0) {
-            requestAnimationFrame(animate);
+        if (this.animationCount > 0) {
+            requestAnimationFrame(() => this.animate());
         }
     }
 
-    function draw(isInstant) {
+    /**
+     * is always instant
+     */
+    private drawLargeCanvas (): void {
 
-        if (!isVisible) {
+        if (!this.largeCanvasIsVisible || !this.layerObj) {
             return;
         }
 
-        nameLabelEl.textContent = layerObj.name;
-        opacityEl.innerHTML = LANG('opacity') + '<br>' + Math.round(layerObj.opacity * 100) + '%';
+        const layerCanvas = this.layerObj.context.canvas;
 
-        let layerCanvas = layerObj.context.canvas;
+        const canvasDimensions = BB.fitInto(layerCanvas.width, layerCanvas.height, this.largeCanvasSize, this.largeCanvasSize, 1);
+        this.largeCanvas.width = Math.round(canvasDimensions.width);
+        this.largeCanvas.height = Math.round(canvasDimensions.height);
+        this.largeCanvasCtx.save();
+        if (this.largeCanvas.width > layerCanvas.width) {
+            this.largeCanvasCtx.imageSmoothingEnabled = false;
+        } else {
+            this.largeCanvasCtx.imageSmoothingEnabled = true;
+            this.largeCanvasCtx.imageSmoothingQuality = 'high';
+        }
+        this.largeCanvasCtx.fillStyle = this.largeCanvasCheckerPattern;
+        this.largeCanvasCtx.fillRect(0, 0, this.largeCanvas.width, this.largeCanvas.height);
+        this.largeCanvasCtx.drawImage(layerCanvas, 0, 0, this.largeCanvas.width, this.largeCanvas.height);
+        this.largeCanvasCtx.restore();
 
-        if (layerCanvas.width !== lastDrawnSize.width || layerCanvas.height !== lastDrawnSize.height) {
-            let canvasDimensions = BB.fitInto(layerCanvas.width, layerCanvas.height, canvasSize, canvasSize, 1);
-            canvas.width = Math.round(canvasDimensions.width);
-            canvas.height = Math.round(canvasDimensions.height);
+        const bounds = this.rootEl.getBoundingClientRect();
+        BB.css(this.largeCanvasWrapper, {
+            top: Math.max(10, (bounds.top + this.height / 2 - this.largeCanvas.height / 2)) + 'px',
+        });
+
+    }
+
+    private draw (isInstant: boolean): void {
+        if (!this.isVisible) {
+            return;
+        }
+
+        this.nameLabelEl.textContent = this.layerObj.name;
+        this.opacityEl.innerHTML = LANG('opacity') + '<br>' + Math.round(this.layerObj.opacity * 100) + '%';
+
+        const layerCanvas = this.layerObj.context.canvas;
+
+        if (layerCanvas.width !== this.lastDrawnSize.width || layerCanvas.height !== this.lastDrawnSize.height) {
+            const canvasDimensions = BB.fitInto(layerCanvas.width, layerCanvas.height, this.canvasSize, this.canvasSize, 1);
+            this.canvas.width = Math.round(canvasDimensions.width);
+            this.canvas.height = Math.round(canvasDimensions.height);
 
             isInstant = true;
         }
 
-        animationCanvas.width = canvas.width;
-        animationCanvas.height = canvas.height;
+        this.animationCanvas.width = this.canvas.width;
+        this.animationCanvas.height = this.canvas.height;
 
-        animationCanvasCtx.save();
-        animationCanvasCtx.imageSmoothingEnabled = false;
-        animationCanvasCtx.fillStyle = animationCanvasCheckerPattern;
-        animationCanvasCtx.fillRect(0, 0, animationCanvas.width, animationCanvas.height);
-        animationCanvasCtx.drawImage(layerCanvas, 0, 0, animationCanvas.width, animationCanvas.height);
-        animationCanvasCtx.restore();
+        this.animationCanvasCtx.save();
+        this.animationCanvasCtx.imageSmoothingEnabled = false;
+        this.animationCanvasCtx.fillStyle = this.animationCanvasCheckerPattern;
+        this.animationCanvasCtx.fillRect(0, 0, this.animationCanvas.width, this.animationCanvas.height);
+        this.animationCanvasCtx.drawImage(layerCanvas, 0, 0, this.animationCanvas.width, this.animationCanvas.height);
+        this.animationCanvasCtx.restore();
 
         if (isInstant) {
-            animationCount = 0;
-            canvasCtx.save();
-            canvasCtx.drawImage(animationCanvas, 0, 0);
-            canvasCtx.restore();
+            this.animationCount = 0;
+            this.canvasCtx.save();
+            this.canvasCtx.drawImage(this.animationCanvas, 0, 0);
+            this.canvasCtx.restore();
 
         } else {
-            animationCount = animationLength;
-            animate();
+            this.animationCount = this.animationLength;
+            this.animate();
 
         }
 
-        drawLargeCanvas();
+        this.drawLargeCanvas();
 
-        lastDrawnState = klHistory.getState();
-        lastDrawnSize.width = layerCanvas.width;
-        lastDrawnSize.height = layerCanvas.height;
+        this.lastDrawnState = klHistory.getState();
+        this.lastDrawnSize.width = layerCanvas.width;
+        this.lastDrawnSize.height = layerCanvas.height;
     }
 
-    function update() {
-        draw(true);
-    }
 
-    setInterval(function() {
-
-        if (!layerObj) {
-            return;
+    // ---- public ----
+    constructor (
+        p: {
+            onClick: () => void; // when clicking on layer name
+            klRootEl: HTMLElement;
+            uiState: TUiLayout;
         }
+    ) {
+        // internally redraws with in an interval. checks history is something changed
+        // this update will be animated
+        // it will not be animated if the resolution changed
+        // also redraws when you call updateLayer - not animated
 
-        let currentState = klHistory.getState();
-        if (currentState === lastDrawnState) {
-            return;
+        // syncs via updateLayer, and internally updates layer opacity via a hack
+
+        this.rootEl = BB.el({
+            className: 'kl-layer-preview',
+        });
+        this.isVisible = true;
+        this.height = 40;
+        this.canvasSize = this.height - 10;
+        this.largeCanvasSize = 300;
+        this.lastDrawnState = -2;
+        this.lastDrawnSize = {
+            width: 0,
+            height: 0,
+        };
+        this.animationCanvas = BB.canvas(); // to help animate the transition
+        this.animationCanvasCtx = BB.ctx(this.animationCanvas);
+        this.animationLength = 30;
+        this.animationCount = 0;
+        this.largeCanvasIsVisible = false;
+        let largeCanvasAnimationTimeout: ReturnType<typeof setTimeout>;
+        const largeCanvasAnimationDurationMs = 300;
+        this.uiState = p.uiState;
+
+
+        // --- setup dom ---
+        this.contentWrapperEl = BB.el({
+            css: {
+                display: 'flex',
+                alignItems: 'center',
+                height: this.height + 'px',
+            },
+        });
+        const canvasWrapperEl = BB.el({
+            css: {
+                //background: '#f00',
+                minWidth: this.height + 'px',
+                height: this.height + 'px',
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+            },
+        });
+        this.canvas = BB.canvas(this.canvasSize, this.canvasSize);
+        this.canvasCtx = BB.ctx(this.canvas);
+        this.canvas.title = LANG('layers-active-layer');
+        const nameWrapper = BB.el({
+            css: {
+                //background: '#ff0',
+                flexGrow: '1',
+                paddingLeft: '10px',
+                fontSize: '13px',
+                overflow: 'hidden',
+                position: 'relative',
+            },
+        });
+        this.nameLabelEl = BB.el({
+            content: '',
+            css: {
+                cssFloat: 'left',
+                whiteSpace: 'nowrap',
+            },
+        });
+        const clickableEl = BB.el({
+            css: {
+                //background: 'rgba(0,255,0,0.6)',
+                position: 'absolute',
+                left: '10px',
+                top: '0',
+                width: '90px',
+                height: '100%',
+            },
+        });
+        if (p.onClick) {
+            clickableEl.addEventListener('click', () => {
+                p.onClick();
+            });
+            this.canvas.addEventListener('click', () => {
+                p.onClick();
+            });
         }
-
-        //update opacity w hack
-        layerObj.opacity = layerObj.context.canvas.opacity;
-
-        draw(false);
-
-    }, 2000);
-
-
-    //is always instant
-    function drawLargeCanvas() {
-
-        if (!largeCanvasIsVisible || !layerObj) {
-            return;
-        }
-
-        let layerCanvas = layerObj.context.canvas;
-
-        let canvasDimensions = BB.fitInto(layerCanvas.width, layerCanvas.height, largeCanvasSize, largeCanvasSize, 1);
-        largeCanvas.width = Math.round(canvasDimensions.width);
-        largeCanvas.height = Math.round(canvasDimensions.height);
-        largeCanvasCtx.save();
-        if (largeCanvas.width > layerCanvas.width) {
-            largeCanvasCtx.imageSmoothingEnabled = false;
-        } else {
-            largeCanvasCtx.imageSmoothingEnabled = true;
-            largeCanvasCtx.imageSmoothingQuality = 'high';
-        }
-        largeCanvasCtx.fillStyle = largeCanvasCheckerPattern;
-        largeCanvasCtx.fillRect(0, 0, largeCanvas.width, largeCanvas.height);
-        largeCanvasCtx.drawImage(layerCanvas, 0, 0, largeCanvas.width, largeCanvas.height);
-        largeCanvasCtx.restore();
-
-        const bounds = div.getBoundingClientRect();
-        BB.css(largeCanvasWrapper, {
-            top: Math.max(10, (bounds.top + height / 2 - largeCanvas.height / 2)) + "px"
+        this.opacityEl = BB.el({
+            content: LANG('opacity') + '<br>100%',
+            css: {
+                minWidth: '60px',
+                fontSize: '12px',
+                textAlign: 'center',
+            },
         });
 
+        this.largeCanvasWrapper = BB.el({
+            onClick: BB.handleClick,
+            css: {
+                pointerEvents: 'none',
+                background: '#fff',
+                position: 'absolute',
+                right: '280px',
+                top: '10px',
+                border: '1px solid #aaa',
+                boxShadow: '1px 1px 3px rgba(0,0,0,0.3)',
+                transition: 'opacity '+largeCanvasAnimationDurationMs+'ms ease-in-out',
+                userSelect: 'none',
+                display: 'block',
+                webkitTouchCallout: 'none',
+                colorScheme: 'only light',
+            },
+        });
+        this.largeCanvas = BB.canvas(this.largeCanvasSize, this.largeCanvasSize);
+        this.largeCanvasWrapper.append(this.largeCanvas);
+        this.largeCanvasCtx = BB.ctx(this.largeCanvas);
+        BB.css(this.largeCanvas, {
+            display: 'block',
+        });
+
+
+        canvasWrapperEl.append(this.canvas);
+        nameWrapper.append(this.nameLabelEl, clickableEl);
+        this.contentWrapperEl.append(canvasWrapperEl, nameWrapper, this.opacityEl);
+        this.rootEl.append(this.contentWrapperEl);
+
+
+        this.updateCheckerPatterns();
+        addIsDarkListener(() => {
+            this.updateCheckerPatterns();
+            this.draw(true);
+        });
+
+
+
+        // --- update logic ---
+
+        // cross-fade done via 2 canvases (old and new state)
+        // both have checkerboard background drawn on them, both fully opaque
+        // -> no "lighter" is needed for accurate cross-fading
+
+        setInterval(() => {
+
+            if (!this.layerObj) {
+                return;
+            }
+
+            const currentState = klHistory.getState();
+            if (currentState === this.lastDrawnState) {
+                return;
+            }
+
+            //update opacity w hack
+            this.layerObj.opacity = this.layerObj.context.canvas.opacity;
+
+            this.draw(false);
+
+        }, 2000);
+        
+
+        const removeLargeCanvas = () => {
+            try {
+                p.klRootEl.removeChild(this.largeCanvasWrapper);
+            } catch(e) {
+
+            }
+        };
+
+        const showLargeCanvas = (b) => {
+            if (this.largeCanvasIsVisible === b) {
+                return;
+            }
+
+            clearTimeout(largeCanvasAnimationTimeout);
+            this.largeCanvasIsVisible = b;
+
+            if (b) {
+                largeCanvasAnimationTimeout = setTimeout(() => {
+                    this.drawLargeCanvas();
+                    this.largeCanvasWrapper.style.opacity = '0';
+                    p.klRootEl.append(this.largeCanvasWrapper);
+                    setTimeout(() => {
+                        this.largeCanvasWrapper.style.opacity = '1';
+                    }, 20);
+                }, 250);
+
+            } else {
+                this.largeCanvasWrapper.style.opacity = '0';
+                largeCanvasAnimationTimeout = setTimeout(removeLargeCanvas, largeCanvasAnimationDurationMs + 20);
+            }
+
+        };
+
+        const pointerListener = new BB.PointerListener({
+            target: this.canvas,
+            onEnterLeave: (b) => {
+                showLargeCanvas(b);
+            },
+        });
     }
 
-    function removeLargeCanvas() {
-        try {
-            p.klRootEl.removeChild(largeCanvasWrapper);
-        } catch(e) {
+    // ---- interface ----
 
-        }
+    getElement (): HTMLElement {
+        return this.rootEl;
     }
 
-    function showLargeCanvas(b) {
-        if (largeCanvasIsVisible === b) {
+    setIsVisible (b: boolean): void {
+        if (this.isVisible === b) {
             return;
         }
+        this.isVisible = b;
+        this.contentWrapperEl.style.display = this.isVisible ? 'flex' : 'none';
+        this.rootEl.style.marginBottom = this.isVisible ? '' : '10px';
 
-        clearTimeout(largeCanvasAnimationTimeout);
-        largeCanvasIsVisible = b;
-
-        if (b) {
-            largeCanvasAnimationTimeout = setTimeout(function() {
-                drawLargeCanvas();
-                largeCanvasWrapper.style.opacity = '0';
-                p.klRootEl.appendChild(largeCanvasWrapper);
-                setTimeout(function() {
-                    largeCanvasWrapper.style.opacity = '1';
-                }, 20);
-            }, 250);
-
-        } else {
-            largeCanvasWrapper.style.opacity = '0';
-            largeCanvasAnimationTimeout = setTimeout(removeLargeCanvas, largeCanvasAnimationDurationMs + 20);
+        const currentState = klHistory.getState();
+        if (b && this.lastDrawnState !== currentState) {
+            this.draw(true);
         }
-
     }
-
-    let pointerListener = new BB.PointerListener({
-        target: canvas,
-        onEnterLeave: function(b) {
-            showLargeCanvas(b);
-        }
-    });
-
-
-
-    // --- interface ---
-
-    this.getElement = function() {
-        return div;
-    };
-
-    this.setIsVisible = function(b) {
-        if (isVisible === b) {
-            return;
-        }
-        isVisible = b;
-        contentWrapperEl.style.display = isVisible ? 'flex' : 'none';
-        div.style.marginBottom = isVisible ? '' : '10px';
-
-        let currentState = klHistory.getState();
-        if (b && lastDrawnState !== currentState) {
-            update();
-        }
-    };
 
     //when the layer might have changed
-    this.setLayer = function(klCanvasLayerObj) {
-        layerObj = klCanvasLayerObj;
-        update();
-    };
+         setLayer (klCanvasLayerObj: TKlCanvasLayer): void {
+        this.layerObj = klCanvasLayerObj;
+        this.draw(true);
+    }
 
-    this.setUiState = function(stateStr) {
-        uiState = '' + stateStr;
+    setUiState (stateStr: TUiLayout): void {
+        this.uiState = stateStr;
 
-        if (uiState === 'left') {
-            BB.css(largeCanvasWrapper, {
+        if (this.uiState === 'left') {
+            BB.css(this.largeCanvasWrapper, {
                 left: '280px',
-                right: ''
+                right: '',
             });
         } else {
-            BB.css(largeCanvasWrapper, {
+            BB.css(this.largeCanvasWrapper, {
                 left: '',
-                right: '280px'
+                right: '280px',
             });
         }
-    };
+    }
 
 }

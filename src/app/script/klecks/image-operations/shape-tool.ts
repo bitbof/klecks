@@ -1,67 +1,73 @@
 import {BB} from '../../bb/bb';
-import {IRGB, IShapeToolObject} from '../kl.types';
-
+import {IRGB, IShapeToolObject} from '../kl-types';
 
 /**
  * Input processor for shape tool.
  * Coordinates are in canvas space.
  * angleRad is the angle of the canvas.
- *
- * @param p - {onShape: func(isDone, x1, y1, x2, y2, angleRad)}
- * @constructor
  */
-export function ShapeTool(p) {
+export class ShapeTool {
 
-    let downX, downY, downAngleRad;
+    private readonly onShape: (isDone: boolean, x1: number, y1: number, x2: number, y2: number, angleRad: number) => void;
+    private downX: number = 0;
+    private downY: number = 0;
+    private downAngleRad: number = 0;
 
-    this.onDown = function(x, y, angleRad) {
-        downX = x;
-        downY = y;
-        downAngleRad = angleRad;
-    };
-
-    this.onMove = function(x, y) {
-        p.onShape(false, downX, downY, x, y, downAngleRad);
-    };
-
-    this.onUp = function(x, y) {
-        p.onShape(true, downX, downY, x, y, downAngleRad);
-    };
-}
-
-function applyDefaults(obj: any, defaults: any): void {
-    for (const property in defaults) {
-        if (!(property in obj)) {
-            obj[property] = defaults[property];
+    // ---- public ----
+    constructor (
+        p: {
+            onShape: (isDone: boolean, x1: number, y1: number, x2: number, y2: number, angleRad: number) => void;
         }
+    ) {
+        this.onShape = p.onShape;
+    }
+
+    onDown (x: number, y: number, angleRad: number): void {
+        this.downX = x;
+        this.downY = y;
+        this.downAngleRad = angleRad;
+    }
+
+    onMove (x: number, y: number): void {
+        this.onShape(false, this.downX, this.downY, x, y, this.downAngleRad);
+    }
+
+    onUp (x: number, y: number): void {
+        this.onShape(true, this.downX, this.downY, x, y, this.downAngleRad);
     }
 }
 
 /**
  * Draw a shape (rectangle, ellipse, line)
- *
- * @param ctx
- * @param shapeObj
  */
-export function drawShape(
+export function drawShape (
     ctx: CanvasRenderingContext2D,
     shapeObj: IShapeToolObject,
-) {
-    shapeObj = BB.copyObj(shapeObj);
-    applyDefaults(shapeObj, {
+): void {
+    shapeObj = {
+        // defaults
         angleRad: 0,
         isOutwards: false,
         opacity: 1,
         isEraser: false,
         doLockAlpha: false,
-    });
+
+        ...BB.copyObj(shapeObj),
+    };
 
     if (['rect', 'ellipse', 'line'].includes(shapeObj.type)) {
-        const lineWidth = Math.round(shapeObj.lineWidth);
+        if (shapeObj.angleRad === undefined) {
+            throw new Error('angleRad undefined');
+        }
+
+        const lineWidth = shapeObj.lineWidth === undefined ? -1 : Math.round(shapeObj.lineWidth);
         const angleDeg = shapeObj.angleRad * 180 / Math.PI;
 
         // --- prep color ---
-        let colorRGB: IRGB = shapeObj.isEraser ? {r: 255, g: 255, b: 255} : (shapeObj.fillRgb ? shapeObj.fillRgb : shapeObj.strokeRgb);
+        if (!shapeObj.isEraser && shapeObj.fillRgb === undefined && shapeObj.strokeRgb === undefined) {
+            throw new Error('fillRgb and strokeRgb undefined');
+        }
+        const colorRGB: IRGB = shapeObj.isEraser ? {r: 255, g: 255, b: 255} : (shapeObj.fillRgb ? shapeObj.fillRgb : shapeObj.strokeRgb!);
 
 
         // --- prep canvas ---
@@ -90,12 +96,12 @@ export function drawShape(
 
         // --- angle snapping ---
         if (shapeObj.isAngleSnap) {
-            let r1 = BB.rotate(x1, y1, shapeObj.angleRad / Math.PI * 180);
-            let r2 = BB.rotate(x2, y2, shapeObj.angleRad / Math.PI * 180);
+            const r1 = BB.rotate(x1, y1, shapeObj.angleRad / Math.PI * 180);
+            const r2 = BB.rotate(x2, y2, shapeObj.angleRad / Math.PI * 180);
 
-            let pAngleDeg = BB.pointsToAngleDeg(r1, r2) + 90;
-            let pAngleDegSnapped = Math.round(pAngleDeg / 45) * 45;
-            let rotated = BB.rotateAround({x: x1, y: y1}, {x: x2, y: y2}, pAngleDegSnapped - pAngleDeg);
+            const pAngleDeg = BB.pointsToAngleDeg(r1, r2) + 90;
+            const pAngleDegSnapped = Math.round(pAngleDeg / 45) * 45;
+            const rotated = BB.rotateAround({x: x1, y: y1}, {x: x2, y: y2}, pAngleDegSnapped - pAngleDeg);
             x2 = rotated.x;
             y2 = rotated.y;
 
@@ -119,8 +125,8 @@ export function drawShape(
             let r1 = BB.rotate(shapeObj.x1, shapeObj.y1, shapeObj.angleRad / Math.PI * 180);
             let r2 = BB.rotate(shapeObj.x2, shapeObj.y2, shapeObj.angleRad / Math.PI * 180);
 
-            let rx = r1.x;
-            let ry = r1.y;
+            const rx = r1.x;
+            const ry = r1.y;
             let rdX = r2.x - r1.x;
             let rdY = r2.y - r1.y;
 

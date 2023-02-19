@@ -63,3 +63,10 @@ body {
   background: black;
   padding-right: 5px;
 }
+
+// dark
+@media (prefers-color-scheme: dark) {
+  .upload-overlay {
+    background: #212121a1;
+  }
+}

@@ -17,18 +17,16 @@
     "lang:sync": "node src/languages/generate.js sync",
     "lang:build": "node src/languages/generate.js build"
   },
-  "devDependencies": {
-    "@parcel/transformer-glsl": "^2.7.0",
-    "@parcel/transformer-sass": "^2.7.0",
-    "buffer": "^6.0.3",
-    "file-saver": "^2.0.5"
-  },
+  "devDependencies": {},
   "dependencies": {
-    "@parcel/transformer-image": "^2.7.0",
-    "ag-psd": "^14.5.3",
-    "js-beautify": "^1.14.0",
-    "json5": "^1.0.1",
-    "mdn-polyfills": "^5.20.0",
-    "parcel": "^2.7.0"
+    "@parcel/transformer-glsl": "^2.8.2",
+    "@parcel/transformer-image": "^2.8.2",
+    "@parcel/transformer-sass": "^2.8.2",
+    "parcel": "^2.8.2",
+    "buffer": "^5.5.0",
+    "ag-psd": "^15.0.1",
+    "js-beautify": "^1.14.7",
+    "json5": "^2.2.2",
+    "mdn-polyfills": "^5.20.0"
   }
 }

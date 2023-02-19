@@ -1,31 +1,41 @@
 import {BB} from '../../bb/bb';
-import {KlSlider} from '../ui/base-components/kl-slider';
+import {KlSlider} from '../ui/components/kl-slider';
 import {eventResMs} from './filters-consts';
 import {KlCanvasPreview} from '../canvas-ui/canvas-preview';
-import {getSharedFx} from './shared-gl-fx';
-import {IFilterApply, IFilterGetDialogParam, IKlBasicLayer} from '../kl.types';
+import {getSharedFx} from '../../fx-canvas/shared-fx';
+import {IFilterApply, IFilterGetDialogParam, IFilterGetDialogResult, IKlBasicLayer} from '../kl-types';
 import {LANG} from '../../language/language';
+import {TFilterHistoryEntry} from './filters';
+
+export type TFilterBlurInput = {
+    radius: number;
+}
+
+export type TFilterBlurHistoryEntry = TFilterHistoryEntry<
+    'blur',
+    TFilterBlurInput>;
+
 
 export const filterBlur = {
 
-    getDialog(params: IFilterGetDialogParam) {
-        let klCanvas = params.klCanvas;
-        let context = params.context;
+    getDialog (params: IFilterGetDialogParam) {
+        const klCanvas = params.klCanvas;
+        const context = params.context;
         if (!klCanvas || !context) {
             return false;
         }
 
-        let layers = klCanvas.getLayers();
-        let selectedLayerIndex = klCanvas.getLayerIndex(context.canvas);
+        const layers = klCanvas.getLayers();
+        const selectedLayerIndex = klCanvas.getLayerIndex(context.canvas);
 
-        let fit = BB.fitInto(context.canvas.width, context.canvas.height, 280, 200, 1);
-        let displayW = parseInt('' + fit.width), displayH = parseInt('' + fit.height);
-        let w = Math.min(displayW, context.canvas.width);
-        let h = Math.min(displayH, context.canvas.height);
+        const fit = BB.fitInto(context.canvas.width, context.canvas.height, 280, 200, 1);
+        const displayW = parseInt('' + fit.width), displayH = parseInt('' + fit.height);
+        const w = Math.min(displayW, context.canvas.width);
+        const h = Math.min(displayH, context.canvas.height);
 
-        let tempCanvas = BB.canvas(w, h);
+        const tempCanvas = BB.canvas(w, h);
         {
-            const ctx = tempCanvas.getContext("2d");
+            const ctx = BB.ctx(tempCanvas);
             ctx.save();
             if (w > context.canvas.width) {
                 ctx.imageSmoothingEnabled = false;
@@ -33,26 +43,26 @@ export const filterBlur = {
             ctx.drawImage(context.canvas, 0, 0, w, h);
             ctx.restore();
         }
-        let previewFactor = w / context.canvas.width;
+        const previewFactor = w / context.canvas.width;
 
-        let div = document.createElement("div");
-        let result: any = {
-            element: div
+        const div = document.createElement('div');
+        const result: IFilterGetDialogResult<TFilterBlurInput> = {
+            element: div,
         };
 
 
-        function finishInit() {
+        function finishInit (): void {
             let radius = 10;
-            div.innerHTML = LANG('filter-triangle-blur-description') + "<br/><br/>";
+            div.innerHTML = LANG('filter-triangle-blur-description') + '<br/><br/>';
 
-            let glCanvas = getSharedFx();
-            if (!glCanvas) {
+            const fxCanvas = getSharedFx();
+            if (!fxCanvas) {
                 return; // todo throw?
             }
-            let texture = glCanvas.texture(tempCanvas);
-            glCanvas.draw(texture).update(); // update glCanvas size
+            const texture = fxCanvas.texture(tempCanvas);
+            fxCanvas.draw(texture).update(); // update fxCanvas size
 
-            let radiusSlider = new KlSlider({
+            const radiusSlider = new KlSlider({
                 label: LANG('radius'),
                 width: 300,
                 height: 30,
@@ -60,76 +70,67 @@ export const filterBlur = {
                 max: 200,
                 value: radius,
                 eventResMs: eventResMs,
-                onChange: function (val) {
+                onChange: (val): void => {
                     radius = val;
-                    glCanvas.draw(texture).triangleBlur(radius * previewFactor).update();
+                    fxCanvas.draw(texture).triangleBlur(radius * previewFactor).update();
                     klCanvasPreview.render();
                 },
             });
-            div.appendChild(radiusSlider.getElement());
+            div.append(radiusSlider.getElement());
 
 
-            let previewWrapper = document.createElement("div");
-            BB.css(previewWrapper, {
-                width: "340px",
-                marginLeft: "-20px",
-                height: "220px",
-                backgroundColor: "#9e9e9e",
-                marginTop: "10px",
-                boxShadow: "rgba(0, 0, 0, 0.2) 0px 1px inset, rgba(0, 0, 0, 0.2) 0px -1px inset",
-                overflow: "hidden",
-                position: "relative",
-                userSelect: 'none',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                colorScheme: 'only light',
+            const previewWrapper = BB.el({
+                className: 'kl-preview-wrapper',
+                css: {
+                    width: '340px',
+                    height: '220px',
+                },
             });
 
-            let previewLayerArr: IKlBasicLayer[] = [];
+            const previewLayerArr: IKlBasicLayer[] = [];
             {
                 for (let i = 0; i < layers.length; i++) {
                     previewLayerArr.push({
-                        image: i === selectedLayerIndex ? glCanvas : layers[i].context.canvas,
+                        image: i === selectedLayerIndex ? fxCanvas : layers[i].context.canvas,
                         opacity: layers[i].opacity,
-                        mixModeStr: layers[i].mixModeStr
+                        mixModeStr: layers[i].mixModeStr,
                     });
                 }
             }
-            let klCanvasPreview = new KlCanvasPreview({
+            const klCanvasPreview = new KlCanvasPreview({
                 width: parseInt('' + displayW),
                 height: parseInt('' + displayH),
-                layers: previewLayerArr
+                layers: previewLayerArr,
             });
 
-            let previewInnerWrapper = BB.el({
+            const previewInnerWrapper = BB.el({
+                className: 'kl-preview-wrapper__canvas',
                 css: {
-                    position: 'relative',
-                    boxShadow: '0 0 5px rgba(0,0,0,0.5)',
                     width: parseInt('' + displayW) + 'px',
-                    height: parseInt('' + displayH) + 'px'
-                }
+                    height: parseInt('' + displayH) + 'px',
+                },
             });
-            previewInnerWrapper.appendChild(klCanvasPreview.getElement());
-            previewWrapper.appendChild(previewInnerWrapper);
+            previewInnerWrapper.append(klCanvasPreview.getElement());
+            previewWrapper.append(previewInnerWrapper);
 
-            div.appendChild(previewWrapper);
+            div.append(previewWrapper);
 
             try {
-                glCanvas.draw(texture).triangleBlur(radius * previewFactor).update();
+                fxCanvas.draw(texture).triangleBlur(radius * previewFactor).update();
                 klCanvasPreview.render();
             } catch(e) {
                 (div as any).errorCallback(e);
             }
 
-            result.destroy = () => {
+            result.destroy = (): void => {
                 texture.destroy();
                 radiusSlider.destroy();
+                klCanvasPreview.destroy();
             };
-            result.getInput = function () {
+            result.getInput = function (): TFilterBlurInput {
                 result.destroy();
                 return {
-                    radius: radius
+                    radius: radius,
                 };
             };
         }
@@ -139,31 +140,32 @@ export const filterBlur = {
         return result;
     },
 
-    apply(params: IFilterApply) {
-        let context = params.context;
-        let history = params.history;
-        let radius = params.input.radius;
-        if (!context || !radius || !history)
+    apply (params: IFilterApply<TFilterBlurInput>): boolean {
+        const context = params.context;
+        const history = params.history;
+        const radius = params.input.radius;
+        if (!context || !radius || !history) {
             return false;
+        }
         history.pause(true);
-        let glCanvas = getSharedFx();
-        if (!glCanvas) {
+        const fxCanvas = getSharedFx();
+        if (!fxCanvas) {
             return false; // todo more specific error?
         }
-        let texture = glCanvas.texture(context.canvas);
-        glCanvas.draw(texture).triangleBlur(radius).update();
+        const texture = fxCanvas.texture(context.canvas);
+        fxCanvas.draw(texture).triangleBlur(radius).update();
         context.clearRect(0, 0, context.canvas.width, context.canvas.height);
-        context.drawImage(glCanvas, 0, 0);
+        context.drawImage(fxCanvas, 0, 0);
         texture.destroy();
         history.pause(false);
         history.push({
-            tool: ["filter", "blur"],
-            action: "apply",
+            tool: ['filter', 'blur'],
+            action: 'apply',
             params: [{
-                input: params.input
-            }]
-        });
+                input: params.input,
+            }],
+        } as TFilterBlurHistoryEntry);
         return true;
-    }
+    },
 
 };

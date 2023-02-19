@@ -1,37 +1,43 @@
 import {BB} from '../../bb/bb';
-import {Checkbox} from '../ui/base-components/checkbox';
+import {Checkbox} from '../ui/components/checkbox';
 import {KlCanvasPreview} from '../canvas-ui/canvas-preview';
-import {FreeTransform, ITransform} from '../ui/components/free-transform';
-import {Select} from '../ui/base-components/select';
-import {IFilterApply, IFilterGetDialogParam, IKlBasicLayer} from '../kl.types';
+import {FreeTransform} from '../ui/components/free-transform';
+import {IFreeTransform} from '../ui/components/free-transform-utils';
+import {Select} from '../ui/components/select';
+import {IFilterApply, IFilterGetDialogParam, IFilterGetDialogResult, IKlBasicLayer} from '../kl-types';
 import {LANG} from '../../language/language';
-import {IRect} from '../../bb/bb.types';
+import {IRect} from '../../bb/bb-types';
+import {TFilterHistoryEntry} from './filters';
 
-interface IFilterTransformInput {
-    bounds: {x: number, y: number, width: number, height: number};
-    transform: ITransform;
+export type TFilterTransformInput = {
+    bounds: {x: number; y: number; width: number; height: number};
+    transform: IFreeTransform;
     isPixelated: boolean;
-}
+};
+
+export type TFilterTransformHistoryEntry = TFilterHistoryEntry<
+    'transform',
+    TFilterTransformInput>;
 
 export const filterTransform = {
 
-    getDialog(params: IFilterGetDialogParam) {
-        let context = params.context;
-        let klCanvas = params.klCanvas;
+    getDialog (params: IFilterGetDialogParam) {
+        const context = params.context;
+        const klCanvas = params.klCanvas;
         if (!context || !klCanvas) {
             return false;
         }
 
-        let isSmall = window.innerWidth < 550;
-        let layers = klCanvas.getLayers();
-        let selectedLayerIndex = klCanvas.getLayerIndex(context.canvas);
+        const isSmall = window.innerWidth < 550;
+        const layers = klCanvas.getLayers();
+        const selectedLayerIndex = klCanvas.getLayerIndex(context.canvas);
 
-        let fit = BB.fitInto(context.canvas.width, context.canvas.height, isSmall ? 280 : 490, isSmall ? 200 : 240, 1);
-        let displayW = parseInt('' + fit.width), displayH = parseInt('' + fit.height);
-        let w = Math.min(displayW, context.canvas.width);
-        let h = Math.min(displayH, context.canvas.height);
+        const fit = BB.fitInto(context.canvas.width, context.canvas.height, isSmall ? 280 : 490, isSmall ? 200 : 240, 1);
+        const displayW = parseInt('' + fit.width), displayH = parseInt('' + fit.height);
+        const w = Math.min(displayW, context.canvas.width);
+        const h = Math.min(displayH, context.canvas.height);
         let freeTransform: FreeTransform;
-        let displayPreviewFactor = displayW / context.canvas.width;
+        const displayPreviewFactor = displayW / context.canvas.width;
 
         // determine bounds and initial transformation
         const boundsObj: IRect = BB.canvasBounds(context);
@@ -48,17 +54,17 @@ export const filterTransform = {
         };
 
 
-        let div = document.createElement("div");
-        let result: any = {
-            element: div
+        const div = document.createElement('div');
+        const result: IFilterGetDialogResult<TFilterTransformInput> = {
+            element: div,
         };
         if (!isSmall) {
             result.width = 500;
         }
         div.innerHTML = LANG('filter-transform-description');
 
-        let keyListener = new BB.KeyListener({
-            onDown: function(keyStr) {
+        const keyListener = new BB.KeyListener({
+            onDown: function (keyStr) {
                 if (BB.isInputFocused(true)) {
                     return;
                 }
@@ -79,31 +85,31 @@ export const filterTransform = {
                     inputY.value = '' + (parseFloat(inputY.value) + 1);
                     onInputsChanged();
                 }
-            }
+            },
 
         });
 
-        let leftWrapper = document.createElement("div");
-        let rightWrapper = document.createElement("div");
-        let rotWrapper = document.createElement("div");
-        let inputY = document.createElement("input");
-        let inputX = document.createElement("input");
-        let inputR = document.createElement("input");
-        leftWrapper.style.width = "100px";
-        leftWrapper.style.height = "30px";
-        rightWrapper.style.width = "100px";
-        rightWrapper.style.height = "30px";
-        rightWrapper.style.display = "inline-block";
-        leftWrapper.style.display = "inline-block";
-        rotWrapper.style.display = "inline-block";
-        rotWrapper.style.width = "150px";
-        rotWrapper.style.height = "30px";
-        inputY.type = "number";
-        inputX.type = "number";
-        inputR.type = "number";
-        inputX.style.width = 70 + "px";
-        inputY.style.width = 70 + "px";
-        inputR.style.width = 70 + "px";
+        const leftWrapper = document.createElement('div');
+        const rightWrapper = document.createElement('div');
+        const rotWrapper = document.createElement('div');
+        const inputY = document.createElement('input');
+        const inputX = document.createElement('input');
+        const inputR = document.createElement('input');
+        leftWrapper.style.width = '100px';
+        leftWrapper.style.height = '30px';
+        rightWrapper.style.width = '100px';
+        rightWrapper.style.height = '30px';
+        rightWrapper.style.display = 'inline-block';
+        leftWrapper.style.display = 'inline-block';
+        rotWrapper.style.display = 'inline-block';
+        rotWrapper.style.width = '150px';
+        rotWrapper.style.height = '30px';
+        inputY.type = 'number';
+        inputX.type = 'number';
+        inputR.type = 'number';
+        inputX.style.width = 70 + 'px';
+        inputY.style.width = 70 + 'px';
+        inputR.style.width = 70 + 'px';
         inputY.value = '0';
         inputX.value = '0';
         inputR.value = '0';
@@ -137,15 +143,15 @@ export const filterTransform = {
         inputR.onkeyup = function () {
             onInputsChanged();
         };
-        leftWrapper.append("X: ", inputX);
-        rightWrapper.append("Y: ", inputY);
+        leftWrapper.append('X: ', inputX);
+        rightWrapper.append('Y: ', inputY);
         rotWrapper.append(LANG('filter-transform-rotation') + ': ', inputR);
         if (!isSmall) {
             const inputRow = BB.el({
                 parent: div,
                 css: {
                     marginTop: '10px',
-                }
+                },
             });
             inputRow.append(leftWrapper, rightWrapper, rotWrapper);
         }
@@ -161,7 +167,7 @@ export const filterTransform = {
                 display: 'flex',
                 flexWrap: 'wrap',
                 marginLeft: '-10px',
-            }
+            },
         });
         const flipXBtn = BB.el ({
             parent: buttonRow,
@@ -253,42 +259,42 @@ export const filterTransform = {
 
 
         let isConstrained = true;
-        let constrainCheckbox = new Checkbox({
+        const constrainCheckbox = new Checkbox({
             init: true,
             label: LANG('filter-transform-constrain'),
             title: LANG('constrain-proportions'),
             allowTab: true,
-            callback: function(b) {
+            callback: function (b) {
                 isConstrained = b;
                 freeTransform.setConstrained(isConstrained);
             },
             css: {
-                display: 'inline-block'
-            }
+                display: 'inline-block',
+            },
         });
         let isSnapping = false;
-        let snappingCheckbox = new Checkbox({
+        const snappingCheckbox = new Checkbox({
             init: true,
             label: LANG('filter-transform-snap'),
             title: LANG('filter-transform-snap-title'),
             allowTab: true,
-            callback: function(b) {
+            callback: function (b) {
                 isSnapping = b;
                 freeTransform.setSnapping(isSnapping);
             },
             css: {
                 display: 'inline-block',
                 marginLeft: '10px',
-            }
+            },
         });
-        const checkboxWrapper = BB.el({});
+        const checkboxWrapper = BB.el();
         checkboxWrapper.append(constrainCheckbox.getElement(), snappingCheckbox.getElement());
 
-        div.appendChild(BB.el({
+        div.append(BB.el({
             css: {
                 clear: 'both',
-                height: '10px'
-            }
+                height: '10px',
+            },
         }));
 
         const bottomRow = BB.el({
@@ -296,51 +302,43 @@ export const filterTransform = {
             css: {
                 display: 'flex',
                 justifyContent: 'space-between',
-            }
+                alignItems: 'center',
+            },
         });
 
-        let algorithmSelect = new Select({
+        const algorithmSelect = new Select({
             isFocusable: true,
             optionArr: [
                 ['smooth', LANG('algorithm-smooth')],
-                ['pixelated', LANG('algorithm-pixelated')]
+                ['pixelated', LANG('algorithm-pixelated')],
             ],
             initValue: 'smooth',
             title: LANG('scaling-algorithm'),
-            onChange: function() {
+            onChange: function () {
                 updatePreview(true);
             },
         });
         bottomRow.append(checkboxWrapper, algorithmSelect.getElement());
 
 
-        let previewWrapper = document.createElement("div");
+        const previewWrapper = BB.el({
+            className: 'kl-preview-wrapper',
+            css: {
+                width: isSmall ? '340px' : '540px',
+                height: isSmall ? '260px' : '300px',
+            },
+        });
         previewWrapper.oncontextmenu = function () {
             return false;
         };
-        BB.css(previewWrapper, {
-            width: isSmall ? '340px' : '540px',
-            marginLeft: "-20px",
-            height: isSmall ? '260px' : '300px',
-            backgroundColor: "#9e9e9e",
-            marginTop: "10px",
-            boxShadow: "rgba(0, 0, 0, 0.2) 0px 1px inset, rgba(0, 0, 0, 0.2) 0px -1px inset",
-            overflow: "hidden",
-            position: "relative",
-            userSelect: 'none',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            colorScheme: 'only light',
-        });
 
-        let previewLayerArr: IKlBasicLayer[] = [];
+        const previewLayerArr: IKlBasicLayer[] = [];
         {
             for (let i = 0; i < layers.length; i++) {
                 let canvas;
                 if (i === selectedLayerIndex) {
                     canvas = BB.canvas(parseInt('' + w), parseInt('' + h));
-                    let ctx = canvas.getContext('2d');
+                    const ctx = BB.ctx(canvas);
                     ctx.drawImage(layers[i].context.canvas, 0, 0, canvas.width, canvas.height);
                 } else {
                     canvas = layers[i].context.canvas;
@@ -348,33 +346,32 @@ export const filterTransform = {
                 previewLayerArr.push({
                     image: canvas,
                     opacity: layers[i].opacity,
-                    mixModeStr: layers[i].mixModeStr
+                    mixModeStr: layers[i].mixModeStr,
                 });
             }
         }
-        let klCanvasPreview = new KlCanvasPreview({
+        const klCanvasPreview = new KlCanvasPreview({
             width: parseInt('' + displayW),
             height: parseInt('' + displayH),
-            layers: previewLayerArr
+            layers: previewLayerArr,
         });
 
-        let previewInnerWrapper = BB.el({
+        const previewInnerWrapper = BB.el({
+            className: 'kl-preview-wrapper__canvas',
             css: {
-                position: 'relative',
-                boxShadow: '0 0 5px rgba(0,0,0,0.5)',
                 width: parseInt('' + displayW) + 'px',
-                height: parseInt('' + displayH) + 'px'
-            }
+                height: parseInt('' + displayH) + 'px',
+            },
         });
-        previewInnerWrapper.appendChild(klCanvasPreview.getElement());
-        previewWrapper.appendChild(previewInnerWrapper);
+        previewInnerWrapper.append(klCanvasPreview.getElement());
+        previewWrapper.append(previewInnerWrapper);
 
         let lastDrawnTransformStr;
-        function updatePreview(doForce: boolean = false) {
+        function updatePreview (doForce: boolean = false) {
             if (!freeTransform) {
                 return;
             }
-            let transform = freeTransform.getTransform();
+            const transform = freeTransform.getTransform();
             if (JSON.stringify(transform) === lastDrawnTransformStr && !doForce) {
                 return;
             }
@@ -385,8 +382,8 @@ export const filterTransform = {
                 transform.width *= displayPreviewFactor;
                 transform.height *= displayPreviewFactor;
             }
-            let transformLayerCanvas = previewLayerArr[selectedLayerIndex].image as HTMLCanvasElement;
-            let ctx = transformLayerCanvas.getContext('2d');
+            const transformLayerCanvas = previewLayerArr[selectedLayerIndex].image as HTMLCanvasElement;
+            const ctx = BB.ctx(transformLayerCanvas);
             ctx.save();
             ctx.clearRect(0, 0, transformLayerCanvas.width, transformLayerCanvas.height);
             BB.drawTransformedImageWithBounds(
@@ -416,16 +413,16 @@ export const filterTransform = {
                 inputR.value = '' + Math.round(t.angleDeg);
                 updatePreview();
             },
-            scale: displayPreviewFactor
+            scale: displayPreviewFactor,
         });
         BB.css(freeTransform.getElement(), {
             position: 'absolute',
             left: '0',
-            top: '0'
+            top: '0',
         });
-        previewInnerWrapper.appendChild(freeTransform.getElement());
+        previewInnerWrapper.append(freeTransform.getElement());
 
-        function onInputsChanged() {
+        function onInputsChanged () {
             freeTransform.setPos({
                 x: parseInt(inputX.value) + initTransform.x,
                 y: parseInt(inputY.value) + initTransform.y}
@@ -436,8 +433,8 @@ export const filterTransform = {
 
         updatePreview();
 
-        div.appendChild(previewWrapper);
-        result.destroy = () => {
+        div.append(previewWrapper);
+        result.destroy = (): void => {
             keyListener.destroy();
             freeTransform.destroy();
             constrainCheckbox.destroy();
@@ -449,22 +446,23 @@ export const filterTransform = {
             BB.destroyEl(scaleDoubleBtn);
             BB.destroyEl(scaleHalfBtn);
             BB.destroyEl(centerBtn);
+            klCanvasPreview.destroy();
         };
-        result.getInput = function () {
+        result.getInput = function (): TFilterTransformInput {
             const transform = freeTransform.getTransform();
-            let input = {
+            const input: TFilterTransformInput = {
                 transform,
                 bounds: boundsObj,
                 isPixelated: algorithmSelect.getValue() === 'pixelated' ||
                     BB.testShouldPixelate(transform, transform.width / initTransform.width, transform.height / initTransform.height),
-            } as IFilterTransformInput;
+            };
             result.destroy();
-            return JSON.parse(JSON.stringify(input));
+            return BB.copyObj(input);
         };
         return result;
     },
 
-    apply(params: IFilterApply) {
+    apply (params: IFilterApply<TFilterTransformInput>): boolean {
         const context = params.context;
         const history = params.history;
         if (!context || !history) {
@@ -472,9 +470,9 @@ export const filterTransform = {
         }
         history.pause(true);
 
-        const input: IFilterTransformInput = params.input;
+        const input = params.input;
 
-        let copyCanvas = BB.copyCanvas(context.canvas);
+        const copyCanvas = BB.copyCanvas(context.canvas);
         context.clearRect(0, 0, context.canvas.width, context.canvas.height);
         BB.drawTransformedImageWithBounds(
             context,
@@ -486,11 +484,11 @@ export const filterTransform = {
 
         history.pause(false);
         history.push({
-            tool: ["filter", "transform"],
-            action: "apply",
+            tool: ['filter', 'transform'],
+            action: 'apply',
             params: [{input}],
-        });
+        } as TFilterTransformHistoryEntry);
         return true;
-    }
+    },
 
 };

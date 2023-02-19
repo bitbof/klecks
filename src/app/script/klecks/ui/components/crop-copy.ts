@@ -1,294 +1,314 @@
 import {BB} from '../../../bb/bb';
+import {KeyListener} from '../../../bb/input/key-listener';
+import {PointerListener} from '../../../bb/input/pointer-listener';
+import {IRect, IVector2D} from '../../../bb/bb-types';
 
 /**
  * element that lets you crop an image and copy it via right click
- *
- * param = {
- *     width: number,
- *     height: number,
- *     canvas: image | canvas,
- *     isNotCopy: boolean,
- *     onChange: function(width, height)
- * }
- *
- * @param param object
- * @constructor
  */
-export function CropCopy(param) {
-    const div = document.createElement('div');
-    BB.css(div, {
-        position: 'relative',
-        height: param.height + 'px',
-        width: param.width + 'px',
-        overflow: 'hidden',
-        colorScheme: 'only light',
-    });
-    div.style.position = 'relative';
+export class CropCopy {
 
-    let crop;
-    function resetCrop() {
-        crop = {
+    private readonly rootEl: HTMLElement;
+    private readonly eventTarget: HTMLElement;
+    private crop: IRect = {x: 0, y: 0, width: 0, height: 0};
+    private readonly croppedCanvas: HTMLCanvasElement;
+    private readonly keyListener: KeyListener;
+    private readonly pointerListener: PointerListener;
+    private readonly canvas: HTMLImageElement | HTMLCanvasElement;
+    private readonly onChange: undefined | ((width: number, height: number) => void);
+    private readonly selectionRect: HTMLElement;
+    private readonly thumbX: number;
+    private readonly thumbY: number;
+    private readonly scaleW: number;
+    private readonly scaleH: number;
+    private readonly croppedImage: undefined | HTMLImageElement;
+
+
+    private resetCrop (): void {
+        this.crop = {
             x: 0,
             y: 0,
-            width: param.canvas.width,
-            height: param.canvas.height
+            width: this.canvas.width,
+            height: this.canvas.height,
         };
     }
-    resetCrop();
-
-
-    function updateCroppedCanvas() {
-        croppedCanvas.width = Math.round(crop.width);
-        croppedCanvas.height = Math.round(crop.height);
-        let ctx = croppedCanvas.getContext('2d');
-        ctx.drawImage(param.canvas, Math.round(-crop.x), Math.round(-crop.y));
-        if (croppedImage) {
-            croppedImage.src = croppedCanvas.toDataURL('image/png');
+    private updateCroppedCanvas (): void {
+        this.croppedCanvas.width = Math.round(this.crop.width);
+        this.croppedCanvas.height = Math.round(this.crop.height);
+        const ctx = BB.ctx(this.croppedCanvas);
+        ctx.drawImage(this.canvas, Math.round(-this.crop.x), Math.round(-this.crop.y));
+        if (this.croppedImage) {
+            this.croppedImage.src = this.croppedCanvas.toDataURL('image/png');
         }
 
-        if (param.onChange) {
-            param.onChange(croppedCanvas.width, croppedCanvas.height);
-        }
+        this.onChange && this.onChange(this.croppedCanvas.width, this.croppedCanvas.height);
     }
-    function updateSelectionRect() {
-        BB.css(selectionRect, {
-            left: (thumbX + crop.x * scaleW) + 'px',
-            top: (thumbY + crop.y * scaleH) + 'px',
-            width: (crop.width * scaleW) + 'px',
-            height: (crop.height * scaleH) + 'px'
+    private updateSelectionRect (): void {
+        BB.css(this.selectionRect, {
+            left: (this.thumbX + this.crop.x * this.scaleW) + 'px',
+            top: (this.thumbY + this.crop.y * this.scaleH) + 'px',
+            width: (this.crop.width * this.scaleW) + 'px',
+            height: (this.crop.height * this.scaleH) + 'px',
+        });
+        this.onChange && this.onChange(Math.round(this.crop.width), Math.round(this.crop.height));
+    }
+
+    // ---- public ----
+
+    constructor (
+        param: {
+            width: number;
+            height: number;
+            canvas: HTMLImageElement | HTMLCanvasElement;
+            isNotCopy: boolean;
+            onChange?: (width: number, height: number) => void;
+        }
+    ) {
+        this.rootEl = BB.el({
+            className: 'kl-edit-crop-preview',
+            css: {
+                position: 'relative',
+                height: param.height + 'px',
+                width: param.width + 'px',
+                overflow: 'hidden',
+                colorScheme: 'only light',
+            },
         });
         if (param.onChange) {
-            param.onChange(Math.round(crop.width), Math.round(crop.height));
+            this.onChange = param.onChange;
         }
-    }
-    function isInsideSelectionRect(p) {
-        let rect = {
-            x: Math.round(thumbX + crop.x * scaleW),
-            y: Math.round(thumbY + crop.y * scaleH),
-            width: Math.round(crop.width * scaleW),
-            height: Math.round(crop.height * scaleH)
+        this.canvas = param.canvas;
+
+        this.resetCrop();
+
+
+
+
+        const isInsideSelectionRect = (p: IVector2D): boolean => {
+            const rect = {
+                x: Math.round(this.thumbX + this.crop.x * this.scaleW),
+                y: Math.round(this.thumbY + this.crop.y * this.scaleH),
+                width: Math.round(this.crop.width * this.scaleW),
+                height: Math.round(this.crop.height * this.scaleH),
+            };
+            return BB.isInsideRect(p, rect);
         };
-        return BB.isInsideRect(p, rect);
-    }
 
-    const croppedCanvas = BB.canvas();
-    let eventTarget = croppedCanvas;
-    let croppedImage = null;
-    if (!param.isNotCopy) { //navigator.appName === 'Microsoft Internet Explorer') { //i would prefer not using an image
-        croppedImage = new Image();
-        eventTarget = croppedImage;
-    }
-    BB.css(eventTarget, {
-        height: param.height + 'px',
-        width: param.width + 'px'
-    });
-    div.appendChild(eventTarget);
-    updateCroppedCanvas();
-
-    const padding = 20;
-    const previewWrapper = BB.el({
-        css: {
-            width: param.width + 'px',
+        this.croppedCanvas = BB.canvas();
+        this.eventTarget = this.croppedCanvas;
+        if (!param.isNotCopy) {
+            this.croppedImage = new Image();
+            this.eventTarget = this.croppedImage;
+        }
+        BB.css(this.eventTarget, {
             height: param.height + 'px',
+            width: param.width + 'px',
+        });
+        this.rootEl.append(this.eventTarget);
+        this.updateCroppedCanvas();
+
+        const padding = 20;
+        const previewWrapper = BB.el({
+            css: {
+                width: param.width + 'px',
+                height: param.height + 'px',
+                position: 'absolute',
+                left: '0',
+                top: '0',
+                pointerEvents: 'none',
+            },
+        });
+        this.rootEl.append(previewWrapper);
+        BB.createCheckerDataUrl(4, (v) => {
+            previewWrapper.style.backgroundImage = 'url('+v+')';
+        }, BB.isDark());
+
+        const thumbSize = BB.fitInto(this.canvas.width, this.canvas.height, param.width - padding * 2, param.height - padding * 2, 1);
+        const thumbCanvas = BB.canvas(Math.round(thumbSize.width), Math.round(thumbSize.height));
+        thumbCanvas.style.imageRendering = 'pixelated';
+        this.scaleW = thumbCanvas.width / this.canvas.width;
+        this.scaleH = thumbCanvas.height / this.canvas.height;
+        const thumbCtx = BB.ctx(thumbCanvas);
+        thumbCtx.imageSmoothingEnabled = false;
+        thumbCtx.drawImage(this.canvas, 0, 0, thumbCanvas.width, thumbCanvas.height);
+        previewWrapper.append(thumbCanvas);
+        this.thumbX = parseInt('' + ((param.width - thumbCanvas.width) / 2));
+        this.thumbY = parseInt('' + ((param.height - thumbCanvas.height) / 2));
+        BB.css(thumbCanvas, {
             position: 'absolute',
-            left: '0',
-            top: '0',
-            pointerEvents: 'none'
-        }
-    });
-    div.appendChild(previewWrapper);
-    BB.createCheckerDataUrl(4, function(v) {
-        previewWrapper.style.backgroundImage = 'url('+v+')';
-    });
+            left: this.thumbX + 'px',
+            top: this.thumbY + 'px',
+        });
 
-    const thumbSize = BB.fitInto(param.canvas.width, param.canvas.height, param.width - padding * 2, param.height - padding * 2, 1);
-    const thumbCanvas = BB.canvas(Math.round(thumbSize.width), Math.round(thumbSize.height));
-    thumbCanvas.style.imageRendering = 'pixelated';
-    const scaleW = thumbCanvas.width / param.canvas.width;
-    const scaleH = thumbCanvas.height / param.canvas.height;
-    const thumbCtx = thumbCanvas.getContext('2d');
-    thumbCtx.imageSmoothingEnabled = false;
-    thumbCtx.drawImage(param.canvas, 0, 0, thumbCanvas.width, thumbCanvas.height);
-    previewWrapper.appendChild(thumbCanvas);
-    const thumbX = parseInt('' + ((param.width - thumbCanvas.width) / 2));
-    const thumbY = parseInt('' + ((param.height - thumbCanvas.height) / 2));
-    BB.css(thumbCanvas, {
-        position: 'absolute',
-        left: thumbX + "px",
-        top: thumbY + "px"
-    });
-
-    const selectionRect = BB.el({
-        css: {
-            position: 'absolute',
-            boxShadow: '0 0 0 1px #fff, 0 0 0 2px #000, 0 0 40px 1px #000',
-        }
-    });
-    previewWrapper.appendChild(selectionRect);
-    updateSelectionRect();
+        this.selectionRect = BB.el({
+            parent: previewWrapper,
+            className: 'kl-edit-crop-preview__sel',
+        });
+        this.updateSelectionRect();
 
 
-    function toOriginalSpace(p) {
-        return {
-            x: BB.clamp((p.x - thumbX) / scaleW, 0, param.canvas.width),
-            y: BB.clamp((p.y - thumbY) / scaleH, 0, param.canvas.height),
+        const toOriginalSpace = (p: IVector2D): IVector2D => {
+            return {
+                x: BB.clamp((p.x - this.thumbX) / this.scaleW, 0, this.canvas.width),
+                y: BB.clamp((p.y - this.thumbY) / this.scaleH, 0, this.canvas.height),
+            };
         };
-    }
-    //gen crop from thumb-space points
-    function genCrop(p1, p2) {
-        let topLeftP = {
-            x: Math.min(p1.x, p2.x),
-            y: Math.min(p1.y, p2.y)
+        //gen crop from thumb-space points
+        const genCrop = (p1: IVector2D, p2: IVector2D): IRect => {
+            const topLeftP = {
+                x: Math.min(p1.x, p2.x),
+                y: Math.min(p1.y, p2.y),
+            };
+            const bottomRightP = {
+                x: Math.max(p1.x, p2.x),
+                y: Math.max(p1.y, p2.y),
+            };
+            const origTopLeftP = toOriginalSpace(topLeftP);
+            const origBottomRightP = toOriginalSpace(bottomRightP);
+            origTopLeftP.x = Math.floor(origTopLeftP.x);
+            origTopLeftP.y = Math.floor(origTopLeftP.y);
+            origBottomRightP.x = Math.ceil(origBottomRightP.x);
+            origBottomRightP.y = Math.ceil(origBottomRightP.y);
+            return {
+                x: origTopLeftP.x,
+                y: origTopLeftP.y,
+                width: origBottomRightP.x - origTopLeftP.x,
+                height: origBottomRightP.y - origTopLeftP.y,
+            };
         };
-        let bottomRightP = {
-            x: Math.max(p1.x, p2.x),
-            y: Math.max(p1.y, p2.y)
-        };
-        let origTopLeftP = toOriginalSpace(topLeftP);
-        let origBottomRightP = toOriginalSpace(bottomRightP);
-        origTopLeftP.x = Math.floor(origTopLeftP.x);
-        origTopLeftP.y = Math.floor(origTopLeftP.y);
-        origBottomRightP.x = Math.ceil(origBottomRightP.x);
-        origBottomRightP.y = Math.ceil(origBottomRightP.y);
-        return {
-            x: origTopLeftP.x,
-            y: origTopLeftP.y,
-            width: origBottomRightP.x - origTopLeftP.x,
-            height: origBottomRightP.y - origTopLeftP.y
-        };
-    }
 
-    function isReset() {
-        return crop.x === 0 && crop.y === 0 && crop.width === param.canvas.width && crop.height === param.canvas.height;
-    }
 
-    let startP;
-    let startCrop = null;
-    let isDragging = false;
-    let didMove = false;
-    let updateCropTimeout;
-    const pointerListener = new BB.PointerListener({
-        target: eventTarget,
-        fixScribble: true,
-        onPointer: function(event) {
-            let fullPos;
-            if (event.type === 'pointerdown' && event.button === 'left') {
-                event.eventPreventDefault();
-                isDragging = true;
-                startP = {
-                    x: event.relX,
-                    y: event.relY
-                };
-                if (!isReset() && isInsideSelectionRect(startP)) {
-                    startCrop = {
-                        x: crop.x,
-                        y: crop.y,
-                        width: crop.width,
-                        height: crop.height
+
+        let startP: IVector2D | null;
+        let startCrop: IRect | null = null;
+        let isDragging = false;
+        let didMove = false;
+        let updateCropTimeout: ReturnType<typeof setTimeout>;
+        this.pointerListener = new BB.PointerListener({
+            target: this.eventTarget,
+            fixScribble: true,
+            onPointer: (event) => {
+                if (event.type === 'pointerdown' && event.button === 'left') {
+                    event.eventPreventDefault();
+                    isDragging = true;
+                    startP = {
+                        x: event.relX,
+                        y: event.relY,
                     };
-                } else {
-                    crop = genCrop(startP, startP);
+                    if (!this.isReset() && isInsideSelectionRect(startP)) {
+                        startCrop = {
+                            x: this.crop.x,
+                            y: this.crop.y,
+                            width: this.crop.width,
+                            height: this.crop.height,
+                        };
+                    } else {
+                        this.crop = genCrop(startP, startP);
+                    }
+                } else if (event.type === 'pointermove' && event.button === 'left') {
+                    event.eventPreventDefault();
+                    didMove = true;
+                    if (startCrop) {
+                        this.crop.x = startCrop.x + Math.round((event.relX - startP!.x) / this.scaleW);
+                        this.crop.y = startCrop.y + Math.round((event.relY - startP!.y) / this.scaleH);
+                        this.crop.x = BB.clamp(this.crop.x, 0, this.canvas.width - this.crop.width);
+                        this.crop.y = BB.clamp(this.crop.y, 0, this.canvas.height - this.crop.height);
+                    } else {
+                        this.crop = genCrop(startP!, {x: event.relX, y: event.relY});
+                    }
+                    this.updateSelectionRect();
+                } else if (event.type === 'pointerup' && startP) {
+                    event.eventPreventDefault();
+                    isDragging = false;
+                    startCrop = null;
+                    startP = null;
+                    if (this.crop.width === 0 || this.crop.height === 0 || !didMove) {
+                        this.resetCrop();
+                        this.updateSelectionRect();
+                    }
+                    didMove = false;
+                    updateCropTimeout = setTimeout(() => this.updateCroppedCanvas(), 1);
                 }
-            } else if (event.type === 'pointermove' && event.button === 'left') {
-                event.eventPreventDefault();
-                didMove = true;
-                if (startCrop) {
-                    crop.x = startCrop.x + Math.round((event.relX - startP.x) / scaleW);
-                    crop.y = startCrop.y + Math.round((event.relY - startP.y) / scaleH);
-                    crop.x = BB.clamp(crop.x, 0, param.canvas.width - crop.width);
-                    crop.y = BB.clamp(crop.y, 0, param.canvas.height - crop.height);
-                } else {
-                    crop = genCrop(startP, {x: event.relX, y: event.relY});
-                }
-                updateSelectionRect();
-            } else if (event.type === 'pointerup' && startP) {
-                event.eventPreventDefault();
-                isDragging = false;
-                startCrop = null;
-                startP = null;
-                if (crop.width === 0 || crop.height === 0 || !didMove) {
-                    resetCrop();
-                    updateSelectionRect();
-                }
-                didMove = false;
-                updateCropTimeout = setTimeout(updateCroppedCanvas, 1);
-            }
-        }
-    });
+            },
+        });
 
-    const keyListener = new BB.KeyListener({
-        onDown: function(keyStr, e, comboStr) {
-            if (isDragging) {
-                return;
-            }
-            let doUpdate = false;
-
-            let stepSize = Math.max(1, 1 / scaleW);
-            let shiftIsPressed = keyListener.isPressed('shift');
-
-            if (keyStr === 'left') {
-                if (shiftIsPressed) {
-                    crop.width = BB.clamp(crop.width - stepSize, 1, param.canvas.width - crop.x);
-                } else {
-                    crop.x = BB.clamp(crop.x - stepSize, 0, param.canvas.width - crop.width);
+        this.keyListener = new BB.KeyListener({
+            onDown: (keyStr, e, comboStr) => {
+                if (isDragging) {
+                    return;
                 }
-                doUpdate = true;
-            }
-            if (keyStr === 'right') {
-                if (shiftIsPressed) {
-                    crop.width = BB.clamp(crop.width + stepSize, 1, param.canvas.width - crop.x);
-                } else {
-                    crop.x = BB.clamp(crop.x + stepSize, 0, param.canvas.width - crop.width);
-                }
-                doUpdate = true;
-            }
-            if (keyStr === 'up') {
-                if (shiftIsPressed) {
-                    crop.height = BB.clamp(crop.height - stepSize, 1, param.canvas.height - crop.y);
-                } else {
-                    crop.y = BB.clamp(crop.y - stepSize, 0, param.canvas.height - crop.height);
-                }
-                doUpdate = true;
-            }
-            if (keyStr === 'down') {
-                if (shiftIsPressed) {
-                    crop.height = BB.clamp(crop.height + stepSize, 1, param.canvas.height - crop.y);
-                } else {
-                    crop.y = BB.clamp(crop.y + stepSize, 0, param.canvas.height - crop.height);
-                }
-                doUpdate = true;
-            }
+                let doUpdate = false;
 
-            if (doUpdate) {
-                e.preventDefault();
-                updateSelectionRect();
-                clearTimeout(updateCropTimeout);
-                updateCropTimeout = setTimeout(updateCroppedCanvas, 100);
-            }
-        }
-    });
+                const stepSize = Math.max(1, 1 / this.scaleW);
+                const shiftIsPressed = this.keyListener.isPressed('shift');
 
-    this.getEl = function() {
-        return div;
-    };
-    this.reset = function() {
-        resetCrop();
-        updateCroppedCanvas();
-        updateSelectionRect();
-    };
-    this.destroy = function() {
-        eventTarget.style.removeProperty('width');
-        eventTarget.style.removeProperty('height');
-        keyListener.destroy();
-        pointerListener.destroy();
-    };
-    this.isReset = function() {
-        return isReset();
-    };
-    this.getRect = function() {
-        return JSON.parse(JSON.stringify(crop));
-    };
-    this.getCroppedImage = function() {
-        return croppedCanvas;
-    };
+                if (keyStr === 'left') {
+                    if (shiftIsPressed) {
+                        this.crop.width = BB.clamp(this.crop.width - stepSize, 1, this.canvas.width - this.crop.x);
+                    } else {
+                        this.crop.x = BB.clamp(this.crop.x - stepSize, 0, this.canvas.width - this.crop.width);
+                    }
+                    doUpdate = true;
+                }
+                if (keyStr === 'right') {
+                    if (shiftIsPressed) {
+                        this.crop.width = BB.clamp(this.crop.width + stepSize, 1, this.canvas.width - this.crop.x);
+                    } else {
+                        this.crop.x = BB.clamp(this.crop.x + stepSize, 0, this.canvas.width - this.crop.width);
+                    }
+                    doUpdate = true;
+                }
+                if (keyStr === 'up') {
+                    if (shiftIsPressed) {
+                        this.crop.height = BB.clamp(this.crop.height - stepSize, 1, this.canvas.height - this.crop.y);
+                    } else {
+                        this.crop.y = BB.clamp(this.crop.y - stepSize, 0, this.canvas.height - this.crop.height);
+                    }
+                    doUpdate = true;
+                }
+                if (keyStr === 'down') {
+                    if (shiftIsPressed) {
+                        this.crop.height = BB.clamp(this.crop.height + stepSize, 1, this.canvas.height - this.crop.y);
+                    } else {
+                        this.crop.y = BB.clamp(this.crop.y + stepSize, 0, this.canvas.height - this.crop.height);
+                    }
+                    doUpdate = true;
+                }
+
+                if (doUpdate) {
+                    e.preventDefault();
+                    this.updateSelectionRect();
+                    clearTimeout(updateCropTimeout);
+                    updateCropTimeout = setTimeout(() => this.updateCroppedCanvas(), 100);
+                }
+            },
+        });
+    }
+
+    // ---- interface ----
+
+    getEl (): HTMLElement {
+        return this.rootEl;
+    }
+    reset (): void {
+        this.resetCrop();
+        this.updateCroppedCanvas();
+        this.updateSelectionRect();
+    }
+    destroy (): void {
+        this.eventTarget.style.removeProperty('width');
+        this.eventTarget.style.removeProperty('height');
+        this.keyListener.destroy();
+        this.pointerListener.destroy();
+    }
+    isReset (): boolean {
+        return this.crop.x === 0 && this.crop.y === 0 && this.crop.width === this.canvas.width && this.crop.height === this.canvas.height;
+    }
+    getRect (): IRect {
+        return BB.copyObj(this.crop);
+    }
+    getCroppedImage (): HTMLCanvasElement {
+        return this.croppedCanvas;
+    }
 }
+

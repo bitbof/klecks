@@ -1,4 +1,3 @@
-// @ts-ignore
 import {english, languages, loadLanguage, TTranslationCode} from '../../languages/languages';
 
 export const LS_LANGUAGE_KEY = 'klecks-language';
@@ -22,7 +21,7 @@ export class LanguageStrings {
             this.data = {...english, ...(await loadLanguage(langCode))};
         }
         this.code = langCode;
-        document.documentElement.setAttribute("lang", langCode);
+        document.documentElement.setAttribute('lang', langCode);
         this.listeners.forEach(item => {
             item();
         });
@@ -38,7 +37,7 @@ export class LanguageStrings {
     getLanguage (): {code: string; name: string} {
         return languages.find(item => {
             return item.code === this.code;
-        })
+        });
     }
 
     getCode (): string {

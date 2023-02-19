@@ -1,29 +1,39 @@
 import {BB} from '../../bb/bb';
-import {Options} from '../ui/base-components/options';
-import {ColorOptions} from '../ui/base-components/color-options';
+import {Options} from '../ui/components/options';
+import {ColorOptions} from '../ui/components/color-options';
 import {KlCanvasPreview} from '../canvas-ui/canvas-preview';
-import {getSharedFx} from './shared-gl-fx';
-import {IFilterApply, IFilterGetDialogParam, IKlBasicLayer} from '../kl.types';
+import {getSharedFx} from '../../fx-canvas/shared-fx';
+import {IFilterApply, IFilterGetDialogParam, IFilterGetDialogResult, IKlBasicLayer, IRGBA} from '../kl-types';
 import {LANG} from '../../language/language';
+import {TFilterHistoryEntry} from './filters';
+
+export type TFilterToAlphaInput = {
+    sourceId: string;
+    selectedRgbaObj: IRGBA;
+};
+
+export type TFilterToAlphaHistoryEntry = TFilterHistoryEntry<
+    'toAlpha',
+    TFilterToAlphaInput>;
 
 export const filterToAlpha = {
 
-    getDialog(params: IFilterGetDialogParam) {
-        let context = params.context;
-        let klCanvas = params.klCanvas;
+    getDialog (params: IFilterGetDialogParam) {
+        const context = params.context;
+        const klCanvas = params.klCanvas;
         if (!context || !klCanvas) {
             return false;
         }
 
-        let layers = klCanvas.getLayers();
-        let selectedLayerIndex = klCanvas.getLayerIndex(context.canvas);
+        const layers = klCanvas.getLayers();
+        const selectedLayerIndex = klCanvas.getLayerIndex(context.canvas);
 
-        let fit = BB.fitInto(context.canvas.width, context.canvas.height, 280, 200, 1);
-        let w = parseInt('' + fit.width), h = parseInt('' + fit.height);
+        const fit = BB.fitInto(context.canvas.width, context.canvas.height, 280, 200, 1);
+        const w = parseInt('' + fit.width), h = parseInt('' + fit.height);
 
-        let tempCanvas = BB.canvas(w, h);
+        const tempCanvas = BB.canvas(w, h);
         {
-            const ctx = tempCanvas.getContext("2d");
+            const ctx = BB.ctx(tempCanvas);
             ctx.save();
             if (tempCanvas.width > context.canvas.width) {
                 ctx.imageSmoothingEnabled = false;
@@ -32,59 +42,59 @@ export const filterToAlpha = {
             ctx.restore();
         }
 
-        let div = document.createElement("div");
-        let result: any = {
-            element: div
+        const div = document.createElement('div');
+        const result: IFilterGetDialogResult<TFilterToAlphaInput> = {
+            element: div,
         };
 
-        function finishInit() {
-            let radius = 2, strength = 5.1 / 10;
-            div.appendChild(BB.el({
+        function finishInit () {
+            const radius = 2, strength = 5.1 / 10;
+            div.append(BB.el({
                 content: LANG('filter-to-alpha-description'),
                 css: {
-                    marginBottom: '5px'
-                }
+                    marginBottom: '5px',
+                },
             }));
 
-            let glCanvas = getSharedFx();
-            if (!glCanvas) {
+            const fxCanvas = getSharedFx();
+            if (!fxCanvas) {
                 return; // todo throw?
             }
-            let texture = glCanvas.texture(tempCanvas);
-            glCanvas.draw(texture).update(); // update glCanvas size
+            const texture = fxCanvas.texture(tempCanvas);
+            fxCanvas.draw(texture).update(); // update fxCanvas size
 
-            function updatePreview() {
-                glCanvas.draw(texture).toAlpha(sourceId === 'inverted-luminance', selectedRgbaObj).update();
+            function updatePreview () {
+                fxCanvas.draw(texture).toAlpha(sourceId === 'inverted-luminance', selectedRgbaObj).update();
                 klCanvasPreview.render();
             }
 
             // source
             let sourceId = 'inverted-luminance';
-            let sourceOptions = new Options({
+            const sourceOptions = new Options({
                 optionArr: [
                     {
                         id: 'inverted-luminance',
-                        label: LANG('filter-to-alpha-inverted-lum')
+                        label: LANG('filter-to-alpha-inverted-lum'),
                     },
                     {
                         id: 'luminance',
-                        label: LANG('filter-to-alpha-lum')
-                    }
+                        label: LANG('filter-to-alpha-lum'),
+                    },
                 ],
-                initialId: sourceId,
-                onChange: function(id) {
+                initId: sourceId,
+                onChange: function (id) {
                     sourceId = id;
                     updatePreview();
-                }
+                },
             });
-            div.appendChild(sourceOptions.getElement());
+            div.append(sourceOptions.getElement());
 
             // color
             let selectedRgbaObj = {r: 0, g: 0, b: 0, a: 1};
-            let colorOptionsArr = [
+            const colorOptionsArr = [
                 null,
                 {r: 0, g: 0, b: 0, a: 1},
-                {r: 255, g: 255, b: 255, a: 1}
+                {r: 255, g: 255, b: 255, a: 1},
             ];
             colorOptionsArr.push({
                 r: params.currentColorRgb.r,
@@ -99,67 +109,57 @@ export const filterToAlpha = {
                 a: 1,
             });
 
-            let colorOptions = new ColorOptions({
+            const colorOptions = new ColorOptions({
                 label: LANG('filter-to-alpha-replace'),
                 colorArr: colorOptionsArr,
                 initialIndex: 1,
-                onChange: function(rgbaObj) {
+                onChange: function (rgbaObj) {
                     selectedRgbaObj = rgbaObj;
                     updatePreview();
-                }
+                },
             });
             colorOptions.getElement().style.marginTop = '10px';
-            div.appendChild(colorOptions.getElement());
+            div.append(colorOptions.getElement());
 
 
-            let previewWrapper = document.createElement("div");
-            BB.css(previewWrapper, {
-                width: "340px",
-                marginLeft: "-20px",
-                height: "220px",
-                backgroundColor: "#9e9e9e",
-                marginTop: "10px",
-                boxShadow: "rgba(0, 0, 0, 0.2) 0px 1px inset, rgba(0, 0, 0, 0.2) 0px -1px inset",
-                overflow: "hidden",
-                position: "relative",
-                userSelect: 'none',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                colorScheme: 'only light',
+            const previewWrapper = BB.el({
+                className: 'kl-preview-wrapper',
+                css: {
+                    width: '340px',
+                    height: '220px',
+                },
             });
 
-            let previewLayerArr: IKlBasicLayer[] = [];
+            const previewLayerArr: IKlBasicLayer[] = [];
             {
                 for (let i = 0; i < layers.length; i++) {
                     previewLayerArr.push({
-                        image: i === selectedLayerIndex ? glCanvas : layers[i].context.canvas,
+                        image: i === selectedLayerIndex ? fxCanvas : layers[i].context.canvas,
                         opacity: layers[i].opacity,
-                        mixModeStr: layers[i].mixModeStr
+                        mixModeStr: layers[i].mixModeStr,
                     });
                 }
             }
-            let klCanvasPreview = new KlCanvasPreview({
+            const klCanvasPreview = new KlCanvasPreview({
                 width: parseInt('' + w),
                 height: parseInt('' + h),
-                layers: previewLayerArr
+                layers: previewLayerArr,
             });
 
-            let previewInnerWrapper = BB.el({
+            const previewInnerWrapper = BB.el({
+                className: 'kl-preview-wrapper__canvas',
                 css: {
-                    position: 'relative',
-                    boxShadow: '0 0 5px rgba(0,0,0,0.5)',
                     width: parseInt('' + w) + 'px',
-                    height: parseInt('' + h) + 'px'
-                }
+                    height: parseInt('' + h) + 'px',
+                },
             });
-            previewInnerWrapper.appendChild(klCanvasPreview.getElement());
-            previewWrapper.appendChild(previewInnerWrapper);
+            previewInnerWrapper.append(klCanvasPreview.getElement());
+            previewWrapper.append(previewInnerWrapper);
 
 
-            div.appendChild(previewWrapper);
+            div.append(previewWrapper);
 
-            setTimeout(function() { //ie has a problem otherwise...
+            setTimeout(function () { //ie has a problem otherwise...
                 try {
                     updatePreview();
                 } catch(e) {
@@ -167,15 +167,16 @@ export const filterToAlpha = {
                 }
             }, 1);
 
-            result.destroy = () => {
+            result.destroy = (): void => {
                 texture.destroy();
                 sourceOptions.destroy();
+                klCanvasPreview.destroy();
             };
-            result.getInput = function () {
+            result.getInput = function (): TFilterToAlphaInput {
                 result.destroy();
                 return {
                     sourceId: sourceId,
-                    selectedRgbaObj: selectedRgbaObj
+                    selectedRgbaObj: selectedRgbaObj,
                 };
             };
         }
@@ -186,32 +187,33 @@ export const filterToAlpha = {
     },
 
 
-    apply(params: IFilterApply) {
-        let context = params.context;
-        let history = params.history;
-        let sourceId = params.input.sourceId;
-        let selectedRgbaObj = params.input.selectedRgbaObj;
-        if (!context || !sourceId || !history)
+    apply (params: IFilterApply<TFilterToAlphaInput>): boolean {
+        const context = params.context;
+        const history = params.history;
+        const sourceId = params.input.sourceId;
+        const selectedRgbaObj = params.input.selectedRgbaObj;
+        if (!context || !sourceId || !history) {
             return false;
+        }
         history.pause(true);
-        let glCanvas = getSharedFx();
-        if (!glCanvas) {
+        const fxCanvas = getSharedFx();
+        if (!fxCanvas) {
             return false; // todo more specific error?
         }
-        let texture = glCanvas.texture(context.canvas);
-        glCanvas.draw(texture).toAlpha(sourceId === 'inverted-luminance', selectedRgbaObj).update();
+        const texture = fxCanvas.texture(context.canvas);
+        fxCanvas.draw(texture).toAlpha(sourceId === 'inverted-luminance', selectedRgbaObj).update();
         context.clearRect(0, 0, context.canvas.width, context.canvas.height);
-        context.drawImage(glCanvas, 0, 0);
+        context.drawImage(fxCanvas, 0, 0);
         texture.destroy();
         history.pause(false);
         history.push({
-            tool: ["filter", "toAlpha"],
-            action: "apply",
+            tool: ['filter', 'toAlpha'],
+            action: 'apply',
             params: [{
-                input: params.input
-            }]
-        });
+                input: params.input,
+            }],
+        } as TFilterToAlphaHistoryEntry);
         return true;
-    }
+    },
 
 };

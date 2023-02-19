@@ -1,6 +1,5 @@
 import {BB} from '../../../bb/bb';
-// @ts-ignore
-import angleSvg from 'url:~/src/app/img/ui/angle.svg';
+import angleSvg from '/src/app/img/ui/angle.svg';
 
 
 type TUiState = 'left' | 'right';
@@ -21,7 +20,7 @@ export class StatusOverlay {
     private timeout2: number;
     private timeout3: number;
 
-    private updateUiState() {
+    private updateUiState () {
         if (!this.el) {
             return;
         }
@@ -33,9 +32,9 @@ export class StatusOverlay {
         }
     }
 
-    private init() {
+    private init () {
         this.el = BB.el({
-            className: "top-overlay g-root",
+            className: 'top-overlay g-root',
             onClick: BB.handleClick,
         }) as HTMLDivElement;
 
@@ -46,8 +45,8 @@ export class StatusOverlay {
         this.updateUiState();
 
         this.innerEl = BB.el({
-            className: 'top-overlay-inner',
-        }) as HTMLDivElement
+            className: 'top-overlay--inner',
+        }) as HTMLDivElement;
 
 
         this.angleIm = new Image();
@@ -57,17 +56,16 @@ export class StatusOverlay {
             width: '20px',
             height: '20px',
             marginLeft: '5px',
-            borderRadius: '10px'
+            borderRadius: '10px',
         });
 
         this.innerInnerEl = document.createElement('div');
         this.innerInnerEl.style.display = 'inline-block';
 
-        this.innerEl.appendChild(this.innerInnerEl);
-        this.innerEl.appendChild(this.angleIm);
-        this.el.appendChild(this.innerEl);
-        document.body.appendChild(this.el);
-        this.el.style.display = "none";
+        this.innerEl.append(this.innerInnerEl, this.angleIm);
+        this.el.append(this.innerEl);
+        document.body.append(this.el);
+        this.el.style.display = 'none';
     }
 
 
@@ -77,7 +75,7 @@ export class StatusOverlay {
         this.init();
     }
 
-    setWide(b: boolean) {
+    setWide (b: boolean) {
         this.isWide = !!b;
 
         if (!this.el) {
@@ -93,12 +91,12 @@ export class StatusOverlay {
         }
     }
 
-    setUiState(state: TUiState) {
+    setUiState (state: TUiState) {
         this.uiState = state;
         this.updateUiState();
     }
 
-    out(msg: string | {type: 'transform', angleDeg: number, scale: number}, doPulse?: boolean) {
+    out (msg: string | {type: 'transform'; angleDeg: number; scale: number}, doPulse?: boolean) {
 
         if (msg && typeof msg === 'object') {
 
@@ -112,7 +110,7 @@ export class StatusOverlay {
                     this.angleIm.style.boxShadow = '';
                 }
 
-                this.innerInnerEl.innerHTML = Math.round(msg.scale * 100) + "%";
+                this.innerInnerEl.innerHTML = Math.round(msg.scale * 100) + '%';
 
 
             } else {
@@ -129,7 +127,7 @@ export class StatusOverlay {
         if (doPulse) {
             this.innerEl.style.animation = '';
             setTimeout(
-                () => this.innerEl.style.animation = 'top-overlay-pulse 0.5s ease-out',
+                () => this.innerEl.style.animation = 'topOverlayPulse 0.5s ease-out',
                 20
             );
             if (this.timeout3) {
@@ -149,18 +147,18 @@ export class StatusOverlay {
         if (this.timeout2) {
             clearTimeout(this.timeout2);
         }
-        this.el.style.animationName = doPulse ? 'consoleInFast' : "consoleIn";
-        this.el.style.opacity = "1";
+        this.el.style.animationName = doPulse ? 'consoleInFast' : 'consoleIn';
+        this.el.style.opacity = '1';
         this.timeout = window.setTimeout(() => {
-            this.el.style.opacity = "0";
-            this.el.style.animationName = "consoleOut";
+            this.el.style.opacity = '0';
+            this.el.style.animationName = 'consoleOut';
             this.timeout2 = window.setTimeout(() => {
-                this.el.style.display = "none";
+                this.el.style.display = 'none';
                 this.timeout2 = 0;
             }, 450);
             this.timeout = 0;
         }, 1200);
-        this.el.style.display = "flex";
+        this.el.style.display = 'flex';
     }
 
 

@@ -1,12 +1,12 @@
 import {BB} from '../../bb/bb';
-import {IKlProject} from '../kl.types';
+import {IKlProject} from '../kl-types';
 
-export function drawProject(project: IKlProject, factor) {
-    let resultCanvas = BB.canvas(
+export function drawProject (project: IKlProject, factor: number): HTMLCanvasElement {
+    const resultCanvas = BB.canvas(
         Math.max(1, Math.round(project.width * factor)),
         Math.max(1, Math.round(project.height * factor))
     );
-    let ctx = resultCanvas.getContext("2d");
+    const ctx = BB.ctx(resultCanvas);
     ctx.save();
     if (factor > 1) {
         ctx.imageSmoothingEnabled = false;
@@ -16,7 +16,8 @@ export function drawProject(project: IKlProject, factor) {
             continue;
         }
         ctx.globalAlpha = project.layers[i].opacity;
-        ctx.globalCompositeOperation = project.layers[i].mixModeStr ? project.layers[i].mixModeStr : 'source-over';
+        const mixModeStr = project.layers[i].mixModeStr;
+        ctx.globalCompositeOperation = mixModeStr !== undefined ? mixModeStr : 'source-over';
         ctx.drawImage(project.layers[i].image, 0, 0, resultCanvas.width, resultCanvas.height);
     }
     ctx.restore();

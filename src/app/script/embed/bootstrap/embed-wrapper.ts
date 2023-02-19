@@ -1,14 +1,14 @@
 import {IEmbedParams, IReadPSD} from '../../main-embed';
-import {IKlProject} from '../../klecks/kl.types';
-// @ts-ignore
-import logoImg from 'url:~/src/app/img/klecks-logo.png';
+import {IKlProject} from '../../klecks/kl-types';
+import logoImg from '/src/app/img/klecks-logo.png';
 import {getEmbedUrl} from './get-embed-url';
 import {initLANG, LANG} from '../../language/language';
+import {isDark} from '../../bb/base/base';
 
 let wrapperInstance: boolean = false;
 
 // lazy load rest of library, show a loading screen, expose Embed interface
-export function EmbedWrapper(p: IEmbedParams) {
+export function EmbedWrapper (p: IEmbedParams) {
     if (wrapperInstance) {
         throw new Error('Already created an embed');
     }
@@ -21,14 +21,14 @@ export function EmbedWrapper(p: IEmbedParams) {
 
     let project: IKlProject;
     let errorStr: string;
-    let psds: IReadPSD[] = []; // if instance not loaded yet, these are psds to be read
+    const psds: IReadPSD[] = []; // if instance not loaded yet, these are psds to be read
     let instance; // instance of loaded Embed
 
     (async () => {
         await initLANG();
 
         // loading screen
-        let loadingScreen = document.createElement('div');
+        const loadingScreen = document.createElement('div');
         const loadingStyleArr = [
             ['position', 'fixed'],
             ['left', '0'],
@@ -41,7 +41,7 @@ export function EmbedWrapper(p: IEmbedParams) {
             ['justifyContent', 'center'],
             ['flexDirection', 'column'],
 
-            ['background', 'rgb(158,158,158)'],
+            ['background', isDark() ? 'rgb(33, 33, 33)' : 'rgb(158,158,158)'],
 
             ['fontFamily', 'Arial, sans-serif'],
             ['fontSize', '30px'],
@@ -50,8 +50,9 @@ export function EmbedWrapper(p: IEmbedParams) {
         for (let i = 0; i < loadingStyleArr.length; i++) {
             loadingScreen.style[loadingStyleArr[i][0]] = loadingStyleArr[i][1];
         }
-        loadingScreen.id = "loading-screen";
-        loadingScreen.innerHTML = '<img width="150" height="54" src="' + (p.logoImg ? p.logoImg : logoImg) + '" alt="Logo"/>\n' +
+        loadingScreen.id = 'loading-screen';
+        const logoStyle = isDark() && !p.logoImg ? ' style="filter: invert(1)"' : '';
+        loadingScreen.innerHTML = '<img width="150" height="54"' + logoStyle + ' src="' + (p.logoImg ? p.logoImg : logoImg) + '" alt="Logo"/>\n' +
             '<div style="margin: 15px 0 0 0; display: flex; align-items: center">\n' +
             '<div class="spinner"></div>\n' +
             '<span id="loading-screen-text">' + LANG('embed-init-loading') + '</span>' +

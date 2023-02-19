@@ -1,19 +1,23 @@
 import {BB} from '../../bb/bb';
-import {IRGB, ITransform} from '../kl.types';
+import {IRGB, ITransform, TDrawEvent} from '../kl-types';
 import {WorkspaceSvgOverlay} from './workspace-svg-overlay';
 import {klHistory} from '../history/kl-history';
-// @ts-ignore
-import pickerImg from 'url:~/src/app/img/ui/cursor-picker.png';
-// @ts-ignore
-import zoomEwImg from 'url:~/src/app/img/ui/cursor-zoom-ew.png';
-// @ts-ignore
-import fillImg from 'url:~/src/app/img/ui/cursor-fill.png';
-// @ts-ignore
-import textImg from 'url:~/src/app/img/ui/cursor-text.png';
-import {IPressureInput, IVector2D} from '../../bb/bb.types';
+import pickerImg from '/src/app/img/ui/cursor-picker.png';
+import zoomEwImg from '/src/app/img/ui/cursor-zoom-ew.png';
+import fillImg from '/src/app/img/ui/cursor-fill.png';
+import textImg from '/src/app/img/ui/cursor-text.png';
+import {IPressureInput, IVector2D} from '../../bb/bb-types';
 import {KlCanvas} from '../canvas/kl-canvas';
 import {KeyListener} from '../../bb/input/key-listener';
 import {KL} from '../kl';
+import {IPointerEvent} from '../../bb/input/event.types';
+import {LinetoolProcessor} from '../events/linetool-processor';
+import {PinchZoomer} from '../../bb/input/event-chain/pinch-zoomer';
+import {DoubleTapper} from '../../bb/input/event-chain/double-tapper';
+import {NFingerTapper} from '../../bb/input/event-chain/n-finger-tapper';
+import {EventChain} from '../../bb/input/event-chain/event-chain';
+import {PointerListener} from '../../bb/input/pointer-listener';
+import {addIsDarkListener} from '../../bb/base/base';
 
 export interface IViewChangeEvent {
     changed: ('scale' | 'angle')[];
@@ -55,50 +59,51 @@ const ANIMATION_SPEED = 0.3; // rate of transition towards targetTransform
  */
 export class KlCanvasWorkspace {
 
-    private rootEl: HTMLElement;
+    private readonly rootEl: HTMLElement;
     private klCanvas: KlCanvas;
-    private renderTargetCanvas: HTMLCanvasElement;
-    private renderTargetCtx: CanvasRenderingContext2D;
+    private readonly renderTargetCanvas: HTMLCanvasElement;
+    private readonly renderTargetCtx: CanvasRenderingContext2D;
     private renderWidth: number;
     private renderHeight: number;
-    private compositeCanvas: HTMLCanvasElement; // for drawing klcanvas layer composite
-    private compositeCtx: CanvasRenderingContext2D;
+    private readonly compositeCanvas: HTMLCanvasElement; // for drawing klcanvas layer composite
+    private readonly compositeCtx: CanvasRenderingContext2D;
     private doResizeCanvas: boolean;
     private oldTransformObj: ITransform;
     private targetTransformObj: ITransform; // animation target
     private highResTransformObj: ITransform; // animated, internal high res
-    private renderedTransformObj: ITransform; // same as highRes, but rounded - what's actually displayed
+    private readonly renderedTransformObj: ITransform; // same as highRes, but rounded - what's actually displayed
     private cursorPos: IVector2D;
-    private usesCssCursor: boolean;
+    private readonly usesCssCursor: boolean;
     private bgVisible: boolean;
     private transformIsDirty: boolean;
     private doAnimateTranslate: boolean;
     private svgOverlay: WorkspaceSvgOverlay;
-    private emptyCanvas: HTMLCanvasElement;
+    private readonly emptyCanvas: HTMLCanvasElement;
+    private readonly emptyLightCanvas: HTMLCanvasElement;
     private keyListener: KeyListener;
     private currentMode: TMode;
     private globalMode: TMode;
     private renderTime: number; // for debugging - average ms per render()
     private lastDrawEvent: IPressureInput | null; // previous drawing input
-    private linetoolProcessor: any; // todo type - BB.EventChain.LinetoolProcessor
+    private linetoolProcessor: LinetoolProcessor;
     private pointer: IVector2D | null; // position of cursor
     private isDrawing: boolean;
     private inputProcessorObj: any; // todo type
     private currentInputProcessor: any; // todo type
     private angleIsExtraSticky: boolean;
-    private pinchZoomer: any; // todo type - BB.EventChain.PinchZoomer
-    private mainDoubleTapper: any; // todo type - BB.EventChain.DoubleTapper - todo docs
-    private middleDoubleTapper: any; // todo type - BB.EventChain.DoubleTapper - todo docs
-    private twoFingerTap: any; // todo type - BB.EventChain.NFingerTapper
-    private threeFingerTap: any; // todo type - BB.EventChain.NFingerTapper
-    private pointerEventChain: any; // todo type - BB.EventChain.EventChain
-    private pointerListener: any; // todo type - BB.PointerListener
+    private readonly pinchZoomer: PinchZoomer;
+    private readonly mainDoubleTapper: DoubleTapper;
+    private readonly middleDoubleTapper: DoubleTapper;
+    private readonly twoFingerTap: NFingerTapper;
+    private readonly threeFingerTap: NFingerTapper;
+    private pointerEventChain: EventChain;
+    private pointerListener: PointerListener | undefined;
     private brushRadius: number;
     private animationFrameRequested: boolean;
     private lastRenderedState: number; // KlHistory state - to detect if there are changes to draw
     private lastRenderTime: number; // ms from performance.now()
-    private hideBrushCursorTimeout: number;
-    private onViewChange: (e:  IViewChangeEvent) => void;
+    private hideBrushCursorTimeout: (ReturnType<typeof setTimeout>) | undefined;
+    private readonly onViewChange: (e:  IViewChangeEvent) => void;
 
     private getRenderedTransform (): ITransform {
         // rounded x & y so canvas is less blurry.
@@ -141,9 +146,9 @@ export class KlCanvasWorkspace {
         } else if (this.currentMode === TMode.Zoom) {
             this.rootEl.style.cursor = "url('" + zoomEwImg + "') 7 7, zoom-in";
         } else if (this.currentMode === TMode.Rotate) {
-            this.rootEl.style.cursor = "grab";
+            this.rootEl.style.cursor = 'grab';
         } else if (this.currentMode === TMode.Rotating) {
-            this.rootEl.style.cursor = "grabbing";
+            this.rootEl.style.cursor = 'grabbing';
         } else if (this.currentMode === TMode.Fill) {
             this.rootEl.style.cursor = "url('" + fillImg + "') 1 12, crosshair";
         } else if (this.currentMode === TMode.Gradient) {
@@ -232,11 +237,11 @@ export class KlCanvasWorkspace {
         // --- determine centerPosA, centerPosB ---
         const centerPosA = this.canvasToWorkspaceCoord({
             x: w / 2,
-            y: h / 2
+            y: h / 2,
         }, transformA);
         const centerPosB = this.canvasToWorkspaceCoord({
             x: w / 2,
-            y: h / 2
+            y: h / 2,
         }, transformB);
 
         // --- centerPosMixed ---
@@ -250,7 +255,7 @@ export class KlCanvasWorkspace {
         // --- x and y ---
         const mixedPos = this.canvasToWorkspaceCoord({
             x: -w / 2,
-            y: -h / 2
+            y: -h / 2,
         }, transformA);
         transformA.x = mixedPos.x;
         transformA.y = mixedPos.y;
@@ -309,6 +314,7 @@ export class KlCanvasWorkspace {
         const h = this.klCanvas.getHeight();
 
         const art = this.getRenderedTransform();
+        const isDark = BB.isDark();
 
         if (art.scale >= 4 || (art.scale === 1 && art.angle === 0)) {
             ctx.imageSmoothingEnabled = false;
@@ -324,7 +330,7 @@ export class KlCanvasWorkspace {
         ctx.save();
         {
             if (this.bgVisible) {
-                ctx.fillStyle = 'rgb(158,158,158)'; // 'rgb(185,185,185)';
+                ctx.fillStyle = isDark ? 'rgb(33, 33, 33)' : 'rgb(158,158,158)'; // 'rgb(185,185,185)';
                 ctx.fillRect(0, 0, this.renderWidth, this.renderHeight);
             } else {
                 ctx.clearRect(0, 0, this.renderWidth, this.renderHeight);
@@ -343,9 +349,9 @@ export class KlCanvasWorkspace {
 
                 //outline
                 const borderSize = 1;
-                ctx.globalAlpha = 0.2;
+                ctx.globalAlpha = isDark ? 0.25 : 0.2;
                 ctx.drawImage(
-                    this.emptyCanvas,
+                    isDark ? this.emptyLightCanvas : this.emptyCanvas,
                     -borderSize / art.scale,
                     -borderSize / art.scale,
                     w + borderSize * 2 / art.scale,
@@ -400,11 +406,11 @@ export class KlCanvasWorkspace {
         if (TMode.Rotate === this.currentMode || TMode.Rotating === this.currentMode) {
             this.svgOverlay.updateCompass({
                 isVisible: true,
-                angleDeg: art.angle / Math.PI * 180
+                angleDeg: art.angle / Math.PI * 180,
             });
         } else {
             this.svgOverlay.updateCompass({
-                isVisible: false
+                isVisible: false,
             });
         }
     }
@@ -553,7 +559,7 @@ export class KlCanvasWorkspace {
             this.svgOverlay.updateCursor({
                 x: this.pointer.x,
                 y: this.pointer.y,
-                isVisible: true
+                isVisible: true,
             });
         } else {
             this.svgOverlay.updateCursor({isVisible: false});
@@ -585,7 +591,7 @@ export class KlCanvasWorkspace {
             klCanvas: any; // todo
             width: number;
             height: number;
-            onDraw: (val) => void; // todo
+            onDraw: (val: TDrawEvent) => void; // todo
             onPick: (rgb: IRGB, isPointerup: boolean) => void;
             onFill: (canvasX: number, canvasY: number) => void;
             onGradient: (type: 'down' | 'up' | 'move', canvasX: number, canvasY: number, angleRad: number) => void;
@@ -607,39 +613,39 @@ export class KlCanvasWorkspace {
                 cursor: 'crosshair',
                 userSelect: 'none',
                 colorScheme: 'only light',
-            }
+            },
         });
         this.klCanvas = p.klCanvas;
         this.onViewChange = p.onViewChange;
         this.renderTargetCanvas = BB.canvas(p.width, p.height);
-        this.renderTargetCtx = this.renderTargetCanvas.getContext('2d');
+        this.renderTargetCtx = BB.ctx(this.renderTargetCanvas);
         this.renderWidth = p.width;
         this.renderHeight = p.height;
         this.compositeCanvas = BB.canvas(1, 1); // for drawing klcanvas layer composite
-        this.compositeCtx = this.compositeCanvas.getContext('2d');
+        this.compositeCtx = BB.ctx(this.compositeCanvas);
         this.doResizeCanvas = false;
         this.oldTransformObj = null;
         this.targetTransformObj = {
             x: 0,
             y: 0,
             scale: 1,
-            angle: 0
+            angle: 0,
         };
         this.highResTransformObj = {
             x: 0,
             y: 0,
             scale: 1,
-            angle: 0
+            angle: 0,
         };
         this.renderedTransformObj = {
             x: null,
             y: null,
             scale: null,
-            angle: null
+            angle: null,
         };
         this.cursorPos = {
             x: 0,
-            y: 0
+            y: 0,
         };
         this.usesCssCursor = false;
         this.bgVisible = true;
@@ -648,7 +654,7 @@ export class KlCanvasWorkspace {
 
         this.svgOverlay = new WorkspaceSvgOverlay({
             width: p.width,
-            height: p.height
+            height: p.height,
         });
 
         BB.css(this.renderTargetCanvas, {
@@ -656,26 +662,36 @@ export class KlCanvasWorkspace {
             pointerEvents: 'none',
         });
         BB.createCheckerDataUrl(8, (url) => {
-            this.renderTargetCanvas.style.background = "url(" + url + ")";
+            this.renderTargetCanvas.style.background = 'url(' + url + ')';
+        }, BB.isDark());
+
+        addIsDarkListener(() => {
+            this.renderTargetCanvas.style.background = 'url(' + BB.createCheckerDataUrl(8, undefined, BB.isDark()) + ')';
+            this.lastRenderedState = -1;
+            this.reqFrame();
         });
-        this.rootEl.appendChild(this.renderTargetCanvas);
-        this.rootEl.appendChild(this.svgOverlay.getElement());
-        BB.addEventListener(this.rootEl, 'touchend', (e) => {
+
+        this.rootEl.append(this.renderTargetCanvas, this.svgOverlay.getElement());
+        this.rootEl.addEventListener( 'touchend', (e) => {
             e.preventDefault();
             return false;
         });
-        BB.addEventListener(this.rootEl, 'contextmenu', (e) => {
+        this.rootEl.addEventListener('contextmenu', (e) => {
             e.preventDefault();
             return false;
         });
-        BB.addEventListener(this.rootEl, 'dragstart', (e) => {
+        this.rootEl.addEventListener('dragstart', (e) => {
             e.preventDefault();
             return false;
         });
 
         this.emptyCanvas = BB.canvas(1, 1);
+        this.emptyLightCanvas = BB.canvas(1, 1);
         {
-            const ctx = this.emptyCanvas.getContext('2d');
+            let ctx = BB.ctx(this.emptyCanvas);
+            ctx.fillRect(0, 0, 1, 1);
+            ctx = BB.ctx(this.emptyLightCanvas);
+            ctx.fillStyle = '#fff';
             ctx.fillRect(0, 0, 1, 1);
         }
 
@@ -733,7 +749,7 @@ export class KlCanvasWorkspace {
                 if (this.currentInputProcessor) {
                     this.currentInputProcessor.onKeyUp(keyStr, event, oldComboStr);
                 }
-            }
+            },
         });
 
         this.updateChangeListener();
@@ -745,7 +761,7 @@ export class KlCanvasWorkspace {
 
         this.lastDrawEvent = null;
 
-        this.linetoolProcessor = new BB.EventChain.LinetoolProcessor({
+        this.linetoolProcessor = new LinetoolProcessor({
             onDraw: (event) => {
                 const getMatrix = () => {
                     const art = this.getRenderedTransform();
@@ -763,7 +779,7 @@ export class KlCanvasWorkspace {
                     this.lastDrawEvent = {
                         x: coords[0],
                         y: coords[1],
-                        pressure: event.pressure1
+                        pressure: event.pressure1,
                     };
                     return;
                 }
@@ -796,11 +812,15 @@ export class KlCanvasWorkspace {
                 }
 
 
-                if (['down', 'move'].includes(event.type)) {
-                    this.lastDrawEvent = event;
+                if (event.type === 'down' || event.type === 'move') {
+                    this.lastDrawEvent = {
+                        x: event.x,
+                        y: event.y,
+                        pressure: event.pressure,
+                    };
                 }
                 p.onDraw(event);
-            }
+            },
         });
 
         this.pointer = null;
@@ -817,7 +837,7 @@ export class KlCanvasWorkspace {
                     const comboStr = this.keyListener.getComboStr();
 
                     const event: any = {
-                        scale: this.highResTransformObj.scale
+                        scale: this.highResTransformObj.scale,
                     };
                     event.shiftIsPressed = comboStr === 'shift';
                     event.pressure = val.pressure;
@@ -853,7 +873,7 @@ export class KlCanvasWorkspace {
                 },
                 onKeyUp: (keyStr, event, oldComboStr) => {
 
-                }
+                },
             },
             fill: {
                 onPointer: (event) => {
@@ -877,7 +897,7 @@ export class KlCanvasWorkspace {
                 },
                 onKeyUp: (keyStr, event, oldComboStr) => {
 
-                }
+                },
             },
             gradient: {
                 onPointer: (event) => {
@@ -905,7 +925,7 @@ export class KlCanvasWorkspace {
                 },
                 onKeyUp: (keyStr, event, oldComboStr) => {
 
-                }
+                },
             },
             text: {
                 onPointer: (event) => {
@@ -929,7 +949,7 @@ export class KlCanvasWorkspace {
                 },
                 onKeyUp: (keyStr, event, oldComboStr) => {
 
-                }
+                },
             },
             shape: {
                 onPointer: (event) => {
@@ -957,7 +977,7 @@ export class KlCanvasWorkspace {
                 },
                 onKeyUp: (keyStr, event, oldComboStr) => {
 
-                }
+                },
             },
             hand: {
                 onPointer: (event) => {
@@ -966,7 +986,7 @@ export class KlCanvasWorkspace {
                         this.updateCursor(TMode.HandGrabbing);
                         this.targetTransformObj.x += event.dX;
                         this.targetTransformObj.y += event.dY;
-                        this.highResTransformObj = JSON.parse(JSON.stringify(this.targetTransformObj));
+                        this.highResTransformObj = BB.copyObj(this.targetTransformObj);
                         this.doAnimateTranslate = false;
                         this.transformIsDirty = true;
                         this.reqFrame(true);
@@ -979,7 +999,7 @@ export class KlCanvasWorkspace {
                 },
                 onKeyUp: (keyStr, event, oldComboStr) => {
 
-                }
+                },
             },
             spaceHand: {
                 onPointer: (event) => {
@@ -988,7 +1008,7 @@ export class KlCanvasWorkspace {
                         this.updateCursor(TMode.HandGrabbing);
                         this.targetTransformObj.x += event.dX;
                         this.targetTransformObj.y += event.dY;
-                        this.highResTransformObj = JSON.parse(JSON.stringify(this.targetTransformObj));
+                        this.highResTransformObj = BB.copyObj(this.targetTransformObj);
                         this.doAnimateTranslate = false;
                         this.transformIsDirty = true;
                         this.reqFrame(true);
@@ -1003,7 +1023,7 @@ export class KlCanvasWorkspace {
                 },
                 onKeyUp: (keyStr, event, oldComboStr) => {
                     this.resetInputProcessor();
-                }
+                },
             },
             zoom: {
                 onPointer: (event) => {
@@ -1015,14 +1035,14 @@ export class KlCanvasWorkspace {
                         const offsetY = event.pageY - event.relY;
 
                         this.internalZoomByStep(event.dX / 175, event.downPageX - offsetX, event.downPageY - offsetY);
-                        this.highResTransformObj = JSON.parse(JSON.stringify(this.targetTransformObj));
+                        this.highResTransformObj = BB.copyObj(this.targetTransformObj);
                         this.lastRenderedState = -1;
                         this.reqFrame();
 
                         this.onViewChange({
                             changed: ['scale'],
                             angle: this.targetTransformObj.angle,
-                            scale: this.targetTransformObj.scale
+                            scale: this.targetTransformObj.scale,
                         });
                     }
                 },
@@ -1035,7 +1055,7 @@ export class KlCanvasWorkspace {
                 },
                 onKeyUp: (keyStr, event, oldComboStr) => {
                     this.resetInputProcessor();
-                }
+                },
             },
             picker: {
                 onPointer: (event) => {
@@ -1051,7 +1071,7 @@ export class KlCanvasWorkspace {
                             x: event.relX,
                             y: event.relY,
                             color: pickedColor,
-                            isVisible: event.type !== 'pointerup'
+                            isVisible: event.type !== 'pointerup',
                         });
 
                         if (event.type === 'pointerup') {
@@ -1064,7 +1084,7 @@ export class KlCanvasWorkspace {
                 },
                 onKeyUp: (keyStr, event, oldComboStr) => {
 
-                }
+                },
             },
             altPicker: {
                 onPointer: (event) => {
@@ -1080,7 +1100,7 @@ export class KlCanvasWorkspace {
                             x: event.relX,
                             y: event.relY,
                             color: pickedColor,
-                            isVisible: event.type !== 'pointerup'
+                            isVisible: event.type !== 'pointerup',
                         });
                     }
                 },
@@ -1093,14 +1113,14 @@ export class KlCanvasWorkspace {
                 },
                 onKeyUp: (keyStr, event, oldComboStr) => {
                     this.resetInputProcessor();
-                }
+                },
             },
             rotate: {
                 onPointer: (event) => {
                     this.updateCursor(event.button === 'left' ? TMode.Rotating : TMode.Rotate);
 
                     if (event.type === 'pointerdown' && event.button === 'left') {
-                        this.oldTransformObj = JSON.parse(JSON.stringify(this.targetTransformObj));
+                        this.oldTransformObj = BB.copyObj(this.targetTransformObj);
                     } else if (event.button === 'left' && !event.isCoalesced && this.oldTransformObj) {
 
 
@@ -1109,7 +1129,7 @@ export class KlCanvasWorkspace {
                         //rotation done around center
                         const centerObj = {
                             x: this.renderWidth / 2,
-                            y: this.renderHeight / 2
+                            y: this.renderHeight / 2,
                         };
 
                         const startAngleRad = BB.Vec2.angle(centerObj, {x: event.downPageX - offsetX, y: event.downPageY - offsetY});
@@ -1117,7 +1137,7 @@ export class KlCanvasWorkspace {
                         let dAngleRad = angleRad - startAngleRad;
 
                         //apply angle
-                        this.targetTransformObj = JSON.parse(JSON.stringify(this.oldTransformObj));
+                        this.targetTransformObj = BB.copyObj(this.oldTransformObj);
                         this.targetTransformObj.angle += dAngleRad;
 
                         if (this.keyListener.isPressed('shift')) {
@@ -1140,7 +1160,7 @@ export class KlCanvasWorkspace {
                         this.targetTransformObj.x = origin[0];
                         this.targetTransformObj.y = origin[1];
 
-                        this.highResTransformObj = JSON.parse(JSON.stringify(this.targetTransformObj));
+                        this.highResTransformObj = BB.copyObj(this.targetTransformObj);
 
                         this.transformIsDirty = true;
                         this.lastRenderedState = -1;
@@ -1149,7 +1169,7 @@ export class KlCanvasWorkspace {
                         this.onViewChange({
                             changed: ['angle'],
                             scale: this.targetTransformObj.scale,
-                            angle: this.targetTransformObj.angle
+                            angle: this.targetTransformObj.angle,
                         });
 
                     }
@@ -1168,24 +1188,24 @@ export class KlCanvasWorkspace {
                     } else {
                         this.resetInputProcessor();
                     }
-                }
-            }
+                },
+            },
         };
         this.currentInputProcessor = null;
 
 
         this.angleIsExtraSticky = false;
-        this.pinchZoomer = new BB.EventChain.PinchZoomer({
+        this.pinchZoomer = new BB.PinchZoomer({
             onPinch: (event) => {
 
                 if (event.type === 'move') {
 
                     if (!this.oldTransformObj) {
-                        this.oldTransformObj = JSON.parse(JSON.stringify(this.targetTransformObj));
+                        this.oldTransformObj = BB.copyObj(this.targetTransformObj);
                         this.angleIsExtraSticky = this.targetTransformObj.angle % (Math.PI / 2) === 0;
                     }
 
-                    this.targetTransformObj = JSON.parse(JSON.stringify(this.oldTransformObj));
+                    this.targetTransformObj = BB.copyObj(this.oldTransformObj);
 
                     event.scale = Math.max(MIN_SCALE, Math.min(MAX_SCALE, this.targetTransformObj.scale * event.scale)) / this.targetTransformObj.scale;
 
@@ -1228,7 +1248,7 @@ export class KlCanvasWorkspace {
                     this.onViewChange({
                         changed: ['scale', 'angle'],
                         scale: this.targetTransformObj.scale,
-                        angle: this.targetTransformObj.angle
+                        angle: this.targetTransformObj.angle,
                     });
                     //}
                     this.reqFrame();
@@ -1241,7 +1261,7 @@ export class KlCanvasWorkspace {
                 }
 
 
-            }
+            },
         });
 
         const onDoubleTap = (event) => {
@@ -1251,7 +1271,7 @@ export class KlCanvasWorkspace {
             } else {
                 // zoom 2 steps further
 
-                let didZoom = this.internalZoomByStep(
+                const didZoom = this.internalZoomByStep(
                     2,
                     event.relX,
                     event.relY,
@@ -1260,46 +1280,46 @@ export class KlCanvasWorkspace {
                     this.onViewChange({
                         changed: ['scale'],
                         angle: this.targetTransformObj.angle,
-                        scale: this.targetTransformObj.scale
+                        scale: this.targetTransformObj.scale,
                     });
                 }
 
                 //updateCursor(TMode.Draw, true);
                 this.lastRenderedState = -1;
             }
-        }
+        };
 
-        this.mainDoubleTapper = new BB.EventChain.DoubleTapper({ onDoubleTap });
-        this.middleDoubleTapper = new BB.EventChain.DoubleTapper({ onDoubleTap });
+        this.mainDoubleTapper = new BB.DoubleTapper({ onDoubleTap });
+        this.middleDoubleTapper = new BB.DoubleTapper({ onDoubleTap });
         this.middleDoubleTapper.setAllowedButtonArr(['middle']);
 
 
-        this.twoFingerTap = new BB.EventChain.NFingerTapper({
+        this.twoFingerTap = new BB.NFingerTapper({
             fingers: 2,
             onTap: () => {
                 p.onUndo();
-            }
+            },
         });
-        this.threeFingerTap = new BB.EventChain.NFingerTapper({
+        this.threeFingerTap = new BB.NFingerTapper({
             fingers: 3,
             onTap: () => {
                 p.onRedo();
-            }
+            },
         });
 
 
-        this.pointerEventChain = new BB.EventChain.EventChain({
+        this.pointerEventChain = new BB.EventChain({
             chainArr: [
                 this.twoFingerTap,
                 this.threeFingerTap,
                 this.mainDoubleTapper,
                 this.middleDoubleTapper,
                 this.pinchZoomer,
-                new BB.EventChain.OnePointerLimiter(),
-                new BB.EventChain.CoalescedExploder()
-            ]
+                new BB.OnePointerLimiter(),
+                new BB.CoalescedExploder(),
+            ],
         });
-        this.pointerEventChain.setChainOut((event) => {
+        this.pointerEventChain.setChainOut((event: IPointerEvent) => {
 
             this.cursorPos.x = event.relX;
             this.cursorPos.y = event.relY;
@@ -1320,7 +1340,7 @@ export class KlCanvasWorkspace {
 
             } else {
 
-                let comboStr = this.keyListener.getComboStr();
+                const comboStr = this.keyListener.getComboStr();
 
                 if (this.globalMode === TMode.Draw) {
 
@@ -1434,7 +1454,7 @@ export class KlCanvasWorkspace {
         });
 
         //prevent ctrl scroll -> zooming page
-        BB.addEventListener(this.rootEl, 'wheel', (event) => {
+        this.rootEl.addEventListener('wheel', (event) => {
             event.preventDefault();
         });
 
@@ -1457,7 +1477,7 @@ export class KlCanvasWorkspace {
                         BB.throwOut(JSON.stringify(e));
                     }*/
 
-                    this.pointerEventChain.chainIn(e)
+                    this.pointerEventChain.chainIn(e);
                 },
                 onWheel: (wheelEvent) => {
 
@@ -1466,7 +1486,7 @@ export class KlCanvasWorkspace {
                     }
 
                     this.reqFrame();
-                    let didZoom = this.internalZoomByStep(
+                    const didZoom = this.internalZoomByStep(
                         -wheelEvent.deltaY / (this.keyListener.isPressed('shift') ? 8 : 2),
                         wheelEvent.relX,
                         wheelEvent.relY
@@ -1475,7 +1495,7 @@ export class KlCanvasWorkspace {
                         this.onViewChange({
                             changed: ['scale'],
                             angle: this.targetTransformObj.angle,
-                            scale: this.targetTransformObj.scale
+                            scale: this.targetTransformObj.scale,
                         });
                     }
 
@@ -1492,7 +1512,7 @@ export class KlCanvasWorkspace {
                         }
                     }
                 },
-                maxPointers: 4
+                maxPointers: 4,
             });
         }, 1);
 
@@ -1591,7 +1611,7 @@ export class KlCanvasWorkspace {
         }
     }
 
-    getMode(): TModeStr {
+    getMode (): TModeStr {
         if (this.globalMode === TMode.Draw) {
             return 'draw';
         }
@@ -1625,15 +1645,14 @@ export class KlCanvasWorkspace {
         this.svgOverlay.updateCursor({radius: this.brushRadius * this.highResTransformObj.scale});
 
         if (this.pointer === null) {
-            clearTimeout(this.hideBrushCursorTimeout);
+            this.hideBrushCursorTimeout && clearTimeout(this.hideBrushCursorTimeout);
 
             this.svgOverlay.updateCursor({
                 x: this.renderWidth / 2,
                 y: this.renderHeight / 2,
-                isVisible: true
+                isVisible: true,
             });
 
-            // @ts-ignore
             this.hideBrushCursorTimeout = setTimeout(() => {
                 if (this.pointer !== null) {
                     return;
@@ -1654,7 +1673,7 @@ export class KlCanvasWorkspace {
         this.onViewChange({
             changed: ['scale'],
             angle: this.targetTransformObj.angle,
-            scale: this.targetTransformObj.scale
+            scale: this.targetTransformObj.scale,
         });
     }
 
@@ -1666,7 +1685,7 @@ export class KlCanvasWorkspace {
         this.targetTransformObj.y = (this.renderHeight - this.klCanvas.getHeight()) / 2;
 
         if (!doAnimate) {
-            this.highResTransformObj = JSON.parse(JSON.stringify(this.targetTransformObj));
+            this.highResTransformObj = BB.copyObj(this.targetTransformObj);
         } else {
             this.doAnimateTranslate = true;
             this.transformIsDirty = true;
@@ -1679,7 +1698,7 @@ export class KlCanvasWorkspace {
             this.onViewChange({
                 changed: ['scale', 'angle'],
                 scale: this.targetTransformObj.scale,
-                angle: this.targetTransformObj.angle
+                angle: this.targetTransformObj.angle,
             });
         }
     }
@@ -1717,7 +1736,7 @@ export class KlCanvasWorkspace {
             x0: null,
             y0: null,
             x1: null,
-            y1: null
+            y1: null,
         };
         for (let i = 0; i < canvasPointsArr.length; i++) {
             if (boundsObj.x0 === null || canvasPointsArr[i][0] < boundsObj.x0) {
@@ -1773,7 +1792,7 @@ export class KlCanvasWorkspace {
         this.onViewChange({
             changed: ['scale', 'angle'],
             scale: this.targetTransformObj.scale,
-            angle: this.targetTransformObj.angle
+            angle: this.targetTransformObj.angle,
         });
         return true;
     }
@@ -1782,7 +1801,7 @@ export class KlCanvasWorkspace {
         //rotation done around center
         const centerObj = {
             x: this.renderWidth / 2,
-            y: this.renderHeight / 2
+            y: this.renderHeight / 2,
         };
 
         const oldAngleRad = this.targetTransformObj.angle;
@@ -1813,7 +1832,7 @@ export class KlCanvasWorkspace {
         this.targetTransformObj.x = origin[0];
         this.targetTransformObj.y = origin[1];
 
-        this.highResTransformObj = JSON.parse(JSON.stringify(this.targetTransformObj));
+        this.highResTransformObj = BB.copyObj(this.targetTransformObj);
         this.transformIsDirty = true;
         this.reqFrame(true);
     }

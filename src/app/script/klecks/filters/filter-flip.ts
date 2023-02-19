@@ -1,197 +1,125 @@
 import {BB} from '../../bb/bb';
-import {Checkbox} from '../ui/base-components/checkbox';
+import {Checkbox} from '../ui/components/checkbox';
 import {KlCanvasPreview} from '../canvas-ui/canvas-preview';
-// @ts-ignore
-import checkmarkImg from 'url:~/src/app/img/ui/checkmark.svg';
-import {IFilterApply, IFilterGetDialogParam, IKlBasicLayer, IMixMode} from '../kl.types';
+import {IFilterApply, IFilterGetDialogParam, IFilterGetDialogResult, IKlBasicLayer, TMixMode} from '../kl-types';
 import {LANG} from '../../language/language';
+import {throwIfNull} from '../../bb/base/base';
+import {TFilterHistoryEntry} from './filters';
+import {Options} from '../ui/components/options';
+
+export type TFilterFlipInput = {
+    horizontal: boolean;
+    vertical: boolean;
+    flipCanvas: boolean;
+};
+
+export type TFilterFlipHistoryEntry = TFilterHistoryEntry<
+    'flip',
+    TFilterFlipInput>;
 
 export const filterFlip = {
 
-    getDialog(params: IFilterGetDialogParam) {
-        let context = params.context;
-        let klCanvas = params.klCanvas;
+    getDialog (params: IFilterGetDialogParam) {
+        const context = params.context;
+        const klCanvas = params.klCanvas;
         if (!context || !klCanvas) {
             return false;
         }
 
-        let layers = klCanvas.getLayers();
-        let selectedLayerIndex = klCanvas.getLayerIndex(context.canvas);
+        const layers = klCanvas.getLayers();
+        const selectedLayerIndex = klCanvas.getLayerIndex(context.canvas);
 
-        let fit = BB.fitInto(context.canvas.width, context.canvas.height, 280, 200, 1);
-        let w = parseInt('' + fit.width), h = parseInt('' + fit.height);
+        const fit = BB.fitInto(context.canvas.width, context.canvas.height, 280, 200, 1);
+        const w = parseInt('' + fit.width), h = parseInt('' + fit.height);
 
-        let div = document.createElement("div");
-        let result: any = {
-            element: div
+        const div = document.createElement('div');
+        const result: IFilterGetDialogResult<TFilterFlipInput> = {
+            element: div,
         };
         let isHorizontal = true;
         let isVertical = false;
         let doFlipCanvas = true;
-        div.innerHTML = LANG('filter-flip-description') + "<br/><br/>";
+        div.innerHTML = LANG('filter-flip-description') + '<br/><br/>';
 
 
-        let horizontalCheckbox = new Checkbox({
+        const horizontalCheckbox = new Checkbox({
             init: isHorizontal,
             label: LANG('filter-flip-horizontal') + ' ⟷',
             allowTab: true,
-            callback: function(v) {
+            callback: function (v) {
                 isHorizontal = v;
                 updatePreview();
             },
             css: {
-                marginBottom: '10px'
-            }
+                marginBottom: '10px',
+            },
         });
-        let verticalCheckbox = new Checkbox({
+        const verticalCheckbox = new Checkbox({
             init: isVertical,
             label: LANG('filter-flip-vertical') + ' ↕',
             allowTab: true,
-            callback: function(v) {
+            callback: function (v) {
                 isVertical = v;
                 updatePreview();
             },
             css: {
-                marginBottom: '10px'
-            }
+                marginBottom: '10px',
+            },
         });
-        div.appendChild(horizontalCheckbox.getElement());
-        div.appendChild(verticalCheckbox.getElement());
+        div.append(horizontalCheckbox.getElement());
+        div.append(verticalCheckbox.getElement());
 
-
-
-
-
-        let fcOption = document.createElement("div");
-        BB.setEventListener(fcOption, 'onpointerdown', function () {
-            return false;
-        });
-        fcOption.textContent = LANG('filter-flip-image');
-        fcOption.style.width = "150px";
-        fcOption.style.height = "30px";
-        fcOption.style.paddingTop = "10px";
-        fcOption.style.textAlign = "center";
-        fcOption.style.cssFloat = "left";
-        fcOption.style.paddingBottom = "0px";
-        fcOption.style.borderTopLeftRadius = "10px";
-        fcOption.style.boxShadow = "inset 0px 5px 10px rgba(0,0,0,0.5)";
-        fcOption.style.background = "url(" + checkmarkImg + ") no-repeat 12px 16px";
-        fcOption.style.backgroundSize = '8%';
-        fcOption.style.backgroundColor = "#9e9e9e";
-
-        let flOption = document.createElement("div");
-        BB.setEventListener(flOption, 'onpointerdown', function () {
-            return false;
-        });
-        flOption.textContent = LANG('filter-flip-layer');
-        flOption.style.width = "150px";
-        flOption.style.height = "30px";
-        flOption.style.paddingTop = "10px";
-        flOption.style.textAlign = "center";
-        flOption.style.cssFloat = "left";
-        flOption.style.paddingBottom = "0px";
-        flOption.style.borderTopRightRadius = "10px";
-        flOption.style.cursor = "pointer";
-        flOption.style.backgroundColor = "rgba(0, 0, 0, 0.1)";
-        flOption.style.backgroundSize = '8%';
-
-        BB.setEventListener(fcOption, 'onpointerover', function () {
-            if (doFlipCanvas === false)
-                fcOption.style.backgroundColor = "#ccc";
-        });
-        BB.setEventListener(fcOption, 'onpointerout', function () {
-            if (doFlipCanvas === false)
-                fcOption.style.backgroundColor = "rgba(0, 0, 0, 0.1)";
-        });
-        BB.setEventListener(flOption, 'onpointerover', function () {
-            if (doFlipCanvas === true)
-                flOption.style.backgroundColor = "#ccc";
-        });
-        BB.setEventListener(flOption, 'onpointerout', function () {
-            if (doFlipCanvas === true)
-                flOption.style.backgroundColor = "rgba(0, 0, 0, 0.1)";
+        const targetOptions = new Options<boolean>({
+            optionArr: [
+                {
+                    id: true,
+                    label: LANG('filter-flip-image'),
+                },
+                {
+                    id: false,
+                    label: LANG('filter-flip-layer'),
+                },
+            ],
+            onChange: (val) => {
+                doFlipCanvas = val;
+                updatePreview();
+            },
         });
 
-        fcOption.onclick = function () {
-            doFlipCanvas = true;
-
-            flOption.style.background = "";
-            flOption.style.backgroundColor = "rgba(0, 0, 0, 0.1)";
-            flOption.style.boxShadow = "";
-            flOption.style.cursor = "pointer";
-
-            fcOption.style.background = "url(" + checkmarkImg + ") no-repeat 12px 16px";
-            fcOption.style.backgroundSize = '8%';
-            fcOption.style.backgroundColor = "#9e9e9e";
-            fcOption.style.cursor = "default";
-            fcOption.style.boxShadow = "inset 0px 5px 10px rgba(0,0,0,0.5)";
-
-            updatePreview();
-        };
-        flOption.onclick = function () {
-            doFlipCanvas = false;
-
-            fcOption.style.background = "";
-            fcOption.style.backgroundColor = "rgba(0, 0, 0, 0.1)";
-            fcOption.style.boxShadow = "";
-            fcOption.style.cursor = "pointer";
-
-            flOption.style.background = "url(" + checkmarkImg + ") no-repeat 12px 16px";
-            flOption.style.backgroundSize = '8%';
-            flOption.style.backgroundColor = "#9e9e9e";
-            flOption.style.cursor = "default";
-            flOption.style.boxShadow = "inset 0px 5px 10px rgba(0,0,0,0.5)";
-
-            updatePreview();
-        };
-
-        let optionWrapper = document.createElement("div");
-        optionWrapper.appendChild(fcOption);
-        optionWrapper.appendChild(flOption);
-        div.appendChild(optionWrapper);
+        div.append(targetOptions.getElement());
 
 
-        let previewWrapper = document.createElement("div");
-        BB.css(previewWrapper, {
-            width: "340px",
-            marginLeft: "-20px",
-            height: "220px",
-            backgroundColor: "#9e9e9e",
-            marginTop: "10px",
-            boxShadow: "rgba(0, 0, 0, 0.2) 0px 1px inset, rgba(0, 0, 0, 0.2) 0px -1px inset",
-            overflow: "hidden",
-            position: "relative",
-            userSelect: 'none',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            colorScheme: 'only light',
+        const previewWrapper = BB.el({
+            className: 'kl-preview-wrapper',
+            css: {
+                width: '340px',
+                height: '220px',
+            },
         });
 
-        let previewLayer: IKlBasicLayer = {
+        const previewLayer: IKlBasicLayer = {
             image: BB.canvas(Math.round(w), Math.round(h)),
             opacity: 1,
-            mixModeStr: 'source-over' as IMixMode,
+            mixModeStr: 'source-over' as TMixMode,
         };
-        let klCanvasPreview = new KlCanvasPreview({
+        const klCanvasPreview = new KlCanvasPreview({
             width: Math.round(w),
             height: Math.round(h),
-            layers: [previewLayer]
+            layers: [previewLayer],
         });
 
-        let previewInnerWrapper = BB.el({
+        const previewInnerWrapper = BB.el({
+            className: 'kl-preview-wrapper__canvas',
             css: {
-                position: 'relative',
-                boxShadow: '0 0 5px rgba(0,0,0,0.5)',
                 width: parseInt('' + w) + 'px',
-                height: parseInt('' + h) + 'px'
-            }
+                height: parseInt('' + h) + 'px',
+            },
         });
-        previewInnerWrapper.appendChild(klCanvasPreview.getElement());
-        previewWrapper.appendChild(previewInnerWrapper);
+        previewInnerWrapper.append(klCanvasPreview.getElement());
+        previewWrapper.append(previewInnerWrapper);
 
-        function updatePreview() {
-            let ctx = (previewLayer.image as HTMLCanvasElement).getContext('2d');
+        function updatePreview (): void {
+            const ctx = BB.ctx((previewLayer.image as HTMLCanvasElement));
             ctx.save();
             ctx.clearRect(0, 0, previewLayer.image.width, previewLayer.image.height);
 
@@ -232,44 +160,50 @@ export const filterFlip = {
         setTimeout(updatePreview, 0);
 
 
-        div.appendChild(previewWrapper);
-        result.destroy = () => {
+        div.append(previewWrapper);
+        result.destroy = (): void => {
             horizontalCheckbox.destroy();
             verticalCheckbox.destroy();
+            targetOptions.destroy();
+            klCanvasPreview.destroy();
         };
-        result.getInput = function () {
+        result.getInput = function (): TFilterFlipInput {
             result.destroy();
             return {
                 horizontal: isHorizontal,
                 vertical: isVertical,
-                flipCanvas: doFlipCanvas
+                flipCanvas: doFlipCanvas,
             };
         };
         return result;
     },
 
-    apply(params: IFilterApply) {
-        let context = params.context;
-        let klCanvas = params.klCanvas;
-        let history = params.history;
-        let horizontal = params.input.horizontal;
-        let vertical = params.input.vertical;
-        let flipCanvas = params.input.flipCanvas;
+    apply (params: IFilterApply<TFilterFlipInput>): boolean {
+        const context = params.context;
+        const klCanvas = params.klCanvas;
+        const history = params.history;
+        const horizontal = params.input.horizontal;
+        const vertical = params.input.vertical;
+        const flipCanvas = params.input.flipCanvas;
         if (!context || !klCanvas || !history) {
             return false;
         }
 
         history.pause(true);
-        klCanvas.flip(horizontal, vertical, flipCanvas ? null : klCanvas.getLayerIndex(context.canvas));
+        klCanvas.flip(
+            horizontal,
+            vertical,
+            flipCanvas ? undefined : throwIfNull(klCanvas.getLayerIndex(context.canvas)),
+        );
         history.pause(false);
 
         history.push({
-            tool: ["filter", "flip"],
-            action: "apply",
+            tool: ['filter', 'flip'],
+            action: 'apply',
             params: [{
-                input: params.input
-            }]
-        });
+                input: params.input,
+            }],
+        } as TFilterFlipHistoryEntry);
         return true;
     },
 

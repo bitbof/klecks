@@ -1,248 +1,277 @@
 import {BB} from '../../bb/bb';
-import {IHistoryEntry, KlHistoryInterface} from '../history/kl-history';
+import {IHistoryEntry, KlHistoryInterface, THistoryInnerActions} from '../history/kl-history';
 import {KL} from '../kl';
+import {TPressureInput} from '../kl-types';
+import {BezierLine} from '../../bb/math/line';
+import {ERASE_COLOR} from './erase-color';
 
-export function EraserBrush() {
-    let context;
-    let history: KlHistoryInterface = new KL.DecoyKlHistory();
-    let historyEntry: IHistoryEntry;
+export interface IEraserBrushHistoryEntry extends IHistoryEntry {
+    tool: ['brush', 'EraserBrush'];
+    actions: THistoryInnerActions<EraserBrush>[];
+}
 
-    let size = 30, spacing = 0.4, opacity = 1;
-    let sizePressure = true, opacityPressure = false;
-    let lastDot, lastInput = {x: 0, y: 0, pressure: 0};
-    let lastInput2 = {x: 0, y: 0, pressure: 0};
-    let started = false;
+type TIndexExtended2DContext = CanvasRenderingContext2D & { canvas: { index: number } };
 
-    let bezierLine;
-    let isBaseLayer = false;
-    let isTransparentBG = false;
+export class EraserBrush {
 
-    function drawDot(x, y, size, opacity) {
+    private size: number = 30;
+    private spacing: number = 0.4;
+    private opacity: number = 1;
+    private useSizePressure: boolean = true;
+    private useOpacityPressure: boolean = false;
+    private isTransparentBG: boolean = false;
 
-        context.save();
-        if (isBaseLayer) {
-            if (isTransparentBG) {
-                context.globalCompositeOperation = "destination-out";
+    private history: KlHistoryInterface = new KL.DecoyKlHistory();
+    private historyEntry: IEraserBrushHistoryEntry | undefined;
+    private isBaseLayer: boolean = false;
+    private context: TIndexExtended2DContext;
+
+    private started: boolean = false;
+    private lastDot: number | undefined;
+    private lastInput: TPressureInput = {x: 0, y: 0, pressure: 0};
+    private lastInput2: TPressureInput = {x: 0, y: 0, pressure: 0};
+    private bezierLine: BezierLine | undefined;
+
+
+    private drawDot (x: number, y: number, size: number, opacity: number): void {
+        this.context.save();
+        if (this.isBaseLayer) {
+            if (this.isTransparentBG) {
+                this.context.globalCompositeOperation = 'destination-out';
             } else {
-                context.globalCompositeOperation = "source-atop";
+                this.context.globalCompositeOperation = 'source-atop';
             }
         } else {
-            context.globalCompositeOperation = "destination-out";
+            this.context.globalCompositeOperation = 'destination-out';
         }
-        let radgrad = context.createRadialGradient(size, size, 0, size, size, size);
+        const radgrad = this.context.createRadialGradient(size, size, 0, size, size, size);
         let sharpness = Math.pow(opacity, 2);
         sharpness = Math.max(0, Math.min((size - 1) / size, sharpness));
-        let oFac = Math.max(0, Math.min(1, opacity));
-        let localOpacity = 2 * oFac - oFac * oFac;
-        radgrad.addColorStop(sharpness, "rgba(255, 255, 255, " + localOpacity + ")");
-        radgrad.addColorStop(1, "rgba(255, 255, 255, 0)");
-        context.fillStyle = radgrad;
-        context.translate(x - size, y - size);
-        context.fillRect(0, 0, size * 2, size * 2);
-        context.restore();
+        const oFac = Math.max(0, Math.min(1, opacity));
+        const localOpacity = 2 * oFac - oFac * oFac;
+        radgrad.addColorStop(sharpness, `rgba(${ERASE_COLOR}, ${ERASE_COLOR}, ${ERASE_COLOR}, ` + localOpacity + ')');
+        radgrad.addColorStop(1, `rgba(${ERASE_COLOR}, ${ERASE_COLOR}, ${ERASE_COLOR}, 0)`);
+        this.context.fillStyle = radgrad;
+        this.context.translate(x - size, y - size);
+        this.context.fillRect(0, 0, size * 2, size * 2);
+        this.context.restore();
     }
 
-    function continueLine(x, y, p) {
+    private continueLine (x: number | null, y: number | null, p: number): void {
         p = Math.max(0, Math.min(1, p));
         let localPressure;
         let localOpacity;
-        let localSize = (sizePressure) ? Math.max(0.1, p * size) : Math.max(0.1, size);
+        let localSize = (this.useSizePressure) ? Math.max(0.1, p * this.size) : Math.max(0.1, this.size);
 
-        let bdist = Math.max(1, Math.max(0.5, 1 - opacity) * localSize * spacing);
+        const bdist = Math.max(1, Math.max(0.5, 1 - this.opacity) * localSize * this.spacing);
 
-        function bezierCallback(val) {
-            let factor = val.t;
-            localPressure = lastInput2.pressure * (1 - factor) + p * factor;
-            localOpacity = (opacityPressure) ? (opacity * localPressure * localPressure) : opacity;
-            localSize = (sizePressure) ? Math.max(0.1, localPressure * size) : Math.max(0.1, size);
+        const bezierCallback = (val: {
+            x: number;
+            y: number;
+            t: number;
+            angle?: number;
+            dAngle: number;
+        }): void => {
+            const factor = val.t;
+            localPressure = this.lastInput2.pressure * (1 - factor) + p * factor;
+            localOpacity = (this.useOpacityPressure) ? (this.opacity * localPressure * localPressure) : this.opacity;
+            localSize = (this.useSizePressure) ? Math.max(0.1, localPressure * this.size) : Math.max(0.1, this.size);
 
-            drawDot(val.x, val.y, localSize, localOpacity);
-        }
+            this.drawDot(val.x, val.y, localSize, localOpacity);
+        };
 
         if (x === null) {
-            bezierLine.addFinal(bdist, bezierCallback);
+            this.bezierLine.addFinal(bdist, bezierCallback);
         } else {
-            bezierLine.add(x, y, bdist, bezierCallback);
+            this.bezierLine.add(x, y, bdist, bezierCallback);
         }
     }
 
+    // ---- public -----
+    constructor () {}
 
-    this.startLine = function (x, y, p) {
-        historyEntry = {
-            tool: ["brush", "EraserBrush"],
-            actions: []
+    // ---- interface ----
+    startLine (x: number, y: number, p: number): void {
+        this.historyEntry = {
+            tool: ['brush', 'EraserBrush'],
+            actions: [
+                {
+                    action: 'opacityPressure',
+                    params: [this.useOpacityPressure],
+                },
+                {
+                    action: 'sizePressure',
+                    params: [this.useSizePressure],
+                },
+                {
+                    action: 'setSize',
+                    params: [this.size],
+                },
+                {
+                    action: 'setOpacity',
+                    params: [this.opacity],
+                },
+                {
+                    action: 'setTransparentBG',
+                    params: [this.isTransparentBG],
+                },
+                {
+                    action: 'startLine',
+                    params: [x, y, p],
+                },
+            ],
         };
-        historyEntry.actions.push({
-            action: "opacityPressure",
-            params: [opacityPressure]
-        });
-        historyEntry.actions.push({
-            action: "sizePressure",
-            params: [sizePressure]
-        });
-        historyEntry.actions.push({
-            action: "setSize",
-            params: [size]
-        });
-        historyEntry.actions.push({
-            action: "setOpacity",
-            params: [opacity]
-        });
-        historyEntry.actions.push({
-            action: "setTransparentBG",
-            params: [isTransparentBG]
-        });
 
-        isBaseLayer = 0 === context.canvas.index;
+        this.isBaseLayer = 0 === this.context.canvas.index;
 
         p = Math.max(0, Math.min(1, p));
-        let localOpacity = (opacityPressure) ? (opacity * p * p) : opacity;
-        let localSize = (sizePressure) ? Math.max(0.1, p * size) : Math.max(0.1, size);
+        const localOpacity = (this.useOpacityPressure) ? (this.opacity * p * p) : this.opacity;
+        const localSize = (this.useSizePressure) ? Math.max(0.1, p * this.size) : Math.max(0.1, this.size);
 
-        started = true;
+        this.started = true;
         if (localSize > 1) {
-            drawDot(x, y, localSize, localOpacity);
+            this.drawDot(x, y, localSize, localOpacity);
         }
-        lastDot = localSize * spacing;
-        lastInput.x = x;
-        lastInput.y = y;
-        lastInput.pressure = p;
-        lastInput2 = BB.copyObj(lastInput);
+        this.lastDot = localSize * this.spacing;
+        this.lastInput.x = x;
+        this.lastInput.y = y;
+        this.lastInput.pressure = p;
+        this.lastInput2 = BB.copyObj(this.lastInput);
 
-        bezierLine = new BB.BezierLine();
-        bezierLine.add(x, y, 0, function () {
-        });
+        this.bezierLine = new BB.BezierLine();
+        this.bezierLine.add(x, y, 0, () => undefined);
+    }
 
-        historyEntry.actions.push({
-            action: "startLine",
-            params: [x, y, p]
-        });
-    };
-    this.goLine = function (x, y, p) {
-        if (!started) {
+    goLine (x: number, y: number, p: number): void {
+        if (!this.started || !this.historyEntry) {
             return;
         }
-        historyEntry.actions.push({
-            action: "goLine",
-            params: [x, y, p]
+        this.historyEntry.actions?.push({
+            action: 'goLine',
+            params: [x, y, p],
         });
 
-        continueLine(x, y, lastInput.pressure);
+        this.continueLine(x, y, this.lastInput.pressure);
 
-        lastInput2 = BB.copyObj(lastInput);
-        lastInput.x = x;
-        lastInput.y = y;
-        lastInput.pressure = p;
-    };
-    this.endLine = function () {
+        this.lastInput2 = BB.copyObj(this.lastInput);
+        this.lastInput.x = x;
+        this.lastInput.y = y;
+        this.lastInput.pressure = p;
+    }
 
-        if (bezierLine) {
-            continueLine(null, null, lastInput.pressure);
+    endLine (): void {
+
+        if (this.bezierLine) {
+            this.continueLine(null, null, this.lastInput.pressure);
         }
 
-        started = false;
-        bezierLine = undefined;
+        this.started = false;
+        this.bezierLine = undefined;
 
-        if (historyEntry) {
-            historyEntry.actions.push({
-                action: "endLine",
-                params: []
+        if (this.historyEntry) {
+            this.historyEntry.actions?.push({
+                action: 'endLine',
+                params: [],
             });
-            history.push(historyEntry);
-            historyEntry = undefined;
+            this.history.push(this.historyEntry);
+            this.historyEntry = undefined;
         }
-    };
-    //cheap n' ugly
-    this.drawLineSegment = function (x1, y1, x2, y2) {
+    }
 
-        isBaseLayer = 0 === context.canvas.index;
+    drawLineSegment (x1: number, y1: number, x2: number, y2: number): void {
 
-        lastInput.x = x2;
-        lastInput.y = y2;
+        this.isBaseLayer = 0 === this.context.canvas.index;
 
-        if (started || x1 === undefined) {
+        this.lastInput.x = x2;
+        this.lastInput.y = y2;
+
+        if (this.started || x1 === undefined) {
             return;
         }
 
-        let mouseDist = Math.sqrt(Math.pow(x2 - x1, 2.0) + Math.pow(y2 - y1, 2.0));
-        let eX = (x2 - x1) / mouseDist;
-        let eY = (y2 - y1) / mouseDist;
+        const mouseDist = Math.sqrt(Math.pow(x2 - x1, 2.0) + Math.pow(y2 - y1, 2.0));
+        const eX = (x2 - x1) / mouseDist;
+        const eY = (y2 - y1) / mouseDist;
         let loopDist;
-        let bdist = Math.max(1, Math.max(0.5, 1 - opacity) * size * spacing);
-        lastDot = 0;
-        for (loopDist = lastDot; loopDist <= mouseDist; loopDist += bdist) {
-            drawDot(x1 + eX * loopDist, y1 + eY * loopDist, size, opacity);
+        const bdist = Math.max(1, Math.max(0.5, 1 - this.opacity) * this.size * this.spacing);
+        this.lastDot = 0;
+        for (loopDist = this.lastDot; loopDist <= mouseDist; loopDist += bdist) {
+            this.drawDot(x1 + eX * loopDist, y1 + eY * loopDist, this.size, this.opacity);
         }
 
 
-        let historyEntry = {
-            tool: ["brush", "EraserBrush"],
-            actions: []
+        const historyEntry: IEraserBrushHistoryEntry = {
+            tool: ['brush', 'EraserBrush'],
+            actions: [
+                {
+                    action: 'opacityPressure',
+                    params: [this.useOpacityPressure],
+                },
+                {
+                    action: 'sizePressure',
+                    params: [this.useSizePressure],
+                },
+                {
+                    action: 'setSize',
+                    params: [this.size],
+                },
+                {
+                    action: 'setOpacity',
+                    params: [this.opacity],
+                },
+                {
+                    action: 'setTransparentBG',
+                    params: [this.isTransparentBG],
+                },
+                {
+                    action: 'drawLineSegment',
+                    params: [x1, y1, x2, y2],
+                },
+            ],
         };
-        historyEntry.actions.push({
-            action: "opacityPressure",
-            params: [opacityPressure]
-        });
-        historyEntry.actions.push({
-            action: "sizePressure",
-            params: [sizePressure]
-        });
-        historyEntry.actions.push({
-            action: "setSize",
-            params: [size]
-        });
-        historyEntry.actions.push({
-            action: "setOpacity",
-            params: [opacity]
-        });
-        historyEntry.actions.push({
-            action: "setTransparentBG",
-            params: [isTransparentBG]
-        });
-
-        historyEntry.actions.push({
-            action: "drawLineSegment",
-            params: [x1, y1, x2, y2]
-        });
-        history.push(historyEntry);
-    };
+        this.history.push(historyEntry);
+    }
 
     //IS
-    this.isDrawing = function () {
-        return started;
-    };
+    isDrawing (): boolean {
+        return this.started;
+    }
+
     //SET
-    /*this.setAlpha = function(a) {
-        lastInput = {};
-        alpha = a;
-        updateAlphaCanvas();
-    };*/
-    this.setContext = function (c) {
-        context = c;
-    };
-    this.setHistory = function (l: KlHistoryInterface) {
-        history = l;
-    };
-    this.setSize = function (s) {
-        size = s;
-    };
-    this.setOpacity = function (o) {
-        opacity = o;
-    };
-    this.sizePressure = function (b) {
-        sizePressure = b;
-    };
-    this.opacityPressure = function (b) {
-        opacityPressure = b;
-    };
-    this.setTransparentBG = function (b) {
-        isTransparentBG = b == true;
-    };
+    setContext (c: TIndexExtended2DContext): void {
+        this.context = c;
+    }
+
+    setHistory (l: KlHistoryInterface): void {
+        this.history = l;
+    }
+
+    setSize (s: number): void {
+        this.size = s;
+    }
+
+    setOpacity (o: number): void {
+        this.opacity = o;
+    }
+
+    sizePressure (b: boolean): void {
+        this.useSizePressure = b;
+    }
+
+    opacityPressure (b: boolean): void {
+        this.useOpacityPressure = b;
+    }
+
+    setTransparentBG (b: boolean): void {
+        this.isTransparentBG = !!b;
+    }
+
     //GET
-    this.getSize = function () {
-        return size;
-    };
-    this.getOpacity = function () {
-        return opacity;
-    };
+    getSize (): number {
+        return this.size;
+    }
+
+    getOpacity (): number {
+        return this.opacity;
+    }
 }

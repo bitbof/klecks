@@ -1,14 +1,14 @@
-import {IMixMode} from '../kl.types';
+import {TMixMode} from '../kl-types';
 import {LANG} from '../../language/language';
 import {TTranslationCode} from '../../../languages/languages';
 
-export function translateBlending(blendMode?: IMixMode): string {
+export function translateBlending (blendMode?: TMixMode): string {
     if (!blendMode) {
         return LANG('layers-blend-normal');
     }
 
     const codes: {
-        [key: string]: TTranslationCode
+        [key: string]: TTranslationCode;
     } = {
         'source-over': 'layers-blend-normal',
         'darken': 'layers-blend-darken',

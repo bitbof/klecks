@@ -1,31 +1,42 @@
 import {BB} from '../../bb/bb';
 import {KlCanvasPreview} from '../canvas-ui/canvas-preview';
-import {getSharedFx} from './shared-gl-fx';
-import {IFilterApply, IFilterGetDialogParam, IKlBasicLayer} from '../kl.types';
+import {getSharedFx} from '../../fx-canvas/shared-fx';
+import {IFilterApply, IFilterGetDialogParam, IFilterGetDialogResult, IKlBasicLayer} from '../kl-types';
 import {LANG} from '../../language/language';
 import {TwoTabs} from '../ui/components/two-tabs';
+import {TRectanglePoints} from '../../fx-canvas/filters/perspective';
+import {TFilterHistoryEntry} from './filters';
+
+export type TFilterPerspectiveInput = {
+    before: TRectanglePoints;
+    after: TRectanglePoints;
+};
+
+export type TFilterPerspectiveHistoryEntry = TFilterHistoryEntry<
+    'perspective',
+    TFilterPerspectiveInput>;
 
 export const filterPerspective = {
 
-    getDialog(params: IFilterGetDialogParam) {
-        let context = params.context;
-        let klCanvas = params.klCanvas;
+    getDialog (params: IFilterGetDialogParam) {
+        const context = params.context;
+        const klCanvas = params.klCanvas;
         if (!context || !klCanvas) {
             return false;
         }
 
-        let isSmall = window.innerWidth < 550;
-        let layers = klCanvas.getLayers();
-        let selectedLayerIndex = klCanvas.getLayerIndex(context.canvas);
+        const isSmall = window.innerWidth < 550;
+        const layers = klCanvas.getLayers();
+        const selectedLayerIndex = klCanvas.getLayerIndex(context.canvas);
 
-        let fit = BB.fitInto(context.canvas.width, context.canvas.height, isSmall ? 280 : 490, isSmall ? 200 : 240, 1);
-        let displayW = parseInt('' + fit.width), displayH = parseInt('' + fit.height);
-        let w = Math.min(displayW, context.canvas.width);
-        let h = Math.min(displayH, context.canvas.height);
+        const fit = BB.fitInto(context.canvas.width, context.canvas.height, isSmall ? 280 : 490, isSmall ? 200 : 240, 1);
+        const displayW = parseInt('' + fit.width), displayH = parseInt('' + fit.height);
+        const w = Math.min(displayW, context.canvas.width);
+        const h = Math.min(displayH, context.canvas.height);
 
-        let tempCanvas = BB.canvas(w, h);
+        const tempCanvas = BB.canvas(w, h);
         {
-            const ctx = tempCanvas.getContext("2d");
+            const ctx = BB.ctx(tempCanvas);
             ctx.save();
             if (w > context.canvas.width) {
                 ctx.imageSmoothingEnabled = false;
@@ -33,32 +44,32 @@ export const filterPerspective = {
             ctx.drawImage(context.canvas, 0, 0, w, h);
             ctx.restore();
         }
-        let displayPreviewFactor = displayW / context.canvas.width;
+        const displayPreviewFactor = displayW / context.canvas.width;
 
-        let div = document.createElement("div");
-        let result: any = {
-            element: div
+        const div = document.createElement('div');
+        const result: IFilterGetDialogResult<TFilterPerspectiveInput> = {
+            element: div,
         };
         if (!isSmall) {
             result.width = 500;
         }
 
-        let pointerListenerArr = [];
+        const pointerListenerArr = [];
 
-        function finishInit() {
-            div.innerHTML = LANG('filter-perspective-description') + "<br/><br/>";
+        function finishInit (): void {
+            div.innerHTML = LANG('filter-perspective-description') + '<br/><br/>';
 
-            let glCanvas = getSharedFx();
-            if (!glCanvas) {
+            const fxCanvas = getSharedFx();
+            if (!fxCanvas) {
                 return; // todo throw?
             }
-            let texture = glCanvas.texture(tempCanvas);
-            glCanvas.draw(texture).update(); // update glCanvas size
+            const texture = fxCanvas.texture(tempCanvas);
+            fxCanvas.draw(texture).update(); // update fxCanvas size
             let ba, bb, bc, bd; //before
             let aa, ab, ac, ad; //after
-            function update() {
+            function update (): void {
                 try {
-                    glCanvas.draw(texture).multiplyAlpha().perspective(
+                    fxCanvas.draw(texture).multiplyAlpha().perspective(
                         [ba.x, ba.y, bb.x, bb.y, bc.x, bc.y, bd.x, bd.y].map((item, i) => {
                             if (i % 2 === 0) {
                                 return item / displayW * w;
@@ -80,53 +91,52 @@ export const filterPerspective = {
                 }
             }
 
-            function nob(x, y, callback?) {
-                let nobSize = 14;
-                let div = document.createElement("div");
+            function nob (x, y, callback?) {
+                const nobSize = 14;
+                const div = document.createElement('div');
                 (div as any).x = x;
                 (div as any).y = y;
                 BB.css(div, {
-                    width: nobSize + "px",
-                    height: nobSize + "px",
-                    backgroundColor: "#fff",
-                    boxShadow: "inset 0 0 0 2px #000",
-                    borderRadius: nobSize + "px",
-                    position: "absolute",
-                    cursor: "move",
-                    left: ((div as any).x - nobSize / 2) + "px",
-                    top: ((div as any).y - nobSize / 2) + "px",
+                    width: nobSize + 'px',
+                    height: nobSize + 'px',
+                    backgroundColor: '#fff',
+                    boxShadow: 'inset 0 0 0 2px #000',
+                    borderRadius: nobSize + 'px',
+                    position: 'absolute',
+                    cursor: 'move',
+                    left: ((div as any).x - nobSize / 2) + 'px',
+                    top: ((div as any).y - nobSize / 2) + 'px',
                     userSelect: 'none',
                     touchAction: 'none',
                 });
 
-                let pointerListener = new BB.PointerListener({
+                const pointerListener = new BB.PointerListener({
                     target: div,
-                    maxPointers: 1,
-                    onPointer: function(event) {
+                    onPointer: function (event) {
                         event.eventPreventDefault();
                         if (event.button === 'left' && event.type === 'pointermove') {
                             (div as any).x += event.dX;
                             (div as any).y += event.dY;
-                            div.style.left = ((div as any).x - nobSize / 2) + "px";
-                            div.style.top = ((div as any).y - nobSize / 2) + "px";
+                            div.style.left = ((div as any).x - nobSize / 2) + 'px';
+                            div.style.top = ((div as any).y - nobSize / 2) + 'px';
                             if (callback) {
                                 callback();
                             }
                             update();
                         }
-                    }
+                    },
                 });
                 (div as any).copy = function (p) {
                     (div as any).x = p.x;
                     (div as any).y = p.y;
-                    div.style.left = ((div as any).x - nobSize / 2) + "px";
-                    div.style.top = ((div as any).y - nobSize / 2) + "px";
+                    div.style.left = ((div as any).x - nobSize / 2) + 'px';
+                    div.style.top = ((div as any).y - nobSize / 2) + 'px';
                 };
                 pointerListenerArr.push(pointerListener);
                 return div;
             }
 
-            function updateAfter() {
+            function updateAfter () {
                 aa.copy(ba);
                 ab.copy(bb);
                 ac.copy(bc);
@@ -151,29 +161,29 @@ export const filterPerspective = {
                 onChange: (val: number) => {
                     before = val === 0;
                     if (before) {
-                        aa.style.display = "none";
-                        ab.style.display = "none";
-                        ac.style.display = "none";
-                        ad.style.display = "none";
+                        aa.style.display = 'none';
+                        ab.style.display = 'none';
+                        ac.style.display = 'none';
+                        ad.style.display = 'none';
 
-                        ba.style.display = "block";
-                        bb.style.display = "block";
-                        bc.style.display = "block";
-                        bd.style.display = "block";
+                        ba.style.display = 'block';
+                        bb.style.display = 'block';
+                        bc.style.display = 'block';
+                        bd.style.display = 'block';
                         ba.copy(aa);
                         bb.copy(ab);
                         bc.copy(ac);
                         bd.copy(ad);
                     } else {
-                        ba.style.display = "none";
-                        bb.style.display = "none";
-                        bc.style.display = "none";
-                        bd.style.display = "none";
+                        ba.style.display = 'none';
+                        bb.style.display = 'none';
+                        bc.style.display = 'none';
+                        bd.style.display = 'none';
 
-                        aa.style.display = "block";
-                        ab.style.display = "block";
-                        ac.style.display = "block";
-                        ad.style.display = "block";
+                        aa.style.display = 'block';
+                        ab.style.display = 'block';
+                        ac.style.display = 'block';
+                        ad.style.display = 'block';
                         aa.copy(ba);
                         ab.copy(bb);
                         ac.copy(bc);
@@ -184,77 +194,64 @@ export const filterPerspective = {
             });
             div.append(beforeAfterTabs.getElement());
 
-            let previewWrapper = document.createElement("div");
+            const previewWrapper = BB.el({
+                className: 'kl-preview-wrapper',
+                css: {
+                    width: isSmall ? '340px' : '540px',
+                    height: isSmall ? '260px' : '300px',
+                    marginTop: '0',
+                },
+            });
             previewWrapper.oncontextmenu = function () {
                 return false;
             };
-            BB.css(previewWrapper, {
-                width: isSmall ? '340px' : '540px',
-                marginLeft: "-20px",
-                height: isSmall ? '260px' : '300px',
-                backgroundColor: "#9e9e9e",
-                boxShadow: "rgba(0, 0, 0, 0.2) 0px 1px inset, rgba(0, 0, 0, 0.2) 0px -1px inset",
-                overflow: "hidden",
-                position: "relative",
-                userSelect: 'none',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                colorScheme: 'only light',
-            });
 
-            let previewLayerArr: IKlBasicLayer[] = [];
+            const previewLayerArr: IKlBasicLayer[] = [];
             {
                 for (let i = 0; i < layers.length; i++) {
-                    let canvas = i === selectedLayerIndex ? glCanvas : layers[i].context.canvas;
+                    const canvas = i === selectedLayerIndex ? fxCanvas : layers[i].context.canvas;
                     previewLayerArr.push({
                         image: canvas,
                         opacity: layers[i].opacity,
-                        mixModeStr: layers[i].mixModeStr
+                        mixModeStr: layers[i].mixModeStr,
                     });
                 }
             }
-            let klCanvasPreview = new KlCanvasPreview({
+            const klCanvasPreview = new KlCanvasPreview({
                 width: parseInt('' + displayW),
                 height: parseInt('' + displayH),
-                layers: previewLayerArr
+                layers: previewLayerArr,
             });
 
-            let previewInnerWrapper = BB.el({
+            const previewInnerWrapper = BB.el({
+                className: 'kl-preview-wrapper__canvas',
                 css: {
-                    position: 'relative',
-                    boxShadow: '0 0 5px rgba(0,0,0,0.5)',
                     width: parseInt('' + displayW) + 'px',
-                    height: parseInt('' + displayH) + 'px'
-                }
+                    height: parseInt('' + displayH) + 'px',
+                },
             });
-            previewInnerWrapper.appendChild(klCanvasPreview.getElement());
-            previewWrapper.appendChild(previewInnerWrapper);
+            previewInnerWrapper.append(klCanvasPreview.getElement());
+            previewWrapper.append(previewInnerWrapper);
 
-            previewInnerWrapper.appendChild(aa);
-            previewInnerWrapper.appendChild(ab);
-            previewInnerWrapper.appendChild(ac);
-            previewInnerWrapper.appendChild(ad);
+            previewInnerWrapper.append(aa, ab, ac, ad);
 
-            ba.style.display = "none";
-            bb.style.display = "none";
-            bc.style.display = "none";
-            bd.style.display = "none";
-            previewInnerWrapper.appendChild(ba);
-            previewInnerWrapper.appendChild(bb);
-            previewInnerWrapper.appendChild(bc);
-            previewInnerWrapper.appendChild(bd);
+            ba.style.display = 'none';
+            bb.style.display = 'none';
+            bc.style.display = 'none';
+            bd.style.display = 'none';
+            previewInnerWrapper.append(ba, bb, bc, bd);
 
 
-            div.appendChild(previewWrapper);
+            div.append(previewWrapper);
             update();
-            result.destroy = () => {
+            result.destroy = (): void => {
                 for (let i = 0; i < pointerListenerArr.length; i++) {
                     pointerListenerArr[i].destroy();
                 }
                 texture.destroy();
+                klCanvasPreview.destroy();
             };
-            result.getInput = function () {
+            result.getInput = function (): TFilterPerspectiveInput {
                 result.destroy();
                 return {
                     before: [
@@ -282,7 +279,7 @@ export const filterPerspective = {
 
                         ad.x / displayPreviewFactor,
                         ad.y / displayPreviewFactor,
-                    ]
+                    ],
                 };
             };
         }
@@ -292,32 +289,33 @@ export const filterPerspective = {
         return result;
     },
 
-    apply(params: IFilterApply) {
-        let context = params.context;
-        let history = params.history;
-        let before = params.input.before;
-        let after = params.input.after;
-        if (!context || !before || !after || !history)
+    apply (params: IFilterApply<TFilterPerspectiveInput>): boolean {
+        const context = params.context;
+        const history = params.history;
+        const before = params.input.before;
+        const after = params.input.after;
+        if (!context || !before || !after || !history) {
             return false;
+        }
         history.pause(true);
-        let glCanvas = getSharedFx();
-        if (!glCanvas) {
+        const fxCanvas = getSharedFx();
+        if (!fxCanvas) {
             return false; // todo more specific error?
         }
-        let texture = glCanvas.texture(context.canvas);
-        glCanvas.draw(texture).multiplyAlpha().perspective(before, after).unmultiplyAlpha().update();
+        const texture = fxCanvas.texture(context.canvas);
+        fxCanvas.draw(texture).multiplyAlpha().perspective(before, after).unmultiplyAlpha().update();
         context.clearRect(0, 0, context.canvas.width, context.canvas.height);
-        context.drawImage(glCanvas, 0, 0);
+        context.drawImage(fxCanvas, 0, 0);
         texture.destroy();
         history.pause(false);
         history.push({
-            tool: ["filter", "perspective"],
-            action: "apply",
+            tool: ['filter', 'perspective'],
+            action: 'apply',
             params: [{
-                input: params.input
-            }]
-        });
+                input: params.input,
+            }],
+        } as TFilterPerspectiveHistoryEntry);
         return true;
-    }
+    },
 
 };

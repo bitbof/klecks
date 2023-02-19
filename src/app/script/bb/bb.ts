@@ -1,32 +1,44 @@
-import * as BBEventListener from './input/event-listener';
 import {
-    append, centerWithin, copyObj, createSvg,
-    css, dateDayDifference, decToFraction,
-    fitInto, gcd, getDate,
-    handleClick, imageBlobToUrl,
-    insertAfter, loadImage,
+    append,
+    centerWithin,
+    copyObj,
+    createSvg,
+    css,
+    dateDayDifference,
+    decToFraction,
+    fitInto,
+    gcd,
+    getDate,
+    handleClick,
+    imageBlobToUrl,
+    insertAfter, isDark,
+    loadImage,
     reduce,
-    setAttributes, shareCanvas
+    setAttributes,
+    shareCanvas,
+    throwIfNull,
 } from './base/base';
 import {
     canShareFiles,
     eventUsesHighResTimeStamp,
-    getVisitor,
     hasPointerEvents,
     hasWebGl,
     isCssMinMaxSupported,
-    mouseEventHasMovement
 } from './base/browser';
 import {KeyListener, sameKeys} from './input/key-listener';
 import {PointerListener} from './input/pointer-listener';
-import * as EventChain from './input/event-chain';
 import {
     canvasBounds,
     convertToAlphaChannelCanvas,
     copyCanvas,
-    createCheckerCanvas, createCheckerDataUrl,
+    createCheckerCanvas,
+    createCheckerDataUrl,
+    ctx,
     drawTransformedImageOnCanvas,
-    drawTransformedImageWithBounds, freeCanvas, resizeCanvas, testShouldPixelate
+    drawTransformedImageWithBounds,
+    freeCanvas,
+    resizeCanvas,
+    testShouldPixelate,
 } from './base/canvas';
 import {Matrix} from './math/matrix';
 import {Vec2} from './math/vec2';
@@ -39,31 +51,42 @@ import {
     el,
     isInputFocused,
     makeUnfocusable,
-    unfocusAnyInput
+    unfocusAnyInput,
 } from './base/ui';
 import {
-    pointsToAngleDeg,
+    boundsInArea,
     clamp,
     dist,
+    distSquared,
+    intDxy,
+    isInsideRect,
+    lenSquared,
     mix,
+    pointsToAngleDeg,
     pointsToAngleRad,
     rotate,
     rotateAround,
-    intDxy,
-    roundEven, roundUneven, distSquared, lenSquared, updateBounds, boundsInArea, round, isInsideRect
+    round,
+    roundEven,
+    roundUneven,
+    updateBounds,
 } from './math/math';
 import {createCanvas} from './base/create-canvas';
 import {BbLog} from './base/bb-log';
 import {LocalStorage} from './base/local-storage';
+import {CoalescedExploder} from './input/event-chain/coalesced-exploder';
+import {NFingerTapper} from './input/event-chain/n-finger-tapper';
+import {PinchZoomer} from './input/event-chain/pinch-zoomer';
+import {DoubleTapper} from './input/event-chain/double-tapper';
+import {OnePointerLimiter} from './input/event-chain/one-pointer-limiter';
+import {EventChain} from './input/event-chain/event-chain';
 
 export const BB = {
 
     // ---- browser ----
     eventUsesHighResTimeStamp,
-    mouseEventHasMovement,
     hasPointerEvents,
     hasWebGl,
-    getVisitor,
     isCssMinMaxSupported,
     canShareFiles,
 
@@ -87,6 +110,8 @@ export const BB = {
     createSvg,
     BbLog,
     LocalStorage,
+    throwIfNull,
+    isDark,
 
     // ---- math ----
     mix,
@@ -117,6 +142,7 @@ export const BB = {
 
     // ---- canvas ----
     canvas: createCanvas,
+    ctx,
     copyCanvas,
     testShouldPixelate,
     drawTransformedImageWithBounds,
@@ -147,14 +173,14 @@ export const BB = {
 
     // ---- events / input ----
 
-    addEventListener: BBEventListener.addEventListener,
-    removeEventListener: BBEventListener.removeEventListener,
-    setEventListener: BBEventListener.setEventListener,
-
     KeyListener,
     PointerListener,
     sameKeys,
 
     EventChain,
-
+    DoubleTapper,
+    NFingerTapper,
+    PinchZoomer,
+    CoalescedExploder,
+    OnePointerLimiter,
 };

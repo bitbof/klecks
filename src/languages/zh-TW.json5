@@ -1,16 +1,18 @@
 {
   'switch-ui-left-right': {
+    hint: 'Button that switches layout from left to right, to accommodate left handed & right handed visitors.',
     original: 'Switch left/right UI',
     value: '向左/右切換'
   },
-  "toggle-show-tools": {
+  'toggle-show-tools': {
+    hint: 'Button that hides/shows the toolbar.',
     original: 'Show/Hide Tools',
-    value: '顯示/隱藏工具',
+    value: '顯示/隱藏工具'
   },
-  "scroll": {
+  scroll: {
     hint: 'Verb. As in scrolling a page.',
     original: 'Scroll',
-    value: '上滑/下滑',
+    value: '上滑/下滑'
   },
   donate: {
     original: 'Donate',
@@ -22,22 +24,22 @@
     value: '主頁'
   },
   'modal-new-tab': {
+    hint: 'as in browser tab',
     original: 'Open in new tab',
     value: '在新頁面打開'
   },
-  'tab-layers': {
-    original: 'Layers',
-    value: '圖層'
-  },
   'tab-edit': {
+    hint: 'label for a tab that offer filters for making color adjustments, cropping, transforming, etc.',
     original: 'Edit',
     value: '編輯'
   },
   'tab-file': {
+    hint: 'label for a tab that lets user save the image, import, upload, etc.',
     original: 'File',
     value: '文件'
   },
   'tool-brush': {
+    hint: 'tool that lets user paint (like in ms paint or photoshop)',
     original: 'Brush',
     value: '畫筆工具'
   },
@@ -50,24 +52,23 @@
     value: '漸層'
   },
   'tool-shape': {
+    hint: 'Tool for drawing rectangles, circles, lines',
     original: 'Shape',
     value: '形狀'
   },
   'tool-text': {
+    hint: 'Tool for placing text on canvas',
     original: 'Text',
     value: '文本'
   },
   'tool-hand': {
+    hint: 'Tool for navigating (or scrolling around) the canvas. Same name in Photoshop.',
     original: 'Hand Tool',
     value: '手型工具'
   },
   'tool-zoom': {
     original: 'Zoom',
     value: '縮放工具'
-  },
-  'tool-undo-redo': {
-    original: 'Undo / Redo',
-    value: '撤銷/重做'
   },
   undo: {
     original: 'Undo',
@@ -78,10 +79,12 @@
     value: '重做'
   },
   'brush-pen': {
+    hint: 'Generic "brush" that feels a bit like a pen or marker, as opposed to a paint brush.',
     original: 'Pen',
     value: '畫筆'
   },
   'brush-blend': {
+    hint: 'brush with watercolor feel. Makes colors blend/bleed into each other. Different from smudging though.',
     original: 'Blend',
     value: '水彩刷'
   },
@@ -109,26 +112,32 @@
     value: '畫筆大小'
   },
   'brush-blending': {
+    hint: 'Wetness. How much colors will bleed into each other.',
     original: 'Blending',
     value: '水分量'
   },
   'brush-toggle-pressure': {
+    hint: 'google "pressure sensitivity". Feature of Wacom tablets, Apple Pencil, XP Pen, etc.',
     original: 'Toggle Pressure Sensitivity',
     value: '筆壓敏度'
   },
   'brush-pen-circle': {
+    hint: 'as in circle shape',
     original: 'Circle',
     value: '圓形'
   },
   'brush-pen-chalk': {
+    hint: 'as in chalk texture',
     original: 'Chalk',
     value: '粉筆'
   },
   'brush-pen-calligraphy': {
+    hint: 'like a "chisel tip marker"',
     original: 'Calligraphy',
     value: '斜角筆'
   },
   'brush-pen-square': {
+    hint: 'as in square shape',
     original: 'Square',
     value: '方形'
   },
@@ -138,10 +147,12 @@
     value: '網格長度'
   },
   'brush-pixel-dither': {
+    hint: 'Dithering/halftone pattern',
     original: 'Dither',
     value: '像素抖動'
   },
   'brush-chemy-fill': {
+    hint: 'Like in MS Paint. A shape can have be outlined, and filled.',
     original: 'Fill',
     value: '填充'
   },
@@ -158,10 +169,12 @@
     value: '垂直對稱'
   },
   'brush-chemy-gradient': {
+    hint: 'as in color gradient',
     original: 'Gradient',
     value: '漸變'
   },
   'brush-eraser-transparent-bg': {
+    hint: 'as in transparent background/bottom layer',
     original: 'Transparent Background',
     value: '底層透明度'
   },
@@ -180,6 +193,7 @@
     value: '顏色選取'
   },
   'secondary-color': {
+    hint: 'or sometimes called "background" color. Photoshop, MS Paint, etc. allow user to switch between two colors.',
     original: 'Secondary Color',
     value: '二級色'
   },
@@ -189,14 +203,17 @@
     value: '手動輸入顏色'
   },
   'mci-hex': {
+    hint: 'as in hex code. Hex representation of color. „#f00“ → red',
     original: 'Hex',
     value: '16進制'
   },
   'mci-copy': {
+    hint: 'verb',
     original: 'Copy',
     value: '複製'
   },
   'modal-ok': {
+    hint: 'main confirmation button in dialogs. Can be to confirm an action, not just acknowledge information.',
     original: 'Ok',
     value: 'Ok'
   },
@@ -205,6 +222,7 @@
     value: '取消'
   },
   'modal-close': {
+    hint: 'as in close a dialog box',
     original: 'Close',
     value: '關閉'
   },
@@ -228,22 +246,27 @@
     value: '混合模式'
   },
   'layers-new': {
+    hint: 'action',
     original: 'New Layer',
     value: '新建圖層'
   },
   'layers-remove': {
+    hint: 'action',
     original: 'Remove Layer',
     value: '刪除圖層'
   },
   'layers-duplicate': {
+    hint: 'action',
     original: 'Duplicate Layer',
     value: '複製圖層'
   },
   'layers-merge': {
+    hint: 'action',
     original: 'Merge with layer below',
     value: '向下合併'
   },
   'layers-rename': {
+    hint: 'action',
     original: 'Rename',
     value: '重命名'
   },
@@ -312,10 +335,12 @@
     value: '明度'
   },
   'layers-rename-title': {
+    hint: '-title in code usually means it shows up in a tooltip, or it’s the header of a dialog box, so it can be a little bit longer.',
     original: 'Rename Layer',
     value: '重命名圖層'
   },
   'layers-rename-name': {
+    hint: 'noun',
     original: 'Name',
     value: '重命名'
   },
@@ -325,27 +350,32 @@
     value: '清除'
   },
   'layers-rename-sketch': {
-    hint: 'noun',
+    hint: 'noun. Name suggestion for a layer',
     original: 'Sketch',
     value: '草圖'
   },
   'layers-rename-colors': {
+    hint: 'noun. Name suggestion for a layer',
     original: 'Colors',
     value: '色彩'
   },
   'layers-rename-shading': {
+    hint: 'noun. Name suggestion for a layer',
     original: 'Shading',
-    value: '陰影'
+    value: ''
   },
   'layers-rename-lines': {
+    hint: 'noun. Name suggestion for a layer',
     original: 'Lines',
     value: '線條'
   },
   'layers-rename-effects': {
+    hint: 'noun. Name suggestion for a layer',
     original: 'Effects',
-    value: '效果'
+    value: ''
   },
   'layers-rename-foreground': {
+    hint: 'noun. Name suggestion for a layer',
     original: 'Foreground',
     value: '前景'
   },
@@ -354,6 +384,7 @@
     value: '向下合併'
   },
   'layers-merge-description': {
+    hint: 'After ":" a list of mix/blend modes is shown.',
     original: 'Merges the selected layer with the one underneath. Select the mix mode:',
     value: '選中層與底下一層合併。選擇混合模式：'
   },
@@ -363,30 +394,26 @@
     value: '不能自動保存，沒有雲端儲存'
   },
   'file-new': {
+    hint: 'action',
     original: 'New',
     value: '新建'
   },
   'file-import': {
+    hint: 'action',
     original: 'Import',
     value: '打開'
   },
   'file-save': {
+    hint: 'action',
     original: 'Save',
     value: '保存'
   },
-  'file-save-png': {
-    original: 'Save PNG',
-    value: '保存為PNG'
-  },
-  'file-save-psd': {
-    original: 'Save PSD',
-    value: '保存為PSD'
-  },
-  'file-save-layers': {
-    original: 'Save Layers',
-    value: '保存圖層'
+  'file-format': {
+    original: 'File Format',
+    value: ''
   },
   'file-copy': {
+    hint: 'verb',
     original: 'Copy',
     value: '複製'
   },
@@ -405,14 +432,17 @@
     value: '保存至瀏覽器'
   },
   'file-storage-thumb-title': {
+    hint: 'when reopening or reloading',
     original: 'Restores when reopening page',
     value: '重新打開頁面時恢復'
   },
   'file-storage-about': {
+    hint: 'link to Browser Storage help/user manual',
     original: 'About Browser Storage',
     value: '關於保存至瀏覽器'
   },
   'file-storage-cant-access': {
+    hint: 'an error. Can’t access the storage.',
     original: "Can't access",
     value: '無法獲取'
   },
@@ -431,10 +461,12 @@
     value: '清除'
   },
   'file-storage-storing': {
+    hint: 'while it is in the process of storing',
     original: 'Storing',
     value: '保存中'
   },
   'file-storage-overwrite': {
+    hint: 'overwrite what is already stored',
     original: 'Overwrite',
     value: '覆蓋'
   },
@@ -480,6 +512,7 @@
     value: '隱身頁面中禁用存儲功能'
   },
   'file-storage-failed-4': {
+    hint: 'as in: unsupported feature',
     original: "Browser doesn't support storage",
     value: '瀏覽器不支持'
   },
@@ -488,10 +521,12 @@
     value: '清除失敗'
   },
   'file-upload': {
+    hint: 'verb',
     original: 'Upload',
     value: '上傳'
   },
   'cleared-layer': {
+    hint: 'the layer has been cleared. It is now empty',
     original: 'Cleared layer',
     value: '圖層已清除'
   },
@@ -505,22 +540,27 @@
     value: '新建項目'
   },
   'new-current': {
+    hint: 'as in "reuse the current image resolution"',
     original: 'Current',
     value: '當前大小'
   },
   'new-fit': {
+    hint: 'make dimensions of image fit your window size',
     original: 'Fit',
     value: '適應頁面'
   },
   'new-oversize': {
+    hint: 'like oversized clothes.',
     original: 'Oversize',
     value: '大畫布'
   },
   'new-square': {
+    hint: 'square image format',
     original: 'Square',
     value: '正方形'
   },
   'new-landscape': {
+    hint: 'https://en.wikipedia.org/wiki/Page_orientation',
     original: 'Landscape',
     value: '橫向尺寸'
   },
@@ -529,14 +569,17 @@
     value: '縱向尺寸'
   },
   'new-screen': {
+    hint: 'resolution of computer screen',
     original: 'Screen',
     value: '顯示分辨率'
   },
   'new-video': {
+    hint: 'dimensions of a video (usually 16:9)',
     original: 'Video',
     value: '視頻'
   },
   'new-din-paper': {
+    hint: 'https://en.wikipedia.org/wiki/Paper_size',
     original: 'DIN Paper',
     value: '紙張大小'
   },
@@ -551,14 +594,17 @@
     value: '比例'
   },
   'upload-title': {
+    hint: '"Imgur" is a website name.',
     original: 'Upload to Imgur',
     value: '上傳到Imgur'
   },
   'upload-link-notice': {
+    hint: 'Explaining to user even though their upload is unlisted, they should be careful who they share the link with. No password protection.',
     original: 'Anyone with the link to your uploaded image will be able to view it.',
     value: '他人可以通過生成的圖片鏈接查看你的作品。 '
   },
   'upload-name': {
+    hint: 'noun',
     original: 'Title',
     value: '標題'
   },
@@ -567,22 +613,17 @@
     value: '未命名'
   },
   'upload-caption': {
+    hint: 'as in image caption / description',
     original: 'Caption',
     value: '描述'
   },
-  'upload-tos': {
-    original: 'Terms of Service',
-    value: '服務條款'
-  },
-  'upload-tos-2': {
-    original: 'for imgur.com',
-    value: 'imgur.com'
-  },
   'upload-submit': {
+    hint: 'verb',
     original: 'Upload',
     value: '上傳'
   },
   'upload-uploading': {
+    hint: 'in the process of uploading',
     original: 'Uploading...',
     value: '上傳中...'
   },
@@ -609,9 +650,10 @@
   },
   'cropcopy-click-hold': {
     original: 'Right-click or press hold to copy.',
-    value: '點擊右鍵或長按進行複制。',
+    value: '點擊右鍵或長按進行複制。'
   },
   'cropcopy-btn-copy': {
+    hint: 'confirmation button. Should be short.',
     original: 'To Clipboard',
     value: '至剪貼板'
   },
@@ -620,10 +662,12 @@
     value: '已複製'
   },
   'cropcopy-btn-crop': {
+    hint: 'confirmation button. Should be short.',
     original: 'Apply Crop',
     value: '應用裁剪'
   },
   'crop-drag-to-crop': {
+    hint: 'drag the mouse to adjust cropping',
     original: 'Drag to crop',
     value: '拖動裁剪'
   },
@@ -636,6 +680,7 @@
     value: '翻轉'
   },
   'filter-perspective': {
+    hint: 'perspective transformation',
     original: 'Perspective',
     value: '透視'
   },
@@ -648,14 +693,17 @@
     value: '旋轉'
   },
   'filter-transform': {
+    hint: 'more generic transformation. Commonly known as "free transform"',
     original: 'Transform',
     value: '自由變換'
   },
   'filter-bright-contrast': {
+    hint: 'brightness contrast',
     original: 'Bright/Contrast',
     value: '亮度/對比'
   },
   'filter-curves': {
+    hint: 'color curves',
     original: 'Curves',
     value: '曲線'
   },
@@ -664,31 +712,37 @@
     value: '色相/飽和度'
   },
   'filter-invert': {
+    hint: 'invert the colors',
     original: 'Invert',
     value: '反相'
   },
   'filter-tilt-shift': {
+    hint: 'or just depth-of-field. https://en.wikipedia.org/wiki/Tilt%E2%80%93shift_photography',
     original: 'Tilt Shift',
     value: '移軸'
   },
   'filter-to-alpha': {
-    hint: 'feature that can isolate linedrawings if it is a black and white image.',
+    hint: 'feature that can isolate line drawings if it is a black and white image.',
     original: 'To Alpha',
     value: '轉換至Alpha'
   },
   'filter-triangle-blur': {
+    hint: 'or just blur',
     original: 'Triangle Blur',
     value: '模糊'
   },
   'filter-unsharp-mask': {
+    hint: 'or just sharpen, https://en.wikipedia.org/wiki/Unsharp_masking',
     original: 'Unsharp Mask',
     value: 'USM 銳化'
   },
   'filter-crop-title': {
+    hint: 'same as the button, but can be longer',
     original: 'Crop / Extend',
     value: '畫布大小'
   },
   'filter-crop-description': {
+    hint: 'descriptions explain the "filter" a tiny bit. Most importantly it says if it’s applied to a single layer, or the entire image (all layer)',
     original: 'Crop or extend the image.',
     value: '裁剪圖片'
   },
@@ -709,14 +763,17 @@
     value: '下'
   },
   'filter-crop-rule-thirds': {
+    hint: 'https://en.wikipedia.org/wiki/Rule_of_thirds',
     original: 'Rule of Thirds',
     value: '三分法'
   },
   'filter-crop-fill': {
+    hint: 'If image gets extended, what color to fill that new area with',
     original: 'Fill',
     value: '填充'
   },
   'filter-flip-title': {
+    hint: 'same as the button, but can be longer',
     original: 'Flip',
     value: '翻轉'
   },
@@ -741,6 +798,7 @@
     value: '翻轉圖層'
   },
   'filter-perspective-title': {
+    hint: 'same as the button, but can be longer',
     original: 'Perspective',
     value: '透視'
   },
@@ -749,6 +807,7 @@
     value: '變換已選圖層'
   },
   'filter-resize-title': {
+    hint: 'same as the button, but can be longer',
     original: 'Resize',
     value: '圖像大小'
   },
@@ -757,6 +816,7 @@
     value: '更改圖像大小'
   },
   'filter-rotate-title': {
+    hint: 'same as the button, but can be longer',
     original: 'Rotate',
     value: '旋轉'
   },
@@ -765,18 +825,22 @@
     value: '旋轉圖像'
   },
   'filter-transform-empty': {
+    hint: 'nothing on the layer, just transparency',
     original: 'Layer is empty.',
     value: '圖層為空'
   },
   'filter-transform-title': {
+    hint: 'same as the button, but can be longer',
     original: 'Transform',
     value: '變換'
   },
   'filter-transform-description': {
+    hint: 'as in the Shift key.',
     original: 'Transforms selected layer. Hold Shift for additional behavior.',
     value: '變換已選圖層。按住Shift操作。 '
   },
   'filter-transform-rotation': {
+    hint: 'or Angle',
     original: 'Rotation',
     value: '旋轉'
   },
@@ -785,22 +849,27 @@
     value: '翻轉'
   },
   'filter-transform-center': {
+    hint: 'verb or noun',
     original: 'Center',
     value: '居中'
   },
   'filter-transform-constrain': {
+    hint: 'short version of "constrain proportions" – feature that locks the aspect ratio',
     original: 'Constrain',
     value: '保持'
   },
   'filter-transform-snap': {
+    hint: 'or snapping. Common feature in graphics software. Makes stuff snap into place so it’s easier to align elements in an image',
     original: 'Snap',
     value: '對齊'
   },
   'filter-transform-snap-title': {
+    hint: 'same as above, but as a tooltip',
     original: 'Snap Rotation And Position',
     value: '旋轉對齊/水平對齊'
   },
   'filter-bright-contrast-title': {
+    hint: 'same as the button, but can be longer',
     original: 'Brightness / Contrast',
     value: '亮度/對比'
   },
@@ -817,6 +886,7 @@
     value: '對比'
   },
   'filter-curves-title': {
+    hint: 'same as the button, but can be longer',
     original: 'Curves',
     value: '曲線'
   },
@@ -829,6 +899,7 @@
     value: '全部'
   },
   'filter-hue-sat-title': {
+    hint: 'same as the button, but can be longer',
     original: 'Hue / Saturation',
     value: '色相/飽和度'
   },
@@ -845,10 +916,12 @@
     value: '飽和度'
   },
   'filter-applied': {
+    hint: 'used like this: „Invert“ applied. Informs that a filter was applied',
     original: 'applied',
     value: '應用'
   },
   'filter-tilt-shift-title': {
+    hint: 'same as the button, but can be longer',
     original: 'Tilt Shift',
     value: '移軸'
   },
@@ -857,22 +930,27 @@
     value: '應用移軸到已選圖層。 '
   },
   'filter-tilt-shift-blur': {
+    hint: 'words can be individually translated',
     original: 'Blur Radius',
     value: '模糊半徑'
   },
   'filter-tilt-shift-gradient': {
+    hint: 'words can be individually translated',
     original: 'Gradient Radius',
     value: '梯度半徑'
   },
   'filter-to-alpha-title': {
+    hint: 'same as the button, but can be longer',
     original: 'To Alpha',
     value: '至Alpha'
   },
   'filter-to-alpha-description': {
+    hint: 'after ":" follow two options',
     original: 'Generates alpha channel for selected layer from:',
     value: '對已選圖層生成Alpha通道：'
   },
   'filter-to-alpha-inverted-lum': {
+    hint: 'luminance is same as the layer blend mode "luminosity"',
     original: 'Inverted Luminance',
     value: '亮度翻轉'
   },
@@ -881,10 +959,12 @@
     value: '亮度'
   },
   'filter-to-alpha-replace': {
+    hint: 'What color to replace the rgb channels with',
     original: 'Replace RGB',
     value: '替換RGB'
   },
   'filter-triangle-blur-title': {
+    hint: 'same as the button, but can be longer',
     original: 'Triangle Blur',
     value: '模糊'
   },
@@ -893,6 +973,7 @@
     value: '應用模糊到已選圖層。 '
   },
   'filter-unsharp-mask-title': {
+    hint: 'same as the button, but can be longer',
     original: 'Unsharp Mask',
     value: 'USM銳化'
   },
@@ -974,6 +1055,7 @@
     value: '線條數量'
   },
   'import-opening': {
+    hint: 'in the process of opening a large file',
     original: 'Opening file...',
     value: '打開文件...'
   },
@@ -986,10 +1068,12 @@
     value: '圖像過大，將會進行縮小。 '
   },
   'import-btn-as-layer': {
+    hint: 'import as layer. Button label, should be short',
     original: 'As Layer',
     value: '作為圖層'
   },
   'import-btn-as-image': {
+    hint: 'import as image. Button label, should be short',
     original: 'As Image',
     value: '作為圖像'
   },
@@ -1002,6 +1086,7 @@
     value: '調整導入圖像的位置。 '
   },
   'import-as-layer-limit-reached': {
+    hint: 'Kleki allows only a certain number of layers',
     original: 'Layer limit reached. Image will be placed on existing layer.',
     value: '達到圖層數量上限。圖像將會應用到已有圖層。'
   },
@@ -1016,18 +1101,22 @@
     value: '拼合圖像'
   },
   'import-unsupported-file': {
+    hint: 'e.g. user tried to open a WAV',
     original: 'Unsupported file type. See Help for supported types.',
     value: '不支持此類文件類型。查看幫助。 '
   },
   'import-broken-file': {
+    hint: 'if an image file is broken',
     original: "Couldn't load image. File might be corrupted.",
     value: '不能加載圖像。文件可能受損。 '
   },
   'import-psd-unsupported': {
+    hint: 'PSD is photoshop file format. flatten as in „flatten image“ in photoshop. Merged all layers',
     original: 'Unsupported features. PSD had to be flattened.',
     value: '不支持該功能。 PSD需要拼合。 '
   },
   'import-psd-limited-support': {
+    hint: 'PSD has lots of fancy features that Kleki doesn\'t have, so when importing a PSD it often has to simplify things. So it might look different compared to when opening in Photoshop. We’re informing the user if they "flatten" the image it will be accurate despite losing layers. The user has to weigh, do they care about having layers, or do they care about it looking right.',
     original: 'PSD support is limited. Flattened will more likely look correct.',
     value: 'PSD支持受限。拼合功能將會更近原始圖像。 '
   },
@@ -1050,10 +1139,12 @@
     value: '適應'
   },
   'bucket-tolerance': {
+    hint: 'a common feature for paint bucket',
     original: 'Tolerance',
     value: '容差'
   },
   'bucket-sample': {
+    hint: 'like "taking a sample"',
     original: 'Sample',
     value: '採樣'
   },
@@ -1062,18 +1153,22 @@
     value: '從特定圖層進行色彩採樣'
   },
   'bucket-sample-all': {
+    hint: 'all layers',
     original: 'All',
     value: '全部'
   },
   'bucket-sample-active': {
+    hint: 'currently active layer',
     original: 'Active',
     value: '當前'
   },
   'bucket-sample-above': {
+    hint: 'layer above active layer',
     original: 'Above',
     value: '之前'
   },
   'bucket-grow': {
+    hint: 'verb. Or expand.',
     original: 'Grow',
     value: '填充擴張'
   },
@@ -1087,6 +1182,7 @@
     value: '連續的'
   },
   'bucket-contiguous-title': {
+    hint: 'tooltip explaining Contiguous',
     original: 'Only fill connected areas',
     value: '僅填充相連的區域'
   },
@@ -1111,10 +1207,12 @@
     value: '填充'
   },
   'shape-rect': {
+    hint: 'rectangle shape',
     original: 'Rectangle',
     value: '方形'
   },
   'shape-ellipse': {
+    hint: 'ellipse shape',
     original: 'Ellipse',
     value: '圓形'
   },
@@ -1132,6 +1230,7 @@
     value: '自中心向外'
   },
   'shape-fixed': {
+    hint: 'fixed ratio of 1:1',
     original: 'Fixed 1:1',
     value: '鎖定 1:1'
   },
@@ -1144,6 +1243,7 @@
     value: '添加文本'
   },
   'text-placeholder': {
+    hint: 'placeholder in text input. Inform user they can have linebreaks when pressing shift+enter. Just pressing enter confirms and closes the dialog',
     original: 'Your text (multiline Shift+Enter)',
     value: '請輸入（換行 Shift+Enter）'
   },
@@ -1156,6 +1256,7 @@
     value: '大小'
   },
   'text-left': {
+    hint: 'left, center, right text formatting like in Word',
     original: 'Left',
     value: '左對齊'
   },
@@ -1198,22 +1299,27 @@
     value: '送出'
   },
   'submit-title': {
+    hint: 'tooltip when hovering "Submit" button',
     original: 'Submit Drawing',
     value: '送出圖像'
   },
   'submit-prompt': {
+    hint: 'Dialog asking for confirmation',
     original: 'Submit drawing?',
     value: '確認送出？'
   },
   'submit-submitting': {
+    hint: 'in the process of uploading',
     original: 'Submitting',
     value: '送出中'
   },
   'embed-init-loading': {
+    hint: 'when opening the app',
     original: 'Loading app',
     value: '加載app'
   },
   'embed-init-waiting': {
+    hint: 'The app is loaded, but it’s still waiting for image',
     original: 'Waiting for image',
     value: '圖像上傳中'
   },
@@ -1222,6 +1328,7 @@
     value: '未保存'
   },
   help: {
+    hint: 'or user manual',
     original: 'Help',
     value: '幫助'
   },
@@ -1238,10 +1345,16 @@
     value: '首選語言'
   },
   'settings-language-reload': {
+    hint: 'changes will be visible after reloading the page',
     original: 'Will update after reloading.',
     value: '刷新後更改語言'
   },
+  'terms-of-service': {
+    original: 'Terms of Service',
+    value: '服務條款'
+  },
   licenses: {
+    hint: 'as in software licenses',
     original: 'Licenses',
     value: '許可'
   },
@@ -1279,6 +1392,7 @@
     value: '高度'
   },
   opacity: {
+    hint: 'for layer opacity, brush opacity, text opacity, ...',
     original: 'Opacity',
     value: '不透明度'
   },
@@ -1295,6 +1409,7 @@
     value: '藍'
   },
   eraser: {
+    hint: 'noun. As short as possible',
     original: 'Eraser',
     value: '橡皮擦'
   },
@@ -1303,11 +1418,18 @@
     original: 'Center',
     value: '居中'
   },
+  layers: {
+    hint: 'layers in the context of image editing software',
+    original: 'Layers',
+    value: '圖層'
+  },
   background: {
+    hint: 'as in background layer',
     original: 'Background',
     value: '背景'
   },
   'scaling-algorithm': {
+    hint: 'Label for dropdown where user chooses which computer graphics algorithm should be used to scale the image',
     original: 'Scaling Algorithm',
     value: '縮放算法'
   },
@@ -1319,12 +1441,13 @@
     original: 'Pixelated',
     value: '像素化'
   },
-  'preview': {
-    original: 'Preview',
+  preview: {
     hint: 'subject. When applying a filter user sees a preview of what the result would look like.',
+    original: 'Preview',
     value: '預覽'
   },
   'angle-snap': {
+    hint: 'Snapping. Like when transforming an image and it snaps to the side of the frame.',
     original: 'Snap',
     value: '對齊'
   },
@@ -1333,17 +1456,19 @@
     value: '以45°角度對齊'
   },
   'lock-alpha': {
+    hint: 'Short. Freezes the alpha channel of image. Images consist of 4 channels (red, green, blue, alpha). Alpha lock also found in Procreate and photoshop',
     original: 'Lock Alpha',
     value: '鎖定'
   },
   'lock-alpha-title': {
+    hint: "same as 'lock-alpha' but longer version. Shows up as a tooltip when hovering",
     original: "Locks layer's alpha channel",
     value: '鎖定圖層透明度'
   },
-  'reverse': {
+  reverse: {
     hint: 'Reversing the direction of a color gradient',
     original: 'Reverse',
-    value: '反向',
+    value: '反向'
   },
   'compare-before': {
     original: 'Before',

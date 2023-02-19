@@ -1,13 +1,15 @@
 import {BB} from '../../../bb/bb';
-import {KlSlider} from '../base-components/kl-slider';
+import {KlSlider} from '../components/kl-slider';
 import {LANG} from '../../../language/language';
-import {Checkbox} from '../base-components/checkbox';
-import {Options} from '../base-components/options';
+import {Checkbox} from '../components/checkbox';
+import {Options} from '../components/options';
+import {TGradientType} from '../../kl-types';
+import {KlColorSlider} from '../components/kl-color-slider';
 
 
 interface IGradientUiSettings {
     opacity: number;
-    type: 'linear' | 'linear-mirror' | 'radial';
+    type: TGradientType;
     doLockAlpha: boolean;
     doSnap: boolean;
     isReversed: boolean;
@@ -17,20 +19,16 @@ interface IGradientUiSettings {
 /**
  * Gradient Tool tab contents
  *
- * p = {
- *     colorSlider: KlColorSlider// when opening tab, inserts it (snatches it from where else it was)
- * }
- *
  * @param p
  * @constructor
  */
 export class GradientUi {
 
-    private rootEl: HTMLElement;
+    private readonly rootEl: HTMLElement;
     private colorDiv: HTMLElement;
-    private colorSlider: any; // todo type
+    private colorSlider: KlColorSlider;
     private isVisible: boolean;
-    private iconArr: HTMLElement[];
+    private readonly iconArr: HTMLElement[];
 
     private settings: IGradientUiSettings = {
         opacity: 1,
@@ -41,7 +39,7 @@ export class GradientUi {
         isEraser: false,
     };
 
-    private updateIcons(): void {
+    private updateIcons (): void {
         const col1 = this.settings.isReversed ? '#0000' : '#000';
         const col2 = this.settings.isReversed ? '#000' : '#0000';
         this.iconArr[0].style.background = `linear-gradient(${col1}, ${col2})`;
@@ -53,42 +51,43 @@ export class GradientUi {
 
     constructor (
         p: {
-            colorSlider: any; // KlColorSlider - when opening tab, inserts it (snatches it from where else it was)
+            colorSlider: KlColorSlider; // when opening tab, inserts it (snatches it from where else it was)
         }
     ) {
         this.colorSlider = p.colorSlider;
         this.rootEl = BB.el({
             css: {
-                margin: '10px'
-            }
+                margin: '10px',
+            },
         });
         this.isVisible = true;
 
         this.colorDiv = BB.el({
             parent: this.rootEl,
             css: {
-                marginBottom: '10px'
-            }
+                marginBottom: '10px',
+            },
         });
 
         this.iconArr = [];
         {
             const size = 33;
-            [0, 1, 2].forEach(item => {
+            [0, 1, 2].forEach(() => {
                 const el = BB.el({
+                    className: 'dark-invert',
                     css: {
                         width: size + 'px',
                         height: size + 'px',
                         borderRadius: '3px',
                         margin: '1px',
-                    }
+                    },
                 });
                 this.iconArr.push(el);
             });
         }
         this.updateIcons();
 
-        const typeOptions = new Options({
+        const typeOptions = new Options<TGradientType>({
             optionArr: [
                 {
                     id: 'linear',
@@ -104,7 +103,7 @@ export class GradientUi {
                     id: 'radial',
                     label: this.iconArr[2],
                     title: LANG('gradient-radial'),
-                }
+                },
             ],
             initId: 'linear',
             onChange: (id) => {
@@ -124,10 +123,10 @@ export class GradientUi {
             toDisplayValue: (value) => value * 100,
             onChange: (val) => {
                 this.settings.opacity = val;
-            }
+            },
         });
         BB.css(opacitySlider.getElement(), {
-            marginTop: '10px'
+            marginTop: '10px',
         });
         this.rootEl.append(opacitySlider.getElement());
 
@@ -138,8 +137,8 @@ export class GradientUi {
             css: {
                 display: 'flex',
                 alignItems: 'center',
-                marginTop: '10px'
-            }
+                marginTop: '10px',
+            },
         });
 
         const reverseToggle = new Checkbox({
@@ -151,7 +150,7 @@ export class GradientUi {
             },
             css: {
                 width: '50%',
-            }
+            },
         });
 
         const doSnapToggle = new Checkbox({
@@ -163,7 +162,7 @@ export class GradientUi {
             },
             css: {
                 width: '50%',
-            }
+            },
         });
 
         row1.append(
@@ -177,8 +176,8 @@ export class GradientUi {
             css: {
                 display: 'flex',
                 alignItems: 'center',
-                marginTop: '10px'
-            }
+                marginTop: '10px',
+            },
         });
 
         const eraserToggle = new Checkbox({
@@ -189,7 +188,7 @@ export class GradientUi {
             },
             css: {
                 width: '50%',
-            }
+            },
         });
 
         const lockAlphaToggle = new Checkbox({
@@ -202,7 +201,7 @@ export class GradientUi {
             doHighlight: true,
             css: {
                 width: '50%',
-            }
+            },
         });
 
         row2.append(
@@ -213,20 +212,19 @@ export class GradientUi {
 
     }
 
-    getElement(): HTMLElement {
+    getElement (): HTMLElement {
         return this.rootEl;
     }
 
-    setIsVisible(isVisible: boolean): void {
+    setIsVisible (isVisible: boolean): void {
         this.isVisible = !!isVisible;
         this.rootEl.style.display = isVisible ? 'block' : 'none';
         if (isVisible) {
-            this.colorDiv.appendChild(this.colorSlider.getElement());
-            this.colorDiv.appendChild(this.colorSlider.getOutputElement());
+            this.colorDiv.append(this.colorSlider.getElement(), this.colorSlider.getOutputElement());
         }
     }
 
-    getSettings(): IGradientUiSettings {
+    getSettings (): IGradientUiSettings {
         return BB.copyObj(this.settings);
     }
 

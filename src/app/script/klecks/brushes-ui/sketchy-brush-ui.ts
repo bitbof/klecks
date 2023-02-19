@@ -1,24 +1,23 @@
 import {brushes} from '../brushes/brushes';
 import {eventResMs} from './brushes-consts';
 import {klHistory} from '../history/kl-history';
-import {KlSlider} from '../ui/base-components/kl-slider';
-// @ts-ignore
-import brushIconImg from 'url:~/src/app/img/ui/brush-sketchy.png';
-import {IBrushUi} from '../kl.types';
+import {KlSlider} from '../ui/components/kl-slider';
+import brushIconImg from '/src/app/img/ui/brush-sketchy.png';
+import {IBrushUi} from '../kl-types';
 import {LANG, languageStrings} from '../../language/language';
 import {BB} from '../../bb/bb';
 
 export const sketchyBrushUi = (function () {
-    let brushInterface: IBrushUi = {
+    const brushInterface: IBrushUi = {
         image: brushIconImg,
         tooltip: LANG('brush-sketchy'),
         sizeSlider: {
             min: 0.5,
-            max: 10
+            max: 10,
         },
         opacitySlider: {
             min: 1 / 100,
-            max: 1
+            max: 1,
         },
         Ui: null,
     };
@@ -28,18 +27,18 @@ export const sketchyBrushUi = (function () {
     });
 
     brushInterface.Ui = function (p) {
-        let div = document.createElement("div"); // the gui
-        let brush = new brushes.SketchyBrush();
+        const div = document.createElement('div'); // the gui
+        const brush = new brushes.SketchyBrush();
         brush.setHistory(klHistory);
         p.onSizeChange(brush.getSize());
         let sizeSlider;
         let opacitySlider;
 
-        function setSize(size) {
+        function setSize (size) {
             brush.setSize(size);
         }
 
-        function init() {
+        function init () {
             sizeSlider = new KlSlider({
                 label: LANG('brush-size'),
                 width: 250,
@@ -78,7 +77,7 @@ export const sketchyBrushUi = (function () {
                     p.onOpacityChange(val);
                 },
             });
-            let blendSlider = new KlSlider({
+            const blendSlider = new KlSlider({
                 label: LANG('brush-blending'),
                 width: 250,
                 height: 30,
@@ -92,7 +91,7 @@ export const sketchyBrushUi = (function () {
                     brush.setBlending(val);
                 },
             });
-            let scaleSlider = new KlSlider({
+            const scaleSlider = new KlSlider({
                 label: LANG('brush-sketchy-scale'),
                 width: 250,
                 height: 30,
@@ -104,13 +103,15 @@ export const sketchyBrushUi = (function () {
                     brush.setScale(val);
                 },
             });
-            opacitySlider.getElement().style.marginTop = "10px";
-            blendSlider.getElement().style.marginTop = "10px";
-            scaleSlider.getElement().style.marginTop = "10px";
-            div.appendChild(sizeSlider.getElement());
-            div.appendChild(opacitySlider.getElement());
-            div.appendChild(blendSlider.getElement());
-            div.appendChild(scaleSlider.getElement());
+            opacitySlider.getElement().style.marginTop = '10px';
+            blendSlider.getElement().style.marginTop = '10px';
+            scaleSlider.getElement().style.marginTop = '10px';
+            div.append(
+                sizeSlider.getElement(),
+                opacitySlider.getElement(),
+                blendSlider.getElement(),
+                scaleSlider.getElement(),
+            );
         }
 
         init();
@@ -128,14 +129,14 @@ export const sketchyBrushUi = (function () {
         this.getSize = function () {
             return brush.getSize();
         };
-        this.setSize = function(size) {
+        this.setSize = function (size) {
             setSize(size);
             sizeSlider.setValue(size);
         };
         this.getOpacity = function () {
             return brush.getOpacity();
         };
-        this.setOpacity = function(opacity) {
+        this.setOpacity = function (opacity) {
             brush.setOpacity(opacity);
             opacitySlider.setValue(opacity);
         };

@@ -1,0 +1,1481 @@
+{
+  'switch-ui-left-right': {
+    hint: 'Button that switches layout from left to right, to accommodate left handed & right handed visitors.',
+    original: 'Switch left/right UI',
+    value: 'Basculer gauche / droite'
+  },
+  'toggle-show-tools': {
+    hint: 'Button that hides/shows the toolbar.',
+    original: 'Show/Hide Tools',
+    value: 'Afficher / Masquer les Outils'
+  },
+  scroll: {
+    hint: 'Verb. As in scrolling a page.',
+    original: 'Scroll',
+    value: 'Défiler'
+  },
+  donate: {
+    original: 'Donate',
+    value: 'Don'
+  },
+  home: {
+    hint: 'button with logo, top left of tools',
+    original: 'Home',
+    value: 'Accueil'
+  },
+  'modal-new-tab': {
+    hint: 'as in browser tab',
+    original: 'Open in new tab',
+    value: 'Ouvrir dans un nouvel onglet'
+  },
+  'tab-edit': {
+    hint: 'label for a tab that offer filters for making color adjustments, cropping, transforming, etc.',
+    original: 'Edit',
+    value: 'Modifier'
+  },
+  'tab-file': {
+    hint: 'label for a tab that lets user save the image, import, upload, etc.',
+    original: 'File',
+    value: 'Fichier'
+  },
+  'tool-brush': {
+    hint: 'tool that lets user paint (like in ms paint or photoshop)',
+    original: 'Brush',
+    value: 'Pinceau'
+  },
+  'tool-paint-bucket': {
+    original: 'Paint Bucket',
+    value: 'Pot de peinture'
+  },
+  'tool-gradient': {
+    original: 'Gradient',
+    value: 'Dégradé'
+  },
+  'tool-shape': {
+    hint: 'Tool for drawing rectangles, circles, lines',
+    original: 'Shape',
+    value: 'Forme'
+  },
+  'tool-text': {
+    hint: 'Tool for placing text on canvas',
+    original: 'Text',
+    value: 'Texte'
+  },
+  'tool-hand': {
+    hint: 'Tool for navigating (or scrolling around) the canvas. Same name in Photoshop.',
+    original: 'Hand Tool',
+    value: 'Outil Main'
+  },
+  'tool-zoom': {
+    original: 'Zoom',
+    value: 'Zoom'
+  },
+  undo: {
+    original: 'Undo',
+    value: 'Annuler'
+  },
+  redo: {
+    original: 'Redo',
+    value: 'Rétablir'
+  },
+  'brush-pen': {
+    hint: 'Generic "brush" that feels a bit like a pen or marker, as opposed to a paint brush.',
+    original: 'Pen',
+    value: 'Stylo'
+  },
+  'brush-blend': {
+    hint: 'brush with watercolor feel. Makes colors blend/bleed into each other. Different from smudging though.',
+    original: 'Blend',
+    value: 'Fusion'
+  },
+  'brush-sketchy': {
+    hint: 'Made up brush name. Pictures drawn with this brush often look like sketches.',
+    original: 'Sketchy',
+    value: 'Croquis'
+  },
+  'brush-pixel': {
+    original: 'Pixel',
+    value: 'Pixel'
+  },
+  'brush-chemy': {
+    hint: 'Made up brush name, derived from drawing applications "Webchemy" and "Alchemy"',
+    original: 'Chemy',
+    value: 'Chimie'
+  },
+  'brush-smudge': {
+    hint: 'Common brush/tool in image editing software. Smudges colors around canvas.',
+    original: 'Smudge',
+    value: 'Outil doigt'
+  },
+  'brush-size': {
+    original: 'Size',
+    value: 'Taille'
+  },
+  'brush-blending': {
+    hint: 'Wetness. How much colors will bleed into each other.',
+    original: 'Blending',
+    value: 'Mélanger'
+  },
+  'brush-toggle-pressure': {
+    hint: 'google "pressure sensitivity". Feature of Wacom tablets, Apple Pencil, XP Pen, etc.',
+    original: 'Toggle Pressure Sensitivity',
+    value: 'Basculer la sensibilité de la pression'
+  },
+  'brush-pen-circle': {
+    hint: 'as in circle shape',
+    original: 'Circle',
+    value: 'Cercle'
+  },
+  'brush-pen-chalk': {
+    hint: 'as in chalk texture',
+    original: 'Chalk',
+    value: 'Craie'
+  },
+  'brush-pen-calligraphy': {
+    hint: 'like a "chisel tip marker"',
+    original: 'Calligraphy',
+    value: 'Calligraphie'
+  },
+  'brush-pen-square': {
+    hint: 'as in square shape',
+    original: 'Square',
+    value: 'Carré'
+  },
+  'brush-sketchy-scale': {
+    hint: 'How far the connecting lines of sketchy brush can reach.',
+    original: 'Scale',
+    value: 'Échelle'
+  },
+  'brush-pixel-dither': {
+    hint: 'Dithering/halftone pattern',
+    original: 'Dither',
+    value: 'Trame'
+  },
+  'brush-chemy-fill': {
+    hint: 'Like in MS Paint. A shape can have be outlined, and filled.',
+    original: 'Fill',
+    value: 'Remplir'
+  },
+  'brush-chemy-stroke': {
+    original: 'Stroke',
+    value: ''
+  },
+  'brush-chemy-mirror-x': {
+    original: 'Horizontal Symmetry',
+    value: 'Symétrie Horizontale'
+  },
+  'brush-chemy-mirror-y': {
+    original: 'Vertical Symmetry',
+    value: 'Symétrie Verticale'
+  },
+  'brush-chemy-gradient': {
+    hint: 'as in color gradient',
+    original: 'Gradient',
+    value: 'Dégradé'
+  },
+  'brush-eraser-transparent-bg': {
+    hint: 'as in transparent background/bottom layer',
+    original: 'Transparent Background',
+    value: 'Fond Transparent'
+  },
+  stabilizer: {
+    hint: 'Common feature in drawing software to make lines smoother',
+    original: 'Stabilizer',
+    value: 'Stabilisateur'
+  },
+  'stabilizer-title': {
+    hint: '-title keys are usually more verbose description. shown as a tooltip.',
+    original: 'Stroke Stabilizer',
+    value: 'Stabilisateur de Ligne'
+  },
+  eyedropper: {
+    original: 'Eyedropper',
+    value: 'Pipette'
+  },
+  'secondary-color': {
+    hint: 'or sometimes called "background" color. Photoshop, MS Paint, etc. allow user to switch between two colors.',
+    original: 'Secondary Color',
+    value: 'Couleur Secondaire'
+  },
+  'manual-color-input': {
+    hint: 'A dialog where users can manually type the color, each channel a number. "mci" keys all related to this dialog.',
+    original: 'Manual Color Input',
+    value: 'Saisie Manuelle des Couleurs'
+  },
+  'mci-hex': {
+    hint: 'as in hex code. Hex representation of color. „#f00“ → red',
+    original: 'Hex',
+    value: ''
+  },
+  'mci-copy': {
+    hint: 'verb',
+    original: 'Copy',
+    value: 'Copier'
+  },
+  'modal-ok': {
+    hint: 'main confirmation button in dialogs. Can be to confirm an action, not just acknowledge information.',
+    original: 'Ok',
+    value: 'Ok'
+  },
+  'modal-cancel': {
+    original: 'Cancel',
+    value: 'Annuler'
+  },
+  'modal-close': {
+    hint: 'as in close a dialog box',
+    original: 'Close',
+    value: 'Fermer'
+  },
+  'layers-active-layer': {
+    hint: 'currently selected layer that user is drawing on',
+    original: 'Active Layer',
+    value: 'Calque Active'
+  },
+  'layers-layer': {
+    original: 'Layer',
+    value: 'Calque'
+  },
+  'layers-copy': {
+    hint: 'noun',
+    original: 'copy',
+    value: 'Copier'
+  },
+  'layers-blending': {
+    hint: 'Common feature in image editing & drawing software. All layers-blend- keys relate to this. https://en.wikipedia.org/wiki/Blend_modes',
+    original: 'Blending',
+    value: 'Mélanger'
+  },
+  'layers-new': {
+    hint: 'action',
+    original: 'New Layer',
+    value: 'Nouveau Calque'
+  },
+  'layers-remove': {
+    hint: 'action',
+    original: 'Remove Layer',
+    value: 'Supprimé un calque'
+  },
+  'layers-duplicate': {
+    hint: 'action',
+    original: 'Duplicate Layer',
+    value: 'Dupliquer le Calque'
+  },
+  'layers-merge': {
+    hint: 'action',
+    original: 'Merge with layer below',
+    value: 'Fusionner avec le calque ci-dessous'
+  },
+  'layers-rename': {
+    hint: 'action',
+    original: 'Rename',
+    value: 'Renommer'
+  },
+  'layers-blend-normal': {
+    original: 'normal',
+    value: 'normal'
+  },
+  'layers-blend-darken': {
+    original: 'darken',
+    value: 'obscurcir'
+  },
+  'layers-blend-multiply': {
+    original: 'multiply',
+    value: 'produit'
+  },
+  'layers-blend-color-burn': {
+    original: 'color burn',
+    value: 'densité couleur +'
+  },
+  'layers-blend-lighten': {
+    original: 'lighten',
+    value: 'éclaircir'
+  },
+  'layers-blend-screen': {
+    original: 'screen',
+    value: 'superposition'
+  },
+  'layers-blend-color-dodge': {
+    original: 'color dodge',
+    value: 'densité couleur -'
+  },
+  'layers-blend-overlay': {
+    original: 'overlay',
+    value: 'incrustation'
+  },
+  'layers-blend-soft-light': {
+    original: 'soft light',
+    value: 'lumière tamisée'
+  },
+  'layers-blend-hard-light': {
+    original: 'hard light',
+    value: 'lumière crue'
+  },
+  'layers-blend-difference': {
+    original: 'difference',
+    value: 'différence'
+  },
+  'layers-blend-exclusion': {
+    original: 'exclusion',
+    value: 'exclusion'
+  },
+  'layers-blend-hue': {
+    original: 'hue',
+    value: 'teinte'
+  },
+  'layers-blend-saturation': {
+    original: 'saturation',
+    value: 'saturation'
+  },
+  'layers-blend-color': {
+    original: 'color',
+    value: 'couleur'
+  },
+  'layers-blend-luminosity': {
+    original: 'luminosity',
+    value: 'luminosité'
+  },
+  'layers-rename-title': {
+    hint: '-title in code usually means it shows up in a tooltip, or it’s the header of a dialog box, so it can be a little bit longer.',
+    original: 'Rename Layer',
+    value: 'Renommer le Calque'
+  },
+  'layers-rename-name': {
+    hint: 'noun',
+    original: 'Name',
+    value: 'Nom'
+  },
+  'layers-rename-clear': {
+    hint: 'aka action of deleting entered name',
+    original: 'Clear Name',
+    value: 'Nom Clair'
+  },
+  'layers-rename-sketch': {
+    hint: 'noun. Name suggestion for a layer',
+    original: 'Sketch',
+    value: 'Croquis'
+  },
+  'layers-rename-colors': {
+    hint: 'noun. Name suggestion for a layer',
+    original: 'Colors',
+    value: 'Couleurs'
+  },
+  'layers-rename-shading': {
+    hint: 'noun. Name suggestion for a layer',
+    original: 'Shading',
+    value: 'Ombrage'
+  },
+  'layers-rename-lines': {
+    hint: 'noun. Name suggestion for a layer',
+    original: 'Lines',
+    value: 'Ligne'
+  },
+  'layers-rename-effects': {
+    hint: 'noun. Name suggestion for a layer',
+    original: 'Effects',
+    value: 'Effet'
+  },
+  'layers-rename-foreground': {
+    hint: 'noun. Name suggestion for a layer',
+    original: 'Foreground',
+    value: 'Premier Plan'
+  },
+  'layers-merge-modal-title': {
+    original: 'Merge/Mix Layers',
+    value: 'Fusionner / Mélanger des Calques'
+  },
+  'layers-merge-description': {
+    hint: 'After ":" a list of mix/blend modes is shown.',
+    original: 'Merges the selected layer with the one underneath. Select the mix mode:',
+    value: 'Fusionne le calque sélectionné avec celui du dessous. Sélectionnez le mode de mixage:'
+  },
+  'file-no-autosave': {
+    hint: "let user know they can't autosave, and there's no cloud storage. Keep short so fits on one line",
+    original: 'No autosave, no cloud storage',
+    value: 'Pas de sauvegarde automatique, pas de cloud'
+  },
+  'file-new': {
+    hint: 'action',
+    original: 'New',
+    value: 'Nouveau'
+  },
+  'file-import': {
+    hint: 'action',
+    original: 'Import',
+    value: 'Importer'
+  },
+  'file-save': {
+    hint: 'action',
+    original: 'Save',
+    value: 'Enregistrer'
+  },
+  'file-format': {
+    original: 'File Format',
+    value: 'Format du Fichier'
+  },
+  'file-copy': {
+    hint: 'verb',
+    original: 'Copy',
+    value: 'Copier'
+  },
+  'file-copy-title': {
+    original: 'Copy To Clipboard',
+    value: 'Copier Dans Le Presse-Papiers'
+  },
+  'file-share': {
+    hint: 'Common feature on phones. Pressing share button allows to send data to a different app, e.g. as a text message to someone.',
+    original: 'Share',
+    value: 'Partager'
+  },
+  'file-storage': {
+    hint: 'Made up term. Allows users to store drawing in the browser. (not synced across devices)',
+    original: 'Browser Storage',
+    value: 'Stockage du navigateur'
+  },
+  'file-storage-thumb-title': {
+    hint: 'when reopening or reloading',
+    original: 'Restores when reopening page',
+    value: 'Récupération lors du rechargement de la page.'
+  },
+  'file-storage-about': {
+    hint: 'link to Browser Storage help/user manual',
+    original: 'About Browser Storage',
+    value: 'A propos du stockage du navigateur'
+  },
+  'file-storage-cant-access': {
+    hint: 'an error. Can’t access the storage.',
+    original: "Can't access",
+    value: 'Ne peut pas avoir accès'
+  },
+  'file-storage-empty': {
+    hint: 'nothing stored',
+    original: 'Empty',
+    value: 'Vide'
+  },
+  'file-storage-store': {
+    hint: 'verb',
+    original: 'Store',
+    value: 'Conserver'
+  },
+  'file-storage-clear': {
+    original: 'Clear',
+    value: 'Effacer'
+  },
+  'file-storage-storing': {
+    hint: 'while it is in the process of storing',
+    original: 'Storing',
+    value: 'Stockage'
+  },
+  'file-storage-overwrite': {
+    hint: 'overwrite what is already stored',
+    original: 'Overwrite',
+    value: 'Écraser'
+  },
+  'file-storage-min-ago': {
+    hint: "{x} <- needs to stay, it's a placeholder.",
+    original: '{x}min ago',
+    value: 'il y a {x}min'
+  },
+  'file-storage-hours-ago': {
+    original: '{x}h ago',
+    value: 'il y a {x}h'
+  },
+  'file-storage-days-ago': {
+    original: '{x}d ago',
+    value: 'il y a {x} jours'
+  },
+  'file-storage-month-ago': {
+    original: '> 1month ago',
+    value: '> il y a un mois'
+  },
+  'file-storage-restored': {
+    original: 'Restored from Browser Storage',
+    value: 'Restauré à partir du stockage du Navigateur'
+  },
+  'file-storage-stored': {
+    original: 'Stored to Browser Storage',
+    value: 'Stocké dans le Stockage du Navigateur'
+  },
+  'file-storage-failed': {
+    original: 'Failed to store to Browser Storage',
+    value: "Échec de l'enregistrement dans le stockage du navigateur"
+  },
+  'file-storage-failed-1': {
+    original: 'Failed to store. Possible causes:',
+    value: 'Impossible de stocker. Causes possibles:'
+  },
+  'file-storage-failed-2': {
+    original: 'Out of disk space',
+    value: "Manque d'espace disque"
+  },
+  'file-storage-failed-3': {
+    original: 'Storage disabled in incognito tab',
+    value: "Stockage désactivé dans l'onglet Navigation privée"
+  },
+  'file-storage-failed-4': {
+    hint: 'as in: unsupported feature',
+    original: "Browser doesn't support storage",
+    value: 'Navigateur ne supporte pas le stockage'
+  },
+  'file-storage-failed-clear': {
+    original: 'Failed to clear.',
+    value: "Échec de l'effacement."
+  },
+  'file-upload': {
+    hint: 'verb',
+    original: 'Upload',
+    value: 'Téléverser'
+  },
+  'cleared-layer': {
+    hint: 'the layer has been cleared. It is now empty',
+    original: 'Cleared layer',
+    value: 'Calque effacée'
+  },
+  filled: {
+    hint: 'layer got filled with a color',
+    original: 'Filled',
+    value: 'Remplir'
+  },
+  'new-title': {
+    original: 'New Image',
+    value: 'Nouvelle Image'
+  },
+  'new-current': {
+    hint: 'as in "reuse the current image resolution"',
+    original: 'Current',
+    value: 'Actuel'
+  },
+  'new-fit': {
+    hint: 'make dimensions of image fit your window size',
+    original: 'Fit',
+    value: 'Cadrer'
+  },
+  'new-oversize': {
+    hint: 'like oversized clothes.',
+    original: 'Oversize',
+    value: 'Surdimensionnée'
+  },
+  'new-square': {
+    hint: 'square image format',
+    original: 'Square',
+    value: 'Carré'
+  },
+  'new-landscape': {
+    hint: 'https://en.wikipedia.org/wiki/Page_orientation',
+    original: 'Landscape',
+    value: 'Paysage'
+  },
+  'new-portrait': {
+    original: 'Portrait',
+    value: 'Portrait'
+  },
+  'new-screen': {
+    hint: 'resolution of computer screen',
+    original: 'Screen',
+    value: 'Écran'
+  },
+  'new-video': {
+    hint: 'dimensions of a video (usually 16:9)',
+    original: 'Video',
+    value: 'Vidéo'
+  },
+  'new-din-paper': {
+    hint: 'https://en.wikipedia.org/wiki/Paper_size',
+    original: 'DIN Paper',
+    value: 'Papier DIN'
+  },
+  'new-px': {
+    hint: 'abbreviation of pixel',
+    original: 'px',
+    value: 'px'
+  },
+  'new-ratio': {
+    hint: 'aspect ratio',
+    original: 'Ratio',
+    value: 'Format'
+  },
+  'upload-title': {
+    hint: '"Imgur" is a website name.',
+    original: 'Upload to Imgur',
+    value: 'Publier sur Imgur'
+  },
+  'upload-link-notice': {
+    hint: 'Explaining to user even though their upload is unlisted, they should be careful who they share the link with. No password protection.',
+    original: 'Anyone with the link to your uploaded image will be able to view it.',
+    value: 'Toute personne disposant du lien vers votre image téléchargée pourra la visualiser.'
+  },
+  'upload-name': {
+    hint: 'noun',
+    original: 'Title',
+    value: 'Titre'
+  },
+  'upload-title-untitled': {
+    original: 'Untitled',
+    value: 'Sans Titre'
+  },
+  'upload-caption': {
+    hint: 'as in image caption / description',
+    original: 'Caption',
+    value: 'Légende'
+  },
+  'upload-submit': {
+    hint: 'verb',
+    original: 'Upload',
+    value: 'Téléverser'
+  },
+  'upload-uploading': {
+    hint: 'in the process of uploading',
+    original: 'Uploading...',
+    value: 'Téléversement...'
+  },
+  'upload-success': {
+    original: 'Upload Successful',
+    value: 'Téléversement Réussi'
+  },
+  'upload-failed': {
+    original: 'Upload failed.',
+    value: 'Le téléversement a échoué.'
+  },
+  'upload-delete': {
+    original: 'To delete your image from Imgur visit:',
+    value: "Pour supprimer votre image d'Imgur, visitez:"
+  },
+  'cropcopy-title-copy': {
+    original: 'Copy To Clipboard',
+    value: 'Copier Dans Le Presse-Papiers'
+  },
+  'cropcopy-title-crop': {
+    hint: 'Cropping is a common feature in image editing.',
+    original: 'Crop',
+    value: 'Rogner'
+  },
+  'cropcopy-click-hold': {
+    original: 'Right-click or press hold to copy.',
+    value: 'Clique-droit ou rester appuyé pour copier.'
+  },
+  'cropcopy-btn-copy': {
+    hint: 'confirmation button. Should be short.',
+    original: 'To Clipboard',
+    value: 'Copier'
+  },
+  'cropcopy-copied': {
+    original: 'Copied.',
+    value: 'Copié.'
+  },
+  'cropcopy-btn-crop': {
+    hint: 'confirmation button. Should be short.',
+    original: 'Apply Crop',
+    value: 'Recadrer'
+  },
+  'crop-drag-to-crop': {
+    hint: 'drag the mouse to adjust cropping',
+    original: 'Drag to crop',
+    value: 'Glisser pour recadrer'
+  },
+  'filter-crop-extend': {
+    original: 'Crop/Extend',
+    value: 'Recadrer'
+  },
+  'filter-flip': {
+    original: 'Flip',
+    value: 'Retourne'
+  },
+  'filter-perspective': {
+    hint: 'perspective transformation',
+    original: 'Perspective',
+    value: 'Perspective'
+  },
+  'filter-resize': {
+    original: 'Resize',
+    value: 'Redimensionner'
+  },
+  'filter-rotate': {
+    original: 'Rotate',
+    value: 'Pivoter'
+  },
+  'filter-transform': {
+    hint: 'more generic transformation. Commonly known as "free transform"',
+    original: 'Transform',
+    value: 'Transformer'
+  },
+  'filter-bright-contrast': {
+    hint: 'brightness contrast',
+    original: 'Bright/Contrast',
+    value: 'Lum / Contraste'
+  },
+  'filter-curves': {
+    hint: 'color curves',
+    original: 'Curves',
+    value: 'Courbe'
+  },
+  'filter-hue-sat': {
+    original: 'Hue/Saturation',
+    value: 'Teinte/Satur.'
+  },
+  'filter-invert': {
+    hint: 'invert the colors',
+    original: 'Invert',
+    value: 'Inverser'
+  },
+  'filter-tilt-shift': {
+    hint: 'or just depth-of-field. https://en.wikipedia.org/wiki/Tilt%E2%80%93shift_photography',
+    original: 'Tilt Shift',
+    value: "Tilt Shift"
+  },
+  'filter-to-alpha': {
+    hint: 'feature that can isolate line drawings if it is a black and white image.',
+    original: 'To Alpha',
+    value: 'Vers Alpha'
+  },
+  'filter-triangle-blur': {
+    hint: 'or just blur',
+    original: 'Triangle Blur',
+    value: 'Flou de Triangle'
+  },
+  'filter-unsharp-mask': {
+    hint: 'or just sharpen, https://en.wikipedia.org/wiki/Unsharp_masking',
+    original: 'Unsharp Mask',
+    value: 'Masque Flou'
+  },
+  'filter-crop-title': {
+    hint: 'same as the button, but can be longer',
+    original: 'Crop / Extend',
+    value: 'Recadrer / Étendre'
+  },
+  'filter-crop-description': {
+    hint: 'descriptions explain the "filter" a tiny bit. Most importantly it says if it’s applied to a single layer, or the entire image (all layer)',
+    original: 'Crop or extend the image.',
+    value: "Recadrez ou étendez l'image."
+  },
+  'filter-crop-left': {
+    original: 'Left',
+    value: 'Gauche'
+  },
+  'filter-crop-right': {
+    original: 'Right',
+    value: 'Droite'
+  },
+  'filter-crop-top': {
+    original: 'Top',
+    value: 'Haut'
+  },
+  'filter-crop-bottom': {
+    original: 'Bottom',
+    value: 'Bas'
+  },
+  'filter-crop-rule-thirds': {
+    hint: 'https://en.wikipedia.org/wiki/Rule_of_thirds',
+    original: 'Rule of Thirds',
+    value: 'Règle des Tiers'
+  },
+  'filter-crop-fill': {
+    hint: 'If image gets extended, what color to fill that new area with',
+    original: 'Fill',
+    value: 'Remplir'
+  },
+  'filter-flip-title': {
+    hint: 'same as the button, but can be longer',
+    original: 'Flip',
+    value: 'Retourne'
+  },
+  'filter-flip-description': {
+    original: 'Flips layer or whole image.',
+    value: "Retourne le calque ou l'image entière."
+  },
+  'filter-flip-horizontal': {
+    original: 'Horizontal',
+    value: 'Horizontalement'
+  },
+  'filter-flip-vertical': {
+    original: 'Vertical',
+    value: 'Verticalement'
+  },
+  'filter-flip-image': {
+    original: 'Flip Image',
+    value: 'Image'
+  },
+  'filter-flip-layer': {
+    original: 'Flip Layer',
+    value: 'Calque'
+  },
+  'filter-perspective-title': {
+    hint: 'same as the button, but can be longer',
+    original: 'Perspective',
+    value: ''
+  },
+  'filter-perspective-description': {
+    original: 'Transforms the selected layer.',
+    value: 'Transforme le calque sélectionné.'
+  },
+  'filter-resize-title': {
+    hint: 'same as the button, but can be longer',
+    original: 'Resize',
+    value: 'Redimensionner'
+  },
+  'filter-resize-description': {
+    original: 'Resizes the image.',
+    value: "Redimensionne l'image."
+  },
+  'filter-rotate-title': {
+    hint: 'same as the button, but can be longer',
+    original: 'Rotate',
+    value: 'Tourner'
+  },
+  'filter-rotate-description': {
+    original: 'Rotates the image.',
+    value: "Faire pivoter l'image."
+  },
+  'filter-transform-empty': {
+    hint: 'nothing on the layer, just transparency',
+    original: 'Layer is empty.',
+    value: 'Le calque est vide.'
+  },
+  'filter-transform-title': {
+    hint: 'same as the button, but can be longer',
+    original: 'Transform',
+    value: 'Transformer'
+  },
+  'filter-transform-description': {
+    hint: 'as in the Shift key.',
+    original: 'Transforms selected layer. Hold Shift for additional behavior.',
+    value: 'Transforme le calque sélectionné. Maintenez la touche Shift enfoncée pour un comportement supplémentaire.'
+  },
+  'filter-transform-rotation': {
+    hint: 'or Angle',
+    original: 'Rotation',
+    value: 'Rotation'
+  },
+  'filter-transform-flip': {
+    original: 'Flip',
+    value: 'Retourne'
+  },
+  'filter-transform-center': {
+    hint: 'verb or noun',
+    original: 'Center',
+    value: 'Centre'
+  },
+  'filter-transform-constrain': {
+    hint: 'short version of "constrain proportions" – feature that locks the aspect ratio',
+    original: 'Constrain',
+    value: 'Contraindre'
+  },
+  'filter-transform-snap': {
+    hint: 'or snapping. Common feature in graphics software. Makes stuff snap into place so it’s easier to align elements in an image',
+    original: 'Snap',
+    value: ''
+  },
+  'filter-transform-snap-title': {
+    hint: 'same as above, but as a tooltip',
+    original: 'Snap Rotation And Position',
+    value: 'Rotation Et Position Du Bouton-Pression'
+  },
+  'filter-bright-contrast-title': {
+    hint: 'same as the button, but can be longer',
+    original: 'Brightness / Contrast',
+    value: 'Luminosité / Contraste'
+  },
+  'filter-bright-contrast-description': {
+    original: 'Change brightness and contrast for the selected layer.',
+    value: 'Modifiez la luminosité et le contraste du calque sélectionné.'
+  },
+  'filter-bright-contrast-brightness': {
+    original: 'Brightness',
+    value: 'Luminosité'
+  },
+  'filter-bright-contrast-contrast': {
+    original: 'Contrast',
+    value: 'Contraste'
+  },
+  'filter-curves-title': {
+    hint: 'same as the button, but can be longer',
+    original: 'Curves',
+    value: 'Courbe'
+  },
+  'filter-curves-description': {
+    original: 'Apply curves on the selected layer.',
+    value: 'Appliquez des courbes sur le calque sélectionné.'
+  },
+  'filter-curves-all': {
+    original: 'All',
+    value: 'Tout'
+  },
+  'filter-hue-sat-title': {
+    hint: 'same as the button, but can be longer',
+    original: 'Hue / Saturation',
+    value: 'Teinte / Saturation'
+  },
+  'filter-hue-sat-description': {
+    original: 'Change hue and saturation for the selected layer.',
+    value: 'Modifiez la teinte et la saturation du calque sélectionné.'
+  },
+  'filter-hue-sat-hue': {
+    original: 'Hue',
+    value: 'Teinte'
+  },
+  'filter-hue-sat-saturation': {
+    original: 'Saturation',
+    value: 'Saturation'
+  },
+  'filter-applied': {
+    hint: 'used like this: „Invert“ applied. Informs that a filter was applied',
+    original: 'applied',
+    value: 'appliquer'
+  },
+  'filter-tilt-shift-title': {
+    hint: 'same as the button, but can be longer',
+    original: 'Tilt Shift',
+    value: "Décalage d'Inclinaison"
+  },
+  'filter-tilt-shift-description': {
+    original: 'Applies tilt shift on the selected layer.',
+    value: "Applique le décalage d'inclinaison sur le calque sélectionné."
+  },
+  'filter-tilt-shift-blur': {
+    hint: 'words can be individually translated',
+    original: 'Blur Radius',
+    value: 'Rayon de Flou'
+  },
+  'filter-tilt-shift-gradient': {
+    hint: 'words can be individually translated',
+    original: 'Gradient Radius',
+    value: 'Rayon de Gradient'
+  },
+  'filter-to-alpha-title': {
+    hint: 'same as the button, but can be longer',
+    original: 'To Alpha',
+    value: 'Vers Alpha'
+  },
+  'filter-to-alpha-description': {
+    hint: 'after ":" follow two options',
+    original: 'Generates alpha channel for selected layer from:',
+    value: 'Généré un canal alpha pour le calque sélectionné:'
+  },
+  'filter-to-alpha-inverted-lum': {
+    hint: 'luminance is same as the layer blend mode "luminosity"',
+    original: 'Inverted Luminance',
+    value: 'Luminance Inversée'
+  },
+  'filter-to-alpha-lum': {
+    original: 'Luminance',
+    value: 'Luminance'
+  },
+  'filter-to-alpha-replace': {
+    hint: 'What color to replace the rgb channels with',
+    original: 'Replace RGB',
+    value: 'Remplacer RGB'
+  },
+  'filter-triangle-blur-title': {
+    hint: 'same as the button, but can be longer',
+    original: 'Triangle Blur',
+    value: 'Flou Triangle'
+  },
+  'filter-triangle-blur-description': {
+    original: 'Applies triangle blur on the selected layer.',
+    value: 'Applique un flou triangulaire sur le calque sélectionné.'
+  },
+  'filter-unsharp-mask-title': {
+    hint: 'same as the button, but can be longer',
+    original: 'Unsharp Mask',
+    value: 'Masque Flou'
+  },
+  'filter-unsharp-mask-description': {
+    original: 'Sharpens the selected layer by scaling pixels away from the average of their neighbors.',
+    value: 'Accentue le calque sélectionné en décalant les pixels de la moyenne de leurs voisins.'
+  },
+  'filter-unsharp-mask-strength': {
+    original: 'Strength',
+    value: 'Force'
+  },
+  'filter-grid': {
+    original: 'Grid',
+    value: 'Grille'
+  },
+  'filter-grid-description': {
+    original: 'Draws grid on selected layer.',
+    value: 'Trace une grille sur le calque choisi.'
+  },
+  'filter-noise': {
+    original: 'Noise',
+    value: 'Bruit'
+  },
+  'filter-noise-description': {
+    original: 'Adds noise to selected layer.',
+    value: 'Ajouter du bruit au calque sélectionné.'
+  },
+  'filter-noise-scale': {
+    original: 'Scale',
+    value: 'Échelle'
+  },
+  'filter-noise-alpha': {
+    original: 'Alpha',
+    value: 'Alpha'
+  },
+  'filter-pattern': {
+    original: 'Pattern',
+    value: 'Motif'
+  },
+  'filter-pattern-description': {
+    original: 'Generates pattern on selected layer. Drag the preview for further controls.',
+    value: "Crée un motif sur le calque choisi. Faites glisser l'aperçu pour plus de contrôle."
+  },
+  'filter-distort': {
+    original: 'Distort',
+    value: 'Déformer'
+  },
+  'filter-distort-description': {
+    original: 'Distorts the selected layer.',
+    value: 'Déformer le calque sélectionné.'
+  },
+  'filter-distort-phase': {
+    original: 'Phase',
+    value: 'Phase'
+  },
+  'filter-distort-stepsize': {
+    original: 'Step Size',
+    value: "Taille de l'Étape"
+  },
+  'filter-distort-sync-xy': {
+    original: 'Sync XY',
+    value: 'Synchroniser XY'
+  },
+  'filter-vanish-point': {
+    original: 'Vanish Point',
+    value: 'Point de Fuite'
+  },
+  'filter-vanish-point-title': {
+    original: 'Vanishing Point',
+    value: 'Point de Fuite'
+  },
+  'filter-vanish-point-description': {
+    original: 'Adds vanishing point to selected layer. Drag preview to move.',
+    value: "Ajoute un point de fuite au calque sélectionné. Faites glisser l'aperçu pour vous déplacer."
+  },
+  'filter-vanish-point-lines': {
+    hint: 'As in: the number of lines',
+    original: 'Lines',
+    value: 'Lignes'
+  },
+  'import-opening': {
+    hint: 'in the process of opening a large file',
+    original: 'Opening file...',
+    value: 'Ouverture du fichier...'
+  },
+  'import-title': {
+    original: 'Import Image',
+    value: 'Importer une Image'
+  },
+  'import-too-large': {
+    original: 'Image too large, will be downscaled.',
+    value: 'Image trop grande, devrait être réduite.'
+  },
+  'import-btn-as-layer': {
+    hint: 'import as layer. Button label, should be short',
+    original: 'As Layer',
+    value: 'En calques'
+  },
+  'import-btn-as-image': {
+    hint: 'import as image. Button label, should be short',
+    original: 'As Image',
+    value: 'En image'
+  },
+  'import-as-layer-title': {
+    original: 'Import Image as New Layer',
+    value: "Importer l'Image en tant que nouveau Calque"
+  },
+  'import-as-layer-description': {
+    original: 'Adjust the position of the imported image.',
+    value: "Ajustez la position de l'image importée."
+  },
+  'import-as-layer-limit-reached': {
+    hint: 'Kleki allows only a certain number of layers',
+    original: 'Layer limit reached. Image will be placed on existing layer.',
+    value: "Limite de couche atteinte. L'image sera placée sur le calque existant."
+  },
+  'import-as-layer-fit': {
+    hint: 'verb. imported image made to fit inside canvas.',
+    original: 'Fit',
+    value: 'Adapter'
+  },
+  'import-flatten': {
+    hint: 'Turn image that has multiple layers into an image that has only one layer.',
+    original: 'Flatten image',
+    value: "Aplatir l'image"
+  },
+  'import-unsupported-file': {
+    hint: 'e.g. user tried to open a WAV',
+    original: 'Unsupported file type. See Help for supported types.',
+    value: "Type de fichier non pris en charge. Voir l'aide pour les types pris en charge."
+  },
+  'import-broken-file': {
+    hint: 'if an image file is broken',
+    original: "Couldn't load image. File might be corrupted.",
+    value: "Impossible de charger l'image. Le fichier peut être corrompu."
+  },
+  'import-psd-unsupported': {
+    hint: 'PSD is photoshop file format. flatten as in „flatten image“ in photoshop. Merged all layers',
+    original: 'Unsupported features. PSD had to be flattened.',
+    value: 'Fonctionnalités non prises en charge. PSD a dû être aplati.'
+  },
+  'import-psd-limited-support': {
+    hint: 'PSD has lots of fancy features that Kleki doesn\'t have, so when importing a PSD it often has to simplify things. So it might look different compared to when opening in Photoshop. We’re informing the user if they "flatten" the image it will be accurate despite losing layers. The user has to weigh, do they care about having layers, or do they care about it looking right.',
+    original: 'PSD support is limited. Flattened will more likely look correct.',
+    value: "Le support PSD est limité. Aplati aura plus probablement l'air correct."
+  },
+  'import-psd-too-large': {
+    original: 'Image exceeds maximum dimensions of {x} x {x} pixels. Unable to import.',
+    value: "L'image dépasse les dimensions maximales de {x} x {x} pixels. Impossible d'importer."
+  },
+  'import-psd-size': {
+    original: 'Image size',
+    value: "Taille de l'image"
+  },
+  'hand-reset': {
+    hint: 'resets zoom (to 100%) and rotation (to 0°)',
+    original: 'Reset',
+    value: 'Réinitialiser'
+  },
+  'hand-fit': {
+    hint: 'makes canvas cover whole working area',
+    original: 'Fit',
+    value: 'Adapter'
+  },
+  'bucket-tolerance': {
+    hint: 'a common feature for paint bucket',
+    original: 'Tolerance',
+    value: 'Tolérance'
+  },
+  'bucket-sample': {
+    hint: 'like "taking a sample"',
+    original: 'Sample',
+    value: 'Échantillon'
+  },
+  'bucket-sample-title': {
+    original: 'Which layers to sample color from',
+    value: 'A quelles couches échantillonner la couleur'
+  },
+  'bucket-sample-all': {
+    hint: 'all layers',
+    original: 'All',
+    value: 'Tous'
+  },
+  'bucket-sample-active': {
+    hint: 'currently active layer',
+    original: 'Active',
+    value: ''
+  },
+  'bucket-sample-above': {
+    hint: 'layer above active layer',
+    original: 'Above',
+    value: 'Supérieur'
+  },
+  'bucket-grow': {
+    hint: 'verb. Or expand.',
+    original: 'Grow',
+    value: 'Étendre'
+  },
+  'bucket-grow-title': {
+    original: 'Grow filled area (in pixels)',
+    value: 'Agrandir la zone remplie (en pixels)'
+  },
+  'bucket-contiguous': {
+    hint: 'common setting for paint bucket in image editing software',
+    original: 'Contiguous',
+    value: 'Contiguë'
+  },
+  'bucket-contiguous-title': {
+    hint: 'tooltip explaining Contiguous',
+    original: 'Only fill connected areas',
+    value: 'Ne remplissez que les zones connectées'
+  },
+  'gradient-linear': {
+    original: 'Linear',
+    value: 'Linéaire'
+  },
+  'gradient-linear-mirror': {
+    original: 'Linear-Mirror',
+    value: 'Linéaire-Miroir'
+  },
+  'gradient-radial': {
+    original: 'Radial',
+    value: 'Radial'
+  },
+  'shape-stroke': {
+    original: 'Stroke',
+    value: 'Contour'
+  },
+  'shape-fill': {
+    original: 'Fill',
+    value: 'Remplir'
+  },
+  'shape-rect': {
+    hint: 'rectangle shape',
+    original: 'Rectangle',
+    value: 'Rectangle'
+  },
+  'shape-ellipse': {
+    hint: 'ellipse shape',
+    original: 'Ellipse',
+    value: 'Ellipse'
+  },
+  'shape-line': {
+    original: 'Line',
+    value: 'Ligne'
+  },
+  'shape-line-width': {
+    original: 'Line Width',
+    value: 'Largeur de Ligne'
+  },
+  'shape-outwards': {
+    hint: 'grows shape from the center outwards',
+    original: 'Outwards',
+    value: 'Extérieur'
+  },
+  'shape-fixed': {
+    hint: 'fixed ratio of 1:1',
+    original: 'Fixed 1:1',
+    value: 'Fixé 1:1'
+  },
+  'text-instruction': {
+    original: 'Click canvas to place text',
+    value: 'Cliquez sur le canevas pour placer le texte'
+  },
+  'text-title': {
+    original: 'Add Text',
+    value: 'Ajouter du Texte'
+  },
+  'text-placeholder': {
+    hint: 'placeholder in text input. Inform user they can have linebreaks when pressing shift+enter. Just pressing enter confirms and closes the dialog',
+    original: 'Your text (multiline Shift+Enter)',
+    value: 'Votre texte (Maj multiligne+Entrée)'
+  },
+  'text-color': {
+    original: 'Color',
+    value: 'Couleur'
+  },
+  'text-size': {
+    original: 'Size',
+    value: 'Taille'
+  },
+  'text-left': {
+    hint: 'left, center, right text formatting like in Word',
+    original: 'Left',
+    value: 'Gauche'
+  },
+  'text-center': {
+    original: 'Center',
+    value: 'Centre'
+  },
+  'text-right': {
+    original: 'Right',
+    value: 'Droite'
+  },
+  'text-italic': {
+    original: 'Italic',
+    value: 'Italique'
+  },
+  'text-bold': {
+    original: 'Bold',
+    value: 'Gras'
+  },
+  'save-reminder-title': {
+    hint: 'Save Reminder is a popup that shows up after 20 minutes of not saving. Allows user to save on the spot.',
+    original: 'Unsaved Work',
+    value: 'Travail non sauvé'
+  },
+  'save-reminder-text': {
+    hint: 'turns into: "...saved in <strong>12 minutes</strong>. Save..."',
+    original: 'Image was not saved in {a} minutes{b}. Save now to prevent eventual loss.',
+    value: "L'image n'a pas été sauvegardée en {a} minutes{b}. Enregistrez-la maintenant pour éviter toute perte éventuelle."
+  },
+  'save-reminder-save-psd': {
+    original: 'Save As PSD',
+    value: 'Enregistrer en tant que PSD'
+  },
+  'save-reminder-psd-layers': {
+    original: 'PSD will remember all layers.',
+    value: 'PSD se souviendra de toutes les couches.'
+  },
+  submit: {
+    original: 'Submit',
+    value: 'Envoyer'
+  },
+  'submit-title': {
+    hint: 'tooltip when hovering "Submit" button',
+    original: 'Submit Drawing',
+    value: 'Soumettre Le Dessin'
+  },
+  'submit-prompt': {
+    hint: 'Dialog asking for confirmation',
+    original: 'Submit drawing?',
+    value: 'Soumettre Un Dessin?'
+  },
+  'submit-submitting': {
+    hint: 'in the process of uploading',
+    original: 'Submitting',
+    value: 'Soumission'
+  },
+  'embed-init-loading': {
+    hint: 'when opening the app',
+    original: 'Loading app',
+    value: "Chargement de l'application"
+  },
+  'embed-init-waiting': {
+    hint: 'The app is loaded, but it’s still waiting for image',
+    original: 'Waiting for image',
+    value: "En Attente de L'image"
+  },
+  unsaved: {
+    original: 'Unsaved',
+    value: 'Pas sauvegardé'
+  },
+  help: {
+    hint: 'or user manual',
+    original: 'Help',
+    value: 'Aide'
+  },
+  'tab-settings': {
+    original: 'Settings',
+    value: 'Paramètres'
+  },
+  'settings-language': {
+    original: 'Language',
+    value: 'Langues'
+  },
+  'settings-preferred-language': {
+    original: 'Preferred Language',
+    value: 'Langue Préférée'
+  },
+  'settings-language-reload': {
+    hint: 'changes will be visible after reloading the page',
+    original: 'Will update after reloading.',
+    value: 'Mettra à jour après le rechargement.'
+  },
+  'terms-of-service': {
+    original: 'Terms of Service',
+    value: "Conditions d'utilisation"
+  },
+  licenses: {
+    hint: 'as in software licenses',
+    original: 'Licenses',
+    value: 'Licence'
+  },
+  'source-code': {
+    original: 'Source Code',
+    value: 'Code Source'
+  },
+  auto: {
+    hint: 'automatically decided',
+    original: 'auto',
+    value: 'auto'
+  },
+  'zoom-in': {
+    original: 'Zoom In',
+    value: 'Zoom Avant'
+  },
+  'zoom-out': {
+    original: 'Zoom Out',
+    value: 'Zoom Arrière'
+  },
+  radius: {
+    original: 'Radius',
+    value: 'Rayon'
+  },
+  'constrain-proportions': {
+    original: 'Constrain Proportions',
+    value: 'Proportions Contraintes'
+  },
+  width: {
+    original: 'Width',
+    value: 'Largeur'
+  },
+  height: {
+    original: 'Height',
+    value: 'Hauteur'
+  },
+  opacity: {
+    hint: 'for layer opacity, brush opacity, text opacity, ...',
+    original: 'Opacity',
+    value: 'Opacité'
+  },
+  red: {
+    original: 'Red',
+    value: 'Rouge'
+  },
+  green: {
+    original: 'Green',
+    value: 'Vert'
+  },
+  blue: {
+    original: 'Blue',
+    value: 'Bleu'
+  },
+  eraser: {
+    hint: 'noun. As short as possible',
+    original: 'Eraser',
+    value: 'Gomme'
+  },
+  center: {
+    hint: 'verb',
+    original: 'Center',
+    value: 'Centre'
+  },
+  layers: {
+    hint: 'layers in the context of image editing software',
+    original: 'Layers',
+    value: 'Calques'
+  },
+  background: {
+    hint: 'as in background layer',
+    original: 'Background',
+    value: 'Arrière Plan'
+  },
+  'scaling-algorithm': {
+    hint: 'Label for dropdown where user chooses which computer graphics algorithm should be used to scale the image',
+    original: 'Scaling Algorithm',
+    value: "Algorithme de Mise à l'Échelle"
+  },
+  'algorithm-smooth': {
+    original: 'Smooth',
+    value: 'Lisse'
+  },
+  'algorithm-pixelated': {
+    original: 'Pixelated',
+    value: 'Pixélisé'
+  },
+  preview: {
+    hint: 'subject. When applying a filter user sees a preview of what the result would look like.',
+    original: 'Preview',
+    value: 'Aperçu'
+  },
+  'angle-snap': {
+    hint: 'Snapping. Like when transforming an image and it snaps to the side of the frame.',
+    original: 'Snap',
+    value: 'Casser'
+  },
+  'angle-snap-title': {
+    original: '45° Angle Snapping',
+    value: 'Encliquetage à angle de 45°'
+  },
+  'lock-alpha': {
+    hint: 'Short. Freezes the alpha channel of image. Images consist of 4 channels (red, green, blue, alpha). Alpha lock also found in Procreate and photoshop',
+    original: 'Lock Alpha',
+    value: 'Verrou Alpha'
+  },
+  'lock-alpha-title': {
+    hint: "same as 'lock-alpha' but longer version. Shows up as a tooltip when hovering",
+    original: "Locks layer's alpha channel",
+    value: 'Verrou Alpha du Calques'
+  },
+  reverse: {
+    hint: 'Reversing the direction of a color gradient',
+    original: 'Reverse',
+    value: 'Inverser'
+  },
+  'compare-before': {
+    original: 'Before',
+    value: 'Avant'
+  },
+  'compare-after': {
+    original: 'After',
+    value: 'Après'
+  }
+}

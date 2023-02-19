@@ -1,209 +1,244 @@
 import {BB} from '../../../bb/bb';
 import {KlCanvasPreview} from '../../canvas-ui/canvas-preview';
 import {FreeTransform} from './free-transform';
-import {IKlBasicLayer, IMixMode} from '../../kl.types';
+import {IKlBasicLayer} from '../../kl-types';
+import {IRect} from '../../../bb/bb-types';
 
 /**
  * a basic canvas where you can transform one layer(move around, rotate, scale)
  *
- * @param params
- * @returns {HTMLDivElement}
- * @constructor
+ * DOM Structure:
+ * div
+ *      innerWrapper
+ *          klCanvasPreview
+ *          transform.div
+ *
  */
-export function FreeTransformCanvas(params: {
-    elementWidth: number;
-    elementHeight: number;
-    imageWidth: number;
-    imageHeight: number;
-    layers: IKlBasicLayer[];
-    transformIndex: number;
-}) {
-    /*
-    div
-        innerWrapper
-            klCanvasPreview
-            transform.div
-    */
+export class FreeTransformCanvas {
 
-    let previewFit = BB.fitInto(
-        params.imageWidth,
-        params.imageHeight,
-        params.elementWidth - 20,
-        params.elementHeight - 60,
-        1
-    );
-    let scale = previewFit.width / params.imageWidth;
+    private readonly rootEl: HTMLElement;
+    private readonly freeTransform: FreeTransform;
+    private readonly layers: IKlBasicLayer[];
+    private readonly transformIndex: number;
+    private readonly imageWidth: number;
+    private readonly imageHeight: number;
+    private readonly initTransform: IRect;
+    private readonly scale: number;
+    private readonly previewLayerArr: IKlBasicLayer[];
+    private readonly klCanvasPreview: KlCanvasPreview;
 
-    let div = BB.el({
-        css: {
-            width: params.elementWidth + "px",
-            height: params.elementHeight + "px",
-            backgroundColor: "#9e9e9e",
-            boxShadow: "rgba(0, 0, 0, 0.2) 0px 1px inset, rgba(0, 0, 0, 0.2) 0px -1px inset",
-            overflow: "hidden",
-            userSelect: "none",
-            position: "relative",
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            colorScheme: 'only light',
-        }
-    });
-    div.oncontextmenu = function () {
-        return false;
-    };
-
-    let innerWrapper = BB.el({
-        css: {
-            position: 'relative',
-            boxShadow: '0 0 5px rgba(0,0,0,0.5)',
-            width: previewFit.width + 'px',
-            height: previewFit.height + 'px'
-        }
-    });
-    div.appendChild(innerWrapper);
-
-    let previewLayerArr = params.layers.map(item => {
-        return {
-            image: item.image,
-            mixModeStr: item.mixModeStr,
-            opacity: item.opacity,
-        }
-    });
-    previewLayerArr[previewLayerArr.length - 1].image = BB.canvas(
-        scale > 1 ? params.imageWidth : previewFit.width,
-        scale > 1 ? params.imageHeight : previewFit.height,
-    );
-    let klCanvasPreview = new KlCanvasPreview({
-        width: previewFit.width,
-        height: previewFit.height,
-        layers: previewLayerArr
-    });
-    innerWrapper.appendChild(klCanvasPreview.getElement());
-
-    let freeTransform;
-    let initTransform;
-    function updatePreview() {
-        if (!freeTransform) {
+    private updatePreview (): void {
+        if (!this.freeTransform) {
             return;
         }
 
-        let transform = freeTransform.getTransform();
-        if (scale < 1) {
-            transform.x *= scale;
-            transform.y *= scale;
-            transform.width *= scale;
-            transform.height *= scale;
+        const transform = this.freeTransform.getTransform();
+        if (this.scale < 1) {
+            transform.x *= this.scale;
+            transform.y *= this.scale;
+            transform.width *= this.scale;
+            transform.height *= this.scale;
         }
 
-        let destCanvas = previewLayerArr[params.transformIndex].image;
-        let ctx = (destCanvas as HTMLCanvasElement).getContext('2d');
+        const destCanvas = this.previewLayerArr[this.transformIndex].image;
+        const ctx = BB.ctx((destCanvas as HTMLCanvasElement));
         ctx.save();
         ctx.clearRect(0, 0, destCanvas.width, destCanvas.height);
         BB.drawTransformedImageWithBounds(
             ctx,
-            params.layers[params.transformIndex].image,
+            this.layers[this.transformIndex].image,
             transform,
-            null,
-            BB.testShouldPixelate(transform, transform.width / initTransform.width, transform.height / initTransform.height),
+            undefined,
+            BB.testShouldPixelate(
+                transform,
+                transform.width / this.initTransform.width,
+                transform.height / this.initTransform.height
+            ),
         );
         ctx.restore();
-        klCanvasPreview.render();
+        this.klCanvasPreview.render();
     }
 
-    {
-        let transformSize = {
-            width: params.layers[params.transformIndex].image.width * scale,
-            height: params.layers[params.transformIndex].image.height * scale
-        };
-        if (transformSize.width > previewFit.width || transformSize.height > previewFit.height) {
-            transformSize = BB.fitInto(
-                params.layers[params.transformIndex].image.width,
-                params.layers[params.transformIndex].image.height,
-                previewFit.width,
-                previewFit.height,
-                1
-            );
+
+    // ---- public ----
+    constructor (
+        p: {
+            elementWidth: number;
+            elementHeight: number;
+            imageWidth: number;
+            imageHeight: number;
+            layers: IKlBasicLayer[];
+            transformIndex: number;
         }
-        initTransform = {
-            x: params.imageWidth / 2,
-            y: params.imageHeight / 2,
-            width: params.layers[params.transformIndex].image.width,
-            height: params.layers[params.transformIndex].image.height,
-        };
-        freeTransform = new FreeTransform({
-            x: initTransform.x,
-            y: initTransform.y,
-            width: initTransform.width,
-            height: initTransform.height,
-            angleDeg: 0,
-            isConstrained: true,
-            snapX: [0, params.imageWidth],
-            snapY: [0, params.imageHeight],
-            scale: scale,
-            callback: (transform) => {
-                updatePreview();
+    ) {
+        this.imageWidth = p.imageWidth;
+        this.imageHeight = p.imageHeight;
+        const previewFit = BB.fitInto(
+            p.imageWidth,
+            this.imageHeight,
+            p.elementWidth - 20,
+            p.elementHeight - 60,
+            1
+        );
+        this.scale = previewFit.width / p.imageWidth;
+
+        this.rootEl = BB.el({
+            className: 'kl-preview-wrapper',
+            css: {
+                width: p.elementWidth + 'px',
+                height: p.elementHeight + 'px',
+                backgroundColor: '#9e9e9e',
+                boxShadow: 'rgba(0, 0, 0, 0.2) 0px 1px inset, rgba(0, 0, 0, 0.2) 0px -1px inset',
+                overflow: 'hidden',
+                userSelect: 'none',
+                position: 'relative',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                colorScheme: 'only light',
             },
         });
+        this.rootEl.oncontextmenu = () => {
+            return false;
+        };
+        this.layers = p.layers;
+        this.transformIndex = p.transformIndex;
+
+
+        const innerWrapper = BB.el({
+            className: 'kl-preview-wrapper__canvas',
+            css: {
+                width: previewFit.width + 'px',
+                height: previewFit.height + 'px',
+            },
+        });
+        this.rootEl.append(innerWrapper);
+
+        this.previewLayerArr = this.layers.map(item => {
+            return {
+                image: item.image,
+                mixModeStr: item.mixModeStr,
+                opacity: item.opacity,
+            };
+        });
+        this.previewLayerArr[this.previewLayerArr.length - 1].image = BB.canvas(
+            this.scale > 1 ? this.imageWidth : previewFit.width,
+            this.scale > 1 ? this.imageHeight : previewFit.height,
+        );
+        this.klCanvasPreview = new KlCanvasPreview({
+            width: previewFit.width,
+            height: previewFit.height,
+            layers: this.previewLayerArr,
+        });
+        innerWrapper.append(this.klCanvasPreview.getElement());
+
+        {
+            let transformSize = {
+                width: this.layers[this.transformIndex].image.width * this.scale,
+                height: this.layers[this.transformIndex].image.height * this.scale,
+            };
+            if (transformSize.width > previewFit.width || transformSize.height > previewFit.height) {
+                transformSize = BB.fitInto(
+                    this.layers[this.transformIndex].image.width,
+                    this.layers[this.transformIndex].image.height,
+                    previewFit.width,
+                    previewFit.height,
+                    1
+                );
+            }
+            this.initTransform = {
+                x: this.imageWidth / 2,
+                y: this.imageHeight / 2,
+                width: this.layers[this.transformIndex].image.width,
+                height: this.layers[this.transformIndex].image.height,
+            };
+            this.freeTransform = new FreeTransform({
+                x: this.initTransform.x,
+                y: this.initTransform.y,
+                width: this.initTransform.width,
+                height: this.initTransform.height,
+                angleDeg: 0,
+                isConstrained: true,
+                snapX: [0, this.imageWidth],
+                snapY: [0, this.imageHeight],
+                scale: this.scale,
+                callback: (transform) => {
+                    this.updatePreview();
+                },
+            });
+        }
+        BB.css(this.freeTransform.getElement(), {
+            position: 'absolute',
+            left: '0',
+            top: '0',
+        });
+        innerWrapper.append(this.freeTransform.getElement());
+        setTimeout(() => this.updatePreview(), 0);
     }
-    BB.css(freeTransform.getElement(), {
-        position: 'absolute',
-        left: '0',
-        top: '0'
-    });
-    innerWrapper.appendChild(freeTransform.getElement());
-    setTimeout(updatePreview, 0);
 
 
-    // --- interface ---
+    // ---- interface ----
+    move (dX: number, dY: number): void {
+        this.freeTransform.move(dX, dY);
+    }
 
-    this.move = function(dX, dY) {
-        freeTransform.move(dX, dY);
-    };
-    this.reset = function() {
-        let w = params.layers[params.transformIndex].image.width;
-        let h = params.layers[params.transformIndex].image.height;
+    reset (): void {
+        const w = this.layers[this.transformIndex].image.width;
+        const h = this.layers[this.transformIndex].image.height;
 
-        freeTransform.setSize(w, h);
-        freeTransform.setPos({x: w / 2, y: h / 2});
-        freeTransform.setAngleDeg(0);
-        updatePreview();
-    };
-    this.setTransformFit = function() {
+        this.freeTransform.setSize(w, h);
+        this.freeTransform.setPos({x: w / 2, y: h / 2});
+        this.freeTransform.setAngleDeg(0);
+        this.updatePreview();
+    }
 
-        let fit = BB.fitInto(
-            params.layers[params.transformIndex].image.width,
-            params.layers[params.transformIndex].image.height,
-            params.imageWidth,
-            params.imageHeight,
+    setTransformFit (): void {
+
+        const fit = BB.fitInto(
+            this.layers[this.transformIndex].image.width,
+            this.layers[this.transformIndex].image.height,
+            this.imageWidth,
+            this.imageHeight,
             1
         );
 
-        freeTransform.setSize(fit.width, fit.height);
-        freeTransform.setPos({x: fit.width / 2, y: fit.height / 2});
-        freeTransform.setAngleDeg(0);
-        updatePreview();
-    };
-    this.setTransformCenter = function() {
-        freeTransform.setPos({x: params.imageWidth / 2, y: params.imageHeight / 2});
-        freeTransform.setAngleDeg(0);
-        updatePreview();
-    };
-    //gives you the transformation in the original scale
-    this.getTransformation = function () {
-        if (!freeTransform) {
+        this.freeTransform.setSize(fit.width, fit.height);
+        this.freeTransform.setPos({x: fit.width / 2, y: fit.height / 2});
+        this.freeTransform.setAngleDeg(0);
+        this.updatePreview();
+    }
+
+    setTransformCenter (): void {
+        this.freeTransform.setPos({x: this.imageWidth / 2, y: this.imageHeight / 2});
+        this.freeTransform.setAngleDeg(0);
+        this.updatePreview();
+    }
+
+    /**
+     * gives you the transformation in the original scale
+     */
+    getTransformation (): any { // todo
+        if (!this.freeTransform) {
             return false;
         }
-        return freeTransform.getTransform();
-    };
-    this.getIsPixelated = () => {
-        const transform = freeTransform.getTransform();
-        return BB.testShouldPixelate(transform, transform.width / initTransform.width, transform.height / initTransform.height);
-    };
-    this.getElement = function() {
-        return div;
-    };
-    this.destroy = function() {
-        freeTransform.destroy();
-    };
+        return this.freeTransform.getTransform();
+    }
+
+    getIsPixelated (): boolean {
+        const transform = this.freeTransform.getTransform();
+        return BB.testShouldPixelate(
+            transform,
+            transform.width / this.initTransform.width,
+            transform.height / this.initTransform.height
+        );
+    }
+
+    getElement (): HTMLElement {
+        return this.rootEl;
+    }
+
+    destroy (): void {
+        this.freeTransform.destroy();
+        this.klCanvasPreview.destroy();
+    }
 }

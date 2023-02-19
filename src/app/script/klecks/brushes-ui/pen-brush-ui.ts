@@ -2,29 +2,29 @@ import {BB} from '../../bb/bb';
 import {brushes} from '../brushes/brushes';
 import {eventResMs} from './brushes-consts';
 import {klHistory} from '../history/kl-history';
-import {Checkbox} from '../ui/base-components/checkbox';
-import {KlSlider} from '../ui/base-components/kl-slider';
-import {penPressureToggle} from '../ui/base-components/pen-pressure-toggle';
-// @ts-ignore
-import brushIconImg from 'url:~/src/app/img/ui/brush-pen.svg';
+import {Checkbox} from '../ui/components/checkbox';
+import {KlSlider} from '../ui/components/kl-slider';
+import {createPenPressureToggle} from '../ui/components/create-pen-pressure-toggle';
+import brushIconImg from '/src/app/img/ui/brush-pen.svg';
 import {genBrushAlpha01, genBrushAlpha02} from '../brushes/alphas/brush-alphas';
-import {IBrushUi} from '../kl.types';
+import {IBrushUi} from '../kl-types';
 import {LANG, languageStrings} from '../../language/language';
-import {input} from '../ui/base-components/input';
+import {Options} from '../ui/components/options';
+
 
 export const penBrushUi = (function () {
-    let brushInterface: IBrushUi = {
+    const brushInterface: IBrushUi = {
         image: brushIconImg,
         tooltip: LANG('brush-pen'),
         sizeSlider: {
             min: 0.5,
             max: 100,
-            curve: BB.quadraticSplineInput(0.5, 100, 0.1)
+            curve: BB.quadraticSplineInput(0.5, 100, 0.1),
         },
         opacitySlider: {
             min: 1/100,
             max: 1,
-            curve: [[0, 1/100], [0.5, 30/100], [1, 1]]
+            curve: [[0, 1/100], [0.5, 30/100], [1, 1]],
         },
         Ui: null,
     };
@@ -46,27 +46,29 @@ export const penBrushUi = (function () {
     });
 
     brushInterface.Ui = function (p) {
-        let div = document.createElement("div"); // the gui
-        let brush = new brushes.PenBrush();
+        const div = document.createElement('div'); // the gui
+        const brush = new brushes.PenBrush();
         brush.setHistory(klHistory);
         p.onSizeChange(brush.getSize());
         let sizeSlider;
         let opacitySlider;
 
-        let alphas = [];
-        let currentAlpha = 0;
-        for (let i = 0; i < 4; i++) {
-            (function (i) {
-                let alpha = BB.el({
-                    title: alphaNames[i],
-                    onClick: () => {
-                        alphaClick(i);
-                    }
+        const alphaOptions = new Options({
+            optionArr: [0, 1, 2, 3].map(id => {
+
+                const alpha = BB.el({
+                    className: 'dark-invert',
+                    css: {
+                        width: '31px',
+                        height: '31px',
+                        backgroundSize: 'contain',
+                        margin: '2px',
+                    },
                 });
-                let canvas = BB.canvas(70, 70);
-                let ctx = canvas.getContext('2d');
-                if (i === 0 || i === 3) {
-                    if (i === 0) {
+                const canvas = BB.canvas(70, 70);
+                const ctx = BB.ctx(canvas);
+                if (id === 0 || id === 3) {
+                    if (id === 0) {
                         ctx.beginPath();
                         ctx.arc(35, 35, 30, 0, 2 * Math.PI);
                         ctx.closePath();
@@ -74,36 +76,26 @@ export const penBrushUi = (function () {
                     } else {
                         ctx.fillRect(5, 5, 60, 60);
                     }
-                } else if (i === 1) {
+                } else if (id === 1) {
                     ctx.drawImage(genBrushAlpha01(60), 5, 5);
-                } else if (i === 2) {
+                } else if (id === 2) {
                     ctx.drawImage(genBrushAlpha02(60), 5, 5);
                 }
                 alpha.style.backgroundImage = 'url(' + canvas.toDataURL('image/png') + ')';
 
-                alphas.push(alpha);
-            }(i));
-        }
+                return {
+                    id: id,
+                    label: alpha,
+                    title: alphaNames[id],
+                };
+            }),
+            initId: 0,
+            onChange: (id) => {
+                brush.setAlpha(id);
+            },
+        });
 
-        function updateAlphas() {
-            for (let i = 0; i < alphas.length; i++) {
-                if (i === currentAlpha) {
-                    alphas[i].className = 'brush-alpha-selected';
-                } else {
-                    alphas[i].className = 'brush-alpha';
-                }
-            }
-        }
-
-        updateAlphas();
-
-        function alphaClick(id) {
-            currentAlpha = id;
-            brush.setAlpha(id);
-            updateAlphas();
-        }
-
-        let lockAlphaToggle = new Checkbox({
+        const lockAlphaToggle = new Checkbox({
             init: brush.getLockAlpha(),
             label: LANG('lock-alpha'),
             callback: function (b) {
@@ -112,19 +104,18 @@ export const penBrushUi = (function () {
             doHighlight: true,
             title: LANG('lock-alpha-title'),
             css: {
-                cssFloat: 'right',
-                textAlign: 'right',
-            }
+                display: 'inline-block',
+            },
         });
 
-        let spacingSpline = new BB.SplineInterpolator([[0, 15], [8, 7], [14, 4], [30, 3], [50, 2.7], [100, 2]]);
+        const spacingSpline = new BB.SplineInterpolator([[0, 15], [8, 7], [14, 4], [30, 3], [50, 2.7], [100, 2]]);
 
-        function setSize(size) {
+        function setSize (size) {
             brush.setSize(size);
             brush.setSpacing(Math.max(2, spacingSpline.interpolate(size)) / 15);
         }
 
-        function init() {
+        function init () {
             sizeSlider = new KlSlider({
                 label: LANG('brush-size'),
                 width: 225,
@@ -166,10 +157,10 @@ export const penBrushUi = (function () {
                 },
             });
 
-            let pressureSizeToggle = penPressureToggle(true, function (b) {
+            const pressureSizeToggle = createPenPressureToggle(true, function (b) {
                 brush.sizePressure(b);
             });
-            let pressureOpacityToggle = penPressureToggle(false, function (b) {
+            const pressureOpacityToggle = createPenPressureToggle(false, function (b) {
                 brush.opacityPressure(b);
             });
 
@@ -177,35 +168,39 @@ export const penBrushUi = (function () {
                 BB.el({
                     content: [
                         sizeSlider.getElement(),
-                        pressureSizeToggle
+                        pressureSizeToggle,
                     ],
                     css: {
                         display: 'flex',
                         justifyContent: 'space-between',
                         alignItems: 'center',
                         marginBottom: '10px',
-                    }
+                    },
                 }),
                 BB.el({
                     content: [
                         opacitySlider.getElement(),
-                        pressureOpacityToggle
+                        pressureOpacityToggle,
                     ],
                     css: {
                         display: 'flex',
                         justifyContent: 'space-between',
                         alignItems: 'center',
-                    }
-                })
+                    },
+                }),
+                BB.el({
+                    content: alphaOptions.getElement(),
+                    css: {
+                        marginTop: '10px',
+                    },
+                }),
+                BB.el({
+                    content: lockAlphaToggle.getElement(),
+                    css: {
+                        marginTop: '10px',
+                    },
+                }),
             );
-
-            let alphaWrapper = document.createElement("div");
-            for (let i = 0; i < alphas.length; i++) {
-                alphaWrapper.appendChild(alphas[i]);
-            }
-            alphaWrapper.style.marginTop = "10px";
-            div.appendChild(alphaWrapper);
-            alphaWrapper.appendChild(lockAlphaToggle.getElement());
 
         }
 
@@ -225,14 +220,14 @@ export const penBrushUi = (function () {
         this.getSize = function () {
             return brush.getSize();
         };
-        this.setSize = function(size) {
+        this.setSize = function (size) {
             setSize(size);
             sizeSlider.setValue(size);
         };
         this.getOpacity = function () {
             return brush.getOpacity();
         };
-        this.setOpacity = function(opacity) {
+        this.setOpacity = function (opacity) {
             brush.setOpacity(opacity);
             opacitySlider.setValue(opacity);
         };

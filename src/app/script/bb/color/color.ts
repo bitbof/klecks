@@ -8,7 +8,7 @@ export class HSV {
     h: number;
     s: number;
     v: number;
-    constructor(h: number, s: number, v: number) {
+    constructor (h: number, s: number, v: number) {
         this.h = Math.max(0, Math.min(360, h));
         this.s = Math.max(0.001, Math.min(100, s)); //bug when 0
         this.v = Math.max(0, Math.min(100, v));
@@ -19,7 +19,7 @@ export class RGB {
     r : number;
     g: number;
     b: number;
-    constructor(r: number, g: number, b: number) {
+    constructor (r: number, g: number, b: number) {
         this.r = Math.max(0, Math.min(255, r));
         this.g = Math.max(0, Math.min(255, g));
         this.b = Math.max(0, Math.min(255, b));
@@ -31,7 +31,7 @@ export class CMYK {
     m: number;
     y: number;
     k: number;
-    constructor(c: number, m: number, y: number, k: number) {
+    constructor (c: number, m: number, y: number, k: number) {
         this.c = Math.max(0, Math.min(100, c));
         this.m = Math.max(0, Math.min(100, m));
         this.y = Math.max(0, Math.min(100, y));
@@ -109,27 +109,27 @@ export const ColorConverter = {
             if (var_i == 0) {
                 var_r = v;
                 var_g = var_3;
-                var_b = var_1
+                var_b = var_1;
             } else if (var_i == 1) {
                 var_r = var_2;
                 var_g = v;
-                var_b = var_1
+                var_b = var_1;
             } else if (var_i == 2) {
                 var_r = var_1;
                 var_g = v;
-                var_b = var_3
+                var_b = var_3;
             } else if (var_i == 3) {
                 var_r = var_1;
                 var_g = var_2;
-                var_b = v
+                var_b = v;
             } else if (var_i == 4) {
                 var_r = var_3;
                 var_g = var_1;
-                var_b = v
+                var_b = v;
             } else {
                 var_r = v;
                 var_g = var_1;
-                var_b = var_2
+                var_b = var_2;
             }
 
             result.r = var_r * 255;
@@ -223,26 +223,29 @@ export const ColorConverter = {
             let ha = (parseInt('' + o.r)).toString(16);
             let hb = (parseInt('' + o.g)).toString(16);
             let hc = (parseInt('' + o.b)).toString(16);
-            if (ha.length == 1)
+            if (ha.length == 1) {
                 ha = '0' + ha;
-            if (hb.length == 1)
+            }
+            if (hb.length == 1) {
                 hb = '0' + hb;
-            if (hc.length == 1)
+            }
+            if (hc.length == 1) {
                 hc = '0' + hc;
+            }
             return ha + hb + hc;
         }
     },
-    toRgbStr: function(rgbObj: {r: number, g: number, b: number}): string {
+    toRgbStr: function (rgbObj: {r: number; g: number; b: number}): string {
         return 'rgb(' + Math.round(rgbObj.r) + ', ' + Math.round(rgbObj.g) + ', ' + Math.round(rgbObj.b) + ')';
     },
-    toRgbaStr: function(rgbaObj: {r: number, g: number, b: number, a: number}): string {
+    toRgbaStr: function (rgbaObj: {r: number; g: number; b: number; a: number}): string {
         return 'rgba(' + Math.round(rgbaObj.r) + ', ' + Math.round(rgbaObj.g) + ', ' + Math.round(rgbaObj.b) + ', ' + rgbaObj.a + ')';
     },
-    hexToRGB: function(hexStr: string): RGB | null {
+    hexToRGB: function (hexStr: string): RGB | null {
         hexStr = hexStr.trim();
         // Expand shorthand form (e.g. "03F") to full form (e.g. "0033FF")
         const shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
-        hexStr = hexStr.replace(shorthandRegex, function(m, r, g, b) {
+        hexStr = hexStr.replace(shorthandRegex, function (m, r, g, b) {
             return r + r + g + g + b + b;
         });
 
@@ -252,10 +255,10 @@ export const ColorConverter = {
             parseInt(result[2], 16),
             parseInt(result[3], 16)
         ) : null;
-    }
+    },
 
 };
 
-export function testIsWhiteBestContrast(rgbObj: {r: number, g: number, b: number}): boolean {
+export function testIsWhiteBestContrast (rgbObj: {r: number; g: number; b: number}): boolean {
     return (rgbObj.r * 0.299 + rgbObj.g * 0.587 + rgbObj.b * 0.114) < 125;
 }

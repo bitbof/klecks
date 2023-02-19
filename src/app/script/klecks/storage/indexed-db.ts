@@ -1,13 +1,10 @@
-//browser storage indexedDB
-
-
-import {IKlStorageProject} from '../kl.types';
+import {IKlStorageProject} from '../kl-types';
 
 const indexedDbIsSupported = !!window.indexedDB;
 let dbNameStr = 'Klecks';
 const storageNameStr = 'ProjectStore';
 
-export function setDbName(name: string) {
+export function setDbName (name: string): void {
     dbNameStr = '' + name;
 }
 
@@ -15,15 +12,19 @@ export function setDbName(name: string) {
  * connects to db dbNameStr, then executes transaction on storageNameStr storage
  * with index 'id'
  *
- * @param actionFunction function(storeObj) - what you want to execute during transaction
- * @param successCallback function() - on succesful transaction
- * @param errorCallback function(errorStr) - on error
+ * @param actionFunction what to execute during transaction
+ * @param successCallback on successful transaction
+ * @param errorCallback on error
  */
-function execIndexedDBTransaction(actionFunction, successCallback, errorCallback) {
+function execIndexedDBTransaction (
+    actionFunction: (storeObj: IDBObjectStore) => void,
+    successCallback: () => void,
+    errorCallback: (errorStr: string) => void,
+): void {
 
     let hasFinished = false;
 
-    function onSuccess() {
+    function onSuccess (): void {
         if (hasFinished) {
             return;
         }
@@ -31,7 +32,7 @@ function execIndexedDBTransaction(actionFunction, successCallback, errorCallback
         successCallback();
     }
 
-    function onError(errorStr) {
+    function onError (errorStr: string): void {
         if (hasFinished) {
             return;
         }
@@ -45,7 +46,7 @@ function execIndexedDBTransaction(actionFunction, successCallback, errorCallback
         }, 0);
         return;
     }
-    let requestObj;
+    let requestObj: IDBOpenDBRequest;
 
     try {
         requestObj = window.indexedDB.open(dbNameStr, 1);
@@ -54,22 +55,22 @@ function execIndexedDBTransaction(actionFunction, successCallback, errorCallback
         return;
     }
 
-    requestObj.onupgradeneeded = function (e) {
+    requestObj.onupgradeneeded = function (): void {
         try {
-            let db = requestObj.result;
-            let store = db.createObjectStore(storageNameStr, {keyPath: 'id'});
+            const db: IDBDatabase = requestObj.result;
+            const store = db.createObjectStore(storageNameStr, {keyPath: 'id'});
             store.createIndex('id', 'id', {unique: true});
         } catch (e) {
             onError(e.message);
         }
     };
-    requestObj.onerror = function (e) {
+    requestObj.onerror = function (): void {
         onError('indexedDB.open failed, ' + requestObj.error);
     };
-    requestObj.onsuccess = function (e) {
-        let databaseObj;
-        let transactionObj;
-        let storeObj;
+    requestObj.onsuccess = function (): void {
+        let databaseObj: IDBDatabase;
+        let transactionObj: IDBTransaction;
+        let storeObj: IDBObjectStore;
 
         try {
             databaseObj = requestObj.result;
@@ -88,7 +89,7 @@ function execIndexedDBTransaction(actionFunction, successCallback, errorCallback
             return;
         }
 
-        databaseObj.onerror = function (e) {
+        databaseObj.onerror = function (e): void {
             onError('database error, ' + databaseObj.error);
         };
 
@@ -99,34 +100,22 @@ function execIndexedDBTransaction(actionFunction, successCallback, errorCallback
             return;
         }
 
-        transactionObj.oncomplete = function () {
+        transactionObj.oncomplete = function (): void {
             onSuccess();
             databaseObj.close();
         };
-        transactionObj.onerror = function () {
+        transactionObj.onerror = function (): void {
             onError('transaction error, ' + transactionObj.error);
         };
     };
 }
 
-/**
- * getKlProjectObj {
- *     width: int,
- *     height: int,
- *     layers: {
- *        name: string,
- *        opacity: float (0 - 1),
- *        mixModeStr: string,
- *        image: image object                <--------- image already loaded!
- *     }[]
- * }
- *
- * @param successCallback function - called when succesfully queried. passes KlProjectObj
- * @param errorCallback - function(errorStr) - called when error during query
- */
-export function getKlProjectObj(successCallback, errorCallback) {
+export function getKlProjectObj (
+    successCallback: (result: undefined | IKlStorageProject) => void,
+    errorCallback: (error: string) => void,
+): void {
     if (indexedDbIsSupported) {
-        let query;
+        let query: IDBRequest<undefined | IKlStorageProject>;
         execIndexedDBTransaction(function (storeObj) {
             query = storeObj.get(1);
         }, function () {
@@ -135,29 +124,18 @@ export function getKlProjectObj(successCallback, errorCallback) {
             errorCallback('execIndexedDBTransaction error, ' + errorStr);
         });
     } else {
-        successCallback(null);
+        successCallback(undefined);
     }
 }
 
 /**
- * stores a klProjectObj into id = 1 in database:dbNameStr > storage: storageNameStr
- *
- * KlProjectObj {
- *     width: int,
- *     height: int,
- *     layers: {
- *        name: string,
- *        opacity: float (0 - 1),
- *        mixModeStr: string,
- *        blob: blob object                 <--------- blob!
- *     }[]
- * }
- *
- * @param storageProject IKlStorageProject - project to be stored
- * @param successCallback function() - on successful transaction
- * @param errorCallback function(errorStr) - on error
+ * stores a project into id = 1 in database:dbNameStr > storage: storageNameStr
  */
-export function storeKlProjectObj(storageProject: IKlStorageProject, successCallback, errorCallback) {
+export function storeKlProjectObj (
+    storageProject: IKlStorageProject,
+    successCallback: () => void,
+    errorCallback: (error: string) => void,
+): void {
     execIndexedDBTransaction(function (storeObj) {
         storeObj.put(storageProject);
     }, function () {
@@ -169,12 +147,12 @@ export function storeKlProjectObj(storageProject: IKlStorageProject, successCall
 }
 
 /**
- * removes id = 1 from database:dbNameStr > storage: storageNameStr
- *
- * @param successCallback function() - on successful transaction
- * @param errorCallback function(error) - on error
+ * deletes stored project, by removing id = 1 from database:dbNameStr > storage: storageNameStr
  */
-export function clear(successCallback, errorCallback) {
+export function clear (
+    successCallback: () => void,
+    errorCallback: (error: string) => void,
+): void {
     execIndexedDBTransaction(function (storeObj) {
         storeObj.delete(1);
     }, function () {

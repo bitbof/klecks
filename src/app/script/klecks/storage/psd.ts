@@ -1,17 +1,17 @@
 import {createCanvas} from '../../bb/base/create-canvas';
-import {Psd} from 'ag-psd/dist/psd';
-import {IKlProject, IKlPsd, IMixMode} from '../kl.types';
+import {BlendMode, Layer, Psd} from 'ag-psd/dist/psd';
+import {IKlProject, IKlPsd, TKlPsdError, TMixMode} from '../kl-types';
 import {LANG} from '../../language/language';
 import {MAX_LAYERS} from '../canvas/kl-canvas';
+import {BB} from '../../bb/bb';
 
-let kl2PsdMap;
-let psd2KlMap;
+let kl2PsdMap: Record<TMixMode, BlendMode>;
+let psd2KlMap: Record<BlendMode, TMixMode>;
 
-function init() {
+function init (): void {
     if (kl2PsdMap) {
         return;
     }
-
     kl2PsdMap = {
         'source-over': 'normal',
 
@@ -35,20 +35,15 @@ function init() {
         'color': 'color',
         'luminosity': 'luminosity',
     };
-
-    psd2KlMap = {};
-    let keys = Object.keys(kl2PsdMap);
-    for (let i = 0; i < keys.length; i++) {
-        psd2KlMap[kl2PsdMap[keys[i]]] = keys[i];
-    }
+    psd2KlMap = Object.fromEntries(Object.entries(kl2PsdMap).map(a => a.reverse()));
 }
 
-export function blendPsdToKl(str: string): IMixMode {
+export function blendPsdToKl (str: BlendMode): TMixMode {
     init();
     return psd2KlMap[str];
 }
 
-export function blendKlToPsd(str: string): string {
+export function blendKlToPsd (str: TMixMode): BlendMode {
     init();
     return kl2PsdMap[str];
 }
@@ -58,15 +53,18 @@ export function blendKlToPsd(str: string): string {
  * Converts ag-psd object into something that KlCanvas can represent
  * @param psdObj
  */
-export function readPsd(psdObj: Psd): IKlPsd {
-    let result: IKlPsd = {
+export function readPsd (psdObj: Psd): IKlPsd {
+    if (!psdObj.canvas) {
+        throw new Error('psdObj.canvas undefined');
+    }
+    const result: IKlPsd = {
         type: 'psd',
         canvas: psdObj.canvas,
         width: psdObj.width,
-        height: psdObj.height
+        height: psdObj.height,
     };
 
-    function addWarning(warningStr) {
+    function addWarning (warningStr: TKlPsdError): void {
         if (!result.warningArr) {
             result.warningArr = [];
         }
@@ -76,8 +74,8 @@ export function readPsd(psdObj: Psd): IKlPsd {
         result.warningArr.push(warningStr);
     }
 
-    function getMixModeStr(blendMode): IMixMode {
-        let mixModeStr: IMixMode = blendPsdToKl(blendMode);
+    function getMixModeStr (blendMode: BlendMode): TMixMode {
+        let mixModeStr: TMixMode = blendPsdToKl(blendMode);
         if (!mixModeStr) {
             addWarning('blend-mode');
             mixModeStr = 'source-over';
@@ -95,27 +93,29 @@ export function readPsd(psdObj: Psd): IKlPsd {
     }
 
     // count resulting layers
-    let maxLayers = MAX_LAYERS;
+    const maxLayers = MAX_LAYERS;
     let layerCount = 0;
-    function countWithinGroup(groupObj) {
+    function countWithinGroup (groupObj: Layer): number {
         let result = 0;
         if (groupObj.blendMode) {
-            let mixModeStr = blendPsdToKl(groupObj.blendMode);
+            const mixModeStr = blendPsdToKl(groupObj.blendMode);
             if (mixModeStr && mixModeStr !== 'source-over') {
                 return 1;
             }
         }
-        for (let i = 0; i < groupObj.children.length; i++) {
-            let item = groupObj.children[i];
-            if (item.clipping || item.adjustment) {
-                continue;
-            }
+        if (groupObj.children) {
+            for (let i = 0; i < groupObj.children.length; i++) {
+                const item = groupObj.children[i];
+                if (item.clipping || item.adjustment) {
+                    continue;
+                }
 
-            if (item.children) {
-                addWarning('group');
-                result += countWithinGroup(item);
-            } else {
-                result++;
+                if (item.children) {
+                    addWarning('group');
+                    result += countWithinGroup(item);
+                } else {
+                    result++;
+                }
             }
         }
         return result;
@@ -128,9 +128,9 @@ export function readPsd(psdObj: Psd): IKlPsd {
 
     result.layers = [];
 
-    function prepareMask(maskCanvas, defaultColor) {
-        const groupMaskCtx = maskCanvas.getContext('2d');
-        let imData = groupMaskCtx.getImageData(0, 0, maskCanvas.width, maskCanvas.height);
+    function prepareMask (maskCanvas: HTMLCanvasElement, defaultColor: number): void {
+        const groupMaskCtx = BB.ctx(maskCanvas);
+        const imData = groupMaskCtx.getImageData(0, 0, maskCanvas.width, maskCanvas.height);
         if (defaultColor === 0) {
             for (let i = 0; i < imData.data.length; i += 4) {
                 imData.data[i + 3] = imData.data[i];
@@ -143,171 +143,280 @@ export function readPsd(psdObj: Psd): IKlPsd {
         groupMaskCtx.putImageData(imData, 0, 0);
     }
 
-    function convertGroup(psdGroupObj): {
+    function convertGroup (psdGroupObj: Layer): {
         name: string;
-        mixModeStr: IMixMode;
+        mixModeStr: TMixMode;
         opacity: number;
         image: HTMLCanvasElement;
     }[] {
 
         let resultArr: {
             name: string;
-            mixModeStr: IMixMode;
+            mixModeStr: TMixMode;
             opacity: number;
             image: HTMLCanvasElement;
         }[] = [];
-        let groupOpacity = psdGroupObj.hidden ? 0 : psdGroupObj.opacity;
-        let groupMixModeStr = getMixModeStr(psdGroupObj.blendMode);
+        const groupOpacity = psdGroupObj.hidden ? 0 : psdGroupObj.opacity;
+        const groupMixModeStr = getMixModeStr(psdGroupObj.blendMode!);
         let groupCanvas;
         let groupCtx;
         if (groupMixModeStr !== 'source-over') {
             groupCanvas = createCanvas(result.width, result.height);
-            groupCtx = groupCanvas.getContext('2d');
+            groupCtx = BB.ctx(groupCanvas);
         }
-
 
         // prepare group mask
         if (psdGroupObj.mask) {
             addWarning('mask');
-            prepareMask(psdGroupObj.mask.canvas, psdGroupObj.mask.defaultColor);
+            prepareMask(psdGroupObj.mask.canvas!, psdGroupObj.mask.defaultColor!);
         }
 
+        if (psdGroupObj.children) {
+            for (let i = 0; i < psdGroupObj.children.length; i++) {
+                const item = psdGroupObj.children[i];
+                if (item.clipping) {
+                    continue;
+                }
+                if (item.adjustment) {
+                    addWarning('adjustment');
+                    continue;
+                }
 
-        for (let i = 0; i < psdGroupObj.children.length; i++) {
-            let item = psdGroupObj.children[i];
-            if (item.clipping) {
-                continue;
-            }
-            if (item.adjustment) {
-                addWarning('adjustment');
-                continue;
-            }
+                const hasClipping = (item.children || item.canvas) && psdGroupObj.children[i + 1] && psdGroupObj.children[i + 1].clipping;
+                if (hasClipping) {
+                    addWarning('clipping');
+                }
 
-            let hasClipping = (item.children || item.canvas) && psdGroupObj.children[i + 1] && psdGroupObj.children[i + 1].clipping;
-            if (hasClipping) {
-                addWarning('clipping');
-            }
+                if (item.children) {
+                    const innerArr = convertGroup(item);
 
-            if (item.children) {
-                let innerArr = convertGroup(item);
+                    for (let e = 0; e < innerArr.length; e++) {
+                        const innerItem = innerArr[e];
+                        const innerCtx = BB.ctx(innerItem.image);
 
-                for (let e = 0; e < innerArr.length; e++) {
-                    let innerItem = innerArr[e];
-                    let innerCtx = innerItem.image.getContext('2d');
+                        // clipping
+                        if (hasClipping) {
+                            const clippingCanvas = createCanvas(result.width, result.height);
+                            const clippingCtx = BB.ctx(clippingCanvas);
+                            clippingCtx.drawImage(innerItem.image, 0, 0);
 
-                    // clipping
-                    if (hasClipping) {
-                        let clippingCanvas = createCanvas(result.width, result.height);
-                        let clippingCtx = clippingCanvas.getContext('2d');
-                        clippingCtx.drawImage(innerItem.image, 0, 0);
-
-                        for (let f = i + 1; f < psdGroupObj.children.length && psdGroupObj.children[f].clipping; f++) {
-                            let clippingItem = psdGroupObj.children[f];
-                            if (clippingItem.opacity === 0 || clippingItem.hidden) {
-                                continue;
+                            for (let f = i + 1; f < psdGroupObj.children.length && psdGroupObj.children[f].clipping; f++) {
+                                const clippingItem = psdGroupObj.children[f];
+                                if (clippingItem.opacity === 0 || clippingItem.hidden) {
+                                    continue;
+                                }
+                                if (clippingItem.blendMode === undefined) {
+                                    throw new Error('clippingItem.blendMode undefined');
+                                }
+                                if (clippingItem.opacity === undefined) {
+                                    throw new Error('clippingItem.opacity undefined');
+                                }
+                                if (clippingItem.canvas === undefined) {
+                                    throw new Error('clippingItem.canvas undefined');
+                                }
+                                if (clippingItem.left === undefined) {
+                                    throw new Error('clippingItem.left undefined');
+                                }
+                                if (clippingItem.top === undefined) {
+                                    throw new Error('clippingItem.top undefined');
+                                }
+                                clippingCtx.globalCompositeOperation = getMixModeStr(clippingItem.blendMode);
+                                clippingCtx.globalAlpha = clippingItem.opacity;
+                                clippingCtx.drawImage(clippingItem.canvas, clippingItem.left, clippingItem.top);
                             }
-                            clippingCtx.globalCompositeOperation = getMixModeStr(clippingItem.blendMode);
-                            clippingCtx.globalAlpha = clippingItem.opacity;
-                            clippingCtx.drawImage(clippingItem.canvas, clippingItem.left, clippingItem.top);
+
+                            innerCtx.globalCompositeOperation = 'source-atop';
+                            innerCtx.drawImage(clippingCanvas, 0, 0);
                         }
 
-                        innerCtx.globalCompositeOperation = 'source-atop';
-                        innerCtx.drawImage(clippingCanvas, 0, 0);
+
+
+                        // group mask
+                        if (psdGroupObj.mask) {
+                            innerCtx.globalCompositeOperation = psdGroupObj.mask.defaultColor === 0 ? 'destination-in' : 'destination-out';
+                            if (psdGroupObj.mask.canvas === undefined) {
+                                throw new Error('psdGroupObj.mask.canvas undefined');
+                            }
+                            if (psdGroupObj.mask.left === undefined) {
+                                throw new Error('psdGroupObj.mask.left undefined');
+                            }
+                            if (psdGroupObj.mask.top === undefined) {
+                                throw new Error('psdGroupObj.mask.top undefined');
+                            }
+                            innerCtx.drawImage(psdGroupObj.mask.canvas, psdGroupObj.mask.left, psdGroupObj.mask.top);
+                        }
+
+                        if (groupCanvas) {
+                            if (groupCtx === undefined) {
+                                throw new Error('groupCtx undefined');
+                            }
+                            groupCtx.globalCompositeOperation = innerItem.mixModeStr;
+                            groupCtx.globalAlpha = innerItem.opacity;
+                            groupCtx.drawImage(innerItem.image, 0, 0);
+
+                        } else {
+                            if (groupOpacity === undefined) {
+                                throw new Error('groupOpacity undefined');
+                            }
+                            innerItem.opacity = innerItem.opacity * groupOpacity;
+                            resultArr.push(innerItem);
+                        }
                     }
 
-
-
-                    // group mask
-                    if (psdGroupObj.mask) {
-                        innerCtx.globalCompositeOperation = psdGroupObj.mask.defaultColor === 0 ? 'destination-in' : 'destination-out';
-                        innerCtx.drawImage(psdGroupObj.mask.canvas, psdGroupObj.mask.left, psdGroupObj.mask.top);
-                    }
-
-                    if (groupCanvas) {
-                        groupCtx.globalCompositeOperation = innerItem.mixModeStr;
-                        groupCtx.globalAlpha = innerItem.opacity;
-                        groupCtx.drawImage(innerItem.image, 0, 0);
-
-                    } else {
-                        innerItem.opacity = innerItem.opacity * groupOpacity;
-                        resultArr.push(innerItem);
-                    }
+                    continue;
                 }
 
-                continue;
-            }
-
-            let canvas = createCanvas(result.width, result.height);
-            let ctx = canvas.getContext('2d');
-            if (item.canvas) { // if a layer is empty it has no canvas
-                ctx.drawImage(item.canvas, item.left, item.top);
-            }
-
-            // effects
-            if (item.effects) {
-                addWarning('layer-effect');
-            }
-
-            // mask
-            if (item.mask) {
-                addWarning('mask');
-                prepareMask(item.mask.canvas, item.mask.defaultColor);
-
-                ctx.globalCompositeOperation = item.mask.defaultColor === 0 ? 'destination-in' : 'destination-out';
-                ctx.drawImage(item.mask.canvas, item.mask.left, item.mask.top);
-            }
-
-            // clipping
-            if (hasClipping) {
-                let clippingCanvas = createCanvas(item.right - item.left, item.bottom - item.top);
-                let clippingCtx = clippingCanvas.getContext('2d');
-                clippingCtx.drawImage(item.canvas, 0, 0);
-
-                for (let e = i + 1; e < psdGroupObj.children.length && psdGroupObj.children[e].clipping; e++) {
-                    let clippingItem = psdGroupObj.children[e];
-                    if (clippingItem.opacity === 0 || clippingItem.hidden) {
-                        continue;
+                const canvas = createCanvas(result.width, result.height);
+                const ctx = BB.ctx(canvas);
+                if (item.canvas) { // if a layer is empty it has no canvas
+                    if (item.top === undefined) {
+                        throw new Error('item.top undefined');
                     }
-                    clippingCtx.globalCompositeOperation = getMixModeStr(clippingItem.blendMode);
-                    clippingCtx.globalAlpha = clippingItem.opacity;
-                    clippingCtx.drawImage(clippingItem.canvas, clippingItem.left - item.left, clippingItem.top - item.top);
+                    if (item.left === undefined) {
+                        throw new Error('item.left undefined');
+                    }
+                    ctx.drawImage(item.canvas, item.left, item.top);
                 }
 
-                ctx.globalCompositeOperation = 'source-atop';
-                ctx.drawImage(clippingCanvas, item.left, item.top);
-            }
-
-            // group mask
-            if (psdGroupObj.mask) {
-                ctx.globalCompositeOperation = psdGroupObj.mask.defaultColor === 0 ? 'destination-in' : 'destination-out';
-                ctx.drawImage(psdGroupObj.mask.canvas, psdGroupObj.mask.left, psdGroupObj.mask.top);
-            }
-
-            if (groupCanvas) {
-                if (groupOpacity > 0) {
-                    groupCtx.globalCompositeOperation = getMixModeStr(item.blendMode);
-                    groupCtx.globalAlpha = item.hidden ? 0 : item.opacity;
-                    groupCtx.drawImage(canvas, 0, 0);
+                // effects
+                if (item.effects) {
+                    addWarning('layer-effect');
                 }
 
-            } else {
-                resultArr.push({
-                    name: item.name,
-                    opacity: (item.hidden ? 0 : item.opacity) * groupOpacity,
-                    mixModeStr: getMixModeStr(item.blendMode),
-                    image: canvas,
-                });
+                // mask
+                if (item.mask) {
+                    addWarning('mask');
+                    if (item.mask.canvas === undefined) {
+                        throw new Error('item.mask.canvas undefined');
+                    }
+                    if (item.mask.defaultColor === undefined) {
+                        throw new Error('item.mask.defaultColor undefined');
+                    }
+                    if (item.mask.left === undefined) {
+                        throw new Error('item.mask.left undefined');
+                    }
+                    if (item.mask.top === undefined) {
+                        throw new Error('item.mask.top undefined');
+                    }
+                    prepareMask(item.mask.canvas, item.mask.defaultColor);
+
+                    ctx.globalCompositeOperation = item.mask.defaultColor === 0 ? 'destination-in' : 'destination-out';
+                    ctx.drawImage(item.mask.canvas, item.mask.left, item.mask.top);
+                }
+
+                // clipping
+                if (hasClipping) {
+                    if (item.right === undefined) {
+                        throw new Error('item.right undefined');
+                    }
+                    if (item.left === undefined) {
+                        throw new Error('item.left undefined');
+                    }
+                    if (item.bottom === undefined) {
+                        throw new Error('item.bottom undefined');
+                    }
+                    if (item.top === undefined) {
+                        throw new Error('item.top undefined');
+                    }
+                    if (item.canvas === undefined) {
+                        throw new Error('item.canvas undefined');
+                    }
+                    const clippingCanvas = createCanvas(item.right - item.left, item.bottom - item.top);
+                    const clippingCtx = BB.ctx(clippingCanvas);
+                    clippingCtx.drawImage(item.canvas, 0, 0);
+
+                    for (let e = i + 1; e < psdGroupObj.children.length && psdGroupObj.children[e].clipping; e++) {
+                        const clippingItem = psdGroupObj.children[e];
+                        if (clippingItem.opacity === 0 || clippingItem.hidden) {
+                            continue;
+                        }
+                        if (clippingItem.blendMode === undefined) {
+                            throw new Error('clippingItem.blendMode undefined');
+                        }
+                        if (clippingItem.opacity === undefined) {
+                            throw new Error('clippingItem.opacity undefined');
+                        }
+                        if (clippingItem.canvas === undefined) {
+                            throw new Error('clippingItem.canvas undefined');
+                        }
+                        if (clippingItem.left === undefined) {
+                            throw new Error('clippingItem.left undefined');
+                        }
+                        if (clippingItem.top === undefined) {
+                            throw new Error('clippingItem.top undefined');
+                        }
+                        clippingCtx.globalCompositeOperation = getMixModeStr(clippingItem.blendMode);
+                        clippingCtx.globalAlpha = clippingItem.opacity;
+                        clippingCtx.drawImage(clippingItem.canvas, clippingItem.left - item.left, clippingItem.top - item.top);
+                    }
+
+                    ctx.globalCompositeOperation = 'source-atop';
+                    ctx.drawImage(clippingCanvas, item.left, item.top);
+                }
+
+                // group mask
+                if (psdGroupObj.mask) {
+                    ctx.globalCompositeOperation = psdGroupObj.mask.defaultColor === 0 ? 'destination-in' : 'destination-out';
+                    if (psdGroupObj.mask.canvas === undefined) {
+                        throw new Error('psdGroupObj.mask.canvas undefined');
+                    }
+                    if (psdGroupObj.mask.left === undefined) {
+                        throw new Error('psdGroupObj.mask.left undefined');
+                    }
+                    if (psdGroupObj.mask.top === undefined) {
+                        throw new Error('psdGroupObj.mask.top undefined');
+                    }
+                    ctx.drawImage(psdGroupObj.mask.canvas, psdGroupObj.mask.left, psdGroupObj.mask.top);
+                }
+
+                if (groupOpacity === undefined) {
+                    throw new Error('groupOpacity undefined');
+                }
+                if (item.blendMode === undefined) {
+                    throw new Error('item.blendMode undefined');
+                }
+                if (item.hidden  === undefined) {
+                    throw new Error('item.hidden  undefined');
+                }
+                if (item.opacity === undefined) {
+                    throw new Error('item.opacity undefined');
+                }
+
+                if (groupCanvas && groupCtx) {
+                    if (groupOpacity > 0) {
+                        groupCtx.globalCompositeOperation = getMixModeStr(item.blendMode);
+                        groupCtx.globalAlpha = item.hidden ? 0 : item.opacity;
+                        groupCtx.drawImage(canvas, 0, 0);
+                    }
+
+                } else {
+                    if (item.name === undefined) {
+                        throw new Error('item.name undefined');
+                    }
+                    resultArr.push({
+                        name: item.name,
+                        opacity: (item.hidden ? 0 : item.opacity) * groupOpacity,
+                        mixModeStr: getMixModeStr(item.blendMode),
+                        image: canvas,
+                    });
+                }
             }
         }
 
         if (groupCanvas) {
+            if (psdGroupObj.name === undefined) {
+                throw new Error('psdGroupObj.name undefined');
+            }
+            if (groupOpacity === undefined) {
+                throw new Error('groupOpacity undefined');
+            }
             resultArr = [
                 {
                     name: psdGroupObj.name,
                     opacity: groupOpacity,
                     mixModeStr: groupMixModeStr,
                     image: groupCanvas,
-                }
+                },
             ];
         }
 
@@ -318,13 +427,13 @@ export function readPsd(psdObj: Psd): IKlPsd {
         name: 'root',
         opacity: 1,
         blendMode: 'normal',
-        children: psdObj.children
+        children: psdObj.children,
     });
 
     return result;
 }
 
-export function klPsdToKlProject(klPsd: IKlPsd): IKlProject {
+export function klPsdToKlProject (klPsd: IKlPsd): IKlProject {
     // only share references to Canvas elements
     const result: IKlProject = {
         width: klPsd.width,
@@ -332,22 +441,22 @@ export function klPsdToKlProject(klPsd: IKlPsd): IKlProject {
         layers: [],
     };
     if (klPsd.layers) {
-        result.layers = result.layers.concat(klPsd.layers.map(item => {
+        result.layers = klPsd.layers.map(item => {
             return {
                 name: item.name,
                 opacity: item.opacity,
                 mixModeStr: item.mixModeStr,
                 image: item.image,
             };
-        }));
+        });
     } else {
         // flattened
-        result.layers.push({
+        result.layers = [{
             name: LANG('background'),
             opacity: 1,
             mixModeStr: 'source-over',
             image: klPsd.canvas,
-        });
+        }];
     }
     return result;
 }

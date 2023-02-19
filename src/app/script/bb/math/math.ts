@@ -1,4 +1,4 @@
-import {IBounds, IRect, IVector2D} from '../BB.types';
+import {IBounds, IRect, IVector2D} from '../bb-types';
 
 export function mix (a: number, b: number, f: number): number {
     return a * (1 - f) + b * f;
@@ -26,15 +26,15 @@ export function pointsToAngleDeg (p1: IVector2D, p2: IVector2D): number {
     return pointsToAngleRad(p1, p2) * 180 / Math.PI;
 }
 
-export function isInsideRect(p: IVector2D, rect: IRect): boolean {
+export function isInsideRect (p: IVector2D, rect: IRect): boolean {
     return rect.x <= p.x && p.x <= rect.x + rect.width &&
         rect.y <= p.y && p.y <= rect.y + rect.height;
 }
 
 export function clamp (num: number, min: number, max: number): number {
-    return num <= min
+    return num < min
         ? min
-        : num >= max
+        : num > max
             ? max
             : num;
 }
@@ -46,7 +46,7 @@ export function rotate (x: number, y: number, deg: number): IVector2D {
 
     return {
         x: x * cs - y * sn,
-        y: x * sn + y * cs
+        y: x * sn + y * cs,
     };
 }
 
@@ -57,7 +57,7 @@ export function rotateAround (center: IVector2D, point: IVector2D, deg: number):
     return rot;
 }
 
-export function intDxy(remainder: IVector2D, fDx: number, fDy: number) {
+export function intDxy (remainder: IVector2D, fDx: number, fDy: number) {
     remainder.x += fDx;
     remainder.y += fDy;
     const dX = Math.round(remainder.x);
@@ -74,7 +74,7 @@ export function intDxy(remainder: IVector2D, fDx: number, fDy: number) {
  * return closest even number
  * @param f
  */
-export function roundEven(f: number) {
+export function roundEven (f: number) {
     if (f % 1 === 0) {
         if (f % 2 === 0) {
             return f;
@@ -94,7 +94,7 @@ export function roundEven(f: number) {
  * return closest uneven number
  * @param f
  */
-export function roundUneven(f: number) {
+export function roundUneven (f: number) {
     if (f % 1 === 0) {
         if (f % 2 === 0) {
             return f + 1;
@@ -119,7 +119,7 @@ export function roundUneven(f: number) {
  * @param f
  * @param digits
  */
-export function round(f: number, digits: number): number {
+export function round (f: number, digits: number): number {
     const digitMult = Math.pow(10, digits);
     return Math.round((f/* + Number.EPSILON*/) * digitMult) / digitMult;
 }
@@ -148,10 +148,10 @@ export function updateBounds (target: IBounds, bounds: IBounds): IBounds {
  * determine overlap of bounds with width&height
  */
 export function boundsInArea (bounds: IBounds, width: number, height: number): IBounds | null {
-    let x1 = Math.max(0, bounds.x1);
-    let y1 = Math.max(0, bounds.y1);
-    let x2 = Math.min(width - 1, bounds.x2);
-    let y2 = Math.min(height - 1, bounds.y2);
+    const x1 = Math.max(0, bounds.x1);
+    const y1 = Math.max(0, bounds.y1);
+    const x2 = Math.min(width - 1, bounds.x2);
+    const y2 = Math.min(height - 1, bounds.y2);
     if (x1 > x2 || y1 > y2) {
         return null;
     }

@@ -2,11 +2,11 @@
 
 let embedUrl;
 
-function getBaseURL(url) {
+function getBaseURL (url) {
     return ('' + url).replace(/^((?:https?|file|ftp):\/\/.+)\/[^/]+$/, '$1') + '/';
 }
 
-export function getEmbedUrl(): string {
+export function getEmbedUrl (): string {
     if (embedUrl) {
         return embedUrl;
     }

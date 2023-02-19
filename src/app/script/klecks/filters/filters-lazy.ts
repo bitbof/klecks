@@ -17,10 +17,9 @@ import {filterGrid} from './filter-grid';
 import {filterNoise} from './filter-noise';
 import {filterPattern} from './filter-pattern';
 import {filterDistort} from './filter-distort';
-import {filterVanishPoint} from "./filter-vanish-point";
+import {filterVanishPoint} from './filter-vanish-point';
 
-let embed: boolean;
-function importFilter(libObj, moduleObj): void {
+function importFilter (libObj, moduleObj): void {
     if (moduleObj.getDialog) {
         libObj.getDialog = moduleObj.getDialog;
     }
@@ -28,12 +27,10 @@ function importFilter(libObj, moduleObj): void {
 }
 
 
-export function importFilters(isEmbed?: boolean) {
+export function importFilters (): void {
     if (filterLibStatus.isLoaded) {
         return;
     }
-    embed = isEmbed
-
     importFilter(filterLib.brightnessContrast, filterBrightnessContrast);
     importFilter(filterLib.cropExtend, filterCropExtend);
     importFilter(filterLib.curves, filterCurves);

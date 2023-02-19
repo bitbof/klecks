@@ -1,68 +1,72 @@
 import {BB} from '../../bb/bb';
-import {IKlBasicLayer} from '../kl.types';
+import {IKlBasicLayer} from '../kl-types';
+import {addIsDarkListener, removeIsDarkListener} from '../../bb/base/base';
 
 /**
  * preview of image with layers. can do mix modes and opacity.
  * creates a canvas.
- *
- * p = {
- *     width: 123,
- *     height: 123,
- *     layers: [// can be changed after the fact
- *         {
- *             image: Canvas,
- *             opacity: 1,
- *             mixModeStr: 'source-over'
- *         }
- *     ]
- * }
- *
- * @param p
- * @constructor
  */
-export function KlCanvasPreview(
-    p: {
-        width: number;
-        height: number;
-        layers: IKlBasicLayer[];
-    }
-) {
-    const scale = p.width / p.layers[0].image.width;
-    const width = scale > 1 ? p.layers[0].image.width : p.width;
-    const height = scale > 1 ? p.layers[0].image.height : p.height;
+export class KlCanvasPreview {
 
-    let canvas = BB.canvas(width, height);
-    canvas.style.backgroundImage = 'url(' + BB.createCheckerDataUrl(8) + ')';
-    let ctx = canvas.getContext('2d');
+    private readonly canvas: HTMLCanvasElement;
+    private readonly ctx: CanvasRenderingContext2D | null;
+    private readonly layers: IKlBasicLayer[];
+    private readonly updateCheckerboard: () => void;
 
-    BB.css(canvas, {
-        width: '100%',
-        height: '100%',
-        imageRendering: scale > 1 ? 'pixelated' : null,
-    });
-
-    function render() {
-        ctx.save();
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        for (let i = 0; i < p.layers.length; i++) {
-            ctx.globalAlpha = p.layers[i].opacity;
-            ctx.globalCompositeOperation = p.layers[i].mixModeStr;
-            if (canvas.width > p.layers[i].image.width) {
-                ctx.imageSmoothingEnabled = false;
-            }
-            ctx.drawImage(p.layers[i].image, 0, 0, canvas.width, canvas.height);
+    // --- public ---
+    constructor (
+        p: {
+            width: number;
+            height: number;
+            layers: IKlBasicLayer[]; // items can be changed after the fact - but not the object
         }
-        ctx.restore();
+    ) {
+        this.layers = p.layers;
+
+        const scale = p.width / p.layers[0].image.width;
+        const width = scale > 1 ? p.layers[0].image.width : p.width;
+        const height = scale > 1 ? p.layers[0].image.height : p.height;
+
+        this.canvas = BB.canvas(width, height);
+        this.updateCheckerboard = () => {
+            this.canvas.style.backgroundImage = 'url(' + BB.createCheckerDataUrl(8, undefined, BB.isDark()) + ')';
+        };
+        this.updateCheckerboard();
+        this.ctx = BB.ctx(this.canvas);
+
+        BB.css(this.canvas, {
+            width: '100%',
+            height: '100%',
+            imageRendering: scale > 1 ? 'pixelated' : undefined,
+        });
+
+        setTimeout(() => this.render(), 0);
+        addIsDarkListener(this.updateCheckerboard);
     }
 
-    setTimeout(render, 0);
+    getElement (): HTMLCanvasElement {
+        return this.canvas;
+    }
 
-    // --- interface ---
-    this.getElement = function() {
-        return canvas;
-    };
+    render (): void {
+        if (!this.ctx) {
+            return;
+        }
 
-    this.render = function() {
-        render();
-    };
+        this.ctx.save();
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        for (let i = 0; i < this.layers.length; i++) {
+            this.ctx.globalAlpha = this.layers[i].opacity;
+            this.ctx.globalCompositeOperation = this.layers[i].mixModeStr as GlobalCompositeOperation;
+            if (this.canvas.width > this.layers[i].image.width) {
+                this.ctx.imageSmoothingEnabled = false;
+            }
+            this.ctx.drawImage(this.layers[i].image, 0, 0, this.canvas.width, this.canvas.height);
+        }
+        this.ctx.restore();
+    }
+
+    destroy (): void {
+        removeIsDarkListener(this.updateCheckerboard);
+    }
 }

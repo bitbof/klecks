@@ -2,27 +2,26 @@ import {BB} from '../../bb/bb';
 import {brushes} from '../brushes/brushes';
 import {eventResMs} from './brushes-consts';
 import {klHistory} from '../history/kl-history';
-import {Checkbox} from '../ui/base-components/checkbox';
-import {KlSlider} from '../ui/base-components/kl-slider';
-import {penPressureToggle} from '../ui/base-components/pen-pressure-toggle';
-// @ts-ignore
-import brushIconImg from 'url:~/src/app/img/ui/brush-pixel.svg';
-import {IBrushUi} from '../kl.types';
+import {Checkbox} from '../ui/components/checkbox';
+import {KlSlider} from '../ui/components/kl-slider';
+import {createPenPressureToggle} from '../ui/components/create-pen-pressure-toggle';
+import brushIconImg from '/src/app/img/ui/brush-pixel.svg';
+import {IBrushUi} from '../kl-types';
 import {LANG, languageStrings} from '../../language/language';
 
 export const pixelBrushUi = (function () {
-    let brushInterface: IBrushUi = {
+    const brushInterface: IBrushUi = {
         image: brushIconImg,
         tooltip: LANG('brush-pixel'),
         sizeSlider: {
             min: 0.5,
             max: 100,
-            curve: BB.quadraticSplineInput(0.5, 100, 0.1)
+            curve: BB.quadraticSplineInput(0.5, 100, 0.1),
         },
         opacitySlider: {
             min: 1 / 100,
             max: 1,
-            curve: [[0, 1 / 100], [0.5, 0.3], [1, 1]]
+            curve: [[0, 1 / 100], [0.5, 0.3], [1, 1]],
         },
         Ui: null,
     };
@@ -32,14 +31,14 @@ export const pixelBrushUi = (function () {
     });
 
     brushInterface.Ui = function (p) {
-        let div = document.createElement("div"); // the gui
-        let brush = new brushes.PixelBrush();
+        const div = document.createElement('div'); // the gui
+        const brush = new brushes.PixelBrush();
         brush.setHistory(klHistory);
         p.onSizeChange(brush.getSize());
         let sizeSlider;
         let opacitySlider;
 
-        let lockAlphaToggle = new Checkbox({
+        const lockAlphaToggle = new Checkbox({
             init: brush.getLockAlpha(),
             label: LANG('lock-alpha'),
             callback: function (b) {
@@ -49,10 +48,10 @@ export const pixelBrushUi = (function () {
             title: LANG('lock-alpha-title'),
             css: {
                 marginRight: '10px',
-            }
+            },
         });
 
-        let eraserToggle = new Checkbox({
+        const eraserToggle = new Checkbox({
             init: brush.getIsEraser(),
             label: LANG('eraser'),
             callback: function (b) {
@@ -60,25 +59,25 @@ export const pixelBrushUi = (function () {
             },
             css: {
                 marginRight: '10px',
-            }
+            },
         });
 
-        let ditherToggle = new Checkbox({
+        const ditherToggle = new Checkbox({
             init: brush.getUseDither(),
             label: LANG('brush-pixel-dither'),
             callback: function (b) {
                 brush.setUseDither(b);
-            }
+            },
         });
 
-        let spacingSpline = new BB.SplineInterpolator([[0.5, 0.45], [100, 4]]);
+        const spacingSpline = new BB.SplineInterpolator([[0.5, 0.45], [100, 4]]);
 
-        function setSize(size) {
+        function setSize (size) {
             brush.setSize(size);
             brush.setSpacing(spacingSpline.interpolate(size) / size);
         }
 
-        function init() {
+        function init () {
             sizeSlider = new KlSlider({
                 label: LANG('brush-size'),
                 width: 225,
@@ -111,7 +110,7 @@ export const pixelBrushUi = (function () {
                 },
             });
 
-            let pressureSizeToggle = penPressureToggle(true, function (b) {
+            const pressureSizeToggle = createPenPressureToggle(true, function (b) {
                 brush.sizePressure(b);
             });
 
@@ -119,29 +118,31 @@ export const pixelBrushUi = (function () {
                 BB.el({
                     content: [
                         sizeSlider.getElement(),
-                        pressureSizeToggle
+                        pressureSizeToggle,
                     ],
                     css: {
                         display: 'flex',
                         justifyContent: 'space-between',
                         alignItems: 'center',
                         marginBottom: '10px',
-                    }
+                    },
                 }),
                 opacitySlider.getElement()
             );
 
-            let toggleRow = BB.el({
+            const toggleRow = BB.el({
                 parent: div,
                 css: {
                     display: 'flex',
-                    marginTop: '10px'
-                }
+                    marginTop: '10px',
+                },
             });
 
-            toggleRow.appendChild(lockAlphaToggle.getElement());
-            toggleRow.appendChild(eraserToggle.getElement());
-            toggleRow.appendChild(ditherToggle.getElement());
+            toggleRow.append(
+                lockAlphaToggle.getElement(),
+                eraserToggle.getElement(),
+                ditherToggle.getElement(),
+            );
         }
 
         init();
@@ -160,14 +161,14 @@ export const pixelBrushUi = (function () {
         this.getSize = function () {
             return brush.getSize();
         };
-        this.setSize = function(size) {
+        this.setSize = function (size) {
             setSize(size);
             sizeSlider.setValue(size * 2);
         };
         this.getOpacity = function () {
             return brush.getOpacity();
         };
-        this.setOpacity = function(opacity) {
+        this.setOpacity = function (opacity) {
             brush.setOpacity(opacity);
             opacitySlider.setValue(opacity * 100);
         };

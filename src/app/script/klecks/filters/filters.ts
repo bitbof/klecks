@@ -1,43 +1,26 @@
-import {IFilter} from '../kl.types';
-// @ts-ignore
-import glBrightnessContrastImg from 'url:~/src/app/img/ui/edit-brightness-contrast.svg';
-// @ts-ignore
-import cropExtendImg from 'url:~/src/app/img/ui/edit-crop.svg';
-// @ts-ignore
-import glCurvesImg from 'url:~/src/app/img/ui/edit-curves.svg';
-// @ts-ignore
-import flipImg from 'url:~/src/app/img/ui/edit-flip.svg';
-// @ts-ignore
-import glHueSaturationImg from 'url:~/src/app/img/ui/edit-hue-saturation.svg';
-// @ts-ignore
-import invertImg from 'url:~/src/app/img/ui/edit-invert.png';
-// @ts-ignore
-import glPerspectiveImg from 'url:~/src/app/img/ui/edit-perspective.svg';
-// @ts-ignore
-import resizeImg from 'url:~/src/app/img/ui/edit-resize.svg';
-// @ts-ignore
-import rotateImg from 'url:~/src/app/img/ui/edit-rotate.svg';
-// @ts-ignore
-import glTiltShiftImg from 'url:~/src/app/img/ui/edit-tilt-shift.png';
-// @ts-ignore
-import toAlphaImg from 'url:~/src/app/img/ui/edit-to-alpha.svg';
-// @ts-ignore
-import transformImg from 'url:~/src/app/img/ui/edit-transform.svg';
-// @ts-ignore
-import glBlurImg from 'url:~/src/app/img/ui/edit-triangle-blur.png';
-// @ts-ignore
-import glUnsharpMaskImg from 'url:~/src/app/img/ui/edit-unsharp-mask.png';
-// @ts-ignore
-import gridImg from 'url:~/src/app/img/ui/edit-grid.svg';
-// @ts-ignore
-import noiseImg from 'url:~/src/app/img/ui/edit-noise.svg';
-// @ts-ignore
-import patternImg from 'url:~/src/app/img/ui/edit-pattern.svg';
-// @ts-ignore
-import vanishPointImg from 'url:~/src/app/img/ui/edit-vanish-point.svg';
-// @ts-ignore
-import distortImg from 'url:~/src/app/img/ui/edit-distort.svg';
+import {IFilter} from '../kl-types';
+import glBrightnessContrastImg from '/src/app/img/ui/edit-brightness-contrast.svg';
+import cropExtendImg from '/src/app/img/ui/edit-crop.svg';
+import glCurvesImg from '/src/app/img/ui/edit-curves.svg';
+import flipImg from '/src/app/img/ui/edit-flip.svg';
+import glHueSaturationImg from '/src/app/img/ui/edit-hue-saturation.svg';
+import invertImg from '/src/app/img/ui/edit-invert.png';
+import glPerspectiveImg from '/src/app/img/ui/edit-perspective.svg';
+import resizeImg from '/src/app/img/ui/edit-resize.svg';
+import rotateImg from '/src/app/img/ui/edit-rotate.svg';
+import glTiltShiftImg from '/src/app/img/ui/edit-tilt-shift.png';
+import toAlphaImg from '/src/app/img/ui/edit-to-alpha.svg';
+import transformImg from '/src/app/img/ui/edit-transform.svg';
+import glBlurImg from '/src/app/img/ui/edit-triangle-blur.png';
+import glUnsharpMaskImg from '/src/app/img/ui/edit-unsharp-mask.png';
+import gridImg from '/src/app/img/ui/edit-grid.svg';
+import noiseImg from '/src/app/img/ui/edit-noise.svg';
+import patternImg from '/src/app/img/ui/edit-pattern.svg';
+import vanishPointImg from '/src/app/img/ui/edit-vanish-point.svg';
+import distortImg from '/src/app/img/ui/edit-distort.svg';
+import {THistoryEntryG} from '../history/kl-history';
 
+export type TFilterHistoryEntry<Filter extends string, Input> = THistoryEntryG<['filter', Filter], 'apply', [{ input: Input }]>;
 
 export const filterLibStatus = {
     isLoaded: false,
@@ -92,6 +75,7 @@ export const filterLib: {
         getDialog: null,
         apply: null,
         inEmbed: true,
+        darkNoInvert: true,
     },
     invert: {
         lang: {name: 'filter-invert', button: 'filter-invert'},
@@ -101,6 +85,7 @@ export const filterLib: {
         getDialog: null,
         apply: null,
         inEmbed: true,
+        darkNoInvert: true,
     },
     perspective: {
         lang: {name: 'filter-perspective-title', button: 'filter-perspective'},
@@ -141,6 +126,7 @@ export const filterLib: {
         getDialog: null,
         apply: null,
         inEmbed: true,
+        darkNoInvert: true,
     },
     transform: {
         lang: {name: 'filter-transform-title', button: 'filter-transform'},
@@ -157,6 +143,7 @@ export const filterLib: {
         getDialog: null,
         apply: null,
         inEmbed: true,
+        darkNoInvert: true,
     },
     unsharpMask: {
         lang: {name: 'filter-unsharp-mask-title', button: 'filter-unsharp-mask'},
@@ -165,6 +152,7 @@ export const filterLib: {
         getDialog: null,
         apply: null,
         inEmbed: true,
+        darkNoInvert: true,
     },
     grid: {
         lang: {name: 'filter-grid', button: 'filter-grid'},

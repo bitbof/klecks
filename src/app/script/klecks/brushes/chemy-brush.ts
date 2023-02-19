@@ -1,7 +1,13 @@
 import {BB} from '../../bb/bb';
-import {IRGB} from '../kl.types';
-import {IBounds} from '../../bb/bb.types';
-import {KlHistoryInterface} from '../history/kl-history';
+import {IRGB} from '../kl-types';
+import {IBounds} from '../../bb/bb-types';
+import {IHistoryEntry, KlHistoryInterface, THistoryInnerActions} from '../history/kl-history';
+import {ERASE_COLOR} from './erase-color';
+
+export interface IChemyBrushHistoryEntry extends IHistoryEntry {
+    tool: ['brush', 'ChemyBrush'];
+    actions: THistoryInnerActions<ChemyBrush>[];
+}
 
 type TChemyMode = 'fill' | 'stroke';
 
@@ -24,12 +30,12 @@ export class ChemyBrush {
     private history: KlHistoryInterface;
 
     private copyCanvas: HTMLCanvasElement;
-    private path: {x: number, y: number}[];
+    private path: {x: number; y: number}[];
     private minY: number;
     private maxY: number;
     private completeRedrawBounds: IBounds;
 
-    updateCompleteRedrawBounds (x, y): void {
+    private updateCompleteRedrawBounds (x: number, y: number): void {
         let bounds = { x1: x, y1: y, x2: x, y2: y};
         if (this.settingXSymmetry) {
             bounds = BB.updateBounds(
@@ -67,19 +73,19 @@ export class ChemyBrush {
         this.context.clearRect(0, 0, this.context.canvas.width, this.context.canvas.height);
         this.context.drawImage(this.copyCanvas, 0, 0);
 
-        let color = {...this.settingColor};
+        const color = {...this.settingColor};
         if (this.settingIsEraser) {
-            color.r = 255;
-            color.g = 255;
-            color.b = 255;
+            color.r = ERASE_COLOR;
+            color.g = ERASE_COLOR;
+            color.b = ERASE_COLOR;
             if (this.settingLockLayerAlpha) {
-                this.context.globalCompositeOperation = "source-atop";
+                this.context.globalCompositeOperation = 'source-atop';
             } else {
-                this.context.globalCompositeOperation = "destination-out";
+                this.context.globalCompositeOperation = 'destination-out';
             }
         } else {
             if (this.settingLockLayerAlpha) {
-                this.context.globalCompositeOperation = "source-atop";
+                this.context.globalCompositeOperation = 'source-atop';
             }
         }
 
@@ -275,7 +281,7 @@ export class ChemyBrush {
         this.minY = y;
         this.maxY = y;
         this.copyCanvas = BB.canvas(this.context.canvas.width, this.context.canvas.height);
-        this.copyCanvas.getContext('2d').drawImage(this.context.canvas, 0, 0);
+        BB.ctx(this.copyCanvas).drawImage(this.context.canvas, 0, 0);
         this.completeRedrawBounds = null;
         this.updateCompleteRedrawBounds(x, y);
     }
@@ -285,7 +291,7 @@ export class ChemyBrush {
             return;
         }
 
-        let pos = { x, y };
+        const pos = { x, y };
         if (this.settingDistort > 0) {
             pos.x += (Math.random() - 0.5) * this.settingDistort * 80;
             pos.y += (Math.random() - 0.5) * this.settingDistort * 80;
@@ -306,22 +312,22 @@ export class ChemyBrush {
                 this.completeRedrawBounds.x2 - this.completeRedrawBounds.x1 + 1,
                 this.completeRedrawBounds.y2 - this.completeRedrawBounds.y1 + 1
             );
-            const historyCtx = historyCanvas.getContext('2d');
+            const historyCtx = BB.ctx(historyCanvas);
             historyCtx.drawImage(this.context.canvas, -this.completeRedrawBounds.x1, -this.completeRedrawBounds.y1);
 
             this.history.push({
-                tool: ["brush", "ChemyBrush"],
+                tool: ['brush', 'ChemyBrush'],
                 actions: [
                     {
-                        action: "drawImage",
+                        action: 'drawImage',
                         params: [
                             historyCanvas, // faster than getting image data (measured on 2018 lenovo chromebook)
                             this.completeRedrawBounds.x1,
                             this.completeRedrawBounds.y1,
                         ],
-                    }
-                ]
-            });
+                    },
+                ],
+            } as IChemyBrushHistoryEntry);
         }
         this.path = null;
         this.copyCanvas = null;

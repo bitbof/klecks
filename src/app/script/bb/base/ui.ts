@@ -1,12 +1,12 @@
-import {addEventListener} from '../input/event-listener';
 import {css} from './base';
 import {BB} from '../bb';
+import {IKeyStringOptional} from '../bb-types';
 
 
-export function appendTextDiv(target: HTMLElement, text: string): HTMLDivElement {
+export function appendTextDiv (target: HTMLElement, text: string): HTMLDivElement {
     const div = document.createElement('div');
     div.innerHTML = text;
-    target.appendChild(div);
+    target.append(div);
     return div;
 }
 
@@ -16,16 +16,16 @@ export function appendTextDiv(target: HTMLElement, text: string): HTMLDivElement
  *
  * @param getAll - check all, even those with "data-ignore-focus" = "true"
  */
-export function isInputFocused(getAll: boolean = false): boolean {
-    let result = document.activeElement && ['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName);
+export function isInputFocused (getAll: boolean = false): boolean {
+    const result = !!(document.activeElement && ['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName));
     if (getAll) {
         return result;
     } else {
-        return result && !document.activeElement.getAttribute('data-ignore-focus');
+        return result && !document.activeElement?.getAttribute('data-ignore-focus');
     }
 }
 
-export function unfocusAnyInput(): void {
+export function unfocusAnyInput (): void {
     if (isInputFocused(true)) {
         /*
             Unfocus anything that is focused.
@@ -43,7 +43,7 @@ export function unfocusAnyInput(): void {
                 opacity: '0',
                 width: '0',
                 height: '0',
-            }
+            },
         }) as HTMLInputElement;
         setTimeout(() => {
             focusEl.select();
@@ -56,7 +56,7 @@ export function unfocusAnyInput(): void {
 /**
  * clears text selection in window
  */
-export function clearSelection(): void {
+export function clearSelection (): void {
     if (window.getSelection) {
         const sel = window.getSelection();
         if (sel) {
@@ -77,9 +77,9 @@ export function clearSelection(): void {
  *
  * @param el - dom element
  */
-export const makeUnfocusable = (function() {
+export const makeUnfocusable = (function () {
 
-    function preventFocus(event: MouseEvent) {
+    function preventFocus (event: MouseEvent) {
         event.preventDefault();
         let didFocusRelated = false;
         if (event.relatedTarget) {
@@ -95,9 +95,9 @@ export const makeUnfocusable = (function() {
         }
     }
 
-    return function(el) {
+    return function (el) {
         el.setAttribute('tabindex', '-1');
-        addEventListener(el, 'focus', preventFocus);
+        el.addEventListener('focus', preventFocus);
     };
 })();
 
@@ -127,25 +127,26 @@ const els: {
  *
  * @param params
  */
-export function el(
-    params: {
-        parent?: HTMLElement,
-        css?: { [key: string]: string },
-        custom?: { [key: string]: any },
-        content?: string | (HTMLElement | string | null)[] | HTMLElement | SVGElement,
-        textContent?: string,
-        className?: string,
-        title?: string,
-        id?: string,
-        tagName?: string,
-        onClick?: (e: Event) => void,
-        onChange?: (e: Event) => void,
+export function el (
+    params?: {
+        parent?: HTMLElement;
+        css?: IKeyStringOptional;
+        custom?: { [key: string]: any };
+        content?: string | (HTMLElement | string | undefined)[] | Element;
+        textContent?: string;
+        className?: string;
+        title?: string;
+        id?: string;
+        tagName?: string;
+        onClick?: (e: MouseEvent) => void;
+        onChange?: (e: Event) => void;
     }
 ): HTMLElement {
-    const div = document.createElement(params.tagName ? params.tagName : 'div');
-    if (params.css) {
-        css(div, params.css);
+    if (!params) {
+        return document.createElement('div');
     }
+    const div = document.createElement(params.tagName ? params.tagName : 'div');
+    params.css && css(div, params.css);
 
     if (params.content) {
         if (typeof params.content === typeof 'aa') {
@@ -155,7 +156,7 @@ export function el(
             BB.append(div, params.content);
 
         } else {
-            div.appendChild(params.content as HTMLElement);
+            div.append(params.content as HTMLElement);
 
         }
     }
@@ -169,25 +170,25 @@ export function el(
         div.id = params.id;
     }
     if (params.parent) {
-        params.parent.appendChild(div);
+        params.parent.append(div);
     }
     if ('title' in params && params.title !== undefined) {
         div.title = params.title;
     }
     const listeners = [];
     if ('onClick' in params) {
-        addEventListener(div, 'click', params.onClick);
+        div.addEventListener('click', params.onClick);
         listeners.push(['click', params.onClick]);
     }
     if ('onChange' in params) {
-        addEventListener(div, 'change', params.onChange);
+        div.addEventListener('change', params.onChange);
         listeners.push(['change', params.onChange]);
     }
     if (listeners.length > 0) {
         els.push({
             el: div,
-            listeners: listeners,
-        })
+            listeners,
+        });
         /*div.style.backgroundColor = '#ff0';
         div.style.border = '1px solid #ff0';*/
     }
@@ -204,7 +205,10 @@ export function el(
  * removes event listeners for Elements created via el()
  * @param el
  */
-export function destroyEl(el: HTMLElement) {
+export function destroyEl (el?: HTMLElement) {
+    if (!el) {
+        return;
+    }
     for (let i = 0; i < els.length; i++) {
         const item = els[i];
         if (item.el === el) {
