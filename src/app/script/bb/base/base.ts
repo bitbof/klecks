@@ -228,14 +228,16 @@ export function throwIfNull<T> (v: T | null): T {
     return v;
 }
 
+const matchMediaDark = ('matchMedia' in window) ? window.matchMedia('(prefers-color-scheme: dark)') : false;
+
 export function isDark (): boolean {
-    return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    return matchMediaDark && matchMediaDark.matches;
 }
 
 export function addIsDarkListener (func: () => void): void {
-    window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', func);
+    matchMediaDark && matchMediaDark.addEventListener('change', func);
 }
 
 export function removeIsDarkListener (func: () => void): void {
-    window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').removeEventListener('change', func);
+    matchMediaDark && matchMediaDark.removeEventListener('change', func);
 }
