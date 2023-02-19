@@ -233,9 +233,9 @@ export function isDark (): boolean {
 }
 
 export function addIsDarkListener (func: () => void): void {
-    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', func);
+    window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', func);
 }
 
 export function removeIsDarkListener (func: () => void): void {
-    window.matchMedia('(prefers-color-scheme: dark)').removeEventListener('change', func);
+    window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').removeEventListener('change', func);
 }
