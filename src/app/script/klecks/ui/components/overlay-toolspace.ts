@@ -49,7 +49,7 @@ export class OverlayToolspace {
         const colorEl = BB.el({
             parent: this.rootEl,
             className: 'kl-overlay-toolspace__color',
-        })
+        });
         const colorSlider = new KlColorSliderSmall({
             width: sizeObj.width,
             heightSV: sizeObj.svHeight,

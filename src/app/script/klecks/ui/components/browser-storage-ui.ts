@@ -7,7 +7,7 @@ import {SaveReminder} from './save-reminder';
 import {IProjectStoreListener, ProjectStore} from '../../storage/project-store';
 import {KL} from '../../kl';
 import {LANG} from '../../../language/language';
-import {addIsDarkListener, removeIsDarkListener} from '../../../bb/base/base';
+import {theme} from '../../../theme/theme';
 
 export class BrowserStorageUi {
 
@@ -232,10 +232,10 @@ export class BrowserStorageUi {
                 return;
             }
             BB.css(this.thumbnail, {
-                background: "url('" + BB.createCheckerCanvas(4, BB.isDark()).toDataURL('image/png') + "')",
+                background: "url('" + BB.createCheckerCanvas(4, theme.isDark()).toDataURL('image/png') + "')",
             });
         };
-        addIsDarkListener(this.updateCheckerboard);
+        theme.addIsDarkListener(this.updateCheckerboard);
 
         setInterval(() => this.updateAge(), 1000 * 60);
 
@@ -272,7 +272,7 @@ export class BrowserStorageUi {
         BB.destroyEl(this.infoEl);
         BB.destroyEl(this.storeButtonEl);
         BB.destroyEl(this.clearButtonEl);
-        removeIsDarkListener(this.updateCheckerboard);
+        theme.removeIsDarkListener(this.updateCheckerboard);
         this.projectStore.unsubscribe(this.storeListener);
     }
 }

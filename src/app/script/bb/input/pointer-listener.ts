@@ -1,4 +1,4 @@
-import {eventUsesHighResTimeStamp, isFirefox} from '../base/browser';
+import {eventUsesHighResTimeStamp, hasPointerEvents, isFirefox} from '../base/browser';
 import {WheelCleaner} from './wheel-cleaner';
 import {IPointerEvent, IWheelEvent, TPointerButton, TPointerEventType, TPointerType} from './event.types';
 import {PressureNormalizer} from './pressure-normalizer';
@@ -106,6 +106,17 @@ function getButtonStr (buttons: number): TPointerButton | undefined {
 const pressureNormalizer = new PressureNormalizer();
 const timeStampOffset = eventUsesHighResTimeStamp() ? 0 : -performance.timing.navigationStart;
 
+
+const pointerDownEvt = hasPointerEvents ? 'pointerdown' : 'mousedown';
+const pointerMoveEvt = hasPointerEvents ? 'pointermove' : 'mousemove';
+const pointerUpEvt = hasPointerEvents ? 'pointerup' : 'mouseup';
+const pointerCancelEvt = hasPointerEvents ? 'pointercancel' : 'mousecancel';
+const pointerLeaveEvt = hasPointerEvents ? 'pointerleave' : 'mouseleave';
+const pointerEnterEvt = hasPointerEvents ? 'pointerenter' : 'mouseenter';
+
+
+
+
 /**
  * More trustworthy pointer attributes. that behave the same across browsers.
  * returns a new object. Also attaches itself to the orig event. -> event.corrected
@@ -114,12 +125,6 @@ function correctPointerEvent (event: PointerEvent | TExtendedDOMPointerEvent): I
     if ('corrected' in event) {
         return event.corrected;
     }
-
-    /*if (event.type === 'pointermove' && !window.hidePressureOut) {
-        if (event.type === 'pointermove') {
-            BB.throwOut(event.pressure + ' ' + event.pointerType);
-        }
-    }*/
 
     const correctedObj: ICorrectedPointerEvent = {
         pointerId: event.pointerId,
@@ -306,17 +311,17 @@ export class PointerListener {
     }
 
     private setupDocumentListeners () {
-        this.windowOnPointerMove && document.addEventListener('pointermove', this.windowOnPointerMove);
-        this.windowOnPointerUp && document.addEventListener('pointerup', this.windowOnPointerUp);
-        this.windowOnPointerLeave && document.addEventListener('pointercancel', this.windowOnPointerLeave);
-        this.windowOnPointerLeave && document.addEventListener('pointerleave', this.windowOnPointerLeave);
+        this.windowOnPointerMove && document.addEventListener(pointerMoveEvt, this.windowOnPointerMove);
+        this.windowOnPointerUp && document.addEventListener(pointerUpEvt, this.windowOnPointerUp);
+        this.windowOnPointerLeave && document.addEventListener(pointerCancelEvt, this.windowOnPointerLeave);
+        this.windowOnPointerLeave && document.addEventListener(pointerLeaveEvt, this.windowOnPointerLeave);
     }
 
     private destroyDocumentListeners () {
-        this.windowOnPointerMove && document.removeEventListener('pointermove', this.windowOnPointerMove);
-        this.windowOnPointerUp && document.removeEventListener('pointerup', this.windowOnPointerUp);
-        this.windowOnPointerLeave && document.removeEventListener('pointercancel', this.windowOnPointerLeave);
-        this.windowOnPointerLeave && document.removeEventListener('pointerleave', this.windowOnPointerLeave);
+        this.windowOnPointerMove && document.removeEventListener(pointerMoveEvt, this.windowOnPointerMove);
+        this.windowOnPointerUp && document.removeEventListener(pointerUpEvt, this.windowOnPointerUp);
+        this.windowOnPointerLeave && document.removeEventListener(pointerCancelEvt, this.windowOnPointerLeave);
+        this.windowOnPointerLeave && document.removeEventListener(pointerLeaveEvt, this.windowOnPointerLeave);
     }
 
 
@@ -516,8 +521,8 @@ export class PointerListener {
                 this.onPointerCallback && this.onPointerCallback(outEvent);
             };
 
-            this.targetElement.addEventListener('pointermove', this.onPointerMove);
-            this.targetElement.addEventListener('pointerdown', this.onPointerDown);
+            this.targetElement.addEventListener(pointerMoveEvt, this.onPointerMove);
+            this.targetElement.addEventListener(pointerDownEvt, this.onPointerDown);
         }
         if (this.onWheelCallback) {
             this.onWheel = (e: WheelEvent) => {
@@ -536,8 +541,8 @@ export class PointerListener {
                 this.onEnterLeaveCallback && this.onEnterLeaveCallback(false);
             };
 
-            this.targetElement.addEventListener('pointerenter', this.onPointerEnter);
-            this.targetElement.addEventListener('pointerleave', this.onPointerLeave);
+            this.targetElement.addEventListener(pointerEnterEvt, this.onPointerEnter);
+            this.targetElement.addEventListener(pointerLeaveEvt, this.onPointerLeave);
         }
 
         if (p.fixScribble) {
@@ -552,10 +557,10 @@ export class PointerListener {
             return;
         }
         this.isDestroyed = true;
-        this.onPointerEnter && this.targetElement.removeEventListener('pointerenter', this.onPointerEnter);
-        this.onPointerLeave && this.targetElement.removeEventListener('pointerleave', this.onPointerLeave);
-        this.onPointerMove && this.targetElement.removeEventListener('pointermove', this.onPointerMove);
-        this.onPointerDown && this.targetElement.removeEventListener('pointerdown', this.onPointerDown);
+        this.onPointerEnter && this.targetElement.removeEventListener(pointerEnterEvt, this.onPointerEnter);
+        this.onPointerLeave && this.targetElement.removeEventListener(pointerLeaveEvt, this.onPointerLeave);
+        this.onPointerMove && this.targetElement.removeEventListener(pointerMoveEvt, this.onPointerMove);
+        this.onPointerDown && this.targetElement.removeEventListener(pointerDownEvt, this.onPointerDown);
         this.onWheel && this.targetElement.removeEventListener('wheel', this.onWheel);
         this.destroyDocumentListeners();
         this.onTouchMove && document.removeEventListener('touchmove', this.onTouchMove);

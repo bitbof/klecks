@@ -36,7 +36,6 @@ export class HexColorDialog {
                 marginBottom: '10px',
                 boxShadow: 'inset 0 0 0 1px #fff, 0 0 0 1px #000',
                 background: '#' + BB.ColorConverter.toHexString(lastValidRgb),
-                colorScheme: 'only light',
             },
         });
         div.append(previewEl);

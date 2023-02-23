@@ -167,8 +167,11 @@ export class FileTab {
             };
 
             const saveNote = BB.el({
-                className: 'kl-file-no-autosave',
-                textContent: '⚠️ ' + LANG('file-no-autosave'),
+                className: 'kl-toolspace-note',
+                textContent: LANG('file-no-autosave'),
+                css: {
+                    margin: '10px 10px 0 10px',
+                },
             });
 
             const createSpacer = () => {

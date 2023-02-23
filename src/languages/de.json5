@@ -1340,14 +1340,22 @@
     original: 'Language',
     value: 'Sprache'
   },
-  'settings-preferred-language': {
-    original: 'Preferred Language',
-    value: 'Bevorzugte Sprache'
-  },
   'settings-language-reload': {
     hint: 'changes will be visible after reloading the page',
     original: 'Will update after reloading.',
     value: 'Aktualisiert mit Neuladen.'
+  },
+  'settings-theme': {
+    original: 'Theme',
+    value: 'Farbe'
+  },
+  'theme-dark': {
+    original: 'Dark',
+    value: 'Dunkel'
+  },
+  'theme-light': {
+    original: 'Light',
+    value: 'Hell'
   },
   'terms-of-service': {
     original: 'Terms of Service',

@@ -6,7 +6,7 @@ import {IFilterApply, IFilterGetDialogParam, IFilterGetDialogResult} from '../kl
 import {LANG} from '../../language/language';
 import {TFilterHistoryEntry} from './filters';
 import {table} from '../ui/components/table';
-import {addIsDarkListener, removeIsDarkListener} from '../../bb/base/base';
+import {theme} from '../../theme/theme';
 
 export type TFilterResizeInput = {
     width: number;
@@ -288,7 +288,6 @@ export const filterResize = {
                 marginTop: '10px',
                 position: 'relative',
                 userSelect: 'none',
-                colorScheme: 'only light',
             },
         });
 
@@ -307,9 +306,9 @@ export const filterResize = {
         function updateCheckerboard (): void {
             BB.createCheckerDataUrl(8, function (url) {
                 previewWrapper.style.background = 'url(' + url + ')';
-            }, BB.isDark());
+            }, theme.isDark());
         }
-        addIsDarkListener(updateCheckerboard);
+        theme.addIsDarkListener(updateCheckerboard);
         updateCheckerboard();
 
 
@@ -318,7 +317,7 @@ export const filterResize = {
 
         result.destroy = (): void => {
             constrainCheckbox.destroy();
-            removeIsDarkListener(updateCheckerboard);
+            theme.removeIsDarkListener(updateCheckerboard);
         };
         result.getInput = function (): TFilterResizeInput {
             result.destroy();

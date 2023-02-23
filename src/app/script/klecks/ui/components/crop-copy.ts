@@ -2,6 +2,7 @@ import {BB} from '../../../bb/bb';
 import {KeyListener} from '../../../bb/input/key-listener';
 import {PointerListener} from '../../../bb/input/pointer-listener';
 import {IRect, IVector2D} from '../../../bb/bb-types';
+import {theme} from '../../../theme/theme';
 
 /**
  * element that lets you crop an image and copy it via right click
@@ -71,7 +72,6 @@ export class CropCopy {
                 height: param.height + 'px',
                 width: param.width + 'px',
                 overflow: 'hidden',
-                colorScheme: 'only light',
             },
         });
         if (param.onChange) {
@@ -121,7 +121,7 @@ export class CropCopy {
         this.rootEl.append(previewWrapper);
         BB.createCheckerDataUrl(4, (v) => {
             previewWrapper.style.backgroundImage = 'url('+v+')';
-        }, BB.isDark());
+        }, theme.isDark());
 
         const thumbSize = BB.fitInto(this.canvas.width, this.canvas.height, param.width - padding * 2, param.height - padding * 2, 1);
         const thumbCanvas = BB.canvas(Math.round(thumbSize.width), Math.round(thumbSize.height));

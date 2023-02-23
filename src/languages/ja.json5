@@ -1340,14 +1340,22 @@
     original: 'Language',
     value: '言語'
   },
-  'settings-preferred-language': {
-    original: 'Preferred Language',
-    value: '優先言語'
-  },
   'settings-language-reload': {
     hint: 'changes will be visible after reloading the page',
     original: 'Will update after reloading.',
     value: 'リロード後に更新されます。'
+  },
+  'settings-theme': {
+    original: 'Theme',
+    value: ''
+  },
+  'theme-dark': {
+    original: 'Dark',
+    value: ''
+  },
+  'theme-light': {
+    original: 'Light',
+    value: ''
   },
   'terms-of-service': {
     original: 'Terms of Service',

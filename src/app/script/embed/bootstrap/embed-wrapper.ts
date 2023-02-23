@@ -3,7 +3,7 @@ import {IKlProject} from '../../klecks/kl-types';
 import logoImg from '/src/app/img/klecks-logo.png';
 import {getEmbedUrl} from './get-embed-url';
 import {initLANG, LANG} from '../../language/language';
-import {isDark} from '../../bb/base/base';
+import {theme} from '../../theme/theme';
 
 let wrapperInstance: boolean = false;
 
@@ -41,7 +41,7 @@ export function EmbedWrapper (p: IEmbedParams) {
             ['justifyContent', 'center'],
             ['flexDirection', 'column'],
 
-            ['background', isDark() ? 'rgb(33, 33, 33)' : 'rgb(158,158,158)'],
+            ['background', theme.isDark() ? 'rgb(33, 33, 33)' : 'rgb(158,158,158)'],
 
             ['fontFamily', 'Arial, sans-serif'],
             ['fontSize', '30px'],
@@ -51,7 +51,7 @@ export function EmbedWrapper (p: IEmbedParams) {
             loadingScreen.style[loadingStyleArr[i][0]] = loadingStyleArr[i][1];
         }
         loadingScreen.id = 'loading-screen';
-        const logoStyle = isDark() && !p.logoImg ? ' style="filter: invert(1)"' : '';
+        const logoStyle = theme.isDark() && !p.logoImg ? ' style="filter: invert(1)"' : '';
         loadingScreen.innerHTML = '<img width="150" height="54"' + logoStyle + ' src="' + (p.logoImg ? p.logoImg : logoImg) + '" alt="Logo"/>\n' +
             '<div style="margin: 15px 0 0 0; display: flex; align-items: center">\n' +
             '<div class="spinner"></div>\n' +

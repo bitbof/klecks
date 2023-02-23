@@ -13,7 +13,8 @@ export function createConsoleApi (
     }
 ): TConsoleApi {
 
-    console.info('Draw via the console! Learn more: %cKL.help()', 'background: #000; color: #0f0;');
+    const output = ['Draw via the console! Learn more: %cKL.help()', 'background: #000; color: #0f0;'];
+    'info' in console ? console.info(...output) : console.log(...output);
 
     return Object.freeze({
         draw: (path: IVector2D[]): void => {

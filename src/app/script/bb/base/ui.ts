@@ -192,7 +192,7 @@ export function el (
         /*div.style.backgroundColor = '#ff0';
         div.style.border = '1px solid #ff0';*/
     }
-    if ('custom' in params) {
+    if ('custom' in params && params.custom) {
         const customKeyArr = Object.keys(params.custom);
         for (let i = 0; i < customKeyArr.length; i++) {
             div.setAttribute(customKeyArr[i], params.custom[customKeyArr[i]]);

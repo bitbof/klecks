@@ -7,7 +7,10 @@ import {IKeyString} from '../../../bb/bb-types';
 export class Select<ValueType extends string> {
 
     private readonly selectEl: HTMLSelectElement;
-    private readonly optionArr: ([ValueType, string] | null)[]; // [value, label]
+    private readonly optionArr: {
+        item: ([ValueType, string] | null); // [value, label]
+        el?: HTMLOptionElement;
+    }[];
     private readonly changeListener: () => void;
     private readonly onChange: ((val: ValueType) => void) | undefined;
 
@@ -29,8 +32,6 @@ export class Select<ValueType extends string> {
                 cursor: 'pointer',
                 fontSize: '15px',
                 padding: '3px',
-                //webkitAppearance: 'none'
-                colorScheme: 'only light', // chrome doesn't properly invert the text color
             },
         }) as HTMLSelectElement;
         if (p.css) {
@@ -41,16 +42,21 @@ export class Select<ValueType extends string> {
         if (!isFocusable) {
             this.selectEl.tabIndex = -1;
         }
-        this.optionArr = p.optionArr;
-        for (let i = 0; i < this.optionArr.length; i++) {
-            const item = this.optionArr[i];
+        this.optionArr = [];
+        for (let i = 0; i < p.optionArr.length; i++) {
+            const item = p.optionArr[i];
             if (item === null) {
+                this.optionArr.push({item});
                 continue;
             }
-            const option = document.createElement('option');
-            option.value = item[0];
-            option.textContent = item[1];
-            this.selectEl.append(option);
+            const el = document.createElement('option');
+            el.value = item[0];
+            el.textContent = item[1];
+            this.optionArr.push({
+                item,
+                el,
+            });
+            this.selectEl.append(el);
         }
         if (p.onChange) {
             this.onChange = p.onChange;
@@ -76,20 +82,29 @@ export class Select<ValueType extends string> {
     setDeltaValue (delta: number): void {
         let index = 0;
         for (let i = 0; i < this.optionArr.length; i++) {
-            const item = this.optionArr[i];
-            if (item && '' + item[0] === this.selectEl.value) {
+            const option = this.optionArr[i];
+            if (option.item && '' + option.item[0] === this.selectEl.value) {
                 index = i;
                 break;
             }
         }
         index = Math.max(0, Math.min(this.optionArr.length -1, index + delta));
-        const item = this.optionArr[index];
-        this.selectEl.value = item ? item[0] : '';
+        const option = this.optionArr[index];
+        this.selectEl.value = option.item ? option.item[0] : '';
         this.onChange && this.onChange(this.getValue());
     }
 
     getElement (): HTMLElement {
         return this.selectEl;
+    }
+
+    updateLabel (id: ValueType, label: string): void {
+        this.optionArr.forEach(option => {
+            if (option.item && option.item[0] === id && option.el) {
+                option.item[1] = label;
+                option.el.textContent = option.item[1];
+            }
+        });
     }
 
     destroy (): void {

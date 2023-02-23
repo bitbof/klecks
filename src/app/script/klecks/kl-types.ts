@@ -37,7 +37,7 @@ export interface IFilter {
     inEmbed: boolean; // is available in embed
     getDialog: null | ((p: IFilterGetDialogParam) => any);
     apply: null | ((p: IFilterApply) => boolean);
-    darkNoInvert?: boolean,
+    darkNoInvert?: boolean;
 }
 
 export interface ITransform {

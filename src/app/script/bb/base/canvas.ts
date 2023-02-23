@@ -181,9 +181,9 @@ export const createCheckerCanvas = function (size: number, isDark?: boolean): HT
         if (!ctx) {
             throw new Error('2d context not supported or canvas already initialized');
         }
-        ctx.fillStyle = isDark ? 'rgb(55, 55, 55)' : 'rgb(255, 255, 255)';
+        ctx.fillStyle = isDark ? 'rgb(90, 90, 90)' : 'rgb(255, 255, 255)';
         ctx.fillRect(0, 0, size * 2, size * 2);
-        ctx.fillStyle = isDark ? 'rgb(0, 0, 0)': 'rgb(200, 200, 200)';
+        ctx.fillStyle = isDark ? 'rgb(63, 63, 63)': 'rgb(200, 200, 200)';
         ctx.fillRect(0, 0, size, size);
         ctx.fillRect(size, size, size * 2, size * 2);
     }

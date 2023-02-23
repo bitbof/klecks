@@ -17,7 +17,7 @@ import {DoubleTapper} from '../../bb/input/event-chain/double-tapper';
 import {NFingerTapper} from '../../bb/input/event-chain/n-finger-tapper';
 import {EventChain} from '../../bb/input/event-chain/event-chain';
 import {PointerListener} from '../../bb/input/pointer-listener';
-import {addIsDarkListener} from '../../bb/base/base';
+import {theme} from '../../theme/theme';
 
 export interface IViewChangeEvent {
     changed: ('scale' | 'angle')[];
@@ -314,7 +314,7 @@ export class KlCanvasWorkspace {
         const h = this.klCanvas.getHeight();
 
         const art = this.getRenderedTransform();
-        const isDark = BB.isDark();
+        const isDark = theme.isDark();
 
         if (art.scale >= 4 || (art.scale === 1 && art.angle === 0)) {
             ctx.imageSmoothingEnabled = false;
@@ -612,7 +612,6 @@ export class KlCanvasWorkspace {
                 bottom: '0',
                 cursor: 'crosshair',
                 userSelect: 'none',
-                colorScheme: 'only light',
             },
         });
         this.klCanvas = p.klCanvas;
@@ -663,10 +662,10 @@ export class KlCanvasWorkspace {
         });
         BB.createCheckerDataUrl(8, (url) => {
             this.renderTargetCanvas.style.background = 'url(' + url + ')';
-        }, BB.isDark());
+        }, theme.isDark());
 
-        addIsDarkListener(() => {
-            this.renderTargetCanvas.style.background = 'url(' + BB.createCheckerDataUrl(8, undefined, BB.isDark()) + ')';
+        theme.addIsDarkListener(() => {
+            this.renderTargetCanvas.style.background = 'url(' + BB.createCheckerDataUrl(8, undefined, theme.isDark()) + ')';
             this.lastRenderedState = -1;
             this.reqFrame();
         });

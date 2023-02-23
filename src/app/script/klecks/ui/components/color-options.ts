@@ -1,6 +1,6 @@
 import {BB} from '../../../bb/bb';
 import {IRGBA} from '../../kl-types';
-import {addIsDarkListener, removeIsDarkListener} from '../../../bb/base/base';
+import {theme} from '../../../theme/theme';
 
 /**
  * UI to pick between colors in colorArr. can display full transparent (checkerboard).
@@ -31,7 +31,6 @@ export class ColorOptions {
             css: {
                 display: 'flex',
                 alignItems: 'center',
-                colorScheme: 'only light',
             },
         });
 
@@ -39,7 +38,7 @@ export class ColorOptions {
         const colorArr: IRGBA[] = [];
         this.buttonArr = [];
         const buttonSize = 22;
-        const checkerUrl = BB.createCheckerDataUrl(5, undefined, BB.isDark());
+        const checkerUrl = BB.createCheckerDataUrl(5, undefined, theme.isDark());
 
         // build colorArr while removing duplicates
         for (let i = 0; i < p.colorArr.length; i++) {
@@ -108,14 +107,14 @@ export class ColorOptions {
         update();
 
         this.updateCheckerboard = (): void => {
-            const checkerUrl = BB.createCheckerDataUrl(5, undefined, BB.isDark());
+            const checkerUrl = BB.createCheckerDataUrl(5, undefined, theme.isDark());
             this.buttonArr.forEach((button, i) => {
                 if (colorArr[i] && colorArr[i].a === 0) {
                     button.el.style.backgroundImage = 'url(' + checkerUrl + ')';
                 }
             });
         };
-        addIsDarkListener(this.updateCheckerboard);
+        theme.addIsDarkListener(this.updateCheckerboard);
     }
 
     // ---- interface ----
@@ -128,7 +127,7 @@ export class ColorOptions {
             BB.destroyEl(item.el);
         });
         this.buttonArr.splice(0, this.buttonArr.length);
-        removeIsDarkListener(this.updateCheckerboard);
+        theme.removeIsDarkListener(this.updateCheckerboard);
     }
 
 }

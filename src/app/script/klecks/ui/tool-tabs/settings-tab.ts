@@ -7,6 +7,8 @@ import bitbofLogoImg from '/src/app/img/bitbof-logo.svg';
 import klecksLogoImg from '/src/app/img/klecks-logo.png';
 import uiSwapImg from '/src/app/img/ui/ui-swap-lr.svg';
 import {LocalStorage} from '../../../bb/base/local-storage';
+import {theme, TTheme} from '../../../theme/theme';
+import {addIsDarkListener} from '../../../bb/base/base';
 
 export class SettingsTab {
 
@@ -17,27 +19,33 @@ export class SettingsTab {
         onLeftRight: () => void,
         customAbout?: HTMLElement,
     ) {
-
-        // ---- language ----
-        const language = languageStrings.getLanguage();
-
         this.el = BB.el({
-            content: `
-${LANG('settings-language')}: ${language.name} (${language.code})
-            `,
             css: {
                 margin: '10px',
             },
         });
 
-        const preferredLanguageRow = BB.el({
-            content: LANG('settings-preferred-language') + ':<br>',
+        // ---- language ----
+        const autoLanguage = languageStrings.getAutoLanguage();
+
+        const langWrapper = BB.el({
+            parent: this.el,
+            content: BB.el({
+                content: LANG('settings-language') + ':',
+                css: {
+                    marginRight: '5px',
+                    marginBottom: '2px',
+                },
+            }),
             css: {
-                marginTop: '10px',
+                display: 'flex',
+                alignItems: 'center',
+                flexWrap: 'wrap',
             },
         });
+
         const options: [string, string][] = [
-            ['auto', LANG('auto')] as [string, string],
+            ['auto', LANG('auto') + ` → ${autoLanguage.name} (${autoLanguage.code})`] as [string, string],
             ...languages.map(item => {
                 return [item.code, item.name + ` (${item.code})`] as [string, string];
             }),
@@ -55,22 +63,64 @@ ${LANG('settings-language')}: ${language.name} (${language.code})
             },
         });
         BB.css(languageSelect.getElement(), {
-            marginTop: '5px',
+            flexGrow: '1',
         });
         const languageHint = BB.el({
+            className: 'kl-toolspace-note',
             content: LANG('settings-language-reload'),
             css: {
                 display: 'none',
                 marginTop: '5px',
+                flexGrow: '1',
             },
         });
 
-        preferredLanguageRow.append(
+        langWrapper.append(
             languageSelect.getElement(),
             languageHint,
         );
 
-        this.el.append(preferredLanguageRow);
+
+        // ---- theme ----
+        function themeToLabel (theme: TTheme): string {
+            return theme === 'dark' ? '⬛ ' + LANG('theme-dark') : '⬜ ' + LANG('theme-light');
+        }
+        const themeSelect = new KL.Select({
+            optionArr: [
+                ['auto', LANG('auto') + ' → ' + themeToLabel(theme.getMediaQueryTheme())],
+                ['light', themeToLabel('light')],
+                ['dark', themeToLabel('dark')],
+            ],
+            initValue: theme.getStoredTheme() || 'auto',
+            onChange: (val): void => {
+                theme.setStoredTheme(val === 'auto' ? undefined : val);
+            },
+        });
+        BB.css(themeSelect.getElement(), {
+            flexGrow: '1',
+        });
+        addIsDarkListener(() => {
+            themeSelect.updateLabel('auto', LANG('auto') + ' → ' + themeToLabel(theme.getMediaQueryTheme()));
+        });
+        BB.el({
+            parent: this.el,
+            content: [
+                BB.el({
+                    content: LANG('settings-theme') + ':',
+                    css: {
+                        marginRight: '5px',
+                        marginBottom: '2px',
+                    },
+                }),
+                themeSelect.getElement(),
+            ],
+            css: {
+                marginTop: '15px',
+                display: 'flex',
+                alignItems: 'center',
+                flexWrap: 'wrap',
+            },
+        });
 
         // ---- flip ui ----
         BB.el({
@@ -79,7 +129,7 @@ ${LANG('settings-language')}: ${language.name} (${language.code})
             content: '<img height="20" width="18" src="' + uiSwapImg + '" alt="icon" style="margin-right: 5px"/>' + LANG('switch-ui-left-right'),
             onClick: () => onLeftRight(),
             css: {
-                marginTop: '20px',
+                marginTop: '15px',
             },
             custom: {
                 tabIndex: '-1',
@@ -131,7 +181,7 @@ ${LANG('settings-language')}: ${language.name} (${language.code})
                 });
                 minimalAbout.append(
                     BB.el({
-                        content: `<img alt="icon" height="20" style="vertical-align:middle" src="${bitbofLogoImg}"> <a href="https://bitbof.com" target="_blank" tabIndex="-1">bitbof</a> © 2022<br>`,
+                        content: `<img alt="icon" height="20" style="vertical-align:middle" src="${bitbofLogoImg}"> <a href="https://bitbof.com" target="_blank" tabIndex="-1">bitbof</a> © 2023<br>`,
                     }),
                     makeLicenses(),
                 );
@@ -144,7 +194,7 @@ ${LANG('settings-language')}: ${language.name} (${language.code})
                 },
                 content: `
 <img alt="Klecks" class="dark-invert" height="25" src="${klecksLogoImg}"><br>
-<img alt="icon" height="20" style="vertical-align:middle" src="${bitbofLogoImg}"> <a href="https://bitbof.com" target="_blank" tabIndex="-1">bitbof</a> © 2022<br>`,
+<img alt="icon" height="20" style="vertical-align:middle" src="${bitbofLogoImg}"> <a href="https://bitbof.com" target="_blank" tabIndex="-1">bitbof</a> © 2023<br>`,
             });
 
             versionEl.append(

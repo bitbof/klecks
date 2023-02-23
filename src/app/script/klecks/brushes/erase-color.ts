@@ -1,3 +1,3 @@
-import {BB} from '../../bb/bb';
+import {theme} from '../../theme/theme';
 
-export const ERASE_COLOR = BB.isDark() ? 80 : 255;
+export const ERASE_COLOR = theme.isDark() ? 180 : 255;

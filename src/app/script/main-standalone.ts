@@ -9,6 +9,7 @@ import {KlApp} from './app/kl-app';
 import {IKlProject} from './klecks/kl-types';
 import {ProjectStore} from './klecks/storage/project-store';
 import {initLANG, LANG} from './language/language';
+import '../script/theme/theme';
 
 function initError (e) {
     const el = document.createElement('div');

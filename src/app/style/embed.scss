@@ -65,7 +65,7 @@ body {
 }
 
 // dark
-@media (prefers-color-scheme: dark) {
+body.kl-theme-dark {
   .upload-overlay {
     background: #212121a1;
   }

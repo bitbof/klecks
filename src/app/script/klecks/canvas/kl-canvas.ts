@@ -3,7 +3,7 @@ import {floodFillBits} from '../image-operations/flood-fill';
 import {drawShape} from '../image-operations/shape-tool';
 import {IRenderTextParam, renderText} from '../image-operations/render-text';
 import {IGradient, IKlProject, IRGB, IShapeToolObject, TFillSampling, TKlCanvasLayer, TMixMode} from '../kl-types';
-import {DecoyKlHistory, KlHistoryInterface, THistoryActions,} from '../history/kl-history';
+import {DecoyKlHistory, KlHistoryInterface, THistoryActions} from '../history/kl-history';
 import {drawProject} from './draw-project';
 import {LANG} from '../../language/language';
 import {drawGradient} from '../image-operations/gradient-tool';

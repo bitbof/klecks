@@ -887,11 +887,13 @@ renaming keys across language files:
 
   "tab-settings": 'Settings',
   "settings-language": 'Language',
-  "settings-preferred-language": 'Preferred Language',
   "settings-language-reload": {
     "hint": "changes will be visible after reloading the page",
     "value": "Will update after reloading."
   },
+  "settings-theme": 'Theme',
+  "theme-dark": 'Dark',
+  "theme-light": 'Light',
   "terms-of-service": {
     oldKey: 'upload-tos',
     value: "Terms of Service",

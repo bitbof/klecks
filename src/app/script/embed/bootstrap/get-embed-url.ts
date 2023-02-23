@@ -1,8 +1,8 @@
 
 
-let embedUrl;
+let embedUrl: string;
 
-function getBaseURL (url) {
+function getBaseURL (url: string): string {
     return ('' + url).replace(/^((?:https?|file|ftp):\/\/.+)\/[^/]+$/, '$1') + '/';
 }
 
@@ -11,7 +11,7 @@ export function getEmbedUrl (): string {
         return embedUrl;
     }
 
-    let match;
+    let match: string;
     try {
         throw new Error();
     } catch (e) {

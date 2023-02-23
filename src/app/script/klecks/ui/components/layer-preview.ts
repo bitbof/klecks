@@ -3,7 +3,7 @@ import {klHistory} from '../../history/kl-history';
 import {LANG} from '../../../language/language';
 import {TKlCanvasLayer, TUiLayout} from '../../kl-types';
 import {ISize2D} from '../../../bb/bb-types';
-import {addIsDarkListener} from '../../../bb/base/base';
+import {theme} from '../../../theme/theme';
 
 
 /**
@@ -49,7 +49,7 @@ export class LayerPreview {
 
 
     private updateCheckerPatterns (): void {
-        const checker = BB.createCheckerCanvas(4, BB.isDark());
+        const checker = BB.createCheckerCanvas(4, theme.isDark());
         this.animationCanvasCheckerPattern = this.animationCanvasCtx.createPattern(checker, 'repeat');
         this.largeCanvasCheckerPattern = this.canvasCtx.createPattern(checker, 'repeat');
     }
@@ -268,7 +268,6 @@ export class LayerPreview {
                 userSelect: 'none',
                 display: 'block',
                 webkitTouchCallout: 'none',
-                colorScheme: 'only light',
             },
         });
         this.largeCanvas = BB.canvas(this.largeCanvasSize, this.largeCanvasSize);
@@ -286,7 +285,7 @@ export class LayerPreview {
 
 
         this.updateCheckerPatterns();
-        addIsDarkListener(() => {
+        theme.addIsDarkListener(() => {
             this.updateCheckerPatterns();
             this.draw(true);
         });

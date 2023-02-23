@@ -1340,14 +1340,22 @@
     original: 'Language',
     value: '语言'
   },
-  'settings-preferred-language': {
-    original: 'Preferred Language',
-    value: '首选语言'
-  },
   'settings-language-reload': {
     hint: 'changes will be visible after reloading the page',
     original: 'Will update after reloading.',
     value: '刷新后更改语言'
+  },
+  'settings-theme': {
+    original: 'Theme',
+    value: ''
+  },
+  'theme-dark': {
+    original: 'Dark',
+    value: ''
+  },
+  'theme-light': {
+    original: 'Light',
+    value: ''
   },
   'terms-of-service': {
     original: 'Terms of Service',

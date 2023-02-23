@@ -4,7 +4,7 @@ import {Options} from '../../components/options';
 import {translateBlending} from '../../../canvas/translate-blending';
 import {showModal} from '../../modals/base/showModal';
 import {TMixMode} from '../../../kl-types';
-import {addIsDarkListener, removeIsDarkListener} from '../../../../bb/base/base';
+import {theme} from '../../../../theme/theme';
 
 export function mergeLayerDialog (
     parentEl: HTMLElement,
@@ -54,10 +54,10 @@ export function mergeLayerDialog (
     function updateCheckerboard (): void {
         BB.createCheckerDataUrl(4, (url) => {
             preview.style.backgroundImage = 'url(' + url + ')';
-        }, BB.isDark());
+        }, theme.isDark());
     }
     updateCheckerboard();
-    addIsDarkListener(updateCheckerboard);
+    theme.addIsDarkListener(updateCheckerboard);
 
     const alphaCanvas = BB.copyCanvas(preview);
     BB.ctx(alphaCanvas).drawImage(p.topCanvas, 0, 0, alphaCanvas.width, alphaCanvas.height);
@@ -107,7 +107,7 @@ export function mergeLayerDialog (
         callback: (val) => {
             keyListener.destroy();
             options.destroy();
-            removeIsDarkListener(updateCheckerboard);
+            theme.removeIsDarkListener(updateCheckerboard);
             if (val === 'Ok') {
                 p.callback(options.getValue());
             }

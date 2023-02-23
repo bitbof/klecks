@@ -6,7 +6,7 @@ import {Cropper} from '../ui/components/cropper';
 import {IFilterApply, IFilterGetDialogParam, IFilterGetDialogResult, IRGBA} from '../kl-types';
 import {LANG} from '../../language/language';
 import {TFilterHistoryEntry} from './filters';
-import {addIsDarkListener, removeIsDarkListener} from '../../bb/base/base';
+import {theme} from '../../theme/theme';
 
 export type TFilterCropExtendInput = {
     left: number;
@@ -273,7 +273,7 @@ export const filterCropExtend = {
                 if (selectedRgbaObj.a !== 0) {
                     tempCanvas.style.background = 'url(' + url + ')';
                 }
-            }, BB.isDark());
+            }, theme.isDark());
             previewWrapper.style.backgroundPosition = (offset.x) + 'px ' + (offset.y) + 'px';
 
             cropper.setScale(scale);
@@ -293,7 +293,6 @@ export const filterCropExtend = {
                 borderBottom: '1px solid rgb(144,144,144)',
                 overflow: 'hidden',
                 userSelect: 'none',
-                colorScheme: 'only light',
                 touchAction: 'none',
             },
         });
@@ -352,19 +351,19 @@ export const filterCropExtend = {
 
                 BB.createCheckerDataUrl(parseInt('' + (50 * scale)), function (url) {
                     tempCanvas.style.background = 'url(' + url + ')';
-                }, BB.isDark());
+                }, theme.isDark());
             }
         }
 
         function updateIsDark (): void {
             updateInput();
         }
-        addIsDarkListener(updateIsDark);
+        theme.addIsDarkListener(updateIsDark);
 
         result.destroy = (): void => {
             cropper.destroy();
             ruleOThirdsCheckbox.destroy();
-            removeIsDarkListener(updateIsDark);
+            theme.removeIsDarkListener(updateIsDark);
             colorOptions.destroy();
         };
         result.getInput = function (): TFilterCropExtendInput {

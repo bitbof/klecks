@@ -36,9 +36,6 @@ export class PointSlider {
         this.sliderPoint = BB.el({
             parent: this.rootEl,
             className: 'kl-point-slider__point',
-            css: {
-                colorScheme: 'only light',
-            },
         });
         let sliderPos: number;
         let isDragging = false;

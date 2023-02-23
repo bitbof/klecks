@@ -16,7 +16,8 @@ import toolZoomOutImg from '/src/app/img/ui/tool-zoom-out.svg';
 import {IRGB} from '../../kl-types';
 import {KlCanvas} from '../../canvas/kl-canvas';
 import {LANG} from '../../../language/language';
-import {addIsDarkListener, removeIsDarkListener, throwIfNull} from '../../../bb/base/base';
+import { throwIfNull} from '../../../bb/base/base';
+import {theme} from '../../../theme/theme';
 
 
 type TTextFormat = 'left' | 'center' | 'right';
@@ -92,7 +93,6 @@ export function textToolDialog (
             width: width + 'px',
             marginLeft: '-20px',
             cursor: 'move',
-            colorScheme: 'only light',
             touchAction: 'none',
         },
         onClick: () => textInput.focus(),
@@ -102,7 +102,7 @@ export function textToolDialog (
         className: 'kl-text-preview-wrapper',
     });
     previewWrapper.append(previewCanvas);
-    let checkerPattern = throwIfNull(previewCtx.createPattern(BB.createCheckerCanvas(8, BB.isDark()), 'repeat'));
+    let checkerPattern = throwIfNull(previewCtx.createPattern(BB.createCheckerCanvas(8, theme.isDark()), 'repeat'));
     const emptyCanvas = BB.canvas(1, 1);
     const emptyCanvasLight = BB.canvas(1, 1);
     {
@@ -115,10 +115,10 @@ export function textToolDialog (
     }
 
     function updateCheckerboard (): void {
-        checkerPattern = throwIfNull(previewCtx.createPattern(BB.createCheckerCanvas(8, BB.isDark()), 'repeat'));
+        checkerPattern = throwIfNull(previewCtx.createPattern(BB.createCheckerCanvas(8, theme.isDark()), 'repeat'));
         updatePreview();
     }
-    addIsDarkListener(updateCheckerboard);
+    theme.addIsDarkListener(updateCheckerboard);
 
     function updatePreview (): void {
 
@@ -177,7 +177,7 @@ export function textToolDialog (
         targetCtx.drawImage(textCanvas, -centerX, -centerY);
         targetCtx.restore();
 
-        const isDark = BB.isDark();
+        const isDark = theme.isDark();
 
         // --- layers ---
         layersCtx.save();
@@ -279,7 +279,7 @@ export function textToolDialog (
 
     }
 
-    addIsDarkListener(updatePreview);
+    theme.addIsDarkListener(updatePreview);
 
     /**
      * Move text by x y
@@ -612,7 +612,7 @@ export function textToolDialog (
                 opacity: opacitySlider.getValue(),
             };
 
-            removeIsDarkListener(updatePreview);
+            theme.removeIsDarkListener(updatePreview);
             window.removeEventListener('scroll', onScroll);
             textInput.removeEventListener('input', updatePreview);
             BB.destroyEl(textInput);
@@ -631,7 +631,7 @@ export function textToolDialog (
             italicToggle.destroy();
             boldToggle.destroy();
             opacitySlider.destroy();
-            removeIsDarkListener(updateCheckerboard);
+            theme.removeIsDarkListener(updateCheckerboard);
             if (val === 'Ok') {
                 p.onConfirm(result);
             }

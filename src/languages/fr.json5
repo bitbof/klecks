@@ -719,7 +719,7 @@
   'filter-tilt-shift': {
     hint: 'or just depth-of-field. https://en.wikipedia.org/wiki/Tilt%E2%80%93shift_photography',
     original: 'Tilt Shift',
-    value: "Tilt Shift"
+    value: 'Tilt Shift'
   },
   'filter-to-alpha': {
     hint: 'feature that can isolate line drawings if it is a black and white image.',
@@ -1340,14 +1340,22 @@
     original: 'Language',
     value: 'Langues'
   },
-  'settings-preferred-language': {
-    original: 'Preferred Language',
-    value: 'Langue Préférée'
-  },
   'settings-language-reload': {
     hint: 'changes will be visible after reloading the page',
     original: 'Will update after reloading.',
     value: 'Mettra à jour après le rechargement.'
+  },
+  'settings-theme': {
+    original: 'Theme',
+    value: ''
+  },
+  'theme-dark': {
+    original: 'Dark',
+    value: ''
+  },
+  'theme-light': {
+    original: 'Light',
+    value: ''
   },
   'terms-of-service': {
     original: 'Terms of Service',

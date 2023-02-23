@@ -87,15 +87,6 @@ export class FreeTransformCanvas {
             css: {
                 width: p.elementWidth + 'px',
                 height: p.elementHeight + 'px',
-                backgroundColor: '#9e9e9e',
-                boxShadow: 'rgba(0, 0, 0, 0.2) 0px 1px inset, rgba(0, 0, 0, 0.2) 0px -1px inset',
-                overflow: 'hidden',
-                userSelect: 'none',
-                position: 'relative',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                colorScheme: 'only light',
             },
         });
         this.rootEl.oncontextmenu = () => {

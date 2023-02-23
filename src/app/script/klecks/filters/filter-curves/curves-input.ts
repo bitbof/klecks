@@ -97,7 +97,6 @@ export class CurvesInput {
             css: {
                 position: 'relative',
                 marginTop: '10px',
-                colorScheme: 'only light',
             },
         });
 

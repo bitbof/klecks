@@ -239,5 +239,5 @@ export function addIsDarkListener (func: () => void): void {
 }
 
 export function removeIsDarkListener (func: () => void): void {
-    matchMediaDark && 'addEventListener' in matchMediaDark && matchMediaDark.removeEventListener('change', func);
+    matchMediaDark && 'removeEventListener' in matchMediaDark && matchMediaDark.removeEventListener('change', func);
 }

@@ -2,7 +2,7 @@ import {BB} from '../../bb/bb';
 import {IFilterApply, IFilterGetDialogParam, IFilterGetDialogResult} from '../kl-types';
 import {LANG} from '../../language/language';
 import {TFilterHistoryEntry} from './filters';
-import {addIsDarkListener, removeIsDarkListener} from '../../bb/base/base';
+import {theme} from '../../theme/theme';
 
 export type TFilterRotateInput = {
     deg: number;
@@ -105,9 +105,9 @@ export const filterRotate = {
         function updateCheckerboard (): void {
             BB.createCheckerDataUrl(8, function (url) {
                 canvasWrapper.style.background = 'url(' + url + ')';
-            }, BB.isDark());
+            }, theme.isDark());
         }
-        addIsDarkListener(updateCheckerboard);
+        theme.addIsDarkListener(updateCheckerboard);
         updateCheckerboard();
 
         canvasWrapper.style.transition = 'all 0.2s ease-out';
@@ -116,7 +116,7 @@ export const filterRotate = {
         update();
 
         result.destroy = (): void => {
-            removeIsDarkListener(updateCheckerboard);
+            theme.removeIsDarkListener(updateCheckerboard);
         };
         result.getInput = function (): TFilterRotateInput {
             result.destroy();

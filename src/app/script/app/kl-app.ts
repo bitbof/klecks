@@ -166,11 +166,7 @@ export class KlApp {
         if (!this.bottomBar) {
             return;
         }
-        const threshold = 617; //590
-        const isVisible = (
-            threshold < window.innerHeight &&
-            this.toolspaceInner.scrollHeight + 50 < window.innerHeight
-        );
+        const isVisible = (this.toolspaceInner.scrollHeight + 40 < window.innerHeight);
         this.bottomBarWrapper.style.display = isVisible ? '' : 'none';
     }
 

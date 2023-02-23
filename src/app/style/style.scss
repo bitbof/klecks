@@ -6,7 +6,6 @@
     --active-highlight-color: #{vars.$activeHighlightColor};
     --body-bg-color: #{vars.$bodyBgColor};
     --kl-color: #{vars.$klColor};
-    color-scheme: light dark;
 }
 
 @keyframes consoleIn {
@@ -40,6 +39,7 @@ body {
     overflow: hidden;
     font-size: 16px;
     overscroll-behavior-x: none; // prevent back gesture in Chrome
+    color-scheme: light;
 }
 
 body, html {
@@ -163,7 +163,6 @@ a:hover, a:not([href]):hover {
 }
 
 .kl-color-picker {
-    color-scheme: only light;
 }
 
 .kl-color-picker__h, .kl-color-picker__sv, .kl-color-picker__preview {
@@ -208,7 +207,6 @@ a:hover, a:not([href]):hover {
     background: linear-gradient(to bottom, #909090 1%, #b3b3b3 73%);
     color: #333;
     cursor: ew-resize;
-    color-scheme: only light;
 }
 
 .slider-wrapper--active {
@@ -453,7 +451,6 @@ button img {
     pointer-events: none;
     user-select: none;
     -webkit-user-select: none; // safari
-    color-scheme: only light;
 
     display: flex;
     justify-content: center;
@@ -873,7 +870,6 @@ iframe {
     color: #555;
     canvas {
         box-shadow: 0 0 0 1px #9e9e9e;
-        color-scheme: only light;
     }
 }
 
@@ -911,7 +907,6 @@ iframe {
     display: flex;
     align-items: center;
     justify-content: center;
-    color-scheme: only light;
 }
 
 .kl-preview-wrapper__canvas {
@@ -941,7 +936,6 @@ iframe {
     display: block;
     margin-left: auto;
     margin-right: auto;
-    color-scheme: only light;
     box-shadow: 0 0 3px rgba(0,0,0,0.5);
 }
 
@@ -953,9 +947,18 @@ iframe {
     margin-right: -1px;
 }
 
+.kl-toolspace-note {
+    color: #534a3c;
+    background: rgba(255,255,0,0.5);
+    border: 1px solid #e7d321;
+    border-radius: 5px;
+    padding: 8px;
+    text-align: center;
+}
+
 .kl-import-note {
     background: rgba(255,255,0,0.5);
-    padding: 10px;
+    padding: 8px;
     margin-top: 5px;
     margin-bottom: 5px;
     border: 1px solid #e7d321;
@@ -988,7 +991,6 @@ iframe {
     box-shadow: inset 0 0 0 1px #aaa;
     background: #cdcdcd;
     color: #545454;
-    color-scheme: only light;
     min-height: 67px;
 }
 
@@ -1021,7 +1023,6 @@ iframe {
     display: none;
     border: 1px solid #fff;
     box-shadow: 0 0 10px rgba(0,0,0,0.5);
-    color-scheme: only light;
 }
 
 .kl-file-save-row {

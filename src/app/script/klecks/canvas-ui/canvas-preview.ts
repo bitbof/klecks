@@ -1,6 +1,6 @@
 import {BB} from '../../bb/bb';
 import {IKlBasicLayer} from '../kl-types';
-import {addIsDarkListener, removeIsDarkListener} from '../../bb/base/base';
+import {theme} from '../../theme/theme';
 
 /**
  * preview of image with layers. can do mix modes and opacity.
@@ -29,7 +29,7 @@ export class KlCanvasPreview {
 
         this.canvas = BB.canvas(width, height);
         this.updateCheckerboard = () => {
-            this.canvas.style.backgroundImage = 'url(' + BB.createCheckerDataUrl(8, undefined, BB.isDark()) + ')';
+            this.canvas.style.backgroundImage = 'url(' + BB.createCheckerDataUrl(8, undefined, theme.isDark()) + ')';
         };
         this.updateCheckerboard();
         this.ctx = BB.ctx(this.canvas);
@@ -41,7 +41,7 @@ export class KlCanvasPreview {
         });
 
         setTimeout(() => this.render(), 0);
-        addIsDarkListener(this.updateCheckerboard);
+        theme.addIsDarkListener(this.updateCheckerboard);
     }
 
     getElement (): HTMLCanvasElement {
@@ -67,6 +67,6 @@ export class KlCanvasPreview {
     }
 
     destroy (): void {
-        removeIsDarkListener(this.updateCheckerboard);
+        theme.removeIsDarkListener(this.updateCheckerboard);
     }
 }

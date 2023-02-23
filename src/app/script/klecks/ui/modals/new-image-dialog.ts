@@ -7,7 +7,7 @@ import {IRGB, IRGBA} from '../../kl-types';
 import {ISize2D} from '../../../bb/bb-types';
 import {table} from '../components/table';
 import {ERASE_COLOR} from '../../brushes/erase-color';
-import {addIsDarkListener, removeIsDarkListener} from '../../../bb/base/base';
+import {theme} from '../../../theme/theme';
 
 export function newImageDialog (
     p: {
@@ -248,7 +248,7 @@ export function newImageDialog (
         },
     ];
     let initColorIndex = 0;
-    if (BB.isDark()) {
+    if (theme.isDark()) {
         colorOptionsArr.forEach((item, index) => {
             if (item.r === ERASE_COLOR && item.g === ERASE_COLOR && item.b === ERASE_COLOR) {
                 initColorIndex = index;
@@ -276,7 +276,6 @@ export function newImageDialog (
             padding: '10px',
             marginTop: '10px',
             marginLeft: '-20px',
-            colorScheme: 'only light',
         },
     });
     const preview = BB.el({
@@ -389,9 +388,9 @@ export function newImageDialog (
         preview.style.height = h + 'px';
         BB.createCheckerDataUrl(parseInt('' + (30 * (w / realw))), function (url) {
             previewWrapper.style.background = 'url(' + url + ')';
-        }, BB.isDark());
+        }, theme.isDark());
     }
-    addIsDarkListener(updateRatio);
+    theme.addIsDarkListener(updateRatio);
 
     widthInput.onchange = function () {
         if (widthInput.value === '' || parseInt(widthInput.value) < 0) {
@@ -450,7 +449,7 @@ export function newImageDialog (
             heightInput.onkeyup = null;
             select.destroy();
             colorOptions.destroy();
-            removeIsDarkListener(updateRatio);
+            theme.removeIsDarkListener(updateRatio);
 
             if (
                 result === 'Cancel'

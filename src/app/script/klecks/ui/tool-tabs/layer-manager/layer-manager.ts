@@ -15,7 +15,7 @@ import duplicateLayerImg from '/src/app/img/ui/duplicate-layer.svg';
 import mergeLayerImg from '/src/app/img/ui/merge-layers.svg';
 import removeLayerImg from '/src/app/img/ui/remove-layer.svg';
 import renameLayerImg from '/src/app/img/ui/rename-layer.svg';
-import {addIsDarkListener} from '../../../../bb/base/base';
+import {theme} from '../../../../theme/theme';
 
 type TLayerEl = HTMLElement & {
     label: HTMLElement;
@@ -195,11 +195,10 @@ export class LayerManager {
                     position: 'absolute',
                     left: ((32 - layer.thumb.width) / 2) + 'px',
                     top: ((32 - layer.thumb.height) / 2) + 'px',
-                    colorScheme: 'only light',
                 });
                 BB.createCheckerDataUrl(4, (url) => {
                     thumb.style.backgroundImage = 'url(' + url + ')';
-                }, BB.isDark());
+                }, theme.isDark());
             }
 
             //layerlabel
@@ -434,13 +433,12 @@ export class LayerManager {
                 border: '1px solid #aaa',
                 transition: 'opacity 0.3s ease-out',
                 userSelect: 'none',
-                colorScheme: 'only light',
             },
         });
         this.setUiState(uiState);
         BB.createCheckerDataUrl(4, (url) => {
             this.largeThumbDiv.style.backgroundImage = 'url(' + url + ')';
-        }, BB.isDark());
+        }, theme.isDark());
         this.largeThumbCanvas = BB.canvas(200, 200);
         this.largeThumbCanvas.style.display = 'block';
         this.largeThumbDiv.append(this.largeThumbCanvas);
@@ -705,7 +703,7 @@ export class LayerManager {
 
         }, 1);
 
-        addIsDarkListener(() => {
+        theme.addIsDarkListener(() => {
             this.createLayerList();
         });
 

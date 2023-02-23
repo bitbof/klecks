@@ -2,7 +2,7 @@ import {english, languages, loadLanguage, TTranslationCode} from '../../language
 
 export const LS_LANGUAGE_KEY = 'klecks-language';
 
-export class LanguageStrings {
+class LanguageStrings {
     private data: any;
     private listeners: (() => void)[] = [];
     private code: string;
@@ -37,7 +37,14 @@ export class LanguageStrings {
     getLanguage (): {code: string; name: string} {
         return languages.find(item => {
             return item.code === this.code;
-        });
+        })!;
+    }
+
+    getAutoLanguage (): {code: string; name: string} {
+        const autoCode = getLanguage(false);
+        return languages.find(item => {
+            return item.code === autoCode;
+        })!;
     }
 
     getCode (): string {
@@ -62,8 +69,10 @@ export class LanguageStrings {
     }
 }
 
-let activeLanguageCode: string = 'en'; // active language code
-{
+export function getLanguage (useLocalStorage?: boolean): string {
+
+    let result: string = 'en';
+
     const langs: string[] = []; // from highest to lowest priority
     const navLangs = navigator.languages ? navigator.languages : [navigator.language];
     navLangs.forEach(item => {
@@ -73,25 +82,31 @@ let activeLanguageCode: string = 'en'; // active language code
             langs.push(split[0]);
         }
     });
-    try {
-        if (localStorage.getItem(LS_LANGUAGE_KEY)) {
-            langs.unshift(localStorage.getItem(LS_LANGUAGE_KEY));
+
+    if (useLocalStorage) {
+        try {
+            if (localStorage.getItem(LS_LANGUAGE_KEY)) {
+                langs.unshift(localStorage.getItem(LS_LANGUAGE_KEY));
+            }
+        } catch (e) {
+            // likely cookies disabled in Safari
         }
-    } catch (e) {
-        // likely cookies disabled in Safari
     }
+
     for (let i = 0; i < langs.length; i++) {
         const lang = langs[i];
         const found = languages.find(item => {
             return item.code.toLowerCase() === lang.toLowerCase();
         });
         if (found) {
-            activeLanguageCode = found.code;
+            result = found.code;
             break;
         }
     }
+    return result;
 }
 
+const activeLanguageCode = getLanguage(true);
 export const languageStrings = new LanguageStrings();
 
 export const LANG = (code: TTranslationCode | null, replace?: {[key: string]: string}): string => {
