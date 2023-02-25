@@ -362,7 +362,7 @@
   'layers-rename-shading': {
     hint: 'noun. Name suggestion for a layer',
     original: 'Shading',
-    value: ''
+    value: '陰影'
   },
   'layers-rename-lines': {
     hint: 'noun. Name suggestion for a layer',
@@ -372,7 +372,7 @@
   'layers-rename-effects': {
     hint: 'noun. Name suggestion for a layer',
     original: 'Effects',
-    value: ''
+    value: '效果'
   },
   'layers-rename-foreground': {
     hint: 'noun. Name suggestion for a layer',
