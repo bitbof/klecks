@@ -115,8 +115,6 @@ const pointerLeaveEvt = hasPointerEvents ? 'pointerleave' : 'mouseleave';
 const pointerEnterEvt = hasPointerEvents ? 'pointerenter' : 'mouseenter';
 
 
-
-
 /**
  * More trustworthy pointer attributes. that behave the same across browsers.
  * returns a new object. Also attaches itself to the orig event. -> event.corrected
@@ -124,6 +122,25 @@ const pointerEnterEvt = hasPointerEvents ? 'pointerenter' : 'mouseenter';
 function correctPointerEvent (event: PointerEvent | TExtendedDOMPointerEvent): ICorrectedPointerEvent {
     if ('corrected' in event) {
         return event.corrected;
+    }
+
+    function determineButtons (): number {
+        if (event.buttons !== undefined) {
+            return event.buttons;
+        }
+        /*
+                button -> buttons
+        none:	undefined -> 0
+        left:	0 -> 1
+        middle:	1 -> 4
+        right:	2 -> 2
+        fourth:	3 -> 8
+        fifth:	4 -> 16
+         */
+        if (event.button !== undefined) { // old safari on mac has no buttons. remove eventually.
+            return [1,4,2,8,16][event.button];
+        }
+        return 0;
     }
 
     const correctedObj: ICorrectedPointerEvent = {
@@ -137,7 +154,7 @@ function correctPointerEvent (event: PointerEvent | TExtendedDOMPointerEvent): I
         movementY: event.movementY,
         timeStamp: event.timeStamp + timeStampOffset,
         pressure: pressureNormalizer.normalize(event.pressure),
-        buttons: event.buttons,
+        buttons: determineButtons(),
         button: event.button,
         coalescedArr: [],
         eventPreventDefault: () => event.preventDefault(),
@@ -229,12 +246,18 @@ export class PointerListener {
     private readonly onPointerEnter: (() => void) | undefined;
     private readonly onPointerLeave: (() => void) | undefined;
     private readonly onPointerMove: ((event: PointerEvent) => void) | undefined;
-    private readonly onPointerDown: ((event: PointerEvent) => void) | undefined;
+    private readonly onPointerDown: ((event: PointerEvent, skipGlobal?: boolean) => void) | undefined;
     private readonly onWheel: ((e: WheelEvent) => void) | undefined;
-    private readonly onTouchMove: ((e: TouchEvent) => void) | undefined;
+    private readonly onTouchMoveScribbleFix: ((e: TouchEvent) => void) | undefined;
     private readonly windowOnPointerMove: ((event: PointerEvent) => void) | undefined;
     private readonly windowOnPointerUp: ((event: PointerEvent) => void) | undefined;
     private readonly windowOnPointerLeave: ((event: PointerEvent) => void) | undefined;
+    // fallback pre pointer events (iOS < 13, as of 2023-02, still 4.4% of iOS users)
+    private readonly onTouchStart: ((e: TouchEvent) => void) | undefined;
+    private readonly onTouchMove: ((e: TouchEvent) => void) | undefined;
+    private readonly onTouchEnd: ((e: TouchEvent) => void) | undefined;
+    private readonly onTouchCancel: ((e: TouchEvent) => void) | undefined;
+
 
     private getDragObj (pointerId: number): IDragObj | null {
         for (let i = 0; i < this.dragObjArr.length; i++) {
@@ -375,18 +398,18 @@ export class PointerListener {
                 this.onPointerCallback && this.onPointerCallback(outEvent);
             };
 
-            this.onPointerDown = (event: PointerEvent) => {
+            this.onPointerDown = (event: PointerEvent, onSkipGlobal? : boolean) => {
 
                 //BB.throwOut('pointerdown ' + event.pointerId + ' | ' + dragPointerIdArr.length);
                 const correctedEvent = correctPointerEvent(event);
                 ////console.log('debug: ' + event.pointerId + ' pointerdown');
-                if (this.dragPointerIdArr.includes(correctedEvent.pointerId) || this.dragPointerIdArr.length === this.maxPointers || !([1, 2, 4].includes(correctedEvent.buttons))) {
+                if (this.dragPointerIdArr.includes(correctedEvent.pointerId) || this.dragPointerIdArr.length === this.maxPointers || ![1, 2, 4].includes(correctedEvent.buttons)) {
                     //BB.throwOut('pointerdown ignored');
                     return;
                 }
 
                 //set up global listeners
-                if (this.dragObjArr.length === 0) {
+                if (this.dragObjArr.length === 0 && !onSkipGlobal) {
                     this.setupDocumentListeners();
                 }
                 const dragObj: IDragObj = {
@@ -523,6 +546,61 @@ export class PointerListener {
 
             this.targetElement.addEventListener(pointerMoveEvt, this.onPointerMove);
             this.targetElement.addEventListener(pointerDownEvt, this.onPointerDown);
+
+            if (!hasPointerEvents) {
+                const touchToFakePointer = (touch: Touch, touchEvent: TouchEvent, isDown: boolean) => {
+                    return {
+                        pointerId: touch.identifier,
+                        pointerType: 'touch',
+                        pageX: touch.pageX,
+                        pageY: touch.pageY,
+                        clientX: touch.clientX,
+                        clientY: touch.clientY,
+                        button: isDown ? 0 : undefined,
+                        buttons: isDown ? 1 : 0,
+                        timeStamp: touchEvent.timeStamp,
+                        target: touchEvent.target,
+                        pressure: isDown ? 1 : 0,
+                        preventDefault: () => touchEvent.preventDefault(),
+                        stopPropagation: () => touchEvent.stopPropagation(),
+                    };
+                };
+
+                const handleTouch = (e: TouchEvent, type: 'start' | 'move' | 'end' | 'cancel'): void => {
+                    for (let i = 0; i < e.changedTouches.length; i++) {
+                        const touch = e.changedTouches[i];
+                        const fakePointer = touchToFakePointer(touch, e, ['start', 'move'].includes(type));
+                        if (type === 'start') {
+                            this.onPointerDown(fakePointer, false);
+                        } else if (type === 'move') {
+                            this.windowOnPointerMove(fakePointer);
+                        } else if (type === 'end') {
+                            this.windowOnPointerUp(fakePointer);
+                        } else {
+                            this.windowOnPointerLeave(fakePointer);
+                        }
+                    }
+                };
+
+                this.onTouchStart = (e: TouchEvent): void => {
+                    e.preventDefault();
+                    handleTouch(e, 'start');
+                };
+                this.onTouchMove = (e: TouchEvent): void => {
+                    handleTouch(e, 'move');
+                };
+                this.onTouchEnd = (e: TouchEvent): void => {
+                    handleTouch(e, 'end');
+                };
+                this.onTouchCancel = (e: TouchEvent): void => {
+                    handleTouch(e, 'cancel');
+                };
+
+                this.targetElement.addEventListener('touchstart', this.onTouchStart);
+                this.targetElement.addEventListener('touchmove', this.onTouchMove);
+                this.targetElement.addEventListener('touchend', this.onTouchEnd);
+                this.targetElement.addEventListener('touchcancel', this.onTouchCancel);
+            }
         }
         if (this.onWheelCallback) {
             this.onWheel = (e: WheelEvent) => {
@@ -547,8 +625,8 @@ export class PointerListener {
 
         if (p.fixScribble) {
             //ipad scribble workaround https://developer.apple.com/forums/thread/662874
-            this.onTouchMove = (e: TouchEvent) => e.preventDefault();
-            this.targetElement.addEventListener('touchmove', this.onTouchMove);
+            this.onTouchMoveScribbleFix = (e: TouchEvent) => e.preventDefault();
+            this.targetElement.addEventListener('touchmove', this.onTouchMoveScribbleFix);
         }
     }
 
@@ -563,7 +641,12 @@ export class PointerListener {
         this.onPointerDown && this.targetElement.removeEventListener(pointerDownEvt, this.onPointerDown);
         this.onWheel && this.targetElement.removeEventListener('wheel', this.onWheel);
         this.destroyDocumentListeners();
-        this.onTouchMove && document.removeEventListener('touchmove', this.onTouchMove);
+        this.onTouchMoveScribbleFix && document.removeEventListener('touchmove', this.onTouchMoveScribbleFix);
+
+        this.onTouchStart && this.targetElement.removeEventListener('touchstart', this.onTouchStart);
+        this.onTouchMove && this.targetElement.removeEventListener('touchmove', this.onTouchMove);
+        this.onTouchEnd && this.targetElement.removeEventListener('touchend', this.onTouchEnd);
+        this.onTouchCancel && this.targetElement.removeEventListener('touchcancel', this.onTouchCancel);
     }
 
 }
