@@ -362,7 +362,7 @@
   'layers-rename-shading': {
     hint: 'noun. Name suggestion for a layer',
     original: 'Shading',
-    value: ''
+    value: '影'
   },
   'layers-rename-lines': {
     hint: 'noun. Name suggestion for a layer',
@@ -372,7 +372,7 @@
   'layers-rename-effects': {
     hint: 'noun. Name suggestion for a layer',
     original: 'Effects',
-    value: ''
+    value: '効果'
   },
   'layers-rename-foreground': {
     hint: 'noun. Name suggestion for a layer',
@@ -410,7 +410,7 @@
   },
   'file-format': {
     original: 'File Format',
-    value: ''
+    value: '保存形式'
   },
   'file-copy': {
     hint: 'verb',
@@ -1347,15 +1347,15 @@
   },
   'settings-theme': {
     original: 'Theme',
-    value: ''
+    value: 'テーマ'
   },
   'theme-dark': {
     original: 'Dark',
-    value: ''
+    value: 'ダーク'
   },
   'theme-light': {
     original: 'Light',
-    value: ''
+    value: 'ライト'
   },
   'terms-of-service': {
     original: 'Terms of Service',
