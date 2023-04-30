@@ -11,13 +11,15 @@ import {ProjectStore} from './klecks/storage/project-store';
 import {initLANG, LANG} from './language/language';
 import '../script/theme/theme';
 
-function initError (e) {
+function initError (e): void {
     const el = document.createElement('div');
     el.style.textAlign = 'center';
     el.style.background = '#fff';
     el.style.padding = '20px';
     el.innerHTML = '<h1>App failed to initialize</h1>';
-    el.innerHTML += 'Error: ' + (e.message ? e.message : ('' + e));
+    const errorMsg = document.createElement('div');
+    errorMsg.textContent = 'Error: ' + (e.message ? e.message : ('' + e));
+    el.append(errorMsg);
     document.body.append(el);
     console.error(e);
 }

@@ -5,6 +5,7 @@ import {SaveReminder} from './klecks/ui/components/save-reminder';
 import {klHistory} from './klecks/history/kl-history';
 import {klPsdToKlProject, readPsd} from './klecks/storage/psd';
 import {LANG} from './language/language';
+import {loadAgPsd} from './klecks/storage/load-ag-psd';
 
 export interface IEmbedParams {
     project?: IKlProject;
@@ -127,7 +128,7 @@ export function Embed (p: IEmbedParams) {
                 // load ag-psd
                 (async () => {
                     try {
-                        agPsd = await import('ag-psd');
+                        agPsd = await loadAgPsd();
                     } catch (e) {
                         agPsd = 'error';
                     }

@@ -1,6 +1,7 @@
 import {KL} from '../kl';
 import {KlCanvas} from '../canvas/kl-canvas';
 import {Psd} from 'ag-psd/dist/psd';
+import {loadAgPsd} from './load-ag-psd';
 
 export async function klCanvasToPsdBlob (klCanvas: KlCanvas): Promise<Blob> {
     const layerArr = klCanvas.getLayersFast();
@@ -22,7 +23,7 @@ export async function klCanvasToPsdBlob (klCanvas: KlCanvas): Promise<Blob> {
         }),
     };
 
-    const agPsd = await import('ag-psd');
+    const agPsd = await loadAgPsd();
     const buffer = agPsd.writePsdBuffer(psdConfig);
     return new Blob([buffer], { type: 'application/octet-stream' });
 }

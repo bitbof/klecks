@@ -5,6 +5,9 @@ let fx: TFxCanvas | null = null;
 try {
     fx = fxCanvas();
 } catch (e) {
+    setTimeout(() => {
+        throw e;
+    });
 }
 
 export function getSharedFx (): TFxCanvas | null {
@@ -12,7 +15,9 @@ export function getSharedFx (): TFxCanvas | null {
         try {
             fx = fxCanvas();
         } catch (e) {
-            // console.log(e);
+            setTimeout(() => {
+                throw e;
+            });
         }
     }
     return fx;

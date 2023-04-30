@@ -36,21 +36,13 @@ export const filterRotate = {
         let deg = 0;
         div.innerHTML = LANG('filter-rotate-description') + '<br/><br/>';
 
-        const first = true;
-
         function update (): void {
-            (canvasWrapper.style as any).WebkitTransform = 'rotate(' + deg + 'deg)';
-            (canvasWrapper.style as any).MozTransform = 'rotate(' + deg + 'deg)';
-            (canvasWrapper.style as any).OTransform = 'rotate(' + deg + 'deg)';
-            (canvasWrapper.style as any).msTransform = 'rotate(' + deg + 'deg)';
+            canvasWrapper.style.transform = 'rotate(' + deg + 'deg)';
             if (Math.abs(deg % 180) === 90) {
                 //height has to fit width because of rotation
                 const fit = BB.fitInto(h, w, 280, 200, 1);
                 const scale = parseInt('' + fit.height) / w;
-                (canvasWrapper.style as any).WebkitTransform = 'rotate(' + deg + 'deg) scale(' + scale + ')';
-                (canvasWrapper.style as any).MozTransform = 'rotate(' + deg + 'deg) scale(' + scale + ')';
-                (canvasWrapper.style as any).OTransform = 'rotate(' + deg + 'deg) scale(' + scale + ')';
-                (canvasWrapper.style as any).msTransform = 'rotate(' + deg + 'deg) scale(' + scale + ')';
+                canvasWrapper.style.transform = 'rotate(' + deg + 'deg) scale(' + scale + ')';
             }
         }
 

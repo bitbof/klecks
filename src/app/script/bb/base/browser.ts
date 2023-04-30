@@ -16,7 +16,7 @@ export const hasWebGl = (function () {
     const hasWebgl = (function () {
         const canvas = createCanvas();
         try {
-            canvas.getContext('experimental-webgl', { premultipliedAlpha: false });
+            canvas.getContext('webgl', { premultipliedAlpha: false });
             return true;
         } catch (e) {
             return false;

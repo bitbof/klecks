@@ -4,6 +4,7 @@ import logoImg from '/src/app/img/klecks-logo.png';
 import {getEmbedUrl} from './get-embed-url';
 import {initLANG, LANG} from '../../language/language';
 import {theme} from '../../theme/theme';
+import {loadAgPsd} from '../../klecks/storage/load-ag-psd';
 
 let wrapperInstance: boolean = false;
 
@@ -77,6 +78,9 @@ export function EmbedWrapper (p: IEmbedParams) {
             instance.readPSDs(psds);
         }
     })();
+
+    // needed for uploading. load here to prevent possible timeouts due to server cold-start
+    loadAgPsd();
 
     this.openProject = (k: IKlProject) => {
         if (project) {

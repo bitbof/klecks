@@ -124,7 +124,7 @@ void main() {
         return this;
     }
 
-    function contents (this: TFxCanvas) {
+    function contents (this: TFxCanvas): TWrappedTexture {
         const texture = new FxTexture(this._.texture.width, this._.texture.height, gl.RGBA, gl.UNSIGNED_BYTE);
         this._.texture.use();
         texture.drawTo(function () {
@@ -159,7 +159,7 @@ void main() {
     const fxCanvas = function () {
         const canvas: TFxCanvas = BB.canvas() as TFxCanvas;
         try {
-            setGl(BB.throwIfNull(canvas.getContext('experimental-webgl', {premultipliedAlpha: false})) as TFxGl);
+            setGl(BB.throwIfNull(canvas.getContext('webgl', {premultipliedAlpha: false})) as TFxGl);
         } catch (e) {
             setGl(null);
         }

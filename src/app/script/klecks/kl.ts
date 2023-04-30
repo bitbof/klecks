@@ -61,7 +61,7 @@ import {ProjectStore} from './storage/project-store';
 import {FileTab} from './ui/tool-tabs/file-tab';
 import {FilterTab} from './ui/tool-tabs/filter-tab';
 import {imgurUpload} from './ui/modals/imgur-upload';
-import {loadAgPsd} from './storage/ag-psd-wrapper';
+import {loadAgPsd} from './storage/load-ag-psd';
 import {SaveReminder} from './ui/components/save-reminder';
 import {SaveToComputer} from './storage/save-to-computer';
 import {UndoRedoCatchup} from './history/undo-redo-catchup';

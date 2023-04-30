@@ -828,6 +828,11 @@ export class KlCanvas {
 
     replaceLayer (layerIndex: number, imageData: ImageData): void {
         const ctx = BB.ctx(this.layerCanvasArr[layerIndex]);
+
+        // 2023-04-30 workaround for https://bugs.webkit.org/show_bug.cgi?id=256151
+        // todo remove eventually when safari fixed
+        ctx.fillRect(-1, -1, 1, 1);
+
         ctx.putImageData(imageData, 0, 0);
         this.history.push({
             tool: ['canvas'],

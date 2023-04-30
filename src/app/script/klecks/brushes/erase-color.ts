@@ -1,3 +1,3 @@
 import {theme} from '../../theme/theme';
 
-export const ERASE_COLOR = theme.isDark() ? 180 : 255;
+export const ERASE_COLOR = theme.isDark() ? 255 : 255;
