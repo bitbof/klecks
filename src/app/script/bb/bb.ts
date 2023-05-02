@@ -22,7 +22,6 @@ import {
     canShareFiles,
     eventUsesHighResTimeStamp,
     hasPointerEvents,
-    hasWebGl,
     isCssMinMaxSupported,
 } from './base/browser';
 import {KeyListener, sameKeys} from './input/key-listener';
@@ -86,7 +85,6 @@ export const BB = {
     // ---- browser ----
     eventUsesHighResTimeStamp,
     hasPointerEvents,
-    hasWebGl,
     isCssMinMaxSupported,
     canShareFiles,
 

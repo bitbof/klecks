@@ -158,11 +158,17 @@ void main() {
 
     const fxCanvas = function () {
         const canvas: TFxCanvas = BB.canvas() as TFxCanvas;
-        try {
-            setGl(BB.throwIfNull(canvas.getContext('webgl', {premultipliedAlpha: false})) as TFxGl);
-        } catch (e) {
-            setGl(null);
-        }
+        let context: TFxGl | null = null;
+        ['webgl', 'experimental-webgl'].forEach(item => {
+            if (context) {
+                return;
+            }
+            // get.webgl.org does a try-catch
+            try {
+                context = canvas.getContext(item, {premultipliedAlpha: false}) as (TFxGl | null);
+            } catch (e) {}
+        });
+        setGl(context);
         if (!gl) {
             throw 'This browser does not support WebGL';
         }

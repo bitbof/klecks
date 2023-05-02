@@ -403,7 +403,9 @@ export class KlCanvas {
 
         (canvas as any).name = this.layerCanvasArr[i].name + ' ' + LANG('layers-copy');
         (canvas as any).mixModeStr = this.layerCanvasArr[i].mixModeStr;
-        BB.ctx(canvas).drawImage(this.layerCanvasArr[i], 0, 0);
+        // 2023-04-30 workaround for https://bugs.webkit.org/show_bug.cgi?id=256151
+        // todo replace with simple drawImage eventually when fixed
+        BB.ctx(canvas).putImageData(BB.ctx(this.layerCanvasArr[i]).getImageData(0, 0, this.width, this.height), 0, 0);
         this.history.pause(true);
         this.layerOpacity(i + 1, this.layerCanvasArr[i].opacity);
         this.history.pause(false);
@@ -828,11 +830,6 @@ export class KlCanvas {
 
     replaceLayer (layerIndex: number, imageData: ImageData): void {
         const ctx = BB.ctx(this.layerCanvasArr[layerIndex]);
-
-        // 2023-04-30 workaround for https://bugs.webkit.org/show_bug.cgi?id=256151
-        // todo remove eventually when safari fixed
-        ctx.fillRect(-1, -1, 1, 1);
-
         ctx.putImageData(imageData, 0, 0);
         this.history.push({
             tool: ['canvas'],

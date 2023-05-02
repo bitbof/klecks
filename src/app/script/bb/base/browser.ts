@@ -1,4 +1,3 @@
-import {createCanvas} from './create-canvas';
 
 export const isFirefox = navigator.userAgent.toLowerCase().indexOf('firefox') > -1;
 
@@ -10,23 +9,6 @@ export const eventUsesHighResTimeStamp = (function () {
 })();
 
 export const hasPointerEvents = !!window.PointerEvent;
-
-export const hasWebGl = (function () {
-
-    const hasWebgl = (function () {
-        const canvas = createCanvas();
-        try {
-            canvas.getContext('webgl', { premultipliedAlpha: false });
-            return true;
-        } catch (e) {
-            return false;
-        }
-    })();
-
-    return function () {
-        return hasWebgl;
-    };
-})();
 
 export const isCssMinMaxSupported = (function () {
     let result: boolean | null = null;
