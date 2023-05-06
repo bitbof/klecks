@@ -35,6 +35,7 @@ export const filterLib: {
         getDialog: null,
         apply: null,
         inEmbed: true,
+        webGL: true,
     },
     cropExtend: {
         lang: {name: 'filter-crop-title', button: 'filter-crop-extend'},
@@ -51,6 +52,7 @@ export const filterLib: {
         getDialog: null,
         apply: null,
         inEmbed: true,
+        webGL: true,
     },
     distort: {
         lang: {name: 'filter-distort', button: 'filter-distort'},
@@ -59,6 +61,7 @@ export const filterLib: {
         getDialog: null,
         apply: null,
         inEmbed: true,
+        webGL: true,
     },
     flip: {
         lang: {name: 'filter-flip-title', button: 'filter-flip'},
@@ -76,6 +79,7 @@ export const filterLib: {
         apply: null,
         inEmbed: true,
         darkNoInvert: true,
+        webGL: true,
     },
     invert: {
         lang: {name: 'filter-invert', button: 'filter-invert'},
@@ -86,6 +90,7 @@ export const filterLib: {
         apply: null,
         inEmbed: true,
         darkNoInvert: true,
+        webGL: true,
     },
     perspective: {
         lang: {name: 'filter-perspective-title', button: 'filter-perspective'},
@@ -94,6 +99,7 @@ export const filterLib: {
         getDialog: null,
         apply: null,
         inEmbed: true,
+        webGL: true,
     },
     resize: {
         lang: {name: 'filter-resize-title', button: 'filter-resize'},
@@ -118,6 +124,7 @@ export const filterLib: {
         getDialog: null,
         apply: null,
         inEmbed: true,
+        webGL: true,
     },
     toAlpha: {
         lang: {name: 'filter-to-alpha-title', button: 'filter-to-alpha'},
@@ -127,6 +134,7 @@ export const filterLib: {
         apply: null,
         inEmbed: true,
         darkNoInvert: true,
+        webGL: true,
     },
     transform: {
         lang: {name: 'filter-transform-title', button: 'filter-transform'},
@@ -144,6 +152,7 @@ export const filterLib: {
         apply: null,
         inEmbed: true,
         darkNoInvert: true,
+        webGL: true,
     },
     unsharpMask: {
         lang: {name: 'filter-unsharp-mask-title', button: 'filter-unsharp-mask'},
@@ -153,6 +162,7 @@ export const filterLib: {
         apply: null,
         inEmbed: true,
         darkNoInvert: true,
+        webGL: true,
     },
     grid: {
         lang: {name: 'filter-grid', button: 'filter-grid'},
@@ -169,6 +179,7 @@ export const filterLib: {
         getDialog: null,
         apply: null,
         inEmbed: true,
+        webGL: true,
     },
     pattern: {
         lang: {name: 'filter-pattern', button: 'filter-pattern'},

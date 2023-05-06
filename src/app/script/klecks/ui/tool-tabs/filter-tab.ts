@@ -11,12 +11,17 @@ import {KlColorSlider} from '../components/kl-color-slider';
 import {LayerManager} from './layer-manager/layer-manager';
 import {HandUi} from './hand-ui';
 import {RGB} from '../../../bb/color/color';
+import {getSharedFx} from '../../../fx-canvas/shared-fx';
 
 
 export class FilterTab {
 
     private readonly rootEl: HTMLDivElement;
     private isInit = false;
+
+    private testHasWebGL (): boolean {
+        return !!getSharedFx();
+    }
 
     constructor (
         private klRootEl: HTMLElement,
@@ -42,11 +47,27 @@ export class FilterTab {
             throw new Error('filters not loaded');
         }
 
+        const hasWebGL: boolean = this.testHasWebGL();
+
+        if (!hasWebGL) {
+            BB.el({
+                parent: this.rootEl,
+                className: 'kl-toolspace-note',
+                content: 'Features disabled because WebGL is failing.',
+                css: {
+                    margin: '5px',
+                    marginBottom: '0',
+                },
+            });
+        }
+
         const createButton = (filterKey: string): HTMLElement => {
+            const filter = filters[filterKey];
+
             const button = document.createElement('button');
-            const buttonLabel = LANG(filters[filterKey].lang.button);
-            const imClass = filters[filterKey].darkNoInvert ? 'class="dark-no-invert"' : '';
-            const im = '<img ' + imClass + ' height="20" width="18" src="' + filters[filterKey].icon + '" alt="icon" />';
+            const buttonLabel = LANG(filter.lang.button);
+            const imClass = filter.darkNoInvert ? 'class="dark-no-invert"' : '';
+            const im = '<img ' + imClass + ' height="20" width="18" src="' + filter.icon + '" alt="icon" />';
             button.innerHTML = im + buttonLabel;
             button.className = 'grid-button';
             BB.css(button, {
@@ -55,106 +76,116 @@ export class FilterTab {
             });
             button.tabIndex = -1;
 
-            const filterName = LANG(filters[filterKey].lang.name);
+            const filterName = LANG(filter.lang.name);
 
-            button.onclick = () => {
+            let isEnabled = true;
+            if (filter.webGL && !hasWebGL) {
+                isEnabled = false;
+            }
 
-                const finishedDialog = (result, filterDialog): void => {
-                    if (result == 'Cancel') {
-                        if (filterDialog.destroy) {
-                            filterDialog.destroy();
+            if (isEnabled) {
+                button.onclick = () => {
+
+                    const finishedDialog = (result, filterDialog): void => {
+                        if (result == 'Cancel') {
+                            if (filterDialog.destroy) {
+                                filterDialog.destroy();
+                            }
+                            return;
                         }
-                        return;
-                    }
-                    let input;
-                    try {
-                        input = filterDialog.getInput(); // also destroys
-                    } catch (e) {
-                        if (e.message.indexOf('.getInput is not a function') !== -1) {
-                            throw 'filterDialog.getInput is not a function, filter: ' + filterName;
-                        } else {
-                            throw e;
+                        let input;
+                        try {
+                            input = filterDialog.getInput(); // also destroys
+                        } catch (e) {
+                            if (e.message.indexOf('.getInput is not a function') !== -1) {
+                                throw 'filterDialog.getInput is not a function, filter: ' + filterName;
+                            } else {
+                                throw e;
+                            }
                         }
-                    }
-                    applyFilter(input);
-                };
-
-                if (!('apply' in filters[filterKey])) {
-                    alert('Application not fully loaded');
-                    return;
-                }
-
-                const applyFilter = (input: any) => {
-                    const filterResult = filters[filterKey].apply({
-                        context: this.getCurrentLayerCtx(),
-                        klCanvas: this.getKlCanvas(),
-                        history: klHistory,
-                        input: input,
-                    } as IFilterApply);
-                    if (filterResult === false) {
-                        alert("Couldn't apply the edit action");
-                    }
-                    if (filters[filterKey].updatePos === true) {
-                        this.klCanvasWorkspace.resetView();
-                        this.handUi.update(this.klCanvasWorkspace.getScale(), this.klCanvasWorkspace.getAngleDeg());
-                    }
-                    this.layerManager.update();
-                };
-
-                if (filters[filterKey].isInstant){
-                    button.blur();
-                    applyFilter(null);
-                    this.statusOverlay.out('"' + filterName + '" ' + LANG('filter-applied'), true);
-                } else {
-                    const secondaryColorRGB = this.klColorSlider.getSecondaryRGB();
-                    const filterDialog = filters[filterKey].getDialog({
-                        context: this.getCurrentLayerCtx(),
-                        klCanvas: this.getKlCanvas(),
-                        maxWidth: this.getKlMaxCanvasSize(),
-                        maxHeight: this.getKlMaxCanvasSize(),
-                        currentColorRgb: {r: this.getCurrentColor().r, g: this.getCurrentColor().g, b: this.getCurrentColor().b},
-                        secondaryColorRgb: {r: secondaryColorRGB.r, g: secondaryColorRGB.g, b: secondaryColorRGB.b},
-                    } as IFilterGetDialogParam) as IFilterGetDialogResult;
-
-                    if (!filterDialog) {
-                        return;
-                        //alert('Error: could not perform action');
-                        //throw('filter['+filterKey+'].getDialog returned '+filterDialog+'. ctx:' + currentLayerCtx + ' klCanvas:' + klCanvas);
-                    }
-
-                    let closeFunc: () => void;
-                    // Todo should move into getDialogParams
-                    filterDialog.errorCallback = (e) => {
-                        setTimeout(() => {
-                            alert('Error: could not perform action');
-                            throw e;
-                        }, 0);
-                        closeFunc();
+                        applyFilter(input);
                     };
 
-
-                    const style: IKeyString = {};
-                    if ('width' in filterDialog) {
-                        style.width = filterDialog.width + 'px';
+                    if (!('apply' in filters[filterKey])) {
+                        alert('Application not fully loaded');
+                        return;
                     }
 
-                    KL.popup({
-                        target: this.klRootEl,
-                        message: '<b>' + filterName + '</b>',
-                        div: filterDialog.element,
-                        style: style,
-                        buttons: ['Ok', 'Cancel'],
-                        clickOnEnter: 'Ok',
-                        callback: (result) => {
-                            finishedDialog(result, filterDialog);
-                        },
-                        closeFunc: (func) => {
-                            closeFunc = func;
-                        },
-                    });
-                }
-            };
-            buttons[buttons.length] = button;
+                    const applyFilter = (input: any) => {
+                        const filterResult = filters[filterKey].apply({
+                            context: this.getCurrentLayerCtx(),
+                            klCanvas: this.getKlCanvas(),
+                            history: klHistory,
+                            input: input,
+                        } as IFilterApply);
+                        if (filterResult === false) {
+                            alert("Couldn't apply the edit action");
+                        }
+                        if (filters[filterKey].updatePos === true) {
+                            this.klCanvasWorkspace.resetView();
+                            this.handUi.update(this.klCanvasWorkspace.getScale(), this.klCanvasWorkspace.getAngleDeg());
+                        }
+                        this.layerManager.update();
+                    };
+
+                    if (filters[filterKey].isInstant){
+                        button.blur();
+                        applyFilter(null);
+                        this.statusOverlay.out('"' + filterName + '" ' + LANG('filter-applied'), true);
+                    } else {
+                        const secondaryColorRGB = this.klColorSlider.getSecondaryRGB();
+                        const filterDialog = filters[filterKey].getDialog({
+                            context: this.getCurrentLayerCtx(),
+                            klCanvas: this.getKlCanvas(),
+                            maxWidth: this.getKlMaxCanvasSize(),
+                            maxHeight: this.getKlMaxCanvasSize(),
+                            currentColorRgb: {r: this.getCurrentColor().r, g: this.getCurrentColor().g, b: this.getCurrentColor().b},
+                            secondaryColorRgb: {r: secondaryColorRGB.r, g: secondaryColorRGB.g, b: secondaryColorRGB.b},
+                        } as IFilterGetDialogParam) as IFilterGetDialogResult;
+
+                        if (!filterDialog) {
+                            return;
+                            //alert('Error: could not perform action');
+                            //throw('filter['+filterKey+'].getDialog returned '+filterDialog+'. ctx:' + currentLayerCtx + ' klCanvas:' + klCanvas);
+                        }
+
+                        let closeFunc: () => void;
+                        // Todo should move into getDialogParams
+                        filterDialog.errorCallback = (e) => {
+                            setTimeout(() => {
+                                alert('Error: could not perform action');
+                                throw e;
+                            }, 0);
+                            closeFunc();
+                        };
+
+
+                        const style: IKeyString = {};
+                        if ('width' in filterDialog) {
+                            style.width = filterDialog.width + 'px';
+                        }
+
+                        KL.popup({
+                            target: this.klRootEl,
+                            message: '<b>' + filterName + '</b>',
+                            div: filterDialog.element,
+                            style: style,
+                            buttons: ['Ok', 'Cancel'],
+                            clickOnEnter: 'Ok',
+                            callback: (result) => {
+                                finishedDialog(result, filterDialog);
+                            },
+                            closeFunc: (func) => {
+                                closeFunc = func;
+                            },
+                        });
+                    }
+                };
+            } else {
+                button.disabled = true;
+            }
+
+            buttons.push(button);
             return button;
         };
 

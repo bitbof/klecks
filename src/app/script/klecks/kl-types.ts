@@ -38,6 +38,7 @@ export interface IFilter {
     getDialog: null | ((p: IFilterGetDialogParam) => any);
     apply: null | ((p: IFilterApply) => boolean);
     darkNoInvert?: boolean;
+    webGL?: boolean; // does the filter require webgl
 }
 
 export interface ITransform {

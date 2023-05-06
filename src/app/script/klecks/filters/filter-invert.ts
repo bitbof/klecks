@@ -16,12 +16,14 @@ export const filterInvert = {
         if (!context || !history) {
             return false;
         }
-        history.pause(true);
 
         const fxCanvas = getSharedFx();
         if (!fxCanvas) {
             return false;
         }
+
+        history.pause(true);
+
         const texture = fxCanvas.texture(context.canvas);
         fxCanvas.draw(texture).invert().update();
         context.clearRect(0, 0, context.canvas.width, context.canvas.height);

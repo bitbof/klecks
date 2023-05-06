@@ -156,25 +156,42 @@ void main() {
         };
     }
 
-    const fxCanvas = function () {
-        const canvas: TFxCanvas = BB.canvas() as TFxCanvas;
-        let context: TFxGl | null = null;
-        ['webgl', 'experimental-webgl'].forEach(item => {
+    function getWebGlContext (canvas: HTMLCanvasElement, options?: WebGLContextAttributes): WebGLRenderingContext | null {
+        const contextNames = ['webgl', 'experimental-webgl', 'webgl2'];
+        let context: WebGLRenderingContext | null = null;
+        contextNames.forEach(name => {
             if (context) {
                 return;
             }
             // get.webgl.org does a try-catch
             try {
-                context = canvas.getContext(item, {premultipliedAlpha: false}) as (TFxGl | null);
+                context = canvas.getContext(name, options) as (typeof context);
             } catch (e) {}
         });
-        setGl(context);
-        if (!gl) {
-            throw 'This browser does not support WebGL';
+        return context;
+    }
+
+    const fxCanvas = (): TFxCanvas => {
+        if (!window.WebGLRenderingContext) {
+            throw 'WebGLRenderingContext not set. Browser does not support WebGL.';
         }
 
+        const canvas: TFxCanvas = BB.canvas() as TFxCanvas;
+        let context = getWebGlContext(canvas, {premultipliedAlpha: false});
+        if (!context) {
+            // maybe premultipliedAlpha causes trouble?
+            context = getWebGlContext(canvas);
+            if (!context) {
+                throw 'This browser does not support WebGL';
+            }
+            setTimeout(() => {
+                throw 'WebGL context creation failed with options. Created without options.';
+            });
+        }
+        setGl(context as TFxGl);
+
         canvas._ = {
-            gl: gl,
+            gl,
             isInitialized: false,
             texture: null,
             spareTexture: null,
