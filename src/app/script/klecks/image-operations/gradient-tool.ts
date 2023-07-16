@@ -1,4 +1,4 @@
-import {IGradient} from '../kl-types';
+import {IGradient, IRGBA} from '../kl-types';
 import {BB} from '../../bb/bb';
 
 
@@ -10,9 +10,9 @@ type TOnGradient = (isDone: boolean, x1: number, y1: number, x2: number, y2: num
  * angleRad is the angle of the canvas.
  */
 export class GradientTool {
-    private downX: number;
-    private downY: number;
-    private downAngleRad: number;
+    private downX: number = 0;
+    private downY: number = 0;
+    private downAngleRad: number = 0;
     private readonly onGradient: TOnGradient;
 
     // ---- public ----
@@ -76,10 +76,14 @@ export function drawGradient (
     if (gradientObj.isEraser && gradientObj.doLockAlpha) {
         baseColor = {r: 255, g: 255, b: 255};
     }
-    let color1 = BB.copyObj(baseColor);
-    color1.a = gradientObj.opacity;
-    let color2 = BB.copyObj(baseColor);
-    color2.a = 0;
+    let color1: IRGBA = {
+        ...baseColor,
+        a: gradientObj.opacity,
+    };
+    let color2: IRGBA = {
+        ...baseColor,
+        a: 0,
+    };
     if (gradientObj.isReversed) {
         const temp = color1;
         color1 = color2;

@@ -11,12 +11,12 @@ type TIsDown = {
     [key: string]: boolean;
 };
 
-type TOnDown = (keyStr: string, e: KeyboardEvent, comboStr: string, isRepeat?: boolean) => void;
-type TOnUp = (keyStr: string, e: KeyboardEvent, oldComboStr: string) => void;
+export type TOnKeyDown = (keyStr: string, e: KeyboardEvent, comboStr: string, isRepeat?: boolean) => void;
+export type TOnKeyUp = (keyStr: string, e: KeyboardEvent, oldComboStr: string) => void;
 type TOnBlur = () => void;
 type TKeyListenerRef = [
-    TOnDown | undefined,
-    TOnUp | undefined,
+    TOnKeyDown | undefined,
+    TOnKeyUp | undefined,
     TOnBlur | undefined,
 ];
 
@@ -94,7 +94,7 @@ const globalKey = ((): TGlobalKey => {
     const listenerArr: TKeyListenerRef[] = [];
 
 
-    const emitDown: TOnDown = function (a, b, c, d?): void {
+    const emitDown: TOnKeyDown = function (a, b, c, d?): void {
         listenerArr.forEach(item => {
             if (!item[0]) {
                 return;
@@ -103,7 +103,7 @@ const globalKey = ((): TGlobalKey => {
         });
     };
 
-    const emitUp: TOnUp = function (a, b, c): void {
+    const emitUp: TOnKeyUp = function (a, b, c): void {
         listenerArr.forEach(item => {
             if (!item[1]) {
                 return;
@@ -248,15 +248,15 @@ const globalKey = ((): TGlobalKey => {
  */
 export class KeyListener {
 
-    private readonly onDown: TOnDown | undefined;
-    private readonly onUp: TOnUp | undefined;
+    private readonly onDown: TOnKeyDown | undefined;
+    private readonly onUp: TOnKeyUp | undefined;
     private readonly onBlur: TOnBlur | undefined;
     private readonly ref: TKeyListenerRef;
 
     constructor (
         p: {
-            onDown?: TOnDown;
-            onUp?: TOnUp;
+            onDown?: TOnKeyDown;
+            onUp?: TOnKeyUp;
             onBlur?: TOnBlur;
         },
     ) {

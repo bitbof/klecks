@@ -200,10 +200,10 @@ export class TabRow {
         return '' + this.activeTab.id;
     }
 
-    setIsVisible (tabId: string, isVisible: string): void {
+    setIsVisible (tabId: string, isVisible: boolean): void {
         for (let i = 0; i < this.tabArr.length; i++) {
             if (this.tabArr[i].id === tabId) {
-                this.tabArr[i].isVisible = !!isVisible;
+                this.tabArr[i].isVisible = isVisible;
                 this.update();
                 return;
             }

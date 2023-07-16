@@ -107,12 +107,12 @@ const pressureNormalizer = new PressureNormalizer();
 const timeStampOffset = eventUsesHighResTimeStamp() ? 0 : -performance.timing.navigationStart;
 
 
-const pointerDownEvt = hasPointerEvents ? 'pointerdown' : 'mousedown';
-const pointerMoveEvt = hasPointerEvents ? 'pointermove' : 'mousemove';
-const pointerUpEvt = hasPointerEvents ? 'pointerup' : 'mouseup';
-const pointerCancelEvt = hasPointerEvents ? 'pointercancel' : 'mousecancel';
-const pointerLeaveEvt = hasPointerEvents ? 'pointerleave' : 'mouseleave';
-const pointerEnterEvt = hasPointerEvents ? 'pointerenter' : 'mouseenter';
+const pointerDownEvt = (hasPointerEvents ? 'pointerdown' : 'mousedown') as 'pointerdown';
+const pointerMoveEvt = (hasPointerEvents ? 'pointermove' : 'mousemove') as 'pointermove';
+const pointerUpEvt = (hasPointerEvents ? 'pointerup' : 'mouseup') as 'pointerup';
+const pointerCancelEvt = (hasPointerEvents ? 'pointercancel' : 'mousecancel') as 'pointercancel';
+const pointerLeaveEvt = (hasPointerEvents ? 'pointerleave' : 'mouseleave') as 'pointerleave';
+const pointerEnterEvt = (hasPointerEvents ? 'pointerenter' : 'mouseenter') as 'pointerenter';
 
 
 /**
@@ -226,7 +226,9 @@ export class PointerListener {
 
     private isDestroyed: boolean = false;
 
-    private readonly targetElement: HTMLElement | SVGElement;
+    // ts has problems with (HTMLElement|SVGElement) when adding event listeners
+    // https://github.com/microsoft/TypeScript/issues/46819
+    private readonly targetElement: HTMLElement;
     private readonly onPointerCallback: undefined | ((pointerEvent: IPointerEvent) => void);
     private readonly onWheelCallback: undefined | ((wheelEvent: IWheelEvent) => void);
     private readonly onEnterLeaveCallback: undefined | ((isOver: boolean) => void);
@@ -351,7 +353,7 @@ export class PointerListener {
     // ---- public ----
 
     constructor (p: IPointerListenerParams) {
-        this.targetElement = p.target;
+        this.targetElement = p.target as HTMLElement;
         this.onPointerCallback = p.onPointer;
         this.onWheelCallback = p.onWheel;
         this.onEnterLeaveCallback = p.onEnterLeave;
@@ -571,13 +573,13 @@ export class PointerListener {
                         const touch = e.changedTouches[i];
                         const fakePointer = touchToFakePointer(touch, e, ['start', 'move'].includes(type));
                         if (type === 'start') {
-                            this.onPointerDown(fakePointer, false);
+                            this.onPointerDown!(fakePointer as PointerEvent, false);
                         } else if (type === 'move') {
-                            this.windowOnPointerMove(fakePointer);
+                            this.windowOnPointerMove!(fakePointer as PointerEvent);
                         } else if (type === 'end') {
-                            this.windowOnPointerUp(fakePointer);
+                            this.windowOnPointerUp!(fakePointer as PointerEvent);
                         } else {
-                            this.windowOnPointerLeave(fakePointer);
+                            this.windowOnPointerLeave!(fakePointer as PointerEvent);
                         }
                     }
                 };
@@ -650,4 +652,3 @@ export class PointerListener {
     }
 
 }
-

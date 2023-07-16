@@ -178,7 +178,7 @@ export const filterResize = {
             ],
             title: LANG('scaling-algorithm'),
             initValue: 'smooth',
-            onChange: function () {
+            onChange: (): void => {
                 update();
             },
         });
@@ -320,7 +320,7 @@ export const filterResize = {
             theme.removeIsDarkListener(updateCheckerboard);
         };
         result.getInput = function (): TFilterResizeInput {
-            result.destroy();
+            result.destroy!();
             return {
                 width: newWidth,
                 height: newHeight,

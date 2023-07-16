@@ -8,6 +8,7 @@ import {KlCanvasWorkspace} from '../klecks/canvas-ui/kl-canvas-workspace';
 import {HandUi} from '../klecks/ui/tool-tabs/hand-ui';
 import {LayerManager} from '../klecks/ui/tool-tabs/layer-manager/layer-manager';
 import {IRect, ISize2D} from '../bb/bb-types';
+import {throwIfNull, throwIfUndefined} from '../bb/base/base';
 
 // todo later:
 // onImage: (project: IKlProject) => void
@@ -89,7 +90,7 @@ export class ImportHandler {
             });
 
             this.layerManager.update(0);
-            this.setCurrentLayer(this.klCanvas.getLayer(0));
+            this.setCurrentLayer(this.klCanvas.getLayer(0)!);
             this.klCanvasWorkspace.resetView();
             this.handUi.update(this.klCanvasWorkspace.getScale(), this.klCanvasWorkspace.getAngleDeg());
         };
@@ -107,6 +108,7 @@ export class ImportHandler {
                 cropCanvas: HTMLCanvasElement,
                 cropObj: IRect,
             ): void => {
+                // eslint-disable-next-line no-self-assign
                 cropCanvas.width = cropCanvas.width;
                 BB.ctx(cropCanvas).drawImage(targetCanvas, -cropObj.x, -cropObj.y);
                 targetCanvas.width = cropObj.width;
@@ -158,7 +160,7 @@ export class ImportHandler {
                 });
             }
             this.layerManager.update(layerIndex);
-            this.setCurrentLayer(this.klCanvas.getLayer(layerIndex));
+            this.setCurrentLayer(throwIfNull(this.klCanvas.getLayer(layerIndex)));
             this.klCanvasWorkspace.resetView();
             this.handUi.update(this.klCanvasWorkspace.getScale(), this.klCanvasWorkspace.getAngleDeg());
         };
@@ -168,7 +170,7 @@ export class ImportHandler {
                 target: this.klRootEl,
                 klCanvas: this.klCanvas,
                 importImage: canvas,
-                callback: (transformObj, isPixelated: boolean) => {
+                callback: (transformObj, isPixelated?: boolean) => {
                     if (!transformObj) {
                         return;
                     }
@@ -180,9 +182,9 @@ export class ImportHandler {
                     if (filename) {
                         this.klCanvas.renameLayer(activeLayerIndex, filename);
                     }
-                    const activeLayerContext = this.klCanvas.getLayerContext(activeLayerIndex);
-                    BB.drawTransformedImageWithBounds(activeLayerContext, canvas, transformObj, null, isPixelated);
-                    this.setCurrentLayer(this.klCanvas.getLayer(activeLayerIndex));
+                    const activeLayerContext = throwIfNull(this.klCanvas.getLayerContext(activeLayerIndex));
+                    BB.drawTransformedImageWithBounds(activeLayerContext, canvas, transformObj, undefined, isPixelated);
+                    this.setCurrentLayer(throwIfNull(this.klCanvas.getLayer(activeLayerIndex)));
                     this.layerManager.update(activeLayerIndex);
 
                     klHistory.pause(false);
@@ -345,6 +347,7 @@ export class ImportHandler {
         };
 
         let hasUnsupportedFile = false;
+        // eslint-disable-next-line no-cond-assign
         for (let i = 0, file; file = files[i]; i++) {
             const nameSplit = file.name.split('.');
             const extension = nameSplit[nameSplit.length - 1].toLowerCase();
@@ -386,6 +389,7 @@ export class ImportHandler {
 
                     const reader = new FileReader();
                     reader.onload = (readerResult) => {
+                        const target = throwIfNull(readerResult.target);
 
                         KL.loadAgPsd().then((agPsdLazy) => {
 
@@ -398,7 +402,7 @@ export class ImportHandler {
 
                                 // first pass, only read metadata
                                 psd = agPsdLazy.readPsd(
-                                    (readerResult.target.result as any),
+                                    (target.result as any),
                                     {
                                         skipLayerImageData: true,
                                         skipThumbnail: true,
@@ -426,7 +430,7 @@ export class ImportHandler {
                                 psd = null;
 
                                 try {
-                                    psd = agPsdLazy.readPsd((readerResult.target.result as any));
+                                    psd = agPsdLazy.readPsd((target.result as any));
                                 } catch (e) {
                                     //console.log('failed regular psd import', e);
                                 }
@@ -443,7 +447,8 @@ export class ImportHandler {
                                     }
                                     this.importFinishedLoading(convertedPsd, f.name, optionStr);
                                 } else {
-                                    psd = agPsdLazy.readPsd((readerResult.target.result as any), { skipLayerImageData: true, skipThumbnail: true });
+                                    psd = agPsdLazy.readPsd((target.result as any), { skipLayerImageData: true, skipThumbnail: true });
+
                                     if (optionStr === 'image') {
                                         showWarningPsdFlattened();
                                     }
@@ -455,7 +460,7 @@ export class ImportHandler {
                                         type: 'psd',
                                         width: psd.width,
                                         height: psd.height,
-                                        canvas: psd.canvas,
+                                        canvas: throwIfUndefined(psd.canvas),
                                         error: true,
                                     }, f.name, optionStr);
                                 }

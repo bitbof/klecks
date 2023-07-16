@@ -6,18 +6,20 @@ import pickerImg from '/src/app/img/ui/cursor-picker.png';
 import zoomEwImg from '/src/app/img/ui/cursor-zoom-ew.png';
 import fillImg from '/src/app/img/ui/cursor-fill.png';
 import textImg from '/src/app/img/ui/cursor-text.png';
-import {IPressureInput, IVector2D} from '../../bb/bb-types';
+import {IBounds, IPressureInput, IVector2D} from '../../bb/bb-types';
 import {KlCanvas} from '../canvas/kl-canvas';
-import {KeyListener} from '../../bb/input/key-listener';
+import {KeyListener, TOnKeyDown, TOnKeyUp} from '../../bb/input/key-listener';
 import {KL} from '../kl';
-import {IPointerEvent} from '../../bb/input/event.types';
 import {LinetoolProcessor} from '../events/linetool-processor';
 import {PinchZoomer} from '../../bb/input/event-chain/pinch-zoomer';
-import {DoubleTapper} from '../../bb/input/event-chain/double-tapper';
+import {DoubleTapper, IDoubleTapperEvent} from '../../bb/input/event-chain/double-tapper';
 import {NFingerTapper} from '../../bb/input/event-chain/n-finger-tapper';
 import {EventChain} from '../../bb/input/event-chain/event-chain';
 import {PointerListener} from '../../bb/input/pointer-listener';
 import {theme} from '../../theme/theme';
+import {TVec4} from '../../bb/math/matrix';
+import {IChainElement} from '../../bb/input/event-chain/event-chain.types';
+import {ICoalescedPointerEvent} from '../../bb/input/event-chain/coalesced-exploder';
 
 export interface IViewChangeEvent {
     changed: ('scale' | 'angle')[];
@@ -26,6 +28,25 @@ export interface IViewChangeEvent {
 }
 
 type TModeStr = 'draw' | 'pick' | 'hand' | 'shape' | 'fill' | 'gradient' | 'text'; // | 'transform' | 'select'
+
+type TInputProcessorKeys = |
+    'draw' |
+    'fill' |
+    'gradient' |
+    'text' |
+    'shape' |
+    'hand' |
+    'spaceHand' |
+    'zoom' |
+    'picker' |
+    'altPicker' |
+    'rotate';
+
+type TInputProcessorItem = {
+    onPointer: (val: ICoalescedPointerEvent) => void;
+    onKeyDown: TOnKeyDown;
+    onKeyUp: TOnKeyUp;
+}
 
 const MIN_SCALE = 1 / 16;
 const MAX_SCALE = 64;
@@ -68,9 +89,9 @@ export class KlCanvasWorkspace {
     private readonly compositeCanvas: HTMLCanvasElement; // for drawing klcanvas layer composite
     private readonly compositeCtx: CanvasRenderingContext2D;
     private doResizeCanvas: boolean;
-    private oldTransformObj: ITransform;
+    private oldTransformObj: ITransform | null;
     private targetTransformObj: ITransform; // animation target
-    private highResTransformObj: ITransform; // animated, internal high res
+    private highResTransformObj: ITransform; // animated, internal high-res
     private readonly renderedTransformObj: ITransform; // same as highRes, but rounded - what's actually displayed
     private cursorPos: IVector2D;
     private readonly usesCssCursor: boolean;
@@ -88,8 +109,10 @@ export class KlCanvasWorkspace {
     private linetoolProcessor: LinetoolProcessor;
     private pointer: IVector2D | null; // position of cursor
     private isDrawing: boolean;
-    private inputProcessorObj: any; // todo type
-    private currentInputProcessor: any; // todo type
+    private inputProcessorObj: {
+        [key in TInputProcessorKeys]: TInputProcessorItem;
+    };
+    private currentInputProcessor: TInputProcessorItem | null;
     private angleIsExtraSticky: boolean;
     private readonly pinchZoomer: PinchZoomer;
     private readonly mainDoubleTapper: DoubleTapper;
@@ -205,7 +228,7 @@ export class KlCanvasWorkspace {
         matrix = BB.Matrix.multiplyMatrices(matrix, BB.Matrix.createScaleMatrix(effectiveFactor));
         matrix = BB.Matrix.multiplyMatrices(matrix, BB.Matrix.createTranslationMatrix(-centerX, -centerY));
 
-        let origin = [this.targetTransformObj.x, this.targetTransformObj.y, 0, 1];
+        let origin: TVec4 = [this.targetTransformObj.x, this.targetTransformObj.y, 0, 1];
         origin = BB.Matrix.multiplyMatrixAndPoint(matrix, origin);
         this.targetTransformObj.x = origin[0];
         this.targetTransformObj.y = origin[1];
@@ -295,7 +318,7 @@ export class KlCanvasWorkspace {
 
         //transform points, then test if outside of canvas
         for (let i = 0; i < workspacePointArr.length; i++) {
-            let coords = [workspacePointArr[i][0], workspacePointArr[i][1], 0, 1];
+            let coords: TVec4 = [workspacePointArr[i][0], workspacePointArr[i][1], 0, 1];
             coords = BB.Matrix.multiplyMatrixAndPoint(matrix, coords);
 
             if (
@@ -380,7 +403,8 @@ export class KlCanvasWorkspace {
                     ctx.globalAlpha = layerArr[i].opacity;
                     ctx.globalCompositeOperation = layerArr[i].mixModeStr;
 
-                    if (layerArr[i].canvas.compositeObj) {
+                    const compositeObj = layerArr[i].canvas.compositeObj;
+                    if (compositeObj) {
                         if (this.compositeCanvas.width !== layerArr[i].canvas.width || this.compositeCanvas.height !== layerArr[i].canvas.height) {
                             this.compositeCanvas.width = layerArr[i].canvas.width;
                             this.compositeCanvas.height = layerArr[i].canvas.height;
@@ -388,7 +412,7 @@ export class KlCanvasWorkspace {
                             this.compositeCtx.clearRect(0, 0, this.compositeCanvas.width, this.compositeCanvas.height);
                         }
                         this.compositeCtx.drawImage(layerArr[i].canvas, 0, 0);
-                        layerArr[i].canvas.compositeObj.draw(this.compositeCtx);
+                        compositeObj.draw(this.compositeCtx);
                         ctx.drawImage(this.compositeCanvas, 0, 0, w, h);
                     } else {
                         ctx.drawImage(layerArr[i].canvas, 0, 0, w, h);
@@ -422,7 +446,7 @@ export class KlCanvasWorkspace {
         matrix = BB.Matrix.multiplyMatrices(matrix, BB.Matrix.createRotationMatrix(-art.angle));
         matrix = BB.Matrix.multiplyMatrices(matrix, BB.Matrix.createTranslationMatrix(-art.x, -art.y));
 
-        let coords = [p.x, p.y, 0, 1];
+        let coords: TVec4 = [p.x, p.y, 0, 1];
         coords = BB.Matrix.multiplyMatrixAndPoint(matrix, coords);
 
         return {
@@ -437,7 +461,7 @@ export class KlCanvasWorkspace {
         matrix = BB.Matrix.multiplyMatrices(matrix, BB.Matrix.createRotationMatrix(transformObj.angle));
         matrix = BB.Matrix.multiplyMatrices(matrix, BB.Matrix.createScaleMatrix(transformObj.scale));
 
-        let coords = [p.x, p.y, 0, 1];
+        let coords: TVec4 = [p.x, p.y, 0, 1];
         coords = BB.Matrix.multiplyMatrixAndPoint(matrix, coords);
 
         return {
@@ -588,10 +612,10 @@ export class KlCanvasWorkspace {
 
     constructor (
         p: {
-            klCanvas: any; // todo
+            klCanvas: KlCanvas;
             width: number;
             height: number;
-            onDraw: (val: TDrawEvent) => void; // todo
+            onDraw: (val: TDrawEvent) => void;
             onPick: (rgb: IRGB, isPointerup: boolean) => void;
             onFill: (canvasX: number, canvasY: number) => void;
             onGradient: (type: 'down' | 'up' | 'move', canvasX: number, canvasY: number, angleRad: number) => void;
@@ -602,7 +626,6 @@ export class KlCanvasWorkspace {
             onRedo: () => void;
         }
     ) {
-        const _this = this;
         this.rootEl = BB.el({
             css: {
                 position: 'absolute',
@@ -636,12 +659,7 @@ export class KlCanvasWorkspace {
             scale: 1,
             angle: 0,
         };
-        this.renderedTransformObj = {
-            x: null,
-            y: null,
-            scale: null,
-            angle: null,
-        };
+        this.renderedTransformObj = {} as ITransform;
         this.cursorPos = {
             x: 0,
             y: 0,
@@ -773,7 +791,7 @@ export class KlCanvasWorkspace {
 
                 if (event.type === 'line' && !this.lastDrawEvent) {
                     const matrix = getMatrix();
-                    let coords = [event.x1, event.y1, 0, 1];
+                    let coords: TVec4 = [event.x1, event.y1, 0, 1];
                     coords = BB.Matrix.multiplyMatrixAndPoint(matrix, coords);
                     this.lastDrawEvent = {
                         x: coords[0],
@@ -788,16 +806,16 @@ export class KlCanvasWorkspace {
                     const matrix = getMatrix();
 
                     if ('x' in event) { //down or move
-                        let coords = [event.x, event.y, 0, 1];
+                        let coords: TVec4 = [event.x, event.y, 0, 1];
                         coords = BB.Matrix.multiplyMatrixAndPoint(matrix, coords);
                         event.x = coords[0];
                         event.y = coords[1];
                     }
                     if ('x0' in event) { //line
-                        event.x0 = this.lastDrawEvent.x;
-                        event.y0 = this.lastDrawEvent.y;
-                        event.pressure0 = this.lastDrawEvent.pressure;
-                        let coords = [event.x1, event.y1, 0, 1];
+                        event.x0 = this.lastDrawEvent!.x;
+                        event.y0 = this.lastDrawEvent!.y;
+                        event.pressure0 = this.lastDrawEvent!.pressure;
+                        let coords: TVec4 = [event.x1, event.y1, 0, 1];
                         coords = BB.Matrix.multiplyMatrixAndPoint(matrix, coords);
                         event.x1 = coords[0];
                         event.y1 = coords[1];
@@ -867,9 +885,11 @@ export class KlCanvasWorkspace {
 
                     this.linetoolProcessor.process(event);
                 },
+                // eslint-disable-next-line @typescript-eslint/no-unused-vars
                 onKeyDown: (keyStr, event, comboStr, isRepeat) => {
 
                 },
+                // eslint-disable-next-line @typescript-eslint/no-unused-vars
                 onKeyUp: (keyStr, event, oldComboStr) => {
 
                 },
@@ -891,9 +911,11 @@ export class KlCanvasWorkspace {
                     }
 
                 },
+                // eslint-disable-next-line @typescript-eslint/no-unused-vars
                 onKeyDown: (keyStr, event, comboStr, isRepeat) => {
 
                 },
+                // eslint-disable-next-line @typescript-eslint/no-unused-vars
                 onKeyUp: (keyStr, event, oldComboStr) => {
 
                 },
@@ -919,9 +941,11 @@ export class KlCanvasWorkspace {
 
                     }
                 },
+                // eslint-disable-next-line @typescript-eslint/no-unused-vars
                 onKeyDown: (keyStr, event, comboStr, isRepeat) => {
 
                 },
+                // eslint-disable-next-line @typescript-eslint/no-unused-vars
                 onKeyUp: (keyStr, event, oldComboStr) => {
 
                 },
@@ -943,9 +967,11 @@ export class KlCanvasWorkspace {
                     }
 
                 },
+                // eslint-disable-next-line @typescript-eslint/no-unused-vars
                 onKeyDown: (keyStr, event, comboStr, isRepeat) => {
 
                 },
+                // eslint-disable-next-line @typescript-eslint/no-unused-vars
                 onKeyUp: (keyStr, event, oldComboStr) => {
 
                 },
@@ -971,9 +997,11 @@ export class KlCanvasWorkspace {
 
                     }
                 },
+                // eslint-disable-next-line @typescript-eslint/no-unused-vars
                 onKeyDown: (keyStr, event, comboStr, isRepeat) => {
 
                 },
+                // eslint-disable-next-line @typescript-eslint/no-unused-vars
                 onKeyUp: (keyStr, event, oldComboStr) => {
 
                 },
@@ -981,7 +1009,7 @@ export class KlCanvasWorkspace {
             hand: {
                 onPointer: (event) => {
                     this.updateCursor(TMode.Hand);
-                    if (['left', 'middle'].includes(event.button)) {
+                    if (['left', 'middle'].includes(event.button || '')) {
                         this.updateCursor(TMode.HandGrabbing);
                         this.targetTransformObj.x += event.dX;
                         this.targetTransformObj.y += event.dY;
@@ -993,9 +1021,11 @@ export class KlCanvasWorkspace {
                         this.resetInputProcessor();
                     }
                 },
+                // eslint-disable-next-line @typescript-eslint/no-unused-vars
                 onKeyDown: (keyStr, event, comboStr, isRepeat) => {
 
                 },
+                // eslint-disable-next-line @typescript-eslint/no-unused-vars
                 onKeyUp: (keyStr, event, oldComboStr) => {
 
                 },
@@ -1003,7 +1033,7 @@ export class KlCanvasWorkspace {
             spaceHand: {
                 onPointer: (event) => {
                     this.updateCursor(TMode.Hand);
-                    if (['left', 'middle'].includes(event.button)) {
+                    if (['left', 'middle'].includes(event.button || '')) {
                         this.updateCursor(TMode.HandGrabbing);
                         this.targetTransformObj.x += event.dX;
                         this.targetTransformObj.y += event.dY;
@@ -1013,6 +1043,7 @@ export class KlCanvasWorkspace {
                         this.reqFrame(true);
                     }
                 },
+                // eslint-disable-next-line @typescript-eslint/no-unused-vars
                 onKeyDown: (keyStr, event, comboStr, isRepeat) => {
                     if (comboStr !== 'space') {
                         this.resetInputProcessor();
@@ -1020,6 +1051,7 @@ export class KlCanvasWorkspace {
                         this.updateCursor(TMode.Hand);
                     }
                 },
+                // eslint-disable-next-line @typescript-eslint/no-unused-vars
                 onKeyUp: (keyStr, event, oldComboStr) => {
                     this.resetInputProcessor();
                 },
@@ -1033,7 +1065,7 @@ export class KlCanvasWorkspace {
                         const offsetX = event.pageX - event.relX;
                         const offsetY = event.pageY - event.relY;
 
-                        this.internalZoomByStep(event.dX / 175, event.downPageX - offsetX, event.downPageY - offsetY);
+                        this.internalZoomByStep(event.dX / 175, event.downPageX! - offsetX, event.downPageY! - offsetY);
                         this.highResTransformObj = BB.copyObj(this.targetTransformObj);
                         this.lastRenderedState = -1;
                         this.reqFrame();
@@ -1045,6 +1077,7 @@ export class KlCanvasWorkspace {
                         });
                     }
                 },
+                // eslint-disable-next-line @typescript-eslint/no-unused-vars
                 onKeyDown: (keyStr, event, comboStr, isRepeat) => {
                     if (comboStr !== 'z') {
                         this.resetInputProcessor();
@@ -1052,6 +1085,7 @@ export class KlCanvasWorkspace {
                         this.updateCursor(TMode.Zoom);
                     }
                 },
+                // eslint-disable-next-line @typescript-eslint/no-unused-vars
                 onKeyUp: (keyStr, event, oldComboStr) => {
                     this.resetInputProcessor();
                 },
@@ -1060,7 +1094,7 @@ export class KlCanvasWorkspace {
                 onPointer: (event) => {
                     this.updateCursor(TMode.Pick);
                     if (
-                        (['left', 'right'].includes(event.button) && !event.isCoalesced) ||
+                        (['left', 'right'].includes(event.button || '') && !event.isCoalesced) ||
                         event.type === 'pointerup'
                     ) {
                         const coord = this.workspaceToCanvasCoord({x: event.relX, y: event.relY});
@@ -1078,9 +1112,11 @@ export class KlCanvasWorkspace {
                         }
                     }
                 },
+                // eslint-disable-next-line @typescript-eslint/no-unused-vars
                 onKeyDown: (keyStr, event, comboStr, isRepeat) => {
 
                 },
+                // eslint-disable-next-line @typescript-eslint/no-unused-vars
                 onKeyUp: (keyStr, event, oldComboStr) => {
 
                 },
@@ -1089,7 +1125,7 @@ export class KlCanvasWorkspace {
                 onPointer: (event) => {
                     this.updateCursor(TMode.Pick);
                     if (
-                        (['left', 'right'].includes(event.button) && !event.isCoalesced) ||
+                        (['left', 'right'].includes(event.button || '') && !event.isCoalesced) ||
                         event.type === 'pointerup'
                     ) {
                         const coord = this.workspaceToCanvasCoord({x: event.relX, y: event.relY});
@@ -1103,6 +1139,7 @@ export class KlCanvasWorkspace {
                         });
                     }
                 },
+                // eslint-disable-next-line @typescript-eslint/no-unused-vars
                 onKeyDown: (keyStr, event, comboStr, isRepeat) => {
                     if (comboStr !== 'alt') {
                         this.resetInputProcessor();
@@ -1110,6 +1147,7 @@ export class KlCanvasWorkspace {
                         this.updateCursor(TMode.Pick);
                     }
                 },
+                // eslint-disable-next-line @typescript-eslint/no-unused-vars
                 onKeyUp: (keyStr, event, oldComboStr) => {
                     this.resetInputProcessor();
                 },
@@ -1131,7 +1169,7 @@ export class KlCanvasWorkspace {
                             y: this.renderHeight / 2,
                         };
 
-                        const startAngleRad = BB.Vec2.angle(centerObj, {x: event.downPageX - offsetX, y: event.downPageY - offsetY});
+                        const startAngleRad = BB.Vec2.angle(centerObj, {x: event.downPageX! - offsetX, y: event.downPageY! - offsetY});
                         const angleRad = BB.Vec2.angle(centerObj, {x: event.pageX - offsetX, y: event.pageY - offsetY});
                         let dAngleRad = angleRad - startAngleRad;
 
@@ -1154,7 +1192,7 @@ export class KlCanvasWorkspace {
                         matrix = BB.Matrix.multiplyMatrices(matrix, BB.Matrix.createTranslationMatrix(-centerObj.x, -centerObj.y));
                         //matrix = multiplyMatrices(matrix, createTranslationMatrix(val.x - val.startX, val.y - val.startY));
 
-                        let origin = [this.targetTransformObj.x, this.targetTransformObj.y, 0, 1];
+                        let origin: TVec4 = [this.targetTransformObj.x, this.targetTransformObj.y, 0, 1];
                         origin = BB.Matrix.multiplyMatrixAndPoint(matrix, origin);
                         this.targetTransformObj.x = origin[0];
                         this.targetTransformObj.y = origin[1];
@@ -1173,6 +1211,7 @@ export class KlCanvasWorkspace {
 
                     }
                 },
+                // eslint-disable-next-line @typescript-eslint/no-unused-vars
                 onKeyDown: (keyStr, event, comboStr, isRepeat) => {
                     if (['r', 'r+shift', 'shift+r', 'r+left', 'r+right', 'r+left+right', 'r+right+left', 'r+up'].includes(comboStr)) {
                         this.updateCursor(TMode.Rotate);
@@ -1180,6 +1219,7 @@ export class KlCanvasWorkspace {
                         this.resetInputProcessor();
                     }
                 },
+                // eslint-disable-next-line @typescript-eslint/no-unused-vars
                 onKeyUp: (keyStr, event, oldComboStr) => {
                     const comboStr = this.keyListener.getComboStr();
                     if (['r', 'r+shift', 'shift+r', 'r+left', 'r+right', 'r+left+right', 'r+right+left', 'r+up'].includes(comboStr)) {
@@ -1233,7 +1273,7 @@ export class KlCanvasWorkspace {
                         matrix = BB.Matrix.multiplyMatrices(matrix, BB.Matrix.createTranslationMatrix(event.relX - event.downRelX, event.relY - event.downRelY));
 
 
-                        let origin = [this.targetTransformObj.x, this.targetTransformObj.y, 0, 1];
+                        let origin: TVec4 = [this.targetTransformObj.x, this.targetTransformObj.y, 0, 1];
                         origin = BB.Matrix.multiplyMatrixAndPoint(matrix, origin);
 
                         this.targetTransformObj.x = origin[0];
@@ -1263,8 +1303,8 @@ export class KlCanvasWorkspace {
             },
         });
 
-        const onDoubleTap = (event) => {
-            if (_this.fitView()) {
+        const onDoubleTap = (event: IDoubleTapperEvent) => {
+            if (this.fitView()) {
                 this.lastRenderedState = -1;
                 this.reqFrame();
             } else {
@@ -1309,16 +1349,16 @@ export class KlCanvasWorkspace {
 
         this.pointerEventChain = new BB.EventChain({
             chainArr: [
-                this.twoFingerTap,
-                this.threeFingerTap,
-                this.mainDoubleTapper,
-                this.middleDoubleTapper,
-                this.pinchZoomer,
-                new BB.OnePointerLimiter(),
-                new BB.CoalescedExploder(),
+                this.twoFingerTap as IChainElement,
+                this.threeFingerTap as IChainElement,
+                this.mainDoubleTapper as IChainElement,
+                this.middleDoubleTapper as IChainElement,
+                this.pinchZoomer as IChainElement,
+                new BB.OnePointerLimiter() as IChainElement,
+                new BB.CoalescedExploder() as IChainElement,
             ],
         });
-        this.pointerEventChain.setChainOut((event: IPointerEvent) => {
+        this.pointerEventChain.setChainOut((event: ICoalescedPointerEvent) => {
 
             this.cursorPos.x = event.relX;
             this.cursorPos.y = event.relY;
@@ -1359,7 +1399,7 @@ export class KlCanvasWorkspace {
 
                 } else if (this.globalMode === TMode.Hand) {
 
-                    if (event.type === 'pointerdown' && ['left', 'middle'].includes(event.button)) {
+                    if (event.type === 'pointerdown' && ['left', 'middle'].includes(event.button || '')) {
                         this.currentInputProcessor = this.inputProcessorObj.hand;
                         this.currentInputProcessor.onPointer(event);
                     } else if ([''].includes(comboStr) && event.type === 'pointerdown' && event.button === 'right') {
@@ -1371,7 +1411,7 @@ export class KlCanvasWorkspace {
 
                 } else if (this.globalMode === TMode.Pick) {
 
-                    if (event.type === 'pointerdown' && ['left', 'right'].includes(event.button)) {
+                    if (event.type === 'pointerdown' && ['left', 'right'].includes(event.button || '')) {
                         this.currentInputProcessor = this.inputProcessorObj.picker;
                         this.currentInputProcessor.onPointer(event);
                     } else if ([''].includes(comboStr) && event.type === 'pointerdown' && event.button === 'middle') {
@@ -1466,7 +1506,9 @@ export class KlCanvasWorkspace {
                     if (e.type === 'pointerdown' && e.button === 'middle') {
                         try {
                             e.eventPreventDefault();
-                        } catch (e) {}
+                        } catch (e) {
+                            /* empty */
+                        }
                     }
                     // prevent manual slider input keeping focus on iPad
                     if (e.type === 'pointerdown') {
@@ -1632,10 +1674,7 @@ export class KlCanvasWorkspace {
         if (this.globalMode === TMode.Pick) {
             return 'pick';
         }
-    }
-
-    setEnabled (b: boolean): void {
-        // todo
+        throw new Error('unknown globalMode');
     }
 
     setCursorSize (diameter: number): void {
@@ -1725,34 +1764,29 @@ export class KlCanvasWorkspace {
 
         //rotate points
         for (let i = 0; i < canvasPointsArr.length; i++) {
-            let coords = [canvasPointsArr[i][0], canvasPointsArr[i][1], 0, 1];
+            let coords: TVec4 = [canvasPointsArr[i][0], canvasPointsArr[i][1], 0, 1];
             coords = BB.Matrix.multiplyMatrixAndPoint(matrix, coords);
             canvasPointsArr[i][0] = coords[0];
             canvasPointsArr[i][1] = coords[1];
         }
 
-        const boundsObj = {
-            x0: null,
-            y0: null,
-            x1: null,
-            y1: null,
-        };
+        const boundsObj: Partial<IBounds> = {};
         for (let i = 0; i < canvasPointsArr.length; i++) {
-            if (boundsObj.x0 === null || canvasPointsArr[i][0] < boundsObj.x0) {
-                boundsObj.x0 = canvasPointsArr[i][0];
-            }
-            if (boundsObj.y0 === null || canvasPointsArr[i][1] < boundsObj.y0) {
-                boundsObj.y0 = canvasPointsArr[i][1];
-            }
-            if (boundsObj.x1 === null || canvasPointsArr[i][0] > boundsObj.x1) {
+            if (boundsObj.x1 === undefined || canvasPointsArr[i][0] < boundsObj.x1) {
                 boundsObj.x1 = canvasPointsArr[i][0];
             }
-            if (boundsObj.y1 === null || canvasPointsArr[i][1] > boundsObj.y1) {
+            if (boundsObj.y1 === undefined || canvasPointsArr[i][1] < boundsObj.y1) {
                 boundsObj.y1 = canvasPointsArr[i][1];
             }
+            if (boundsObj.x2 === undefined || canvasPointsArr[i][0] > boundsObj.x2) {
+                boundsObj.x2 = canvasPointsArr[i][0];
+            }
+            if (boundsObj.y2 === undefined || canvasPointsArr[i][1] > boundsObj.y2) {
+                boundsObj.y2 = canvasPointsArr[i][1];
+            }
         }
-        const boundsWidth = boundsObj.x1 - boundsObj.x0;
-        const boundsHeight = boundsObj.y1 - boundsObj.y0;
+        const boundsWidth = boundsObj.x2! - boundsObj.x1!;
+        const boundsHeight = boundsObj.y2! - boundsObj.y1!;
 
         //fit bounds
         const padding = 0;
@@ -1826,7 +1860,7 @@ export class KlCanvasWorkspace {
         matrix = BB.Matrix.multiplyMatrices(matrix, BB.Matrix.createRotationMatrix(this.targetTransformObj.angle - oldAngleRad));
         matrix = BB.Matrix.multiplyMatrices(matrix, BB.Matrix.createTranslationMatrix(-centerObj.x, -centerObj.y));
 
-        let origin = [this.targetTransformObj.x, this.targetTransformObj.y, 0, 1];
+        let origin: TVec4 = [this.targetTransformObj.x, this.targetTransformObj.y, 0, 1];
         origin = BB.Matrix.multiplyMatrixAndPoint(matrix, origin);
         this.targetTransformObj.x = origin[0];
         this.targetTransformObj.y = origin[1];
@@ -1877,8 +1911,8 @@ export class KlCanvasWorkspace {
         this.reqFrame();
     }
 
-    setLastDrawEvent (x: number | null, y?: number, pressure?: number): void {
-        if (x === null) {
+    setLastDrawEvent (x?: number, y?: number, pressure?: number): void {
+        if (x === undefined) {
             this.lastDrawEvent = null;
             return;
         }
@@ -1887,8 +1921,8 @@ export class KlCanvasWorkspace {
             this.lastDrawEvent = {x: 0, y: 0, pressure: 0};
         }
         this.lastDrawEvent.x = x;
-        this.lastDrawEvent.y = y;
-        this.lastDrawEvent.pressure = pressure;
+        this.lastDrawEvent.y = y!;
+        this.lastDrawEvent.pressure = pressure!;
     }
 
 }

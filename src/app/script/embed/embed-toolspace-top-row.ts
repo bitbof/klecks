@@ -25,7 +25,14 @@ export class EmbedToolspaceTopRow {
             },
         });
 
-        function createButton (p): {
+        function createButton (p: {
+            title: string;
+            content?: HTMLElement;
+            image?: string;
+            onClick: () => void;
+            extraPadding?: number;
+            contain: boolean;
+        }): {
             el: HTMLElement;
             pointerListener: PointerListener;
         } {
@@ -57,7 +64,7 @@ export class EmbedToolspaceTopRow {
             }
             const pointerListener = new BB.PointerListener({ // because :hover causes problems w touch
                 target: el,
-                onEnterLeave: function (isOver) {
+                onEnterLeave: function (isOver): void {
                     el.classList.toggle('toolspace-row-button-hover', isOver);
                 },
             });

@@ -369,7 +369,7 @@ export class KlColorSlider {
                         }
                     }
 
-                    if (event.type === 'pointermove' && ['left', 'right'].includes(event.button)) {
+                    if (event.type === 'pointermove' && ['left', 'right'].includes(event.button || '')) {
 
                         let factor = 1;
                         if (event.button === 'right') {
@@ -420,9 +420,9 @@ export class KlColorSlider {
                         }
                     }
 
-                    if (event.type === 'pointermove' && ['left', 'right'].includes(event.button)) {
+                    if (event.type === 'pointermove' && ['left', 'right'].includes(event.button || '')) {
 
-                        const deltaY = Math.abs(event.pageY - event.downPageY);
+                        const deltaY = Math.abs(event.pageY - event.downPageY!);
                         const factor = calcSliderFalloffFactor(deltaY, event.button === 'right');
 
                         virtualHSV.h += event.dX / this.width * 359.99 * factor;

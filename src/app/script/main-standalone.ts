@@ -11,7 +11,7 @@ import {ProjectStore} from './klecks/storage/project-store';
 import {initLANG, LANG} from './language/language';
 import '../script/theme/theme';
 
-function initError (e): void {
+function initError (e: Error): void {
     const el = document.createElement('div');
     el.style.textAlign = 'center';
     el.style.background = '#fff';
@@ -25,7 +25,7 @@ function initError (e): void {
 }
 
 (async () => {
-    let klApp;
+    let klApp: KlApp;
     let domIsLoaded = false;
 
     try {
@@ -34,19 +34,17 @@ function initError (e): void {
         });
         await initLANG();
     } catch (e) {
-        initError(e);
+        initError(e as Error);
         return;
     }
 
-    function onProjectLoaded (project: IKlProject, projectStore: ProjectStore) {
+    function onProjectLoaded (project: IKlProject | null, projectStore: ProjectStore) {
         if (klApp) {
             throw 'onKlProjectObjLoaded called more than once';
         }
+        // in case an extension manipulated the page
         const loadingScreenEl = document.getElementById('loading-screen');
-        try {
-            // in case an extension screwed with the page
-            loadingScreenEl.parentNode.removeChild(loadingScreenEl);
-        } catch(e) {}
+        loadingScreenEl?.remove();
 
         const saveReminder = new KL.SaveReminder(
             klHistory,
@@ -80,17 +78,17 @@ function initError (e): void {
         try {
             window.removeEventListener('DOMContentLoaded', onDomLoaded);
             const projectStore = new KL.ProjectStore();
-            let project: IKlProject = null;
+            let project: IKlProject | null = null;
             try {
                 const readResult = await projectStore.read();
                 if (readResult) {
                     project = readResult.project;
                 }
             } catch(e) {
-                let message;
-                if (e.message.indexOf('db-error') === 0) {
+                let message: string;
+                if ((e as Error).message.indexOf('db-error') === 0) {
                     message = 'Failed to access Browser Storage';
-                } else if (e.message.indexOf('format-error') === 0) {
+                } else if ((e as Error).message.indexOf('format-error') === 0) {
                     message = 'Failed to restore from Browser Storage';
                 } else {
                     message = 'Failed to restore from Browser Storage';
@@ -104,7 +102,7 @@ function initError (e): void {
             }
             onProjectLoaded(project, projectStore);
         } catch (e) {
-            initError(e);
+            initError(e as Error);
         }
 
     }

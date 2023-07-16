@@ -7,6 +7,8 @@ import {IFilterApply, IFilterGetDialogParam, IFilterGetDialogResult, IKlBasicLay
 import {LANG} from '../../language/language';
 import {IVector2D} from '../../bb/bb-types';
 import {TFilterHistoryEntry} from './filters';
+import {PointerListener} from '../../bb/input/pointer-listener';
+import {throwIfNull} from '../../bb/base/base';
 
 export type TFilterTiltShiftInput = {
     a: IVector2D;
@@ -18,6 +20,12 @@ export type TFilterTiltShiftInput = {
 export type TFilterTiltShiftHistoryEntry = TFilterHistoryEntry<
     'tiltShift',
     TFilterTiltShiftInput>;
+
+type TDraggable = HTMLDivElement & {
+    x: number;
+    y: number;
+    // copy: (p: IVector2D) => void;
+};
 
 export const filterTiltShift = {
 
@@ -49,24 +57,21 @@ export const filterTiltShift = {
         const previewFactor = w / context.canvas.width;
         const displayPreviewFactor = displayW / context.canvas.width;
 
-        const div = document.createElement('div');
+        const rootEl = document.createElement('div');
         const result: IFilterGetDialogResult<TFilterTiltShiftInput> = {
-            element: div,
+            element: rootEl,
         };
 
-        const pointerListenerArr = [];
+        const pointerListenerArr: PointerListener[] = [];
 
         function finishInit () {
             let blur = 20, gradient = 200;
-            div.innerHTML = LANG('filter-tilt-shift-description') + '<br/><br/>';
+            rootEl.innerHTML = LANG('filter-tilt-shift-description') + '<br/><br/>';
 
-            const fxCanvas = getSharedFx();
-            if (!fxCanvas) {
-                return; // todo throw?
-            }
+            const fxCanvas = throwIfNull(getSharedFx());
             const texture = fxCanvas.texture(tempCanvas);
             fxCanvas.draw(texture).update(); // update fxCanvas size
-            let fa, fb; // focus line
+
             function update () {
                 try {
                     fxCanvas.draw(texture).tiltShift(
@@ -79,38 +84,38 @@ export const filterTiltShift = {
                     ).update();
                     klCanvasPreview.render();
                 } catch(e) {
-                    (div as any).errorCallback(e);
+                    (rootEl as any).errorCallback(e);
                 }
             }
 
-            function nob (x, y) {
-                const nobSize = 14;
+            function createDraggable (x: number, y: number): TDraggable {
+                const size = 14;
                 const div = BB.el({
                     css: {
-                        width: nobSize + 'px',
-                        height: nobSize + 'px',
+                        width: size + 'px',
+                        height: size + 'px',
                         backgroundColor: '#fff',
                         boxShadow: 'inset 0 0 0 2px #000',
-                        borderRadius: nobSize + 'px',
+                        borderRadius: size + 'px',
                         position: 'absolute',
                         cursor: 'move',
-                        left: (x - nobSize / 2) + 'px',
-                        top: (y - nobSize / 2) + 'px',
+                        left: (x - size / 2) + 'px',
+                        top: (y - size / 2) + 'px',
                         userSelect: 'none',
                         touchAction: 'none',
                     },
-                });
-                (div as any).x = x;
-                (div as any).y = y;
+                }) as TDraggable;
+                div.x = x;
+                div.y = y;
                 const pointerListener = new BB.PointerListener({
                     target: div,
                     onPointer: function (event) {
                         event.eventPreventDefault();
                         if (event.button === 'left' && event.type === 'pointermove') {
-                            (div as any).x += event.dX;
-                            (div as any).y += event.dY;
-                            div.style.left = ((div as any).x - nobSize / 2) + 'px';
-                            div.style.top = ((div as any).y - nobSize / 2) + 'px';
+                            div.x += event.dX;
+                            div.y += event.dY;
+                            div.style.left = (div.x - size / 2) + 'px';
+                            div.style.top = (div.y - size / 2) + 'px';
                             update();
                         }
                     },
@@ -119,8 +124,9 @@ export const filterTiltShift = {
                 return div;
             }
 
-            fa = nob(parseInt('' + (displayW / 6)), parseInt('' + (displayH / 2)));
-            fb = nob(parseInt('' + (displayW - displayW / 6)), parseInt('' + (displayH - displayH / 3)));
+            // focus line control points
+            const fa = createDraggable(parseInt('' + (displayW / 6)), parseInt('' + (displayH / 2)));
+            const fb = createDraggable(parseInt('' + (displayW - displayW / 6)), parseInt('' + (displayH - displayH / 3)));
 
             const blurSlider = new KlSlider({
                 label: LANG('filter-tilt-shift-blur'),
@@ -136,7 +142,7 @@ export const filterTiltShift = {
                 },
             });
             blurSlider.getElement().style.marginBottom = '10px';
-            div.append(blurSlider.getElement());
+            rootEl.append(blurSlider.getElement());
             const gradientSlider = new KlSlider({
                 label: LANG('filter-tilt-shift-gradient'),
                 width: 300,
@@ -150,7 +156,7 @@ export const filterTiltShift = {
                     update();
                 },
             });
-            div.append(gradientSlider.getElement());
+            rootEl.append(gradientSlider.getElement());
 
 
             const previewWrapper = BB.el({
@@ -193,7 +199,7 @@ export const filterTiltShift = {
             previewInnerWrapper.append(fa, fb);
 
 
-            div.append(previewWrapper);
+            rootEl.append(previewWrapper);
             update();
             result.destroy = (): void => {
                 for (let i = 0; i < pointerListenerArr.length; i++) {
@@ -205,7 +211,7 @@ export const filterTiltShift = {
                 klCanvasPreview.destroy();
             };
             result.getInput = function (): TFilterTiltShiftInput {
-                result.destroy();
+                result.destroy!();
                 return {
                     a: {x: fa.x / displayPreviewFactor, y: fa.y / displayPreviewFactor},
                     b: {x: fb.x / displayPreviewFactor, y: fb.y / displayPreviewFactor},

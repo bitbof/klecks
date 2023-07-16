@@ -144,7 +144,7 @@ export const filterBrightnessContrast = {
                 klCanvasPreview.destroy();
             };
             result.getInput = function (): TFilterBrightnessContrastInput {
-                result.destroy();
+                result.destroy!();
                 return {
                     brightness: brightness,
                     contrast: contrast,

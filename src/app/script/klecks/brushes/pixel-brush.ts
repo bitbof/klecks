@@ -5,6 +5,7 @@ import {IRGB, TPressureInput} from '../kl-types';
 import {IVector2D} from '../../bb/bb-types';
 import {BezierLine} from '../../bb/math/line';
 import {ERASE_COLOR} from './erase-color';
+import {throwIfNull} from '../../bb/base/base';
 
 export interface IPixelBrushHistoryEntry extends IHistoryEntry {
     tool: ['brush', 'PixelBrush'];
@@ -16,19 +17,19 @@ export class PixelBrush {
 
     private history: KlHistoryInterface = new KL.DecoyKlHistory();
     private historyEntry: IPixelBrushHistoryEntry | undefined;
-    private context: CanvasRenderingContext2D;
+    private context: CanvasRenderingContext2D = {} as CanvasRenderingContext2D;
     private settingHasSizePressure: boolean = true;
     private settingHasOpacityPressure: boolean = false;
     private settingSize: number = 0.5;
     private settingSpacing: number = 0.9;
     private settingOpacity: number = 1;
-    private settingColor: IRGB;
-    private settingColorStr: string;
+    private settingColor: IRGB = {} as IRGB;
+    private settingColorStr: string = '';
     private settingLockLayerAlpha: boolean = false;
     private settingIsEraser: boolean = false;
     private settingUseDither: boolean = true;
     private inputIsDrawing: boolean = false;
-    private lineToolLastDot: number;
+    private lineToolLastDot: number = 0;
     private lastInput: TPressureInput = {x: 0, y: 0, pressure: 0};
     private lastInput2: TPressureInput = {x: 0, y: 0, pressure: 0};
     private bezierLine: BezierLine | null = null;
@@ -53,7 +54,7 @@ export class PixelBrush {
     ];
     private readonly ditherCanvas: HTMLCanvasElement;
     private readonly ditherCtx: CanvasRenderingContext2D;
-    private ditherPattern: CanvasPattern;
+    private ditherPattern: CanvasPattern = {} as CanvasPattern;
 
 
     private updateDither (): void {
@@ -62,7 +63,7 @@ export class PixelBrush {
         for (let i = 0; i < Math.max(1, Math.round(this.settingOpacity * this.ditherArr.length)); i++) {
             this.ditherCtx.fillRect(this.ditherArr[i][0], this.ditherArr[i][1], 1, 1);
         }
-        this.ditherPattern = this.context.createPattern(this.ditherCanvas, 'repeat');
+        this.ditherPattern = throwIfNull(this.context.createPattern(this.ditherCanvas, 'repeat'));
     }
 
     /**
@@ -243,6 +244,7 @@ export class PixelBrush {
         const dY = -Math.abs(y1 - y0);
         const sY = y0 < y1 ? 1 : -1;
         let err = dX + dY;
+        // eslint-disable-next-line no-constant-condition
         while (true) {
             if (skipFirst) {
                 skipFirst = false;
@@ -511,11 +513,11 @@ export class PixelBrush {
     }
 
     setIsEraser (b: boolean): void {
-        this.settingIsEraser = !!b;
+        this.settingIsEraser = b;
     }
 
     setUseDither (b: boolean): void {
-        this.settingUseDither = !!b;
+        this.settingUseDither = b;
     }
 
     //GET

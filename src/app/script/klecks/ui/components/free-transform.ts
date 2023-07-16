@@ -47,14 +47,14 @@ export class FreeTransform {
     private isConstrained: boolean;
     private ratio: number; // aspect ratio of transform
     private readonly scale: number;
-    private readonly scaled = { // scaled coordinates and dimensions for screenspace
+    private readonly scaled = { // scaled coordinates and dimensions for screen space
         x: 0,
         y: 0,
         width: 0,
         height: 0,
         corners: [{x: 0, y: 0}], // in transform space
     };
-    private readonly minSnapDist = 7; // minimal snapping distance in px screenspace
+    private readonly minSnapDist = 7; // minimal snapping distance in px screen space
     private snappingEnabled: boolean;
     private readonly snapX: number[];
     private readonly snapY: number[];
@@ -122,7 +122,7 @@ export class FreeTransform {
         for (let e = 0; e < this.snapX.length; e++) {
             dist = Math.abs(iX - this.snapX[e]);
             if (dist < this.minSnapDist / this.scale) {
-                if (snap.x === undefined || dist < snap.dist.x) {
+                if (snap.x === undefined || dist < snap.dist.x!) {
                     snap.x = this.snapX[e];
                     snap.dist.x = dist;
                 }
@@ -131,7 +131,7 @@ export class FreeTransform {
         for (let e = 0; e < this.snapY.length; e++) {
             dist = Math.abs(iY - this.snapY[e]);
             if (dist < this.minSnapDist / this.scale) {
-                if (snap.y === undefined || dist < snap.dist.y) {
+                if (snap.y === undefined || dist < snap.dist.y!) {
                     snap.y = this.snapY[e];
                     snap.dist.y = dist;
                 }
@@ -387,23 +387,26 @@ export class FreeTransform {
                     boundsStartP = {x: this.transform.x, y: this.transform.y};
                 }
                 if (event.type === 'pointermove' && event.button === 'left') {
-                    this.transform.x = boundsStartP.x + (event.pageX - event.downPageX) / this.scale;
-                    this.transform.y = boundsStartP.y + (event.pageY - event.downPageY) / this.scale;
+                    this.transform.x = boundsStartP.x + (event.pageX - event.downPageX!) / this.scale;
+                    this.transform.y = boundsStartP.y + (event.pageY - event.downPageY!) / this.scale;
 
 
                     let dist: number;
                     let snap: {
                         x?: number;
                         y?: number;
-                        distX?: number;
-                        distY?: number;
-                    } = {};
+                        distX: number;
+                        distY: number;
+                    } = {
+                        distX: -1,
+                        distY: -1,
+                    };
                     if (this.snappingEnabled) {
                         let i;
                         for (i = 0; i < this.snapX.length; i++) {
                             dist = Math.abs(this.transform.x - this.snapX[i]);
                             if (dist < this.minSnapDist / this.scale) {
-                                if (!snap.x || dist < snap.distX) {
+                                if (snap.x === undefined || dist < snap.distX) {
                                     snap.x = this.snapX[i];
                                     snap.distX = dist;
                                 }
@@ -412,7 +415,7 @@ export class FreeTransform {
                         for (i = 0; i < this.snapY.length; i++) {
                             dist = Math.abs(this.transform.y - this.snapY[i]);
                             if (dist < this.minSnapDist / this.scale) {
-                                if (!snap.y || dist < snap.distY) {
+                                if (snap.y === undefined || dist < snap.distY) {
                                     snap.y = this.snapY[i];
                                     snap.distY = dist;
                                 }
@@ -426,7 +429,7 @@ export class FreeTransform {
                             for (j = 0; j < this.snapX.length; j++) {
                                 dist = Math.abs(iP.x - this.snapX[j]);
                                 if (dist < this.minSnapDist / this.scale) {
-                                    if (!snap.x || dist < snap.distX) {
+                                    if (snap.x === undefined || dist < snap.distX) {
                                         snap.x = this.snapX[j] - (iP.x - this.transform.x);
                                         snap.distX = dist;
                                     }
@@ -435,7 +438,7 @@ export class FreeTransform {
                             for (j = 0; j < this.snapY.length; j++) {
                                 dist = Math.abs(iP.y - this.snapY[j]);
                                 if (dist < this.minSnapDist / this.scale) {
-                                    if (!snap.y || dist < snap.distY) {
+                                    if (snap.y === undefined || dist < snap.distY) {
                                         snap.y = this.snapY[j] - (iP.y - this.transform.y);
                                         snap.distY = dist;
                                     }
@@ -546,7 +549,7 @@ export class FreeTransform {
                 g.updateDOM = (): void => {
 
                     // grip position
-                    // if gets small, offset grips, so easier to handle
+                    // if it gets small: slightly offset grips, so easier to handle
                     const offsetArr = [[-1, -1], [1, -1], [1, 1], [-1, 1]].map(item => {
                         item[0] *= this.transform.width > 0 ? 1 : -1;
                         item[1] *= this.transform.height > 0 ? 1 : -1;

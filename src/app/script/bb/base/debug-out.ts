@@ -5,7 +5,7 @@ import {el} from './ui';
 let debugOutEl: HTMLElement;
 const outArr: string[] = [];
 
-export function debugOut (str: string) {
+export function debugOut (str: string): void {
     if (!debugOutEl) {
         debugOutEl = el({
             css: {

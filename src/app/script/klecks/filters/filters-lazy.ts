@@ -18,8 +18,11 @@ import {filterNoise} from './filter-noise';
 import {filterPattern} from './filter-pattern';
 import {filterDistort} from './filter-distort';
 import {filterVanishPoint} from './filter-vanish-point';
+import {IFilter} from '../kl-types';
 
-function importFilter (libObj, moduleObj): void {
+type TModuleFilter = Pick<IFilter, 'getDialog' | 'apply'>;
+
+function importFilter (libObj: IFilter, moduleObj: TModuleFilter): void {
     if (moduleObj.getDialog) {
         libObj.getDialog = moduleObj.getDialog;
     }
@@ -31,25 +34,25 @@ export function importFilters (): void {
     if (filterLibStatus.isLoaded) {
         return;
     }
-    importFilter(filterLib.brightnessContrast, filterBrightnessContrast);
-    importFilter(filterLib.cropExtend, filterCropExtend);
-    importFilter(filterLib.curves, filterCurves);
-    importFilter(filterLib.flip, filterFlip);
-    importFilter(filterLib.hueSaturation, filterHueSaturation);
-    importFilter(filterLib.invert, filterInvert);
-    importFilter(filterLib.perspective, filterPerspective);
-    importFilter(filterLib.resize, filterResize);
-    importFilter(filterLib.rotate, filterRotate);
-    importFilter(filterLib.tiltShift, filterTiltShift);
-    importFilter(filterLib.transform, filterTransform);
-    importFilter(filterLib.blur, filterBlur);
-    importFilter(filterLib.unsharpMask, filterUnsharpMask);
-    importFilter(filterLib.toAlpha, filterToAlpha);
-    importFilter(filterLib.grid, filterGrid);
-    importFilter(filterLib.noise, filterNoise);
-    importFilter(filterLib.pattern, filterPattern);
-    importFilter(filterLib.distort, filterDistort);
-    importFilter(filterLib.vanishPoint, filterVanishPoint);
+    importFilter(filterLib.brightnessContrast, filterBrightnessContrast as TModuleFilter);
+    importFilter(filterLib.cropExtend, filterCropExtend as TModuleFilter);
+    importFilter(filterLib.curves, filterCurves as TModuleFilter);
+    importFilter(filterLib.flip, filterFlip as TModuleFilter);
+    importFilter(filterLib.hueSaturation, filterHueSaturation as TModuleFilter);
+    importFilter(filterLib.invert, filterInvert as TModuleFilter);
+    importFilter(filterLib.perspective, filterPerspective as TModuleFilter);
+    importFilter(filterLib.resize, filterResize as TModuleFilter);
+    importFilter(filterLib.rotate, filterRotate as TModuleFilter);
+    importFilter(filterLib.tiltShift, filterTiltShift as TModuleFilter);
+    importFilter(filterLib.transform, filterTransform as TModuleFilter);
+    importFilter(filterLib.blur, filterBlur as TModuleFilter);
+    importFilter(filterLib.unsharpMask, filterUnsharpMask as TModuleFilter);
+    importFilter(filterLib.toAlpha, filterToAlpha as TModuleFilter);
+    importFilter(filterLib.grid, filterGrid as TModuleFilter);
+    importFilter(filterLib.noise, filterNoise as TModuleFilter);
+    importFilter(filterLib.pattern, filterPattern as TModuleFilter);
+    importFilter(filterLib.distort, filterDistort as TModuleFilter);
+    importFilter(filterLib.vanishPoint, filterVanishPoint as TModuleFilter);
 
     filterLibStatus.isLoaded = true;
 }

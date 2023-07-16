@@ -8,7 +8,7 @@ export function drawGrid (
     thickness: number, // px
     color: string,
     opacity: number, // 0 - 1
-) {
+): void {
     ctx.save();
     const w = ctx.canvas.width;
     const h = ctx.canvas.height;

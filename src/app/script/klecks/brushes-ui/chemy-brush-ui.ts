@@ -9,9 +9,10 @@ import {IBrushUi} from '../kl-types';
 import {Options} from '../ui/components/options';
 import {BoxToggle} from '../ui/components/box-toggle';
 import {LANG, languageStrings} from '../../language/language';
+import {ChemyBrush} from '../brushes/chemy-brush';
 
 export const chemyBrushUi = (function () {
-    const brushInterface: IBrushUi = {
+    const brushInterface = {
         image: brushIconImg,
         tooltip: LANG('brush-chemy'),
         sizeSlider: {
@@ -24,8 +25,7 @@ export const chemyBrushUi = (function () {
             min: 1 / 100,
             max: 1,
         },
-        Ui: null,
-    };
+    } as IBrushUi<ChemyBrush>;
 
     languageStrings.subscribe(() => {
         brushInterface.tooltip = LANG('brush-chemy');
@@ -40,7 +40,7 @@ export const chemyBrushUi = (function () {
         let sizeSlider: KlSlider;
         let opacitySlider: KlSlider;
 
-        function setSize (size) {
+        function setSize (size: number) {
             brush.setSize(size);
         }
 
@@ -361,7 +361,7 @@ export const chemyBrushUi = (function () {
         this.getElement = function () {
             return div;
         };
-    };
+    } as IBrushUi<ChemyBrush>['Ui'];
 
     return brushInterface;
 })();

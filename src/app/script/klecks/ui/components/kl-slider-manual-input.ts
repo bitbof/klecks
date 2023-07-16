@@ -8,8 +8,8 @@ import {input} from './input';
 export class KlSliderManualInput {
 
     private readonly input: HTMLInputElement;
-    private isEnabled: boolean;
-    private scrollBefore: { x: number; y: number }; // window scroll position on creation
+    private isEnabled: boolean = true;
+    private scrollBefore: { x: number; y: number } | undefined; // window scroll position on creation
     private lastValue: number; // last emitted value
     private isClosed: boolean = false;
 
@@ -30,8 +30,8 @@ export class KlSliderManualInput {
         this.onClose();
         setTimeout(() => {
             // because iPad keyboard changes the scroll position
-            window.scrollTo(this.scrollBefore.x, this.scrollBefore.y);
-            this.scrollBefore = null;
+            this.scrollBefore && window.scrollTo(this.scrollBefore.x, this.scrollBefore.y);
+            this.scrollBefore = undefined;
         });
     }
 

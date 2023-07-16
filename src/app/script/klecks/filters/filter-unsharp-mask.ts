@@ -147,7 +147,7 @@ export const filterUnsharpMask = {
                 klCanvasPreview.destroy();
             };
             result.getInput = function (): TFilterUnsharpMaskInput {
-                result.destroy();
+                result.destroy!();
                 return {
                     radius: radius,
                     strength: strength,

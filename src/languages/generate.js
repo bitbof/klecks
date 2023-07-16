@@ -99,7 +99,7 @@ export const languages: {code: string; name: string}[] = [
         code: 'en',
         name: 'English',
     },
-${langArray.join(`,\n`)},
+${langArray.join(',\n')},
 ];
 export const loadLanguage = async (code: string): Promise<Record<TTranslationCode, string>> => {
     if (code === 'en') {
@@ -116,11 +116,11 @@ export type TTranslationCode = `;
             }
             tsStr += `'${item}'`;
             if (index < keys.length - 1) {
-                tsStr += ` |`;
+                tsStr += ' |';
             } else {
-                tsStr += `;`;
+                tsStr += ';';
             }
-            tsStr += ` // ${baseEn[item].replace("\n", "")}\n`;
+            tsStr += ` // ${baseEn[item].replace('\n', '')}\n`;
         });
         fs.writeFileSync('./src/app/languages/languages.ts', tsStr);
     }
@@ -134,7 +134,7 @@ export type TTranslationCode = `;
             if (!keys.includes(key)) {
                 console.log(`${translation.code}: Key "${key}" not in "${translation.code}".`);
             }
-        })
+        });
         keys.forEach(key => {
             const item = translation.data[key];
             if (
@@ -171,7 +171,7 @@ export type TTranslationCode = `;
  * @param {string} code
  * @returns {void}
  */
-function cmdAdd(code) {
+function cmdAdd (code) {
     if (!code) {
         console.log('error: argument missing for language code (ISO 639-1).');
         process.exit(1);
@@ -192,14 +192,14 @@ function cmdAdd(code) {
 /**
  * @returns {void}
  */
-function cmdSync() {
+function cmdSync () {
     console.log('not implemented');
 }
 
 /**
  * @return {string[]}
  */
-function getCodes() {
+function getCodes () {
     const codes = [];
     fs.readdirSync('./src/languages').forEach(file => {
         if (file === '_base-en.json5') {
@@ -215,7 +215,7 @@ function getCodes() {
 /**
  * @returns {void}
  */
-function cmdBuild() {
+function cmdBuild () {
     const translations = [];
     const codes = getCodes();
     codes.forEach(code => {

@@ -8,9 +8,10 @@ import {createPenPressureToggle} from '../ui/components/create-pen-pressure-togg
 import brushIconImg from '/src/app/img/ui/brush-smudge.svg';
 import {IBrushUi} from '../kl-types';
 import {LANG, languageStrings} from '../../language/language';
+import {SmudgeBrush} from '../brushes/smudge-brush';
 
 export const smudgeBrushUi = (function () {
-    const brushInterface: IBrushUi = {
+    const brushInterface = {
         image: brushIconImg,
         tooltip: LANG('brush-smudge'),
         sizeSlider: {
@@ -23,8 +24,7 @@ export const smudgeBrushUi = (function () {
             max: 1,
             curve: [[0, 1 / 100], [0.5, 0.3], [1, 1]],
         },
-        Ui: null,
-    };
+    } as IBrushUi<SmudgeBrush>;
 
     languageStrings.subscribe(() => {
         brushInterface.tooltip = LANG('brush-smudge');
@@ -35,8 +35,8 @@ export const smudgeBrushUi = (function () {
         const brush = new brushes.SmudgeBrush();
         brush.setHistory(klHistory);
         p.onSizeChange(brush.getSize());
-        let sizeSlider;
-        let opacitySlider;
+        let sizeSlider: KlSlider;
+        let opacitySlider: KlSlider;
 
         const lockAlphaToggle = new Checkbox({
             init: brush.getLockAlpha(),
@@ -50,7 +50,7 @@ export const smudgeBrushUi = (function () {
 
         const spacingSpline = new BB.SplineInterpolator([[0, 15], [8, 7], [14, 4], [30, 3], [50, 2.7], [100, 2]]);
 
-        function setSize (size) {
+        function setSize (size: number) {
             brush.setSize(size);
             brush.setSpacing(Math.max(2, spacingSpline.interpolate(size)) / 15);
         }
@@ -180,7 +180,7 @@ export const smudgeBrushUi = (function () {
         this.goLine = function (x, y, p) {
             brush.goLine(x, y, p);
         };
-        this.endLine = function (x, y) {
+        this.endLine = function () {
             brush.endLine();
         };
         this.getBrush = function () {
@@ -192,6 +192,6 @@ export const smudgeBrushUi = (function () {
         this.getElement = function () {
             return div;
         };
-    };
+    } as IBrushUi<SmudgeBrush>['Ui'];
     return brushInterface;
 })();

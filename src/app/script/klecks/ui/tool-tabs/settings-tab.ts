@@ -8,7 +8,7 @@ import klecksLogoImg from '/src/app/img/klecks-logo.png';
 import uiSwapImg from '/src/app/img/ui/ui-swap-lr.svg';
 import {LocalStorage} from '../../../bb/base/local-storage';
 import {theme, TTheme} from '../../../theme/theme';
-import {addIsDarkListener} from '../../../bb/base/base';
+import {addIsDarkListener, nullToUndefined} from '../../../bb/base/base';
 
 export class SettingsTab {
 
@@ -51,7 +51,7 @@ export class SettingsTab {
             }),
         ];
         const languageSelect = new KL.Select({
-            initValue: LocalStorage.getItem(LS_LANGUAGE_KEY) ? LocalStorage.getItem(LS_LANGUAGE_KEY) : 'auto',
+            initValue: nullToUndefined(LocalStorage.getItem(LS_LANGUAGE_KEY) ? LocalStorage.getItem(LS_LANGUAGE_KEY) : 'auto'),
             optionArr: options,
             onChange: (val) => {
                 if (val === 'auto') {
@@ -227,7 +227,7 @@ export class SettingsTab {
                 return;
             }
             languageSelect.setValue(
-                LocalStorage.getItem(LS_LANGUAGE_KEY) ? LocalStorage.getItem(LS_LANGUAGE_KEY) : 'auto'
+                nullToUndefined(LocalStorage.getItem(LS_LANGUAGE_KEY) ? LocalStorage.getItem(LS_LANGUAGE_KEY) : 'auto'),
             );
         });
 

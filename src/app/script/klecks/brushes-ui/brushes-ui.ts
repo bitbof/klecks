@@ -14,7 +14,7 @@ import {IBrushUi} from '../kl-types';
  */
 
 export const brushesUI: {
-    [key: string]: IBrushUi;
+    [key: string]: IBrushUi<any>;
 } = {
     penBrush: penBrushUi,
     blendBrush: blendBrushUi,

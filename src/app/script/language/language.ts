@@ -85,8 +85,9 @@ export function getLanguage (useLocalStorage?: boolean): string {
 
     if (useLocalStorage) {
         try {
-            if (localStorage.getItem(LS_LANGUAGE_KEY)) {
-                langs.unshift(localStorage.getItem(LS_LANGUAGE_KEY));
+            const item = localStorage.getItem(LS_LANGUAGE_KEY);
+            if (item) {
+                langs.unshift(item);
             }
         } catch (e) {
             // likely cookies disabled in Safari
@@ -109,7 +110,7 @@ export function getLanguage (useLocalStorage?: boolean): string {
 const activeLanguageCode = getLanguage(true);
 export const languageStrings = new LanguageStrings();
 
-export const LANG = (code: TTranslationCode | null, replace?: {[key: string]: string}): string => {
+export const LANG = (code: TTranslationCode, replace?: {[key: string]: string}): string => {
     if (replace) {
         let result = languageStrings.get(code);
         const keyArr = Object.keys(replace);

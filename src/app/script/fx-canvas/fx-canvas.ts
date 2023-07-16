@@ -76,6 +76,7 @@ export const fxCanvas: (() => TFxCanvas) = (function () {
                     textureType = gl.FLOAT;
                 });
             } catch (e) {
+                /* empty */
             }
             testTexture.destroy();
         }
@@ -166,27 +167,22 @@ void main() {
             // get.webgl.org does a try-catch
             try {
                 context = canvas.getContext(name, options) as (typeof context);
-            } catch (e) {}
+            } catch (e) {
+                /* empty */
+            }
         });
         return context;
     }
 
-    const fxCanvas = (): TFxCanvas => {
+    return (): TFxCanvas => {
         if (!window.WebGLRenderingContext) {
             throw 'WebGLRenderingContext not set. Browser does not support WebGL.';
         }
 
         const canvas: TFxCanvas = BB.canvas() as TFxCanvas;
-        let context = getWebGlContext(canvas, {premultipliedAlpha: false});
+        const context = getWebGlContext(canvas, {premultipliedAlpha: false});
         if (!context) {
-            // maybe premultipliedAlpha causes trouble?
-            context = getWebGlContext(canvas);
-            if (!context) {
-                throw 'This browser does not support WebGL';
-            }
-            setTimeout(() => {
-                throw 'WebGL context creation failed with options. Created without options.';
-            });
+            throw 'This browser does not support WebGL';
         }
         setGl(context as TFxGl);
 
@@ -196,7 +192,7 @@ void main() {
             texture: null,
             spareTexture: null,
             flippedShader: null,
-        };
+        } as any;
 
         // Core methods
         canvas.texture = wrap(texture);
@@ -223,6 +219,4 @@ void main() {
 
         return canvas as TFxCanvas;
     };
-
-    return fxCanvas;
 })();

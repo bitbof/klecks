@@ -17,8 +17,8 @@ export class FillUi {
     private readonly colorSlider: KlColorSlider;
     private readonly toleranceSlider: KlSlider;
     private readonly opacitySlider: KlSlider;
-    private readonly modeSelect: Select;
-    private readonly growSelect: Select;
+    private readonly modeSelect: Select<string>;
+    private readonly growSelect: Select<string>;
     private isContiguous: boolean;
     private readonly eraserToggle: Checkbox;
 

@@ -8,6 +8,7 @@ import {KlCanvasPreview} from '../canvas-ui/canvas-preview';
 import {TwoTabs} from '../ui/components/two-tabs';
 import {IVector2D} from '../../bb/bb-types';
 import {TFilterHistoryEntry} from './filters';
+import {throwIfNull} from '../../bb/base/base';
 
 
 export type TFilterPatternInput = {
@@ -15,7 +16,7 @@ export type TFilterPatternInput = {
     y: number;
     width: number;
     height: number;
-    blend?: number; // [0, 1] - 1 will blend linearly across whole length
+    blend: number; // [0, 1] - 1 will blend linearly across whole length
     offsetX: number;
     offsetY: number;
 };
@@ -130,7 +131,7 @@ function drawPattern (context: CanvasRenderingContext2D, settings: TFilterPatter
 
     context.clearRect(0, 0, context.canvas.width, context.canvas.height);
     context.translate(settings.offsetX - blendOffsetX, settings.offsetY - blendOffsetY);
-    context.fillStyle = context.createPattern(finalPatternCanvas, 'repeat');
+    context.fillStyle = throwIfNull(context.createPattern(finalPatternCanvas, 'repeat'));
     context.fillRect(-settings.offsetX + blendOffsetX, -settings.offsetY + blendOffsetY, context.canvas.width, context.canvas.height);
 
     context.restore();
@@ -159,7 +160,7 @@ export const filterPattern = {
             offsetX: 0,
             offsetY: 0,
         };
-        let lastDrawnSettings = null;
+        let lastDrawnSettings: TFilterPatternInput | undefined;
 
         // determine bounds
         const bounds = BB.canvasBounds(context);
@@ -320,13 +321,13 @@ export const filterPattern = {
 
         const klCanvas = params.klCanvas;
         const layers = klCanvas.getLayers();
-        const selectedLayerIndex = klCanvas.getLayerIndex(context.canvas);
+        const selectedLayerIndex = throwIfNull(klCanvas.getLayerIndex(context.canvas));
 
         const fit = BB.fitInto(context.canvas.width, context.canvas.height, isSmall ? 280 : 490, isSmall ? 200 : 240, 1);
         const w = parseInt('' + fit.width), h = parseInt('' + fit.height);
         const renderW = Math.min(w, context.canvas.width);
         const renderH = Math.min(h, context.canvas.height);
-        const renderFactor = renderW / context.canvas.width;
+        // const renderFactor = renderW / context.canvas.width;
         const previewFactor = w / context.canvas.width;
 
         const previewWrapper = BB.el({
@@ -385,16 +386,11 @@ export const filterPattern = {
 
 
         // ---- preview input processing ----
-        const inputs: {
+        const inputs = {} as {
             start: IVector2D;
-            end: IVector2D;
+            end: IVector2D | null;
             oldSettings: TFilterPatternInput;
             state: null | 'move' | 'select';
-        } = {
-            start: null,
-            end: null,
-            oldSettings: null,
-            state: null,
         };
 
         function syncInputs (): void {
@@ -589,15 +585,19 @@ export const filterPattern = {
 
 
         // ----- result -------------------
+        const destroy = () => {
+            blendSlider.destroy();
+            keyListener.destroy();
+            pointerListener.destroy();
+            klCanvasPreview.destroy();
+        };
         const result: IFilterGetDialogResult<TFilterPatternInput> = {
             element: rootEl,
-            destroy: (): void => {
-                blendSlider.destroy();
-                keyListener.destroy();
-                pointerListener.destroy();
-                klCanvasPreview.destroy();
+            destroy,
+            getInput: () => {
+                destroy();
+                return BB.copyObj(settings);
             },
-            getInput: () => BB.copyObj(settings),
         };
         if (!isSmall) {
             result.width = 500;

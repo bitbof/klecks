@@ -1,3 +1,5 @@
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-nocheck
 import {gl} from '../core/gl';
 import {Shader} from '../core/shader';
 import {simpleShader} from '../core/simple-shader';

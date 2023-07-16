@@ -3,10 +3,10 @@ import './polyfills-nomodule';
 /*
  * ---- Below ----------------------
  * features that didn't have support until *after* browsers supported the modules script tag:
- * chrome 61
- * edge 16
- * safari 11
- * firefox 60
+ * Chrome 61
+ * Edge 16
+ * Safari 11
+ * Firefox 60
  * https://caniuse.com/es6-module
  */
 
@@ -34,11 +34,12 @@ if (!('scrollBy' in Element.prototype)) {
 if (!Array.prototype.flat) {
     Object.defineProperty(Array.prototype, 'flat', {
         configurable: true,
-        value: function flat () {
-            const depth = isNaN(arguments[0]) ? 1 : Number(arguments[0]);
+        value: function flat (...args: any[]) {
+            const depth = isNaN(args[0]) ? 1 : Number(args[0]);
 
-            return depth ? Array.prototype.reduce.call(this, function (acc, cur) {
+            return depth ? Array.prototype.reduce.call(this, function (acc: any, cur) {
                 if (Array.isArray(cur)) {
+                    // eslint-disable-next-line prefer-spread
                     acc.push.apply(acc, flat.call(cur, depth - 1));
                 } else {
                     acc.push(cur);
@@ -54,11 +55,11 @@ if (!Array.prototype.flat) {
 // sometimes Android WebView has no localStorage
 if (!('localStorage' in window)) {
     try {
-        window['localStorage'] = {
+        (window as any).localStorage = {
             getItem: () => null,
             setItem: () => {},
             removeItem: () => {},
-        } as any;
+        };
     } catch (e) {
         // maybe it fails?
     }

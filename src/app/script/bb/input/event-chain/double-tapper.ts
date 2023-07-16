@@ -3,7 +3,7 @@ import {dist} from '../../math/math';
 import {IPointerEvent, TPointerButton, TPointerType} from '../event.types';
 
 
-interface IDoubleTapperEvent {
+export interface IDoubleTapperEvent {
     pageX: number;
     pageY: number;
     relX: number;

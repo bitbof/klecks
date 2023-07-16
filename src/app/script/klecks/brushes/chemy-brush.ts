@@ -3,6 +3,7 @@ import {IRGB} from '../kl-types';
 import {IBounds} from '../../bb/bb-types';
 import {IHistoryEntry, KlHistoryInterface, THistoryInnerActions} from '../history/kl-history';
 import {ERASE_COLOR} from './erase-color';
+import {KL} from '../kl';
 
 export interface IChemyBrushHistoryEntry extends IHistoryEntry {
     tool: ['brush', 'ChemyBrush'];
@@ -13,8 +14,8 @@ type TChemyMode = 'fill' | 'stroke';
 
 export class ChemyBrush {
 
-    private context: CanvasRenderingContext2D;
-    private settingColor: IRGB;
+    private context: CanvasRenderingContext2D = {} as CanvasRenderingContext2D;
+    private settingColor: IRGB = {} as IRGB;
     private settingSize: number = 0.25; // radius - 0.5 - 99999
     private settingOpacity: number = 1; // 0-1
     private settingLockLayerAlpha: boolean = false;
@@ -27,13 +28,13 @@ export class ChemyBrush {
 
     private isDrawing: boolean = false;
 
-    private history: KlHistoryInterface;
+    private history: KlHistoryInterface = new KL.DecoyKlHistory();
 
-    private copyCanvas: HTMLCanvasElement;
-    private path: {x: number; y: number}[];
-    private minY: number;
-    private maxY: number;
-    private completeRedrawBounds: IBounds;
+    private copyCanvas: HTMLCanvasElement = {} as HTMLCanvasElement;
+    private path: {x: number; y: number}[] = [];
+    private minY: number = 0;
+    private maxY: number = 0;
+    private completeRedrawBounds: IBounds | undefined;
 
     private updateCompleteRedrawBounds (x: number, y: number): void {
         let bounds = { x1: x, y1: y, x2: x, y2: y};
@@ -89,7 +90,7 @@ export class ChemyBrush {
             }
         }
 
-        if (this.path) {
+        if (this.path.length > 1) {
 
             // path
             const path = new Path2D();
@@ -232,7 +233,7 @@ export class ChemyBrush {
     }
 
     setXSymmetry (b: boolean): void {
-        this.settingXSymmetry = !!b;
+        this.settingXSymmetry = b;
     }
 
     getXSymmetry (): boolean {
@@ -240,7 +241,7 @@ export class ChemyBrush {
     }
 
     setYSymmetry (b: boolean): void {
-        this.settingYSymmetry = !!b;
+        this.settingYSymmetry = b;
     }
 
     getYSymmetry (): boolean {
@@ -248,7 +249,7 @@ export class ChemyBrush {
     }
 
     setGradient (b: boolean): void {
-        this.settingGradient = !!b;
+        this.settingGradient = b;
     }
 
     getGradient (): boolean {
@@ -260,7 +261,7 @@ export class ChemyBrush {
     }
 
     setLockAlpha (b: boolean): void {
-        this.settingLockLayerAlpha = !!b;
+        this.settingLockLayerAlpha = b;
     }
 
     getIsEraser (): boolean {
@@ -268,7 +269,7 @@ export class ChemyBrush {
     }
 
     setIsEraser (b: boolean): void {
-        this.settingIsEraser = !!b;
+        this.settingIsEraser = b;
     }
 
     getIsDrawing (): boolean {
@@ -282,7 +283,7 @@ export class ChemyBrush {
         this.maxY = y;
         this.copyCanvas = BB.canvas(this.context.canvas.width, this.context.canvas.height);
         BB.ctx(this.copyCanvas).drawImage(this.context.canvas, 0, 0);
-        this.completeRedrawBounds = null;
+        this.completeRedrawBounds = undefined;
         this.updateCompleteRedrawBounds(x, y);
     }
 
@@ -329,8 +330,8 @@ export class ChemyBrush {
                 ],
             } as IChemyBrushHistoryEntry);
         }
-        this.path = null;
-        this.copyCanvas = null;
+        this.path = [];
+        this.copyCanvas = {} as HTMLCanvasElement;
     }
 
     drawImage (im: HTMLCanvasElement, x: number, y: number): void {
@@ -340,7 +341,7 @@ export class ChemyBrush {
         this.context.restore();
     }
 
-    drawLineSegment (x1, y1, x2, y2): void {
+    drawLineSegment (x1: number, y1: number, x2: number, y2: number): void {
         // might make sense for stroke
     }
 }

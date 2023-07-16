@@ -43,7 +43,7 @@ export function genBrushAlpha01 (w: number): HTMLCanvasElement {
 }
 
 // https://www.shadertoy.com/view/3tdSDj
-function udSegment ( p: IVector2D, a: IVector2D, b: IVector2D ) {
+function udSegment ( p: IVector2D, a: IVector2D, b: IVector2D ): number {
     const ba = BB.Vec2.sub(b, a);
     const pa = BB.Vec2.sub(p, a);
     const h = BB.clamp( BB.Vec2.dot(pa,ba) / BB.Vec2.dot(ba,ba), 0.0, 1.0 );

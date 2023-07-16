@@ -9,7 +9,7 @@ type TMatrix4x4 = [
     number, number, number, number,
 ];
 
-type TVec4 = [number, number, number, number];
+export type TVec4 = [number, number, number, number];
 
 function getIdentity (): TMatrix4x4 {
     return [

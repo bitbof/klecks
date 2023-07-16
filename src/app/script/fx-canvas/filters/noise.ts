@@ -10,7 +10,7 @@ import {TFxCanvas} from '../fx-canvas-types';
  */
 export type TFilterNoise = (
     this: TFxCanvas,
-    seed: number, // float, any value okay
+    seed: number | undefined, // float, any value okay - default 0
     type: number, // 1 value, 2 simplex, 3 cellular
     scale: [number, number], // float, small scale will show repeating patterns
     offset: [number, number], // offset x, y - large offsets will show repeating patterns
@@ -20,8 +20,8 @@ export type TFilterNoise = (
     brightness: number, // range [-1, 1]
     contrast: number, // range [-1, 1]
     isReversed: boolean, // reverse 0-1 range
-    colA: {r: number; g: number; b: number}, // which color at 0, if rgb
-    colB: {r: number; g: number; b: number}, // which color at 1, if rgb
+    colA: {r: number; g: number; b: number} | undefined, // which color at 0, if rgb - default black
+    colB: {r: number; g: number; b: number} | undefined, // which color at 1, if rgb - default white
     channels: 'rgb' | 'alpha', // which channel to target
 ) => TFxCanvas;
 
@@ -42,7 +42,7 @@ export const noise: TFilterNoise = function (
 ) {
     gl.noise = gl.noise || new FxShader(null, shaderNoise.replace(/#define.*/, ''), 'noise');
     simpleShader.call(this, gl.noise, {
-        seed,
+        seed: seed || 0,
         type,
         scale: [scale[0], scale[1]],
         offset,

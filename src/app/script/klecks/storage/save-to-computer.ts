@@ -4,6 +4,7 @@ import {KlCanvas} from '../canvas/kl-canvas';
 import {TExportType} from '../kl-types';
 import {SaveReminder} from '../ui/components/save-reminder';
 import {saveAs} from '../../bb/base/save-as';
+import {Psd} from 'ag-psd/dist/psd';
 
 export class SaveToComputer {
 
@@ -38,7 +39,7 @@ export class SaveToComputer {
         private filenameBase: string,
     ) {}
 
-    save (format?: 'psd' | 'layers' | 'png') {
+    save (format?: 'psd' | 'layers' | 'png'): void {
         this.saveReminder.reset();
 
         if (!format) {
@@ -78,19 +79,7 @@ export class SaveToComputer {
 
             const layerArr = this.getKlCanvas().getLayersFast();
 
-            const psdConfig: {
-                width: number;
-                height: number;
-                children: {
-                    name: string;
-                    opacity: number;
-                    canvas: HTMLCanvasElement;
-                    blendMode: string;
-                    left: number;
-                    top: number;
-                }[];
-                canvas: HTMLCanvasElement;
-            } = {
+            const psdConfig: Psd = {
                 width: this.getKlCanvas().getWidth(),
                 height: this.getKlCanvas().getHeight(),
                 children: [],
@@ -98,7 +87,7 @@ export class SaveToComputer {
             };
             for (let i = 0; i < layerArr.length; i++) {
                 const item = layerArr[i];
-                psdConfig.children.push({
+                psdConfig.children!.push({
                     name: item.name,
                     opacity: item.opacity,
                     canvas: item.canvas,

@@ -153,7 +153,7 @@ export function renderText (canvas: HTMLCanvasElement, p: IRenderTextParam): IRe
         ctx.restore();
     }
 
-    document.body.removeChild(outer);
+    outer.remove();
 
     return {
         x: x - p.x,

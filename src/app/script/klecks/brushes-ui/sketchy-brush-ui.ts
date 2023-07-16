@@ -6,9 +6,10 @@ import brushIconImg from '/src/app/img/ui/brush-sketchy.png';
 import {IBrushUi} from '../kl-types';
 import {LANG, languageStrings} from '../../language/language';
 import {BB} from '../../bb/bb';
+import {SketchyBrush} from '../brushes/sketchy-brush';
 
 export const sketchyBrushUi = (function () {
-    const brushInterface: IBrushUi = {
+    const brushInterface = {
         image: brushIconImg,
         tooltip: LANG('brush-sketchy'),
         sizeSlider: {
@@ -19,8 +20,7 @@ export const sketchyBrushUi = (function () {
             min: 1 / 100,
             max: 1,
         },
-        Ui: null,
-    };
+    } as IBrushUi<SketchyBrush>;
 
     languageStrings.subscribe(() => {
         brushInterface.tooltip = LANG('brush-sketchy');
@@ -31,10 +31,10 @@ export const sketchyBrushUi = (function () {
         const brush = new brushes.SketchyBrush();
         brush.setHistory(klHistory);
         p.onSizeChange(brush.getSize());
-        let sizeSlider;
-        let opacitySlider;
+        let sizeSlider: KlSlider;
+        let opacitySlider: KlSlider;
 
-        function setSize (size) {
+        function setSize (size: number) {
             brush.setSize(size);
         }
 
@@ -150,16 +150,16 @@ export const sketchyBrushUi = (function () {
             brush.startLine(x, y, pressure);
         };
         this.goLine = function (x, y, pressure) {
-            brush.goLine(x, y, pressure, null);
+            brush.goLine(x, y, pressure, undefined);
         };
         this.endLine = function () {
             brush.endLine();
         };
         this.getSeed = function () {
-            return parseInt(brush.getSeed());
+            return parseInt('' + brush.getSeed());
         };
         this.setSeed = function (s) {
-            brush.setSeed(parseInt(s));
+            brush.setSeed(parseInt('' + s));
         };
         this.getBrush = function () {
             return brush;
@@ -170,7 +170,7 @@ export const sketchyBrushUi = (function () {
         this.getElement = function () {
             return div;
         };
-    };
+    } as IBrushUi<SketchyBrush>['Ui'];
 
     return brushInterface;
 })();

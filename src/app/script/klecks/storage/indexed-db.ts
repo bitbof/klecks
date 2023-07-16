@@ -51,7 +51,7 @@ function execIndexedDBTransaction (
     try {
         requestObj = window.indexedDB.open(dbNameStr, 1);
     } catch (e) {
-        onError(e.message);
+        onError((e as {message: string}).message);
         return;
     }
 
@@ -61,7 +61,7 @@ function execIndexedDBTransaction (
             const store = db.createObjectStore(storageNameStr, {keyPath: 'id'});
             store.createIndex('id', 'id', {unique: true});
         } catch (e) {
-            onError(e.message);
+            onError((e as {message: string}).message);
         }
     };
     requestObj.onerror = function (): void {
@@ -85,18 +85,18 @@ function execIndexedDBTransaction (
             storeObj = transactionObj.objectStore(storageNameStr);
             storeObj.index('id');
         } catch (e) {
-            onError(e.message);
+            onError((e as {message: string}).message);
             return;
         }
 
-        databaseObj.onerror = function (e): void {
-            onError('database error, ' + databaseObj.error);
+        databaseObj.onerror = function (): void {
+            onError('database error, ' + (databaseObj as IDBDatabase & {error: string}).error);
         };
 
         try {
             actionFunction(storeObj);
         } catch (e) {
-            onError(e.message);
+            onError((e as {message: string}).message);
             return;
         }
 

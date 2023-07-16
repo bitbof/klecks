@@ -4,6 +4,8 @@ import {LANG} from '../../../language/language';
 import {TKlCanvasLayer, TUiLayout} from '../../kl-types';
 import {ISize2D} from '../../../bb/bb-types';
 import {theme} from '../../../theme/theme';
+import {KlCanvasLayer} from '../../canvas/kl-canvas';
+import {throwIfNull} from '../../../bb/base/base';
 
 
 /**
@@ -20,7 +22,7 @@ export class LayerPreview {
     private readonly rootEl: HTMLElement;
     private readonly contentWrapperEl: HTMLElement;
     private readonly height: number;
-    private layerObj: TKlCanvasLayer;
+    private layerObj: TKlCanvasLayer | undefined;
     private isVisible: boolean;
     private uiState: TUiLayout;
 
@@ -38,20 +40,20 @@ export class LayerPreview {
 
     private readonly animationCanvas: HTMLCanvasElement;
     private readonly animationCanvasCtx: CanvasRenderingContext2D;
-    private animationCanvasCheckerPattern: CanvasPattern;
+    private animationCanvasCheckerPattern: CanvasPattern = {} as CanvasPattern;
 
     private largeCanvasIsVisible: boolean;
     private readonly largeCanvasWrapper: HTMLElement;
     private readonly largeCanvasSize: number;
     private readonly largeCanvas: HTMLCanvasElement;
     private readonly largeCanvasCtx: CanvasRenderingContext2D;
-    private largeCanvasCheckerPattern: CanvasPattern;
+    private largeCanvasCheckerPattern: CanvasPattern = {} as CanvasPattern;
 
 
     private updateCheckerPatterns (): void {
         const checker = BB.createCheckerCanvas(4, theme.isDark());
-        this.animationCanvasCheckerPattern = this.animationCanvasCtx.createPattern(checker, 'repeat');
-        this.largeCanvasCheckerPattern = this.canvasCtx.createPattern(checker, 'repeat');
+        this.animationCanvasCheckerPattern = throwIfNull(this.animationCanvasCtx.createPattern(checker, 'repeat'));
+        this.largeCanvasCheckerPattern = throwIfNull(this.canvasCtx.createPattern(checker, 'repeat'));
     }
     
     private animate (): void {
@@ -105,7 +107,7 @@ export class LayerPreview {
     }
 
     private draw (isInstant: boolean): void {
-        if (!this.isVisible) {
+        if (!this.isVisible || !this.layerObj) {
             return;
         }
 
@@ -310,7 +312,7 @@ export class LayerPreview {
             }
 
             //update opacity w hack
-            this.layerObj.opacity = this.layerObj.context.canvas.opacity;
+            this.layerObj.opacity = (this.layerObj.context.canvas as KlCanvasLayer).opacity;
 
             this.draw(false);
 
@@ -318,14 +320,10 @@ export class LayerPreview {
         
 
         const removeLargeCanvas = () => {
-            try {
-                p.klRootEl.removeChild(this.largeCanvasWrapper);
-            } catch(e) {
-
-            }
+            this.largeCanvasWrapper.remove();
         };
 
-        const showLargeCanvas = (b) => {
+        const showLargeCanvas = (b: boolean) => {
             if (this.largeCanvasIsVisible === b) {
                 return;
             }
@@ -379,7 +377,7 @@ export class LayerPreview {
     }
 
     //when the layer might have changed
-         setLayer (klCanvasLayerObj: TKlCanvasLayer): void {
+    setLayer (klCanvasLayerObj: TKlCanvasLayer): void {
         this.layerObj = klCanvasLayerObj;
         this.draw(true);
     }

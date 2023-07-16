@@ -22,7 +22,7 @@ export type TMatDeep3x3 = [TVec3, TVec3, TVec3];
 
 export type TFxSupportedElements = HTMLCanvasElement | HTMLVideoElement | HTMLImageElement;
 
-export type TUniforms = Record<string, unknown>;
+export type TUniforms<T extends number | (number[]) | unknown = unknown> = Record<string, T>;
 
 export type TFxFilters = {
     matrixWarp: TFilterMatrixWarp;

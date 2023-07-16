@@ -6,6 +6,7 @@ import {KlSliderManualInput} from './kl-slider-manual-input';
 import {SplineInterpolator} from '../../../bb/math/line';
 import {PointerListener} from '../../../bb/input/pointer-listener';
 import {IPointerEvent} from '../../../bb/input/event.types';
+import {IChainElement} from '../../../bb/input/event-chain/event-chain.types';
 
 /**
  * Horizontal slider, can be changed by dragging anywhere on it. Has a label & value.
@@ -151,13 +152,14 @@ export class KlSlider {
                     display: '',
                 });
                 if (this.manualInput) {
-                    this.rootEl.removeChild(this.manualInput.getElement());
+                    this.manualInput.getElement().remove();
                     this.manualInput.destroy();
                 }
                 this.manualInput = undefined;
             },
             (this.manualInputRoundDigits && this.manualInputRoundDigits > 0) ? this.manualInputRoundDigits : 0,
         );
+        this.manualInput.setIsEnabled(this.isEnabled);
         this.rootEl.append(this.manualInput.getElement());
         setTimeout(() => {
             this.manualInput && this.manualInput.focus();
@@ -290,7 +292,7 @@ export class KlSlider {
         doubleTapper.setAllowedButtonArr(['left', 'right']);
         const eventChain = new BB.EventChain({
             chainArr: [
-                doubleTapper,
+                doubleTapper as IChainElement,
             ],
         });
 

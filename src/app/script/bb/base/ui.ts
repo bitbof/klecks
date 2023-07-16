@@ -17,7 +17,7 @@ export function appendTextDiv (target: HTMLElement, text: string): HTMLDivElemen
  * @param getAll - check all, even those with "data-ignore-focus" = "true"
  */
 export function isInputFocused (getAll: boolean = false): boolean {
-    const result = !!(document.activeElement && ['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName));
+    const result: boolean = !!document.activeElement && ['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName);
     if (getAll) {
         return result;
     } else {
@@ -48,7 +48,7 @@ export function unfocusAnyInput (): void {
         setTimeout(() => {
             focusEl.select();
             focusEl.focus();
-            focusEl.parentNode.removeChild(focusEl);
+            focusEl.remove();
         }, 10);
     }
 }
@@ -66,8 +66,6 @@ export function clearSelection (): void {
                 sel.removeAllRanges();
             }
         }
-    } else if ('selection' in document) {
-        (document as any).selection.empty();
     }
 }
 
@@ -77,9 +75,9 @@ export function clearSelection (): void {
  *
  * @param el - dom element
  */
-export const makeUnfocusable = (function () {
+export const makeUnfocusable = (function (): ((el: HTMLElement) => void) {
 
-    function preventFocus (event: MouseEvent) {
+    function preventFocus (event: FocusEvent): void {
         event.preventDefault();
         let didFocusRelated = false;
         if (event.relatedTarget) {
@@ -104,7 +102,7 @@ export const makeUnfocusable = (function () {
 
 const els: {
     el: HTMLElement;
-    listeners: [string, any][];
+    listeners: [keyof HTMLElementEventMap, EventListener][];
 }[] = [];
 // window['els'] = els;
 
@@ -131,7 +129,7 @@ export function el (
     params?: {
         parent?: HTMLElement;
         css?: IKeyStringOptional;
-        custom?: { [key: string]: any };
+        custom?: { [key: string]: string };
         content?: string | (HTMLElement | string | undefined)[] | Element;
         textContent?: string;
         className?: string;
@@ -175,12 +173,12 @@ export function el (
     if ('title' in params && params.title !== undefined) {
         div.title = params.title;
     }
-    const listeners = [];
-    if ('onClick' in params) {
+    const listeners: [keyof HTMLElementEventMap, EventListener][] = [];
+    if (params.onClick !== undefined) {
         div.addEventListener('click', params.onClick);
-        listeners.push(['click', params.onClick]);
+        listeners.push(['click', params.onClick as EventListener]);
     }
-    if ('onChange' in params) {
+    if (params.onChange !== undefined) {
         div.addEventListener('change', params.onChange);
         listeners.push(['change', params.onChange]);
     }
@@ -205,7 +203,7 @@ export function el (
  * removes event listeners for Elements created via el()
  * @param el
  */
-export function destroyEl (el?: HTMLElement) {
+export function destroyEl (el?: HTMLElement): void {
     if (!el) {
         return;
     }

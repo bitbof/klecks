@@ -12,7 +12,7 @@ import {
     handleClick,
     imageBlobToUrl,
     insertAfter, isDark,
-    loadImage,
+    loadImage, nullToUndefined,
     reduce,
     setAttributes,
     shareCanvas,
@@ -22,7 +22,7 @@ import {
     canShareFiles,
     eventUsesHighResTimeStamp,
     hasPointerEvents,
-    isCssMinMaxSupported,
+    isCssMinMaxSupported, unsetEventHandler,
 } from './base/browser';
 import {KeyListener, sameKeys} from './input/key-listener';
 import {PointerListener} from './input/pointer-listener';
@@ -87,6 +87,7 @@ export const BB = {
     hasPointerEvents,
     isCssMinMaxSupported,
     canShareFiles,
+    unsetEventHandler,
 
     // ---- base ----
     insertAfter,
@@ -109,6 +110,7 @@ export const BB = {
     BbLog,
     LocalStorage,
     throwIfNull,
+    nullToUndefined,
     isDark,
 
     // ---- math ----

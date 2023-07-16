@@ -8,9 +8,10 @@ import {KlSlider} from '../ui/components/kl-slider';
 import brushIconImg from '/src/app/img/ui/brush-blend.svg';
 import {IBrushUi} from '../kl-types';
 import {LANG, languageStrings} from '../../language/language';
+import {BlendBrush} from '../brushes/blend-brush';
 
 export const blendBrushUi = (function () {
-    const brushInterface: IBrushUi = {
+    const brushInterface = {
         image: brushIconImg,
         tooltip: LANG('brush-blend'),
         sizeSlider: {
@@ -22,8 +23,7 @@ export const blendBrushUi = (function () {
             min: 1 / 100,
             max: 1,
         },
-        Ui: null,
-    };
+    } as IBrushUi<BlendBrush>;
 
     languageStrings.subscribe(() => {
         brushInterface.tooltip = LANG('brush-blend');
@@ -35,10 +35,10 @@ export const blendBrushUi = (function () {
         brush.setHistory(klHistory);
         p.onSizeChange(brush.getSize());
 
-        let sizeSlider;
-        let opacitySlider;
+        let sizeSlider: KlSlider;
+        let opacitySlider: KlSlider;
 
-        function setSize (size) {
+        function setSize (size: number): void {
             brush.setSize(size);
         }
 
@@ -194,7 +194,7 @@ export const blendBrushUi = (function () {
         this.getElement = function () {
             return div;
         };
-    };
+    } as IBrushUi<BlendBrush>['Ui'];
 
     return brushInterface;
 })();

@@ -8,6 +8,8 @@ import {getSharedFx} from '../../fx-canvas/shared-fx';
 import {Options} from '../ui/components/options';
 import {Checkbox} from '../ui/components/checkbox';
 import {TFilterHistoryEntry} from './filters';
+import {throwIfNull} from '../../bb/base/base';
+import {TFilterDistortSettings} from '../../fx-canvas/filters/distort';
 
 
 // see fx-canvas distort
@@ -44,7 +46,7 @@ export const filterDistort = {
         // let lastDrawnSettings = null;
 
         // ---- thumb -------
-        const thumbImgArr = [];
+        const thumbImgArr: HTMLImageElement[] = [];
         const thumbSize = 32;
         {
             const canvas = BB.canvas(thumbSize, thumbSize);
@@ -69,13 +71,13 @@ export const filterDistort = {
             ctx.globalCompositeOperation = 'destination-atop';
             ctx.fillRect(0, 0, thumbSize, thumbSize);
 
-            const fxCanvas = getSharedFx();
+            const fxCanvas = throwIfNull(getSharedFx());
             const texture = fxCanvas.texture(canvas);
             fxCanvas.draw(texture).update(); // update fxCanvas size
 
             const scaleFactor = 20;
 
-            [0, 1, 2].forEach(item => {
+            ([0, 1, 2] as const).forEach(item => {
                 const thumbImg = new Image();
                 const settingsCopy: TFilterDistortSettings = BB.copyObj(settings);
                 settingsCopy.distortType = item;
@@ -118,24 +120,24 @@ export const filterDistort = {
             }),
             initId: '0',
             onChange: (id) => {
-                settings.distortType = Number(id) as any;
+                settings.distortType = Number(id) as TFilterDistortSettings['distortType'];
                 updatePreview();
             },
         });
 
         function sync (from: 'x' | 'y') {
             if (from === 'x') {
-                settings.scale.y = settings.scale.x;
-                settings.strength.y = settings.strength.x;
-                settings.phase.y = settings.phase.x;
+                settings.scale.y = (settings.scale.x);
+                settings.strength.y = (settings.strength.x);
+                settings.phase.y = (settings.phase.x);
 
                 sliderArr[3].setValue(settings.scale.y);
                 sliderArr[4].setValue(settings.strength.y);
                 sliderArr[5].setValue(settings.phase.y);
             } else {
-                settings.scale.x = settings.scale.y;
-                settings.strength.x = settings.strength.y;
-                settings.phase.x = settings.phase.y;
+                settings.scale.x = (settings.scale.y);
+                settings.strength.x = (settings.strength.y);
+                settings.phase.x = (settings.phase.y);
 
                 sliderArr[0].setValue(settings.scale.x);
                 sliderArr[1].setValue(settings.strength.x);
@@ -179,7 +181,7 @@ export const filterDistort = {
         const sliderWidth = isSmall ? 300 : 245;
         const sliderArr: KlSlider[] = [];
 
-        ['x', 'y'].forEach((item, index) => {
+        (['x', 'y'] as const).forEach((item, index) => {
             const targetEl = index === 0 ? leftCol : rightCol;
 
             const scaleSlider = new KlSlider({
@@ -194,7 +196,7 @@ export const filterDistort = {
                 onChange: (val) => {
                     settings.scale[item] = val;
                     if (isSynced) {
-                        sync(item as any);
+                        sync(item);
                     } else {
                         updatePreview();
                     }
@@ -215,7 +217,7 @@ export const filterDistort = {
                 onChange: (val) => {
                     settings.strength[item] = val;
                     if (isSynced) {
-                        sync(item as any);
+                        sync(item);
                     } else {
                         updatePreview();
                     }
@@ -237,7 +239,7 @@ export const filterDistort = {
                 onChange: (val) => {
                     settings.phase[item] = val;
                     if (isSynced) {
-                        sync(item as any);
+                        sync(item);
                     } else {
                         updatePreview();
                     }
@@ -274,14 +276,14 @@ export const filterDistort = {
 
         const klCanvas = params.klCanvas;
         const layers = klCanvas.getLayers();
-        const selectedLayerIndex = klCanvas.getLayerIndex(context.canvas);
+        const selectedLayerIndex = throwIfNull(klCanvas.getLayerIndex(context.canvas));
 
         const fit = BB.fitInto(context.canvas.width, context.canvas.height, isSmall ? 280 : 490, isSmall ? 200 : 240, 1);
         const w = parseInt('' + fit.width), h = parseInt('' + fit.height);
-        const renderW = Math.min(w, context.canvas.width);
-        const renderH = Math.min(h, context.canvas.height);
-        const renderFactor = renderW / context.canvas.width;
-        const previewFactor = w / context.canvas.width;
+        // const renderW = Math.min(w, context.canvas.width);
+        // const renderH = Math.min(h, context.canvas.height);
+        // const renderFactor = renderW / context.canvas.width;
+        // const previewFactor = w / context.canvas.width;
 
         const previewWrapper = BB.el({
             className: 'kl-preview-wrapper',
@@ -291,10 +293,7 @@ export const filterDistort = {
             },
         });
 
-        const fxCanvas = getSharedFx();
-        if (!fxCanvas) {
-            return; // todo throw?
-        }
+        const fxCanvas = throwIfNull(getSharedFx());
         const texture = fxCanvas.texture(context.canvas);
         fxCanvas.draw(texture).update(); // update fxCanvas size
 
@@ -341,18 +340,23 @@ export const filterDistort = {
         updatePreview();
 
 
+        const destroy = () => {
+            typeOptions.destroy();
+            sliderArr.forEach(item => item.destroy());
+            stepSlider.destroy();
+            syncToggle.destroy();
+            texture.destroy();
+            klCanvasPreview.destroy();
+        };
+
         // ----- result -------------------
         const result: IFilterGetDialogResult<TFilterDistortInput> = {
             element: rootEl,
-            destroy: () => {
-                typeOptions.destroy();
-                sliderArr.forEach(item => item.destroy());
-                stepSlider.destroy();
-                syncToggle.destroy();
-                texture.destroy();
-                klCanvasPreview.destroy();
+            destroy,
+            getInput: () => {
+                destroy();
+                return BB.copyObj(settings);
             },
-            getInput: () => BB.copyObj(settings),
         };
         if (!isSmall) {
             result.width = 500;

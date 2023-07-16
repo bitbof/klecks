@@ -30,7 +30,7 @@ export class FxTexture {
     
     
     // ---- private ----
-    private canvas: HTMLCanvasElement;
+    private canvas: HTMLCanvasElement | null;
     private type: TTextureType;
 
     /*
@@ -77,12 +77,12 @@ export class FxTexture {
     gl: TFxGl;
     width: number;
     height: number;
-    id: WebGLTexture; // null -> destroyed
+    id: WebGLTexture | null; // null -> destroyed
     format: TTextureFormat;
     
     loadContentsOf (element: TFxSupportedElements): void {
-        this.width = element.width || element.videoWidth;
-        this.height = element.height || element.videoHeight;
+        this.width = element.width || (element as HTMLVideoElement).videoWidth;
+        this.height = element.height || (element as HTMLVideoElement).videoHeight!;
         gl.bindTexture(gl.TEXTURE_2D, this.id);
         gl.texImage2D(gl.TEXTURE_2D, 0, this.format, this.format, this.type, element);
     }

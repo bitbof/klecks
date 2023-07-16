@@ -6,7 +6,9 @@ let fx: TFxCanvas | null = null;
 
 export function getSharedFx (): TFxCanvas | null {
     // failed previously, don't need to try again.
-    if (failed) return fx;
+    if (failed) {
+        return fx;
+    }
 
     if (!fx || fx._.gl.isContextLost()) {
         try {

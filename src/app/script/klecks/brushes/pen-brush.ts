@@ -19,7 +19,7 @@ const TWO_PI = 2 * Math.PI;
 
 export class PenBrush {
 
-    private context: CanvasRenderingContext2D;
+    private context: CanvasRenderingContext2D = {} as CanvasRenderingContext2D;
     private history: KlHistoryInterface = new KL.DecoyKlHistory();
     private historyEntry: IPenBrushHistoryEntry | undefined;
 
@@ -28,16 +28,16 @@ export class PenBrush {
     private settingSize: number = 2;
     private settingSpacing: number = 0.8489;
     private settingOpacity: number = 1;
-    private settingColor: IRGB;
-    private settingColorStr: string;
+    private settingColor: IRGB = {} as IRGB;
+    private settingColorStr: string = '';
     private settingAlphaId: number = ALPHA_CIRCLE;
     private settingLockLayerAlpha: boolean = false;
 
     private hasDrawnDot: boolean = false;
-    private lineToolLastDot: number;
+    private lineToolLastDot: number = 0;
     private lastInput: TPressureInput = {x: 0, y: 0, pressure: 0};
     private lastInput2: TPressureInput = {x: 0, y: 0, pressure: 0};
-    private inputArr: TPressureInput[];
+    private inputArr: TPressureInput[] = [];
     private inputIsDrawing: boolean = false;
     private bezierLine: BezierLine | null = null;
 
@@ -190,7 +190,7 @@ export class PenBrush {
 
         // execute draw instructions
         this.context.save();
-        let before;
+        let before: typeof drawArr[number] | undefined = undefined;
         for (let i = 0; i < drawArr.length; i++) {
             const item = drawArr[i];
             this.drawDot(item[0], item[1], item[2], item[3], item[4], before);
@@ -445,7 +445,7 @@ export class PenBrush {
         this.history = l;
     }
 
-    setSize (s: number, b?: string): void {
+    setSize (s: number): void {
         this.settingSize = s;
     }
 

@@ -11,7 +11,7 @@ export interface IProjectStoreListener {
 function makeAsync<T> (
     nonAsyncFunc: (
         resolveCallback: (value: T) => void,
-        rejectCallback: (reason?: any) => void
+        rejectCallback: (reason?: unknown) => void
     ) => void,
 ): Promise<T> {
     return new Promise<T>((resolve, reject) => {
@@ -70,7 +70,7 @@ export class ProjectStore {
                     }
                 })();
             } catch (e) {
-                if (e.message.indexOf('db-error') === 0) {
+                if (e instanceof Error && e.message.indexOf('db-error') === 0) {
                     this.accessHasFailed = true;
                 }
             }

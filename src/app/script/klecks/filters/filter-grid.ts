@@ -6,6 +6,7 @@ import {input} from '../ui/components/input';
 import {ColorOptions} from '../ui/components/color-options';
 import {drawGrid} from '../image-operations/draw-grid';
 import {TFilterHistoryEntry} from './filters';
+import {throwIfNull} from '../../bb/base/base';
 
 export type TFilterGridInput = {
     x: number;
@@ -29,7 +30,7 @@ export const filterGrid = {
         }
 
         const layers = klCanvas.getLayers();
-        const selectedLayerIndex = klCanvas.getLayerIndex(context.canvas);
+        const selectedLayerIndex = throwIfNull(klCanvas.getLayerIndex(context.canvas));
 
         const fit = BB.fitInto(context.canvas.width, context.canvas.height, 280, 200, 1);
         const w = parseInt('' + fit.width), h = parseInt('' + fit.height);
@@ -120,7 +121,7 @@ export const filterGrid = {
             label: LANG('shape-stroke'),
             colorArr: colorOptionsArr,
             onChange: function (rgbaObj) {
-                selectedRgbaObj = rgbaObj;
+                selectedRgbaObj = rgbaObj!;
                 settingsObj.color = BB.ColorConverter.toRgbStr(selectedRgbaObj);
                 updatePreview();
             },
@@ -202,7 +203,7 @@ export const filterGrid = {
             colorOptions.destroy();
         };
         result.getInput = function (): TFilterGridInput {
-            result.destroy();
+            result.destroy!();
             return BB.copyObj(settingsObj);
         };
         return result;

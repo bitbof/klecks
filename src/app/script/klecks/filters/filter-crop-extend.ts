@@ -7,6 +7,7 @@ import {IFilterApply, IFilterGetDialogParam, IFilterGetDialogResult, IRGBA} from
 import {LANG} from '../../language/language';
 import {TFilterHistoryEntry} from './filters';
 import {theme} from '../../theme/theme';
+import {IRect} from '../../bb/bb-types';
 
 export type TFilterCropExtendInput = {
     left: number;
@@ -46,7 +47,7 @@ export const filterCropExtend = {
         let left = 0, right = 0, top = 0, bottom = 0;
         let leftChanged = false, rightChanged = false, topChanged = false, bottomChanged = false;
         const maxWidth = params.maxWidth, maxHeight = params.maxHeight;
-        let scale;
+        let scale: number = 1;
 
 
 
@@ -66,7 +67,7 @@ export const filterCropExtend = {
             min: -klCanvas.getWidth(),
             max: maxWidth,
             css: {width: '75px', marginRight: '20px'},
-            callback: function (v) {
+            callback: function () {
                 leftChanged = true;
                 updateInput();
             },
@@ -77,7 +78,7 @@ export const filterCropExtend = {
             min: -klCanvas.getWidth(),
             max: maxWidth,
             css: {width: '75px'},
-            callback: function (v) {
+            callback: function () {
                 rightChanged = true;
                 updateInput();
             },
@@ -88,7 +89,7 @@ export const filterCropExtend = {
             min: -klCanvas.getHeight(),
             max: maxHeight,
             css: {width: '75px', marginRight: '20px'},
-            callback: function (v) {
+            callback: function () {
                 topChanged = true;
                 updateInput();
             },
@@ -99,7 +100,7 @@ export const filterCropExtend = {
             min: -klCanvas.getHeight(),
             max: maxHeight,
             css: {width: '75px'},
-            callback: function (v) {
+            callback: function () {
                 bottomChanged = true;
                 updateInput();
             },
@@ -227,7 +228,7 @@ export const filterCropExtend = {
             label: LANG('filter-crop-fill'),
             colorArr: colorOptionsArr,
             onChange: function (rgbaObj) {
-                selectedRgbaObj = rgbaObj;
+                selectedRgbaObj = rgbaObj!;
                 updateBg();
             },
         });
@@ -247,7 +248,7 @@ export const filterCropExtend = {
 
         // when input field changed, or dragging in preview finished
         // adjusts the zoom
-        function update (transform): void {
+        function update (transform: IRect): void {
             const fit = BB.fitInto(transform.width, transform.height, 260, 180, 1);
             scale = fit.width / transform.width;
 
@@ -316,7 +317,7 @@ export const filterCropExtend = {
         offsetWrapper.style.top = '0px';
         previewWrapper.append(offsetWrapper);
 
-        const canvasWrapper = BB.el({
+        BB.el({
             parent: offsetWrapper,
             content: tempCanvas,
             css: {
@@ -367,7 +368,7 @@ export const filterCropExtend = {
             colorOptions.destroy();
         };
         result.getInput = function (): TFilterCropExtendInput {
-            result.destroy();
+            result.destroy!();
             return {
                 left: left,
                 right: right,

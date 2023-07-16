@@ -1,7 +1,7 @@
 
 export const isFirefox = navigator.userAgent.toLowerCase().indexOf('firefox') > -1;
 
-export const eventUsesHighResTimeStamp = (function () {
+export const eventUsesHighResTimeStamp = (function (): (() => boolean) {
     const eventUsesHighResTimeStamp: boolean = new Event('').timeStamp < 1000 * 60 * 60;
     return function (): boolean {
         return eventUsesHighResTimeStamp;
@@ -10,10 +10,10 @@ export const eventUsesHighResTimeStamp = (function () {
 
 export const hasPointerEvents = !!window.PointerEvent;
 
-export const isCssMinMaxSupported = (function () {
-    let result: boolean | null = null;
+export const isCssMinMaxSupported = (function (): (() => boolean) {
+    let result: boolean | undefined;
 
-    function test () {
+    function test (): void {
         const div = document.createElement('div');
         div.style.position = 'absolute';
         div.style.top = '0';
@@ -21,7 +21,7 @@ export const isCssMinMaxSupported = (function () {
         document.body.append(div);
         setTimeout(function () {
             result = div.offsetLeft === 25;
-            document.body.removeChild(div);
+            div.remove();
         }, 25);
     }
 
@@ -34,7 +34,7 @@ export const isCssMinMaxSupported = (function () {
     }
 
     return function (): boolean {
-        if (result === null) {
+        if (result === undefined) {
             throw new Error('isCssMinMaxSupported not initialized');
         }
         return result;
@@ -44,3 +44,11 @@ export const isCssMinMaxSupported = (function () {
 export const canShareFiles = function (): boolean {
     return 'share' in navigator && 'canShare' in navigator;
 };
+
+type THandler = 'onchange' | 'onclick' | 'onkeyup';
+export function unsetEventHandler (obj: HTMLElement, ...handlers: [...THandler[]]): void {
+    handlers.forEach(handler => {
+        // (disabled) eslint-disable-next-line no-null/no-null
+        obj[handler] = null;
+    });
+}

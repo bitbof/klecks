@@ -155,7 +155,7 @@ export class DynamicModal {
     close (): void {
         dialogCounter.decrease();
         BB.destroyEl(this.rootEl);
-        this.parent.removeChild(this.rootEl);
+        this.rootEl.remove();
         window.removeEventListener('resize', this.updatePos);
         this.keyListener.destroy();
         BB.destroyEl(this.xButton);

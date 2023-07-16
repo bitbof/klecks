@@ -193,6 +193,7 @@ export const ColorConverter = {
         if (o instanceof CMYK) {
             return this._CMYKtoRGB(o);
         }
+        throw new Error('unknown type');
     },
 
     toHSV: function (o: RGB | HSV | CMYK): HSV {
@@ -205,6 +206,7 @@ export const ColorConverter = {
         if (o instanceof CMYK) {
             return this._RGBtoHSV(this._CMYKtoRGB(o));
         }
+        throw new Error('unknown type');
     },
 
     toCMYK: function (o: RGB | HSV | CMYK): CMYK {
@@ -217,6 +219,7 @@ export const ColorConverter = {
         if (o instanceof HSV) {
             return this._RGBtoCMYK(this._HSVtoRGB(o));
         }
+        throw new Error('unknown type');
     },
     toHexString: function (o: RGB): string {
         if (o instanceof RGB || ('r' in o && 'g' in o && 'b' in o)) {
@@ -234,6 +237,7 @@ export const ColorConverter = {
             }
             return ha + hb + hc;
         }
+        return '#000';
     },
     toRgbStr: function (rgbObj: {r: number; g: number; b: number}): string {
         return 'rgb(' + Math.round(rgbObj.r) + ', ' + Math.round(rgbObj.g) + ', ' + Math.round(rgbObj.b) + ')';
@@ -241,7 +245,7 @@ export const ColorConverter = {
     toRgbaStr: function (rgbaObj: {r: number; g: number; b: number; a: number}): string {
         return 'rgba(' + Math.round(rgbaObj.r) + ', ' + Math.round(rgbaObj.g) + ', ' + Math.round(rgbaObj.b) + ', ' + rgbaObj.a + ')';
     },
-    hexToRGB: function (hexStr: string): RGB | null {
+    hexToRGB: function (hexStr: string): RGB | undefined {
         hexStr = hexStr.trim();
         // Expand shorthand form (e.g. "03F") to full form (e.g. "0033FF")
         const shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
@@ -254,7 +258,7 @@ export const ColorConverter = {
             parseInt(result[1], 16),
             parseInt(result[2], 16),
             parseInt(result[3], 16)
-        ) : null;
+        ) : undefined;
     },
 
 };

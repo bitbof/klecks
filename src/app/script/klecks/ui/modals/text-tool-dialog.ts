@@ -369,7 +369,7 @@ export function textToolDialog (
         colorArr: colorOptionsArr,
         initialIndex: 0,
         onChange: (rgbaObj) => {
-            p.color = rgbaObj;
+            p.color = rgbaObj!;
             updatePreview();
         },
     });
@@ -426,9 +426,9 @@ export function textToolDialog (
         title: LANG('text-size'),
         custom: {
             type: 'number',
-            min: 1,
-            max: 10000,
-            value: p.size,
+            min: '1',
+            max: '10000',
+            value: '' + p.size,
         },
         css: {
             width: '60px',

@@ -16,7 +16,7 @@ export function clipboardDialog (
     let clipboardItemIsSupported: boolean = false;
     try {
         clipboardItemIsSupported = !!ClipboardItem;
-    } catch (e) {}
+    } catch (e) { /* empty */ }
 
     const div = document.createElement('div');
     const isSmall = window.innerWidth < 550 || window.innerHeight < 550;
@@ -57,7 +57,7 @@ export function clipboardDialog (
                     output.out(LANG('cropcopy-copied'), true);
                 }, 200);
             } catch (err) {
-                console.error(err.name, err.message);
+                console.error((err as Error).name, (err as Error).message);
             }
         }, 0);
     }

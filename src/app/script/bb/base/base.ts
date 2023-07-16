@@ -221,11 +221,22 @@ export function createSvg (p: ISVG): SVGElement {
 }
 
 export function throwIfNull<T> (v: T | null): T {
-    // eslint-disable-next-line no-null/no-null
+    // (disabled) eslint-disable-next-line no-null/no-null
     if (v === null) {
         throw new Error('value is null');
     }
     return v;
+}
+
+export function throwIfUndefined<T> (v: T | undefined): T {
+    if (v === undefined) {
+        throw new Error('value is undefined');
+    }
+    return v;
+}
+
+export function nullToUndefined<T> (v: T | null): T | undefined {
+    return v === null ? undefined : v;
 }
 
 const matchMediaDark = ('matchMedia' in window) ? window.matchMedia('(prefers-color-scheme: dark)') : false;

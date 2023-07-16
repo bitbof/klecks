@@ -22,7 +22,7 @@ export class HexColorDialog {
     constructor (
         p: {
             color: IRGB;
-            onClose: (rgb: IRGB | null) => void;
+            onClose: (rgb: IRGB | undefined) => void;
         }
     ) {
         let lastValidRgb: RGB = new BB.RGB(p.color.r, p.color.g, p.color.b);
@@ -62,7 +62,7 @@ export class HexColorDialog {
             },
             callback: function () {
                 let rgbObj = BB.ColorConverter.hexToRGB(hexInput.value);
-                if (rgbObj === null) {
+                if (!rgbObj) {
                     rgbObj = lastValidRgb;
                     hexInput.value = '#' + BB.ColorConverter.toHexString(lastValidRgb);
                 } else {
@@ -77,7 +77,7 @@ export class HexColorDialog {
         });
         const copyButton = BB.el({
             tagName: 'button',
-            content: '<img src="' + copyImg + '" height="20"/>',
+            content: '<img src="' + copyImg + '" height="20" alt=""/>',
             title: LANG('mci-copy'),
             css: {
                 marginLeft: '10px',
@@ -136,11 +136,11 @@ export class HexColorDialog {
             div.append(rowEl);
 
             const result = {
-                update: () => {
+                update: (): void => {
                     inputEl.value = '' + lastValidRgb[attributeStr];
                 },
-                destroy: () => {
-                    inputEl.onchange = null;
+                destroy: (): void => {
+                    BB.unsetEventHandler(inputEl, 'onchange');
                 },
             };
             return result;
@@ -163,7 +163,7 @@ export class HexColorDialog {
                 rgbArr.forEach(item => item.destroy());
                 rgbArr.splice(0, rgbArr.length);
 
-                p.onClose(resultStr === 'Ok' ? BB.ColorConverter.hexToRGB(hexInput.value) : null);
+                p.onClose(resultStr === 'Ok' ? BB.ColorConverter.hexToRGB(hexInput.value) : undefined);
             },
         });
     }

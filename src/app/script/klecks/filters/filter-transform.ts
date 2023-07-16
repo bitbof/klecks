@@ -6,8 +6,8 @@ import {IFreeTransform} from '../ui/components/free-transform-utils';
 import {Select} from '../ui/components/select';
 import {IFilterApply, IFilterGetDialogParam, IFilterGetDialogResult, IKlBasicLayer} from '../kl-types';
 import {LANG} from '../../language/language';
-import {IRect} from '../../bb/bb-types';
 import {TFilterHistoryEntry} from './filters';
+import {throwIfNull} from '../../bb/base/base';
 
 export type TFilterTransformInput = {
     bounds: {x: number; y: number; width: number; height: number};
@@ -30,18 +30,17 @@ export const filterTransform = {
 
         const isSmall = window.innerWidth < 550;
         const layers = klCanvas.getLayers();
-        const selectedLayerIndex = klCanvas.getLayerIndex(context.canvas);
+        const selectedLayerIndex = throwIfNull(klCanvas.getLayerIndex(context.canvas));
 
         const fit = BB.fitInto(context.canvas.width, context.canvas.height, isSmall ? 280 : 490, isSmall ? 200 : 240, 1);
         const displayW = parseInt('' + fit.width), displayH = parseInt('' + fit.height);
         const w = Math.min(displayW, context.canvas.width);
         const h = Math.min(displayH, context.canvas.height);
-        let freeTransform: FreeTransform;
         const displayPreviewFactor = displayW / context.canvas.width;
 
         // determine bounds and initial transformation
-        const boundsObj: IRect = BB.canvasBounds(context);
-        if (boundsObj === null) {
+        const boundsObj = BB.canvasBounds(context);
+        if (!boundsObj) {
             alert(LANG('filter-transform-empty'));
             return false;
         }
@@ -114,15 +113,15 @@ export const filterTransform = {
         inputX.value = '0';
         inputR.value = '0';
         inputY.onclick = function () {
-            (this as any).focus();
+            inputY.focus();
             onInputsChanged();
         };
         inputX.onclick = function () {
-            (this as any).focus();
+            inputX.focus();
             onInputsChanged();
         };
         inputR.onclick = function () {
-            (this as any).focus();
+            inputR.focus();
             onInputsChanged();
         };
         inputY.onchange = function () {
@@ -314,7 +313,7 @@ export const filterTransform = {
             ],
             initValue: 'smooth',
             title: LANG('scaling-algorithm'),
-            onChange: function () {
+            onChange: (): void => {
                 updatePreview(true);
             },
         });
@@ -366,7 +365,7 @@ export const filterTransform = {
         previewInnerWrapper.append(klCanvasPreview.getElement());
         previewWrapper.append(previewInnerWrapper);
 
-        let lastDrawnTransformStr;
+        let lastDrawnTransformStr = '';
         function updatePreview (doForce: boolean = false) {
             if (!freeTransform) {
                 return;
@@ -398,7 +397,7 @@ export const filterTransform = {
             klCanvasPreview.render();
         }
 
-        freeTransform = new FreeTransform({
+        const freeTransform = new FreeTransform({
             x: initTransform.x,
             y: initTransform.y,
             width: initTransform.width,
@@ -456,7 +455,7 @@ export const filterTransform = {
                 isPixelated: algorithmSelect.getValue() === 'pixelated' ||
                     BB.testShouldPixelate(transform, transform.width / initTransform.width, transform.height / initTransform.height),
             };
-            result.destroy();
+            result.destroy!();
             return BB.copyObj(input);
         };
         return result;

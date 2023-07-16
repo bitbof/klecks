@@ -50,15 +50,39 @@ export class FilterTab {
         const hasWebGL: boolean = this.testHasWebGL();
 
         if (!hasWebGL) {
-            BB.el({
+            const note = BB.el({
                 parent: this.rootEl,
                 className: 'kl-toolspace-note',
                 content: 'Features disabled because WebGL is failing.',
                 css: {
-                    margin: '5px',
+                    margin: '10px',
                     marginBottom: '0',
                 },
             });
+            const noteButton = BB.el({
+                parent: note,
+                tagName: 'button',
+                textContent: 'Learn More',
+                css: {
+                    marginLeft: '5px',
+                },
+            });
+            noteButton.onclick = () => {
+                KL.popup({
+                    target: this.klRootEl,
+                    message: '<b>WebGL is not working</b>',
+                    div: BB.el({
+                        content: `
+See if your browser supports WebGL and has it enabled: <a href="https://get.webgl.org" target="_blank" rel="noopener noreferrer">get.webgl.org</a><br>
+<br>
+Recently (2023-05) a number of Chrome users on Chrome OS reported that WebGL fails, although it is enabled & supported.
+This has been reported to Google.
+`,
+                    }),
+                    buttons: ['Ok'],
+                    clickOnEnter: 'Ok',
+                });
+            };
         }
 
         const createButton = (filterKey: string): HTMLElement => {
@@ -86,7 +110,10 @@ export class FilterTab {
             if (isEnabled) {
                 button.onclick = () => {
 
-                    const finishedDialog = (result, filterDialog): void => {
+                    type TOptions = 'Ok' | 'Cancel';
+                    const dialogButtons: TOptions[] = ['Ok', 'Cancel'];
+
+                    const finishedDialog = (result: TOptions, filterDialog: IFilterGetDialogResult<any>): void => {
                         if (result == 'Cancel') {
                             if (filterDialog.destroy) {
                                 filterDialog.destroy();
@@ -95,9 +122,9 @@ export class FilterTab {
                         }
                         let input;
                         try {
-                            input = filterDialog.getInput(); // also destroys
+                            input = filterDialog.getInput!(); // also destroys
                         } catch (e) {
-                            if (e.message.indexOf('.getInput is not a function') !== -1) {
+                            if ((e as Error).message.indexOf('.getInput is not a function') !== -1) {
                                 throw 'filterDialog.getInput is not a function, filter: ' + filterName;
                             } else {
                                 throw e;
@@ -112,7 +139,7 @@ export class FilterTab {
                     }
 
                     const applyFilter = (input: any) => {
-                        const filterResult = filters[filterKey].apply({
+                        const filterResult = filters[filterKey].apply!({
                             context: this.getCurrentLayerCtx(),
                             klCanvas: this.getKlCanvas(),
                             history: klHistory,
@@ -134,7 +161,7 @@ export class FilterTab {
                         this.statusOverlay.out('"' + filterName + '" ' + LANG('filter-applied'), true);
                     } else {
                         const secondaryColorRGB = this.klColorSlider.getSecondaryRGB();
-                        const filterDialog = filters[filterKey].getDialog({
+                        const filterDialog = filters[filterKey].getDialog!({
                             context: this.getCurrentLayerCtx(),
                             klCanvas: this.getKlCanvas(),
                             maxWidth: this.getKlMaxCanvasSize(),
@@ -170,10 +197,10 @@ export class FilterTab {
                             message: '<b>' + filterName + '</b>',
                             div: filterDialog.element,
                             style: style,
-                            buttons: ['Ok', 'Cancel'],
+                            buttons: dialogButtons,
                             clickOnEnter: 'Ok',
                             callback: (result) => {
-                                finishedDialog(result, filterDialog);
+                                finishedDialog(result as TOptions, filterDialog);
                             },
                             closeFunc: (func) => {
                                 closeFunc = func;

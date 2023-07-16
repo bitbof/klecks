@@ -13,7 +13,10 @@ export const input = function (params: {
     if (params.type) {
         try {
             result.type = params.type;
-        } catch(e) {} // ie can't deal with number
+        } catch(e) {
+            /* empty */
+            // ie can't deal with number
+        }
     } else {
         result.type = 'text';
     }

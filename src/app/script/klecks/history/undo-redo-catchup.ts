@@ -1,33 +1,34 @@
 import {KL} from '../kl';
 import {IHistoryBroadcast, IHistoryEntry, klHistory} from './kl-history';
 import {KlCanvasWorkspace} from '../canvas-ui/kl-canvas-workspace';
-import {IFilterApply, IInitState} from '../kl-types';
-import {KlCanvas} from '../canvas/kl-canvas';
+import {IFilter, IFilterApply, IInitState} from '../kl-types';
+import {KlCanvas, KlCanvasContext} from '../canvas/kl-canvas';
 import {LayerManager} from '../ui/tool-tabs/layer-manager/layer-manager';
 import {LayerPreview} from '../ui/components/layer-preview';
 import {HandUi} from '../ui/tool-tabs/hand-ui';
 import {throwIfNull} from '../../bb/base/base';
+import {TBrush} from '../brushes/brushes';
 
 function execHistoryEntry (
     historyEntry: IHistoryEntry,
     layerIndex: number,
     klCanvas: KlCanvas,
-    brushes: any, // todo
+    brushes: TBrush[],
     setCurrentLayerCtx: (ctx: CanvasRenderingContext2D) => void,
     getCurrentLayerCtx: () => CanvasRenderingContext2D,
 ): number {
     if (historyEntry.tool[0] === 'brush') {
-        const b = brushes[historyEntry.tool[1]];
-        historyEntry.actions.forEach(action => {
-            b[action.action].apply(b, action.params);
+        const b = brushes[historyEntry.tool[1] as any];
+        historyEntry.actions!.forEach(action => {
+            (b[action.action as keyof TBrush] as any)(...action.params);
         });
 
     } else if (historyEntry.tool[0] === 'canvas') {
-        const p = historyEntry.params;
-        const id = klCanvas[historyEntry.action].apply(klCanvas, p);
+        const p = historyEntry.params!;
+        const id = (klCanvas[historyEntry.action as keyof KlCanvas] as any)(...p);
         if (typeof id === 'number') {
             layerIndex = id;
-            const ctx = throwIfNull(klCanvas.getLayerContext(layerIndex));
+            const ctx = throwIfNull(klCanvas.getLayerContext(layerIndex)) as KlCanvasContext;
             setCurrentLayerCtx(ctx);
             Object.entries(brushes).forEach(([, brush]) => brush.setContext(ctx));
         }
@@ -36,14 +37,14 @@ function execHistoryEntry (
         const p = [{
             context: getCurrentLayerCtx(),
             klCanvas,
-            input: historyEntry.params[0].input,
+            input: historyEntry.params![0].input,
             history: new KL.DecoyKlHistory(),
         } as IFilterApply];
-        KL.filterLib[historyEntry.tool[1]][historyEntry.action].apply(null, p);
+        (KL.filterLib[historyEntry.tool[1]][historyEntry.action! as keyof IFilter] as any)(...p);
 
     } else if (historyEntry.tool[0] === 'misc' && historyEntry.action === 'focusLayer') {
-        layerIndex = historyEntry.params[0];
-        const ctx = throwIfNull(klCanvas.getLayerContext(layerIndex));
+        layerIndex = historyEntry.params![0];
+        const ctx = throwIfNull(klCanvas.getLayerContext(layerIndex)) as KlCanvasContext;
         setCurrentLayerCtx(ctx);
         Object.entries(brushes).forEach(([, brush]) => brush.setContext(ctx));
 
@@ -51,14 +52,14 @@ function execHistoryEntry (
         const id = klCanvas.addLayer();
         if (typeof id === 'number') {
             layerIndex = id;
-            if (historyEntry.params[1]) {
-                klCanvas.renameLayer(layerIndex, historyEntry.params[1]);
+            if (historyEntry.params![1]) {
+                klCanvas.renameLayer(layerIndex, historyEntry.params![1]);
             }
-            const ctx = throwIfNull(klCanvas.getLayerContext(layerIndex));
+            const ctx = throwIfNull(klCanvas.getLayerContext(layerIndex)) as KlCanvasContext;
             setCurrentLayerCtx(ctx);
             Object.entries(brushes).forEach(([, brush]) => brush.setContext(ctx));
         }
-        getCurrentLayerCtx().drawImage(historyEntry.params[0], 0, 0);
+        getCurrentLayerCtx().drawImage(historyEntry.params![0], 0, 0);
     }
     return layerIndex;
 }
@@ -95,7 +96,7 @@ export class UndoRedoCatchup {
         private getKlCanvas: () => KlCanvas,
         private getCurrentLayerCtx: () => CanvasRenderingContext2D | null,
         private setCurrentLayerCtx: (ctx: CanvasRenderingContext2D) => void,
-        private getCurrentBrush: () => any, // todo
+        private getCurrentBrush: () => TBrush,
     ) { }
 
     undo (): boolean {
@@ -109,14 +110,12 @@ export class UndoRedoCatchup {
         const oldSize = {w: klCanvas.getWidth(), h: klCanvas.getHeight()};
         klCanvas.copy(initState.canvas);
         let layerIndex = initState.focus;
-        this.setCurrentLayerCtx(klCanvas.getLayerContext(layerIndex));
+        this.setCurrentLayerCtx(throwIfNull(klCanvas.getLayerContext(layerIndex)));
         const brushes: any = {};
-        for (const b in KL.brushes) {
-            if (KL.brushes.hasOwnProperty(b)) {
-                brushes[b] = new KL.brushes[b]();
-                brushes[b].setContext(this.getCurrentLayerCtx());
-            }
-        }
+        Object.entries(KL.brushes).forEach(([b, brush]) => {
+            brushes[b] = new brush();
+            brushes[b].setContext(this.getCurrentLayerCtx());
+        });
         brushes.SketchyBrush.setSeed(initState.brushes.SketchyBrush.getSeed());
         entries.forEach(entry => {
             layerIndex = execHistoryEntry(
@@ -133,10 +132,10 @@ export class UndoRedoCatchup {
             this.handUi.update(this.klCanvasWorkspace.getScale(), this.klCanvasWorkspace.getAngleDeg());
         }
         this.layerManager.update(layerIndex);
-        this.layerPreview.setLayer(klCanvas.getLayer(layerIndex));
+        this.layerPreview.setLayer(throwIfNull(klCanvas.getLayer(layerIndex)));
         this.brushUiMap.sketchyBrush.setSeed(brushes.SketchyBrush.getSeed());
-        this.getCurrentBrush().setContext(this.getCurrentLayerCtx());
-        this.klCanvasWorkspace.setLastDrawEvent(null);
+        this.getCurrentBrush().setContext(this.getCurrentLayerCtx()! as KlCanvasContext);
+        this.klCanvasWorkspace.setLastDrawEvent();
 
         klHistory.pause(false);
         return true;
@@ -157,12 +156,10 @@ export class UndoRedoCatchup {
         klHistory.pause(true);
         const oldSize = {w: klCanvas.getWidth(), h: klCanvas.getHeight()};
         const brushes: any = {};
-        for (const b in KL.brushes) {
-            if (KL.brushes.hasOwnProperty(b)) {
-                brushes[b] = new KL.brushes[b]();
-                brushes[b].setContext(this.getCurrentLayerCtx());
-            }
-        }
+        Object.entries(KL.brushes).forEach(([b, brush]) => {
+            brushes[b] = new brush();
+            brushes[b].setContext(this.getCurrentLayerCtx());
+        });
         brushes.SketchyBrush.setSeed(this.brushUiMap.sketchyBrush.getSeed());
         execHistoryEntry(
             entry,
@@ -177,12 +174,12 @@ export class UndoRedoCatchup {
             this.klCanvasWorkspace.resetView();
             this.handUi.update(this.klCanvasWorkspace.getScale(), this.klCanvasWorkspace.getAngleDeg());
         }
-        const currentLayerIndex = klCanvas.getLayerIndex(this.getCurrentLayerCtx().canvas);
+        const currentLayerIndex = throwIfNull(klCanvas.getLayerIndex(this.getCurrentLayerCtx()!.canvas));
         this.layerManager.update(currentLayerIndex);
-        this.layerPreview.setLayer(klCanvas.getLayer(currentLayerIndex));
+        this.layerPreview.setLayer(klCanvas.getLayer(currentLayerIndex)!);
         this.brushUiMap.sketchyBrush.setSeed(brushes.SketchyBrush.getSeed());
-        this.getCurrentBrush().setContext(this.getCurrentLayerCtx());
-        this.klCanvasWorkspace.setLastDrawEvent(null);
+        this.getCurrentBrush().setContext(this.getCurrentLayerCtx()! as KlCanvasContext);
+        this.klCanvasWorkspace.setLastDrawEvent();
         klHistory.pause(false);
 
         return true;

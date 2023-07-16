@@ -87,18 +87,18 @@ export class FxShader {
     
     vertexAttribute: null | number;
     texCoordAttribute: null | number;
-    program: WebGLProgram; // null = destroyed
+    program: WebGLProgram | null; // null = destroyed
 
     destroy (): void {
         gl.deleteProgram(this.program);
         this.program = null;
     }
 
-    uniforms (uniforms: TUniforms): FxShader {
+    uniforms (uniforms: TUniforms<number | number[]>): FxShader {
         gl.useProgram(this.program);
         Object.entries(uniforms).forEach(([name, value]) => {
 
-            const location = gl.getUniformLocation(this.program, name);
+            const location = gl.getUniformLocation(this.program!, name);
             if (location === null) {
                 // will be null if the uniform isn't used in the shader
                 return;
@@ -130,7 +130,7 @@ export class FxShader {
             } else if (isNumber(value)) {
                 gl.uniform1f(location, value);
             } else {
-                throw 'attempted to set uniform "' + name + '" to invalid value ' + (value || 'undefined').toString();
+                throw 'attempted to set uniform "' + name + '" to invalid value ' + ((value as any) || 'undefined').toString();
             }
         });
         // allow chaining
@@ -146,7 +146,7 @@ export class FxShader {
         gl.useProgram(this.program);
 
         Object.entries(textures).forEach(([name, value]) => {
-            gl.uniform1i(gl.getUniformLocation(this.program, name), value);
+            gl.uniform1i(gl.getUniformLocation(this.program!, name), value);
         });
 
         // allow chaining
@@ -171,11 +171,11 @@ export class FxShader {
             gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([0, 0, 0, 1, 1, 0, 1, 1]), gl.STATIC_DRAW);
         }
         if (this.vertexAttribute == null) {
-            this.vertexAttribute = gl.getAttribLocation(this.program, 'vertex');
+            this.vertexAttribute = gl.getAttribLocation(this.program!, 'vertex');
             gl.enableVertexAttribArray(this.vertexAttribute);
         }
         if (this.texCoordAttribute == null) {
-            this.texCoordAttribute = gl.getAttribLocation(this.program, '_texCoord');
+            this.texCoordAttribute = gl.getAttribLocation(this.program!, '_texCoord');
             gl.enableVertexAttribArray(this.texCoordAttribute);
         }
         gl.useProgram(this.program);

@@ -15,14 +15,16 @@ export function getEmbedUrl (): string {
     try {
         throw new Error();
     } catch (e) {
-        match = ('' + e.stack).match(/(https?|file|ftp):\/\/[^)\n]+/g);
+        if (e instanceof Error) {
+            match = ('' + e.stack).match(/(https?|file|ftp):\/\/[^)\n]+/g)!;
+        }
     }
     let index = 0;
-    match.forEach((item, i) => {
+    match!.forEach((item, i) => {
         if (item.indexOf('embed.js') !== -1) {
             index = i;
         }
     });
-    embedUrl = getBaseURL(match[index]);
+    embedUrl = getBaseURL(match![index]);
     return embedUrl;
 }

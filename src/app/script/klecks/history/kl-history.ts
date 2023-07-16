@@ -150,7 +150,7 @@ export class KlHistory implements KlHistoryInterface {
         if (
             lastEntry && newEntry.tool[0] === 'canvas' && lastEntry.tool[0] === 'canvas' &&
             newEntry.action === 'layerOpacity' && lastEntry.action === 'layerOpacity' &&
-            lastEntry.params[0] === newEntry.params[0]
+            lastEntry.params![0] === newEntry.params![0]
         ) {
             this.entries[this.entries.length - 1] = newEntry;
             this.state++; //still needs to increment because something changed
@@ -183,7 +183,7 @@ export class KlHistory implements KlHistoryInterface {
     /**
      * lowers action number, returns all entries that need to be executed
      * on trailing snapshot to represent the canvas one undo step back.
-     * Empty array if can't undo
+     * Empty array if it can't undo
      */
     undo (): IHistoryEntry[] {
         const result: IHistoryEntry[] = [];

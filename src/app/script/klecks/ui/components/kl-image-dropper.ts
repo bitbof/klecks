@@ -73,9 +73,7 @@ export class KlImageDropper {
             rootCounter = 0;
             optionLayerCounter = 0;
             optionImageCounter = 0;
-            try {
-                p.target.removeChild(this.rootEl);
-            } catch (e) { }
+            this.rootEl.remove();
         };
 
         /**
@@ -141,7 +139,7 @@ export class KlImageDropper {
             }
             rootCounter = Math.max(0, rootCounter - 1);
             if (rootCounter === 0) {
-                p.target.removeChild(this.rootEl);
+                this.rootEl.remove();
             }
         };
 
@@ -164,7 +162,7 @@ export class KlImageDropper {
 
 
             if (rootCounter > 0) {
-                p.target.removeChild(this.rootEl);
+                this.rootEl.remove();
             }
             rootCounter = 0;
             optionLayerCounter = 0;

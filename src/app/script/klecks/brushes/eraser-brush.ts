@@ -4,13 +4,12 @@ import {KL} from '../kl';
 import {TPressureInput} from '../kl-types';
 import {BezierLine} from '../../bb/math/line';
 import {ERASE_COLOR} from './erase-color';
+import {KlCanvasContext} from '../canvas/kl-canvas';
 
 export interface IEraserBrushHistoryEntry extends IHistoryEntry {
     tool: ['brush', 'EraserBrush'];
     actions: THistoryInnerActions<EraserBrush>[];
 }
-
-type TIndexExtended2DContext = CanvasRenderingContext2D & { canvas: { index: number } };
 
 export class EraserBrush {
 
@@ -24,7 +23,7 @@ export class EraserBrush {
     private history: KlHistoryInterface = new KL.DecoyKlHistory();
     private historyEntry: IEraserBrushHistoryEntry | undefined;
     private isBaseLayer: boolean = false;
-    private context: TIndexExtended2DContext;
+    private context: KlCanvasContext = {} as KlCanvasContext;
 
     private started: boolean = false;
     private lastDot: number | undefined;
@@ -57,7 +56,7 @@ export class EraserBrush {
         this.context.restore();
     }
 
-    private continueLine (x: number | null, y: number | null, p: number): void {
+    private continueLine (x: number | undefined, y: number | undefined, p: number): void {
         p = Math.max(0, Math.min(1, p));
         let localPressure;
         let localOpacity;
@@ -80,10 +79,10 @@ export class EraserBrush {
             this.drawDot(val.x, val.y, localSize, localOpacity);
         };
 
-        if (x === null) {
-            this.bezierLine.addFinal(bdist, bezierCallback);
+        if (x === undefined || y === undefined) {
+            this.bezierLine!.addFinal(bdist, bezierCallback);
         } else {
-            this.bezierLine.add(x, y, bdist, bezierCallback);
+            this.bezierLine!.add(x, y, bdist, bezierCallback);
         }
     }
 
@@ -162,7 +161,7 @@ export class EraserBrush {
     endLine (): void {
 
         if (this.bezierLine) {
-            this.continueLine(null, null, this.lastInput.pressure);
+            this.continueLine(undefined, undefined, this.lastInput.pressure);
         }
 
         this.started = false;
@@ -238,7 +237,7 @@ export class EraserBrush {
     }
 
     //SET
-    setContext (c: TIndexExtended2DContext): void {
+    setContext (c: KlCanvasContext): void {
         this.context = c;
     }
 
@@ -263,7 +262,7 @@ export class EraserBrush {
     }
 
     setTransparentBG (b: boolean): void {
-        this.isTransparentBG = !!b;
+        this.isTransparentBG = b;
     }
 
     //GET

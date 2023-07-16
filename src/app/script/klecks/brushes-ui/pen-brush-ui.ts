@@ -10,10 +10,11 @@ import {genBrushAlpha01, genBrushAlpha02} from '../brushes/alphas/brush-alphas';
 import {IBrushUi} from '../kl-types';
 import {LANG, languageStrings} from '../../language/language';
 import {Options} from '../ui/components/options';
+import {PenBrush} from '../brushes/pen-brush';
 
 
 export const penBrushUi = (function () {
-    const brushInterface: IBrushUi = {
+    const brushInterface = {
         image: brushIconImg,
         tooltip: LANG('brush-pen'),
         sizeSlider: {
@@ -26,8 +27,7 @@ export const penBrushUi = (function () {
             max: 1,
             curve: [[0, 1/100], [0.5, 30/100], [1, 1]],
         },
-        Ui: null,
-    };
+    } as IBrushUi<PenBrush>;
 
     let alphaNames = [
         LANG('brush-pen-circle'),
@@ -50,8 +50,8 @@ export const penBrushUi = (function () {
         const brush = new brushes.PenBrush();
         brush.setHistory(klHistory);
         p.onSizeChange(brush.getSize());
-        let sizeSlider;
-        let opacitySlider;
+        let sizeSlider: KlSlider;
+        let opacitySlider: KlSlider;
 
         const alphaOptions = new Options({
             optionArr: [0, 1, 2, 3].map(id => {
@@ -110,7 +110,7 @@ export const penBrushUi = (function () {
 
         const spacingSpline = new BB.SplineInterpolator([[0, 15], [8, 7], [14, 4], [30, 3], [50, 2.7], [100, 2]]);
 
-        function setSize (size) {
+        function setSize (size: number) {
             brush.setSize(size);
             brush.setSpacing(Math.max(2, spacingSpline.interpolate(size)) / 15);
         }
@@ -256,6 +256,6 @@ export const penBrushUi = (function () {
         this.getElement = function () {
             return div;
         };
-    };
+    } as IBrushUi<PenBrush>['Ui'];
     return brushInterface;
 })();

@@ -7,6 +7,7 @@ import {DecoyKlHistory, KlHistoryInterface, THistoryActions} from '../history/kl
 import {drawProject} from './draw-project';
 import {LANG} from '../../language/language';
 import {drawGradient} from '../image-operations/gradient-tool';
+import {nullToUndefined} from '../../bb/base/base';
 
 export type TKlCanvasHistoryEntry = THistoryActions<'canvas', KlCanvas>;
 
@@ -27,11 +28,11 @@ const allowedMixModes = [
     'saturation',
     'color',
     'luminosity',
-];
+] as const;
 
 export const MAX_LAYERS = 16;
 
-interface KlCanvasLayer extends HTMLCanvasElement {
+export interface KlCanvasLayer extends HTMLCanvasElement {
     name: string;
     mixModeStr: TMixMode;
     opacity: number;
@@ -40,6 +41,10 @@ interface KlCanvasLayer extends HTMLCanvasElement {
     };
     index: number; // certain brushes need to know
 }
+
+export type KlCanvasContext = CanvasRenderingContext2D & {
+    canvas: KlCanvasLayer;
+};
 
 /**
  * The image/canvas that the user paints on
@@ -52,6 +57,7 @@ export class KlCanvas {
     // todo changeListener consistent concept
     // todo history interaction, consistent concept - currently have to look at code to know if something pushes on history
 
+    private isDestroyed = false;
     private width: number;
     private height: number;
     private layerCanvasArr: KlCanvasLayer[];
@@ -83,15 +89,7 @@ export class KlCanvas {
 
     constructor (
         params: {
-            projectObj: {
-                width: number;
-                height: number;
-                layers: {
-                    name: string;
-                    opacity: number;
-                    image: HTMLImageElement | HTMLCanvasElement; // already loaded!
-                }[];
-            };
+            projectObj: IKlProject;
         } | {
             // creates blank KlCanvas, 0 layers
             width: number;
@@ -136,14 +134,15 @@ export class KlCanvas {
             }
 
             for (let i = 0; i < origLayers.length; i++) {
-                if (origLayers[i].mixModeStr && !allowedMixModes.includes(origLayers[i].mixModeStr)) {
+                const mixModeStr = origLayers[i].mixModeStr;
+                if (mixModeStr && !allowedMixModes.includes(mixModeStr)) {
                     throw new Error('unknown mixModeStr ' + origLayers[i].mixModeStr);
                 }
 
                 this.addLayer();
                 this.layerOpacity(i, origLayers[i].opacity);
                 this.layerCanvasArr[i].name = origLayers[i].name;
-                this.layerCanvasArr[i].mixModeStr = origLayers[i].mixModeStr ? origLayers[i].mixModeStr : 'source-over';
+                this.layerCanvasArr[i].mixModeStr = mixModeStr || 'source-over';
                 BB.ctx(this.layerCanvasArr[i]).drawImage(origLayers[i].image, 0, 0);
             }
         }
@@ -173,7 +172,7 @@ export class KlCanvas {
                 image: HTMLCanvasElement;
             }[];
         }
-    ): void | number {
+    ): number {
         if (!p.width || !p.height || p.width < 1 || p.height < 1 || isNaN(p.width) || isNaN(p.height) ) {
             throw new Error('invalid canvas size');
         }
@@ -366,22 +365,22 @@ export class KlCanvas {
         if (this.isLayerLimitReached()) {
             return false;
         }
-        const canvas = BB.canvas(this.width, this.height);
+        const canvas = BB.canvas(this.width, this.height) as KlCanvasLayer;
         if (!canvas.getContext('2d')) {
             throw new Error('kl-create-canvas-error');
         }
 
-        (canvas as any).mixModeStr = 'source-over';
+        canvas.mixModeStr = 'source-over';
 
         if (selected === undefined) {
-            this.layerCanvasArr[this.layerCanvasArr.length] = canvas as any;
+            this.layerCanvasArr[this.layerCanvasArr.length] = canvas;
             selected = Math.max(0, this.layerCanvasArr.length - 1);
         } else {
-            this.layerCanvasArr.splice(selected + 1, 0, canvas as any);
+            this.layerCanvasArr.splice(selected + 1, 0, canvas);
             selected++;
         }
 
-        (canvas as any).name = LANG('layers-layer') + ' ' + (this.layerCanvasArr.length + this.layerNrOffset);
+        canvas.name = LANG('layers-layer') + ' ' + (this.layerCanvasArr.length + this.layerNrOffset);
         this.history.pause(true);
         this.layerOpacity(selected, 1);
         this.history.pause(false);
@@ -398,11 +397,11 @@ export class KlCanvas {
         if (!this.layerCanvasArr[i] || this.isLayerLimitReached()) {
             return false;
         }
-        const canvas = BB.canvas(this.width, this.height);
-        this.layerCanvasArr.splice(i + 1, 0, canvas as any);
+        const canvas = BB.canvas(this.width, this.height) as KlCanvasLayer;
+        this.layerCanvasArr.splice(i + 1, 0, canvas);
 
-        (canvas as any).name = this.layerCanvasArr[i].name + ' ' + LANG('layers-copy');
-        (canvas as any).mixModeStr = this.layerCanvasArr[i].mixModeStr;
+        canvas.name = this.layerCanvasArr[i].name + ' ' + LANG('layers-copy');
+        canvas.mixModeStr = this.layerCanvasArr[i].mixModeStr;
         // 2023-04-30 workaround for https://bugs.webkit.org/show_bug.cgi?id=256151
         // todo replace with simple drawImage eventually when fixed
         BB.ctx(canvas).putImageData(BB.ctx(this.layerCanvasArr[i]).getImageData(0, 0, this.width, this.height), 0, 0);
@@ -571,8 +570,8 @@ export class KlCanvas {
             temp.width = this.width;
             temp.height = this.height;
         } else if (deg === 90 || deg === 270) {
-            temp.width = this.height;
-            temp.height = this.width;
+            temp.width = (this.height);
+            temp.height = (this.width);
         }
         const ctx = BB.ctx(temp);
         for (let i = 0; i < this.layerCanvasArr.length; i++) {
@@ -698,28 +697,16 @@ export class KlCanvas {
         }
 
         let result;
-
-        let srcCtx;
-        let srcImageData;
-        let srcData;
-
         let targetCtx;
         let targetImageData;
-        let targetData;
-
 
         if (sampleStr === 'all') {
 
-            let srcCanvas = this.layerCanvasArr.length === 1 ? this.layerCanvasArr[0] : this.getCompleteCanvas(1);
-            srcCtx = BB.ctx(srcCanvas);
-            srcImageData = srcCtx.getImageData(0, 0, this.width, this.height);
-            srcData = srcImageData.data;
+            const srcCanvas = this.layerCanvasArr.length === 1 ? this.layerCanvasArr[0] : this.getCompleteCanvas(1);
+            const srcCtx = BB.ctx(srcCanvas);
+            const srcImageData = srcCtx.getImageData(0, 0, this.width, this.height);
+            const srcData = srcImageData.data;
             result = floodFillBits(srcData, this.width, this.height, x, y, tolerance, Math.round(grow), isContiguous);
-
-            srcCanvas = null;
-            srcCtx = null;
-            srcImageData = null;
-            srcData = null;
 
             targetCtx = BB.ctx(this.layerCanvasArr[layerIndex]);
             targetImageData = targetCtx.getImageData(0, 0, this.width, this.height);
@@ -731,23 +718,17 @@ export class KlCanvas {
                 return;
             }
 
-            srcCtx = BB.ctx(this.layerCanvasArr[srcIndex]);
-            srcImageData = srcCtx.getImageData(0, 0, this.width, this.height);
-            srcData = srcImageData.data;
+            const srcCtx = BB.ctx(this.layerCanvasArr[srcIndex]);
+            const srcImageData = srcCtx.getImageData(0, 0, this.width, this.height);
+            const srcData = srcImageData.data;
             result = floodFillBits(srcData, this.width, this.height, x, y, tolerance, Math.round(grow), isContiguous);
-
-            if (layerIndex !== srcIndex) {
-                srcCtx = null;
-                srcImageData = null;
-                srcData = null;
-            }
 
             targetCtx = layerIndex === srcIndex ? srcCtx : BB.ctx(this.layerCanvasArr[layerIndex]);
             targetImageData = layerIndex === srcIndex ? srcImageData : targetCtx.getImageData(0, 0, this.width, this.height);
 
         }
 
-        targetData = targetImageData.data;
+        const targetData = targetImageData.data;
         if (rgb) {
             if (opacity === 1) {
                 for (let i = 0; i < this.width * this.height; i++) {
@@ -991,17 +972,18 @@ export class KlCanvas {
         if (!this.layerCanvasArr[layerIndex]) {
             throw new Error('invalid layer');
         }
-        this.layerCanvasArr[layerIndex].compositeObj = compositeObj;
+        this.layerCanvasArr[layerIndex].compositeObj = nullToUndefined(compositeObj);
     }
 
     destroy (): void {
-        if (this.layerCanvasArr === null) {
+        if (this.isDestroyed) {
             return;
         }
         this.layerCanvasArr.forEach(canvas => {
             BB.freeCanvas(canvas);
         });
-        this.layerCanvasArr = null;
+        this.layerCanvasArr = [];
+        this.isDestroyed = true;
     }
 
 }

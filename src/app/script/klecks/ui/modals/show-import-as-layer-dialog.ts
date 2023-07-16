@@ -96,8 +96,8 @@ export function showImportAsLayerDialog (
     const freeTransformCanvas = new FreeTransformCanvas({
         elementWidth: isSmall ? 340 : 540,
         elementHeight: isSmall ? 280 : 350,
-        imageWidth: params.klCanvas.getLayerContext(0).canvas.width,
-        imageHeight: params.klCanvas.getLayerContext(0).canvas.height,
+        imageWidth: params.klCanvas.getLayerContext(0)!.canvas.width,
+        imageHeight: params.klCanvas.getLayerContext(0)!.canvas.height,
         layers: layers,
         transformIndex: layers.length - 1,
     });

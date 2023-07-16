@@ -128,7 +128,7 @@ export const filterBlur = {
                 klCanvasPreview.destroy();
             };
             result.getInput = function (): TFilterBlurInput {
-                result.destroy();
+                result.destroy!();
                 return {
                     radius: radius,
                 };

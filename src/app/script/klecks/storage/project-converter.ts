@@ -17,7 +17,7 @@ function loadImage (blob: Blob): Promise<HTMLImageElement> {
         try {
             im.src = BB.imageBlobToUrl(blob);
         } catch (e) {
-            reject('imageBlobToUrl, ' + e.message);
+            reject('imageBlobToUrl, ' + (e instanceof Error ? e.message : ''));
             return;
         }
         im.onload = (): void => {

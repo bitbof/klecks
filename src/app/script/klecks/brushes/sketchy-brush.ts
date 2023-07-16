@@ -13,8 +13,8 @@ const sampleCtx = BB.ctx(sampleCanvas);
 
 export class SketchyBrush {
 
-    private context: CanvasRenderingContext2D;
-    private settingColor: IRGB;
+    private context: CanvasRenderingContext2D = {} as CanvasRenderingContext2D;
+    private settingColor: IRGB = {} as IRGB;
     private settingSize: number = 1;
     private settingOpacity: number = 0.2;
     private settingBlending: number = 0.5;
@@ -28,11 +28,11 @@ export class SketchyBrush {
     private sketchySeed: number = 0;
     private points: [number, number][] = []; // x y
     private count: number = 0;
-    private readonly mixmode = [
-        (c1: IRGB, c2: IRGB) => {
+    private readonly mixMode = [
+        (c1: IRGB): IRGB => {
             return c1;
         },
-        (c1: IRGB, c2: IRGB) => { // why
+        (c1: IRGB, c2: IRGB): IRGB => { // why
             const result = new BB.RGB(c1.r, c1.g, c1.b);
             result.r *= c2.r / 255;
             result.g *= c2.g / 255;
@@ -147,7 +147,7 @@ export class SketchyBrush {
 
     }
 
-    goLine (p_x: number, p_y: number, pressure: number, preMixedColor: IRGB): void {
+    goLine (p_x: number, p_y: number, pressure: number, preMixedColor: IRGB | undefined): void {
         if (!this.inputIsDrawing || (p_x === this.lastInput.x && p_y === this.lastInput.y)) {
             return;
         }
@@ -161,7 +161,7 @@ export class SketchyBrush {
         let mixg = this.settingColor.g;
         let mixb = this.settingColor.b;
 
-        if (preMixedColor !== null) {
+        if (preMixedColor) {
             mixr = preMixedColor.r;
             mixg = preMixedColor.g;
             mixb = preMixedColor.b;
@@ -171,28 +171,28 @@ export class SketchyBrush {
                     mixr = 0;
                     mixg = 0;
                     mixb = 0;
-                    const mixx = Math.min(this.context.canvas.width - 1, Math.max(0, x - 5));
-                    const mixy = Math.min(this.context.canvas.height - 1, Math.max(0, y - 5));
-                    let mixw = Math.min(this.context.canvas.width - 1, Math.max(0, x + 5));
-                    let mixh = Math.min(this.context.canvas.height - 1, Math.max(0, y + 5));
-                    mixw -= mixx;
-                    mixh -= mixy;
+                    const mixX = Math.min(this.context.canvas.width - 1, Math.max(0, x - 5));
+                    const mixY = Math.min(this.context.canvas.height - 1, Math.max(0, y - 5));
+                    let mixW = Math.min(this.context.canvas.width - 1, Math.max(0, x + 5));
+                    let mixH = Math.min(this.context.canvas.height - 1, Math.max(0, y + 5));
+                    mixW -= mixX;
+                    mixH -= mixY;
 
-                    if (mixw > 0 && mixh > 0) {
-                        const imdat = this.context.getImageData(mixx, mixy, mixw, mixh);
-                        let countmix = 0;
-                        for (let i = 0; i < imdat.data.length; i += 4) {
-                            mixr += imdat.data[i + 0];
-                            mixg += imdat.data[i + 1];
-                            mixb += imdat.data[i + 2];
-                            countmix++;
+                    if (mixW > 0 && mixH > 0) {
+                        const imDat = this.context.getImageData(mixX, mixY, mixW, mixH);
+                        let countMix = 0;
+                        for (let i = 0; i < imDat.data.length; i += 4) {
+                            mixr += imDat.data[i + 0];
+                            mixg += imDat.data[i + 1];
+                            mixb += imDat.data[i + 2];
+                            countMix++;
                         }
-                        mixr /= countmix;
-                        mixg /= countmix;
-                        mixb /= countmix;
+                        mixr /= countMix;
+                        mixg /= countMix;
+                        mixb /= countMix;
                     }
 
-                    const mixed = this.mixmode[0](new BB.RGB(mixr, mixg, mixb), this.settingColor);
+                    const mixed = this.mixMode[0](new BB.RGB(mixr, mixg, mixb), this.settingColor);
                     mixr = parseInt('' + BB.mix(this.settingColor.r, mixed.r, this.settingBlending));
                     mixg = parseInt('' + BB.mix(this.settingColor.g, mixed.g, this.settingBlending));
                     mixb = parseInt('' + BB.mix(this.settingColor.b, mixed.b, this.settingBlending));
@@ -246,7 +246,7 @@ export class SketchyBrush {
             this.historyEntry = undefined;
         }
     }
-    //cheap n' ugly
+    //cheap 'n' ugly
 
     drawLineSegment (x1: number, y1: number, x2: number, y2: number): void {
         this.lastInput.x = x2;
@@ -260,48 +260,52 @@ export class SketchyBrush {
         this.context.save();
         this.context.lineWidth = this.settingSize;
 
-        let mixr = this.settingColor.r, mixg = this.settingColor.g, mixb = this.settingColor.b;
+        const mixCol = {
+            r: this.settingColor.r,
+            g: this.settingColor.g,
+            b: this.settingColor.b,
+        };
         if (x1 + 5 >= 0 && y1 + 5 >= 0 && x1 - 5 < this.context.canvas.width - 1 && y1 - 5 < this.context.canvas.height - 1) {
-            mixr = 0;
-            mixg = 0;
-            mixb = 0;
-            const mixx = Math.min(this.context.canvas.width - 1, Math.max(0, x1 - 5));
-            const mixy = Math.min(this.context.canvas.height - 1, Math.max(0, y1 - 5));
-            let mixw = Math.min(this.context.canvas.width - 1, Math.max(0, x1 + 5));
-            let mixh = Math.min(this.context.canvas.height - 1, Math.max(0, y1 + 5));
-            mixw -= mixx;
-            mixh -= mixy;
-            if (mixw > 0 && mixh > 0) {
-                const w = Math.min(sampleCanvas.width, mixw);
-                const h = Math.min(sampleCanvas.height, mixh);
+            mixCol.r = 0;
+            mixCol.g = 0;
+            mixCol.b = 0;
+            const mixX = Math.min(this.context.canvas.width - 1, Math.max(0, x1 - 5));
+            const mixY = Math.min(this.context.canvas.height - 1, Math.max(0, y1 - 5));
+            let mixW = Math.min(this.context.canvas.width - 1, Math.max(0, x1 + 5));
+            let mixH = Math.min(this.context.canvas.height - 1, Math.max(0, y1 + 5));
+            mixW -= mixX;
+            mixH -= mixY;
+            if (mixW > 0 && mixH > 0) {
+                const w = Math.min(sampleCanvas.width, mixW);
+                const h = Math.min(sampleCanvas.height, mixH);
                 sampleCtx.save();
                 sampleCtx.globalCompositeOperation = 'copy';
-                sampleCtx.drawImage(this.context.canvas, mixx, mixy, mixw, mixh, 0, 0, w, h);
+                sampleCtx.drawImage(this.context.canvas, mixX, mixY, mixW, mixH, 0, 0, w, h);
                 sampleCtx.restore();
 
-                const imdat = sampleCtx.getImageData(mixx, mixy, mixw, mixh);
-                let countmix = 0;
-                for (let i = 0; i < imdat.data.length; i += 4) {
-                    mixr += imdat.data[i + 0];
-                    mixg += imdat.data[i + 1];
-                    mixb += imdat.data[i + 2];
-                    countmix++;
+                const imDat = sampleCtx.getImageData(mixX, mixY, mixW, mixH);
+                let countMix = 0;
+                for (let i = 0; i < imDat.data.length; i += 4) {
+                    mixCol.r += imDat.data[i + 0];
+                    mixCol.g += imDat.data[i + 1];
+                    mixCol.b += imDat.data[i + 2];
+                    countMix++;
                 }
-                mixr /= countmix;
-                mixg /= countmix;
-                mixb /= countmix;
+                mixCol.r /= countMix;
+                mixCol.g /= countMix;
+                mixCol.b /= countMix;
             }
         }
-        const mixed = this.mixmode[0](new BB.RGB(mixr, mixg, mixb), this.settingColor);
-        mixr = parseInt('' + (this.settingBlending * mixed.r + this.settingColor.r * (1 - this.settingBlending)));
-        mixg = parseInt('' + (this.settingBlending * mixed.g + this.settingColor.g * (1 - this.settingBlending)));
-        mixb = parseInt('' + (this.settingBlending * mixed.b + this.settingColor.b * (1 - this.settingBlending)));
-        this.context.strokeStyle = 'rgba(' + mixr + ', ' + mixg + ', ' + mixb + ', ' + this.settingOpacity + ')';
+        const mixed = this.mixMode[0](new BB.RGB(mixCol.r, mixCol.g, mixCol.b), this.settingColor);
+        mixCol.r = parseInt('' + (this.settingBlending * mixed.r + this.settingColor.r * (1 - this.settingBlending)));
+        mixCol.g = parseInt('' + (this.settingBlending * mixed.g + this.settingColor.g * (1 - this.settingBlending)));
+        mixCol.b = parseInt('' + (this.settingBlending * mixed.b + this.settingColor.b * (1 - this.settingBlending)));
+        this.context.strokeStyle = 'rgba(' + mixCol.r + ', ' + mixCol.g + ', ' + mixCol.b + ', ' + this.settingOpacity + ')';
         this.context.beginPath();
         this.context.moveTo(x1, y1);
         this.context.lineTo(x2, y2);
         this.context.stroke();
-        this.context.strokeStyle = 'rgba(' + mixr + ', ' + mixg + ', ' + mixb + ', ' + this.settingOpacity + ')';
+        this.context.strokeStyle = 'rgba(' + mixCol.r + ', ' + mixCol.g + ', ' + mixCol.b + ', ' + this.settingOpacity + ')';
         this.context.restore();
 
         const historyEntry: ISketchyBrushHistoryEntry = {

@@ -11,15 +11,15 @@ import {theme} from '../../../theme/theme';
 
 export class BrowserStorageUi {
 
-    private previewEl: HTMLDivElement;
-    private readonly infoEl: HTMLElement;
-    private readonly ageEl: HTMLElement;
-    private readonly storeButtonEl: HTMLButtonElement;
-    private readonly clearButtonEl: HTMLButtonElement;
-    private readonly storeListener: IProjectStoreListener;
-    private readonly updateCheckerboard: () => void;
+    private previewEl: HTMLDivElement = {} as HTMLDivElement;
+    private readonly infoEl: HTMLElement = {} as HTMLElement;
+    private readonly ageEl: HTMLElement = {} as HTMLElement;
+    private readonly storeButtonEl: HTMLButtonElement = {} as HTMLButtonElement;
+    private readonly clearButtonEl: HTMLButtonElement = {} as HTMLButtonElement;
+    private readonly storeListener: IProjectStoreListener = {} as IProjectStoreListener;
+    private readonly updateCheckerboard: () => void = () => {};
 
-    private timestamp: number;
+    private timestamp: number | undefined;
     private thumbnail: HTMLImageElement | HTMLCanvasElement | undefined;
 
     private updateAge () {
@@ -188,8 +188,8 @@ export class BrowserStorageUi {
                 textSize: '13px',
             },
         }) as HTMLDivElement;
-        const btnCustom = options?.isFocusable ?  {} : {
-            tabIndex: -1,
+        const btnCustom: { [key: string]: string } = options?.isFocusable ?  {} : {
+            tabIndex: '-1',
         };
         this.storeButtonEl = BB.el({
             parent: this.element,

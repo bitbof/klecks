@@ -6,6 +6,9 @@ import {LANG} from '../../language/language';
 import {TwoTabs} from '../ui/components/two-tabs';
 import {TRectanglePoints} from '../../fx-canvas/filters/perspective';
 import {TFilterHistoryEntry} from './filters';
+import {PointerListener} from '../../bb/input/pointer-listener';
+import {IVector2D} from '../../bb/bb-types';
+import {throwIfNull} from '../../bb/base/base';
 
 export type TFilterPerspectiveInput = {
     before: TRectanglePoints;
@@ -15,6 +18,12 @@ export type TFilterPerspectiveInput = {
 export type TFilterPerspectiveHistoryEntry = TFilterHistoryEntry<
     'perspective',
     TFilterPerspectiveInput>;
+
+type TDraggable = HTMLDivElement & {
+    x: number;
+    y: number;
+    copy: (p: IVector2D) => void;
+};
 
 export const filterPerspective = {
 
@@ -54,19 +63,14 @@ export const filterPerspective = {
             result.width = 500;
         }
 
-        const pointerListenerArr = [];
+        const pointerListenerArr: PointerListener[] = [];
 
         function finishInit (): void {
             div.innerHTML = LANG('filter-perspective-description') + '<br/><br/>';
 
-            const fxCanvas = getSharedFx();
-            if (!fxCanvas) {
-                return; // todo throw?
-            }
+            const fxCanvas = throwIfNull(getSharedFx());
             const texture = fxCanvas.texture(tempCanvas);
             fxCanvas.draw(texture).update(); // update fxCanvas size
-            let ba, bb, bc, bd; //before
-            let aa, ab, ac, ad; //after
             function update (): void {
                 try {
                     fxCanvas.draw(texture).multiplyAlpha().perspective(
@@ -76,14 +80,14 @@ export const filterPerspective = {
                             } else {
                                 return item / displayH * h;
                             }
-                        }),
+                        }) as TRectanglePoints,
                         [aa.x, aa.y, ab.x, ab.y, ac.x, ac.y, ad.x, ad.y].map((item, i) => {
                             if (i % 2 === 0) {
                                 return item / displayW * w;
                             } else {
                                 return item / displayH * h;
                             }
-                        })
+                        }) as TRectanglePoints
                     ).unmultiplyAlpha().update();
                     klCanvasPreview.render();
                 } catch(e) {
@@ -91,21 +95,21 @@ export const filterPerspective = {
                 }
             }
 
-            function nob (x, y, callback?) {
-                const nobSize = 14;
-                const div = document.createElement('div');
-                (div as any).x = x;
-                (div as any).y = y;
+            function createDraggable (x: number, y: number, callback?: () => void): TDraggable {
+                const size = 14;
+                const div = document.createElement('div') as TDraggable;
+                div.x = x;
+                div.y = y;
                 BB.css(div, {
-                    width: nobSize + 'px',
-                    height: nobSize + 'px',
+                    width: size + 'px',
+                    height: size + 'px',
                     backgroundColor: '#fff',
                     boxShadow: 'inset 0 0 0 2px #000',
-                    borderRadius: nobSize + 'px',
+                    borderRadius: size + 'px',
                     position: 'absolute',
                     cursor: 'move',
-                    left: ((div as any).x - nobSize / 2) + 'px',
-                    top: ((div as any).y - nobSize / 2) + 'px',
+                    left: (div.x - size / 2) + 'px',
+                    top: (div.y - size / 2) + 'px',
                     userSelect: 'none',
                     touchAction: 'none',
                 });
@@ -115,10 +119,10 @@ export const filterPerspective = {
                     onPointer: function (event) {
                         event.eventPreventDefault();
                         if (event.button === 'left' && event.type === 'pointermove') {
-                            (div as any).x += event.dX;
-                            (div as any).y += event.dY;
-                            div.style.left = ((div as any).x - nobSize / 2) + 'px';
-                            div.style.top = ((div as any).y - nobSize / 2) + 'px';
+                            div.x += event.dX;
+                            div.y += event.dY;
+                            div.style.left = (div.x - size / 2) + 'px';
+                            div.style.top = (div.y - size / 2) + 'px';
                             if (callback) {
                                 callback();
                             }
@@ -126,11 +130,11 @@ export const filterPerspective = {
                         }
                     },
                 });
-                (div as any).copy = function (p) {
-                    (div as any).x = p.x;
-                    (div as any).y = p.y;
-                    div.style.left = ((div as any).x - nobSize / 2) + 'px';
-                    div.style.top = ((div as any).y - nobSize / 2) + 'px';
+                div.copy = function (p) {
+                    div.x = p.x;
+                    div.y = p.y;
+                    div.style.left = (div.x - size / 2) + 'px';
+                    div.style.top = (div.y - size / 2) + 'px';
                 };
                 pointerListenerArr.push(pointerListener);
                 return div;
@@ -143,14 +147,16 @@ export const filterPerspective = {
                 ad.copy(bd);
             }
 
-            ba = nob(0, 0, updateAfter);
-            bb = nob(displayW, 0, updateAfter);
-            bc = nob(displayW, displayH, updateAfter);
-            bd = nob(0, displayH, updateAfter);
-            aa = nob(0, 0);
-            ab = nob(displayW, 0);
-            ac = nob(displayW, displayH);
-            ad = nob(0, displayH);
+            // b - before
+            const ba = createDraggable(0, 0, updateAfter);
+            const bb = createDraggable(displayW, 0, updateAfter);
+            const bc = createDraggable(displayW, displayH, updateAfter);
+            const bd = createDraggable(0, displayH, updateAfter);
+            // a - after
+            const aa = createDraggable(0, 0);
+            const ab = createDraggable(displayW, 0);
+            const ac = createDraggable(displayW, displayH);
+            const ad = createDraggable(0, displayH);
 
             let before = false;
 
@@ -252,7 +258,7 @@ export const filterPerspective = {
                 klCanvasPreview.destroy();
             };
             result.getInput = function (): TFilterPerspectiveInput {
-                result.destroy();
+                result.destroy!();
                 return {
                     before: [
                         ba.x / displayPreviewFactor,

@@ -49,7 +49,7 @@ export class LayerManager {
     private readonly addBtn: HTMLButtonElement;
     private readonly duplicateBtn: HTMLButtonElement;
     private readonly mergeBtn: HTMLButtonElement;
-    private readonly modeSelect: Select;
+    private readonly modeSelect: Select<TMixMode>;
     private uiState: TUiLayout;
     private readonly largeThumbDiv: HTMLElement;
     private oldHistoryState: number | undefined;
@@ -131,9 +131,9 @@ export class LayerManager {
 
         renameLayerDialog(
             this.parentEl,
-            this.klCanvas.getLayer(layerSpot).name,
+            this.klCanvas.getLayer(layerSpot)!.name,
             (newName) => {
-                if (newName === undefined || newName === this.klCanvas.getLayer(layerSpot).name) {
+                if (newName === undefined || newName === this.klCanvas.getLayer(layerSpot)!.name) {
                     return;
                 }
                 this.klCanvas.renameLayer(layerSpot, newName);
@@ -152,7 +152,7 @@ export class LayerManager {
     private createLayerList (): void {
         this.oldHistoryState = klHistory.getState();
         const createLayerEntry = (index: number): void => {
-            const layerName = this.klCanvas.getLayer(index).name;
+            const layerName = this.klCanvas.getLayer(index)!.name;
             const opacity = this.klCanvasLayerArr[index].opacity;
             const layercanvas = this.klCanvasLayerArr[index].context.canvas;
 
@@ -250,7 +250,7 @@ export class LayerManager {
                 pointSize: 14,
                 callback: (sliderValue, isFirst, isLast) => {
                     if (isFirst) {
-                        oldOpacity = this.klCanvas.getLayer(layer.spot).opacity;
+                        oldOpacity = this.klCanvas.getLayer(layer.spot)!.opacity;
                         klHistory.pause(true);
                         return;
                     }
@@ -319,7 +319,7 @@ export class LayerManager {
                     if (!this.largeThumbInDocument) {
                         return;
                     }
-                    document.body.removeChild(this.largeThumbDiv);
+                    this.largeThumbDiv.remove();
                     this.largeThumbInDocument = false;
                 }, 300);
             };
@@ -395,7 +395,7 @@ export class LayerManager {
             const child = this.layerListEl.firstChild as TLayerEl;
             child.pointerListener.destroy();
             child.opacitySlider.destroy();
-            this.layerListEl.removeChild(child);
+            child.remove();
         }
         for (let i = 0; i < this.klCanvasLayerArr.length; i++) {
             createLayerEntry(i);
@@ -592,10 +592,10 @@ export class LayerManager {
                     mergeLayerDialog(this.parentEl, {
                         topCanvas: this.klCanvasLayerArr[this.selectedSpotIndex].context.canvas,
                         bottomCanvas: this.klCanvasLayerArr[this.selectedSpotIndex - 1].context.canvas,
-                        topOpacity: this.klCanvas.getLayer(this.selectedSpotIndex).opacity,
+                        topOpacity: this.klCanvas.getLayer(this.selectedSpotIndex)!.opacity,
                         mixModeStr: this.klCanvasLayerArr[this.selectedSpotIndex].mixModeStr,
                         callback: (mode) => {
-                            this.klCanvas.mergeLayers(this.selectedSpotIndex, this.selectedSpotIndex - 1, mode);
+                            this.klCanvas.mergeLayers(this.selectedSpotIndex, this.selectedSpotIndex - 1, mode as TMixMode | 'as-alpha');
                             this.klCanvasLayerArr = this.klCanvas.getLayers();
                             this.selectedSpotIndex--;
                             if (this.klCanvasLayerArr.length === 1) {
@@ -631,31 +631,31 @@ export class LayerManager {
                 },
             });
 
-            this.modeSelect = new Select({
+            this.modeSelect = new Select<TMixMode>({
                 optionArr: [
                     'source-over',
-                    null,
+                    undefined,
                     'darken',
                     'multiply',
                     'color-burn',
-                    null,
+                    undefined,
                     'lighten',
                     'screen',
                     'color-dodge',
-                    null,
+                    undefined,
                     'overlay',
                     'soft-light',
                     'hard-light',
-                    null,
+                    undefined,
                     'difference',
                     'exclusion',
-                    null,
+                    undefined,
                     'hue',
                     'saturation',
                     'color',
                     'luminosity',
-                ].map((item: TMixMode) => {
-                    return item ? [item, translateBlending(item)] : null;
+                ].map((item: any) => {
+                    return item ? [item, translateBlending(item)] : undefined;
                 }),
                 onChange: (val) => {
                     this.klCanvas.setMixMode(this.selectedSpotIndex, val as TMixMode);

@@ -101,7 +101,7 @@ export class PointLine {
     }
 }
 
-type TBezierLineCallback = (
+export type TBezierLineCallback = (
     v: {
         x: number;
         y: number;
@@ -119,23 +119,25 @@ type TBezierLineControlsCallback = (
     }
 ) => void;
 
+type TBezierLinePoint = {
+    x: number;
+    y: number;
+    spacing: number;
+    dir: IVector2D;
+};
+
 /**
  * Each instance is one line made up of bezier interpolated segments.
  * You feed it points. It calculates control points on its own, and the resulting curve.
  */
 export class BezierLine {
 
-    private readonly pointArr: {
-        x: number;
-        y: number;
-        spacing: number;
-        dir: IVector2D;
-    }[];
+    private readonly pointArr: TBezierLinePoint[];
     private lastDot: number = 0;
     private lastPoint: IVector2D | undefined;
     private lastCallbackPoint: IVector2D | undefined;
     private lastAngle: number | undefined;
-    private lastSpacing: number | null = null;
+    private lastSpacing: number | undefined;
 
     /**
      * creates bezier curve from control points
@@ -190,7 +192,7 @@ export class BezierLine {
             x,
             y,
             spacing,
-        };
+        } as TBezierLinePoint;
 
         //calculate directions
         if (this.pointArr.length === 1) {
@@ -383,13 +385,13 @@ export class SplineInterpolator {
      * find x to y. simply by stepping through. suboptimal, so don't call often.
      * searches in x 0-1 range
      */
-    findX (y: number, resolution: number): number | null {
-        let x = null;
-        let dist = null;
+    findX (y: number, resolution: number): number | undefined {
+        let x;
+        let dist: number;
         for (let i = 0; i <= resolution; i++) {
             const tempX = i / resolution;
             const tempY = this.interpolate(tempX);
-            if (x === null) {
+            if (x === undefined) {
                 x = tempX;
                 dist = Math.abs(tempY - y);
                 continue;
@@ -397,7 +399,7 @@ export class SplineInterpolator {
 
             const tempDist = Math.abs(tempY - y);
 
-            if (tempDist < dist) {
+            if (tempDist < dist!) {
                 x = tempX;
                 dist = tempDist;
             } else {

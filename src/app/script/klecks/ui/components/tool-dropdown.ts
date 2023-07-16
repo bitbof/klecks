@@ -329,9 +329,8 @@ export class ToolDropdown {
             isOpen = false;
             this.arrowButton.style.removeProperty('display');
             this.rootEl.style.removeProperty('z-index');
-            document.body.removeChild(overlay);
-
-            this.rootEl.removeChild(dropdownWrapper);
+            overlay.remove();
+            dropdownWrapper.remove();
         };
 
         this.updateButton();

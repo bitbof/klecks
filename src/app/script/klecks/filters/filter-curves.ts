@@ -55,7 +55,7 @@ export const filterCurves = {
             let curves: TCurvesInput = getDefaultCurvesInput();
 
             const fxCanvas = getSharedFx();
-            if (!fxCanvas) {
+            if (fxCanvas === null) {
                 return; // todo throw?
             }
             const texture = fxCanvas.texture(tempCanvas);
@@ -63,7 +63,7 @@ export const filterCurves = {
 
             function update (): void {
                 try {
-                    fxCanvas.draw(texture).curves(curves.r, curves.g, curves.b).update();
+                    fxCanvas!.draw(texture).curves(curves.r, curves.g, curves.b).update();
                     if (klCanvasPreview) {
                         klCanvasPreview.render();
                     }
@@ -130,7 +130,7 @@ export const filterCurves = {
                 klCanvasPreview.destroy();
             };
             result.getInput = function (): TFilterCurvesInput {
-                result.destroy();
+                result.destroy!();
                 return {
                     curves: curves,
                 };

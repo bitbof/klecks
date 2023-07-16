@@ -142,7 +142,7 @@ export const filterHueSaturation = {
                 klCanvasPreview.destroy();
             };
             result.getInput = function (): TFilterHueSaturationInput {
-                result.destroy();
+                result.destroy!();
                 return {
                     hue: hue,
                     saturation: saturation,

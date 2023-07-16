@@ -75,11 +75,11 @@ export function newImageDialog (
     heightInput.style.width = '70px';
     widthInput.value = '' + canvasWidth;
     heightInput.value = '' + canvasHeight;
-    widthInput.onclick = () => {
+    widthInput.onclick = (): void => {
         widthInput.focus();
         updateRatio();
     };
-    heightInput.onclick = () => {
+    heightInput.onclick = (): void => {
         heightInput.focus();
         updateRatio();
     };
@@ -150,34 +150,34 @@ export function newImageDialog (
 
     const templatePadding = 0;
 
-    presetCurrentBtn.onclick = function () {
+    presetCurrentBtn.onclick = function (): void {
         widthInput.value = '' + canvasWidth;
         heightInput.value = '' + canvasHeight;
         updateRatio();
     };
-    presetFitBtn.onclick = function () {
+    presetFitBtn.onclick = function (): void {
         widthInput.value = '' + workspaceWidth;
         heightInput.value = '' + workspaceHeight;
         updateRatio();
     };
-    presetOversizeBtn.onclick = function () {
+    presetOversizeBtn.onclick = function (): void {
         widthInput.value = '' + (workspaceWidth + 500);
         heightInput.value = '' + (workspaceHeight + 500);
         updateRatio();
     };
-    presetSquareBtn.onclick = function () {
+    presetSquareBtn.onclick = function (): void {
         const sizeObj = createRatioSize(1, 1, workspaceWidth, workspaceHeight, templatePadding);
         widthInput.value = '' + Math.round(sizeObj.width);
         heightInput.value = '' + Math.round(sizeObj.height);
         updateRatio();
     };
-    presetLandscapeBtn.onclick = function () {
+    presetLandscapeBtn.onclick = function (): void {
         const sizeObj = createRatioSize(4, 3, workspaceWidth, workspaceHeight, templatePadding);
         widthInput.value = '' + Math.round(sizeObj.width);
         heightInput.value = '' + Math.round(sizeObj.height);
         updateRatio();
     };
-    presetPortraitBtn.onclick = function () {
+    presetPortraitBtn.onclick = function (): void {
         const sizeObj = createRatioSize(3, 4, workspaceWidth, workspaceHeight, templatePadding);
         widthInput.value = '' + Math.round(sizeObj.width);
         heightInput.value = '' + Math.round(sizeObj.height);
@@ -199,7 +199,7 @@ export function newImageDialog (
             ['1 2', '1:2'],
             ['1 1.4142135623730951', '1:√2'],
         ],
-        onChange: function (val) {
+        onChange: function (val): void {
             if (val === 'screen') {
                 widthInput.value = '' + window.screen.width;
                 heightInput.value = '' + window.screen.height;
@@ -214,12 +214,12 @@ export function newImageDialog (
                 heightInput.value = '' + Math.round(sizeObj.height);
             }
             updateRatio();
-            select.setValue(null);
+            select.setValue(undefined);
         },
     });
     setTimeout(() => {
         // safari: not empty without also setting it to null via timeout
-        select.setValue(null);
+        select.setValue(undefined);
     }, 0);
     BB.css(select.getElement(), {
         width: '80px',
@@ -260,9 +260,9 @@ export function newImageDialog (
     const colorOptions = new ColorOptions({
         colorArr: colorOptionsArr,
         initialIndex: initColorIndex,
-        onChange: function (rgbaObj) {
-            backgroundRGBA = rgbaObj;
-            preview.style.backgroundColor = 'rgba(' + rgbaObj.r + ',' + rgbaObj.g + ',' + rgbaObj.b + ', ' + rgbaObj.a + ')';
+        onChange: function (rgbaObj): void {
+            backgroundRGBA = rgbaObj!;
+            preview.style.backgroundColor = 'rgba(' + rgbaObj!.r + ',' + rgbaObj!.g + ',' + rgbaObj!.b + ', ' + rgbaObj!.a + ')';
         },
     });
 
@@ -295,7 +295,7 @@ export function newImageDialog (
             overflow: 'hidden',
         },
     });
-    const previewcell = BB.el({
+    BB.el({
         parent: previewWrapper,
         content: preview,
         css: {
@@ -303,7 +303,7 @@ export function newImageDialog (
             verticalAlign: 'middle',
         },
     });
-    const cell = BB.el({
+    BB.el({
         parent: preview,
         css: {
             display: 'table-cell',
@@ -311,12 +311,13 @@ export function newImageDialog (
         },
     });
 
-    function updateRatio () {
+    function updateRatio (): void {
         widthInput.value = '' + Math.min(maxCanvasSize, parseInt(widthInput.value));
         heightInput.value = '' + Math.min(maxCanvasSize, parseInt(heightInput.value));
 
         function hcf (u: number, v: number): number {
             let U = u, V = v;
+            // eslint-disable-next-line no-constant-condition
             while (true) {
                 if (!(U %= V)) {
                     return V;
@@ -353,10 +354,10 @@ export function newImageDialog (
             [1.414, 1], [1, 1.414],
         ];
         const reducedArr = BB.reduce(w, h);
-        let closestRatio = null;
-        let closestDistance = null;
+        let closestRatio = commonRatios[0];
+        let closestDistance = Math.abs(commonRatios[0][0] / commonRatios[0][1] - reducedArr[0] / reducedArr[1]);
         for (let i = 0; i < commonRatios.length; i++) {
-            if (i === 0 || Math.abs(commonRatios[i][0] / commonRatios[i][1] - reducedArr[0] / reducedArr[1]) < closestDistance) {
+            if (Math.abs(commonRatios[i][0] / commonRatios[i][1] - reducedArr[0] / reducedArr[1]) < closestDistance) {
                 closestRatio = commonRatios[i];
                 closestDistance = Math.abs(commonRatios[i][0] / commonRatios[i][1] - reducedArr[0] / reducedArr[1]);
             }
@@ -392,22 +393,22 @@ export function newImageDialog (
     }
     theme.addIsDarkListener(updateRatio);
 
-    widthInput.onchange = function () {
+    widthInput.onchange = (): void => {
         if (widthInput.value === '' || parseInt(widthInput.value) < 0) {
             widthInput.value = '1';
         }
         updateRatio();
     };
-    widthInput.onkeyup = function () {
+    widthInput.onkeyup = (): void => {
         updateRatio();
     };
-    heightInput.onchange = function () {
+    heightInput.onchange = (): void => {
         if (heightInput.value === '' || parseFloat(heightInput.value) < 0) {
             heightInput.value = '1';
         }
         updateRatio();
     };
-    heightInput.onkeyup = function () {
+    heightInput.onkeyup = (): void => {
         updateRatio();
     };
     updateRatio();
@@ -435,18 +436,16 @@ export function newImageDialog (
         div: newImDiv,
         buttons: ['Ok', 'Cancel'],
         callback: function (result) {
-            widthInput.onclick = null;
-            heightInput.onclick = null;
-            presetCurrentBtn.onclick = null;
-            presetFitBtn.onclick = null;
-            presetOversizeBtn.onclick = null;
-            presetSquareBtn.onclick = null;
-            presetLandscapeBtn.onclick = null;
-            presetPortraitBtn.onclick = null;
-            widthInput.onchange = null;
-            widthInput.onkeyup = null;
-            heightInput.onchange = null;
-            heightInput.onkeyup = null;
+            BB.unsetEventHandler(widthInput, 'onclick', 'onchange', 'onkeyup');
+            BB.unsetEventHandler(widthInput, 'onclick', 'onchange', 'onkeyup');
+
+            BB.unsetEventHandler(presetCurrentBtn, 'onclick');
+            BB.unsetEventHandler(presetFitBtn, 'onclick');
+            BB.unsetEventHandler(presetOversizeBtn, 'onclick');
+            BB.unsetEventHandler(presetSquareBtn, 'onclick');
+            BB.unsetEventHandler(presetLandscapeBtn, 'onclick');
+            BB.unsetEventHandler(presetPortraitBtn, 'onclick');
+
             select.destroy();
             colorOptions.destroy();
             theme.removeIsDarkListener(updateRatio);

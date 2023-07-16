@@ -7,7 +7,7 @@ import {ProjectStore} from '../../storage/project-store';
 import {IKlProject} from '../../kl-types';
 
 
-const reminderTimelimitMs = 1000 * 60 * 20; // 20 minutes
+const reminderTimeLimitMs = 1000 * 60 * 20; // 20 minutes
 const unsavedActionsLimit = 100; // number of actions user did since last save
 
 
@@ -15,12 +15,12 @@ const unsavedActionsLimit = 100; // number of actions user did since last save
  * remind user of saving, keep user aware of save state
  */
 export class SaveReminder {
-    private lastSavedActionNumber: number = null;
-    private lastSavedAt: number;
+    private lastSavedActionNumber: number | undefined;
+    private lastSavedAt: number = 0;
 
-    private lastReminderShownAt: number;
-    private unsavedInterval;
-    private closeFunc: () => void;
+    private lastReminderShownAt: number = 0;
+    private unsavedInterval: ReturnType<typeof setInterval> | undefined;
+    private closeFunc: (() => void) | undefined;
 
     showPopup (): void {
         if (!this.projectStore || !this.getProject) {
@@ -85,7 +85,7 @@ export class SaveReminder {
             this.projectStore,
             this.getProject,
             this,
-            document.body as any,
+            document.body,
             {
                 hideClearButton: true,
                 isFocusable: true,
@@ -102,7 +102,7 @@ export class SaveReminder {
             callback: () => {
                 storageUi.destroy();
                 BB.destroyEl(psdBtn);
-                this.closeFunc = null;
+                this.closeFunc = undefined;
                 this.lastReminderShownAt = performance.now();
             },
             closeFunc: (f) => {
@@ -126,7 +126,7 @@ export class SaveReminder {
     ) { }
 
     init (): void {
-        if (this.lastSavedActionNumber !== null) { // already initialized
+        if (this.lastSavedActionNumber !== undefined) { // already initialized
             return;
         }
         this.lastSavedActionNumber = this.history.getActionNumber();
@@ -139,12 +139,12 @@ export class SaveReminder {
                     return;
                 }
 
-                const unsavedActions = Math.abs(this.history.getActionNumber() - this.lastSavedActionNumber);
+                const unsavedActions = Math.abs(this.history.getActionNumber() - this.lastSavedActionNumber!);
 
                 if (
                     KL.dialogCounter.get() === 0 &&
                     !this.isDrawing() &&
-                    this.lastReminderShownAt + reminderTimelimitMs < performance.now() &&
+                    this.lastReminderShownAt + reminderTimeLimitMs < performance.now() &&
                     unsavedActions >= unsavedActionsLimit
                 ) {
                     this.showPopup();
@@ -153,7 +153,7 @@ export class SaveReminder {
         }
 
         // confirmation dialog when closing tab
-        function onBeforeUnload (e) {
+        function onBeforeUnload (e: BeforeUnloadEvent) {
             e.preventDefault();
             e.returnValue = '';
         }
@@ -192,7 +192,7 @@ export class SaveReminder {
     }
 
     reset (): void {
-        if (this.lastSavedActionNumber === null) { // not initialized
+        if (this.lastSavedActionNumber === undefined) { // not initialized
             return;
         }
 

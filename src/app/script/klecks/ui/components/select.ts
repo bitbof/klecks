@@ -1,6 +1,9 @@
 import {BB} from '../../../bb/bb';
 import {IKeyString} from '../../../bb/bb-types';
 
+
+type TSelectItem<ValueType> = [ValueType, string]; // [value, label]
+
 /**
  * A select dropdown
  */
@@ -8,7 +11,7 @@ export class Select<ValueType extends string> {
 
     private readonly selectEl: HTMLSelectElement;
     private readonly optionArr: {
-        item: ([ValueType, string] | null); // [value, label]
+        item: (TSelectItem<ValueType> | undefined);
         el?: HTMLOptionElement;
     }[];
     private readonly changeListener: () => void;
@@ -18,8 +21,8 @@ export class Select<ValueType extends string> {
     // --- public ---
     constructor (p: {
         isFocusable?: boolean; // default false
-        optionArr: ([ValueType, string] | null)[]; // [value, label]
-        initValue?: ValueType; // default null
+        optionArr: (TSelectItem<ValueType> | undefined)[];
+        initValue?: ValueType; // default ''
         onChange?: (val: ValueType) => void;
         css?: IKeyString;
         title?: string;
@@ -45,8 +48,10 @@ export class Select<ValueType extends string> {
         this.optionArr = [];
         for (let i = 0; i < p.optionArr.length; i++) {
             const item = p.optionArr[i];
-            if (item === null) {
-                this.optionArr.push({item});
+            if (!item) {
+                this.optionArr.push({
+                    item,
+                });
                 continue;
             }
             const el = document.createElement('option');
@@ -68,11 +73,11 @@ export class Select<ValueType extends string> {
             this.onChange && this.onChange(this.getValue());
         };
         this.selectEl.addEventListener('change', this.changeListener);
-        this.selectEl.value = ('initValue' in p && p.initValue !== undefined) ? p.initValue : '';
+        this.selectEl.value = p.initValue !== undefined ? p.initValue : '';
     }
 
-    setValue (val: ValueType): void {
-        this.selectEl.value = val;
+    setValue (val: ValueType | undefined): void {
+        this.selectEl.value = val === undefined ? '' : val;
     }
 
     getValue (): ValueType {

@@ -13,7 +13,7 @@ export function mergeLayerDialog (
         bottomCanvas: HTMLCanvasElement;
         topOpacity: number;
         mixModeStr: TMixMode;
-        callback: (mode?: string) => void;
+        callback: (mode: string) => void;
     }
 ): void {
     const div = BB.el();
@@ -77,7 +77,7 @@ export function mergeLayerDialog (
             ctx.globalAlpha = p.topOpacity;
             ctx.drawImage(alphaCanvas, 0, 0, preview.width, preview.height);
         } else {
-            ctx.globalCompositeOperation = options.getValue();
+            ctx.globalCompositeOperation = options.getValue() as GlobalCompositeOperation;
             ctx.globalAlpha = p.topOpacity;
             ctx.drawImage(p.topCanvas, 0, 0, preview.width, preview.height);
         }

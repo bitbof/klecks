@@ -20,8 +20,8 @@ export class ColorOptions {
     // ---- public ----
     constructor (
         p: {
-            colorArr: IRGBA[]; // duplicates will be removed
-            onChange: (rgbaObj: IRGBA) => void;
+            colorArr: (IRGBA | null)[]; // duplicates will be removed
+            onChange: (rgbaObj: IRGBA | null) => void;
             label?: string;
             initialIndex?: number; // index before duplicates were removed
         }
@@ -35,7 +35,7 @@ export class ColorOptions {
         });
 
         let selectedIndex = 0;
-        const colorArr: IRGBA[] = [];
+        const colorArr: (IRGBA | null)[] = [];
         this.buttonArr = [];
         const buttonSize = 22;
         const checkerUrl = BB.createCheckerDataUrl(5, undefined, theme.isDark());
@@ -65,6 +65,7 @@ export class ColorOptions {
 
         for (let i = 0; i < colorArr.length; i++) {
             ((i) => {
+                const color = colorArr[i];
 
                 const colorButton = BB.el({
                     parent: this.rootEl,
@@ -73,17 +74,17 @@ export class ColorOptions {
                     css: {
                         width: buttonSize + 'px',
                         height: buttonSize + 'px',
-                        backgroundColor: colorArr[i] ? BB.ColorConverter.toRgbaStr(colorArr[i]) : 'transparent',
+                        backgroundColor: color ? BB.ColorConverter.toRgbaStr(color) : 'transparent',
                         lineHeight: (buttonSize + 1) + 'px',
                     },
                     onClick: (e) => {
                         e.preventDefault();
                         selectedIndex = i;
                         update();
-                        p.onChange(colorArr[i]);
+                        p.onChange(color);
                     },
                 });
-                if (colorArr[i] && colorArr[i].a === 0) {
+                if (color && color.a === 0) {
                     colorButton.style.backgroundImage = 'url(' + checkerUrl + ')';
                 }
 
@@ -109,7 +110,8 @@ export class ColorOptions {
         this.updateCheckerboard = (): void => {
             const checkerUrl = BB.createCheckerDataUrl(5, undefined, theme.isDark());
             this.buttonArr.forEach((button, i) => {
-                if (colorArr[i] && colorArr[i].a === 0) {
+                const color = colorArr[i];
+                if (color && color.a === 0) {
                     button.el.style.backgroundImage = 'url(' + checkerUrl + ')';
                 }
             });

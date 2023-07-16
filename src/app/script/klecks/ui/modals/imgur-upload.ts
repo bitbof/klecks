@@ -86,7 +86,7 @@ async function upload (
 
     } catch (e) {
         w.close();
-        throw new Error(e);
+        throw e;
     }
     if (!response.ok) {
         w.close();
@@ -116,7 +116,7 @@ export function imgurUpload (
     const inputDescription = BB.el({
         tagName: 'textarea',
         custom: {
-            rows: 2,
+            rows: '2',
         },
         css: {
             width: '100%',

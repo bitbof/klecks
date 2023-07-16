@@ -9,6 +9,7 @@ import {KlSlider} from '../ui/components/kl-slider';
 import {eventResMs} from './filters-consts';
 import {IVector2D} from '../../bb/bb-types';
 import {TFilterHistoryEntry} from './filters';
+import {throwIfNull} from '../../bb/base/base';
 
 export type TFilterVanishPointInput = {
     x: number;
@@ -33,7 +34,7 @@ export const filterVanishPoint = {
         }
 
         const layers = klCanvas.getLayers();
-        const selectedLayerIndex = klCanvas.getLayerIndex(context.canvas);
+        const selectedLayerIndex = throwIfNull(klCanvas.getLayerIndex(context.canvas));
 
         const fit = BB.fitInto(context.canvas.width, context.canvas.height, 280, 200, 1);
         const w = parseInt('' + fit.width), h = parseInt('' + fit.height);
@@ -141,7 +142,7 @@ export const filterVanishPoint = {
             label: LANG('shape-stroke'),
             colorArr: colorOptionsArr,
             onChange: function (rgbaObj) {
-                selectedRgbaObj = rgbaObj;
+                selectedRgbaObj = rgbaObj!;
                 settingsObj.color = BB.copyObj(selectedRgbaObj);
                 updatePreview();
             },
@@ -208,16 +209,11 @@ export const filterVanishPoint = {
 
 
         // ---- preview input processing ----
-        const inputs: {
+        const inputs = {} as {
             start: IVector2D;
-            end: IVector2D;
+            end: IVector2D | null;
             state: null | 'move';
-            oldSettings: any;
-        } = {
-            start: null,
-            end: null,
-            state: null,
-            oldSettings: null,
+            oldSettings: TFilterVanishPointInput;
         };
         function syncInputs (): void {
             xInput.value = '' + settingsObj.x;
@@ -286,7 +282,7 @@ export const filterVanishPoint = {
             colorOptions.destroy();
         };
         result.getInput = function (): TFilterVanishPointInput {
-            result.destroy();
+            result.destroy!();
             return BB.copyObj(settingsObj);
         };
         return result;

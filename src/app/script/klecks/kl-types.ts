@@ -179,33 +179,37 @@ export interface ISliderConfig {
     opacitySlider: IKlSliderConfig;
 }
 
-export type TBrushUiInstance = {
-    increaseSize: (val: number) => void;
-    decreaseSize: (val: number) => void;
+export type TBrushUiInstance<GBrush> = {
+    increaseSize: (f: number) => void;
+    decreaseSize: (f: number) => void;
     getSize: () => number;
     setSize: (size: number) => void;
     getOpacity: () => number;
     setOpacity: (opacity: number) => void;
-    setColor: (color: IRGB) => void;
-    setContext: (context: CanvasRenderingContext2D) => void;
+    setColor: (c: IRGB) => void;
+    setContext: (ctx: CanvasRenderingContext2D) => void;
     startLine: (x: number, y: number, p: number) => void;
-    goLine: (x: number, y: number, p: number) => void;
+    goLine: (x: number, y: number, p: number, isCoalesced: boolean) => void;
     endLine: (x: number, y: number) => void;
-    getBrush: () => any;
+    getBrush: () => GBrush;
     isDrawing: () => boolean;
     getElement: () => HTMLElement;
+    getIsTransparentBg?: () => boolean;
+    getSeed?: () => number;
+    setSeed?: (s: number) => void;
 };
 
-export interface IBrushUi extends ISliderConfig {
+export interface IBrushUi<GBrush> extends ISliderConfig {
     image: string;
     tooltip: string;
     Ui: (
+        this: TBrushUiInstance<GBrush>,
         p: {
             onSizeChange: (size: number) => void;
             onOpacityChange: (size: number) => void;
             onConfigChange: () => void;
         }
-    ) => TBrushUiInstance;
+    ) => TBrushUiInstance<GBrush>;
 }
 
 export type TPressureInput = {

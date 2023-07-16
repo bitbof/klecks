@@ -6,10 +6,11 @@ import {getSharedFx} from '../../fx-canvas/shared-fx';
 import {IFilterApply, IFilterGetDialogParam, IFilterGetDialogResult, IKlBasicLayer, IRGBA} from '../kl-types';
 import {LANG} from '../../language/language';
 import {TFilterHistoryEntry} from './filters';
+import {throwIfNull} from '../../bb/base/base';
 
 export type TFilterToAlphaInput = {
     sourceId: string;
-    selectedRgbaObj: IRGBA;
+    selectedRgbaObj: IRGBA | null;
 };
 
 export type TFilterToAlphaHistoryEntry = TFilterHistoryEntry<
@@ -48,7 +49,6 @@ export const filterToAlpha = {
         };
 
         function finishInit () {
-            const radius = 2, strength = 5.1 / 10;
             div.append(BB.el({
                 content: LANG('filter-to-alpha-description'),
                 css: {
@@ -56,7 +56,7 @@ export const filterToAlpha = {
                 },
             }));
 
-            const fxCanvas = getSharedFx();
+            const fxCanvas = throwIfNull(getSharedFx());
             if (!fxCanvas) {
                 return; // todo throw?
             }
@@ -90,24 +90,24 @@ export const filterToAlpha = {
             div.append(sourceOptions.getElement());
 
             // color
-            let selectedRgbaObj = {r: 0, g: 0, b: 0, a: 1};
+            let selectedRgbaObj: IRGBA | null = {r: 0, g: 0, b: 0, a: 1};
             const colorOptionsArr = [
                 null,
                 {r: 0, g: 0, b: 0, a: 1},
                 {r: 255, g: 255, b: 255, a: 1},
+                {
+                    r: params.currentColorRgb.r,
+                    g: params.currentColorRgb.g,
+                    b: params.currentColorRgb.b,
+                    a: 1,
+                },
+                {
+                    r: params.secondaryColorRgb.r,
+                    g: params.secondaryColorRgb.g,
+                    b: params.secondaryColorRgb.b,
+                    a: 1,
+                },
             ];
-            colorOptionsArr.push({
-                r: params.currentColorRgb.r,
-                g: params.currentColorRgb.g,
-                b: params.currentColorRgb.b,
-                a: 1,
-            });
-            colorOptionsArr.push({
-                r: params.secondaryColorRgb.r,
-                g: params.secondaryColorRgb.g,
-                b: params.secondaryColorRgb.b,
-                a: 1,
-            });
 
             const colorOptions = new ColorOptions({
                 label: LANG('filter-to-alpha-replace'),
@@ -173,7 +173,7 @@ export const filterToAlpha = {
                 klCanvasPreview.destroy();
             };
             result.getInput = function (): TFilterToAlphaInput {
-                result.destroy();
+                result.destroy!();
                 return {
                     sourceId: sourceId,
                     selectedRgbaObj: selectedRgbaObj,

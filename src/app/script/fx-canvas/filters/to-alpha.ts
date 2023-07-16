@@ -13,7 +13,7 @@ import {IRGBA} from '../../klecks/kl-types';
 export type TFilterToAlpha = (
     this: TFxCanvas,
     isInverted: boolean,
-    replaceRGBA: IRGBA,
+    replaceRGBA: IRGBA | null,
 ) => TFxCanvas;
 
 export const toAlpha: TFilterToAlpha = function (isInverted, replaceRGBA) {

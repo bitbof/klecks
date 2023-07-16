@@ -4,6 +4,7 @@ import {IHistoryEntry, KlHistoryInterface, THistoryInnerActions} from '../histor
 import {KL} from '../kl';
 import {IRGB} from '../kl-types';
 import {clamp} from '../../bb/math/math';
+import {BezierLine, TBezierLineCallback} from '../../bb/math/line';
 
 export interface ISmudgeBrushHistoryEntry extends IHistoryEntry {
     tool: ['brush', 'SmudgeBrush'];
@@ -176,9 +177,9 @@ function smudge (imageData: ImageData, p : ISmudgeParams): void {
         }
 
         if (!imageData.data[ai + 3]) {
-
+            /* empty */
         } else if (!imageData.data[bi + 3]) { // don't mix if target fully transparent. pixel might have a strange color.
-            imageData.data[bi] = imageData.data[ai + 0];
+            imageData.data[bi] = imageData.data[ai];
             imageData.data[bi + 1] = imageData.data[ai + 1];
             imageData.data[bi + 2] = imageData.data[ai + 2];
         } else {
@@ -250,36 +251,40 @@ function smudge (imageData: ImageData, p : ISmudgeParams): void {
 
 export class SmudgeBrush {
 
-    private context: CanvasRenderingContext2D;
+    private context: CanvasRenderingContext2D = {} as CanvasRenderingContext2D;
     private history: KlHistoryInterface = new KL.DecoyKlHistory();
-    private historyEntry: ISmudgeBrushHistoryEntry;
+    private historyEntry: ISmudgeBrushHistoryEntry | undefined;
 
     private settingColor: IRGB = {r: 0, g: 0, b: 0};
     private settingSize: number = 35;
     private settingSpacing: number = 0.20446882736951905;
     private settingOpacity: number = 0.8;
-    private settingColorStr: string;
     private settingHasSizePressure: boolean = false;
     private settingHasOpacityPressure: boolean = false;
     private settingLockLayerAlpha: boolean = false;
 
-    private lineToolLastDot: number;
+    private lineToolLastDot: number = 0;
     private lastInput: IPressureInput = {x: 0, y: 0, pressure: 0};
     private lastInput2: IPressureInput = {x: 0, y: 0, pressure: 0};
-    private lastDot: IVector2D;
+    private lastDot: IVector2D | undefined;
 
     private isDrawing: boolean = false;
 
-    private bezierLine: any = null; // todo type BezierLine
+    private bezierLine: BezierLine | undefined;
 
-    private redrawBounds: IBounds;
-    private completeRedrawBounds: IBounds;
+    private redrawBounds: IBounds | undefined;
+    private completeRedrawBounds: IBounds | undefined;
 
-    private copyImageData: ImageData;
+    private copyImageData: ImageData = {} as ImageData;
 
     private drawBuffer: ISmudgeParams[] = [];
 
-    private copiedCells: boolean[];
+    private copiedCells: boolean[] = [];
+
+    // workaround for https://github.com/microsoft/TypeScript/issues/41654
+    private resetRedrawBounds (): void {
+        this.redrawBounds = undefined;
+    }
 
     private updateRedrawBounds (bounds: IBounds): void {
         this.redrawBounds = BB.updateBounds(this.redrawBounds, bounds);
@@ -297,7 +302,7 @@ export class SmudgeBrush {
      */
     copyFromCanvas (): void {
 
-        const touchedCells = this.copiedCells.map(item => false);
+        const touchedCells = this.copiedCells.map(() => false);
 
         const bounds: IBounds[] = [];
         const cellsW = Math.ceil(this.copyImageData.width / CELL_SIZE);
@@ -415,36 +420,34 @@ export class SmudgeBrush {
         };
     }
 
-    continueLine (x: number, y: number, size: number, pressure: number): void {
+    continueLine (x: number | undefined, y: number | undefined, size: number, pressure: number): void {
         this.drawBuffer = [];
 
-        if (this.bezierLine === null) {
+        if (!this.bezierLine) {
             this.bezierLine = new BB.BezierLine();
             this.bezierLine.add(this.lastInput.x, this.lastInput.y, 0, function (){});
         }
 
-        const drawArr = []; //draw instructions. will be all drawn at once
+        const drawArr: Parameters<typeof this.prepDot>[] = []; //draw instructions. will be all drawn at once
 
-        const dotCallback = (val): void => {
+        const dotCallback: TBezierLineCallback = (val): void => {
             const localPressure = BB.mix(this.lastInput2.pressure, pressure, val.t);
             const localOpacity = this.settingOpacity * (this.settingHasOpacityPressure ? (localPressure * localPressure) : 1);
             const localSize = Math.max(0.1, this.settingSize * (this.settingHasSizePressure ? localPressure : 1));
-            drawArr.push([val.x, val.y, localSize, localOpacity, val.angle]);
+            drawArr.push([val.x, val.y, localSize, localOpacity]);//, val.angle]);
         };
 
         const localSpacing = size * this.settingSpacing / 3;
-        if (x === null) {
+        if (x === undefined || y === undefined) {
             this.bezierLine.addFinal(localSpacing, dotCallback);
         } else {
             this.bezierLine.add(x, y, localSpacing, dotCallback);
         }
 
         // execute draw instructions
-        let before;
         for (let i = 0; i < drawArr.length; i++) {
             const item = drawArr[i];
             this.prepDot(item[0], item[1], item[2], item[3]);
-            before = item;
         }
 
         this.copyFromCanvas();
@@ -470,12 +473,12 @@ export class SmudgeBrush {
         const localOpacity = this.settingHasOpacityPressure ? (this.settingOpacity * p * p) : this.settingOpacity;
         const localSize = this.settingHasSizePressure ? Math.max(0.1, p * this.settingSize) : Math.max(0.1, this.settingSize);
 
-        this.lastDot = null;
+        this.lastDot = undefined;
         this.isDrawing = true;
 
         this.copyImageData = new ImageData(this.context.canvas.width, this.context.canvas.height);
         const totalCells = Math.ceil(this.context.canvas.width / CELL_SIZE) * Math.ceil(this.context.canvas.height / CELL_SIZE);
-        this.copiedCells = '0'.repeat(totalCells).split('').map(item => false);
+        this.copiedCells = '0'.repeat(totalCells).split('').map(() => false);
 
         this.prepDot(x, y, localSize, localOpacity);
 
@@ -485,7 +488,7 @@ export class SmudgeBrush {
         this.lastInput.pressure = p;
         this.lastInput2.pressure = p;
 
-        this.completeRedrawBounds = null;
+        this.completeRedrawBounds = undefined;
     }
 
     goLine (x: number, y: number, p: number): void {
@@ -493,7 +496,7 @@ export class SmudgeBrush {
             return;
         }
 
-        this.redrawBounds = null;
+        this.resetRedrawBounds();
         const pressure = BB.clamp(p, 0, 1);
         const localSize = this.settingHasSizePressure ?
             Math.max(0.1, this.lastInput.pressure * this.settingSize) : Math.max(0.1, this.settingSize);
@@ -526,15 +529,15 @@ export class SmudgeBrush {
     }
 
     endLine (): void {
-        this.redrawBounds = null;
+        this.resetRedrawBounds();
         const localSize = this.settingHasSizePressure ?
             Math.max(0.1, this.lastInput.pressure * this.settingSize) : Math.max(0.1, this.settingSize);
         this.context.save();
-        this.continueLine(null, null, localSize, this.lastInput.pressure);
+        this.continueLine(undefined, undefined, localSize, this.lastInput.pressure);
         this.context.restore();
 
         this.isDrawing = false;
-        this.bezierLine = null;
+        this.bezierLine = undefined;
 
         if (this.redrawBounds) {
             this.context.putImageData(
@@ -584,7 +587,7 @@ export class SmudgeBrush {
             this.history.push(this.historyEntry);
             this.historyEntry = undefined;
         }
-        this.copyImageData = null;
+        this.copyImageData = {} as ImageData;
     }
 
     drawImage (im: ImageData | HTMLCanvasElement, x: number, y: number): void {
@@ -637,7 +640,6 @@ export class SmudgeBrush {
             return;
         }
         this.settingColor = {r: c.r, g: c.g, b: c.b};
-        this.settingColorStr = BB.ColorConverter.toRgbStr(this.settingColor);
     }
 
     setContext (c: CanvasRenderingContext2D): void {
@@ -661,15 +663,15 @@ export class SmudgeBrush {
     }
 
     sizePressure (b: boolean): void {
-        this.settingHasSizePressure = !!b;
+        this.settingHasSizePressure = b;
     }
 
     opacityPressure (b: boolean): void {
-        this.settingHasOpacityPressure = !!b;
+        this.settingHasOpacityPressure = b;
     }
 
     setLockAlpha (b: boolean): void {
-        this.settingLockLayerAlpha = !!b;
+        this.settingLockLayerAlpha = b;
     }
 
     getSpacing (): number {

@@ -11,8 +11,9 @@ import {translateBlending} from '../canvas/translate-blending';
 import {KL} from '../kl';
 import {ColorConverter} from '../../bb/color/color';
 import {Checkbox} from '../ui/components/checkbox';
-import {TFxCanvas} from '../../fx-canvas/fx-canvas-types';
+import {TFxCanvas, TWrappedTexture} from '../../fx-canvas/fx-canvas-types';
 import {TKlCanvasHistoryEntry} from '../canvas/kl-canvas';
+import {throwIfNull} from '../../bb/base/base';
 
 // see noise(...) in fx-canvas
 interface INoisePreset {
@@ -32,10 +33,10 @@ interface INoisePreset {
 type TNoiseChannels = 'rgb' | 'alpha';
 
 interface INoiseSettings extends INoisePreset {
-    seed: number;
-    colA: IRGB;
-    colB: IRGB;
-    channels: TNoiseChannels;
+    seed?: number;
+    colA?: IRGB;
+    colB?: IRGB;
+    channels?: TNoiseChannels; // default rgb
 }
 
 export type TFilterNoiseInput = {
@@ -84,7 +85,7 @@ const presetArr: INoisePreset[] = [
 
 function drawNoise (fxCanvas: TFxCanvas, settings: INoiseSettings): void {
     fxCanvas.noise(
-        settings.seed  ? settings.seed : 0,
+        settings.seed,
         settings.type,
         [settings.scaleX, settings.scaleY],
         [fxCanvas.width / 2, fxCanvas.height / 2],
@@ -111,7 +112,7 @@ export const filterNoise = {
         }
 
         const layers = klCanvas.getLayers();
-        const selectedLayerIndex = klCanvas.getLayerIndex(context.canvas);
+        const selectedLayerIndex = throwIfNull(klCanvas.getLayerIndex(context.canvas));
 
         const fit = BB.fitInto(context.canvas.width, context.canvas.height, 280, 200, 1);
         const w = parseInt('' + fit.width), h = parseInt('' + fit.height);
@@ -120,13 +121,10 @@ export const filterNoise = {
         const renderFactor = renderW / context.canvas.width;
 
 
-        const fxCanvas = getSharedFx();
-        if (!fxCanvas) {
-            return; // todo throw?
-        }
-        let texture;
+        const fxCanvas = throwIfNull(getSharedFx());
+        let texture: TWrappedTexture;
 
-        const thumbImgArr = [];
+        const thumbImgArr: HTMLImageElement[] = [];
         const thumbSize = 32;
         {
             const canvas = BB.canvas(thumbSize, thumbSize);
@@ -135,9 +133,9 @@ export const filterNoise = {
             fxCanvas.draw(texture).update(); // update fxCanvas size
             texture.destroy();
 
-            presetArr.forEach((preset, index) => {
+            presetArr.forEach((preset) => {
                 const thumbImg = new Image();
-                const presetCopy = BB.copyObj(preset);
+                const presetCopy = BB.copyObj(preset) as INoiseSettings;
                 presetCopy.scaleX /= 10;
                 presetCopy.scaleY /= 10;
                 drawNoise(fxCanvas, presetCopy);
@@ -148,10 +146,12 @@ export const filterNoise = {
 
         }
 
-        let tempCanvas = BB.canvas(renderW, renderH);
-        texture = fxCanvas.texture(tempCanvas);
-        fxCanvas.draw(texture).update(); // update fxCanvas size
-        tempCanvas = null;
+        {
+            const tempCanvas = BB.canvas(renderW, renderH);
+            texture = fxCanvas.texture(tempCanvas);
+            fxCanvas.draw(texture).update(); // update fxCanvas size
+            BB.freeCanvas(tempCanvas);
+        }
 
         const div = document.createElement('div');
         const result: IFilterGetDialogResult<TFilterNoiseInput> = {
@@ -267,32 +267,34 @@ export const filterNoise = {
             allowTab: true,
         });
 
+        const mixModes: (TMixMode | undefined)[] = [
+            'source-over',
+            undefined,
+            'darken',
+            'multiply',
+            'color-burn',
+            undefined,
+            'lighten',
+            'screen',
+            'color-dodge',
+            undefined,
+            'overlay',
+            'soft-light',
+            'hard-light',
+            undefined,
+            'difference',
+            'exclusion',
+            undefined,
+            'hue',
+            'saturation',
+            'color',
+            'luminosity',
+        ];
+
         const blendSelect = new Select({
             isFocusable: true,
-            optionArr: [
-                'source-over',
-                null,
-                'darken',
-                'multiply',
-                'color-burn',
-                null,
-                'lighten',
-                'screen',
-                'color-dodge',
-                null,
-                'overlay',
-                'soft-light',
-                'hard-light',
-                null,
-                'difference',
-                'exclusion',
-                null,
-                'hue',
-                'saturation',
-                'color',
-                'luminosity',
-            ].map((item: TMixMode) => {
-                return item ? [item, translateBlending(item)] : null;
+            optionArr: mixModes.map(item => {
+                return item ? ([item, translateBlending(item)] as [TMixMode, string]) : undefined;
             }),
             initValue: settingsObj.mixModeStr,
             onChange: (val: GlobalCompositeOperation) => {
@@ -317,8 +319,11 @@ export const filterNoise = {
             type: 'color',
             init: '#' + ColorConverter.toHexString(settingsObj.colA),
             callback: (val) => {
-                settingsObj.colA = ColorConverter.hexToRGB(val);
-                updatePreview();
+                const newColor = ColorConverter.hexToRGB(val);
+                if (newColor) {
+                    settingsObj.colA = newColor;
+                    updatePreview();
+                }
             },
             css: colInputStyle,
         });
@@ -327,8 +332,11 @@ export const filterNoise = {
             type: 'color',
             init: '#' + ColorConverter.toHexString(settingsObj.colB),
             callback: (val) => {
-                settingsObj.colB = ColorConverter.hexToRGB(val);
-                updatePreview();
+                const newColor = ColorConverter.hexToRGB(val);
+                if (newColor) {
+                    settingsObj.colB = newColor;
+                    updatePreview();
+                }
             },
             css: colInputStyle,
         });
@@ -407,7 +415,7 @@ export const filterNoise = {
 
             ctx.globalAlpha = settingsObj.opacity;
 
-            const presetCopy = BB.copyObj(presetArr[settingsObj.presetIndex]);
+            const presetCopy = BB.copyObj(presetArr[settingsObj.presetIndex]) as INoiseSettings;
             presetCopy.seed = settingsObj.seed;
             presetCopy.scaleX = presetCopy.scaleX  * settingsObj.scale / 50 * renderFactor;
             presetCopy.scaleY = presetCopy.scaleY  * settingsObj.scale / 50 * renderFactor;
@@ -442,7 +450,7 @@ export const filterNoise = {
             klCanvasPreview.destroy();
         };
         result.getInput = function (): TFilterNoiseInput {
-            result.destroy();
+            result.destroy!();
             return BB.copyObj(settingsObj);
         };
 

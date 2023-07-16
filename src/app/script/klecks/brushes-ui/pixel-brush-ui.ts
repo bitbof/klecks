@@ -8,9 +8,10 @@ import {createPenPressureToggle} from '../ui/components/create-pen-pressure-togg
 import brushIconImg from '/src/app/img/ui/brush-pixel.svg';
 import {IBrushUi} from '../kl-types';
 import {LANG, languageStrings} from '../../language/language';
+import {PixelBrush} from '../brushes/pixel-brush';
 
 export const pixelBrushUi = (function () {
-    const brushInterface: IBrushUi = {
+    const brushInterface = {
         image: brushIconImg,
         tooltip: LANG('brush-pixel'),
         sizeSlider: {
@@ -23,8 +24,7 @@ export const pixelBrushUi = (function () {
             max: 1,
             curve: [[0, 1 / 100], [0.5, 0.3], [1, 1]],
         },
-        Ui: null,
-    };
+    } as IBrushUi<PixelBrush>;
 
     languageStrings.subscribe(() => {
         brushInterface.tooltip = LANG('brush-pixel');
@@ -35,8 +35,8 @@ export const pixelBrushUi = (function () {
         const brush = new brushes.PixelBrush();
         brush.setHistory(klHistory);
         p.onSizeChange(brush.getSize());
-        let sizeSlider;
-        let opacitySlider;
+        let sizeSlider: KlSlider;
+        let opacitySlider: KlSlider;
 
         const lockAlphaToggle = new Checkbox({
             init: brush.getLockAlpha(),
@@ -72,7 +72,7 @@ export const pixelBrushUi = (function () {
 
         const spacingSpline = new BB.SplineInterpolator([[0.5, 0.45], [100, 4]]);
 
-        function setSize (size) {
+        function setSize (size: number) {
             brush.setSize(size);
             brush.setSpacing(spacingSpline.interpolate(size) / size);
         }
@@ -197,6 +197,6 @@ export const pixelBrushUi = (function () {
         this.getElement = function () {
             return div;
         };
-    };
+    } as IBrushUi<PixelBrush>['Ui'];
     return brushInterface;
 })();

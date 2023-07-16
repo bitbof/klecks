@@ -19,7 +19,7 @@ export function showModal (
         style?: IKeyString;
         clickOnEnter?: string; // name of button - will be clicked if enter key pressed
         autoFocus?: false | string; // name of  to automatically focus - default 'Ok' - false -> none
-        ignoreBackground?: boolean; // deafult false; if true clicking on background doesn't close
+        ignoreBackground?: boolean; // default false; if true clicking on background doesn't close
     }
 ): void {
     dialogCounter.increase();
@@ -142,7 +142,7 @@ export function showModal (
     }
 
     const keyListener = new BB.KeyListener({
-        onDown: function (keyStr, e, comboStr) {
+        onDown: function (keyStr, e, comboStr): void {
             if (isClosed) {
                 return;
             }
@@ -185,7 +185,7 @@ export function showModal (
             marginTop: '12px', // 8px already via buttons
             marginLeft: '-8px',
         },
-    }) : null;
+    }) : undefined;
     let clickOnEnterBtn: HTMLButtonElement | undefined;
     const btnElArr: HTMLButtonElement[] = [];
     if (p.buttons) {
@@ -205,7 +205,7 @@ export function showModal (
                 iconUrl = cancelImg;
                 btnClasses.push('kl-button-cancel');
             }
-            let iconImg = null;
+            let iconImg: HTMLElement | undefined = undefined;
             if (iconUrl) {
                 iconImg = BB.el({
                     tagName: 'img',
@@ -216,11 +216,11 @@ export function showModal (
                 });
             }
             const btn = BB.el({
-                parent: buttonRowEl || undefined,
+                parent: buttonRowEl,
                 tagName: 'button',
                 className: btnClasses.join(' '),
                 content: [
-                    iconImg || undefined,
+                    iconImg,
                     BB.el({
                         className: 'kl-popup__btn__text',
                         content: label,
@@ -247,7 +247,7 @@ export function showModal (
         });
     }
 
-    function close (value: string) {
+    function close (value: string): void {
         if (isClosed) {
             return;
         }
@@ -255,12 +255,13 @@ export function showModal (
         isClosed = true;
         BB.clearSelection();
         BB.unfocusAnyInput();
-        document.body.removeChild(rootRootEl);
+        rootRootEl.remove();
         dialogCounter.decrease();
         BB.destroyEl(xButton);
         BB.destroyEl(bgEl);
         keyListener.destroy();
         rootEl.removeEventListener('wheel', wheelPrevent);
+        // (disabled) eslint-disable-next-line no-null/no-null
         rootEl.onclick = null;
         btnElArr.forEach(item => BB.destroyEl(item));
         btnElArr.splice(0, btnElArr.length);

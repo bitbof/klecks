@@ -111,7 +111,7 @@ export const filterRotate = {
             theme.removeIsDarkListener(updateCheckerboard);
         };
         result.getInput = function (): TFilterRotateInput {
-            result.destroy();
+            result.destroy!();
             return {
                 deg: deg,
             };

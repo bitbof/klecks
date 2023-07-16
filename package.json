@@ -19,14 +19,14 @@
   },
   "devDependencies": {},
   "dependencies": {
-    "@parcel/transformer-glsl": "^2.8.2",
-    "@parcel/transformer-image": "^2.8.2",
-    "@parcel/transformer-sass": "^2.8.2",
-    "parcel": "^2.8.2",
-    "buffer": "^5.5.0",
-    "ag-psd": "^15.0.1",
-    "js-beautify": "^1.14.7",
-    "json5": "^2.2.2",
+    "@parcel/transformer-glsl": "^2.9.3",
+    "@parcel/transformer-image": "^2.9.3",
+    "@parcel/transformer-sass": "^2.9.3",
+    "parcel": "^2.9.3",
+    "buffer": "^6.0.3",
+    "ag-psd": "^17.0.0",
+    "js-beautify": "^1.14.8",
+    "json5": "^2.2.3",
     "mdn-polyfills": "^5.20.0"
   }
 }

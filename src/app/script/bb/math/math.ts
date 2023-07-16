@@ -57,7 +57,7 @@ export function rotateAround (center: IVector2D, point: IVector2D, deg: number):
     return rot;
 }
 
-export function intDxy (remainder: IVector2D, fDx: number, fDy: number) {
+export function intDxy (remainder: IVector2D, fDx: number, fDy: number): {dX: number; dY: number} {
     remainder.x += fDx;
     remainder.y += fDy;
     const dX = Math.round(remainder.x);
@@ -74,7 +74,7 @@ export function intDxy (remainder: IVector2D, fDx: number, fDy: number) {
  * return closest even number
  * @param f
  */
-export function roundEven (f: number) {
+export function roundEven (f: number): number {
     if (f % 1 === 0) {
         if (f % 2 === 0) {
             return f;
@@ -94,7 +94,7 @@ export function roundEven (f: number) {
  * return closest uneven number
  * @param f
  */
-export function roundUneven (f: number) {
+export function roundUneven (f: number): number {
     if (f % 1 === 0) {
         if (f % 2 === 0) {
             return f + 1;
@@ -129,9 +129,12 @@ export function round (f: number, digits: number): number {
  * @param target
  * @param bounds
  */
-export function updateBounds (target: IBounds, bounds: IBounds): IBounds {
+export function updateBounds (target: IBounds | undefined, bounds: IBounds | undefined): IBounds {
+    if (!bounds && !target) {
+        throw new Error('at least one param needs to be defined');
+    }
     if (!bounds) {
-        return target;
+        return target!;
     }
     if (!target) {
         target = { x1: bounds.x1, y1: bounds.y1, x2: bounds.x2, y2: bounds.y2 };
@@ -147,13 +150,16 @@ export function updateBounds (target: IBounds, bounds: IBounds): IBounds {
 /**
  * determine overlap of bounds with width&height
  */
-export function boundsInArea (bounds: IBounds, width: number, height: number): IBounds | null {
+export function boundsInArea (bounds: IBounds | undefined, width: number, height: number): IBounds | undefined {
+    if (!bounds) {
+        return undefined;
+    }
     const x1 = Math.max(0, bounds.x1);
     const y1 = Math.max(0, bounds.y1);
     const x2 = Math.min(width - 1, bounds.x2);
     const y2 = Math.min(height - 1, bounds.y2);
     if (x1 > x2 || y1 > y2) {
-        return null;
+        return undefined;
     }
     return { x1, y1, x2, y2 };
 }

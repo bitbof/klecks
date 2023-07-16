@@ -8,9 +8,10 @@ import {Checkbox} from '../ui/components/checkbox';
 import brushIconImg from '/src/app/img/ui/brush-eraser.svg';
 import {IBrushUi} from '../kl-types';
 import {LANG, languageStrings} from '../../language/language';
+import {EraserBrush} from '../brushes/eraser-brush';
 
 export const eraserBrushUi = (function () {
-    const brushInterface: IBrushUi = {
+    const brushInterface = {
         image: brushIconImg,
         tooltip: LANG('eraser') + ' [E]',
         sizeSlider: {
@@ -22,8 +23,7 @@ export const eraserBrushUi = (function () {
             min: 1 / 100,
             max: 1,
         },
-        Ui: null,
-    };
+    } as IBrushUi<EraserBrush>;
 
     languageStrings.subscribe(() => {
         brushInterface.tooltip = LANG('eraser') + ' [E]';
@@ -35,11 +35,11 @@ export const eraserBrushUi = (function () {
         brush.setHistory(klHistory);
         p.onSizeChange(brush.getSize());
 
-        let sizeSlider;
-        let opacitySlider;
+        let sizeSlider: KlSlider;
+        let opacitySlider: KlSlider;
         let isTransparentBg = false;
 
-        function setSize (size) {
+        function setSize (size: number) {
             brush.setSize(size);
         }
 
@@ -133,10 +133,6 @@ export const eraserBrushUi = (function () {
 
         init();
 
-        function drawDot (x, y) {
-            brush.drawDot(x, y);
-        }
-
         this.increaseSize = function (f) {
             if (!brush.isDrawing()) {
                 sizeSlider.changeSliderValue(f);
@@ -161,11 +157,10 @@ export const eraserBrushUi = (function () {
             brush.setOpacity(opacity);
             opacitySlider.setValue(opacity);
         };
-        this.setColor = function (c) {
-            //brush.setColor(c);
+        this.setColor = function () {
         };
         this.setContext = function (c) {
-            brush.setContext(c);
+            brush.setContext(c as Parameters<EraserBrush['setContext']>[0]);
         };
         this.startLine = function (x, y, p) {
             brush.startLine(x, y, p);
@@ -188,7 +183,7 @@ export const eraserBrushUi = (function () {
         this.getElement = function () {
             return div;
         };
-    };
+    } as IBrushUi<EraserBrush>['Ui'];
 
     return brushInterface;
 })();

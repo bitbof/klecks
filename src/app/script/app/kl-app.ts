@@ -6,7 +6,7 @@ import {EmbedToolspaceTopRow} from '../embed/embed-toolspace-top-row';
 import {
     IGradient,
     IInitState,
-    IKlProject,
+    IKlProject, IRGB, IRGBA,
     TDrawEvent,
     TExportType,
     TKlCanvasLayer,
@@ -46,6 +46,7 @@ import {LayerManager} from '../klecks/ui/tool-tabs/layer-manager/layer-manager';
 import {IVector2D} from '../bb/bb-types';
 import {createConsoleApi} from './console-api';
 import {ERASE_COLOR} from '../klecks/brushes/erase-color';
+import {throwIfNull} from '../bb/base/base';
 
 type KlAppOptionsEmbed = {
     url: string;
@@ -230,16 +231,17 @@ export class KlApp {
                 height: Math.max(10, Math.min(klMaxCanvasSize, this.uiHeight)),
             }, this.embed ? -1 : 0);
         this.klCanvas.setHistory(klHistory);
-        let initState: IInitState | null = null;
-        let mainTabRow: TabRow | undefined;
+        let initState: IInitState;
+        let mainTabRow: TabRow | undefined = undefined;
 
         if (!pOptions.saveReminder) {
             pOptions.saveReminder = {init: () => {}, reset: () => {}} as SaveReminder;
         }
 
         if (pProject) {
+            // attempt at freeing memory
             pProject.layers.forEach(layer => {
-                layer.image = null;
+                layer.image = null as any;
             });
             pProject = null;
         } else {
@@ -255,7 +257,7 @@ export class KlApp {
                 brushes: {},
             };
         } catch (e) {
-            if (e.message === 'kl-create-canvas-error') {
+            if ((e as Error).message === 'kl-create-canvas-error') {
                 this.klCanvas.destroy();
             }
             throw e;
@@ -269,10 +271,10 @@ export class KlApp {
 
 
         let currentColor = new BB.RGB(0, 0, 0);
-        let currentBrushUi;
+        let currentBrushUi: any; // todo
         let currentBrushId: string;
         let lastNonEraserBrushId: string;
-        let currentLayerCtx = this.klCanvas.getLayerContext(this.klCanvas.getLayerCount() - 1);
+        let currentLayerCtx = throwIfNull(this.klCanvas.getLayerContext(this.klCanvas.getLayerCount() - 1));
 
         // when cycling through brushes you need to know the next non-eraser brush
         const getNextBrushId = (): string => {
@@ -284,7 +286,7 @@ export class KlApp {
             return keyArr[(i + 1) % keyArr.length];
         };
 
-        const sizeWatcher = (val) => {
+        const sizeWatcher = (val: number) => {
             brushSettingService.emitSize(val);
             if (this.klCanvasWorkspace) {
                 this.klCanvasWorkspace.setCursorSize(val * 2);
@@ -322,12 +324,12 @@ export class KlApp {
 
         const drawEventChain = new BB.EventChain({
             chainArr: [
-                this.lineSanitizer,
-                lineSmoothing,
+                this.lineSanitizer as any,
+                lineSmoothing as any,
             ],
         });
 
-        drawEventChain.setChainOut((event: TDrawEvent) => {
+        drawEventChain.setChainOut(((event: TDrawEvent) => {
             if (event.type === 'down') {
                 this.toolspace.style.pointerEvents = 'none';
                 currentBrushUi.startLine(event.x, event.y, event.pressure);
@@ -347,7 +349,7 @@ export class KlApp {
                 currentBrushUi.getBrush().drawLineSegment(event.x0, event.y0, event.x1, event.y1);
                 this.klCanvasWorkspace.requestFrame();
             }
-        });
+        }) as any);
 
         const textToolSettings = {
             size: 20,
@@ -362,7 +364,7 @@ export class KlApp {
             klCanvas: this.klCanvas,
             width: Math.max(0, this.uiWidth - this.toolWidth),
             height: this.uiHeight,
-            onDraw: (e) => drawEventChain.chainIn(e),
+            onDraw: (e) => drawEventChain.chainIn(e as any),
             onPick: (rgbObj, isDragDone) => {
                 brushSettingService.setColor(rgbObj);
                 if (isDragDone) {
@@ -371,7 +373,7 @@ export class KlApp {
                 }
             },
             onFill: (canvasX, canvasY) => {
-                const layerIndex = this.klCanvas.getLayerIndex(currentLayerCtx.canvas);
+                const layerIndex = throwIfNull(this.klCanvas.getLayerIndex(currentLayerCtx.canvas));
                 this.klCanvas.floodFill(
                     layerIndex,
                     canvasX,
@@ -403,7 +405,7 @@ export class KlApp {
 
                 KL.textToolDialog({
                     klCanvas: this.klCanvas,
-                    layerIndex: this.klCanvas.getLayerIndex(currentLayerCtx.canvas),
+                    layerIndex: throwIfNull(this.klCanvas.getLayerIndex(currentLayerCtx.canvas)),
                     x: canvasX,
                     y: canvasY,
                     angleRad: angleRad,
@@ -417,7 +419,7 @@ export class KlApp {
                     opacity: textToolSettings.opacity,
                     onConfirm: (val) => {
 
-                        const colorRGBA = val.color;
+                        const colorRGBA = val.color as IRGBA;
                         colorRGBA.a = val.opacity;
 
                         textToolSettings.size = val.size;
@@ -427,7 +429,7 @@ export class KlApp {
                         textToolSettings.font = val.font;
                         textToolSettings.opacity = val.opacity;
 
-                        const layerIndex = this.klCanvas.getLayerIndex(currentLayerCtx.canvas);
+                        const layerIndex = throwIfNull(this.klCanvas.getLayerIndex(currentLayerCtx.canvas));
                         this.klCanvas.text(layerIndex, {
                             textStr: val.textStr,
                             x: val.x,
@@ -569,7 +571,7 @@ export class KlApp {
                         (async () => {
                             let success = true;
                             try {
-                                await projectStore.store(this.klCanvas.getProject());
+                                await projectStore!.store(this.klCanvas.getProject());
                             } catch (e) {
                                 success = false;
                                 setTimeout(() => {
@@ -578,7 +580,7 @@ export class KlApp {
                                 this.statusOverlay.out('❌ ' + LANG('file-storage-failed'), true);
                             }
                             if (success) {
-                                pOptions.saveReminder.reset();
+                                pOptions.saveReminder!.reset();
                                 this.statusOverlay.out(LANG('file-storage-stored'), true);
                             }
                         })();
@@ -632,11 +634,14 @@ export class KlApp {
                     currentBrushUi.increaseSize(0.03 / this.klCanvasWorkspace.getScale());
                 }
                 if (comboStr === 'enter') {
-                    this.klCanvas.layerFill(this.klCanvas.getLayerIndex(currentLayerCtx.canvas), this.klColorSlider.getColor());
+                    this.klCanvas.layerFill(
+                        throwIfNull(this.klCanvas.getLayerIndex(currentLayerCtx.canvas)),
+                        this.klColorSlider.getColor(),
+                    );
                     this.statusOverlay.out(LANG('filled'), true);
                 }
                 if (['delete', 'backspace'].includes(comboStr)) {
-                    const layerIndex = this.klCanvas.getLayerIndex(currentLayerCtx.canvas);
+                    const layerIndex = throwIfNull(this.klCanvas.getLayerIndex(currentLayerCtx.canvas));
                     if (layerIndex === 0 && !brushUiMap.eraserBrush.getIsTransparentBg()) {
                         this.klCanvas.layerFill(layerIndex, {r: 255, g: 255, b: 255}, 'source-in');
                     } else {
@@ -694,12 +699,14 @@ export class KlApp {
             },
         });
 
-        const brushUiMap = {};
+        const brushUiMap: {
+            [key: string]: any;
+        } = {};
         // create brush UIs
         Object.entries(KL.brushesUI).forEach(([b, brushUi]) => {
-            const ui = new brushUi.Ui({
+            const ui = new (brushUi.Ui as any)({
                 onSizeChange: sizeWatcher,
-                onOpacityChange: (opacity) => {
+                onOpacityChange: (opacity: number) => {
                     brushSettingService.emitOpacity(opacity);
                 },
                 onConfigChange: () => {
@@ -773,7 +780,7 @@ export class KlApp {
         if (this.embed) {
             toolspaceTopRow = new EmbedToolspaceTopRow({
                 onHelp: () => {
-                    showIframeModal(this.embed.url + '/help.html', !!this.embed);
+                    showIframeModal(this.embed!.url + '/help.html', !!this.embed);
                 },
                 onSubmit: () => {
                     KL.popup({
@@ -791,13 +798,13 @@ export class KlApp {
                                 content: '<div class="spinner"></div> ' + LANG('submit-submitting'),
                             });
 
-                            this.embed.onSubmit(
+                            this.embed!.onSubmit(
                                 () => {
-                                    pOptions.saveReminder.reset();
-                                    this.klRootEl.removeChild(overlay);
+                                    pOptions.saveReminder!.reset();
+                                    overlay.remove();
                                 },
                                 () => {
-                                    this.klRootEl.removeChild(overlay);
+                                    overlay.remove();
                                 });
                         },
                     });
@@ -809,7 +816,7 @@ export class KlApp {
             });
         } else {
             toolspaceTopRow = new KL.ToolspaceTopRow({
-                logoImg: pOptions.logoImg,
+                logoImg: pOptions.logoImg!,
                 onLogo: () => {
                     showIframeModal('./home/', !!this.embed);
                 },
@@ -817,7 +824,7 @@ export class KlApp {
                     showNewImageDialog();
                 },
                 onImport: () => {
-                    fileTab.triggerImport();
+                    fileTab!.triggerImport();
                 },
                 onSave: () => {
                     this.saveToComputer.save();
@@ -874,7 +881,7 @@ export class KlApp {
         });
         this.toolspaceInner.append(this.toolspaceToolRow.getElement());
 
-        const setBrushColor = (p_color) => {
+        const setBrushColor = (p_color: IRGB) => {
             currentColor = p_color;
             currentBrushUi.setColor(p_color);
             brushSettingService.emitColor(p_color);
@@ -900,7 +907,7 @@ export class KlApp {
 
         });
 
-        const setCurrentBrush = (brushId) => {
+        const setCurrentBrush = (brushId: string) => {
             if (brushId !== 'eraserBrush') {
                 lastNonEraserBrushId = brushId;
             }
@@ -958,7 +965,7 @@ export class KlApp {
             tabArr: (() => {
                 const result = [];
 
-                const createTab = (keyStr) => {
+                const createTab = (keyStr: string) => {
                     return {
                         id: keyStr,
                         image: KL.brushesUI[keyStr].image,
@@ -1027,7 +1034,7 @@ export class KlApp {
 
         const gradientTool = new KL.GradientTool({
             onGradient: (isDone, x1, y1, x2, y2, angleRad) => {
-                const layerIndex = this.klCanvas.getLayerIndex(currentLayerCtx.canvas);
+                const layerIndex = throwIfNull(this.klCanvas.getLayerIndex(currentLayerCtx.canvas));
                 const settings = gradientUi.getSettings();
                 const gradientObj: IGradient = {
                     type: settings.type,
@@ -1061,7 +1068,7 @@ export class KlApp {
         const shapeTool = new KL.ShapeTool({
             onShape: (isDone, x1, y1, x2, y2, angleRad) => {
 
-                const layerIndex = this.klCanvas.getLayerIndex(currentLayerCtx.canvas);
+                const layerIndex = throwIfNull(this.klCanvas.getLayerIndex(currentLayerCtx.canvas));
 
                 const shapeObj: any = {
                     type: shapeUi.getShape(),
@@ -1107,7 +1114,7 @@ export class KlApp {
         this.layerManager = new KL.LayerManager(
             this.klCanvas,
             (val) => {
-                setCurrentLayer(this.klCanvas.getLayer(val));
+                setCurrentLayer(throwIfNull(this.klCanvas.getLayer(val)));
                 klHistory.push({
                     tool: ['misc'],
                     action: 'focusLayer',
@@ -1125,7 +1132,7 @@ export class KlApp {
             uiState: this.uiState,
         });
         this.layerPreview.setIsVisible(this.uiHeight >= 579);
-        this.layerPreview.setLayer(this.klCanvas.getLayer(this.klCanvas.getLayerIndex(currentLayerCtx.canvas)));
+        this.layerPreview.setLayer(this.klCanvas.getLayer(this.klCanvas.getLayerIndex(currentLayerCtx.canvas)!)!);
 
         const filterTab = new KL.FilterTab(
             this.klRootEl,
@@ -1177,11 +1184,11 @@ export class KlApp {
                     this.klCanvas.reset({
                         width: width,
                         height: height,
-                        color: color.a === 1 ? color : null,
+                        color: color.a === 1 ? color : undefined,
                     });
 
                     this.layerManager.update(0);
-                    setCurrentLayer(this.klCanvas.getLayer(0));
+                    setCurrentLayer(throwIfNull(this.klCanvas.getLayer(0)));
                     this.klCanvasWorkspace.resetView();
                     handUi.update(this.klCanvasWorkspace.getScale(), this.klCanvasWorkspace.getAngleDeg());
                 },
@@ -1215,7 +1222,7 @@ export class KlApp {
                         return;
                     }
                     //do a crop
-                    KL.filterLib.cropExtend.apply({
+                    KL.filterLib.cropExtend.apply!({
                         context: currentLayerCtx,
                         klCanvas: this.klCanvas,
                         input: inputObj,
@@ -1232,7 +1239,7 @@ export class KlApp {
 
         const fileTab = this.embed ? null : new KL.FileTab(
             this.klRootEl,
-            projectStore,
+            projectStore!,
             () => this.klCanvas.getProject(),
             exportType,
             (type) => {
@@ -1246,8 +1253,8 @@ export class KlApp {
                 KL.imgurUpload(
                     this.klCanvas,
                     this.klRootEl,
-                    pOptions.saveReminder,
-                    pOptions.app && pOptions.app.imgurKey ? pOptions.app.imgurKey : null,
+                    pOptions.saveReminder!,
+                    pOptions.app && pOptions.app.imgurKey ? pOptions.app.imgurKey : '',
                 );
             },
             copyToClipboard,
@@ -1539,7 +1546,11 @@ export class KlApp {
                 },
             });
 
-            window.addEventListener('paste', (e) => importHandler.onPaste(e), false);
+            window.document.addEventListener(
+                'paste',
+                (e: ClipboardEvent) => importHandler.onPaste(e),
+                false
+            );
         }
 
         {
@@ -1570,7 +1581,7 @@ export class KlApp {
                 const observer = new ResizeObserver(() => this.resize(window.innerWidth, window.innerHeight));
                 observer.observe(windowResizeWatcher);
             } catch (e) {
-                windowResizeWatcher.parentNode.removeChild(windowResizeWatcher);
+                windowResizeWatcher.remove();
             }
 
             // prevent ctrl scroll -> zooming page
@@ -1580,7 +1591,7 @@ export class KlApp {
                 }
             });
             //maybe prevent zooming on safari mac os - todo still needed?
-            const prevent = (e) => {
+            const prevent = (e: Event) => {
                 e.preventDefault();
             };
             window.addEventListener('gesturestart', prevent);

@@ -9,22 +9,18 @@ type TUiState = 'left' | 'right';
  */
 export class StatusOverlay {
 
-    private el: HTMLDivElement;
-    private innerEl: HTMLDivElement;
-    private angleIm: HTMLImageElement;
-    private innerInnerEl: HTMLDivElement;
-    private isWide: boolean;
-    private uiState: TUiState;
+    private readonly el: HTMLDivElement;
+    private readonly innerEl: HTMLDivElement;
+    private readonly angleIm: HTMLImageElement;
+    private readonly innerInnerEl: HTMLDivElement;
+    private isWide: boolean = false; // tool space hidden
+    private uiState: TUiState = 'right';
 
-    private timeout: number;
-    private timeout2: number;
-    private timeout3: number;
+    private timeout: ReturnType<typeof setTimeout> | undefined;
+    private timeout2: ReturnType<typeof setTimeout> | undefined;
+    private timeout3: ReturnType<typeof setTimeout> | undefined;
 
     private updateUiState () {
-        if (!this.el) {
-            return;
-        }
-        setTimeout(()=>{}, 100);
         if (this.uiState === 'left') {
             this.el.style.left = '271px';
         } else {
@@ -32,15 +28,14 @@ export class StatusOverlay {
         }
     }
 
-    private init () {
+
+    // --- public ---
+
+    constructor () {
         this.el = BB.el({
             className: 'top-overlay g-root',
             onClick: BB.handleClick,
         }) as HTMLDivElement;
-
-        if (this.isWide) {
-            this.el.style.width = '100%';
-        }
 
         this.updateUiState();
 
@@ -68,15 +63,8 @@ export class StatusOverlay {
         this.el.style.display = 'none';
     }
 
-
-    // --- public ---
-
-    constructor () {
-        this.init();
-    }
-
     setWide (b: boolean) {
-        this.isWide = !!b;
+        this.isWide = b;
 
         if (!this.el) {
             return;
@@ -98,8 +86,10 @@ export class StatusOverlay {
 
     out (msg: string | {type: 'transform'; angleDeg: number; scale: number}, doPulse?: boolean) {
 
-        if (msg && typeof msg === 'object') {
-
+        if (typeof msg === 'string') {
+            this.angleIm.style.display = 'none';
+            this.innerInnerEl.innerHTML = msg;
+        } else {
             if (msg.type === 'transform') {
                 this.angleIm.style.display = 'inline-block';
                 this.angleIm.style.transform = 'rotate(' + msg.angleDeg + 'deg)';
@@ -116,12 +106,6 @@ export class StatusOverlay {
             } else {
                 this.angleIm.style.display = 'none';
             }
-
-
-
-        } else if (typeof msg === 'string') {
-            this.angleIm.style.display = 'none';
-            this.innerInnerEl.innerHTML = msg;
         }
 
         if (doPulse) {
@@ -130,10 +114,8 @@ export class StatusOverlay {
                 () => this.innerEl.style.animation = 'topOverlayPulse 0.5s ease-out',
                 20
             );
-            if (this.timeout3) {
-                clearTimeout(this.timeout3);
-            }
-            this.timeout3 = window.setTimeout(
+            clearTimeout(this.timeout3);
+            this.timeout3 = setTimeout(
                 () => this.innerEl.style.animation = '',
                 520
             );
@@ -141,22 +123,16 @@ export class StatusOverlay {
 
 
 
-        if (this.timeout) {
-            clearTimeout(this.timeout);
-        }
-        if (this.timeout2) {
-            clearTimeout(this.timeout2);
-        }
+        clearTimeout(this.timeout);
+        clearTimeout(this.timeout2);
         this.el.style.animationName = doPulse ? 'consoleInFast' : 'consoleIn';
         this.el.style.opacity = '1';
-        this.timeout = window.setTimeout(() => {
+        this.timeout = setTimeout(() => {
             this.el.style.opacity = '0';
             this.el.style.animationName = 'consoleOut';
-            this.timeout2 = window.setTimeout(() => {
+            this.timeout2 = setTimeout(() => {
                 this.el.style.display = 'none';
-                this.timeout2 = 0;
             }, 450);
-            this.timeout = 0;
         }, 1200);
         this.el.style.display = 'flex';
     }

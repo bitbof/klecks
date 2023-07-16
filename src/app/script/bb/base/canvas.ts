@@ -1,4 +1,4 @@
-import {IBounds, IKeyString, IRect, TNullable} from '../bb-types';
+import {IBounds, IKeyString, IRect} from '../bb-types';
 import {createCanvas} from './create-canvas';
 import {copyObj} from './base';
 
@@ -21,7 +21,7 @@ export function ctx (canvas: HTMLCanvasElement): CanvasRenderingContext2D {
 }
 
 /**
- * Determine if should disable imageSmoothing for transformation.
+ * Determine if we should disable imageSmoothing for transformation.
  * ImageSmoothing can make images blurry even when they're in the original scale and aligned with the pixelgrid.
  */
 export function testShouldPixelate (
@@ -196,7 +196,7 @@ export const createCheckerDataUrl = (function () {
         '4l': 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAYAAADED76LAAAAJ0lEQVQoU2M8ceLEfwYkYG5ujsxlYKSDgv///6O44eTJk6huoL0CAGsOKVVu8UYvAAAAAElFTkSuQmCC',
     };
 
-    return function (size: number, callback?: (s: string) => void, isDark?: boolean) {
+    return function (size: number, callback?: (s: string) => void, isDark?: boolean): string | void {
         const modeStr = isDark ? 'd' : 'l';
 
         function create (size: number): string {
@@ -386,7 +386,7 @@ export function freeCanvas (canvas: HTMLCanvasElement): void {
  *
  * @param context
  */
-export function canvasBounds (context: CanvasRenderingContext2D): IRect | null {
+export function canvasBounds (context: CanvasRenderingContext2D): IRect | undefined {
     const boundsObj: {
         x: number;
         y: number;
@@ -394,11 +394,11 @@ export function canvasBounds (context: CanvasRenderingContext2D): IRect | null {
         height: number;
     } = { x: 0, y: 0, width: 0, height: 0 };
     {
-        const tempBounds: TNullable<IBounds> = {
-            x1: null,
-            y1: null,
-            x2: null,
-            y2: null,
+        const tempBounds: Partial<IBounds> = {
+            x1: undefined,
+            y1: undefined,
+            x2: undefined,
+            y2: undefined,
         };
         const imdat = context.getImageData(0, 0, context.canvas.width, context.canvas.height);
 
@@ -412,23 +412,23 @@ export function canvasBounds (context: CanvasRenderingContext2D): IRect | null {
                 if (imdat.data[i] > 0 ) {
                     const x = ((i - 3) / 4) %  context.canvas.width;
                     const y = Math.floor((i - 3) / 4 / context.canvas.width);
-                    if (tempBounds.x1 === null || tempBounds.x1 > x) {
+                    if (tempBounds.x1 === undefined || tempBounds.x1 > x) {
                         tempBounds.x1 = x;
                     }
-                    if (tempBounds.y1 === null) {
+                    if (tempBounds.y1 === undefined) {
                         tempBounds.y1 = y;
                     }
-                    if (tempBounds.x2 === null || tempBounds.x2 < x) {
+                    if (tempBounds.x2 === undefined || tempBounds.x2 < x) {
                         tempBounds.x2 = x;
                     }
-                    if (tempBounds.y2 === null || tempBounds.y2 < y) {
+                    if (tempBounds.y2 === undefined || tempBounds.y2 < y) {
                         tempBounds.y2 = y;
                     }
                 }
             }
         }
-        if (tempBounds.x1 === null || tempBounds.y1 === null || tempBounds.x2 === null || tempBounds.y2 === null) {
-            return null;
+        if (tempBounds.x1 === undefined || tempBounds.y1 === undefined || tempBounds.x2 === undefined || tempBounds.y2 === undefined) {
+            return undefined;
         }
         boundsObj.x = tempBounds.x1;
         boundsObj.y = tempBounds.y1;

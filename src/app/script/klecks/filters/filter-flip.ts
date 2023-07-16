@@ -168,7 +168,7 @@ export const filterFlip = {
             klCanvasPreview.destroy();
         };
         result.getInput = function (): TFilterFlipInput {
-            result.destroy();
+            result.destroy!();
             return {
                 horizontal: isHorizontal,
                 vertical: isVertical,
