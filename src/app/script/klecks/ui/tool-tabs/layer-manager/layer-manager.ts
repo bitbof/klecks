@@ -16,6 +16,8 @@ import mergeLayerImg from '/src/app/img/ui/merge-layers.svg';
 import removeLayerImg from '/src/app/img/ui/remove-layer.svg';
 import renameLayerImg from '/src/app/img/ui/rename-layer.svg';
 import {theme} from '../../../../theme/theme';
+import {throwIfNull} from '../../../../bb/base/base';
+import {hasPointerEvents} from '../../../../bb/base/browser';
 
 type TLayerEl = HTMLElement & {
     label: HTMLElement;
@@ -30,6 +32,8 @@ type TLayerEl = HTMLElement & {
     opacitySlider: PointSlider;
     isSelected: boolean;
 };
+
+const paddingLeft = 25;
 
 export class LayerManager {
 
@@ -151,13 +155,19 @@ export class LayerManager {
 
     private createLayerList (): void {
         this.oldHistoryState = klHistory.getState();
+        this.klCanvasLayerArr = this.klCanvas.getLayers();
+        const checkerImUrl = BB.createCheckerDataUrl(4, undefined, theme.isDark());
+
         const createLayerEntry = (index: number): void => {
-            const layerName = this.klCanvas.getLayer(index)!.name;
+            const klLayer = throwIfNull(this.klCanvas.getLayer(index));
+            const layerName = klLayer.name;
             const opacity = this.klCanvasLayerArr[index].opacity;
+            const isVisible = klLayer.isVisible;
             const layercanvas = this.klCanvasLayerArr[index].context.canvas;
 
-            const layer: TLayerEl = BB.el() as TLayerEl;
-            layer.className = 'kl-layer';
+            const layer: TLayerEl = BB.el({
+                className: 'kl-layer',
+            }) as HTMLElement as TLayerEl;
             this.layerElArr[index] = layer;
             layer.posY = ((this.klCanvasLayerArr.length - 1) * 35 - index * 35);
             BB.css(layer, {
@@ -170,7 +180,7 @@ export class LayerManager {
 
             const container1 = BB.el();
             BB.css(container1, {
-                width: '250px',
+                width: '270px',
                 height: '34px',
             });
             const container2 = BB.el();
@@ -179,26 +189,76 @@ export class LayerManager {
 
             layer.spot = index;
 
+            //checkbox - visibility
+            {
+                const checkWrapper = BB.el({
+                    tagName: 'label',
+                    parent: container1,
+                    title: LANG('layers-visibility-toggle'),
+                    css: {
+                        display: 'flex',
+                        width: '25px',
+                        height: '100%',
+                        justifyContent: 'right',
+                        alignItems: 'center',
+                        cursor: 'pointer',
+                    },
+                });
+                const check = BB.el({
+                    tagName: 'input',
+                    parent: checkWrapper,
+                    custom: {
+                        type: 'checkbox',
+                        tabindex: '-1',
+                    },
+                    css: {
+                        display: 'block',
+                        cursor: 'pointer',
+                        margin: '0',
+                        marginRight: '5px',
+                    },
+                });
+                check.checked = isVisible;
+                check.onchange = () => {
+                    this.klCanvas.setLayerIsVisible(layer.spot, check.checked);
+                    this.createLayerList();
+                    if (layer.spot === this.selectedSpotIndex) {
+                        klHistory.pause(true);
+                        this.onSelect(this.selectedSpotIndex);
+                        klHistory.pause(false);
+                    }
+                };
+                // prevent layer getting dragged
+                const preventFunc = (e: PointerEvent | MouseEvent) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                };
+                if (hasPointerEvents) {
+                    checkWrapper.onpointerdown = preventFunc;
+                } else {
+                    checkWrapper.onmousedown = preventFunc;
+                }
+            }
+
+
             //thumb
             {
                 const thumbDimensions = BB.fitInto(layercanvas.width, layercanvas.height, 30, 30, 1);
-                const thumb = layer.thumb = BB.canvas(thumbDimensions.width, thumbDimensions.height);
+                layer.thumb = BB.canvas(thumbDimensions.width, thumbDimensions.height);
 
-                const thc = BB.ctx(thumb);
+                const thc = BB.ctx(layer.thumb);
                 thc.save();
-                if (thumb.width > layercanvas.width) {
+                if (layer.thumb.width > layercanvas.width) {
                     thc.imageSmoothingEnabled = false;
                 }
-                thc.drawImage(layercanvas, 0, 0, thumb.width, thumb.height);
+                thc.drawImage(layercanvas, 0, 0, layer.thumb.width, layer.thumb.height);
                 thc.restore();
                 BB.css(layer.thumb, {
                     position: 'absolute',
-                    left: ((32 - layer.thumb.width) / 2) + 'px',
-                    top: ((32 - layer.thumb.height) / 2) + 'px',
+                    left: ((32 - layer.thumb.width) / 2 + paddingLeft) + 'px',
+                    top: ((32 - layer.thumb.height) / 2 + 1) + 'px',
                 });
-                BB.createCheckerDataUrl(4, (url) => {
-                    thumb.style.backgroundImage = 'url(' + url + ')';
-                }, theme.isDark());
+                layer.thumb.style.backgroundImage = 'url(' + checkerImUrl + ')';
             }
 
             //layerlabel
@@ -211,7 +271,7 @@ export class LayerManager {
 
                 BB.css(layer.label, {
                     position: 'absolute',
-                    left: (1 + 32 + 5) + 'px',
+                    left: (1 + 32 + 5 + paddingLeft) + 'px',
                     top: 1 + 'px',
                     fontSize: '13px',
                     width: '170px',
@@ -224,7 +284,7 @@ export class LayerManager {
                     this.renameLayer(layer.spot);
                 };
             }
-            //layerlabel
+            //layer label opacity
             {
                 layer.opacityLabel = BB.el({
                     className: 'kl-layer__opacity-label',
@@ -234,19 +294,20 @@ export class LayerManager {
 
                 BB.css(layer.opacityLabel, {
                     position: 'absolute',
-                    left: (250 - 1 - 5 - 50) + 'px',
+                    left: (250 - 1 - 5 - 50 - 5 + paddingLeft) + 'px',
                     top: 1 + 'px',
                     fontSize: '13px',
                     textAlign: 'right',
                     width: '50px',
                     transition: 'color 0.2s ease-in-out',
+                    textDecoration: isVisible ? undefined : 'line-through',
                 });
             }
 
             let oldOpacity: number;
             const opacitySlider = new PointSlider({
                 init: layer.opacity,
-                width: 204,
+                width: 200,
                 pointSize: 14,
                 callback: (sliderValue, isFirst, isLast) => {
                     if (isFirst) {
@@ -267,7 +328,7 @@ export class LayerManager {
             });
             BB.css(opacitySlider.getEl(), {
                 position: 'absolute',
-                left: '39px',
+                left: (39 + paddingLeft) + 'px',
                 top: '17px',
             });
             layer.opacitySlider = opacitySlider;
@@ -417,7 +478,7 @@ export class LayerManager {
         this.layerElArr = [];
         this.layerHeight = 35;
         this.layerSpacing = 0;
-        const width = 250;
+        const width = 270;
         this.onSelect = onSelect;
         this.uiState = uiState;
 
@@ -460,16 +521,20 @@ export class LayerManager {
             css: {
                 width: width + 'px',
                 position: 'relative',
+                margin: '0 -10px',
+                zIndex: '0',
             },
         });
 
-        this.layerListEl = BB.el();
+        this.layerListEl = BB.el({
+            parent: listDiv,
+        });
 
-        this.addBtn = BB.el({tagName: 'button'}) as HTMLButtonElement;
-        this.duplicateBtn = BB.el({tagName: 'button'}) as HTMLButtonElement;
-        this.mergeBtn = BB.el({tagName: 'button'}) as HTMLButtonElement;
-        this.removeBtn = BB.el({tagName: 'button'}) as HTMLButtonElement;
-        const renameBtn = BB.el({tagName: 'button'}) as HTMLButtonElement;
+        this.addBtn = BB.el({tagName: 'button'});
+        this.duplicateBtn = BB.el({tagName: 'button'});
+        this.mergeBtn = BB.el({tagName: 'button'});
+        this.removeBtn = BB.el({tagName: 'button'});
+        const renameBtn = BB.el({tagName: 'button'});
 
         const createButtons = () => {
             const div = BB.el();
@@ -672,7 +737,6 @@ export class LayerManager {
         }
 
 
-        listDiv.append(this.layerListEl);
         this.rootEl.append(listDiv);
 
         //updating the thumbs in interval

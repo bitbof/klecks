@@ -193,7 +193,7 @@ export function shareCanvas (p: {canvas: HTMLCanvasElement; fileName:string; tit
  * @param clickEvent
  * @returns {boolean}
  */
-export function handleClick (clickEvent: MouseEvent): boolean {
+export function handleClick (clickEvent: Event): boolean {
     const target: HTMLElement | null = clickEvent.target as HTMLElement;
     if (!target) {
         return false;
@@ -228,9 +228,9 @@ export function throwIfNull<T> (v: T | null): T {
     return v;
 }
 
-export function throwIfUndefined<T> (v: T | undefined): T {
+export function throwIfUndefined<T> (v: T | undefined, message = 'value is undefined'): T {
     if (v === undefined) {
-        throw new Error('value is undefined');
+        throw new Error(message);
     }
     return v;
 }

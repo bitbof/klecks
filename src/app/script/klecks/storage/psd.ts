@@ -1,9 +1,10 @@
 import {createCanvas} from '../../bb/base/create-canvas';
 import {BlendMode, Layer, Psd} from 'ag-psd/dist/psd';
-import {IKlProject, IKlPsd, TKlPsdError, TMixMode} from '../kl-types';
+import {IKlProject, IKlPsd, TKlPsdError, TKlPsdLayer, TMixMode} from '../kl-types';
 import {LANG} from '../../language/language';
 import {MAX_LAYERS} from '../canvas/kl-canvas';
 import {BB} from '../../bb/bb';
+import {throwIfUndefined} from '../../bb/base/base';
 
 let kl2PsdMap: Record<TMixMode, BlendMode>;
 let psd2KlMap: Record<BlendMode, TMixMode>;
@@ -143,20 +144,11 @@ export function readPsd (psdObj: Psd): IKlPsd {
         groupMaskCtx.putImageData(imData, 0, 0);
     }
 
-    function convertGroup (psdGroupObj: Layer): {
-        name: string;
-        mixModeStr: TMixMode;
-        opacity: number;
-        image: HTMLCanvasElement;
-    }[] {
+    function convertGroup (psdGroupObj: Layer): TKlPsdLayer[] {
 
-        let resultArr: {
-            name: string;
-            mixModeStr: TMixMode;
-            opacity: number;
-            image: HTMLCanvasElement;
-        }[] = [];
-        const groupOpacity = psdGroupObj.hidden ? 0 : psdGroupObj.opacity;
+        let resultArr: TKlPsdLayer[] = [];
+        const groupIsVisible = !psdGroupObj.hidden;
+        const groupOpacity = throwIfUndefined(psdGroupObj.opacity, 'groupOpacity is undefined');
         const groupMixModeStr = getMixModeStr(psdGroupObj.blendMode!);
         let groupCanvas;
         let groupCtx;
@@ -188,10 +180,10 @@ export function readPsd (psdObj: Psd): IKlPsd {
                 }
 
                 if (item.children) {
-                    const innerArr = convertGroup(item);
+                    const convertedChildGroupItems = convertGroup(item);
 
-                    for (let e = 0; e < innerArr.length; e++) {
-                        const innerItem = innerArr[e];
+                    for (let e = 0; e < convertedChildGroupItems.length; e++) {
+                        const innerItem = convertedChildGroupItems[e];
                         const innerCtx = BB.ctx(innerItem.image);
 
                         // clipping
@@ -255,9 +247,6 @@ export function readPsd (psdObj: Psd): IKlPsd {
                             groupCtx.drawImage(innerItem.image, 0, 0);
 
                         } else {
-                            if (groupOpacity === undefined) {
-                                throw new Error('groupOpacity undefined');
-                            }
                             innerItem.opacity = innerItem.opacity * groupOpacity;
                             resultArr.push(innerItem);
                         }
@@ -369,9 +358,6 @@ export function readPsd (psdObj: Psd): IKlPsd {
                     ctx.drawImage(psdGroupObj.mask.canvas, psdGroupObj.mask.left, psdGroupObj.mask.top);
                 }
 
-                if (groupOpacity === undefined) {
-                    throw new Error('groupOpacity undefined');
-                }
                 if (item.blendMode === undefined) {
                     throw new Error('item.blendMode undefined');
                 }
@@ -395,7 +381,8 @@ export function readPsd (psdObj: Psd): IKlPsd {
                     }
                     resultArr.push({
                         name: item.name,
-                        opacity: (item.hidden ? 0 : item.opacity) * groupOpacity,
+                        isVisible: !item.hidden && groupIsVisible,
+                        opacity: item.opacity * groupOpacity,
                         mixModeStr: getMixModeStr(item.blendMode),
                         image: canvas,
                     });
@@ -407,12 +394,10 @@ export function readPsd (psdObj: Psd): IKlPsd {
             if (psdGroupObj.name === undefined) {
                 throw new Error('psdGroupObj.name undefined');
             }
-            if (groupOpacity === undefined) {
-                throw new Error('groupOpacity undefined');
-            }
             resultArr = [
                 {
                     name: psdGroupObj.name,
+                    isVisible: groupIsVisible,
                     opacity: groupOpacity,
                     mixModeStr: groupMixModeStr,
                     image: groupCanvas,
@@ -444,6 +429,7 @@ export function klPsdToKlProject (klPsd: IKlPsd): IKlProject {
         result.layers = klPsd.layers.map(item => {
             return {
                 name: item.name,
+                isVisible: item.isVisible,
                 opacity: item.opacity,
                 mixModeStr: item.mixModeStr,
                 image: item.image,
@@ -453,6 +439,7 @@ export function klPsdToKlProject (klPsd: IKlPsd): IKlProject {
         // flattened
         result.layers = [{
             name: LANG('background'),
+            isVisible: true,
             opacity: 1,
             mixModeStr: 'source-over',
             image: klPsd.canvas,

@@ -91,7 +91,7 @@ export class ImportHandler {
 
             this.layerManager.update(0);
             this.setCurrentLayer(this.klCanvas.getLayer(0)!);
-            this.klCanvasWorkspace.resetView();
+            this.klCanvasWorkspace.resetOrFitView();
             this.handUi.update(this.klCanvasWorkspace.getScale(), this.klCanvasWorkspace.getAngleDeg());
         };
 
@@ -101,7 +101,6 @@ export class ImportHandler {
          * @param cropObj? - {x: number, y: number, width: number, height: number}
          */
         const importAsImagePsd = (convertedPsdObj: IKlPsd, cropObj?: IRect) => {
-
             // crop
             const crop = (
                 targetCanvas: HTMLCanvasElement,
@@ -161,7 +160,7 @@ export class ImportHandler {
             }
             this.layerManager.update(layerIndex);
             this.setCurrentLayer(throwIfNull(this.klCanvas.getLayer(layerIndex)));
-            this.klCanvasWorkspace.resetView();
+            this.klCanvasWorkspace.resetOrFitView();
             this.handUi.update(this.klCanvasWorkspace.getScale(), this.klCanvasWorkspace.getAngleDeg());
         };
 

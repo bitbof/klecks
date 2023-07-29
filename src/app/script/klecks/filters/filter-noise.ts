@@ -378,6 +378,7 @@ export const filterNoise = {
 
         const previewLayer: IKlBasicLayer = {
             image: BB.canvas(renderW, renderH),
+            isVisible: layers[selectedLayerIndex].isVisible,
             opacity: layers[selectedLayerIndex].opacity,
             mixModeStr: layers[selectedLayerIndex].mixModeStr,
         };
@@ -390,6 +391,7 @@ export const filterNoise = {
                 } else {
                     return {
                         image: item.context.canvas,
+                        isVisible: item.isVisible,
                         opacity: item.opacity,
                         mixModeStr: item.mixModeStr,
                     };

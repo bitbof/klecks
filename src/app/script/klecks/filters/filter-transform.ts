@@ -344,6 +344,7 @@ export const filterTransform = {
                 }
                 previewLayerArr.push({
                     image: canvas,
+                    isVisible: layers[i].isVisible,
                     opacity: layers[i].opacity,
                     mixModeStr: layers[i].mixModeStr,
                 });

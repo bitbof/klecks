@@ -270,6 +270,18 @@
     original: 'Rename',
     value: 'Umbenennen'
   },
+  'layers-active-layer-visible': {
+    original: 'Active layer is visible',
+    value: 'Aktive Ebene ist eingeblendet'
+  },
+  'layers-active-layer-hidden': {
+    original: 'Active layer is hidden',
+    value: 'Aktive Ebene ist ausgeblendet'
+  },
+  'layers-visibility-toggle': {
+    original: 'Layer Visibility',
+    value: 'Ebenensichtbarkeit'
+  },
   'layers-blend-normal': {
     original: 'normal',
     value: 'Normal'
@@ -633,7 +645,7 @@
   },
   'upload-failed': {
     original: 'Upload failed.',
-    value: 'Fehlgeschlagenes Hochladen'
+    value: 'Hochladen fehlgeschlagen.'
   },
   'upload-delete': {
     original: 'To delete your image from Imgur visit:',
@@ -1293,6 +1305,11 @@
   'save-reminder-psd-layers': {
     original: 'PSD will remember all layers.',
     value: 'PSD merkt sich alle Ebenen.'
+  },
+  'backup-drawing': {
+    hint: '(Embed) If the upload failed, the user can backup/download their drawing.',
+    original: 'You can backup your drawing.',
+    value: 'Du kannst dein Bild lokal sichern.'
   },
   submit: {
     original: 'Submit',

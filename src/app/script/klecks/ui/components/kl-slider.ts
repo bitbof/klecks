@@ -45,7 +45,8 @@ export class KlSlider {
     private readonly resolution: number;
 
     private readonly isChangeOnFinal: boolean;
-    private readonly formatFunc: undefined | ((val: number) => number);
+    private readonly formatFunc: undefined | ((val: number) => number | string);
+    private readonly unit: string | undefined;
 
     private readonly onChange: (val: number) => void;
     private readonly valueToDisplayValue: (value: number) => number;
@@ -86,7 +87,8 @@ export class KlSlider {
         let displayValue: number | string = this.valueToDisplayValue(this.value);
         displayValue = this.formatFunc ? this.formatFunc(displayValue) : Math.round(displayValue);
         displayValue = displayValue.toLocaleString(languageStrings.getCode());
-        this.textEl.innerHTML = this.label + '&nbsp;&nbsp;<span style="font-weight:bold">' + displayValue + '</span>';
+        const unit = this.unit !== undefined ? this.unit : '';
+        this.textEl.innerHTML = this.label + '&nbsp;&nbsp;<span style="font-weight:bold">' + displayValue + unit + '</span>';
 
         const sliderValue = this.valueToSliderValue(this.value);
         this.control.style.width = (sliderValue * this.elementWidth) + 'px';
@@ -182,7 +184,7 @@ export class KlSlider {
             value: number;
             resolution?: number; // int, if you want spline.findX() to use a custom resolution
             curve?: 'quadratic' | [number, number][]; // optional. array is BB.SplineInterpolator points. 0-1
-            formatFunc?: (val: number) => number; // function to display a different number than value
+            formatFunc?: (val: number) => number | string; // function to display a different number than value
             onChange?: (val: number) => void;
             isChangeOnFinal?: boolean; // only fire onChange on pointerUp
             eventResMs?: number; // frequency of change events
@@ -190,6 +192,7 @@ export class KlSlider {
             manualInputRoundDigits?: number; // default 0, how value should be rounded for manual input
             toDisplayValue?: (value: number) => number;
             toValue?: (displayValue: number) => number;
+            unit?: string; // attached to end of value in output
         }
     ) {
         this.isEnabled = p.isEnabled !== false;
@@ -224,6 +227,7 @@ export class KlSlider {
         this.isChangeOnFinal = !!p.isChangeOnFinal;
         this.formatFunc = p.formatFunc;
         this.eventResMs = p.eventResMs;
+        this.unit = p.unit;
 
         if (this.useSpline) {
             if (!p.curve) {

@@ -16,7 +16,7 @@ export function table (
             const cellEl = BB.el({
                 tagName: 'td',
                 content: el,
-            }) as HTMLTableCellElement;
+            });
 
             const key = rowIndex + '.' + colIndex;
             if (cellProps !== undefined && key in cellProps) {

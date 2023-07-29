@@ -12,13 +12,14 @@ export function drawProject (project: IKlProject, factor: number): HTMLCanvasEle
         ctx.imageSmoothingEnabled = false;
     }
     for (let i = 0; i < project.layers.length; i++) {
-        if (project.layers[i].opacity === 0) {
+        const layer = project.layers[i];
+        if (!layer.isVisible || layer.opacity === 0) {
             continue;
         }
-        ctx.globalAlpha = project.layers[i].opacity;
-        const mixModeStr = project.layers[i].mixModeStr;
+        ctx.globalAlpha = layer.opacity;
+        const mixModeStr = layer.mixModeStr;
         ctx.globalCompositeOperation = mixModeStr !== undefined ? mixModeStr : 'source-over';
-        ctx.drawImage(project.layers[i].image, 0, 0, resultCanvas.width, resultCanvas.height);
+        ctx.drawImage(layer.image, 0, 0, resultCanvas.width, resultCanvas.height);
     }
     ctx.restore();
     return resultCanvas;

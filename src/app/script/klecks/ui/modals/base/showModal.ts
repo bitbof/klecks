@@ -21,10 +21,12 @@ export function showModal (
         autoFocus?: false | string; // name of  to automatically focus - default 'Ok' - false -> none
         ignoreBackground?: boolean; // default false; if true clicking on background doesn't close
     }
-): void {
+): {
+    setIgnoreBackground: (b: boolean) => void;
+} {
     dialogCounter.increase();
     let isClosed = false;
-
+    let ignoreBackground = !!p.ignoreBackground;
 
     // need this extra layer because chrome mobile otherwise scrolls the page and then glitches as the address bar goes away
     const rootRootEl = BB.el({
@@ -60,7 +62,7 @@ export function showModal (
     const bgEl = BB.el({
         parent: scrollContent,
         onClick: () => {
-            if (p.ignoreBackground) {
+            if (ignoreBackground) {
                 return;
             }
             close('Cancel');
@@ -229,7 +231,7 @@ export function showModal (
                 onClick: () => {
                     close(buttonName);
                 },
-            }) as HTMLButtonElement;
+            });
             btnElArr.push(btn);
             if (autoFocus === buttonName) {
                 setTimeout(() => {
@@ -277,4 +279,9 @@ export function showModal (
         });
     }
 
+    return {
+        setIgnoreBackground: (b: boolean) => {
+            ignoreBackground = b;
+        },
+    } as const;
 }

@@ -89,6 +89,7 @@ export class SaveToComputer {
                 const item = layerArr[i];
                 psdConfig.children!.push({
                     name: item.name,
+                    hidden: !item.isVisible,
                     opacity: item.opacity,
                     canvas: item.canvas,
                     blendMode: KL.PSD.blendKlToPsd(item.mixModeStr),

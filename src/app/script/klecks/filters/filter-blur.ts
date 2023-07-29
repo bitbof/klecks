@@ -92,6 +92,7 @@ export const filterBlur = {
                 for (let i = 0; i < layers.length; i++) {
                     previewLayerArr.push({
                         image: i === selectedLayerIndex ? fxCanvas : layers[i].context.canvas,
+                        isVisible: layers[i].isVisible,
                         opacity: layers[i].opacity,
                         mixModeStr: layers[i].mixModeStr,
                     });

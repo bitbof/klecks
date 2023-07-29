@@ -221,6 +221,15 @@ renaming keys across language files:
     "hint": "action",
     "value": "Rename"
   },
+  "layers-active-layer-visible": {
+    "value": "Active layer is visible"
+  },
+  "layers-active-layer-hidden": {
+    "value": "Active layer is hidden"
+  },
+  "layers-visibility-toggle": {
+    "value": "Layer Visibility"
+  },
 
   // Layer blend modes as seen in Photoshop and other image editing software
 
@@ -855,6 +864,10 @@ renaming keys across language files:
   },
   "save-reminder-save-psd": "Save As PSD",
   "save-reminder-psd-layers": "PSD will remember all layers.",
+  "backup-drawing": {
+    "hint": '(Embed) If the upload failed, the user can backup/download their drawing.',
+    "value": 'You can backup your drawing.',
+  },
 
   "submit": "Submit",
   "submit-title": {

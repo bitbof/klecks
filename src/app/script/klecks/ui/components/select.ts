@@ -36,7 +36,7 @@ export class Select<ValueType extends string> {
                 fontSize: '15px',
                 padding: '3px',
             },
-        }) as HTMLSelectElement;
+        });
         if (p.css) {
             BB.css(this.selectEl, p.css);
         }

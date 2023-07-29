@@ -299,6 +299,7 @@ export const filterDistort = {
 
         const previewLayer: IKlBasicLayer = {
             image: fxCanvas,
+            isVisible: layers[selectedLayerIndex].isVisible,
             opacity: layers[selectedLayerIndex].opacity,
             mixModeStr: layers[selectedLayerIndex].mixModeStr,
         };
@@ -308,6 +309,7 @@ export const filterDistort = {
             } else {
                 return {
                     image: item.context.canvas,
+                    isVisible: item.isVisible,
                     opacity: item.opacity,
                     mixModeStr: item.mixModeStr,
                 };

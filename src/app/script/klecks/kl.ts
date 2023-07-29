@@ -175,3 +175,5 @@ export const KL = {
     klHistory,
     DecoyKlHistory,
 };
+
+Object.keys(KL); // without this, parcel build may break this object

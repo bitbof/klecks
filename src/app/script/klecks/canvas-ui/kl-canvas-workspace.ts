@@ -399,24 +399,26 @@ export class KlCanvasWorkspace {
 
             const layerArr = this.klCanvas.getLayersFast();
             for (let i = 0; i < layerArr.length; i++) {
-                if (layerArr[i].opacity > 0) {
-                    ctx.globalAlpha = layerArr[i].opacity;
-                    ctx.globalCompositeOperation = layerArr[i].mixModeStr;
+                if (!layerArr[i].isVisible || layerArr[i].opacity === 0) {
+                    continue;
+                }
 
-                    const compositeObj = layerArr[i].canvas.compositeObj;
-                    if (compositeObj) {
-                        if (this.compositeCanvas.width !== layerArr[i].canvas.width || this.compositeCanvas.height !== layerArr[i].canvas.height) {
-                            this.compositeCanvas.width = layerArr[i].canvas.width;
-                            this.compositeCanvas.height = layerArr[i].canvas.height;
-                        } else {
-                            this.compositeCtx.clearRect(0, 0, this.compositeCanvas.width, this.compositeCanvas.height);
-                        }
-                        this.compositeCtx.drawImage(layerArr[i].canvas, 0, 0);
-                        compositeObj.draw(this.compositeCtx);
-                        ctx.drawImage(this.compositeCanvas, 0, 0, w, h);
+                ctx.globalAlpha = layerArr[i].opacity;
+                ctx.globalCompositeOperation = layerArr[i].mixModeStr;
+
+                const compositeObj = layerArr[i].canvas.compositeObj;
+                if (compositeObj) {
+                    if (this.compositeCanvas.width !== layerArr[i].canvas.width || this.compositeCanvas.height !== layerArr[i].canvas.height) {
+                        this.compositeCanvas.width = layerArr[i].canvas.width;
+                        this.compositeCanvas.height = layerArr[i].canvas.height;
                     } else {
-                        ctx.drawImage(layerArr[i].canvas, 0, 0, w, h);
+                        this.compositeCtx.clearRect(0, 0, this.compositeCanvas.width, this.compositeCanvas.height);
                     }
+                    this.compositeCtx.drawImage(layerArr[i].canvas, 0, 0);
+                    compositeObj.draw(this.compositeCtx);
+                    ctx.drawImage(this.compositeCanvas, 0, 0, w, h);
+                } else {
+                    ctx.drawImage(layerArr[i].canvas, 0, 0, w, h);
                 }
             }
             ctx.globalAlpha = 1;
@@ -1304,7 +1306,7 @@ export class KlCanvasWorkspace {
         });
 
         const onDoubleTap = (event: IDoubleTapperEvent) => {
-            if (this.fitView()) {
+            if (this.fitView(true)) {
                 this.lastRenderedState = -1;
                 this.reqFrame();
             } else {
@@ -1570,7 +1572,7 @@ export class KlCanvasWorkspace {
 
         window.requestAnimationFrame(() => this.updateLoop());
 
-        this.resetView();
+        this.resetOrFitView();
     }
 
 
@@ -1722,11 +1724,11 @@ export class KlCanvasWorkspace {
         this.targetTransformObj.x = (this.renderWidth - this.klCanvas.getWidth()) / 2;
         this.targetTransformObj.y = (this.renderHeight - this.klCanvas.getHeight()) / 2;
 
-        if (!doAnimate) {
-            this.highResTransformObj = BB.copyObj(this.targetTransformObj);
-        } else {
+        if (doAnimate) {
             this.doAnimateTranslate = true;
             this.transformIsDirty = true;
+        } else {
+            this.highResTransformObj = BB.copyObj(this.targetTransformObj);
         }
 
         this.bgVisible = this.testBgVisible();
@@ -1745,7 +1747,7 @@ export class KlCanvasWorkspace {
      * fit into view. center. snap angle. padding
      * returns true if transform changes
      */
-    fitView (): boolean {
+    fitView (doAnimate?: boolean): boolean {
         // determine new transform
         const newAngle = this.snapAngleRad(this.targetTransformObj.angle, 90, 90);
 
@@ -1818,16 +1820,36 @@ export class KlCanvasWorkspace {
         }
         this.targetTransformObj = newTargetTransformObj;
 
-        this.doAnimateTranslate = true;
+        if (doAnimate) {
+            this.doAnimateTranslate = true;
+        } else {
+            this.highResTransformObj = BB.copyObj(this.targetTransformObj);
+        }
         this.transformIsDirty = true;
         this.reqFrame();
 
-        this.onViewChange({
-            changed: ['scale', 'angle'],
-            scale: this.targetTransformObj.scale,
-            angle: this.targetTransformObj.angle,
-        });
+        if (doAnimate) {
+            this.onViewChange({
+                changed: ['scale', 'angle'],
+                scale: this.targetTransformObj.scale,
+                angle: this.targetTransformObj.angle,
+            });
+        }
         return true;
+    }
+
+    /**
+     * let the workspace decide what is best. E.g. if it's pixel art, Fit might be better.
+     */
+    resetOrFitView (): void {
+        if (
+            this.klCanvas.getWidth() * 2 < this.renderWidth &&
+            this.klCanvas.getHeight() * 2 < this.renderHeight
+        ) {
+            this.fitView();
+        } else {
+            this.resetView();
+        }
     }
 
     setAngle (angleDeg: number, isRelative?: boolean): void {

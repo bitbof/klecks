@@ -23,11 +23,11 @@ export function renameLayerDialog (
             display: 'flex',
         },
     });
-    const input = BB.el({tagName: 'input'}) as HTMLInputElement;
+    const input = BB.el({tagName: 'input'});
     input.value = currentName;
     input.setAttribute('data-ignore-focus', 'true');
     const clearBtn = BB.el({
-        tagName: 'Button',
+        tagName: 'button',
         content: '<img src="' + removeLayerImg + '" height="20"/>',
         title: LANG('layers-rename-clear'),
         css: {
@@ -55,11 +55,11 @@ export function renameLayerDialog (
             marginTop: '5px',
             marginLeft: '-5px',
         },
-    }) as HTMLDivElement;
+    });
     suggestions.forEach(item => {
         const btn = BB.el({
             parent: row2,
-            tagName: 'Button',
+            tagName: 'button',
             content: item,
             onClick: () => {
                 input.value = '' + btn.textContent;
@@ -67,7 +67,7 @@ export function renameLayerDialog (
             css: {
                 margin: '5px 0 0 5px',
             },
-        }) as HTMLButtonElement;
+        });
         suggestionBtns.push(btn);
     });
 

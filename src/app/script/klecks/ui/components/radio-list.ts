@@ -16,7 +16,7 @@ export class RadioList {
     }) {
         this.el = BB.el({
             className: 'kl-radio',
-        }) as HTMLDivElement;
+        });
 
         items.forEach(item => {
             const label = BB.el({
@@ -30,7 +30,7 @@ export class RadioList {
                     value: item.value,
                     type: 'radio',
                 },
-            }) as HTMLInputElement;
+            });
             if (ignoreFocus) {
                 input.setAttribute('data-ignore-focus', 'true');
             }

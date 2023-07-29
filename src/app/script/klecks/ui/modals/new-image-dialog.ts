@@ -43,7 +43,7 @@ export function newImageDialog (
     }
 
     const newImDiv = BB.el();
-    const widthInput = BB.el({tagName: 'input'}) as HTMLInputElement;
+    const widthInput = BB.el({tagName: 'input'});
     const unitStyle = {
         color: '#888',
         fontSize: '12px',
@@ -53,7 +53,7 @@ export function newImageDialog (
         textContent: LANG('new-px'),
         css: unitStyle,
     });
-    const heightInput = BB.el({tagName: 'input'}) as HTMLInputElement;
+    const heightInput = BB.el({tagName: 'input'});
     const heightUnit = BB.el({
         textContent: LANG('new-px'),
         css: unitStyle,
@@ -116,13 +116,13 @@ export function newImageDialog (
 
     const templateWrapper = BB.el();
     //BB.appendTextDiv(templateWrapper, "Preset Resolutions: <br />");
-    const presetFitBtn = BB.el({tagName: 'button'}) as HTMLButtonElement;
+    const presetFitBtn = BB.el({tagName: 'button'});
     templateWrapper.style.marginBottom = '10px';
-    const presetCurrentBtn = BB.el({tagName: 'button'}) as HTMLButtonElement;
-    const presetSquareBtn = BB.el({tagName: 'button'}) as HTMLButtonElement;
-    const presetLandscapeBtn = BB.el({tagName: 'button'}) as HTMLButtonElement;
-    const presetPortraitBtn = BB.el({tagName: 'button'}) as HTMLButtonElement;
-    const presetOversizeBtn = BB.el({tagName: 'button'}) as HTMLButtonElement;
+    const presetCurrentBtn = BB.el({tagName: 'button'});
+    const presetSquareBtn = BB.el({tagName: 'button'});
+    const presetLandscapeBtn = BB.el({tagName: 'button'});
+    const presetPortraitBtn = BB.el({tagName: 'button'});
+    const presetOversizeBtn = BB.el({tagName: 'button'});
 
     presetCurrentBtn.textContent = LANG('new-current');
     presetFitBtn.textContent = LANG('new-fit');

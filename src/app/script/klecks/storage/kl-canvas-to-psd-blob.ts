@@ -14,6 +14,7 @@ export async function klCanvasToPsdBlob (klCanvas: KlCanvas): Promise<Blob> {
             // todo - can be optimized if layer mostly empty
             return {
                 name: item.name,
+                hidden: !item.isVisible,
                 opacity: item.opacity,
                 canvas: item.canvas,
                 blendMode: KL.PSD.blendKlToPsd(item.mixModeStr),

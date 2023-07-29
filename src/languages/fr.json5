@@ -270,6 +270,18 @@
     original: 'Rename',
     value: 'Renommer'
   },
+  'layers-active-layer-visible': {
+    original: 'Active layer is visible',
+    value: 'Calque active visible'
+  },
+  'layers-active-layer-hidden': {
+    original: 'Active layer is hidden',
+    value: 'Calque active masqué'
+  },
+  'layers-visibility-toggle': {
+    original: 'Layer Visibility',
+    value: 'Visibilité des calques'
+  },
   'layers-blend-normal': {
     original: 'normal',
     value: 'normal'
@@ -1293,6 +1305,11 @@
   'save-reminder-psd-layers': {
     original: 'PSD will remember all layers.',
     value: 'PSD se souviendra de toutes les couches.'
+  },
+  'backup-drawing': {
+    hint: '(Embed) If the upload failed, the user can backup/download their drawing.',
+    original: 'You can backup your drawing.',
+    value: 'Vous pouvez sauvegarder votre dessin.'
   },
   submit: {
     original: 'Submit',

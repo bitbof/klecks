@@ -9,6 +9,16 @@ import {loadAgPsd} from '../../klecks/storage/load-ag-psd';
 // only one instance can exist
 let wrapperCreated = false;
 
+// add missing props. modifies project object
+function processProject (project: IKlProject | undefined): void {
+    if (!project) {
+        return;
+    }
+    project.layers.forEach(layer => {
+        layer.isVisible = layer.isVisible === undefined ? true : layer.isVisible;
+    });
+}
+
 /**
  * Starting point for the Embed. Quickly available due to lazy loading.
  * (Which is why it had to be separated from main-embed.ts > Embed)
@@ -31,6 +41,7 @@ export class EmbedWrapper {
         }
         wrapperCreated = true;
 
+        processProject(p.project);
         p = {
             ...p,
             embedUrl: p.embedUrl ? p.embedUrl : getEmbedUrl(),
@@ -93,6 +104,7 @@ export class EmbedWrapper {
     }
 
     openProject (project: IKlProject) {
+        processProject(project);
         if (this.instance) {
             this.instance.openProject(project);
         } else {

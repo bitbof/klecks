@@ -128,7 +128,7 @@ export class UndoRedoCatchup {
             );
         });
         if (oldSize.w !== klCanvas.getWidth() || oldSize.h !== klCanvas.getHeight()) {
-            this.klCanvasWorkspace.resetView();
+            this.klCanvasWorkspace.resetOrFitView();
             this.handUi.update(this.klCanvasWorkspace.getScale(), this.klCanvasWorkspace.getAngleDeg());
         }
         this.layerManager.update(layerIndex);
@@ -171,7 +171,7 @@ export class UndoRedoCatchup {
         );
 
         if (oldSize.w !== klCanvas.getWidth() || oldSize.h !== klCanvas.getHeight()) {
-            this.klCanvasWorkspace.resetView();
+            this.klCanvasWorkspace.resetOrFitView();
             this.handUi.update(this.klCanvasWorkspace.getScale(), this.klCanvasWorkspace.getAngleDeg());
         }
         const currentLayerIndex = throwIfNull(klCanvas.getLayerIndex(this.getCurrentLayerCtx()!.canvas));

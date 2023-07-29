@@ -44,7 +44,7 @@ export function unfocusAnyInput (): void {
                 width: '0',
                 height: '0',
             },
-        }) as HTMLInputElement;
+        });
         setTimeout(() => {
             focusEl.select();
             focusEl.focus();
@@ -125,7 +125,7 @@ const els: {
  *
  * @param params
  */
-export function el (
+export function el <GTag extends keyof HTMLElementTagNameMap = 'div'> (
     params?: {
         parent?: HTMLElement;
         css?: IKeyStringOptional;
@@ -135,56 +135,56 @@ export function el (
         className?: string;
         title?: string;
         id?: string;
-        tagName?: string;
-        onClick?: (e: MouseEvent) => void;
+        tagName?: GTag;
+        onClick?: (e: Event) => void;
         onChange?: (e: Event) => void;
     }
-): HTMLElement {
+) {
     if (!params) {
-        return document.createElement('div');
+        return document.createElement('div') as HTMLElementTagNameMap[GTag];
     }
-    const div = document.createElement(params.tagName ? params.tagName : 'div');
-    params.css && css(div, params.css);
+    const result = document.createElement(params.tagName ? params.tagName : 'div');
+    params.css && css(result, params.css);
 
     if (params.content) {
         if (typeof params.content === typeof 'aa') {
-            div.innerHTML = params.content as string;
+            result.innerHTML = params.content as string;
 
         } else if (Array.isArray(params.content)) {
-            BB.append(div, params.content);
+            BB.append(result, params.content);
 
         } else {
-            div.append(params.content as HTMLElement);
+            result.append(params.content as HTMLElement);
 
         }
     }
     if (params.textContent) {
-        div.textContent = params.textContent;
+        result.textContent = params.textContent;
     }
     if (params.className) {
-        div.className = params.className;
+        result.className = params.className;
     }
     if (params.id) {
-        div.id = params.id;
+        result.id = params.id;
     }
     if (params.parent) {
-        params.parent.append(div);
+        params.parent.append(result);
     }
     if ('title' in params && params.title !== undefined) {
-        div.title = params.title;
+        result.title = params.title;
     }
     const listeners: [keyof HTMLElementEventMap, EventListener][] = [];
     if (params.onClick !== undefined) {
-        div.addEventListener('click', params.onClick);
+        result.addEventListener('click', params.onClick);
         listeners.push(['click', params.onClick as EventListener]);
     }
     if (params.onChange !== undefined) {
-        div.addEventListener('change', params.onChange);
+        result.addEventListener('change', params.onChange);
         listeners.push(['change', params.onChange]);
     }
     if (listeners.length > 0) {
         els.push({
-            el: div,
+            el: result,
             listeners,
         });
         /*div.style.backgroundColor = '#ff0';
@@ -193,10 +193,10 @@ export function el (
     if ('custom' in params && params.custom) {
         const customKeyArr = Object.keys(params.custom);
         for (let i = 0; i < customKeyArr.length; i++) {
-            div.setAttribute(customKeyArr[i], params.custom[customKeyArr[i]]);
+            result.setAttribute(customKeyArr[i], params.custom[customKeyArr[i]]);
         }
     }
-    return div;
+    return result as HTMLElementTagNameMap[GTag];
 }
 
 /**

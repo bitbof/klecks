@@ -147,6 +147,7 @@ export class KlHistory implements KlHistoryInterface {
 
         //taking care of actions that shouldn't cause a new undo step
         const lastEntry = this.entries[this.entries.length - 1];
+        // opacity
         if (
             lastEntry && newEntry.tool[0] === 'canvas' && lastEntry.tool[0] === 'canvas' &&
             newEntry.action === 'layerOpacity' && lastEntry.action === 'layerOpacity' &&
@@ -156,6 +157,21 @@ export class KlHistory implements KlHistoryInterface {
             this.state++; //still needs to increment because something changed
             return;
         }
+        // layer visibility
+        if (
+            lastEntry && newEntry.tool[0] === 'canvas' && lastEntry.tool[0] === 'canvas' &&
+            newEntry.action === 'setLayerIsVisible' && lastEntry.action === 'setLayerIsVisible' &&
+            lastEntry.params![0] === newEntry.params![0] &&
+            lastEntry.params![1] != newEntry.params![1]
+        ) {
+            // if last and current step toggle visibility -> that means it's the way it was before
+            this.entries.pop();
+            this.actionNumber--;
+            this.state++; //still needs to increment because something changed
+            this.broadcast(null);
+            return;
+        }
+        // select layer
         if (newEntry.action === 'focusLayer' && lastEntry && lastEntry.action === 'focusLayer') {
             this.entries[this.entries.length - 1] = newEntry;
             this.state++;

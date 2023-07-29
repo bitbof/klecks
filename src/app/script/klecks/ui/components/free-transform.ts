@@ -538,7 +538,7 @@ export class FreeTransform {
                             position: 'absolute',
                             boxShadow: 'inset 0 0 0 2px #000',
                         },
-                    }),
+                    }) as HTMLElement,
                     x: 0,
                     y: 0,
                     virtualPos: {
@@ -661,7 +661,7 @@ export class FreeTransform {
                             ][i],*/
                             position: 'absolute',
                         },
-                    }),
+                    }) as HTMLElement,
                 } as TFreeTransformEdge;
                 const g = this.edges[i];
                 g.updateDOM = () => {

@@ -99,6 +99,7 @@ export const filterFlip = {
 
         const previewLayer: IKlBasicLayer = {
             image: BB.canvas(Math.round(w), Math.round(h)),
+            isVisible: true,
             opacity: 1,
             mixModeStr: 'source-over' as TMixMode,
         };
@@ -135,6 +136,10 @@ export const filterFlip = {
             }
 
             for (let i = 0; i < layers.length; i++) {
+                if (!layers[i].isVisible) {
+                    continue;
+                }
+
                 ctx.save();
                 if (!doFlipCanvas && selectedLayerIndex === i) {
                     if (isHorizontal) {

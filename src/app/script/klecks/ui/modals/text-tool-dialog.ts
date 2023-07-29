@@ -34,6 +34,7 @@ export type TTextToolResult = {
     size: number; // px
     font: TTextFont;
     opacity: number;
+    angleRad: number;
 };
 
 /**
@@ -124,6 +125,8 @@ export function textToolDialog (
 
         // try to draw very much like klCanvasWorkspace
 
+        const angleRad = rotationSlider.getValue();
+
         // --- draw text ---
         textCtx.clearRect(0, 0, textCanvas.width, textCanvas.height);
         const colorRGBA = {
@@ -140,7 +143,7 @@ export function textToolDialog (
             size: parseFloat(sizeInput.value),
             font: fontSelect.getValue(),
             color: BB.ColorConverter.toRgbaStr(colorRGBA),
-            angleRad: p.angleRad,
+            angleRad,
         });
 
 
@@ -148,8 +151,8 @@ export function textToolDialog (
         // text should always be visible
         bounds.width = Math.max(bounds.width, 1);
         bounds.height = Math.max(bounds.height, 1);
-        const rotatedXY = BB.rotate(bounds.x, bounds.y, -p.angleRad / Math.PI * 180);
-        const rotatedWH = BB.rotate(bounds.width, bounds.height, -p.angleRad / Math.PI * 180);
+        const rotatedXY = BB.rotate(bounds.x, bounds.y, -angleRad / Math.PI * 180);
+        const rotatedWH = BB.rotate(bounds.width, bounds.height, -angleRad / Math.PI * 180);
         const centerX = p.x + rotatedXY.x + rotatedWH.x / 2;
         const centerY = p.y + rotatedXY.y + rotatedWH.y / 2;
 
@@ -172,7 +175,7 @@ export function textToolDialog (
         targetCtx.clearRect(0, 0, previewCanvas.width, previewCanvas.height);
         targetCtx.translate(width / 2, height / 2);
         targetCtx.scale(scale, scale);
-        targetCtx.rotate(p.angleRad);
+        targetCtx.rotate(angleRad);
         targetCtx.drawImage(layerArr[p.layerIndex].canvas, -centerX, -centerY);
         targetCtx.drawImage(textCanvas, -centerX, -centerY);
         targetCtx.restore();
@@ -190,14 +193,20 @@ export function textToolDialog (
 
             layersCtx.translate(width / 2, height / 2);
             layersCtx.scale(scale, scale);
-            layersCtx.rotate(p.angleRad);
+            layersCtx.rotate(angleRad);
 
             layersCtx.imageSmoothingEnabled = false;
 
             //outline
             const borderSize = 1 / scale;
             layersCtx.globalAlpha = isDark ? 0.25 : 0.2;
-            layersCtx.drawImage(isDark ? emptyCanvasLight : emptyCanvas, -centerX - borderSize, -centerY - borderSize, textCanvas.width + borderSize * 2, textCanvas.height + borderSize * 2);
+            layersCtx.drawImage(
+                isDark ? emptyCanvasLight : emptyCanvas,
+                -centerX - borderSize,
+                -centerY - borderSize,
+                textCanvas.width + borderSize * 2,
+                textCanvas.height + borderSize * 2,
+            );
             layersCtx.globalAlpha = 1;
 
             //erase
@@ -220,9 +229,9 @@ export function textToolDialog (
             layersCtx.save();
             layersCtx.translate(width / 2, height / 2);
             layersCtx.scale(scale, scale);
-            layersCtx.rotate(p.angleRad);
+            layersCtx.rotate(angleRad);
             for (let i = 0; i < p.layerIndex; i++) {
-                if (layerArr[i].opacity > 0) {
+                if (layerArr[i].isVisible && layerArr[i].opacity > 0) {
                     layersCtx.globalAlpha = layerArr[i].opacity;
                     layersCtx.globalCompositeOperation = layerArr[i].mixModeStr;
                     layersCtx.drawImage(layerArr[i].canvas, -centerX, -centerY);
@@ -231,7 +240,7 @@ export function textToolDialog (
             layersCtx.restore();
 
             // target layer
-            layersCtx.globalAlpha = layerArr[p.layerIndex].opacity;
+            layersCtx.globalAlpha = layerArr[p.layerIndex].opacity * (layerArr[p.layerIndex].isVisible ? 1 : 0);
             layersCtx.globalCompositeOperation = layerArr[p.layerIndex].mixModeStr;
             layersCtx.drawImage(targetCanvas, 0, 0);
 
@@ -239,9 +248,9 @@ export function textToolDialog (
             layersCtx.save();
             layersCtx.translate(width / 2, height / 2);
             layersCtx.scale(scale, scale);
-            layersCtx.rotate(p.angleRad);
+            layersCtx.rotate(angleRad);
             for (let i = p.layerIndex + 1; i < layerArr.length; i++) {
-                if (layerArr[i].opacity > 0) {
+                if (layerArr[i].isVisible && layerArr[i].opacity > 0) {
                     layersCtx.globalAlpha = layerArr[i].opacity;
                     layersCtx.globalCompositeOperation = layerArr[i].mixModeStr;
                     layersCtx.drawImage(layerArr[i].canvas, -centerX, -centerY);
@@ -285,7 +294,7 @@ export function textToolDialog (
      * Move text by x y
      */
     function move (x: number, y: number): void {
-        const rotated = BB.rotate(x, y, -p.angleRad / Math.PI * 180);
+        const rotated = BB.rotate(x, y, -rotationSlider.getValue() / Math.PI * 180);
         p.x += rotated.x / scale;
         p.y += rotated.y / scale;
         updatePreview();
@@ -393,36 +402,54 @@ export function textToolDialog (
 
     const zoomWrapper = BB.el({
         parent: row1,
+        css: {
+            display: 'flex',
+            gap: '5px',
+        },
     });
 
+    const rotationSlider = new KlSlider({
+        label: LANG('filter-transform-rotation'),
+        width: 150,
+        height: 30,
+        min: -Math.PI,
+        max: Math.PI,
+        value: p.angleRad,
+        resolution: 225,
+        eventResMs: 1000 / 30,
+        toValue: (deg) => deg * Math.PI / 180,
+        toDisplayValue: (rad) => rad / Math.PI * 180,
+        onChange: () => updatePreview(),
+        unit: '°',
+    });
+    zoomWrapper.append(rotationSlider.getElement());
     const zoomInBtn = BB.el({
+        tagName: 'button',
         parent: zoomWrapper,
         content: `<img height="20" src="${toolZoomInImg}">`,
         title: LANG('zoom-in'),
-        tagName: 'button',
         onClick: () => changeZoomFac(1),
         css: {
             fontWeight: 'bold',
         },
-    }) as HTMLButtonElement;
+    });
     const zoomOutBtn = BB.el({
+        tagName: 'button',
         parent: zoomWrapper,
         content: `<img height="20" src="${toolZoomOutImg}">`,
         title: LANG('zoom-out'),
-        tagName: 'button',
         onClick: () => changeZoomFac(-1),
         css: {
             fontWeight: 'bold',
-            marginLeft: '5px',
         },
-    }) as HTMLButtonElement;
+    });
 
 
 
     // --- row 2 ---
     const sizeInput = BB.el({
-        parent: row2,
         tagName: 'input',
+        parent: row2,
         title: LANG('text-size'),
         custom: {
             type: 'number',
@@ -437,7 +464,7 @@ export function textToolDialog (
             sizeInput.value = '' + Math.max(1, Math.min(10000, parseInt(sizeInput.value)));
             updatePreview();
         },
-    }) as HTMLInputElement;
+    });
     const sizePointerListener = new BB.PointerListener({
         target: sizeInput,
         onWheel: (e) => {
@@ -542,8 +569,8 @@ export function textToolDialog (
 
 
     const textInput = BB.el({
-        parent: div,
         tagName: 'textarea',
+        parent: div,
         custom: {
             placeholder: LANG('text-placeholder'),
             'data-ignore-focus': 'true',
@@ -556,8 +583,11 @@ export function textToolDialog (
             resize: 'vertical',
             marginTop: '10px',
         },
-        onChange: () => updatePreview(),
-    }) as HTMLTextAreaElement;
+        onChange: () => {
+            modal.setIgnoreBackground(textInput.value.length > 0);
+            updatePreview();
+        },
+    });
     textInput.addEventListener('input', updatePreview);
     setTimeout(() => {
         textInput.focus();
@@ -590,7 +620,7 @@ export function textToolDialog (
     window.addEventListener('scroll', onScroll);
 
 
-    showModal({
+    const modal = showModal({
         target: document.body,
         message: `<b>${LANG('text-title')}</b>`,
         div: div,
@@ -610,6 +640,7 @@ export function textToolDialog (
                 size: Number(sizeInput.value),
                 font: fontSelect.getValue(),
                 opacity: opacitySlider.getValue(),
+                angleRad: rotationSlider.getValue(),
             };
 
             theme.removeIsDarkListener(updatePreview);
@@ -621,6 +652,7 @@ export function textToolDialog (
             fontPointerListener.destroy();
             previewCanvas.removeEventListener('wheel', wheelPrevent);
             BB.destroyEl(previewWrapper);
+            rotationSlider.destroy();
             BB.destroyEl(zoomInBtn);
             BB.destroyEl(zoomOutBtn);
             BB.destroyEl(sizeInput);
@@ -638,7 +670,6 @@ export function textToolDialog (
         },
         autoFocus: false,
         clickOnEnter: 'Ok',
-        ignoreBackground: true,
     });
 
     updatePreview();

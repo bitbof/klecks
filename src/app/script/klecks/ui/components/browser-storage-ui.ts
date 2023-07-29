@@ -136,7 +136,7 @@ export class BrowserStorageUi {
                 gap: '0 0',
                 gridTemplateAreas: '"title title" "preview store" "preview clear"',
             },
-        }) as HTMLDivElement;
+        });
 
 
         const title = BB.el({
@@ -158,7 +158,7 @@ export class BrowserStorageUi {
             onClick: () => {
                 showIframeModal('./help/#help-browser-storage', false);
             },
-        }) as HTMLDivElement;
+        });
 
         if (this.projectStore.isBroken()) {
             BB.el({
@@ -175,7 +175,7 @@ export class BrowserStorageUi {
             parent: this.element,
             title: LANG('file-storage-thumb-title'),
             className: 'kl-storage-preview',
-        }) as HTMLDivElement;
+        });
         this.ageEl = BB.el({
             css: {
                 position: 'absolute',
@@ -187,7 +187,7 @@ export class BrowserStorageUi {
                 color: '#fff',
                 textSize: '13px',
             },
-        }) as HTMLDivElement;
+        });
         const btnCustom: { [key: string]: string } = options?.isFocusable ?  {} : {
             tabIndex: '-1',
         };
@@ -202,7 +202,7 @@ export class BrowserStorageUi {
             },
             custom: btnCustom,
             onClick: () => this.store(),
-        }) as HTMLButtonElement;
+        });
         this.clearButtonEl = BB.el({
             parent: this.element,
             tagName: 'button',
@@ -214,7 +214,7 @@ export class BrowserStorageUi {
             },
             custom: btnCustom,
             onClick: () => this.clear(),
-        }) as HTMLButtonElement;
+        });
 
         if (this.options?.hideClearButton) {
             this.clearButtonEl.style.visibility = 'hidden';

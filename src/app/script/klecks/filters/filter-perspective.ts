@@ -218,6 +218,7 @@ export const filterPerspective = {
                     const canvas = i === selectedLayerIndex ? fxCanvas : layers[i].context.canvas;
                     previewLayerArr.push({
                         image: canvas,
+                        isVisible: layers[i].isVisible,
                         opacity: layers[i].opacity,
                         mixModeStr: layers[i].mixModeStr,
                     });

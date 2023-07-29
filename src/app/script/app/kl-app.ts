@@ -439,7 +439,7 @@ export class KlApp {
                             align: val.align,
                             isBold: val.isBold,
                             isItalic: val.isItalic,
-                            angleRad: angleRad,
+                            angleRad: val.angleRad,
                             color: BB.ColorConverter.toRgbaStr(colorRGBA),
                         });
                         this.klCanvasWorkspace.requestFrame();
@@ -539,7 +539,7 @@ export class KlApp {
                     this.klCanvasWorkspace.zoomByStep(keyListener.isPressed('shift') ? -1/8 : -1/2);
                 }
                 if (comboStr === 'home') {
-                    this.klCanvasWorkspace.fitView();
+                    this.klCanvasWorkspace.fitView(true);
                 }
                 if (comboStr === 'end') {
                     this.klCanvasWorkspace.resetView(true);
@@ -783,6 +783,40 @@ export class KlApp {
                     showIframeModal(this.embed!.url + '/help.html', !!this.embed);
                 },
                 onSubmit: () => {
+                    const onFailure = () => {
+                        let closeFunc: () => void;
+                        const saveBtn = BB.el({
+                            tagName: 'button',
+                            textContent: LANG('save-reminder-save-psd'),
+                            css: {
+                                display: 'block',
+                            },
+                        });
+                        saveBtn.onclick = () => {
+                            this.saveAsPsd();
+                            closeFunc();
+                        };
+                        KL.popup({
+                            target: this.klRootEl,
+                            message: '<b>' + LANG('upload-failed') + '</b>',
+                            div: BB.el({
+                                    content: [
+                                        BB.el({
+                                            content: LANG('backup-drawing'),
+                                            css: {
+                                                marginBottom: '10px',
+                                            },
+                                        }),
+                                        saveBtn,
+                                    ],
+                                }),
+                            ignoreBackground: true,
+                            closeFunc: (f) => {
+                                closeFunc = f;
+                            },
+                        });
+                    };
+
                     KL.popup({
                         target: this.klRootEl,
                         message: LANG('submit-prompt'),
@@ -805,6 +839,7 @@ export class KlApp {
                                 },
                                 () => {
                                     overlay.remove();
+                                    onFailure();
                                 });
                         },
                     });
@@ -1007,7 +1042,7 @@ export class KlApp {
                 handUi.update(this.klCanvasWorkspace.getScale(), this.klCanvasWorkspace.getAngleDeg());
             },
             onFit: () => {
-                this.klCanvasWorkspace.fitView();
+                this.klCanvasWorkspace.fitView(true);
                 handUi.update(this.klCanvasWorkspace.getScale(), this.klCanvasWorkspace.getAngleDeg());
             },
             onAngleChange: (angleDeg, isRelative) => {
@@ -1189,7 +1224,7 @@ export class KlApp {
 
                     this.layerManager.update(0);
                     setCurrentLayer(throwIfNull(this.klCanvas.getLayer(0)));
-                    this.klCanvasWorkspace.resetView();
+                    this.klCanvasWorkspace.resetOrFitView();
                     handUi.update(this.klCanvasWorkspace.getScale(), this.klCanvasWorkspace.getAngleDeg());
                 },
                 onCancel: () => {},
@@ -1229,7 +1264,7 @@ export class KlApp {
                         history: klHistory,
                     });
                     this.layerManager.update();
-                    this.klCanvasWorkspace.resetView();
+                    this.klCanvasWorkspace.resetOrFitView();
                     handUi.update(this.klCanvasWorkspace.getScale(), this.klCanvasWorkspace.getAngleDeg());
                 },
                 this.statusOverlay,

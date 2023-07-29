@@ -50,6 +50,7 @@ export interface ITransform {
 
 export type TKlCanvasLayer = {
     context: CanvasRenderingContext2D;
+    isVisible: boolean;
     opacity: number;
     name: string;
     id: number;
@@ -77,6 +78,7 @@ export type TMixMode = (
 
 export type IKlBasicLayer = {
     opacity: number; // 0 - 1
+    isVisible: boolean;
     mixModeStr?: TMixMode; // default "source-over"
     image: HTMLImageElement | HTMLCanvasElement; // already loaded
 };
@@ -86,6 +88,7 @@ export type IKlProject = {
     height: number; // int
     layers: {
         name: string;
+        isVisible: boolean;
         opacity: number; // 0 - 1
         mixModeStr?: TMixMode; // default "source-over"
         image: HTMLImageElement | HTMLCanvasElement; // already loaded
@@ -101,6 +104,7 @@ export type IKlStorageProject = {
     height: number; // int
     layers: {
         name: string;
+        isVisible: boolean;
         opacity: number; // 0 - 1
         mixModeStr?: TMixMode; // default "source-over"
         blob: Blob; // png
@@ -267,6 +271,14 @@ export type TKlPsdError =
     | 'blend-mode'
     | 'bits-per-channel';
 
+export type TKlPsdLayer = {
+    name: string;
+    isVisible: boolean;
+    mixModeStr: TMixMode;
+    opacity: number;
+    image: HTMLCanvasElement;
+};
+
 /**
  * Psd interpreted for usage in Klecks.
  */
@@ -275,12 +287,7 @@ export interface IKlPsd {
     canvas: HTMLCanvasElement;
     width: number;
     height: number;
-    layers?: { // not there if flattened
-        name: string;
-        mixModeStr: TMixMode;
-        opacity: number;
-        image: HTMLCanvasElement;
-    }[];
+    layers?: TKlPsdLayer[]; // not there if flattened
     // if one of these features show up, they become a warning
     // because Klecks can't properly represent them (yet)
     warningArr?: TKlPsdError[];

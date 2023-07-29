@@ -270,6 +270,18 @@
     original: 'Rename',
     value: 'リネーム'
   },
+  'layers-active-layer-visible': {
+    original: 'Active layer is visible',
+    value: ''
+  },
+  'layers-active-layer-hidden': {
+    original: 'Active layer is hidden',
+    value: ''
+  },
+  'layers-visibility-toggle': {
+    original: 'Layer Visibility',
+    value: ''
+  },
   'layers-blend-normal': {
     original: 'normal',
     value: '通常'
@@ -1293,6 +1305,11 @@
   'save-reminder-psd-layers': {
     original: 'PSD will remember all layers.',
     value: 'PSDは全レイヤーを保持します。'
+  },
+  'backup-drawing': {
+    hint: '(Embed) If the upload failed, the user can backup/download their drawing.',
+    original: 'You can backup your drawing.',
+    value: ''
   },
   submit: {
     original: 'Submit',

@@ -35,6 +35,7 @@ export const MAX_LAYERS = 16;
 export interface KlCanvasLayer extends HTMLCanvasElement {
     name: string;
     mixModeStr: TMixMode;
+    isVisible: boolean;
     opacity: number;
     compositeObj?: {
         draw: (ctx: CanvasRenderingContext2D) => void;
@@ -126,24 +127,25 @@ export class KlCanvas {
                 throw e;
             }
         } else if ('projectObj' in params) {
-            const origLayers = [...params.projectObj.layers];
+            const inLayers = [...params.projectObj.layers];
             this.init(params.projectObj.width, params.projectObj.height);
 
-            if (!origLayers.length) {
+            if (!inLayers.length) {
                 throw new Error('project.layers needs at least 1 layer');
             }
 
-            for (let i = 0; i < origLayers.length; i++) {
-                const mixModeStr = origLayers[i].mixModeStr;
+            for (let i = 0; i < inLayers.length; i++) {
+                const mixModeStr = inLayers[i].mixModeStr;
                 if (mixModeStr && !allowedMixModes.includes(mixModeStr)) {
-                    throw new Error('unknown mixModeStr ' + origLayers[i].mixModeStr);
+                    throw new Error('unknown mixModeStr ' + inLayers[i].mixModeStr);
                 }
 
                 this.addLayer();
-                this.layerOpacity(i, origLayers[i].opacity);
-                this.layerCanvasArr[i].name = origLayers[i].name;
+                this.layerOpacity(i, inLayers[i].opacity);
+                this.layerCanvasArr[i].name = inLayers[i].name;
+                this.layerCanvasArr[i].isVisible = inLayers[i].isVisible;
                 this.layerCanvasArr[i].mixModeStr = mixModeStr || 'source-over';
-                BB.ctx(this.layerCanvasArr[i]).drawImage(origLayers[i].image, 0, 0);
+                BB.ctx(this.layerCanvasArr[i]).drawImage(inLayers[i].image, 0, 0);
             }
         }
         this.updateIndices();
@@ -167,6 +169,7 @@ export class KlCanvas {
             layerName?: string; // if via image
             layers?: {
                 name: string;
+                isVisible: boolean;
                 opacity: number;
                 mixModeStr: TMixMode;
                 image: HTMLCanvasElement;
@@ -191,6 +194,7 @@ export class KlCanvas {
                     this.addLayer();
                 }
                 this.layerCanvasArr[i].name = item.name;
+                this.layerCanvasArr[i].isVisible = item.isVisible;
                 this.layerCanvasArr[i].width = this.width;
                 this.layerCanvasArr[i].height = this.height;
                 this.layerCanvasArr[i].mixModeStr = item.mixModeStr ? item.mixModeStr : 'source-over';
@@ -199,6 +203,7 @@ export class KlCanvas {
             }
         } else {
             this.layerCanvasArr[0].name = p.layerName ? p.layerName : LANG('layers-layer') + ' 1';
+            this.layerCanvasArr[0].isVisible = true;
             this.layerCanvasArr[0].width = this.width;
             this.layerCanvasArr[0].height = this.height;
             this.layerCanvasArr[0].mixModeStr = 'source-over';
@@ -264,6 +269,7 @@ export class KlCanvas {
             }
             this.layerOpacity(i, origLayers[i].opacity);
             this.layerCanvasArr[i].name = origLayers[i].name;
+            this.layerCanvasArr[i].isVisible = origLayers[i].isVisible;
             this.layerCanvasArr[i].mixModeStr = origLayers[i].mixModeStr;
             BB.ctx(this.layerCanvasArr[i]).drawImage(origLayers[i].context.canvas, 0, 0);
         }
@@ -370,6 +376,7 @@ export class KlCanvas {
             throw new Error('kl-create-canvas-error');
         }
 
+        canvas.isVisible = true;
         canvas.mixModeStr = 'source-over';
 
         if (selected === undefined) {
@@ -401,6 +408,7 @@ export class KlCanvas {
         this.layerCanvasArr.splice(i + 1, 0, canvas);
 
         canvas.name = this.layerCanvasArr[i].name + ' ' + LANG('layers-copy');
+        canvas.isVisible = this.layerCanvasArr[i].isVisible;
         canvas.mixModeStr = this.layerCanvasArr[i].mixModeStr;
         // 2023-04-30 workaround for https://bugs.webkit.org/show_bug.cgi?id=256151
         // todo replace with simple drawImage eventually when fixed
@@ -461,20 +469,34 @@ export class KlCanvas {
         return true;
     }
 
-    layerOpacity (i: number, o: number): void {
-        if (!this.layerCanvasArr[i]) {
+    layerOpacity (layerIndex: number, opacity: number): void {
+        if (!this.layerCanvasArr[layerIndex]) {
             return;
         }
-        o = Math.max(0, Math.min(1, o));
-        this.layerCanvasArr[i].opacity = o;
+        opacity = Math.max(0, Math.min(1, opacity));
+        this.layerCanvasArr[layerIndex].opacity = opacity;
 
         this.history.push({
             tool: ['canvas'],
             action: 'layerOpacity',
-            params: [i, o],
+            params: [layerIndex, opacity],
         } as TKlCanvasHistoryEntry);
 
         this.emitChange();
+    }
+
+    setLayerIsVisible (layerIndex: number, isVisible: boolean): void {
+        if (this.layerCanvasArr[layerIndex]) {
+            this.layerCanvasArr[layerIndex].isVisible = isVisible;
+        } else {
+            throw new Error(`layer ${layerIndex} undefined`);
+        }
+
+        this.history.push({
+            tool: ['canvas'],
+            action: 'setLayerIsVisible',
+            params: [layerIndex, isVisible],
+        } as TKlCanvasHistoryEntry);
     }
 
     moveLayer (i: number, d: number): void | number {
@@ -834,6 +856,7 @@ export class KlCanvas {
 
     getLayers (): {
         context: CanvasRenderingContext2D;
+        isVisible: boolean;
         opacity: number;
         name: string;
         mixModeStr: TMixMode;
@@ -841,6 +864,7 @@ export class KlCanvas {
         return this.layerCanvasArr.map(item => {
             return {
                 context: BB.ctx(item),
+                isVisible: item.isVisible,
                 opacity: item.opacity,
                 name: item.name,
                 mixModeStr: item.mixModeStr,
@@ -850,6 +874,7 @@ export class KlCanvas {
 
     getLayersFast (): {
         canvas: KlCanvasLayer;
+        isVisible: boolean;
         opacity: number;
         name: string;
         mixModeStr: TMixMode;
@@ -857,6 +882,7 @@ export class KlCanvas {
         return this.layerCanvasArr.map(item => {
             return {
                 canvas: item,
+                isVisible: item.isVisible,
                 opacity: item.opacity,
                 name: item.name,
                 mixModeStr: item.mixModeStr,
@@ -880,6 +906,7 @@ export class KlCanvas {
         if (this.layerCanvasArr[index]) {
             return {
                 context: BB.ctx(this.layerCanvasArr[index]),
+                isVisible: this.layerCanvasArr[index].isVisible,
                 opacity: this.layerCanvasArr[index].opacity,
                 name: this.layerCanvasArr[index].name,
                 id: index,
@@ -919,6 +946,7 @@ export class KlCanvas {
             layers: this.layerCanvasArr.map(layer => {
                 return {
                     name: layer.name,
+                    isVisible: layer.isVisible,
                     opacity: layer.opacity,
                     mixModeStr: layer.mixModeStr,
                     image: layer,

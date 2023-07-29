@@ -23,7 +23,7 @@ export function showIframeModal (
             height: '100%',
             opacity: '0',
         },
-    }) as HTMLIFrameElement;
+    });
     setTimeout(() => {
         iframe.style.opacity = ''; // fallback
     }, 500);
@@ -43,7 +43,7 @@ export function showIframeModal (
             onClick: function () {
                 popup.close();
             },
-        }) as HTMLAnchorElement;
+        });
         iframe.onload = () => {
             if (linkEl && iframe.contentWindow) {
                 BB.setAttributes(linkEl, {

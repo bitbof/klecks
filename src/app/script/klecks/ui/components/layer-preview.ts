@@ -26,6 +26,8 @@ export class LayerPreview {
     private isVisible: boolean;
     private uiState: TUiLayout;
 
+    private readonly checkEl: HTMLInputElement;
+
     private readonly nameLabelEl: HTMLElement;
     private readonly opacityEl: HTMLElement;
     private lastDrawnSize: ISize2D;
@@ -111,8 +113,17 @@ export class LayerPreview {
             return;
         }
 
+        const layerIsVisible = this.layerObj.isVisible;
+        this.checkEl.parentElement!.title = layerIsVisible ? LANG('layers-active-layer-visible') : LANG('layers-active-layer-hidden');
+        this.checkEl.checked = layerIsVisible;
+        this.checkEl.style.boxShadow = layerIsVisible ? '' : '0 0 0 1px red';
+
         this.nameLabelEl.textContent = this.layerObj.name;
-        this.opacityEl.innerHTML = LANG('opacity') + '<br>' + Math.round(this.layerObj.opacity * 100) + '%';
+        if (this.layerObj.isVisible) {
+            this.opacityEl.innerHTML = LANG('opacity') + '<br>' + Math.round(this.layerObj.opacity * 100) + '%';
+        } else {
+            this.opacityEl.innerHTML = LANG('opacity') + '<br><s>' + Math.round(this.layerObj.opacity * 100) + '%</s>';
+        }
 
         const layerCanvas = this.layerObj.context.canvas;
 
@@ -199,6 +210,28 @@ export class LayerPreview {
                 height: this.height + 'px',
             },
         });
+
+
+        const checkWrapper = BB.el({
+            css: {
+                display: 'flex',
+                justifyContent: 'flex-end',
+                alignItems: 'center',
+                width: '23px',
+            },
+        });
+        this.checkEl = BB.el({
+            parent: checkWrapper,
+            tagName: 'input',
+            css: {
+                pointerEvents: 'none',
+            },
+            custom: {
+                type: 'checkbox',
+                disabled: 'true',
+            },
+        });
+
         const canvasWrapperEl = BB.el({
             css: {
                 //background: '#f00',
@@ -231,7 +264,7 @@ export class LayerPreview {
         });
         const clickableEl = BB.el({
             css: {
-                //background: 'rgba(0,255,0,0.6)',
+                // background: 'rgba(0,255,0,0.6)',
                 position: 'absolute',
                 left: '10px',
                 top: '0',
@@ -240,12 +273,9 @@ export class LayerPreview {
             },
         });
         if (p.onClick) {
-            clickableEl.addEventListener('click', () => {
-                p.onClick();
-            });
-            this.canvas.addEventListener('click', () => {
-                p.onClick();
-            });
+            clickableEl.addEventListener('click', () => p.onClick());
+            this.canvas.addEventListener('click', () => p.onClick());
+            checkWrapper.addEventListener('click', () => p.onClick());
         }
         this.opacityEl = BB.el({
             content: LANG('opacity') + '<br>100%',
@@ -282,7 +312,7 @@ export class LayerPreview {
 
         canvasWrapperEl.append(this.canvas);
         nameWrapper.append(this.nameLabelEl, clickableEl);
-        this.contentWrapperEl.append(canvasWrapperEl, nameWrapper, this.opacityEl);
+        this.contentWrapperEl.append(checkWrapper, canvasWrapperEl, nameWrapper, this.opacityEl);
         this.rootEl.append(this.contentWrapperEl);
 
 

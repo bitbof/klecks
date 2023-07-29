@@ -270,6 +270,18 @@
     original: 'Rename',
     value: '重命名'
   },
+  'layers-active-layer-visible': {
+    original: 'Active layer is visible',
+    value: '当前图层可见'
+  },
+  'layers-active-layer-hidden': {
+    original: 'Active layer is hidden',
+    value: '当前图层隐藏'
+  },
+  'layers-visibility-toggle': {
+    original: 'Layer Visibility',
+    value: '图层可见性'
+  },
   'layers-blend-normal': {
     original: 'normal',
     value: '正常'
@@ -1293,6 +1305,11 @@
   'save-reminder-psd-layers': {
     original: 'PSD will remember all layers.',
     value: 'PSD可保留所有图层。'
+  },
+  'backup-drawing': {
+    hint: '(Embed) If the upload failed, the user can backup/download their drawing.',
+    original: 'You can backup your drawing.',
+    value: '你可以备份绘画。'
   },
   submit: {
     original: 'Submit',

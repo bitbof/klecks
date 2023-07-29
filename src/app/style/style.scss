@@ -485,14 +485,15 @@ button img {
 }
 
 .kl-layer {
-    width: 250px;
-    height: 34px;
+    width: 270px;
+    height: 36px;
+    // padding-left: 25px;
     background-color: rgb(220, 220, 220);
     border: 1px solid rgb(158, 158, 158);
     position: absolute;
     left: 0;
     transition: all 0.1s linear;
-    border-radius: 5px;
+    // border-radius: 5px;
     box-sizing: border-box;
     background-image: linear-gradient(to top, rgba(188, 188, 188, 0.1) 0%, rgba(255, 255, 255, 0.3) 100%);
 
@@ -504,6 +505,7 @@ button img {
 .kl-layer--selected {
     background: #fff;
     border: 1px solid var(--active-highlight-color);
+    z-index: 1;
 
     .kl-layer__label {
         color: #000;

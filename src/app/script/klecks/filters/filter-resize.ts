@@ -71,7 +71,7 @@ export const filterResize = {
                 max: '' + maxWidth,
                 value: '' + klCanvas.getWidth(),
             },
-        }) as HTMLInputElement;
+        });
         const heightInput = BB.el({
             tagName: 'input',
             css: {
@@ -84,7 +84,7 @@ export const filterResize = {
                 max: '' + maxHeight,
                 value: '' + klCanvas.getHeight(),
             },
-        }) as HTMLInputElement;
+        });
         widthInput.onclick = function () {
             (this as any).focus();
             widthChanged = true;

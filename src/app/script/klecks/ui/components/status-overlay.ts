@@ -35,13 +35,13 @@ export class StatusOverlay {
         this.el = BB.el({
             className: 'top-overlay g-root',
             onClick: BB.handleClick,
-        }) as HTMLDivElement;
+        });
 
         this.updateUiState();
 
         this.innerEl = BB.el({
             className: 'top-overlay--inner',
-        }) as HTMLDivElement;
+        });
 
 
         this.angleIm = new Image();

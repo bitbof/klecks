@@ -63,6 +63,7 @@ export class ProjectConverter {
                 }
                 return {
                     name: item.name,
+                    isVisible: item.isVisible,
                     opacity: item.opacity,
                     mixModeStr: item.mixModeStr,
                     blob,
@@ -84,10 +85,12 @@ export class ProjectConverter {
             height: storageProject.height,
             layers: (await Promise.all(storageProject.layers.map(layer => loadImage(layer.blob))))
                 .map((image, i) => {
+                    const storageLayer = storageProject.layers[i];
                     return {
-                        name: storageProject.layers[i].name,
-                        opacity: storageProject.layers[i].opacity,
-                        mixModeStr: storageProject.layers[i].mixModeStr,
+                        name: storageLayer.name,
+                        isVisible: 'isVisible' in storageLayer ? storageLayer.isVisible : true, // isVisible added 2023-07
+                        opacity: storageLayer.opacity,
+                        mixModeStr: storageLayer.mixModeStr,
                         image,
                     };
                 }),

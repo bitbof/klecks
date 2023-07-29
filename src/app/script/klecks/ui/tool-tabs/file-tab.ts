@@ -95,7 +95,7 @@ export class FileTab {
                 css: {
                     display: 'none',
                 },
-            }) as HTMLInputElement;
+            });
             this.importButton.tabIndex = -1;
             this.importButton.type = 'file';
             this.importButton.multiple = true;
@@ -121,7 +121,7 @@ export class FileTab {
                     top: '0',
                     cursor: 'pointer',
                 },
-            }) as HTMLButtonElement;
+            });
             importFakeButton.tabIndex = -1;
             importFakeButton.onclick = () => this.importButton && this.importButton.click();
 

@@ -45,7 +45,7 @@ export class Checkbox {
             custom: {
                 type: 'checkbox',
             },
-        }) as HTMLInputElement;
+        });
 
         this.check.checked = !!params.init;
         if (this.doHighlight && this.check.checked) {

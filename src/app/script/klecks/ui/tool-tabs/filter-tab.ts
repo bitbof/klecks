@@ -149,7 +149,7 @@ This has been reported to Google.
                             alert("Couldn't apply the edit action");
                         }
                         if (filters[filterKey].updatePos === true) {
-                            this.klCanvasWorkspace.resetView();
+                            this.klCanvasWorkspace.resetOrFitView();
                             this.handUi.update(this.klCanvasWorkspace.getScale(), this.klCanvasWorkspace.getAngleDeg());
                         }
                         this.layerManager.update();

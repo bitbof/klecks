@@ -110,7 +110,7 @@ export function imgurUpload (
         throw new Error('imgur key missing');
     }
 
-    const inputTitle = BB.el({tagName: 'input'}) as HTMLInputElement;
+    const inputTitle = BB.el({tagName: 'input'});
     inputTitle.type = 'text';
     inputTitle.value = LANG('upload-title-untitled');
     const inputDescription = BB.el({
@@ -122,7 +122,7 @@ export function imgurUpload (
             width: '100%',
             maxWidth: '100%',
         },
-    }) as HTMLTextAreaElement;
+    });
 
     const labelTitle =  BB.el({
         textContent: LANG('upload-name') + ':',

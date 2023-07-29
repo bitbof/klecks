@@ -108,6 +108,7 @@ export class FreeTransformCanvas {
         this.previewLayerArr = this.layers.map(item => {
             return {
                 image: item.image,
+                isVisible: item.isVisible,
                 mixModeStr: item.mixModeStr,
                 opacity: item.opacity,
             };
@@ -153,7 +154,7 @@ export class FreeTransformCanvas {
                 snapX: [0, this.imageWidth],
                 snapY: [0, this.imageHeight],
                 scale: this.scale,
-                callback: (transform) => {
+                callback: () => {
                     this.updatePreview();
                 },
             });

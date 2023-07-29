@@ -56,6 +56,10 @@ export class KlCanvasPreview {
         this.ctx.save();
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
         for (let i = 0; i < this.layers.length; i++) {
+            const layer = this.layers[i];
+            if (!layer.isVisible || layer.opacity === 0) {
+                continue;
+            }
             this.ctx.globalAlpha = this.layers[i].opacity;
             this.ctx.globalCompositeOperation = this.layers[i].mixModeStr as GlobalCompositeOperation;
             if (this.canvas.width > this.layers[i].image.width) {

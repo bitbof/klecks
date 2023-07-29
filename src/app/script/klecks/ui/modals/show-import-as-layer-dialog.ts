@@ -81,6 +81,7 @@ export function showImportAsLayerDialog (
         for (let i = 0; i < klCanvasLayerArr.length; i++) {
             layers.push({
                 image: klCanvasLayerArr[i].context.canvas,
+                isVisible: klCanvasLayerArr[i].isVisible,
                 opacity: klCanvasLayerArr[i].opacity,
                 mixModeStr: klCanvasLayerArr[i].mixModeStr,
             });
@@ -88,6 +89,7 @@ export function showImportAsLayerDialog (
     }
     layers.push({
         image: params.importImage,
+        isVisible: true,
         opacity: 1,
         mixModeStr: 'source-over',
     });

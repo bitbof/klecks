@@ -184,3 +184,5 @@ export const BB = {
     CoalescedExploder,
     OnePointerLimiter,
 };
+
+Object.keys(BB); // without this, parcel build may break this object
