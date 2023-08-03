@@ -109,7 +109,7 @@
   },
   'brush-size': {
     original: 'Size',
-    value: '畫筆大小'
+    value: '筆刷大小'
   },
   'brush-blending': {
     hint: 'Wetness. How much colors will bleed into each other.',
@@ -272,15 +272,15 @@
   },
   'layers-active-layer-visible': {
     original: 'Active layer is visible',
-    value: ''
+    value: '當前圖層可見'
   },
   'layers-active-layer-hidden': {
     original: 'Active layer is hidden',
-    value: ''
+    value: '當前圖層隱藏'
   },
   'layers-visibility-toggle': {
     original: 'Layer Visibility',
-    value: ''
+    value: '圖層可見性'
   },
   'layers-blend-normal': {
     original: 'normal',
@@ -422,7 +422,7 @@
   },
   'file-format': {
     original: 'File Format',
-    value: ''
+    value: '檔案格式'
   },
   'file-copy': {
     hint: 'verb',
@@ -1309,7 +1309,7 @@
   'backup-drawing': {
     hint: '(Embed) If the upload failed, the user can backup/download their drawing.',
     original: 'You can backup your drawing.',
-    value: ''
+    value: '您可以備份繪圖。'
   },
   submit: {
     original: 'Submit',
@@ -1364,15 +1364,15 @@
   },
   'settings-theme': {
     original: 'Theme',
-    value: ''
+    value: '外觀主題'
   },
   'theme-dark': {
     original: 'Dark',
-    value: ''
+    value: '深色'
   },
   'theme-light': {
     original: 'Light',
-    value: ''
+    value: '淺色'
   },
   'terms-of-service': {
     original: 'Terms of Service',

@@ -272,15 +272,15 @@
   },
   'layers-active-layer-visible': {
     original: 'Active layer is visible',
-    value: ''
+    value: 'レイヤー表示中'
   },
   'layers-active-layer-hidden': {
     original: 'Active layer is hidden',
-    value: ''
+    value: 'レイヤー非表示中'
   },
   'layers-visibility-toggle': {
     original: 'Layer Visibility',
-    value: ''
+    value: 'レイヤー表示/非表示'
   },
   'layers-blend-normal': {
     original: 'normal',
@@ -1309,7 +1309,7 @@
   'backup-drawing': {
     hint: '(Embed) If the upload failed, the user can backup/download their drawing.',
     original: 'You can backup your drawing.',
-    value: ''
+    value: '画像をバックアップできます。'
   },
   submit: {
     original: 'Submit',
