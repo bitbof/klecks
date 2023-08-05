@@ -422,7 +422,7 @@
   },
   'file-format': {
     original: 'File Format',
-    value: ''
+    value: '文件格式'
   },
   'file-copy': {
     hint: 'verb',
@@ -1364,15 +1364,15 @@
   },
   'settings-theme': {
     original: 'Theme',
-    value: ''
+    value: '主题'
   },
   'theme-dark': {
     original: 'Dark',
-    value: ''
+    value: '深色'
   },
   'theme-light': {
     original: 'Light',
-    value: ''
+    value: '浅色'
   },
   'terms-of-service': {
     original: 'Terms of Service',

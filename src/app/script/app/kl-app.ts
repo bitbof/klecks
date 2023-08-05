@@ -47,6 +47,7 @@ import {IVector2D} from '../bb/bb-types';
 import {createConsoleApi} from './console-api';
 import {ERASE_COLOR} from '../klecks/brushes/erase-color';
 import {throwIfNull} from '../bb/base/base';
+import {klConfig} from "../klecks/kl-config";
 
 type KlAppOptionsEmbed = {
     url: string;
@@ -60,7 +61,6 @@ interface IKlAppOptions {
     bottomBar?: HTMLElement; // row at bottom of toolspace
     embed?: KlAppOptionsEmbed;
     app?: {
-        filenameBase?: string; // part of filename when downloading drawing
         imgurKey?: string; // for imgur uploads
     };
     aboutEl?: HTMLElement; // replaces info about Klecks in settings tab
@@ -208,7 +208,6 @@ export class KlApp {
         // but not larger than 4096 - a fairly arbitrary decision
         const klMaxCanvasSize = Math.min(4096, Math.max(2048, Math.max(window.screen.width, window.screen.height)));
         this.uiState = (this.embed ? 'left' : (LocalStorage.getItem('uiState') ? LocalStorage.getItem('uiState') : 'right')) as TUiLayout;
-        const filenameBase = pOptions.app?.filenameBase ? pOptions.app.filenameBase : 'Klecks';
         const projectStore = pOptions.projectStore;
         this.klRootEl = BB.el({
             className: 'g-root',
@@ -1035,7 +1034,7 @@ export class KlApp {
         ]);
 
         const handUi = new KL.HandUi({
-            scale: 1,
+            scale: this.klCanvasWorkspace.getScale(),
             angleDeg: 0,
             onReset: () => {
                 this.klCanvasWorkspace.resetView(true);
@@ -1234,18 +1233,16 @@ export class KlApp {
         const shareImage = (callback?: () => void) => {
             BB.shareCanvas({
                 canvas: this.klCanvas.getCompleteCanvas(1),
-                fileName: BB.getDate() + filenameBase + '.png',
-                title: BB.getDate() + filenameBase + '.png',
+                fileName: BB.getDate() + klConfig.filenameBase + '.png',
+                title: BB.getDate() + klConfig.filenameBase + '.png',
                 callback: callback ? callback : () => {},
             });
         };
 
         this.saveToComputer = new KL.SaveToComputer(
             pOptions.saveReminder,
-            this.klRootEl,
             () => exportType,
             () => this.klCanvas,
-            filenameBase,
         );
 
         const copyToClipboard = (showCrop?: boolean) => {

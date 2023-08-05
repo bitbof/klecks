@@ -926,9 +926,13 @@ export class KlCanvas {
         ctx.imageSmoothingEnabled = false;
         ctx.clearRect(0, 0, 1, 1);
         for (let i = 0; i < this.layerCanvasArr.length; i++) {
-            ctx.globalAlpha = this.layerCanvasArr[i].opacity;
-            ctx.globalCompositeOperation = this.layerCanvasArr[i].mixModeStr;
-            ctx.drawImage(this.layerCanvasArr[i], -x, -y);
+            const layer = this.layerCanvasArr[i];
+            if (!layer.isVisible || layer.opacity === 0) {
+                continue;
+            }
+            ctx.globalAlpha = layer.opacity;
+            ctx.globalCompositeOperation = layer.mixModeStr;
+            ctx.drawImage(layer, -x, -y);
         }
         ctx.restore();
         const imData = ctx.getImageData(0, 0, 1, 1);

@@ -20,6 +20,7 @@ import {theme} from '../../theme/theme';
 import {TVec4} from '../../bb/math/matrix';
 import {IChainElement} from '../../bb/input/event-chain/event-chain.types';
 import {ICoalescedPointerEvent} from '../../bb/input/event-chain/coalesced-exploder';
+import {klConfig} from "../kl-config";
 
 export interface IViewChangeEvent {
     changed: ('scale' | 'angle')[];
@@ -49,7 +50,7 @@ type TInputProcessorItem = {
 }
 
 const MIN_SCALE = 1 / 16;
-const MAX_SCALE = 64;
+const MAX_SCALE = Math.pow(2, 7);
 enum TMode {
     Draw,
     Hand,
@@ -1801,7 +1802,7 @@ export class KlCanvasWorkspace {
         );
 
         //determine scale
-        const factor = fitWidth / boundsWidth;
+        const factor = Math.min(MAX_SCALE, fitWidth / boundsWidth);
 
         const newTargetTransformObj = {
             angle: newAngle,
@@ -1842,9 +1843,11 @@ export class KlCanvasWorkspace {
      * let the workspace decide what is best. E.g. if it's pixel art, Fit might be better.
      */
     resetOrFitView (): void {
+        const threshold = 4; // >= 400% zoom. pixelated, not blurry
         if (
-            this.klCanvas.getWidth() * 2 < this.renderWidth &&
-            this.klCanvas.getHeight() * 2 < this.renderHeight
+            !klConfig.disableAutoFit &&
+            this.klCanvas.getWidth() <= this.renderWidth / threshold &&
+            this.klCanvas.getHeight() <= this.renderHeight / threshold
         ) {
             this.fitView();
         } else {

@@ -6,6 +6,7 @@ import {klHistory} from './klecks/history/kl-history';
 import {klPsdToKlProject, readPsd} from './klecks/storage/psd';
 import {LANG} from './language/language';
 import {loadAgPsd, TAgPsd} from './klecks/storage/load-ag-psd';
+import {klConfig} from "./klecks/kl-config";
 
 export interface IEmbedParams {
     project?: IKlProject;
@@ -15,6 +16,7 @@ export interface IEmbedParams {
     logoImg?: any;
     bottomBar?: HTMLElement;
     aboutEl?: HTMLElement;
+    disableAutoFit?: boolean; // disable automatic Fit to View for small canvases
 }
 
 export interface IReadPSD {
@@ -91,6 +93,9 @@ export class Embed {
             this.loadingScreenTextEl.textContent = LANG('embed-init-waiting');
         }
 
+        if (p.disableAutoFit) {
+            klConfig.disableAutoFit = true;
+        }
         if (p.project) {
             this.onProjectReady(p.project);
         }

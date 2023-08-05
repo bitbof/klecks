@@ -5,6 +5,7 @@ import {TExportType} from '../kl-types';
 import {SaveReminder} from '../ui/components/save-reminder';
 import {saveAs} from '../../bb/base/save-as';
 import {Psd} from 'ag-psd/dist/psd';
+import {klConfig} from "../kl-config";
 
 export class SaveToComputer {
 
@@ -33,10 +34,8 @@ export class SaveToComputer {
 
     constructor (
         private saveReminder: SaveReminder,
-        private klRootEl: HTMLElement,
         private getExportType: () => TExportType,
         private getKlCanvas: () => KlCanvas,
-        private filenameBase: string,
     ) {}
 
     save (format?: 'psd' | 'layers' | 'png'): void {
@@ -49,7 +48,7 @@ export class SaveToComputer {
         if (format === 'png') {
             const extension = 'png';
             const mimeType = 'image/png';
-            const filename = BB.getDate() + this.filenameBase + '.' + extension;
+            const filename = BB.getDate() + klConfig.filenameBase + '.' + extension;
             const fullCanvas = this.getKlCanvas().getCompleteCanvas(1);
             try {
                 this.saveImage(fullCanvas, filename, mimeType);
@@ -60,7 +59,7 @@ export class SaveToComputer {
         } else if (format === 'layers') {
             const extension = 'png';
             const mimeType = 'image/png';
-            const fileBase = BB.getDate() + this.filenameBase;
+            const fileBase = BB.getDate() + klConfig.filenameBase;
             const layerArr = this.getKlCanvas().getLayersFast();
             for (let i = 0; i < layerArr.length; i++) {
                 const item = layerArr[i];
@@ -101,7 +100,7 @@ export class SaveToComputer {
             KL.loadAgPsd().then((agPsdLazy) => {
                 const buffer = agPsdLazy.writePsdBuffer(psdConfig);
                 const blob = new Blob([buffer], { type: 'application/octet-stream' });
-                saveAs(blob, BB.getDate() + this.filenameBase + '.psd');
+                saveAs(blob, BB.getDate() + klConfig.filenameBase + '.psd');
             }).catch(() => {
                 alert('Error: failed to load PSD library');
             });

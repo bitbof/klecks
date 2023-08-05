@@ -38,6 +38,7 @@
     }());
 
     const klecks = new Klecks({
+        // disableAutoFit: true,
         onSubmit: (onSuccess, onError) => {
             // download png
             saveData(klecks.getPNG(), 'drawing.png');
@@ -51,7 +52,7 @@
                 onSuccess();
                 location.reload();
             }, 500);
-        }
+        },
     });
 
     if (psdURL) {
@@ -67,8 +68,8 @@
 
     } else {
         klecks.openProject({
-            width: 500,
-            height: 500,
+            width: 100,
+            height: 100,
             layers: [{
                 name: 'Background',
                 isVisible: true,
@@ -76,8 +77,8 @@
                 mixModeStr: 'source-over',
                 image: (() => {
                     const canvas = document.createElement('canvas');
-                    canvas.width = 500;
-                    canvas.height = 500;
+                    canvas.width = 100;
+                    canvas.height = 100;
                     const ctx = canvas.getContext('2d');
                     ctx.save();
                     ctx.fillStyle = '#fff';
