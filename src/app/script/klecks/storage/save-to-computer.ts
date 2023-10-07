@@ -82,7 +82,7 @@ export class SaveToComputer {
                 width: this.getKlCanvas().getWidth(),
                 height: this.getKlCanvas().getHeight(),
                 children: [],
-                // canvas: this.getKlCanvas().getCompleteCanvas(1),
+                canvas: this.getKlCanvas().getCompleteCanvas(1),
             };
             for (let i = 0; i < layerArr.length; i++) {
                 const item = layerArr[i];

@@ -117,7 +117,7 @@ export class ColorOptions {
                     onClick: (e) => {
                         if (this.selectedIndex === i) {
                             if (color && color.a === 1) {
-                                this.colorInput.showPicker();
+                                this.colorInput.showPicker ? this.colorInput.showPicker() : this.colorInput.click();
                             }
                             return;
                         }
