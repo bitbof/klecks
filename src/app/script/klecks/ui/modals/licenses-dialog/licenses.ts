@@ -1,16 +1,10 @@
-export const licenses = `
-Includes:
-- glfx.js by Evan Wallace
-- FileSaver.js by Eli Grey
-- ag-psd by Agamnentzar
-- MDN polyfills
-- Gonkees-Shaders by Gonkee
-- GLSL Simplex Noise by Inigo Quilez
-
-Full licenses below
-
-<hr>
-glfx.js
+export const licenses: {
+    title: string;
+    full: string;
+}[] = [
+    {
+        title: 'glfx.js by Evan Wallace',
+        full: `glfx.js
 https://github.com/evanw/glfx.js
 
 Copyright (C) 2011 by Evan Wallace
@@ -20,9 +14,11 @@ Permission is hereby granted, free of charge, to any person obtaining a copy of 
 The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
-<hr>
-FileSaver.js
+`,
+    },
+    {
+        title: 'FileSaver.js by Eli Grey',
+        full: `FileSaver.js
 https://github.com/eligrey/FileSaver.js
 
 The MIT License
@@ -33,10 +29,11 @@ Permission is hereby granted, free of charge, to any person obtaining a copy of 
 
 The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
-<hr>
-ag-psd
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.`,
+    },
+    {
+        title: 'ag-psd by Agamnentzar',
+        full: `ag-psd
 https://github.com/Agamnentzar/ag-psd
 
 The MIT License (MIT)
@@ -49,14 +46,16 @@ The above copyright notice and this permission notice shall be included in all c
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-Any image or brush files included in this repository are not covered by this license and belong to their copyright holders.
-
-<hr>
-MDN Polyfills
-<a href="https://developer.mozilla.org/en-US/docs/MDN/About#copyrights_and_licenses" target="_blank">Licenses</a>
-
-<hr>
-Gonkees-Shaders
+Any image or brush files included in this repository are not covered by this license and belong to their copyright holders.`,
+    },
+    {
+        title: 'MDN polyfills',
+        full: `MDN Polyfills
+<a href="https://web.archive.org/web/20210225154741/https://developer.mozilla.org/en-US/docs/MDN/About#copyrights_and_licenses" target="_blank">Licenses</a>`,
+    },
+    {
+        title: 'Gonkees-Shaders by Gonkee',
+        full: `Gonkees-Shaders
 https://github.com/Gonkee/Gonkees-Shaders
 
 MIT License
@@ -79,10 +78,11 @@ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
 AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-
-<hr>
-GLSL Simplex Noise
+SOFTWARE.`,
+    },
+    {
+        title: 'GLSL Simplex Noise by Inigo Quilez',
+        full: `GLSL Simplex Noise
 
 The MIT License
 Copyright © 2013 Inigo Quilez
@@ -106,7 +106,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 https://www.youtube.com/c/InigoQuilez
-https://iquilezles.org
-
-end
-`;
+https://iquilezles.org`,
+    },
+];

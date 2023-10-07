@@ -6,7 +6,7 @@ import {klHistory} from './klecks/history/kl-history';
 import {klPsdToKlProject, readPsd} from './klecks/storage/psd';
 import {LANG} from './language/language';
 import {loadAgPsd, TAgPsd} from './klecks/storage/load-ag-psd';
-import {klConfig} from "./klecks/kl-config";
+import {klConfig} from './klecks/kl-config';
 
 export interface IEmbedParams {
     project?: IKlProject;

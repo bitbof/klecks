@@ -22,3 +22,11 @@ declare module '*.glsl'{
 }
 declare module '*.json';
 declare module '*.scss';
+declare module '*.ttf'{
+    const path: string;
+    export default path;
+}
+declare module '*.woff2'{
+    const path: string;
+    export default path;
+}

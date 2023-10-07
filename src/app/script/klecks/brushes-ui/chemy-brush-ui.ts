@@ -44,6 +44,8 @@ export const chemyBrushUi = (function () {
             brush.setSize(size);
         }
 
+        let eraserToggle: Checkbox;
+
         function init () {
             sizeSlider = new KlSlider({
                 label: LANG('brush-size'),
@@ -90,7 +92,7 @@ export const chemyBrushUi = (function () {
                 marginTop: '10px',
             });
 
-            const eraserToggle = new Checkbox({
+            eraserToggle = new Checkbox({
                 init: brush.getIsEraser(),
                 label: LANG('eraser'),
                 callback: function (b) {
@@ -357,6 +359,10 @@ export const chemyBrushUi = (function () {
         };
         this.isDrawing = function () {
             return brush.getIsDrawing();
+        };
+        this.toggleEraser = () => {
+            eraserToggle.setValue(!eraserToggle.getValue());
+            brush.setIsEraser(eraserToggle.getValue());
         };
         this.getElement = function () {
             return div;

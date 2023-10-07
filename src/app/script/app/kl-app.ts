@@ -6,7 +6,7 @@ import {EmbedToolspaceTopRow} from '../embed/embed-toolspace-top-row';
 import {
     IGradient,
     IInitState,
-    IKlProject, IRGB, IRGBA,
+    IKlProject, IRGB,
     TDrawEvent,
     TExportType,
     TKlCanvasLayer,
@@ -47,7 +47,8 @@ import {IVector2D} from '../bb/bb-types';
 import {createConsoleApi} from './console-api';
 import {ERASE_COLOR} from '../klecks/brushes/erase-color';
 import {throwIfNull} from '../bb/base/base';
-import {klConfig} from "../klecks/kl-config";
+import {klConfig} from '../klecks/kl-config';
+import {TRenderTextParam} from '../klecks/image-operations/render-text';
 
 type KlAppOptionsEmbed = {
     url: string;
@@ -350,14 +351,18 @@ export class KlApp {
             }
         }) as any);
 
-        const textToolSettings = {
+        let textToolSettings = {
             size: 20,
             align: 'left' as ('left' | 'center' | 'right'),
             isBold: false,
             isItalic: false,
-            font: 'sans-serif' as ('serif' | 'monospace' | 'sans-serif' | 'cursive' | 'fantasy'),
-            opacity: 1,
-        };
+            font: 'sans-serif',
+            letterSpacing: 0,
+            lineHeight: 1,
+            fill: {
+                color: {r: 0, g: 0, b: 0, a: 1},
+            },
+        } as TRenderTextParam;
 
         this.klCanvasWorkspace = new KL.KlCanvasWorkspace({
             klCanvas: this.klCanvas,
@@ -405,42 +410,37 @@ export class KlApp {
                 KL.textToolDialog({
                     klCanvas: this.klCanvas,
                     layerIndex: throwIfNull(this.klCanvas.getLayerIndex(currentLayerCtx.canvas)),
-                    x: canvasX,
-                    y: canvasY,
-                    angleRad: angleRad,
-                    color: this.klColorSlider.getColor(),
+                    primaryColor: this.klColorSlider.getColor(),
                     secondaryColor: this.klColorSlider.getSecondaryRGB(),
-                    size: textToolSettings.size,
-                    align: textToolSettings.align,
-                    isBold: textToolSettings.isBold,
-                    isItalic: textToolSettings.isItalic,
-                    font: textToolSettings.font,
-                    opacity: textToolSettings.opacity,
+
+                    text: {
+                        ...textToolSettings,
+                        text: '',
+                        x: canvasX,
+                        y: canvasY,
+                        angleRad: angleRad,
+                        fill : textToolSettings.fill ? {
+                            color: {
+                                ...this.klColorSlider.getColor(),
+                                a: textToolSettings.fill.color.a,
+                            },
+                        } : undefined,
+                        stroke : textToolSettings.stroke ? {
+                            ...textToolSettings.stroke,
+                            color: {
+                                ...this.klColorSlider.getSecondaryRGB(),
+                                a: textToolSettings.stroke.color.a,
+                            },
+                        } : undefined,
+                    },
+
                     onConfirm: (val) => {
-
-                        const colorRGBA = val.color as IRGBA;
-                        colorRGBA.a = val.opacity;
-
-                        textToolSettings.size = val.size;
-                        textToolSettings.align = val.align;
-                        textToolSettings.isBold = val.isBold;
-                        textToolSettings.isItalic = val.isItalic;
-                        textToolSettings.font = val.font;
-                        textToolSettings.opacity = val.opacity;
-
+                        textToolSettings = {
+                            ...val,
+                            text: '',
+                        };
                         const layerIndex = throwIfNull(this.klCanvas.getLayerIndex(currentLayerCtx.canvas));
-                        this.klCanvas.text(layerIndex, {
-                            textStr: val.textStr,
-                            x: val.x,
-                            y: val.y,
-                            size: val.size,
-                            font: val.font,
-                            align: val.align,
-                            isBold: val.isBold,
-                            isItalic: val.isItalic,
-                            angleRad: val.angleRad,
-                            color: BB.ColorConverter.toRgbaStr(colorRGBA),
-                        });
+                        this.klCanvas.text(layerIndex, val);
                         this.klCanvasWorkspace.requestFrame();
                     },
                 });
@@ -648,7 +648,11 @@ export class KlApp {
                     }
                     this.statusOverlay.out(LANG('cleared-layer'), true);
                 }
-                if (comboStr === 'e') {
+                if (comboStr === 'shift+e') {
+                    event.preventDefault();
+                    currentBrushUi.toggleEraser && currentBrushUi.toggleEraser();
+
+                } else if (comboStr === 'e') {
                     event.preventDefault();
                     this.klCanvasWorkspace.setMode('draw');
                     this.toolspaceToolRow.setActive('draw');

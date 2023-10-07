@@ -717,7 +717,6 @@ iframe {
 }
 
 .kl-color-option {
-    margin-left: 7px;
     box-shadow: 0 0 0 1px #aaa;
     cursor: pointer;
     user-select: none;
@@ -727,7 +726,6 @@ iframe {
 
 .kl-color-option--active {
     box-shadow: 0 0 0 2px var(--active-highlight-color), 0 0 5px 0 var(--active-highlight-color);
-    pointer-events: none;
 }
 
 
@@ -782,10 +780,7 @@ iframe {
 
 .image-radio-wrapper {
     display: flex;
-}
-
-.image-radio-wrapper .image-toggle:not(:first-child) {
-    margin-left: 7px;
+    gap: 7px;
 }
 
 .image-radio-wrapper .image-toggle-active {
@@ -930,7 +925,6 @@ iframe {
     top: 0;
     right: 0;
     bottom: 0;
-    box-shadow: rgba(0, 0, 0, 0.2) 0 1px inset, rgba(0, 0, 0, 0.2) 0 -1px inset;
     pointer-events: none;
 }
 

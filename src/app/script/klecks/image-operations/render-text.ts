@@ -1,164 +1,149 @@
 import {BB} from '../../bb/bb';
-import {IRect} from '../../bb/bb-types';
+import {IBounds, IRect} from '../../bb/bb-types';
+import {IRGBA} from '../kl-types';
 
-export interface IRenderTextParam {
-    textStr: string; // text to be drawn. can contain newlines
+export type TTextFormat = 'left' | 'center' | 'right';
+export type TTextFont = 'serif' | 'monospace' | 'sans-serif' | 'cursive' | 'fantasy' | string;
+
+export type TRenderTextParam = {
+    text: string; // text to be drawn. can contain newlines
+
     x: number;
     y: number;
-    size: number;
-    font: 'serif' | 'monospace' | 'sans-serif' | 'cursive' | 'fantasy'; // default sans-serif
-    align: 'left' | 'center' | 'right'; // default 'left'
-    isBold: boolean; // default false
-    isItalic: boolean; // default false
-    angleRad: number; // default 0 - rotates around x y
-    lineHeight?: number; // pixels
-    color: string;
-    isDebug?: boolean;
+    angleRad: number;
+    size: number; // px
+    align: TTextFormat;
+    isBold: boolean;
+    isItalic: boolean;
+    font: TTextFont;
+    letterSpacing?: number;
+    lineHeight?: number; // em
+    fill?: {
+        color: IRGBA;
+    };
+    stroke?: {
+        color: IRGBA;
+        lineWidth: number;
+    };
 }
 
+function textMetricToRect (metrics: TextMetrics, align: TTextFormat): IRect {
+    if (align === 'left') {
+        return {
+            x: 0,
+            y: -metrics.fontBoundingBoxAscent,
+            width: metrics.width,
+            height: metrics.fontBoundingBoxAscent + metrics.fontBoundingBoxDescent,
+        };
+    }
+    if (align === 'right') {
+        return {
+            x: -metrics.width,
+            y: -metrics.fontBoundingBoxAscent,
+            width: metrics.width,
+            height: metrics.fontBoundingBoxAscent + metrics.fontBoundingBoxDescent,
+        };
+    }
+    // center
+    return {
+        x: -metrics.width / 2,
+        y: -metrics.fontBoundingBoxAscent,
+        width: metrics.width,
+        height: metrics.fontBoundingBoxAscent + metrics.fontBoundingBoxDescent,
+    };
+}
 
 /**
- * Draw text on a canvas.
+ * Draws text on a canvas.
+ * Return bounds, relative to p.x, p.y.
  *
  * @param canvas
  * @param p
- * @returns - bounds. coords relative to p.x p.y
  */
-export function renderText (canvas: HTMLCanvasElement, p: IRenderTextParam): IRect {
+export function renderText (canvas: HTMLCanvasElement, p: TRenderTextParam): IRect {
 
-    // always at least a space. so bounds aren't just a dot
-    const textStr = p.textStr === '' ? ' ' : p.textStr;
+    p = BB.copyObj(p);
 
-    // --- create el ---
-    // create an actual dom element. figure out where exactly each letter is positioned.
-    // that way multiline is feasible. canvas can't do multiline or text-align
-    const outer = BB.el({
-        css: {
-            position: 'fixed',
-            left: '0',
-            top: '0',
-            width: '100000px',
-            fontSize: p.size + 'px',
-            lineHeight: p.lineHeight ? p.lineHeight + 'px' : 'default',
-        },
-    });
-    const div = BB.el({
-        parent: outer,
-        css: {
-            display: 'inline-block',
-            textAlign: p.align ? p.align : 'left',
-            fontFamily: p.font ? p.font : 'sans-serif',
-            fontSize: p.size + 'px',
-            fontWeight: p.isBold ? 'bold' : 'normal',
-            fontStyle: p.isItalic ? 'italic' : 'normal',
-            lineHeight: p.lineHeight ? p.lineHeight + 'px' : 'default',
-
-
-            opacity: '0',
-            pointerEvents: 'none',
-        },
-    });
-    let spanStr = '';
-    const replaceObj = {
-        '\n': '<br>',
-        ' ': '&nbsp;',
-        '	': '&nbsp;&nbsp;&nbsp;&nbsp;',
-    };
-    for (let i = 0; i < textStr.length; i++) {
-        if (textStr[i] === '\n') {
-            BB.el({
-                parent: div,
-                tagName: 'span',
-                textContent: spanStr,
-                css: {
-                    whiteSpace: 'pre',
-                },
-            });
-            spanStr = '';
-            div.append(BB.el({
-                tagName: 'br',
-            }));
-            continue;
-        }
-        spanStr += textStr[i].replace('\t', '    ');
-    }
-    BB.el({
-        parent: div,
-        tagName: 'span',
-        textContent: spanStr,
-        css: {
-            whiteSpace: 'pre',
-        },
-    });
-    document.body.append(outer);
-
-
-    // --- determine bounds ---
-    const bounds = {
-        x0: 99999999,
-        y0: 99999999,
-        x1: 0,
-        y1: 0,
-    };
-    for (let i = 0; i < div.children.length; i++) {
-        const el = div.children[i] as HTMLElement;
-        bounds.x0 = Math.min(bounds.x0, el.offsetLeft);
-        bounds.y0 = Math.min(bounds.y0, el.offsetTop);
-        bounds.x1 = Math.max(bounds.x1, el.offsetLeft + el.offsetWidth);
-        bounds.y1 = Math.max(bounds.y1, el.offsetTop + el.offsetHeight);
-    }
-
-    // --- draw ---
-    const ctx = BB.ctx(canvas);
+    // setup context
+    const ctx = BB.ctx(canvas) as CanvasRenderingContext2D & {letterSpacing: string};
     ctx.save();
+    ctx.textAlign = p.align;
+    ctx.letterSpacing = p.letterSpacing ? p.letterSpacing + 'px' : '0';
 
-    const font = [];
-    if (p.isItalic) {
-        font.push('italic');
-    }
+    // font
+    const fontArr = [p.size + 'px ' + (p.font ? p.font : 'sans-serif')];
     if (p.isBold) {
-        font.push('bold');
+        fontArr.unshift('bold');
     }
-    font.push(p.size + 'px ' + (p.font ? p.font : 'sans-serif'));
-    ctx.font = font.join(' ');
-    ctx.fillStyle = p.color ? p.color : '#000';
-
-    let x = p.x;
-    const y = p.y;
-    if (p.align === 'right') {
-        x += -bounds.x1 + bounds.x0;
+    if (p.isItalic) {
+        fontArr.unshift('italic');
     }
-    if (p.align === 'center') {
-        x += (-bounds.x1 + bounds.x0) / 2;
-    }
-    ctx.translate(p.x, p.y);
-    ctx.rotate(p.angleRad ? -p.angleRad : 0);
-    ctx.translate(-p.x, -p.y);
-    ctx.translate(x, y);
+    ctx.font = fontArr.join(' ');
 
     // fill
-    for (let i = 0; i < div.children.length; i++) {
-        const el = div.children[i] as HTMLElement;
+    ctx.fillStyle = p.fill ? BB.ColorConverter.toRgbaStr(p.fill.color) : 'transparent';
 
-        //ctx.fillText(el.innerText, 0, 0);
-        ctx.fillText(el.innerText, el.offsetLeft, el.offsetTop);
+    // stroke
+    ctx.strokeStyle = p.stroke ? BB.ColorConverter.toRgbaStr(p.stroke.color) : 'transparent';
+    if (p.stroke) {
+        ctx.lineWidth = p.stroke.lineWidth;
+        ctx.lineJoin = 'round';
     }
 
-    if (p.isDebug) {
-        ctx.lineWidth = 1;
-        ctx.strokeRect(0, -p.size * 0.85, bounds.x1, bounds.y1);
-        ctx.restore();
-        ctx.fillRect(p.x - 1, p.y - 1, 2, 2);
-    } else {
-        ctx.restore();
+    ctx.translate(p.x, p.y);
+    ctx.rotate(-p.angleRad);
+
+
+    const lines = p.text.split('\n').map(line => line.replaceAll('\t', '    '));
+
+    // bounds
+    const bounds: IBounds = {
+        x1: 0,
+        y1: 0,
+        x2: 0,
+        y2: 0,
+    };
+    {
+        let isFirst = true;
+        lines.forEach((line, lineIndex) => {
+            const metrics = ctx.measureText(line);
+            const x = 0;
+            const y =  p.size * (p.lineHeight ?? 1) * lineIndex;
+            const mRect = textMetricToRect(metrics, p.align);
+            if (isFirst) {
+                isFirst = false;
+                bounds.x1 = x + mRect.x;
+                bounds.y1 = y + mRect.y;
+                bounds.x2 = x + mRect.x + mRect.width;
+                bounds.y2 = y + mRect.y + mRect.height;
+            } else {
+                bounds.x1 = Math.min(bounds.x1, x + mRect.x);
+                bounds.y1 = Math.min(bounds.y1, y + mRect.y);
+                bounds.x2 = Math.max(bounds.x2, x + mRect.x + mRect.width);
+                bounds.y2 = Math.max(bounds.y2, y + mRect.y + mRect.height);
+            }
+        });
     }
 
-    outer.remove();
+    // draw stroke
+    lines.forEach((line, lineIndex) => {
+        const x = 0;
+        const y =  p.size * (p.lineHeight ?? 1) * lineIndex;
+        ctx.strokeText(line, x, y);
+    });
 
+    // draw fill
+    lines.forEach((line, lineIndex) => {
+        const x = 0;
+        const y =  p.size * (p.lineHeight ?? 1) * lineIndex;
+        ctx.fillText(line, x, y);
+    });
+
+    ctx.restore();
     return {
-        x: x - p.x,
-        y: y - p.y -p.size * 0.85,
-        width: bounds.x1 - bounds.x0,
-        height: bounds.y1 - bounds.y0,
+        x: bounds.x1,
+        y: bounds.y1,
+        width: bounds.x2 - bounds.x1,
+        height: bounds.y2 - bounds.y1,
     };
 }

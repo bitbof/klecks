@@ -20,7 +20,7 @@ import {theme} from '../../theme/theme';
 import {TVec4} from '../../bb/math/matrix';
 import {IChainElement} from '../../bb/input/event-chain/event-chain.types';
 import {ICoalescedPointerEvent} from '../../bb/input/event-chain/coalesced-exploder';
-import {klConfig} from "../kl-config";
+import {klConfig} from '../kl-config';
 
 export interface IViewChangeEvent {
     changed: ('scale' | 'angle')[];

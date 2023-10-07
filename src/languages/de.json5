@@ -1254,10 +1254,18 @@
     original: 'Add Text',
     value: 'Text Hinzufügen'
   },
+  'text-text': {
+    original: 'Text',
+    value: 'Text'
+  },
+  'text-font': {
+    original: 'Font',
+    value: 'Schrift'
+  },
   'text-placeholder': {
-    hint: 'placeholder in text input. Inform user they can have linebreaks when pressing shift+enter. Just pressing enter confirms and closes the dialog',
-    original: 'Your text (multiline Shift+Enter)',
-    value: 'Dein Text (mehrzeilig Shift+Enter)'
+    hint: 'placeholder in text input.',
+    original: 'Your text',
+    value: 'Dein Text'
   },
   'text-color': {
     original: 'Color',
@@ -1266,6 +1274,14 @@
   'text-size': {
     original: 'Size',
     value: 'Größe'
+  },
+  'text-line-height': {
+    original: 'Line Height',
+    value: 'Zeilenhöhe'
+  },
+  'text-letter-spacing': {
+    original: 'Letter Spacing',
+    value: 'Zeichenabstand'
   },
   'text-left': {
     hint: 'left, center, right text formatting like in Word',
@@ -1502,5 +1518,9 @@
   'compare-after': {
     original: 'After',
     value: 'Danach'
+  },
+  loading: {
+    original: 'Loading',
+    value: 'Läd'
   }
 }

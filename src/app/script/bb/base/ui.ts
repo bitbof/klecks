@@ -17,7 +17,7 @@ export function appendTextDiv (target: HTMLElement, text: string): HTMLDivElemen
  * @param getAll - check all, even those with "data-ignore-focus" = "true"
  */
 export function isInputFocused (getAll: boolean = false): boolean {
-    const result: boolean = !!document.activeElement && ['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName);
+    const result: boolean = !!document.activeElement && ['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement.tagName);
     if (getAll) {
         return result;
     } else {

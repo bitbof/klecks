@@ -201,6 +201,7 @@ export type TBrushUiInstance<GBrush> = {
     getIsTransparentBg?: () => boolean;
     getSeed?: () => number;
     setSeed?: (s: number) => void;
+    toggleEraser?: () => void;
 };
 
 export interface IBrushUi<GBrush> extends ISliderConfig {

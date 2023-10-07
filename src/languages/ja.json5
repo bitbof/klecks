@@ -1254,10 +1254,18 @@
     original: 'Add Text',
     value: 'テキストを追加'
   },
+  'text-text': {
+    original: 'Text',
+    value: ''
+  },
+  'text-font': {
+    original: 'Font',
+    value: ''
+  },
   'text-placeholder': {
-    hint: 'placeholder in text input. Inform user they can have linebreaks when pressing shift+enter. Just pressing enter confirms and closes the dialog',
-    original: 'Your text (multiline Shift+Enter)',
-    value: 'テキストを入力（複数行はShift + Enter）'
+    hint: 'placeholder in text input.',
+    original: 'Your text',
+    value: 'テキストを入力'
   },
   'text-color': {
     original: 'Color',
@@ -1266,6 +1274,14 @@
   'text-size': {
     original: 'Size',
     value: 'サイズ'
+  },
+  'text-line-height': {
+    original: 'Line Height',
+    value: ''
+  },
+  'text-letter-spacing': {
+    original: 'Letter Spacing',
+    value: ''
   },
   'text-left': {
     hint: 'left, center, right text formatting like in Word',
@@ -1502,5 +1518,9 @@
   'compare-after': {
     original: 'After',
     value: 'アフター'
+  },
+  loading: {
+    original: 'Loading',
+    value: ''
   }
 }

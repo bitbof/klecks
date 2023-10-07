@@ -5,7 +5,7 @@ import {TExportType} from '../kl-types';
 import {SaveReminder} from '../ui/components/save-reminder';
 import {saveAs} from '../../bb/base/save-as';
 import {Psd} from 'ag-psd/dist/psd';
-import {klConfig} from "../kl-config";
+import {klConfig} from '../kl-config';
 
 export class SaveToComputer {
 
@@ -82,7 +82,7 @@ export class SaveToComputer {
                 width: this.getKlCanvas().getWidth(),
                 height: this.getKlCanvas().getHeight(),
                 children: [],
-                canvas: this.getKlCanvas().getCompleteCanvas(1),
+                // canvas: this.getKlCanvas().getCompleteCanvas(1),
             };
             for (let i = 0; i < layerArr.length; i++) {
                 const item = layerArr[i];

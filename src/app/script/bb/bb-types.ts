@@ -64,6 +64,9 @@ export interface ISVG {
     'flood-color'?: string;
     'flood-opacity'?: string;
     'vector-effect'?: string;
+    points?: string;
+    'transform-origin'?: string;
+    opacity?: string;
     // add more when needed
 }
 

@@ -19,6 +19,7 @@
   },
   "devDependencies": {},
   "dependencies": {
+    "@emotion/css": "^11.11.2",
     "@parcel/transformer-glsl": "^2.9.3",
     "@parcel/transformer-image": "^2.9.3",
     "@parcel/transformer-sass": "^2.9.3",

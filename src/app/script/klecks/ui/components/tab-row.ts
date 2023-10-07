@@ -1,6 +1,7 @@
 import {BB} from '../../../bb/bb';
 import invertedBorderImg from '/src/app/img/ui/inverted-border.svg';
 import {IKeyStringOptional} from '../../../bb/bb-types';
+import {PointerListener} from '../../../bb/input/pointer-listener';
 
 
 // type all functions
@@ -24,6 +25,7 @@ type TTab = {
     onClose: () => void;
     update: (activeTab: TTab) => void;
     el: HTMLElement;
+    pointerListener: PointerListener;
 };
 
 
@@ -52,9 +54,10 @@ export class TabRow {
             initialId: string; // e.g. 'draw'
             useAccent?: boolean;
             tabArr: TTabInit[];
+            height?: number;
         }
     ) {
-        const height = 35;
+        const height = p.height ?? 35;
         this.rootEl = BB.el({
             className: 'tabrow',
             css: {
@@ -119,6 +122,7 @@ export class TabRow {
                         this.open(result.id);
                     },
                 }),
+                pointerListener: {} as PointerListener,
             };
             if ('image' in pTabObj) {
 
@@ -142,7 +146,7 @@ export class TabRow {
                 BB.css(result.el, pTabObj.css);
             }
 
-            const pointerListener = new BB.PointerListener({ // because :hover causes problems w touch
+            result.pointerListener = new BB.PointerListener({ // because :hover causes problems w touch
                 target: result.el,
                 onEnterLeave: (isOver) => {
                     result.el.classList.toggle('tabrow__tab-hover', isOver);
@@ -209,6 +213,13 @@ export class TabRow {
             }
         }
         throw 'TabRow.setIsVisible - invalid tabId';
+    }
+
+    destroy (): void {
+        this.tabArr.forEach(item => {
+            BB.destroyEl(item.el);
+            item.pointerListener.destroy();
+        });
     }
 }
 

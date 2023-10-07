@@ -198,7 +198,7 @@ export function handleClick (clickEvent: Event): boolean {
     if (!target) {
         return false;
     }
-    if (['A', 'LABEL', 'INPUT'].includes(target.tagName) || (target as any).allowClick) {
+    if (['A', 'LABEL', 'INPUT', 'SUMMARY'].includes(target.tagName) || (target as any).allowClick) {
         return true;
     }
     clickEvent.preventDefault();

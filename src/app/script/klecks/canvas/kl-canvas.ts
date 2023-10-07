@@ -1,7 +1,7 @@
 import {BB} from '../../bb/bb';
 import {floodFillBits} from '../image-operations/flood-fill';
 import {drawShape} from '../image-operations/shape-tool';
-import {IRenderTextParam, renderText} from '../image-operations/render-text';
+import {TRenderTextParam, renderText} from '../image-operations/render-text';
 import {IGradient, IKlProject, IRGB, IShapeToolObject, TFillSampling, TKlCanvasLayer, TMixMode} from '../kl-types';
 import {DecoyKlHistory, KlHistoryInterface, THistoryActions} from '../history/kl-history';
 import {drawProject} from './draw-project';
@@ -822,7 +822,7 @@ export class KlCanvas {
         } as TKlCanvasHistoryEntry);
     }
 
-    text (layerIndex: number, p: IRenderTextParam): void {
+    text (layerIndex: number, p: TRenderTextParam): void {
         renderText(this.layerCanvasArr[layerIndex], BB.copyObj(p));
         this.history.push({
             tool: ['canvas'],

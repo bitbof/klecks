@@ -2,13 +2,13 @@ import {BB} from '../../../bb/bb';
 import {LANG, languageStrings, LS_LANGUAGE_KEY} from '../../../language/language';
 import {KL} from '../../kl';
 import {languages} from '../../../../languages/languages';
-import {DynamicModal} from '../modals/base/dynamic-modal';
 import bitbofLogoImg from '/src/app/img/bitbof-logo.svg';
 import klecksLogoImg from '/src/app/img/klecks-logo.png';
 import uiSwapImg from '/src/app/img/ui/ui-swap-lr.svg';
 import {LocalStorage} from '../../../bb/base/local-storage';
 import {theme, TTheme} from '../../../theme/theme';
 import {addIsDarkListener, nullToUndefined} from '../../../bb/base/base';
+import {showLicensesDialog} from '../modals/licenses-dialog/show-licenses-dialog';
 
 export class SettingsTab {
 
@@ -144,29 +144,7 @@ export class SettingsTab {
             return BB.el({
                 tagName: 'a',
                 content: LANG('licenses'),
-                onClick: () => {
-                    import('./licenses').then(result => {
-                        new DynamicModal({
-                            title: BB.el({
-                                content: LANG('licenses'),
-                            }),
-                            content: BB.el({
-                                content: BB.el({
-                                    content: result.licenses.replace(/\n/g, '<br>'),
-                                    css: {
-                                        padding: '20px',
-                                    },
-                                }),
-                                css: {
-                                    height: '100%',
-                                    overflowY: 'scroll',
-                                },
-                            }),
-                            width: 800,
-                            isMaxHeight: true,
-                        });
-                    });
-                },
+                onClick: () => showLicensesDialog(),
             });
         }
 

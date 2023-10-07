@@ -1,8 +1,8 @@
 import {BB} from '../../../bb/bb';
-import {IKeyString} from '../../../bb/bb-types';
+import {IKeyString, IKeyStringOptional} from '../../../bb/bb-types';
 
 
-type TSelectItem<ValueType> = [ValueType, string]; // [value, label]
+type TSelectItem<ValueType> = [ValueType, string] | [ValueType, string, { css: IKeyStringOptional }]; // [value, label, properties]
 
 /**
  * A select dropdown
@@ -10,10 +10,10 @@ type TSelectItem<ValueType> = [ValueType, string]; // [value, label]
 export class Select<ValueType extends string> {
 
     private readonly selectEl: HTMLSelectElement;
-    private readonly optionArr: {
+    private optionArr: {
         item: (TSelectItem<ValueType> | undefined);
         el?: HTMLOptionElement;
-    }[];
+    }[] = [];
     private readonly changeListener: () => void;
     private readonly onChange: ((val: ValueType) => void) | undefined;
 
@@ -45,24 +45,7 @@ export class Select<ValueType extends string> {
         if (!isFocusable) {
             this.selectEl.tabIndex = -1;
         }
-        this.optionArr = [];
-        for (let i = 0; i < p.optionArr.length; i++) {
-            const item = p.optionArr[i];
-            if (!item) {
-                this.optionArr.push({
-                    item,
-                });
-                continue;
-            }
-            const el = document.createElement('option');
-            el.value = item[0];
-            el.textContent = item[1];
-            this.optionArr.push({
-                item,
-                el,
-            });
-            this.selectEl.append(el);
-        }
+        this.setOptionArr(p.optionArr);
         if (p.onChange) {
             this.onChange = p.onChange;
         }
@@ -110,6 +93,31 @@ export class Select<ValueType extends string> {
                 option.el.textContent = option.item[1];
             }
         });
+    }
+
+    setOptionArr (optionArr: (TSelectItem<ValueType> | undefined)[]): void {
+        this.optionArr = [];
+        this.selectEl.innerHTML = '';
+        for (let i = 0; i < optionArr.length; i++) {
+            const item = optionArr[i];
+            if (!item) {
+                this.optionArr.push({
+                    item,
+                });
+                continue;
+            }
+            const el = document.createElement('option');
+            el.value = item[0];
+            el.textContent = item[1];
+            if (item[2]) {
+                BB.css(el, item[2].css);
+            }
+            this.optionArr.push({
+                item,
+                el,
+            });
+            this.selectEl.append(el);
+        }
     }
 
     destroy (): void {

@@ -374,7 +374,7 @@
   'layers-rename-shading': {
     hint: 'noun. Name suggestion for a layer',
     original: 'Shading',
-    value: ''
+    value: '阴影'
   },
   'layers-rename-lines': {
     hint: 'noun. Name suggestion for a layer',
@@ -384,7 +384,7 @@
   'layers-rename-effects': {
     hint: 'noun. Name suggestion for a layer',
     original: 'Effects',
-    value: ''
+    value: '视觉效果'
   },
   'layers-rename-foreground': {
     hint: 'noun. Name suggestion for a layer',
@@ -1254,10 +1254,18 @@
     original: 'Add Text',
     value: '添加文本'
   },
+  'text-text': {
+    original: 'Text',
+    value: '文本'
+  },
+  'text-font': {
+    original: 'Font',
+    value: '字体'
+  },
   'text-placeholder': {
-    hint: 'placeholder in text input. Inform user they can have linebreaks when pressing shift+enter. Just pressing enter confirms and closes the dialog',
-    original: 'Your text (multiline Shift+Enter)',
-    value: '请输入（换行 Shift+Enter）'
+    hint: 'placeholder in text input.',
+    original: 'Your text',
+    value: '请输入'
   },
   'text-color': {
     original: 'Color',
@@ -1266,6 +1274,14 @@
   'text-size': {
     original: 'Size',
     value: '大小'
+  },
+  'text-line-height': {
+    original: 'Line Height',
+    value: '行间距'
+  },
+  'text-letter-spacing': {
+    original: 'Letter Spacing',
+    value: '字符间距'
   },
   'text-left': {
     hint: 'left, center, right text formatting like in Word',
@@ -1502,5 +1518,9 @@
   'compare-after': {
     original: 'After',
     value: '之后'
+  },
+  loading: {
+    original: 'Loading',
+    value: '加载中'
   }
 }

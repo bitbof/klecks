@@ -839,12 +839,16 @@ renaming keys across language files:
   // text tool
   "text-instruction": "Click canvas to place text",
   "text-title": "Add Text",
+  "text-text": "Text",
+  "text-font": "Font",
   "text-placeholder": {
-    "hint": "placeholder in text input. Inform user they can have linebreaks when pressing shift+enter. Just pressing enter confirms and closes the dialog",
-    "value": "Your text (multiline Shift+Enter)"
+    "hint": "placeholder in text input.",
+    "value": "Your text"
   },
   "text-color": "Color",
   "text-size": "Size",
+  "text-line-height": "Line Height",
+  "text-letter-spacing": 'Letter Spacing',
   "text-left": {
     "hint": "left, center, right text formatting like in Word",
     "value": "Left"
@@ -979,4 +983,5 @@ renaming keys across language files:
   },
   "compare-before": "Before",
   "compare-after": "After",
+  "loading": "Loading"
 }

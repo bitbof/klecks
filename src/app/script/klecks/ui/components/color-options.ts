@@ -1,6 +1,8 @@
 import {BB} from '../../../bb/bb';
 import {IRGBA} from '../../kl-types';
 import {theme} from '../../../theme/theme';
+import {ColorConverter} from '../../../bb/color/color';
+import {c} from '../../../bb/base/c';
 
 /**
  * UI to pick between colors in colorArr. can display full transparent (checkerboard).
@@ -14,8 +16,12 @@ export class ColorOptions {
         el: HTMLElement;
         setIsSelected: (b: boolean) => void;
     }[];
+    private readonly colorArr: (IRGBA | null)[] = [];
+    private selectedIndex: number = 0;
+    private colorInput: HTMLInputElement;
 
     private readonly updateCheckerboard: () => void;
+    private readonly onColorInputChange: () => void;
 
     // ---- public ----
     constructor (
@@ -24,28 +30,59 @@ export class ColorOptions {
             onChange: (rgbaObj: IRGBA | null) => void;
             label?: string;
             initialIndex?: number; // index before duplicates were removed
+            title?: string;
         }
     ) {
         this.rootEl = BB.el({
             content: p.label ? p.label : '',
+            title: p.title ?? undefined,
             css: {
                 display: 'flex',
                 alignItems: 'center',
+                gap: '7px',
             },
         });
 
-        let selectedIndex = 0;
-        const colorArr: (IRGBA | null)[] = [];
         this.buttonArr = [];
         const buttonSize = 22;
         const checkerUrl = BB.createCheckerDataUrl(5, undefined, theme.isDark());
+
+        this.onColorInputChange = () => {
+            const i = this.selectedIndex;
+            const color = this.colorArr[i];
+            if (!color || color.a < 1) {
+                // ignore
+                return;
+            }
+
+            const newRawColor = this.colorInput.value;
+            this.buttonArr[this.selectedIndex].el.style.backgroundColor = newRawColor;
+            this.colorArr[i] = {
+                ...ColorConverter.hexToRGB(newRawColor)!,
+                a: 1,
+            };
+            p.onChange(this.colorArr[i]);
+        };
+        this.colorInput = BB.el({
+            tagName: 'input',
+            custom: {
+                type: 'color',
+                tabIndex: '-1',
+            },
+        });
+        this.colorInput.onchange = this.onColorInputChange;
+        this.colorInput.oninput = this.onColorInputChange;
 
         // build colorArr while removing duplicates
         for (let i = 0; i < p.colorArr.length; i++) {
             const item = p.colorArr[i];
             let found = false;
-            for (let e = 0; e < colorArr.length; e++) {
-                const sItem = colorArr[e];
+            for (let e = 0; e < this.colorArr.length; e++) {
+                const sItem = this.colorArr[e];
+                if (sItem === item) {
+                    found = true;
+                    break;
+                }
                 if (sItem === null || item === null) {
                     continue;
                 }
@@ -57,19 +94,19 @@ export class ColorOptions {
             if (found) {
                 continue;
             }
-            colorArr.push(item);
+            this.colorArr.push(item);
             if ('initialIndex' in p && p.initialIndex === i) {
-                selectedIndex = colorArr.length - 1;
+                this.selectedIndex = this.colorArr.length - 1;
             }
         }
 
-        for (let i = 0; i < colorArr.length; i++) {
+        for (let i = 0; i < this.colorArr.length; i++) {
             ((i) => {
-                const color = colorArr[i];
+                const color = this.colorArr[i];
 
                 const colorButton = BB.el({
                     parent: this.rootEl,
-                    content: colorArr[i] ? '' : 'X',
+                    content: color ? '' : 'X',
                     className: 'kl-color-option',
                     css: {
                         width: buttonSize + 'px',
@@ -78,10 +115,17 @@ export class ColorOptions {
                         lineHeight: (buttonSize + 1) + 'px',
                     },
                     onClick: (e) => {
+                        if (this.selectedIndex === i) {
+                            if (color && color.a === 1) {
+                                this.colorInput.showPicker();
+                            }
+                            return;
+                        }
+
                         e.preventDefault();
-                        selectedIndex = i;
+                        this.selectedIndex = i;
                         update();
-                        p.onChange(color);
+                        p.onChange(this.colorArr[i]); // color may change
                     },
                 });
                 if (color && color.a === 0) {
@@ -99,10 +143,12 @@ export class ColorOptions {
             })(i);
         }
 
+        this.rootEl.append(c(',w-0,h-0,overflow-hidden', [this.colorInput]));
+
 
         const update = () => {
             for (let i = 0; i < this.buttonArr.length; i++) {
-                this.buttonArr[i].setIsSelected(i === selectedIndex);
+                this.buttonArr[i].setIsSelected(i === this.selectedIndex);
             }
         };
         update();
@@ -110,7 +156,7 @@ export class ColorOptions {
         this.updateCheckerboard = (): void => {
             const checkerUrl = BB.createCheckerDataUrl(5, undefined, theme.isDark());
             this.buttonArr.forEach((button, i) => {
-                const color = colorArr[i];
+                const color = this.colorArr[i];
                 if (color && color.a === 0) {
                     button.el.style.backgroundImage = 'url(' + checkerUrl + ')';
                 }
@@ -124,12 +170,18 @@ export class ColorOptions {
         return this.rootEl;
     }
 
+    getValue (): IRGBA | null {
+        return this.colorArr[this.selectedIndex];
+    }
+
     destroy (): void {
         this.buttonArr.forEach(item => {
             BB.destroyEl(item.el);
         });
         this.buttonArr.splice(0, this.buttonArr.length);
         theme.removeIsDarkListener(this.updateCheckerboard);
+        this.colorInput.onchange = null;
+        this.colorInput.oninput = null;
     }
 
 }

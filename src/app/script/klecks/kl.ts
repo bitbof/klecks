@@ -42,7 +42,7 @@ import {ShapeUi} from './ui/tool-tabs/shape-ui';
 import {newImageDialog} from './ui/modals/new-image-dialog';
 import {ToolspaceCollapser} from './ui/components/toolspace-collapser';
 import {renderText} from './image-operations/render-text';
-import {textToolDialog} from './ui/modals/text-tool-dialog';
+import {textToolDialog} from './ui/modals/text-tool-dialog/text-tool-dialog';
 import {showImportImageDialog} from './ui/modals/show-import-image-dialog';
 import {floodFillBits} from './image-operations/flood-fill';
 import * as PSD from './storage/psd';
