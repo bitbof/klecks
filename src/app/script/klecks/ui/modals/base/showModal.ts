@@ -102,13 +102,12 @@ export function showModal (
     if (p.type) {
 
         icon = BB.el({
-            css: {
-                width: '1.1rem',
-                height: '1.1rem',
-                background: 'red',
-                cssFloat: 'left',
-                marginRight: '5px',
-            },
+            className: {
+                error: 'kl-popup__icon-error',
+                ok: 'kl-popup__icon-ok',
+                warning: 'kl-popup__icon-warning',
+                upload: 'kl-popup__icon-upload',
+            }[p.type],
         });
     }
 
@@ -144,19 +143,6 @@ export function showModal (
             },
         })
     );
-
-    /*if (p.type === 'error') {
-        boxEl.classList.add('poperror');
-    }
-    if (p.type === 'ok') {
-        boxEl.classList.add('popok');
-    }
-    if (p.type === 'warning') {
-        boxEl.classList.add('popwarning');
-    }
-    if (p.type === 'upload') {
-        boxEl.classList.add('popupload');
-    }*/
 
     const keyListener = new BB.KeyListener({
         onDown: function (keyStr, e, comboStr): void {

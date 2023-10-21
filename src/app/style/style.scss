@@ -387,35 +387,29 @@ button img {
     text-align: center;
 }
 
-.poperror, .popok, .popwarning, .popupload {
-    padding-left: 104px;
+.kl-popup__icon-error,
+.kl-popup__icon-ok,
+.kl-popup__icon-warning,
+.kl-popup__icon-upload,
+{
+    background-size: cover;
     background-repeat: no-repeat;
-    background-position: 20px 20px;
+    width: 1.1rem;
+    height: 1.1rem;
+    float: left;
+    margin-right: 5px;
 }
-
-@media (max-width: 600px) {
-    .poperror, .popok, .popwarning, .popupload {
-        padding-left: 35px;
-        background-position: 10px 20px;
-        background-size: 20px 20px !important;
-    }
-}
-
-.poperror {
+.kl-popup__icon-error {
     background-image: url(../img/ui/error.svg);
-    background-size: 60px;
 }
-.popok {
+.kl-popup__icon-ok {
     background-image: url(../img/ui/ok.svg);
-    background-size: 60px;
 }
-.popwarning {
+.kl-popup__icon-warning {
     background-image: url(../img/ui/warning.svg);
-    background-size: 60px;
 }
-.popupload {
+.kl-popup__icon-upload {
     background-image: url(../img/ui/upload-large.svg);
-    background-size: 60px;
 }
 
 .kl-d-modal-root {
