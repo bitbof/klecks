@@ -35,6 +35,10 @@
     }
 }
 
+*, *::before, *::after {
+    box-sizing: border-box;
+}
+
 body {
     overflow: hidden;
     font-size: 16px;
@@ -360,7 +364,7 @@ button img {
 }
 
 .kl-popup-box--sm {
-    width: 300px;
+    width: 340px;
 }
 
 .kl-popup__btn {

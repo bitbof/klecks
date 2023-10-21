@@ -91,7 +91,7 @@ export function clipboardDialog (
         message: '<b>' + (showCrop ? `${LANG('cropcopy-title-copy')} / ${LANG('cropcopy-title-crop')}` : `${LANG('cropcopy-title-copy')}`) + '</b>',
         div: div,
         style: isSmall ? {} : {
-            width: '500px',
+            width: '540px',
         },
         buttons: buttonArr,
         primaries: [LANG('cropcopy-btn-copy')],

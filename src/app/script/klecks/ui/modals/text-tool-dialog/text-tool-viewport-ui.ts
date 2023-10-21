@@ -459,8 +459,6 @@ export class TextToolViewportUI {
         this.previewCtx.strokeStyle = '#fff';
         this.previewCtx.lineWidth = 0.5;
         this.previewCtx.translate(-this.offset.x, -this.offset.y);
-        // centerX = p.x + bounds.x + bounds.width / 2;
-        // centerY = p.y + bounds.y + bounds.height / 2;
         this.previewCtx.strokeRect(
             Math.round(this.width / 2 - (bounds.width / 2) * this.scale) + 0.5,
             Math.round(this.height / 2 - (bounds.height / 2) * this.scale) + 0.5,

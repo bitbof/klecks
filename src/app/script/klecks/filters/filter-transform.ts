@@ -58,7 +58,7 @@ export const filterTransform = {
             element: div,
         };
         if (!isSmall) {
-            result.width = 500;
+            result.width = 540;
         }
         div.innerHTML = LANG('filter-transform-description');
 

@@ -28,28 +28,32 @@ export type TRenderTextParam = {
 }
 
 function textMetricToRect (metrics: TextMetrics, align: TTextFormat): IRect {
+    // fallback for older browsers
+    const ascent = metrics.fontBoundingBoxAscent ?? metrics.actualBoundingBoxAscent;
+    const descent = metrics.fontBoundingBoxDescent ?? metrics.actualBoundingBoxDescent;
+
     if (align === 'left') {
         return {
             x: 0,
-            y: -metrics.fontBoundingBoxAscent,
+            y: -ascent,
             width: metrics.width,
-            height: metrics.fontBoundingBoxAscent + metrics.fontBoundingBoxDescent,
+            height: ascent + descent,
         };
     }
     if (align === 'right') {
         return {
             x: -metrics.width,
-            y: -metrics.fontBoundingBoxAscent,
+            y: -ascent,
             width: metrics.width,
-            height: metrics.fontBoundingBoxAscent + metrics.fontBoundingBoxDescent,
+            height: ascent + descent,
         };
     }
     // center
     return {
         x: -metrics.width / 2,
-        y: -metrics.fontBoundingBoxAscent,
+        y: -ascent,
         width: metrics.width,
-        height: metrics.fontBoundingBoxAscent + metrics.fontBoundingBoxDescent,
+        height: ascent + descent,
     };
 }
 

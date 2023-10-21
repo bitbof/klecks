@@ -135,7 +135,7 @@ export function showImportAsLayerDialog (
         message: `<b>${LANG('import-as-layer-title')}</b>`,
         div: div,
         style: isSmall ? undefined : {
-            width: '500px',
+            width: '540px',
         },
         buttons: ['Ok', 'Cancel'],
         clickOnEnter: 'Ok',

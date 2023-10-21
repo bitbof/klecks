@@ -98,16 +98,31 @@ export function showModal (
         },
     });
 
+    let icon: HTMLElement | undefined = undefined;
+    if (p.type) {
+
+        icon = BB.el({
+            css: {
+                width: '1.1rem',
+                height: '1.1rem',
+                background: 'red',
+                cssFloat: 'left',
+                marginRight: '5px',
+            },
+        });
+    }
+
     const boxClasses = ['kl-popup-box'];
     boxClasses.push('kl-popup-box--sm');
     const boxEl = BB.el({
         content: [
             xButton,
+            icon,
             BB.el({
                 content:p.message,
                 css: {
-                    marginBottom: p.div ? '10px' : undefined,
                     marginRight: '15px',
+                    marginBottom: p.div ? '10px' : undefined,
                 },
             }),
             p.div,
@@ -130,7 +145,7 @@ export function showModal (
         })
     );
 
-    if (p.type === 'error') {
+    /*if (p.type === 'error') {
         boxEl.classList.add('poperror');
     }
     if (p.type === 'ok') {
@@ -141,7 +156,7 @@ export function showModal (
     }
     if (p.type === 'upload') {
         boxEl.classList.add('popupload');
-    }
+    }*/
 
     const keyListener = new BB.KeyListener({
         onDown: function (keyStr, e, comboStr): void {

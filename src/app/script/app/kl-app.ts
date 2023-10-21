@@ -732,7 +732,7 @@ export class KlApp {
                 right: '0',
                 top: '0',
                 bottom: '0',
-                width: (this.toolWidth - 1) + 'px',
+                width: (this.toolWidth) + 'px',
                 overflow: 'hidden',
                 userSelect: 'none',
                 touchAction: 'none',

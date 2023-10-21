@@ -61,7 +61,7 @@ export class TabRow {
         this.rootEl = BB.el({
             className: 'tabrow',
             css: {
-                height: height + 'px',
+                height: (height + 1) + 'px',
             },
         });
 

@@ -60,7 +60,7 @@ export const filterPerspective = {
             element: div,
         };
         if (!isSmall) {
-            result.width = 500;
+            result.width = 540;
         }
 
         const pointerListenerArr: PointerListener[] = [];

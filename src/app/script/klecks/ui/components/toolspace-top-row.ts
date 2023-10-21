@@ -92,7 +92,7 @@ export class ToolspaceTopRow {
         });
         logoButton.el.classList.add('kl-tool-row-border-right');
         BB.css(logoButton.el, {
-            width: '45px',
+            width: '46px',
         });
         const newButton = createButton({
             onClick: p.onNew,

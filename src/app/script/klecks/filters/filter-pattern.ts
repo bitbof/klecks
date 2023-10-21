@@ -602,7 +602,7 @@ export const filterPattern = {
             },
         };
         if (!isSmall) {
-            result.width = 500;
+            result.width = 540;
         }
         return result;
     },
