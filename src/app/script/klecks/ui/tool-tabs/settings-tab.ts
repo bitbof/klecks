@@ -9,17 +9,21 @@ import {LocalStorage} from '../../../bb/base/local-storage';
 import {theme, TTheme} from '../../../theme/theme';
 import {addIsDarkListener, nullToUndefined} from '../../../bb/base/base';
 import {showLicensesDialog} from '../modals/licenses-dialog/show-licenses-dialog';
+import {c} from '../../../bb/base/c';
+import {SaveReminder} from '../components/save-reminder';
+import {showModal} from '../modals/base/showModal';
 
 export class SettingsTab {
 
-    private el: HTMLElement;
+    private readonly rootEl: HTMLElement;
 
     // --- public ---
     constructor (
         onLeftRight: () => void,
+        saveReminder: SaveReminder | undefined,
         customAbout?: HTMLElement,
     ) {
-        this.el = BB.el({
+        this.rootEl = BB.el({
             css: {
                 margin: '10px',
             },
@@ -29,7 +33,7 @@ export class SettingsTab {
         const autoLanguage = languageStrings.getAutoLanguage();
 
         const langWrapper = BB.el({
-            parent: this.el,
+            parent: this.rootEl,
             content: BB.el({
                 content: LANG('settings-language') + ':',
                 css: {
@@ -103,7 +107,7 @@ export class SettingsTab {
             themeSelect.updateLabel('auto', LANG('auto') + ' → ' + themeToLabel(theme.getMediaQueryTheme()));
         });
         BB.el({
-            parent: this.el,
+            parent: this.rootEl,
             content: [
                 BB.el({
                     content: LANG('settings-theme') + ':',
@@ -122,10 +126,51 @@ export class SettingsTab {
             },
         });
 
+        // ---- save reminder ----
+        if (saveReminder) {
+            const reminderSelect = new KL.Select({
+                optionArr: [
+                    ['20min', '20min'],
+                    ['40min', '40min'],
+                    ['disabled', '⚠️ ' + LANG('settings-save-reminder-disabled')],
+                ],
+                initValue: saveReminder.getSetting(),
+                onChange: (val) => {
+                    if (val !== 'disabled') {
+                        saveReminder.setSetting(val);
+                        return;
+                    }
+                    const disableStr = LANG('settings-save-reminder-confirm-disable');
+                    showModal({
+                        target: document.body,
+                        message: '⚠️' + LANG('settings-save-reminder-confirm-title'),
+                        div: c('', [
+                            c('.info-hint', LANG('settings-save-reminder-confirm-a')),
+                            LANG('settings-save-reminder-confirm-b'),
+                        ]),
+                        buttons: [disableStr, 'Cancel'],
+                        callback: (result) => {
+                            if (result === disableStr) {
+                                saveReminder.setSetting(val);
+                            } else {
+                                reminderSelect.setValue(saveReminder.getSetting());
+                            }
+                        },
+                    });
+                },
+            });
+            reminderSelect.getElement().style.flexGrow = '1';
+
+            this.rootEl.append(c(',flex,items-center,gap-5,mt-15,flexWrap', [
+                LANG('settings-save-reminder-label') + ':',
+                reminderSelect.getElement(),
+            ]));
+        }
+
         // ---- flip ui ----
         BB.el({
             tagName: 'button',
-            parent: this.el,
+            parent: this.rootEl,
             content: '<img height="20" width="18" src="' + uiSwapImg + '" alt="icon" style="margin-right: 5px"/>' + LANG('switch-ui-left-right'),
             onClick: () => onLeftRight(),
             css: {
@@ -138,7 +183,7 @@ export class SettingsTab {
 
 
         // ---- about ----
-        this.el.append(BB.el({className: 'grid-hr', css: {margin: '10px 0'}}));
+        this.rootEl.append(BB.el({className: 'grid-hr', css: {margin: '10px 0'}}));
 
         function makeLicenses () {
             return BB.el({
@@ -149,7 +194,7 @@ export class SettingsTab {
         }
 
         if (customAbout) {
-            this.el.append(customAbout);
+            this.rootEl.append(customAbout);
             if (!customAbout.innerHTML) {
                 const minimalAbout = BB.el({
                     parent: customAbout,
@@ -166,7 +211,7 @@ export class SettingsTab {
             }
         } else {
             const versionEl = BB.el({
-                parent: this.el,
+                parent: this.rootEl,
                 css: {
                     textAlign: 'center',
                 },
@@ -212,7 +257,7 @@ export class SettingsTab {
     }
 
     getElement (): HTMLElement {
-        return this.el;
+        return this.rootEl;
     }
 
 }

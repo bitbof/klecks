@@ -6,15 +6,17 @@ import {BrowserStorageUi} from './browser-storage-ui';
 import {ProjectStore} from '../../storage/project-store';
 import {IKlProject} from '../../kl-types';
 
+export type TSaveReminderSetting = '20min' | '40min' | 'disabled';
 
-const reminderTimeLimitMs = 1000 * 60 * 20; // 20 minutes
 const unsavedActionsLimit = 100; // number of actions user did since last save
-
+const LS_REMINDER_KEY = 'kl-save-reminder';
 
 /**
  * remind user of saving, keep user aware of save state
  */
 export class SaveReminder {
+    private setting: TSaveReminderSetting;
+
     private lastSavedActionNumber: number | undefined;
     private lastSavedAt: number = 0;
 
@@ -123,7 +125,9 @@ export class SaveReminder {
         private projectStore: ProjectStore | null, // needed if showReminder
         private getProject: (() => IKlProject) | null, // needed if showReminder
         private title: string = 'Klecks',
-    ) { }
+    ) {
+        this.setting = (localStorage.getItem(LS_REMINDER_KEY) as TSaveReminderSetting | null) ?? '20min';
+    }
 
     init (): void {
         if (this.lastSavedActionNumber !== undefined) { // already initialized
@@ -141,10 +145,17 @@ export class SaveReminder {
 
                 const unsavedActions = Math.abs(this.history.getActionNumber() - this.lastSavedActionNumber!);
 
+                const timeLimitMs = 100 * 60 * {
+                    '20min': 20,
+                    '40min': 40,
+                    'disabled': 0,
+                }[this.setting];
+
                 if (
+                    timeLimitMs > 0 &&
                     KL.dialogCounter.get() === 0 &&
                     !this.isDrawing() &&
-                    this.lastReminderShownAt + reminderTimeLimitMs < performance.now() &&
+                    this.lastReminderShownAt + timeLimitMs < performance.now() &&
                     unsavedActions >= unsavedActionsLimit
                 ) {
                     this.showPopup();
@@ -204,5 +215,14 @@ export class SaveReminder {
         if (this.closeFunc) {
             this.closeFunc();
         }
+    }
+
+    getSetting (): TSaveReminderSetting {
+        return this.setting;
+    }
+
+    setSetting (setting: TSaveReminderSetting): void {
+        this.setting = setting;
+        localStorage.setItem(LS_REMINDER_KEY, this.setting);
     }
 }

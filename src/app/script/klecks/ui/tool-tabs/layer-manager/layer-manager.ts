@@ -10,14 +10,17 @@ import {PointerListener} from '../../../../bb/input/pointer-listener';
 import {IPointerEvent} from '../../../../bb/input/event.types';
 import {renameLayerDialog} from './rename-layer-dialog';
 import {mergeLayerDialog} from './merge-layer-dialog';
+import {theme} from '../../../../theme/theme';
+import {throwIfNull} from '../../../../bb/base/base';
+import {hasPointerEvents} from '../../../../bb/base/browser';
+import {c} from '../../../../bb/base/c';
+import {DropdownMenu} from '../../components/dropdown-menu';
 import addLayerImg from '/src/app/img/ui/add-layer.svg';
 import duplicateLayerImg from '/src/app/img/ui/duplicate-layer.svg';
 import mergeLayerImg from '/src/app/img/ui/merge-layers.svg';
 import removeLayerImg from '/src/app/img/ui/remove-layer.svg';
 import renameLayerImg from '/src/app/img/ui/rename-layer.svg';
-import {theme} from '../../../../theme/theme';
-import {throwIfNull} from '../../../../bb/base/base';
-import {hasPointerEvents} from '../../../../bb/base/browser';
+import caretDownImg from '/src/app/img/ui/caret-down.svg';
 
 type TLayerEl = HTMLElement & {
     label: HTMLElement;
@@ -53,6 +56,7 @@ export class LayerManager {
     private readonly addBtn: HTMLButtonElement;
     private readonly duplicateBtn: HTMLButtonElement;
     private readonly mergeBtn: HTMLButtonElement;
+    private readonly moreDropdown: DropdownMenu;
     private readonly modeSelect: Select<TMixMode>;
     private uiState: TUiLayout;
     private readonly largeThumbDiv: HTMLElement;
@@ -465,6 +469,17 @@ export class LayerManager {
         this.updateHeight();
     }
 
+    private updateButtons (): void {
+        const maxReached = this.klCanvasLayerArr.length === MAX_LAYERS;
+        const oneLayer = this.klCanvasLayerArr.length === 1;
+
+        this.addBtn.disabled = maxReached;
+        this.removeBtn.disabled = oneLayer;
+        this.duplicateBtn.disabled = maxReached;
+        this.mergeBtn.disabled = this.selectedSpotIndex === 0;
+        this.moreDropdown.setEnabled('merge-all', !oneLayer);
+    }
+
 
     // ---- public ----
     constructor (
@@ -535,6 +550,39 @@ export class LayerManager {
         this.mergeBtn = BB.el({tagName: 'button'});
         this.removeBtn = BB.el({tagName: 'button'});
         const renameBtn = BB.el({tagName: 'button'});
+        this.moreDropdown = new DropdownMenu({
+            button: BB.el({
+                content: `<img src="${caretDownImg}" width="13"/>`,
+                css: {
+                    display: 'flex',
+                    justifyContent: 'center',
+                    opacity: '0.9',
+                },
+            }),
+            buttonTitle: LANG('more'),
+            items: [
+                ['merge-all', LANG('layers-merge-all')],
+            ],
+            onItemClick: (id) => {
+                if (id === 'merge-all') {
+                    const newIndex = this.klCanvas.mergeAll();
+                    if (newIndex === false) {
+                        return;
+                    }
+                    this.klCanvasLayerArr = this.klCanvas.getLayers();
+                    this.selectedSpotIndex = newIndex;
+
+                    this.createLayerList();
+                    klHistory.pause(true);
+                    this.onSelect(this.selectedSpotIndex);
+                    klHistory.pause(false);
+
+                    this.updateButtons();
+                }
+            },
+        });
+
+        this.updateButtons();
 
         const createButtons = () => {
             const div = BB.el();
@@ -577,22 +625,16 @@ export class LayerManager {
                 this.mergeBtn.innerHTML = "<img src='" + mergeLayerImg + "' height='20'/>";
                 this.removeBtn.innerHTML = "<img src='" + removeLayerImg + "' height='20'/>";
                 renameBtn.innerHTML = "<img src='" + renameLayerImg + "' height='20'/>";
-                this.addBtn.style.marginRight = '5px';
-                this.removeBtn.style.marginRight = '5px';
-                this.duplicateBtn.style.marginRight = '5px';
-                this.mergeBtn.style.marginRight = '5px';
                 div.append(
-                    this.addBtn,
-                    this.removeBtn,
-                    this.duplicateBtn,
-                    this.mergeBtn,
-                    renameBtn,
-                    BB.el({
-                        css: {
-                            clear: 'both',
-                            height: '10px',
-                        },
-                    }),
+                    c(',flex,gap-5,mb-10', [
+                        this.addBtn,
+                        this.removeBtn,
+                        this.duplicateBtn,
+                        this.mergeBtn,
+                        renameBtn,
+                        c(',grow-1'),
+                        this.moreDropdown.getElement(),
+                    ]),
                 );
 
                 this.addBtn.onclick = () => {
@@ -601,32 +643,27 @@ export class LayerManager {
                     }
                     this.klCanvasLayerArr = this.klCanvas.getLayers();
 
-                    if (this.klCanvasLayerArr.length === MAX_LAYERS) {
-                        this.addBtn.disabled = true;
-                        this.duplicateBtn.disabled = true;
-                    }
-                    this.removeBtn.disabled = false;
                     this.selectedSpotIndex = this.selectedSpotIndex + 1;
                     this.createLayerList();
                     klHistory.pause(true);
                     this.onSelect(this.selectedSpotIndex);
                     klHistory.pause(false);
+
+                    this.updateButtons();
                 };
                 this.duplicateBtn.onclick = () => {
                     if (this.klCanvas.duplicateLayer(this.selectedSpotIndex) === false) {
                         return;
                     }
                     this.klCanvasLayerArr = this.klCanvas.getLayers();
-                    if (this.klCanvasLayerArr.length === MAX_LAYERS) {
-                        this.addBtn.disabled = true;
-                        this.duplicateBtn.disabled = true;
-                    }
-                    this.removeBtn.disabled = false;
+
                     this.selectedSpotIndex++;
                     this.createLayerList();
                     klHistory.pause(true);
                     this.onSelect(this.selectedSpotIndex);
                     klHistory.pause(false);
+
+                    this.updateButtons();
                 };
                 this.removeBtn.onclick = () => {
                     if (this.layerElArr.length <= 1) {
@@ -642,13 +679,8 @@ export class LayerManager {
                     klHistory.pause(true);
                     this.onSelect(this.selectedSpotIndex);
                     klHistory.pause(false);
-                    if (this.klCanvasLayerArr.length === 1) {
-                        this.removeBtn.disabled = true;
-                    }
-                    if (this.klCanvasLayerArr.length < MAX_LAYERS) {
-                        this.addBtn.disabled = false;
-                        this.duplicateBtn.disabled = false;
-                    }
+
+                    this.updateButtons();
                 };
                 this.mergeBtn.onclick = () => {
                     if (this.selectedSpotIndex <= 0) {
@@ -663,17 +695,13 @@ export class LayerManager {
                             this.klCanvas.mergeLayers(this.selectedSpotIndex, this.selectedSpotIndex - 1, mode as TMixMode | 'as-alpha');
                             this.klCanvasLayerArr = this.klCanvas.getLayers();
                             this.selectedSpotIndex--;
-                            if (this.klCanvasLayerArr.length === 1) {
-                                this.removeBtn.disabled = true;
-                            }
-                            if (this.klCanvasLayerArr.length < MAX_LAYERS) {
-                                this.addBtn.disabled = false;
-                                this.duplicateBtn.disabled = false;
-                            }
+
                             this.createLayerList();
                             klHistory.pause(true);
                             this.onSelect(this.selectedSpotIndex);
                             klHistory.pause(false);
+
+                            this.updateButtons();
                         },
                     });
                 };
@@ -780,14 +808,7 @@ export class LayerManager {
         if (activeLayerSpotIndex || activeLayerSpotIndex === 0) {
             this.selectedSpotIndex = activeLayerSpotIndex;
         }
-        this.removeBtn.disabled = this.klCanvasLayerArr.length === 1;
-        if (this.klCanvasLayerArr.length === MAX_LAYERS) {
-            this.addBtn.disabled = true;
-            this.duplicateBtn.disabled = true;
-        } else {
-            this.addBtn.disabled = false;
-            this.duplicateBtn.disabled = false;
-        }
+        this.updateButtons();
         setTimeout(() => this.createLayerList(), 1);
     }
 

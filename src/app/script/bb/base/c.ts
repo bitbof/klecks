@@ -68,6 +68,12 @@ function applyStyleNames (el: HTMLElement, styleNames: string[]) {
             style.paddingTop = params[0] + 'px';
             style.paddingBottom = params[0] + 'px';
         },
+        mt: (params) => {
+            style.marginTop = params[0] + 'px';
+        },
+        mb: (params) => {
+            style.marginBottom = params[0] + 'px';
+        },
 
         // flex
         flex: () => {
@@ -95,16 +101,19 @@ function applyStyleNames (el: HTMLElement, styleNames: string[]) {
         hidden: () => {
             style.display = 'none';
         },
+        nowrap: () => {
+            style.whiteSpace = 'nowrap';
+        },
         abs: (params) => {
             style.position = 'absolute';
             style.left = params[0] + 'px';
             style.top = params[1] + 'px';
         },
         w: (params) => {
-            style.width = params[0] + 'px';
+            style.width = params[0] === 'full' ? '100%' : params[0] + 'px';
         },
         h: (params) => {
-            style.height = params[0] + 'px';
+            style.height = params[0] === 'full' ? '100%' : params[0] + 'px';
         },
         minh: (params) => {
             style.minHeight = params[0] + 'px';
@@ -114,6 +123,21 @@ function applyStyleNames (el: HTMLElement, styleNames: string[]) {
         },
         overflow: (params) => {
             style.overflow = params[0];
+        },
+        pos: (params) => {
+            style.position = params[0];
+        },
+        left: (params) => {
+            style.left = params[0] === 'full' ? '100%' : params[0] + 'px';
+        },
+        top: (params) => {
+            style.top = params[0] === 'full' ? '100%' : params[0] + 'px';
+        },
+        right: (params) => {
+            style.right = params[0] === 'full' ? '100%' : params[0] + 'px';
+        },
+        bottom: (params) => {
+            style.bottom = params[0] === 'full' ? '100%' : params[0] + 'px';
         },
     };
 

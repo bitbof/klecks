@@ -217,6 +217,7 @@ renaming keys across language files:
     "hint": "action",
     "value": "Merge with layer below"
   },
+  "layers-merge-all": 'Merge all',
   "layers-rename": {
     "hint": "action",
     "value": "Rename"
@@ -909,6 +910,12 @@ renaming keys across language files:
     "value": "Will update after reloading."
   },
   "settings-theme": 'Theme',
+  "settings-save-reminder-label": 'Save Reminder',
+  "settings-save-reminder-disabled": 'disabled',
+  "settings-save-reminder-confirm-title": 'Turn off Save Reminder?',
+  "settings-save-reminder-confirm-a": "There is no autosave and browser tabs don't last forever. If you don't periodically save you will likely lose work.",
+  "settings-save-reminder-confirm-b": "Disable at your own risk?",
+  "settings-save-reminder-confirm-disable": 'Disable',
   "theme-dark": 'Dark',
   "theme-light": 'Light',
   "terms-of-service": {
@@ -983,5 +990,6 @@ renaming keys across language files:
   },
   "compare-before": "Before",
   "compare-after": "After",
-  "loading": "Loading"
+  "loading": "Loading",
+  "more": "More",
 }

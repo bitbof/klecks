@@ -265,6 +265,10 @@
     original: 'Merge with layer below',
     value: '向下合併'
   },
+  'layers-merge-all': {
+    original: 'Merge all',
+    value: ''
+  },
   'layers-rename': {
     hint: 'action',
     original: 'Rename',
@@ -1382,6 +1386,30 @@
     original: 'Theme',
     value: '外觀主題'
   },
+  'settings-save-reminder-label': {
+    original: 'Save Reminder',
+    value: ''
+  },
+  'settings-save-reminder-disabled': {
+    original: 'disabled',
+    value: ''
+  },
+  'settings-save-reminder-confirm-title': {
+    original: 'Turn off Save Reminder?',
+    value: ''
+  },
+  'settings-save-reminder-confirm-a': {
+    original: "There is no autosave and browser tabs don't last forever. If you don't periodically save you will likely lose work.",
+    value: ''
+  },
+  'settings-save-reminder-confirm-b': {
+    original: 'Disable at your own risk?',
+    value: ''
+  },
+  'settings-save-reminder-confirm-disable': {
+    original: 'Disable',
+    value: ''
+  },
   'theme-dark': {
     original: 'Dark',
     value: '深色'
@@ -1521,6 +1549,10 @@
   },
   loading: {
     original: 'Loading',
+    value: ''
+  },
+  more: {
+    original: 'More',
     value: ''
   }
 }

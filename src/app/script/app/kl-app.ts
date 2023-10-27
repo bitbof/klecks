@@ -1305,7 +1305,8 @@ export class KlApp {
                     LocalStorage.setItem('uiState', this.uiState);
                 }
             },
-            pOptions.aboutEl
+            this.embed ? undefined : pOptions.saveReminder,
+            pOptions.aboutEl,
         );
 
         mainTabRow = new KL.TabRow({

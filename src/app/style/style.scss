@@ -1027,3 +1027,13 @@ iframe {
     padding-right: 10px;
     display: flex;
 }
+
+.kl-dropdown-menu {
+    position: absolute;
+    margin-top: 1px;
+    overflow: hidden;
+
+    background: #ddd;
+    box-shadow: 0 2px 5px #00000080;
+    border-radius: 3px;
+}

@@ -265,6 +265,10 @@
     original: 'Merge with layer below',
     value: 'Auf untere Ebene reduzieren'
   },
+  'layers-merge-all': {
+    original: 'Merge all',
+    value: 'Alle Ebenen vereinen'
+  },
   'layers-rename': {
     hint: 'action',
     original: 'Rename',
@@ -1382,6 +1386,30 @@
     original: 'Theme',
     value: 'Farbe'
   },
+  'settings-save-reminder-label': {
+    original: 'Save Reminder',
+    value: 'Speicher-Erinnerung'
+  },
+  'settings-save-reminder-disabled': {
+    original: 'disabled',
+    value: 'deaktiviert'
+  },
+  'settings-save-reminder-confirm-title': {
+    original: 'Turn off Save Reminder?',
+    value: 'Speicher-Erinnerung deaktivieren?'
+  },
+  'settings-save-reminder-confirm-a': {
+    original: "There is no autosave and browser tabs don't last forever. If you don't periodically save you will likely lose work.",
+    value: 'Es gibt kein Autosave und Browser Tabs existieren nicht für ewig. Wenn du nicht regelmäßig speicherst, verlierst du wahrscheinlich deinen Fortschritt.'
+  },
+  'settings-save-reminder-confirm-b': {
+    original: 'Disable at your own risk?',
+    value: 'Auf eigene Gefahr ausschalten?'
+  },
+  'settings-save-reminder-confirm-disable': {
+    original: 'Disable',
+    value: 'Deaktivieren'
+  },
   'theme-dark': {
     original: 'Dark',
     value: 'Dunkel'
@@ -1522,5 +1550,9 @@
   loading: {
     original: 'Loading',
     value: 'Läd'
+  },
+  more: {
+    original: 'More',
+    value: 'Mehr'
   }
 }

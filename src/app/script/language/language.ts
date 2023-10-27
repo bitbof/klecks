@@ -29,7 +29,7 @@ class LanguageStrings {
 
     get (code: TTranslationCode): string {
         if (!(code in this.data)) {
-            throw new Error('translation code doesn\'t exist: ' + code);
+            throw new Error("translation code doesn't exist: " + code);
         }
         return this.data[code];
     }

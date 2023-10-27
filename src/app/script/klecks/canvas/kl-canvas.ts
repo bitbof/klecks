@@ -9,6 +9,18 @@ import {LANG} from '../../language/language';
 import {drawGradient} from '../image-operations/gradient-tool';
 import {nullToUndefined} from '../../bb/base/base';
 
+
+// TODO remove in 2026
+// workaround for chrome bug https://bugs.chromium.org/p/chromium/issues/detail?id=1281185
+// reported 2021-13 (v96), fixed 2022-02 (v99)
+// affects: source-in, source-out, destination-in, destination-atop
+function workaroundForChromium1281185 (ctx: CanvasRenderingContext2D): void {
+    ctx.save();
+    ctx.fillStyle = 'rgba(0,0,0,0.01)';
+    ctx.fillRect(-0.9999999, -0.9999999, 1, 1);
+    ctx.restore();
+}
+
 export type TKlCanvasHistoryEntry = THistoryActions<'canvas', KlCanvas>;
 
 const allowedMixModes = [
@@ -557,14 +569,7 @@ export class KlCanvas {
 
             ctx.restore();
 
-            // workaround for chrome bug https://bugs.chromium.org/p/chromium/issues/detail?id=1281185
-            // TODO remove if chrome updated
-            if (mixModeStr) {
-                ctx.save();
-                ctx.fillStyle = 'rgba(0,0,0,0.01)';
-                ctx.fillRect(-0.9999999, -0.9999999, 1, 1);
-                ctx.restore();
-            }
+            mixModeStr && workaroundForChromium1281185(ctx);
         }
         this.updateIndices();
         this.history.pause(true);
@@ -577,6 +582,47 @@ export class KlCanvas {
         } as TKlCanvasHistoryEntry);
 
         return layerBottomIndex;
+    }
+
+    mergeAll (): number | false {
+        if (this.layerCanvasArr.length === 1) {
+            return false;
+        }
+
+        // draw all on bottom layer
+        const ctx = BB.ctx(this.layerCanvasArr[0]);
+        for (let i = 1; i < this.layerCanvasArr.length; i++) {
+            const current = this.layerCanvasArr[i];
+            if (!current.isVisible || current.opacity === 0) {
+                continue;
+            }
+
+            ctx.save();
+            ctx.globalCompositeOperation = current.mixModeStr;
+            ctx.globalAlpha = current.opacity;
+            ctx.drawImage(current, 0, 0);
+            ctx.restore();
+        }
+
+        this.history.pause(true);
+
+        // remove upper layers
+        for (let i = this.layerCanvasArr.length - 1; i > 0; i--) {
+            this.removeLayer(i);
+        }
+
+        // rename first layer to "layer 1"
+        this.renameLayer(0, LANG('layers-layer') + ' 1');
+
+        this.history.pause(false);
+
+        this.history.push({
+            tool: ['canvas'],
+            action: 'mergeAll',
+            params: [],
+        } as TKlCanvasHistoryEntry);
+
+        return 0;
     }
 
     rotate (deg: number): void {
