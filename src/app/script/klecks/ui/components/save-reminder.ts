@@ -145,7 +145,7 @@ export class SaveReminder {
 
                 const unsavedActions = Math.abs(this.history.getActionNumber() - this.lastSavedActionNumber!);
 
-                const timeLimitMs = 100 * 60 * {
+                const timeLimitMs = 1000 * 60 * {
                     '20min': 20,
                     '40min': 40,
                     'disabled': 0,

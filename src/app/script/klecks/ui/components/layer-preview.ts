@@ -218,6 +218,7 @@ export class LayerPreview {
                 justifyContent: 'flex-end',
                 alignItems: 'center',
                 width: '23px',
+                flexShrink: '0',
             },
         });
         this.checkEl = BB.el({
