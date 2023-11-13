@@ -169,7 +169,11 @@ export class KlApp {
             return;
         }
         const isVisible = (this.toolspaceInner.scrollHeight + 40 < window.innerHeight);
-        this.bottomBarWrapper.style.display = isVisible ? '' : 'none';
+        const newDisplay = isVisible ? '' : 'none';
+        // check to prevent infinite MutationObserver loop in Pale Moon
+        if (newDisplay !== this.bottomBarWrapper.style.display) {
+            this.bottomBarWrapper.style.display = newDisplay;
+        }
     }
 
     private updateUi (): void {

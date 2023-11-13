@@ -16,19 +16,28 @@ export class ToolspaceScroller {
     private upInterval: any;
 
     private update (): void {
+        let newUpDisplay = this.upBtn.style.display;
+        let newDownDisplay = this.downBtn.style.display;
         if (this.toolspace.scrollHeight > this.toolspace.offsetHeight + 3) { // small buffer where it's not worth it
             if (!this.upInterval) {
-                this.upBtn.style.display = this.toolspace.scrollTop === 0 ? 'none' : 'block';
+                newUpDisplay = this.toolspace.scrollTop === 0 ? 'none' : 'block';
             }
             if (!this.downInterval) {
-                this.downBtn.style.display = (
+                newDownDisplay = (
                     this.toolspace.scrollTop + this.toolspace.offsetHeight + 1 >= this.toolspace.scrollHeight ?
                         'none' : 'block'
                 );
             }
         } else {
-            this.upBtn.style.display = 'none';
-            this.downBtn.style.display = 'none';
+            newUpDisplay = 'none';
+            newDownDisplay = 'none';
+        }
+        // check to prevent infinite MutationObserver loop in Pale Moon
+        if (newUpDisplay !== this.upBtn.style.display) {
+            this.upBtn.style.display = newUpDisplay;
+        }
+        if (newDownDisplay !== this.downBtn.style.display) {
+            this.downBtn.style.display = newDownDisplay;
         }
     }
 
