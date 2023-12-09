@@ -1,6 +1,5 @@
 import {BB} from '../../bb/bb';
 import {IFilterApply, IFilterGetDialogParam, IFilterGetDialogResult} from '../kl-types';
-import {LANG} from '../../language/language';
 import {TFilterHistoryEntry} from './filters';
 import {theme} from '../../theme/theme';
 
@@ -34,7 +33,6 @@ export const filterRotate = {
             element: div,
         };
         let deg = 0;
-        div.innerHTML = LANG('filter-rotate-description') + '<br/><br/>';
 
         function update (): void {
             canvasWrapper.style.transform = 'rotate(' + deg + 'deg)';

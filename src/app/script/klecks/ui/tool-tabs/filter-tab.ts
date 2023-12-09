@@ -12,6 +12,7 @@ import {LayerManager} from './layer-manager/layer-manager';
 import {HandUi} from './hand-ui';
 import {RGB} from '../../../bb/color/color';
 import {getSharedFx} from '../../../fx-canvas/shared-fx';
+import {c} from '../../../bb/base/c';
 
 
 export class FilterTab {
@@ -91,9 +92,9 @@ This has been reported to Google.
             const button = document.createElement('button');
             const buttonLabel = LANG(filter.lang.button);
             const imClass = filter.darkNoInvert ? 'class="dark-no-invert"' : '';
-            const im = '<img ' + imClass + ' height="20" width="18" src="' + filter.icon + '" alt="icon" />';
+            const im = '<img ' + imClass + ' height="20" width="18" src="' + filter.icon + '" style="margin-right: 3px" alt="icon" />';
             button.innerHTML = im + buttonLabel;
-            button.className = 'grid-button';
+            button.className = 'grid-button grid-button--filter';
             BB.css(button, {
                 lineHeight: '20px',
                 fontSize: '12px',
@@ -134,7 +135,11 @@ This has been reported to Google.
                     };
 
                     if (!('apply' in filters[filterKey])) {
-                        alert('Application not fully loaded');
+                        KL.popup({
+                            target: this.klRootEl,
+                            message: 'Application not fully loaded',
+                            type: 'error',
+                        });
                         return;
                     }
 
@@ -146,7 +151,11 @@ This has been reported to Google.
                             input: input,
                         } as IFilterApply);
                         if (filterResult === false) {
-                            alert("Couldn't apply the edit action");
+                            KL.popup({
+                                target: this.klRootEl,
+                                message: "Couldn't apply the edit action",
+                                type: 'error',
+                            });
                         }
                         if (filters[filterKey].updatePos === true) {
                             this.klCanvasWorkspace.resetOrFitView();
@@ -161,26 +170,41 @@ This has been reported to Google.
                         this.statusOverlay.out('"' + filterName + '" ' + LANG('filter-applied'), true);
                     } else {
                         const secondaryColorRGB = this.klColorSlider.getSecondaryRGB();
-                        const filterDialog = filters[filterKey].getDialog!({
-                            context: this.getCurrentLayerCtx(),
-                            klCanvas: this.getKlCanvas(),
-                            maxWidth: this.getKlMaxCanvasSize(),
-                            maxHeight: this.getKlMaxCanvasSize(),
-                            currentColorRgb: {r: this.getCurrentColor().r, g: this.getCurrentColor().g, b: this.getCurrentColor().b},
-                            secondaryColorRgb: {r: secondaryColorRGB.r, g: secondaryColorRGB.g, b: secondaryColorRGB.b},
-                        } as IFilterGetDialogParam) as IFilterGetDialogResult;
+                        let filterDialog: IFilterGetDialogResult<any> | undefined = undefined;
+
+                        try {
+                            filterDialog = filters[filterKey].getDialog!({
+                                context: this.getCurrentLayerCtx(),
+                                klCanvas: this.getKlCanvas(),
+                                maxWidth: this.getKlMaxCanvasSize(),
+                                maxHeight: this.getKlMaxCanvasSize(),
+                                currentColorRgb: {r: this.getCurrentColor().r, g: this.getCurrentColor().g, b: this.getCurrentColor().b},
+                                secondaryColorRgb: {r: secondaryColorRGB.r, g: secondaryColorRGB.g, b: secondaryColorRGB.b},
+                            } as IFilterGetDialogParam) as IFilterGetDialogResult;
+                        } catch (e) {
+                            setTimeout(() => {
+                                throw e;
+                            });
+                        }
 
                         if (!filterDialog) {
+                            KL.popup({
+                                target: this.klRootEl,
+                                message: 'Error: Could not perform action.',
+                                type: 'error',
+                            });
                             return;
-                            //alert('Error: could not perform action');
-                            //throw('filter['+filterKey+'].getDialog returned '+filterDialog+'. ctx:' + currentLayerCtx + ' klCanvas:' + klCanvas);
                         }
 
                         let closeFunc: () => void;
                         // Todo should move into getDialogParams
                         filterDialog.errorCallback = (e) => {
+                            KL.popup({
+                                target: this.klRootEl,
+                                message: 'Error: Could not perform action.',
+                                type: 'error',
+                            });
                             setTimeout(() => {
-                                alert('Error: could not perform action');
                                 throw e;
                             }, 0);
                             closeFunc();
@@ -192,15 +216,39 @@ This has been reported to Google.
                             style.width = filterDialog.width + 'px';
                         }
 
+                        let title: HTMLElement;
+                        {
+                            const els: HTMLElement[] = [
+                                c('b', filterName),
+                            ];
+                            if (filter.lang.description !== undefined) {
+                                els.push(c({
+                                    className: 'kl-info-btn',
+                                    onClick: () => {
+                                        KL.popup({
+                                            target: this.klRootEl,
+                                            message: LANG(filter.lang.description!),
+                                        });
+                                    },
+                                    title: LANG(filter.lang.description!),
+                                    noRef: true,
+                                }, '?'));
+                            }
+                            title = c(',flex,gap-5', els);
+                        }
+
+
+
+
                         KL.popup({
                             target: this.klRootEl,
-                            message: '<b>' + filterName + '</b>',
+                            message: title,
                             div: filterDialog.element,
                             style: style,
                             buttons: dialogButtons,
                             clickOnEnter: 'Ok',
                             callback: (result) => {
-                                finishedDialog(result as TOptions, filterDialog);
+                                finishedDialog(result as TOptions, filterDialog!);
                             },
                             closeFunc: (func) => {
                                 closeFunc = func;

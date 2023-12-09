@@ -1,12 +1,13 @@
-import {BB} from '../../bb/bb';
 import {Options} from '../ui/components/options';
 import {ColorOptions} from '../ui/components/color-options';
-import {KlCanvasPreview} from '../canvas-ui/canvas-preview';
 import {getSharedFx} from '../../fx-canvas/shared-fx';
-import {IFilterApply, IFilterGetDialogParam, IFilterGetDialogResult, IKlBasicLayer, IRGBA} from '../kl-types';
+import {IFilterApply, IFilterGetDialogParam, IFilterGetDialogResult, IRGBA} from '../kl-types';
 import {LANG} from '../../language/language';
 import {TFilterHistoryEntry} from './filters';
-import {throwIfNull} from '../../bb/base/base';
+import {FxPreviewRenderer} from '../ui/project-viewport/fx-preview-renderer';
+import {Preview} from '../ui/project-viewport/preview';
+import {css} from '@emotion/css/dist/emotion-css.cjs';
+import {TProjectViewportProject} from '../ui/project-viewport/project-viewport';
 
 export type TFilterToAlphaInput = {
     sourceId: string;
@@ -29,44 +30,19 @@ export const filterToAlpha = {
         const layers = klCanvas.getLayers();
         const selectedLayerIndex = klCanvas.getLayerIndex(context.canvas);
 
-        const fit = BB.fitInto(context.canvas.width, context.canvas.height, 280, 200, 1);
-        const w = parseInt('' + fit.width), h = parseInt('' + fit.height);
-
-        const tempCanvas = BB.canvas(w, h);
-        {
-            const ctx = BB.ctx(tempCanvas);
-            ctx.save();
-            if (tempCanvas.width > context.canvas.width) {
-                ctx.imageSmoothingEnabled = false;
-            }
-            ctx.drawImage(context.canvas, 0, 0, w, h);
-            ctx.restore();
-        }
-
         const div = document.createElement('div');
         const result: IFilterGetDialogResult<TFilterToAlphaInput> = {
             element: div,
         };
 
         function finishInit () {
-            div.append(BB.el({
-                content: LANG('filter-to-alpha-description'),
-                css: {
-                    marginBottom: '5px',
+
+            const fxPreviewRenderer = new FxPreviewRenderer({
+                original: context.canvas,
+                onUpdate: (fxCanvas) => {
+                    return fxCanvas.toAlpha(sourceId === 'inverted-luminance', selectedRgbaObj);
                 },
-            }));
-
-            const fxCanvas = throwIfNull(getSharedFx());
-            if (!fxCanvas) {
-                return; // todo throw?
-            }
-            const texture = fxCanvas.texture(tempCanvas);
-            fxCanvas.draw(texture).update(); // update fxCanvas size
-
-            function updatePreview () {
-                fxCanvas.draw(texture).toAlpha(sourceId === 'inverted-luminance', selectedRgbaObj).update();
-                klCanvasPreview.render();
-            }
+            });
 
             // source
             let sourceId = 'inverted-luminance';
@@ -84,7 +60,8 @@ export const filterToAlpha = {
                 initId: sourceId,
                 onChange: function (id) {
                     sourceId = id;
-                    updatePreview();
+                    fxPreviewRenderer.update();
+                    preview.render();
                 },
             });
             div.append(sourceOptions.getElement());
@@ -115,63 +92,49 @@ export const filterToAlpha = {
                 initialIndex: 1,
                 onChange: function (rgbaObj) {
                     selectedRgbaObj = rgbaObj;
-                    updatePreview();
+                    fxPreviewRenderer.update();
+                    preview.render();
                 },
             });
             colorOptions.getElement().style.marginTop = '10px';
+            colorOptions.getElement().style.marginBottom = '10px';
             div.append(colorOptions.getElement());
 
 
-            const previewWrapper = BB.el({
-                className: 'kl-preview-wrapper',
-                css: {
-                    width: '340px',
-                    height: '220px',
-                },
-            });
-
-            const previewLayerArr: IKlBasicLayer[] = [];
+            const previewLayerArr: TProjectViewportProject['layers'] = [];
             {
                 for (let i = 0; i < layers.length; i++) {
                     previewLayerArr.push({
-                        image: i === selectedLayerIndex ? fxCanvas : layers[i].context.canvas,
+                        image: i === selectedLayerIndex ? fxPreviewRenderer.render : layers[i].context.canvas,
                         isVisible: layers[i].isVisible,
                         opacity: layers[i].opacity,
                         mixModeStr: layers[i].mixModeStr,
+                        hasClipping: false,
                     });
                 }
             }
-            const klCanvasPreview = new KlCanvasPreview({
-                width: parseInt('' + w),
-                height: parseInt('' + h),
-                layers: previewLayerArr,
-            });
 
-            const previewInnerWrapper = BB.el({
-                className: 'kl-preview-wrapper__canvas',
-                css: {
-                    width: parseInt('' + w) + 'px',
-                    height: parseInt('' + h) + 'px',
+            const preview = new Preview({
+                width: 340,
+                height: 220,
+                project: {
+                    width: context.canvas.width,
+                    height: context.canvas.height,
+                    layers: previewLayerArr,
                 },
             });
-            previewInnerWrapper.append(klCanvasPreview.getElement());
-            previewWrapper.append(previewInnerWrapper);
-
-
-            div.append(previewWrapper);
-
-            setTimeout(function () { //ie has a problem otherwise...
-                try {
-                    updatePreview();
-                } catch(e) {
-                    (div as any).errorCallback(e);
-                }
-            }, 1);
+            preview.render();
+            preview.getElement().classList.add(css({
+                marginLeft: '-20px',
+                marginRight: '-20px',
+            }));
+            div.append(preview.getElement());
 
             result.destroy = (): void => {
-                texture.destroy();
                 sourceOptions.destroy();
-                klCanvasPreview.destroy();
+                colorOptions.destroy();
+                fxPreviewRenderer.destroy();
+                preview.destroy();
             };
             result.getInput = function (): TFilterToAlphaInput {
                 result.destroy!();

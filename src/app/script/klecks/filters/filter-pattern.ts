@@ -144,9 +144,7 @@ export const filterPattern = {
 
         const isSmall = window.innerWidth < 550;
         const maxSize = 1024;
-        const rootEl = BB.el({
-            content: LANG('filter-pattern-description') + '<br><br>',
-        });
+        const rootEl = BB.el();
         const context = params.context;
         const width = context.canvas.width;
         const height = context.canvas.height;

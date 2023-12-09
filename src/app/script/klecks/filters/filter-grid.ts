@@ -42,7 +42,6 @@ export const filterGrid = {
         const result: IFilterGetDialogResult<TFilterGridInput> = {
             element: div,
         };
-        div.innerHTML = LANG('filter-grid-description') + '<br/><br/>';
 
         const settingsObj: TFilterGridInput = {
             x: 2,

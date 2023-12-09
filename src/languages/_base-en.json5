@@ -992,4 +992,5 @@ renaming keys across language files:
   "compare-after": "After",
   "loading": "Loading",
   "more": "More",
+  "x-minutes": "{x}min",
 }

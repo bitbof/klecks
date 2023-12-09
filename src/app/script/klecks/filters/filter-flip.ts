@@ -39,7 +39,6 @@ export const filterFlip = {
         let isHorizontal = true;
         let isVertical = false;
         let doFlipCanvas = true;
-        div.innerHTML = LANG('filter-flip-description') + '<br/><br/>';
 
 
         const horizontalCheckbox = new Checkbox({

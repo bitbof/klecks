@@ -1,11 +1,13 @@
-import {BB} from '../../bb/bb';
 import {KlSlider} from '../ui/components/kl-slider';
 import {eventResMs} from './filters-consts';
-import {KlCanvasPreview} from '../canvas-ui/canvas-preview';
 import {getSharedFx} from '../../fx-canvas/shared-fx';
-import {IFilterApply, IFilterGetDialogParam, IFilterGetDialogResult, IKlBasicLayer} from '../kl-types';
+import {IFilterApply, IFilterGetDialogParam, IFilterGetDialogResult} from '../kl-types';
 import {LANG} from '../../language/language';
 import {TFilterHistoryEntry} from './filters';
+import {FxPreviewRenderer} from '../ui/project-viewport/fx-preview-renderer';
+import {TProjectViewportProject} from '../ui/project-viewport/project-viewport';
+import {Preview} from '../ui/project-viewport/preview';
+import {css} from '@emotion/css/dist/emotion-css.cjs';
 
 export type TFilterBrightnessContrastInput = {
     brightness: number;
@@ -34,32 +36,15 @@ export const filterBrightnessContrast = {
         const layers = klCanvas.getLayers();
         const selectedLayerIndex = klCanvas.getLayerIndex(context.canvas);
 
-        const fit = BB.fitInto(context.canvas.width, context.canvas.height, 280, 200, 1);
-        const w = parseInt('' + fit.width), h = parseInt('' + fit.height);
-
-        const tempCanvas = BB.canvas(w, h);
-        {
-            const ctx = BB.ctx(tempCanvas);
-            ctx.save();
-            if (tempCanvas.width > context.canvas.width) {
-                ctx.imageSmoothingEnabled = false;
-            }
-            ctx.drawImage(context.canvas, 0, 0, w, h);
-            ctx.restore();
-        }
-
+        let brightness = 0, contrast = 0;
+        const fxPreviewRenderer = new FxPreviewRenderer({
+            original: context.canvas,
+            onUpdate: (fxCanvas) => {
+                return fxCanvas.brightnessContrast(brightness, contrast);
+            },
+        });
 
         function finishInit (): void {
-
-            let brightness = 0, contrast = 0;
-            div.innerHTML = LANG('filter-bright-contrast-description') + '<br/><br/>';
-
-            const fxCanvas = getSharedFx();
-            if (!fxCanvas) {
-                return; // todo throw?
-            }
-            const texture = fxCanvas.texture(tempCanvas);
-            fxCanvas.draw(texture).update(); // update fxCanvas size
 
             const brightnessSlider = new KlSlider({
                 label: LANG('filter-bright-contrast-brightness'),
@@ -71,8 +56,8 @@ export const filterBrightnessContrast = {
                 eventResMs: eventResMs,
                 onChange: function (val) {
                     brightness = val / 50 - 1;
-                    fxCanvas.draw(texture).brightnessContrast(brightness, contrast).update();
-                    klCanvasPreview.render();
+                    fxPreviewRenderer.update();
+                    preview.render();
                 },
             });
             const contrastSlider = new KlSlider({
@@ -85,64 +70,49 @@ export const filterBrightnessContrast = {
                 eventResMs: eventResMs,
                 onChange: function (val) {
                     contrast = val / 50 - 1;
-                    fxCanvas.draw(texture).brightnessContrast(brightness, contrast).update();
-                    klCanvasPreview.render();
+                    fxPreviewRenderer.update();
+                    preview.render();
                 },
             });
             brightnessSlider.getElement().style.marginBottom = '10px';
+            contrastSlider.getElement().style.marginBottom = '10px';
             div.append(brightnessSlider.getElement(), contrastSlider.getElement());
 
-
-
-            const previewWrapper = BB.el({
-                className: 'kl-preview-wrapper',
-                css: {
-                    width: '340px',
-                    height: '220px',
-                },
-            });
-
-            const previewLayerArr: IKlBasicLayer[] = [];
+            const previewLayerArr: TProjectViewportProject['layers'] = [];
             {
                 for (let i = 0; i < layers.length; i++) {
                     previewLayerArr.push({
-                        image: i === selectedLayerIndex ? fxCanvas : layers[i].context.canvas,
+                        image: i === selectedLayerIndex ? fxPreviewRenderer.render : layers[i].context.canvas,
                         isVisible: layers[i].isVisible,
                         opacity: layers[i].opacity,
                         mixModeStr: layers[i].mixModeStr,
+                        hasClipping: false,
                     });
                 }
             }
-            const klCanvasPreview = new KlCanvasPreview({
-                width: parseInt('' + w),
-                height: parseInt('' + h),
-                layers: previewLayerArr,
-            });
 
-            const previewInnerWrapper = BB.el({
-                className: 'kl-preview-wrapper__canvas',
-                css: {
-                    width: parseInt('' + w) + 'px',
-                    height: parseInt('' + h) + 'px',
+            const preview = new Preview({
+                width: 340,
+                height: 220,
+                project: {
+                    width: context.canvas.width,
+                    height: context.canvas.height,
+                    layers: previewLayerArr,
                 },
             });
-            previewInnerWrapper.append(klCanvasPreview.getElement());
-            previewWrapper.append(previewInnerWrapper);
+            preview.render();
+            preview.getElement().classList.add(css({
+                marginLeft: '-20px',
+                marginRight: '-20px',
+            }));
+            div.append(preview.getElement());
 
-            div.append(previewWrapper);
-
-            try {
-                fxCanvas.draw(texture).brightnessContrast(brightness, contrast).update();
-                klCanvasPreview.render();
-            } catch(e) {
-                (div as any).errorCallback(e);
-            }
 
             result.destroy = () => {
                 brightnessSlider.destroy();
                 contrastSlider.destroy();
-                texture.destroy();
-                klCanvasPreview.destroy();
+                fxPreviewRenderer.destroy();
+                preview.destroy();
             };
             result.getInput = function (): TFilterBrightnessContrastInput {
                 result.destroy!();

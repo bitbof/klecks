@@ -25,6 +25,15 @@ export function loadImage (im: HTMLImageElement, callback: () => void): void {
     check();
 }
 
+export function asyncLoadImage (src: string): Promise<HTMLImageElement> {
+    return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.onload = () => resolve(img);
+        img.onerror = reject;
+        img.src = src;
+    });
+}
+
 export function css (el: HTMLElement | SVGElement, styleObj: IKeyStringOptional): void {
     const keyArr = Object.keys(styleObj);
     let keyStr: string;

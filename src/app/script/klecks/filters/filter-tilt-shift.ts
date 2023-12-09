@@ -66,7 +66,6 @@ export const filterTiltShift = {
 
         function finishInit () {
             let blur = 20, gradient = 200;
-            rootEl.innerHTML = LANG('filter-tilt-shift-description') + '<br/><br/>';
 
             const fxCanvas = throwIfNull(getSharedFx());
             const texture = fxCanvas.texture(tempCanvas);

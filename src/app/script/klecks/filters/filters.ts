@@ -29,7 +29,11 @@ export const filterLib: {
     [key:string]: IFilter;
 } = {
     brightnessContrast: {
-        lang: {name: 'filter-bright-contrast-title', button: 'filter-bright-contrast'},
+        lang: {
+            name: 'filter-bright-contrast-title',
+            button: 'filter-bright-contrast',
+            description: 'filter-bright-contrast-description',
+        },
         icon: glBrightnessContrastImg,
         updatePos: false,
         getDialog: null,
@@ -38,7 +42,11 @@ export const filterLib: {
         webGL: true,
     },
     cropExtend: {
-        lang: {name: 'filter-crop-title', button: 'filter-crop-extend'},
+        lang: {
+            name: 'filter-crop-title',
+            button: 'filter-crop-extend',
+            description: 'filter-crop-description',
+        },
         icon: cropExtendImg,
         updatePos: true,
         getDialog: null,
@@ -46,7 +54,11 @@ export const filterLib: {
         inEmbed: false,
     },
     curves: {
-        lang: {name: 'filter-curves-title', button: 'filter-curves'},
+        lang: {
+            name: 'filter-curves-title',
+            button: 'filter-curves',
+            description: 'filter-curves-description',
+        },
         icon: glCurvesImg,
         updatePos: false,
         getDialog: null,
@@ -55,7 +67,11 @@ export const filterLib: {
         webGL: true,
     },
     distort: {
-        lang: {name: 'filter-distort', button: 'filter-distort'},
+        lang: {
+            name: 'filter-distort',
+            button: 'filter-distort',
+            description: 'filter-distort-description',
+        },
         icon: distortImg,
         updatePos: false,
         getDialog: null,
@@ -64,7 +80,11 @@ export const filterLib: {
         webGL: true,
     },
     flip: {
-        lang: {name: 'filter-flip-title', button: 'filter-flip'},
+        lang: {
+            name: 'filter-flip-title',
+            button: 'filter-flip',
+            description: 'filter-flip-description',
+        },
         icon: flipImg,
         updatePos: false,
         getDialog: null,
@@ -72,7 +92,11 @@ export const filterLib: {
         inEmbed: true,
     },
     hueSaturation: {
-        lang: {name: 'filter-hue-sat-title', button: 'filter-hue-sat'},
+        lang: {
+            name: 'filter-hue-sat-title',
+            button: 'filter-hue-sat',
+            description: 'filter-hue-sat-description',
+        },
         icon: glHueSaturationImg,
         updatePos: false,
         getDialog: null,
@@ -82,7 +106,10 @@ export const filterLib: {
         webGL: true,
     },
     invert: {
-        lang: {name: 'filter-invert', button: 'filter-invert'},
+        lang: {
+            name: 'filter-invert',
+            button: 'filter-invert',
+        },
         icon: invertImg,
         updatePos: false,
         isInstant: true,
@@ -93,7 +120,11 @@ export const filterLib: {
         webGL: true,
     },
     perspective: {
-        lang: {name: 'filter-perspective-title', button: 'filter-perspective'},
+        lang: {
+            name: 'filter-perspective-title',
+            button: 'filter-perspective',
+            description: 'filter-perspective-description',
+        },
         icon: glPerspectiveImg,
         updatePos: false,
         getDialog: null,
@@ -102,7 +133,11 @@ export const filterLib: {
         webGL: true,
     },
     resize: {
-        lang: {name: 'filter-resize-title', button: 'filter-resize'},
+        lang: {
+            name: 'filter-resize-title',
+            button: 'filter-resize',
+            description: 'filter-resize-description',
+        },
         icon: resizeImg,
         updatePos: true,
         getDialog: null,
@@ -110,7 +145,11 @@ export const filterLib: {
         inEmbed: false,
     },
     rotate: {
-        lang: {name: 'filter-rotate-title', button: 'filter-rotate'},
+        lang: {
+            name: 'filter-rotate-title',
+            button: 'filter-rotate',
+            description: 'filter-rotate-description',
+        },
         icon: rotateImg,
         updatePos: true,
         getDialog: null,
@@ -118,7 +157,11 @@ export const filterLib: {
         inEmbed: false,
     },
     tiltShift: {
-        lang: {name: 'filter-tilt-shift-title', button: 'filter-tilt-shift'},
+        lang: {
+            name: 'filter-tilt-shift-title',
+            button: 'filter-tilt-shift',
+            description: 'filter-tilt-shift-description',
+        },
         icon: glTiltShiftImg,
         updatePos: false,
         getDialog: null,
@@ -127,7 +170,11 @@ export const filterLib: {
         webGL: true,
     },
     toAlpha: {
-        lang: {name: 'filter-to-alpha-title', button: 'filter-to-alpha'},
+        lang: {
+            name: 'filter-to-alpha-title',
+            button: 'filter-to-alpha',
+            description: 'filter-to-alpha-description',
+        },
         icon: toAlphaImg,
         updatePos: false,
         getDialog: null,
@@ -137,7 +184,11 @@ export const filterLib: {
         webGL: true,
     },
     transform: {
-        lang: {name: 'filter-transform-title', button: 'filter-transform'},
+        lang: {
+            name: 'filter-transform-title',
+            button: 'filter-transform',
+            description: 'filter-transform-description',
+        },
         icon: transformImg,
         updatePos: false,
         getDialog: null,
@@ -145,7 +196,11 @@ export const filterLib: {
         inEmbed: true,
     },
     blur: {
-        lang: {name: 'filter-triangle-blur-title', button: 'filter-triangle-blur'},
+        lang: {
+            name: 'filter-triangle-blur-title',
+            button: 'filter-triangle-blur',
+            description: 'filter-triangle-blur-description',
+        },
         icon: glBlurImg,
         updatePos: false,
         getDialog: null,
@@ -155,7 +210,11 @@ export const filterLib: {
         webGL: true,
     },
     unsharpMask: {
-        lang: {name: 'filter-unsharp-mask-title', button: 'filter-unsharp-mask'},
+        lang: {
+            name: 'filter-unsharp-mask-title',
+            button: 'filter-unsharp-mask',
+            description: 'filter-unsharp-mask-description',
+        },
         icon: glUnsharpMaskImg,
         updatePos: false,
         getDialog: null,
@@ -165,7 +224,11 @@ export const filterLib: {
         webGL: true,
     },
     grid: {
-        lang: {name: 'filter-grid', button: 'filter-grid'},
+        lang: {
+            name: 'filter-grid',
+            button: 'filter-grid',
+            description: 'filter-grid-description',
+        },
         icon: gridImg,
         updatePos: false,
         getDialog: null,
@@ -173,7 +236,11 @@ export const filterLib: {
         inEmbed: true,
     },
     noise: {
-        lang: {name: 'filter-noise', button: 'filter-noise'},
+        lang: {
+            name: 'filter-noise',
+            button: 'filter-noise',
+            description: 'filter-noise-description',
+        },
         icon: noiseImg,
         updatePos: false,
         getDialog: null,
@@ -182,7 +249,11 @@ export const filterLib: {
         webGL: true,
     },
     pattern: {
-        lang: {name: 'filter-pattern', button: 'filter-pattern'},
+        lang: {
+            name: 'filter-pattern',
+            button: 'filter-pattern',
+            description: 'filter-pattern-description',
+        },
         icon: patternImg,
         updatePos: false,
         getDialog: null,
@@ -190,7 +261,11 @@ export const filterLib: {
         inEmbed: true,
     },
     vanishPoint: {
-        lang: {name: 'filter-vanish-point-title', button: 'filter-vanish-point'},
+        lang: {
+            name: 'filter-vanish-point-title',
+            button: 'filter-vanish-point',
+            description: 'filter-vanish-point-description',
+        },
         icon: vanishPointImg,
         updatePos: false,
         getDialog: null,

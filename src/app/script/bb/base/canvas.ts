@@ -12,8 +12,8 @@ export function copyCanvas (canvas: HTMLCanvasElement): HTMLCanvasElement {
     return resultCanvas;
 }
 
-export function ctx (canvas: HTMLCanvasElement): CanvasRenderingContext2D {
-    const ctx = canvas.getContext('2d');
+export function ctx (canvas: HTMLCanvasElement, options?: CanvasRenderingContext2DSettings): CanvasRenderingContext2D {
+    const ctx = canvas.getContext('2d', options);
     if (!ctx) {
         throw new Error("couldn't get 2d context");
     }
@@ -370,14 +370,13 @@ export function convertToAlphaChannelCanvas (canvas: HTMLCanvasElement): void {
 
 /**
  * Sometimes garbage collection is too slow, and canvases use up too much memory,
- * or there is a hard to fix memory leak.
+ * or in the worst case there is a hard to fix memory leak.
  * This function manually makes the canvas use as little memory as possible.
  */
 export function freeCanvas (canvas: HTMLCanvasElement): void {
     canvas.width = 1;
     canvas.height = 1;
-    const ctx = canvas.getContext('2d');
-    ctx && ctx.clearRect(0, 0, 1, 1);
+    canvas.remove();
 }
 
 /**

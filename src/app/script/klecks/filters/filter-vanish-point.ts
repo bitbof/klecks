@@ -47,7 +47,6 @@ export const filterVanishPoint = {
         const result: IFilterGetDialogResult<TFilterVanishPointInput> = {
             element: div,
         };
-        div.innerHTML = LANG('filter-vanish-point-description') + '<br/><br/>';
 
         const settingsObj: TFilterVanishPointInput = {
             x: context.canvas.width / 2,

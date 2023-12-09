@@ -1,11 +1,13 @@
 import {BB} from '../../bb/bb';
-import {KlCanvasPreview} from '../canvas-ui/canvas-preview';
 import {getSharedFx} from '../../fx-canvas/shared-fx';
-import {IFilterApply, IFilterGetDialogParam, IFilterGetDialogResult, IKlBasicLayer} from '../kl-types';
-import {LANG} from '../../language/language';
+import {IFilterApply, IFilterGetDialogParam, IFilterGetDialogResult} from '../kl-types';
 import {CurvesInput, getDefaultCurvesInput, TCurvesInput} from './filter-curves/curves-input';
 import {Options} from '../ui/components/options';
 import {TFilterHistoryEntry} from './filters';
+import {FxPreviewRenderer} from '../ui/project-viewport/fx-preview-renderer';
+import {TProjectViewportProject} from '../ui/project-viewport/project-viewport';
+import {Preview} from '../ui/project-viewport/preview';
+import {css} from '@emotion/css/dist/emotion-css.cjs';
 
 export type TFilterCurvesInput = {
     curves: TCurvesInput;
@@ -28,107 +30,67 @@ export const filterCurves = {
         const layers = klCanvas.getLayers();
         const selectedLayerIndex = klCanvas.getLayerIndex(context.canvas);
 
-        const fit = BB.fitInto(context.canvas.width, context.canvas.height, 280, 200, 1);
-        const w = parseInt('' + fit.width), h = parseInt('' + fit.height);
-
-        const tempCanvas = BB.canvas(w, h);
-        {
-            const ctx = BB.ctx(tempCanvas);
-            ctx.save();
-            if (tempCanvas.width > context.canvas.width) {
-                ctx.imageSmoothingEnabled = false;
-            }
-            ctx.drawImage(context.canvas, 0, 0, w, h);
-            ctx.restore();
-        }
-
         const div = BB.el();
         const result: IFilterGetDialogResult<TFilterCurvesInput> = {
             element: div,
         };
-        let klCanvasPreview: KlCanvasPreview;
+
+        let curves: TCurvesInput = getDefaultCurvesInput();
+        const fxPreviewRenderer = new FxPreviewRenderer({
+            original: context.canvas,
+            onUpdate: (fxCanvas) => {
+                return fxCanvas.curves(curves.r, curves.g, curves.b);
+            },
+        });
+
 
         function finishInit (): void {
 
-            div.innerHTML = LANG('filter-curves-description') + '<br/><br/>';
-
-            let curves: TCurvesInput = getDefaultCurvesInput();
-
-            const fxCanvas = getSharedFx();
-            if (fxCanvas === null) {
-                return; // todo throw?
-            }
-            const texture = fxCanvas.texture(tempCanvas);
-            fxCanvas.draw(texture).update(); // update fxCanvas size
-
-            function update (): void {
-                try {
-                    fxCanvas!.draw(texture).curves(curves.r, curves.g, curves.b).update();
-                    if (klCanvasPreview) {
-                        klCanvasPreview.render();
-                    }
-                } catch(e) {
-                    (div as any).errorCallback(e);
+            const previewLayerArr: TProjectViewportProject['layers'] = [];
+            {
+                for (let i = 0; i < layers.length; i++) {
+                    previewLayerArr.push({
+                        image: i === selectedLayerIndex ? fxPreviewRenderer.render : layers[i].context.canvas,
+                        isVisible: layers[i].isVisible,
+                        opacity: layers[i].opacity,
+                        mixModeStr: layers[i].mixModeStr,
+                        hasClipping: false,
+                    });
                 }
             }
+
+            const preview = new Preview({
+                width: 340,
+                height: 220,
+                project: {
+                    width: context.canvas.width,
+                    height: context.canvas.height,
+                    layers: previewLayerArr,
+                },
+            });
+            preview.getElement().classList.add(css({
+                marginLeft: '-20px',
+                marginRight: '-20px',
+            }));
 
             const input = new CurvesInput({
                 curves,
                 callback: function (val) {
                     curves = val;
-                    update();
+                    fxPreviewRenderer.update();
+                    preview.render();
                 },
             });
             const modeButtons: Options<string> = input.getModeButtons();
 
 
-            div.append(input.getElement());
-
-
-
-            const previewWrapper = BB.el({
-                className: 'kl-preview-wrapper',
-                css: {
-                    width: '340px',
-                    height: '220px',
-                },
-            });
-
-            const previewLayerArr: IKlBasicLayer[] = [];
-            {
-                for (let i = 0; i < layers.length; i++) {
-                    previewLayerArr.push({
-                        image: i === selectedLayerIndex ? fxCanvas : layers[i].context.canvas,
-                        isVisible: layers[i].isVisible,
-                        opacity: layers[i].opacity,
-                        mixModeStr: layers[i].mixModeStr,
-                    });
-                }
-            }
-            klCanvasPreview = new KlCanvasPreview({
-                width: parseInt('' + w),
-                height: parseInt('' + h),
-                layers: previewLayerArr,
-            });
-
-            const previewInnerWrapper = BB.el({
-                className: 'kl-preview-wrapper__canvas',
-                css: {
-                    width: parseInt('' + w) + 'px',
-                    height: parseInt('' + h) + 'px',
-                },
-            });
-            previewInnerWrapper.append(klCanvasPreview.getElement());
-            previewWrapper.append(previewInnerWrapper);
-
-
-            div.append(previewWrapper);
+            div.append(input.getElement(),preview.getElement());
 
             result.destroy = (): void => {
                 input.destroy();
-                texture.destroy();
                 modeButtons.destroy();
-                klCanvasPreview.destroy();
+                fxPreviewRenderer.destroy();
+                preview.destroy();
             };
             result.getInput = function (): TFilterCurvesInput {
                 result.destroy!();

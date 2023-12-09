@@ -1554,5 +1554,9 @@
   more: {
     original: 'More',
     value: 'Mehr'
+  },
+  'x-minutes': {
+    original: '{x}min',
+    value: '{x} Min'
   }
 }

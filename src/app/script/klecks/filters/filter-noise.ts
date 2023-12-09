@@ -158,8 +158,6 @@ export const filterNoise = {
             element: div,
         };
 
-        div.innerHTML = LANG('filter-noise-description') + '<br/><br/>';
-
         const settingsObj: TFilterNoiseInput = {
             seed: Math.random() * 300,
             presetIndex: 0,

@@ -10,7 +10,7 @@ export function showModal (
     p: {
         target: HTMLElement;
         div?: HTMLElement; // node with content
-        message: string; // can be html
+        message: string | Element; // can be html
         callback?: (result: string) => void;
         buttons?: string[]; // "Ok", and "Cancel" will be automatically translated
         primaries?: string[];
@@ -118,7 +118,7 @@ export function showModal (
             xButton,
             icon,
             BB.el({
-                content:p.message,
+                content: p.message,
                 css: {
                     marginRight: '15px',
                     marginBottom: p.div ? '10px' : undefined,

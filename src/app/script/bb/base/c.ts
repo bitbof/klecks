@@ -1,5 +1,6 @@
 import {IKeyStringOptional} from '../bb-types';
 import {BB} from '../bb';
+import {el} from './ui';
 
 function decomposeElString (el: string) {
     if (el === '') {
@@ -139,6 +140,9 @@ function applyStyleNames (el: HTMLElement, styleNames: string[]) {
         bottom: (params) => {
             style.bottom = params[0] === 'full' ? '100%' : params[0] + 'px';
         },
+        size: (params) => {
+            style.fontSize = params[0] + 'px';
+        },
     };
 
     styleNames.forEach(item => {
@@ -153,24 +157,28 @@ function applyStyleNames (el: HTMLElement, styleNames: string[]) {
  * composes HTML
  */
 export function c (
-    el?: HTMLElement | string,
+    element?: HTMLElement | string | Parameters<typeof el>[0],
     inner?: string | (SVGElement | HTMLElement | string)[]
 ): HTMLElement {
-    if (el === undefined) {
+    if (element === undefined) {
         return document.createElement('div');
     }
-    if (typeof el !== 'string') {
+    if (typeof element !== 'string') {
+        if (!(element instanceof HTMLElement)) {
+            element = el(element);
+        }
         if (inner) {
             if (typeof inner === 'string') {
-                el.innerHTML = inner;
+                element.innerHTML = inner;
             } else {
-                el.append(...inner);
+                element.append(...inner);
             }
         }
-        return el;
+
+        return element;
     }
 
-    const decomp = decomposeElString(el);
+    const decomp = decomposeElString(element);
     const result = document.createElement(decomp.tagName ?? 'div');
     decomp.classes && result.classList.add(...decomp.classes);
     decomp.styles && applyStyleNames(result, decomp.styles);

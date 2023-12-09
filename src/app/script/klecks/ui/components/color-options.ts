@@ -175,6 +175,7 @@ export class ColorOptions {
     }
 
     destroy (): void {
+        this.rootEl.remove();
         this.buttonArr.forEach(item => {
             BB.destroyEl(item.el);
         });

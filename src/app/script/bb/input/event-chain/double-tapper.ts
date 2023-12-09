@@ -81,13 +81,18 @@ export class DoubleTapper {
     }
 
     // returns false if time already up. otherwise sets up timeout
-    private setupTimeout (timeoutStr: TDoubleTapperTimeoutType, targetFunc: () => void, timeMS: number): boolean {
+    private setupTimeout (
+        timeoutStr: TDoubleTapperTimeoutType,
+        targetFunc: () => void,
+        timeMS: number,
+        noComparison?: boolean,
+    ): boolean {
         const diff = timeMS - this.nowTime;
         // console.log(fingers + ': ' + timeoutStr + ' diff', diff);
-        if (diff <= 0) { // time already up
+        if (diff <= 0 && !noComparison) { // time already up
             return false;
         }
-        this.timeoutObj[timeoutStr] = setTimeout(targetFunc, diff);
+        this.timeoutObj[timeoutStr] = setTimeout(targetFunc, Math.max(0, diff));
         return true;
     }
 
@@ -231,7 +236,14 @@ export class DoubleTapper {
                     relX: event.relX,
                     relY: event.relY,
                 });
-                if (!this.setupTimeout('success', () => this.success(), event.time + this.minSilenceAfterMs)) {
+                if (
+                    !this.setupTimeout(
+                        'success',
+                        () => this.success(),
+                        event.time + this.minSilenceAfterMs,
+                        true
+                    )
+                ) {
                     this.gestureFailed();
                 }
             } else { // time up -> fail
@@ -246,9 +258,14 @@ export class DoubleTapper {
     constructor (
         p: {
             onDoubleTap: (e: IDoubleTapperEvent) => void; // fires when double tap occurs
+            isInstant?: boolean;
         }
     ) {
         this.onDoubleTap = p.onDoubleTap;
+        if (p.isInstant) {
+            this.minSilenceBeforeDurationMs = 0;
+            this.minSilenceAfterMs = 0;
+        }
         this.gestureFailed = () => {
             if (this.sequenceArr.length === 0) { // no gesture started -> can be ignored
                 return;

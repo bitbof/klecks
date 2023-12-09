@@ -130,8 +130,8 @@ export class SettingsTab {
         if (saveReminder) {
             const reminderSelect = new KL.Select({
                 optionArr: [
-                    ['20min', '20min'],
-                    ['40min', '40min'],
+                    ['20min', LANG('x-minutes', {x: '20'})],
+                    ['40min', LANG('x-minutes', {x: '40'})],
                     ['disabled', '⚠️ ' + LANG('settings-save-reminder-disabled')],
                 ],
                 initValue: saveReminder.getSetting(),

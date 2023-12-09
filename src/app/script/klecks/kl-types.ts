@@ -30,6 +30,7 @@ export interface IFilter {
     lang: {
         name: TTranslationCode; // title in modal
         button: TTranslationCode; // text on button in filter tab
+        description?: TTranslationCode;
     };
     updatePos: boolean; // changes size/orientation of klCanvas
     icon: string; // image url

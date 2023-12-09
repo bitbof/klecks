@@ -136,6 +136,7 @@ export class Options<IdType> {
     }
 
     destroy (): void {
+        this.rootEl.remove();
         this.optionArr.forEach(item => {
             BB.destroyEl(item.el);
         });

@@ -146,6 +146,7 @@ export class BrowserStorageUi {
                 gridArea: 'title',
                 display: 'flex',
                 margin: '-5px 0',
+                gap: '5px',
                 //background: '#f00',
             },
         });
@@ -153,7 +154,7 @@ export class BrowserStorageUi {
         this.infoEl = BB.el({
             parent: title,
             content: '?',
-            className: 'kl-storage-about',
+            className: 'kl-info-btn',
             title: LANG('file-storage-about'),
             onClick: () => {
                 showIframeModal('./help/#help-browser-storage', false);

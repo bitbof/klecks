@@ -60,7 +60,6 @@ export const filterTransform = {
         if (!isSmall) {
             result.width = 540;
         }
-        div.innerHTML = LANG('filter-transform-description');
 
         const keyListener = new BB.KeyListener({
             onDown: function (keyStr) {

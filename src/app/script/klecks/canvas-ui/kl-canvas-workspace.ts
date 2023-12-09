@@ -220,7 +220,6 @@ export class KlCanvasWorkspace {
             return false;
         }
 
-
         const effectiveFactor = newScale / this.targetTransformObj.scale;
         this.targetTransformObj.scale = newScale;
 

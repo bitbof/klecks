@@ -43,7 +43,6 @@ export const filterCropExtend = {
         const result: IFilterGetDialogResult<TFilterCropExtendInput> = {
             element: div,
         };
-        div.innerHTML = LANG('filter-crop-description') + '<br/><br/>';
         let left = 0, right = 0, top = 0, bottom = 0;
         let leftChanged = false, rightChanged = false, topChanged = false, bottomChanged = false;
         const maxWidth = params.maxWidth, maxHeight = params.maxHeight;

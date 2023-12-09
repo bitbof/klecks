@@ -1,11 +1,13 @@
-import {BB} from '../../bb/bb';
 import {eventResMs} from './filters-consts';
 import {KlSlider} from '../ui/components/kl-slider';
-import {KlCanvasPreview} from '../canvas-ui/canvas-preview';
 import {getSharedFx} from '../../fx-canvas/shared-fx';
-import {IFilterApply, IFilterGetDialogParam, IFilterGetDialogResult, IKlBasicLayer} from '../kl-types';
+import {IFilterApply, IFilterGetDialogParam, IFilterGetDialogResult} from '../kl-types';
 import {LANG} from '../../language/language';
 import {TFilterHistoryEntry} from './filters';
+import {FxPreviewRenderer} from '../ui/project-viewport/fx-preview-renderer';
+import {TProjectViewportProject} from '../ui/project-viewport/project-viewport';
+import {Preview} from '../ui/project-viewport/preview';
+import {css} from '@emotion/css/dist/emotion-css.cjs';
 
 export type TFilterHueSaturationInput = {
     hue: number;
@@ -29,35 +31,20 @@ export const filterHueSaturation = {
         const layers = klCanvas.getLayers();
         const selectedLayerIndex = klCanvas.getLayerIndex(context.canvas);
 
-        const fit = BB.fitInto(context.canvas.width, context.canvas.height,280, 200,  1);
-        const w = parseInt('' + fit.width), h = parseInt('' + fit.height);
-
-        const tempCanvas = BB.canvas(w, h);
-        {
-            const ctx = BB.ctx(tempCanvas);
-            ctx.save();
-            if (tempCanvas.width > context.canvas.width) {
-                ctx.imageSmoothingEnabled = false;
-            }
-            ctx.drawImage(context.canvas, 0, 0, w, h);
-            ctx.restore();
-        }
-
         const div = document.createElement('div');
         const result: IFilterGetDialogResult<TFilterHueSaturationInput> = {
             element: div,
         };
 
-        function finishInit (): void {
-            let hue = 0, saturation = 0;
-            div.innerHTML = LANG('filter-hue-sat-description') + '<br/><br/>';
+        let hue = 0, saturation = 0;
+        const fxPreviewRenderer = new FxPreviewRenderer({
+            original: context.canvas,
+            onUpdate: (fxCanvas) => {
+                return fxCanvas.hueSaturation(hue, saturation);
+            },
+        });
 
-            const fxCanvas = getSharedFx();
-            if (!fxCanvas) {
-                return; // todo throw?
-            }
-            const texture = fxCanvas.texture(tempCanvas);
-            fxCanvas.draw(texture).update(); // update fxCanvas size
+        function finishInit (): void {
 
             const hueSlider = new KlSlider({
                 label: LANG('filter-hue-sat-hue'),
@@ -69,8 +56,8 @@ export const filterHueSaturation = {
                 eventResMs: eventResMs,
                 onChange: function (val) {
                     hue = val / 100;
-                    fxCanvas.draw(texture).hueSaturation(hue, saturation).update();
-                    klCanvasPreview.render();
+                    fxPreviewRenderer.update();
+                    preview.render();
                 },
             });
             const saturationSlider = new KlSlider({
@@ -83,64 +70,49 @@ export const filterHueSaturation = {
                 eventResMs: eventResMs,
                 onChange: function (val) {
                     saturation = val / 50 - 1;
-                    fxCanvas.draw(texture).hueSaturation(hue, saturation).update();
-                    klCanvasPreview.render();
+                    fxPreviewRenderer.update();
+                    preview.render();
                 },
             });
             hueSlider.getElement().style.marginBottom = '10px';
+            saturationSlider.getElement().style.marginBottom = '10px';
             div.append(hueSlider.getElement(), saturationSlider.getElement());
 
 
-            const previewWrapper = BB.el({
-                className: 'kl-preview-wrapper',
-                css: {
-                    width: '340px',
-                    height: '220px',
-                },
-            });
-
-            const previewLayerArr: IKlBasicLayer[] = [];
+            const previewLayerArr: TProjectViewportProject['layers'] = [];
             {
                 for (let i = 0; i < layers.length; i++) {
                     previewLayerArr.push({
-                        image: i === selectedLayerIndex ? fxCanvas : layers[i].context.canvas,
+                        image: i === selectedLayerIndex ? fxPreviewRenderer.render : layers[i].context.canvas,
                         isVisible: layers[i].isVisible,
                         opacity: layers[i].opacity,
                         mixModeStr: layers[i].mixModeStr,
+                        hasClipping: false,
                     });
                 }
             }
-            const klCanvasPreview = new KlCanvasPreview({
-                width: parseInt('' + w),
-                height: parseInt('' + h),
-                layers: previewLayerArr,
-            });
 
-            const previewInnerWrapper = BB.el({
-                className: 'kl-preview-wrapper__canvas',
-                css: {
-                    width: parseInt('' + w) + 'px',
-                    height: parseInt('' + h) + 'px',
+            const preview = new Preview({
+                width: 340,
+                height: 220,
+                project: {
+                    width: context.canvas.width,
+                    height: context.canvas.height,
+                    layers: previewLayerArr,
                 },
             });
-            previewInnerWrapper.append(klCanvasPreview.getElement());
-            previewWrapper.append(previewInnerWrapper);
-
-
-            div.append(previewWrapper);
-
-            try {
-                fxCanvas.draw(texture).hueSaturation(hue, saturation).update();
-                klCanvasPreview.render();
-            } catch(e) {
-                (div as any).errorCallback(e);
-            }
+            preview.render();
+            preview.getElement().classList.add(css({
+                marginLeft: '-20px',
+                marginRight: '-20px',
+            }));
+            div.append(preview.getElement());
 
             result.destroy = (): void => {
                 hueSlider.destroy();
                 saturationSlider.destroy();
-                texture.destroy();
-                klCanvasPreview.destroy();
+                fxPreviewRenderer.destroy();
+                preview.destroy();
             };
             result.getInput = function (): TFilterHueSaturationInput {
                 result.destroy!();

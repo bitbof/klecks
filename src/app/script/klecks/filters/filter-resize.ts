@@ -40,9 +40,6 @@ export const filterResize = {
         };
         let newWidth = klCanvas.getWidth(), newHeight = klCanvas.getHeight();
 
-        div.innerHTML = LANG('filter-resize-description') + '<br/><br/>';
-
-
         const maxWidth = params.maxWidth, maxHeight = params.maxHeight;
 
         const widthWrapper = BB.el({

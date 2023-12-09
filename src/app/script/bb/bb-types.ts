@@ -15,6 +15,8 @@ export interface ISize2D {
     height: number;
 }
 
+export type TCSS = Partial<CSSStyleDeclaration>;
+
 export interface IKeyString {
     [key: string]: string;
 }

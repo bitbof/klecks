@@ -342,6 +342,12 @@ button img {
     margin-top: 10px;
 }
 
+.grid-button--filter {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
 .kl-popup {
     width: 100%;
     height: 100%;
@@ -997,9 +1003,8 @@ iframe {
     pointer-events: none;
 }
 
-.kl-storage-about {
+.kl-info-btn {
     cursor: pointer;
-    margin-left: 5px;
     width: 19px;
     height: 19px;
     border-radius: 100%;

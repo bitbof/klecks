@@ -26,37 +26,36 @@ export type TFilterDistort = (
  * @description   Distorts image (moves pixels around)
  */
 export const distort: TFilterDistort = function (settings) {
-    gl.distort = gl.distort || warpShader('\
-        uniform float stepSize;\
-        uniform vec2 scale;\
-        uniform vec2 strength;\
-        uniform vec2 phase;\
-        uniform float type;\
-        ', '\
-        const float PI = 3.14159265;\
-        float x = coord.x;\
-        float y = coord.y;\
-        if (stepSize > 1.0) {\
-            x = floor(x / stepSize) * stepSize;\
-            y = floor(y / stepSize) * stepSize;\
-        }\
-        float distortX = sin((x/scale.x + phase.x) * PI * 2.0) * strength.x;\
-        float distortY = sin((y/scale.y + phase.y) * PI * 2.0) * strength.y;\
-        if (type == 0.0) {\
-            coord.y += distortX;\
-            coord.x += distortY;\
-        } else if (type == 1.0) {\
-            coord.x += distortX;\
-            coord.y += distortY;\
-        } else if (type == 2.0) {\
-            gl_FragColor = texture2D(texture, vec2(x, y) / texSize);\
-            coord.y += sin(gl_FragColor.r/scale.x*200.0 + phase.x * PI * 2.0) * strength.x;\
-            coord.x += cos(gl_FragColor.g/scale.y*200.0 + phase.y * PI * 2.0) * strength.y;\
-        }\
-        coord.x = mod(coord.x, texSize.x);\
-        coord.y = mod(coord.y, texSize.y);\
-        \
-        ');
+    gl.distort = gl.distort || warpShader(`
+    uniform float stepSize;
+    uniform vec2 scale;
+    uniform vec2 strength;
+    uniform vec2 phase;
+    uniform float type;
+`, `
+    const float PI = 3.14159265;
+    float x = coord.x;
+    float y = coord.y;
+    if (stepSize > 1.0) {
+        x = floor(x / stepSize) * stepSize;
+        y = floor(y / stepSize) * stepSize;
+    }
+    float distortX = sin((x/scale.x + phase.x) * PI * 2.0) * strength.x;
+    float distortY = sin((y/scale.y + phase.y) * PI * 2.0) * strength.y;
+    if (type == 0.0) {
+        coord.y += distortX;
+        coord.x += distortY;
+    } else if (type == 1.0) {
+        coord.x += distortX;
+        coord.y += distortY;
+    } else if (type == 2.0) {
+        gl_FragColor = texture2D(texture, vec2(x, y) / texSize);
+        coord.y += sin(gl_FragColor.r/scale.x*200.0 + phase.x * PI * 2.0) * strength.x;
+        coord.x += cos(gl_FragColor.g/scale.y*200.0 + phase.y * PI * 2.0) * strength.y;
+    }
+    coord.x = mod(coord.x, texSize.x);
+    coord.y = mod(coord.y, texSize.y);
+`);
 
     simpleShader.call(this, gl.distort, {
         stepSize: settings.stepSize,

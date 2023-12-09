@@ -1,15 +1,18 @@
 import {BB} from '../../bb/bb';
-import {IFilterApply, IFilterGetDialogParam, IFilterGetDialogResult, IKlBasicLayer} from '../kl-types';
+import {IFilterApply, IFilterGetDialogParam, IFilterGetDialogResult} from '../kl-types';
 import {KlSlider} from '../ui/components/kl-slider';
 import {LANG} from '../../language/language';
 import {eventResMs} from './filters-consts';
-import {KlCanvasPreview} from '../canvas-ui/canvas-preview';
 import {getSharedFx} from '../../fx-canvas/shared-fx';
 import {Options} from '../ui/components/options';
 import {Checkbox} from '../ui/components/checkbox';
 import {TFilterHistoryEntry} from './filters';
 import {throwIfNull} from '../../bb/base/base';
 import {TFilterDistortSettings} from '../../fx-canvas/filters/distort';
+import {FxPreviewRenderer} from '../ui/project-viewport/fx-preview-renderer';
+import {TProjectViewportProject} from '../ui/project-viewport/project-viewport';
+import {Preview} from '../ui/project-viewport/preview';
+import {css} from '@emotion/css/dist/emotion-css.cjs';
 
 
 // see fx-canvas distort
@@ -30,9 +33,7 @@ export const filterDistort = {
     getDialog (params: IFilterGetDialogParam) {
 
         const isSmall = window.innerWidth < 550;
-        const rootEl = BB.el({
-            content: LANG('filter-distort-description') + '<br><br>',
-        });
+        const rootEl = BB.el();
         const context = params.context;
 
         let isSynced = true;
@@ -121,7 +122,8 @@ export const filterDistort = {
             initId: '0',
             onChange: (id) => {
                 settings.distortType = Number(id) as TFilterDistortSettings['distortType'];
-                updatePreview();
+                fxPreviewRenderer.update();
+                preview.render();
             },
         });
 
@@ -143,7 +145,8 @@ export const filterDistort = {
                 sliderArr[1].setValue(settings.strength.x);
                 sliderArr[2].setValue(settings.phase.x);
             }
-            updatePreview();
+            fxPreviewRenderer.update();
+            preview.render();
         }
 
         const syncToggle = new Checkbox({
@@ -198,7 +201,8 @@ export const filterDistort = {
                     if (isSynced) {
                         sync(item);
                     } else {
-                        updatePreview();
+                        fxPreviewRenderer.update();
+                        preview.render();
                     }
                 },
             });
@@ -219,7 +223,8 @@ export const filterDistort = {
                     if (isSynced) {
                         sync(item);
                     } else {
-                        updatePreview();
+                        fxPreviewRenderer.update();
+                        preview.render();
                     }
                 },
             });
@@ -241,7 +246,8 @@ export const filterDistort = {
                     if (isSynced) {
                         sync(item);
                     } else {
-                        updatePreview();
+                        fxPreviewRenderer.update();
+                        preview.render();
                     }
                 },
             });
@@ -264,11 +270,13 @@ export const filterDistort = {
             eventResMs: eventResMs,
             onChange: (val) => {
                 settings.stepSize = Math.round(val);
-                updatePreview();
+                fxPreviewRenderer.update();
+                preview.render();
             },
         });
 
         stepSlider.getElement().style.marginTop = '20px';
+        stepSlider.getElement().style.marginBottom = '10px';
         rootEl.append(stepSlider.getElement());
 
 
@@ -278,77 +286,57 @@ export const filterDistort = {
         const layers = klCanvas.getLayers();
         const selectedLayerIndex = throwIfNull(klCanvas.getLayerIndex(context.canvas));
 
-        const fit = BB.fitInto(context.canvas.width, context.canvas.height, isSmall ? 280 : 490, isSmall ? 200 : 240, 1);
-        const w = parseInt('' + fit.width), h = parseInt('' + fit.height);
-        // const renderW = Math.min(w, context.canvas.width);
-        // const renderH = Math.min(h, context.canvas.height);
-        // const renderFactor = renderW / context.canvas.width;
-        // const previewFactor = w / context.canvas.width;
 
-        const previewWrapper = BB.el({
-            className: 'kl-preview-wrapper',
-            css: {
-                width: isSmall ? '340px' : '540px',
-                height: isSmall ? '260px' : '300px',
+        const fxPreviewRenderer = new FxPreviewRenderer({
+            original: context.canvas,
+            onUpdate: (fxCanvas, transform) => {
+                const scaledSettings = BB.copyObj(settings);
+                scaledSettings.stepSize *= transform.scaleX;
+                scaledSettings.strength.x *= transform.scaleX;
+                scaledSettings.strength.y *= transform.scaleY;
+                if (scaledSettings.distortType !== 2) {
+                    scaledSettings.scale.x *= transform.scaleX;
+                    scaledSettings.scale.y *= transform.scaleY;
+                    scaledSettings.phase.x -= transform.x / scaledSettings.scale.x;
+                    scaledSettings.phase.y -= transform.y / scaledSettings.scale.y;
+                }
+
+                return fxCanvas.multiplyAlpha().distort(scaledSettings).unmultiplyAlpha();
             },
         });
 
-        const fxCanvas = throwIfNull(getSharedFx());
-        const texture = fxCanvas.texture(context.canvas);
-        fxCanvas.draw(texture).update(); // update fxCanvas size
-
-        const previewLayer: IKlBasicLayer = {
-            image: fxCanvas,
-            isVisible: layers[selectedLayerIndex].isVisible,
-            opacity: layers[selectedLayerIndex].opacity,
-            mixModeStr: layers[selectedLayerIndex].mixModeStr,
-        };
-        const previewLayerArr = layers.map((item, i) => {
-            if (i === selectedLayerIndex) {
-                return previewLayer;
-            } else {
-                return {
-                    image: item.context.canvas,
-                    isVisible: item.isVisible,
-                    opacity: item.opacity,
-                    mixModeStr: item.mixModeStr,
-                };
-            }
+        const previewLayerArr: TProjectViewportProject['layers'] = layers.map((item, i) => {
+            return {
+                image: i === selectedLayerIndex ? fxPreviewRenderer.render : item.context.canvas,
+                isVisible: item.isVisible,
+                opacity: item.opacity,
+                mixModeStr: item.mixModeStr,
+                hasClipping: false,
+            };
         });
-        const klCanvasPreview = new KlCanvasPreview({
-            width: Math.round(w),
-            height: Math.round(h),
-            layers: previewLayerArr,
-        });
-
-        const previewInnerWrapper = BB.el({
-            className: 'kl-preview-wrapper__canvas',
-            css: {
-                width: parseInt('' + w) + 'px',
-                height: parseInt('' + h) + 'px',
+        const preview = new Preview({
+            width: isSmall ? 340 : 540,
+            height: isSmall ? 260 : 300,
+            project: {
+                width: context.canvas.width,
+                height: context.canvas.height,
+                layers: previewLayerArr,
             },
         });
-        previewInnerWrapper.append(klCanvasPreview.getElement());
-        previewWrapper.append(previewInnerWrapper);
-        rootEl.append(previewWrapper);
-
-        // ---------- rendering ---------------------
-
-        function updatePreview (): void {
-            fxCanvas.draw(texture).multiplyAlpha().distort(settings).unmultiplyAlpha().update();
-            klCanvasPreview.render();
-        }
-
-        updatePreview();
-
+        preview.render();
+        preview.getElement().classList.add(css({
+            marginLeft: '-20px',
+            marginRight: '-20px',
+        }));
+        rootEl.append(preview.getElement());
 
         const destroy = () => {
             typeOptions.destroy();
             sliderArr.forEach(item => item.destroy());
             stepSlider.destroy();
             syncToggle.destroy();
-            texture.destroy();
-            klCanvasPreview.destroy();
+            fxPreviewRenderer.destroy();
+            preview.destroy();
         };
 
         // ----- result -------------------

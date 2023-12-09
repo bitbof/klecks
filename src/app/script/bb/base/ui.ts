@@ -138,6 +138,7 @@ export function el <GTag extends keyof HTMLElementTagNameMap = 'div'> (
         tagName?: GTag;
         onClick?: (e: Event) => void;
         onChange?: (e: Event) => void;
+        noRef?: boolean; // don't keep references of listeners
     }
 ) {
     if (!params) {
@@ -176,11 +177,11 @@ export function el <GTag extends keyof HTMLElementTagNameMap = 'div'> (
     const listeners: [keyof HTMLElementEventMap, EventListener][] = [];
     if (params.onClick !== undefined) {
         result.addEventListener('click', params.onClick);
-        listeners.push(['click', params.onClick as EventListener]);
+        !params.noRef && listeners.push(['click', params.onClick as EventListener]);
     }
     if (params.onChange !== undefined) {
         result.addEventListener('change', params.onChange);
-        listeners.push(['change', params.onChange]);
+        !params.noRef && listeners.push(['change', params.onChange]);
     }
     if (listeners.length > 0) {
         els.push({

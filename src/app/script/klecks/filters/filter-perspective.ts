@@ -66,8 +66,6 @@ export const filterPerspective = {
         const pointerListenerArr: PointerListener[] = [];
 
         function finishInit (): void {
-            div.innerHTML = LANG('filter-perspective-description') + '<br/><br/>';
-
             const fxCanvas = throwIfNull(getSharedFx());
             const texture = fxCanvas.texture(tempCanvas);
             fxCanvas.draw(texture).update(); // update fxCanvas size

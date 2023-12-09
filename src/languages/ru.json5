@@ -2,1561 +2,1561 @@
   'switch-ui-left-right': {
     hint: 'Button that switches layout from left to right, to accommodate left handed & right handed visitors.',
     original: 'Switch left/right UI',
-    value: '向左/右切換'
+    value: 'Меню влево/вправо'
   },
   'toggle-show-tools': {
     hint: 'Button that hides/shows the toolbar.',
     original: 'Show/Hide Tools',
-    value: '顯示/隱藏工具'
+    value: 'Показать/скрыть инструменты'
   },
   scroll: {
     hint: 'Verb. As in scrolling a page.',
     original: 'Scroll',
-    value: '上滑/下滑'
+    value: 'Прокрутка'
   },
   donate: {
     original: 'Donate',
-    value: '贊助'
+    value: 'Пожертвовать'
   },
   home: {
     hint: 'button with logo, top left of tools',
     original: 'Home',
-    value: '主頁'
+    value: 'Главная страница'
   },
   'modal-new-tab': {
     hint: 'as in browser tab',
     original: 'Open in new tab',
-    value: '在新頁面打開'
+    value: 'Открыть в новой вкладке'
   },
   'tab-edit': {
     hint: 'label for a tab that offer filters for making color adjustments, cropping, transforming, etc.',
     original: 'Edit',
-    value: '編輯'
+    value: 'Изменить'
   },
   'tab-file': {
     hint: 'label for a tab that lets user save the image, import, upload, etc.',
     original: 'File',
-    value: '文件'
+    value: 'Файл'
   },
   'tool-brush': {
     hint: 'tool that lets user paint (like in ms paint or photoshop)',
     original: 'Brush',
-    value: '畫筆工具'
+    value: 'Кисть'
   },
   'tool-paint-bucket': {
     original: 'Paint Bucket',
-    value: '油漆桶'
+    value: 'Заливка'
   },
   'tool-gradient': {
     original: 'Gradient',
-    value: '漸層'
+    value: 'Градиент'
   },
   'tool-shape': {
     hint: 'Tool for drawing rectangles, circles, lines',
     original: 'Shape',
-    value: '形狀'
+    value: 'Форма'
   },
   'tool-text': {
     hint: 'Tool for placing text on canvas',
     original: 'Text',
-    value: '文本'
+    value: 'Текст'
   },
   'tool-hand': {
     hint: 'Tool for navigating (or scrolling around) the canvas. Same name in Photoshop.',
     original: 'Hand Tool',
-    value: '手型工具'
+    value: 'Инструмент «Рука»'
   },
   'tool-zoom': {
     original: 'Zoom',
-    value: '縮放工具'
+    value: 'Приблизить/отдалить'
   },
   undo: {
     original: 'Undo',
-    value: '撤銷'
+    value: 'Отмена'
   },
   redo: {
     original: 'Redo',
-    value: '重做'
+    value: 'Повторить действие'
   },
   'brush-pen': {
     hint: 'Generic "brush" that feels a bit like a pen or marker, as opposed to a paint brush.',
     original: 'Pen',
-    value: '畫筆'
+    value: 'Ручка'
   },
   'brush-blend': {
     hint: 'brush with watercolor feel. Makes colors blend/bleed into each other. Different from smudging though.',
     original: 'Blend',
-    value: '水彩刷'
+    value: 'Переход'
   },
   'brush-sketchy': {
     hint: 'Made up brush name. Pictures drawn with this brush often look like sketches.',
     original: 'Sketchy',
-    value: '素描筆'
+    value: 'Эскиз'
   },
   'brush-pixel': {
     original: 'Pixel',
-    value: '像素化'
+    value: 'Пиксели'
   },
   'brush-chemy': {
     hint: 'Made up brush name, derived from drawing applications "Webchemy" and "Alchemy"',
     original: 'Chemy',
-    value: '異形圖形'
+    value: 'Графика особой формы'
   },
   'brush-smudge': {
     hint: 'Common brush/tool in image editing software. Smudges colors around canvas.',
     original: 'Smudge',
-    value: '暈染'
+    value: 'Палец'
   },
   'brush-size': {
     original: 'Size',
-    value: '筆刷大小'
+    value: 'Размер'
   },
   'brush-blending': {
     hint: 'Wetness. How much colors will bleed into each other.',
     original: 'Blending',
-    value: '水分量'
+    value: 'Наложение'
   },
   'brush-toggle-pressure': {
     hint: 'google "pressure sensitivity". Feature of Wacom tablets, Apple Pencil, XP Pen, etc.',
     original: 'Toggle Pressure Sensitivity',
-    value: '筆壓敏度'
+    value: 'Переключение чувствительности давления'
   },
   'brush-pen-circle': {
     hint: 'as in circle shape',
     original: 'Circle',
-    value: '圓形'
+    value: 'Круг'
   },
   'brush-pen-chalk': {
     hint: 'as in chalk texture',
     original: 'Chalk',
-    value: '粉筆'
+    value: 'Мел'
   },
   'brush-pen-calligraphy': {
     hint: 'like a "chisel tip marker"',
     original: 'Calligraphy',
-    value: '斜角筆'
+    value: 'Каллиграфия'
   },
   'brush-pen-square': {
     hint: 'as in square shape',
     original: 'Square',
-    value: '方形'
+    value: 'Квадрат'
   },
   'brush-sketchy-scale': {
     hint: 'How far the connecting lines of sketchy brush can reach.',
     original: 'Scale',
-    value: '網格長度'
+    value: 'Масштабирование'
   },
   'brush-pixel-dither': {
     hint: 'Dithering/halftone pattern',
     original: 'Dither',
-    value: '像素抖動'
+    value: 'Дизеринг'
   },
   'brush-chemy-fill': {
     hint: 'Like in MS Paint. A shape can have be outlined, and filled.',
     original: 'Fill',
-    value: '填充'
+    value: 'Заливка'
   },
   'brush-chemy-stroke': {
     original: 'Stroke',
-    value: '線條'
+    value: 'Обводка'
   },
   'brush-chemy-mirror-x': {
     original: 'Horizontal Symmetry',
-    value: '水平對稱'
+    value: 'Горизонтальная симметрия'
   },
   'brush-chemy-mirror-y': {
     original: 'Vertical Symmetry',
-    value: '垂直對稱'
+    value: 'Вертикальная симметрия'
   },
   'brush-chemy-gradient': {
     hint: 'as in color gradient',
     original: 'Gradient',
-    value: '漸變'
+    value: 'Градиент'
   },
   'brush-eraser-transparent-bg': {
     hint: 'as in transparent background/bottom layer',
     original: 'Transparent Background',
-    value: '底層透明度'
+    value: 'Прозрачный фон'
   },
   stabilizer: {
     hint: 'Common feature in drawing software to make lines smoother',
     original: 'Stabilizer',
-    value: '抖動修正'
+    value: 'Стабилизатор'
   },
   'stabilizer-title': {
     hint: '-title keys are usually more verbose description. shown as a tooltip.',
     original: 'Stroke Stabilizer',
-    value: '抖動修正線條'
+    value: 'Стабилизатор обводки'
   },
   eyedropper: {
     original: 'Eyedropper',
-    value: '顏色選取'
+    value: 'Пипетка'
   },
   'secondary-color': {
     hint: 'or sometimes called "background" color. Photoshop, MS Paint, etc. allow user to switch between two colors.',
     original: 'Secondary Color',
-    value: '二級色'
+    value: 'Вторичный цвет'
   },
   'manual-color-input': {
     hint: 'A dialog where users can manually type the color, each channel a number. "mci" keys all related to this dialog.',
     original: 'Manual Color Input',
-    value: '手動輸入顏色'
+    value: 'Ввод цвета вручную'
   },
   'mci-hex': {
     hint: 'as in hex code. Hex representation of color. „#f00“ → red',
     original: 'Hex',
-    value: '16進制'
+    value: 'Шестнадцатеричный'
   },
   'mci-copy': {
     hint: 'verb',
     original: 'Copy',
-    value: '複製'
+    value: 'Скопировать'
   },
   'modal-ok': {
     hint: 'main confirmation button in dialogs. Can be to confirm an action, not just acknowledge information.',
     original: 'Ok',
-    value: 'Ok'
+    value: 'OK'
   },
   'modal-cancel': {
     original: 'Cancel',
-    value: '取消'
+    value: 'Отмена'
   },
   'modal-close': {
     hint: 'as in close a dialog box',
     original: 'Close',
-    value: '關閉'
+    value: 'Закрыть'
   },
   'layers-active-layer': {
     hint: 'currently selected layer that user is drawing on',
     original: 'Active Layer',
-    value: '當前圖層'
+    value: 'Активный слой'
   },
   'layers-layer': {
     original: 'Layer',
-    value: '圖層'
+    value: 'Слой'
   },
   'layers-copy': {
     hint: 'noun',
     original: 'copy',
-    value: '副本'
+    value: 'копия'
   },
   'layers-blending': {
     hint: 'Common feature in image editing & drawing software. All layers-blend- keys relate to this. https://en.wikipedia.org/wiki/Blend_modes',
     original: 'Blending',
-    value: '混合模式'
+    value: 'Наложение'
   },
   'layers-new': {
     hint: 'action',
     original: 'New Layer',
-    value: '新建圖層'
+    value: 'Новый слой'
   },
   'layers-remove': {
     hint: 'action',
     original: 'Remove Layer',
-    value: '刪除圖層'
+    value: 'Удалить слой'
   },
   'layers-duplicate': {
     hint: 'action',
     original: 'Duplicate Layer',
-    value: '複製圖層'
+    value: 'Копировать слой'
   },
   'layers-merge': {
     hint: 'action',
     original: 'Merge with layer below',
-    value: '向下合併'
+    value: 'Объединить со слоём ниже'
   },
   'layers-merge-all': {
     original: 'Merge all',
-    value: ''
+    value: 'Объединить все'
   },
   'layers-rename': {
     hint: 'action',
     original: 'Rename',
-    value: '重命名'
+    value: 'Переименовать'
   },
   'layers-active-layer-visible': {
     original: 'Active layer is visible',
-    value: '當前圖層可見'
+    value: 'Активный слой видимый'
   },
   'layers-active-layer-hidden': {
     original: 'Active layer is hidden',
-    value: '當前圖層隱藏'
+    value: 'Активный слой скрыт'
   },
   'layers-visibility-toggle': {
     original: 'Layer Visibility',
-    value: '圖層可見性'
+    value: 'Видимость слоя'
   },
   'layers-blend-normal': {
     original: 'normal',
-    value: '正常'
+    value: 'обычный'
   },
   'layers-blend-darken': {
     original: 'darken',
-    value: '變暗'
+    value: 'затемнение'
   },
   'layers-blend-multiply': {
     original: 'multiply',
-    value: '正片疊底'
+    value: 'умножение'
   },
   'layers-blend-color-burn': {
     original: 'color burn',
-    value: '顏色加深'
+    value: 'затемнение основы'
   },
   'layers-blend-lighten': {
     original: 'lighten',
-    value: '變亮'
+    value: 'осветление'
   },
   'layers-blend-screen': {
     original: 'screen',
-    value: '濾色'
+    value: 'экранирование'
   },
   'layers-blend-color-dodge': {
     original: 'color dodge',
-    value: '顏色減淡'
+    value: 'осветление основы'
   },
   'layers-blend-overlay': {
     original: 'overlay',
-    value: '疊加'
+    value: 'перекрытие'
   },
   'layers-blend-soft-light': {
     original: 'soft light',
-    value: '柔光'
+    value: 'мягкий свет'
   },
   'layers-blend-hard-light': {
     original: 'hard light',
-    value: '強光'
+    value: 'жёсткий свет'
   },
   'layers-blend-difference': {
     original: 'difference',
-    value: '差值'
+    value: 'разница'
   },
   'layers-blend-exclusion': {
     original: 'exclusion',
-    value: '排除'
+    value: 'исключение'
   },
   'layers-blend-hue': {
     original: 'hue',
-    value: '色相'
+    value: 'цветовой тон'
   },
   'layers-blend-saturation': {
     original: 'saturation',
-    value: '飽和度'
+    value: 'насыщенность'
   },
   'layers-blend-color': {
     original: 'color',
-    value: '顏色'
+    value: 'цветность'
   },
   'layers-blend-luminosity': {
     original: 'luminosity',
-    value: '明度'
+    value: 'светимость'
   },
   'layers-rename-title': {
     hint: '-title in code usually means it shows up in a tooltip, or it’s the header of a dialog box, so it can be a little bit longer.',
     original: 'Rename Layer',
-    value: '重命名圖層'
+    value: 'Переименовать слой'
   },
   'layers-rename-name': {
     hint: 'noun',
     original: 'Name',
-    value: '重命名'
+    value: 'Имя'
   },
   'layers-rename-clear': {
     hint: 'aka action of deleting entered name',
     original: 'Clear Name',
-    value: '清除'
+    value: 'Очистить имя'
   },
   'layers-rename-sketch': {
     hint: 'noun. Name suggestion for a layer',
     original: 'Sketch',
-    value: '草圖'
+    value: 'Эскиз'
   },
   'layers-rename-colors': {
     hint: 'noun. Name suggestion for a layer',
     original: 'Colors',
-    value: '色彩'
+    value: 'Цвета'
   },
   'layers-rename-shading': {
     hint: 'noun. Name suggestion for a layer',
     original: 'Shading',
-    value: '陰影'
+    value: 'Затенение'
   },
   'layers-rename-lines': {
     hint: 'noun. Name suggestion for a layer',
     original: 'Lines',
-    value: '線條'
+    value: 'Линии'
   },
   'layers-rename-effects': {
     hint: 'noun. Name suggestion for a layer',
     original: 'Effects',
-    value: '效果'
+    value: 'Эффекты'
   },
   'layers-rename-foreground': {
     hint: 'noun. Name suggestion for a layer',
     original: 'Foreground',
-    value: '前景'
+    value: 'Передний план'
   },
   'layers-merge-modal-title': {
     original: 'Merge/Mix Layers',
-    value: '向下合併'
+    value: 'Объединение/смешивание слоёв'
   },
   'layers-merge-description': {
     hint: 'After ":" a list of mix/blend modes is shown.',
     original: 'Merges the selected layer with the one underneath. Select the mix mode:',
-    value: '選中層與底下一層合併。選擇混合模式：'
+    value: 'Объединяет выбранный слой с тем, который находится под ним. Выберите режим смешивания:'
   },
   'file-no-autosave': {
     hint: "let user know they can't autosave, and there's no cloud storage. Keep short so fits on one line",
     original: 'No autosave, no cloud storage',
-    value: '不能自動保存，沒有雲端儲存'
+    value: 'Нет автосохранения, нет облачного хранилища'
   },
   'file-new': {
     hint: 'action',
     original: 'New',
-    value: '新建'
+    value: 'Новый'
   },
   'file-import': {
     hint: 'action',
     original: 'Import',
-    value: '打開'
+    value: 'Импорт'
   },
   'file-save': {
     hint: 'action',
     original: 'Save',
-    value: '保存'
+    value: 'Сохранить'
   },
   'file-format': {
     original: 'File Format',
-    value: '檔案格式'
+    value: 'Формат файла'
   },
   'file-copy': {
     hint: 'verb',
     original: 'Copy',
-    value: '複製'
+    value: 'Скопировать'
   },
   'file-copy-title': {
     original: 'Copy To Clipboard',
-    value: '複製到剪貼板'
+    value: 'Скопировать в буфер обмена'
   },
   'file-share': {
     hint: 'Common feature on phones. Pressing share button allows to send data to a different app, e.g. as a text message to someone.',
     original: 'Share',
-    value: '分享'
+    value: 'Поделиться'
   },
   'file-storage': {
     hint: 'Made up term. Allows users to store drawing in the browser. (not synced across devices)',
     original: 'Browser Storage',
-    value: '保存至瀏覽器'
+    value: 'Хранилище браузера'
   },
   'file-storage-thumb-title': {
     hint: 'when reopening or reloading',
     original: 'Restores when reopening page',
-    value: '重新打開頁面時恢復'
+    value: 'Восстанавливается при повторном открытии страницы'
   },
   'file-storage-about': {
     hint: 'link to Browser Storage help/user manual',
     original: 'About Browser Storage',
-    value: '關於保存至瀏覽器'
+    value: 'О хранилище браузера'
   },
   'file-storage-cant-access': {
     hint: 'an error. Can’t access the storage.',
     original: "Can't access",
-    value: '無法獲取'
+    value: 'Не удаётся получить доступ'
   },
   'file-storage-empty': {
     hint: 'nothing stored',
     original: 'Empty',
-    value: '無內容'
+    value: 'Пусто'
   },
   'file-storage-store': {
     hint: 'verb',
     original: 'Store',
-    value: '保存'
+    value: 'Сохранить'
   },
   'file-storage-clear': {
     original: 'Clear',
-    value: '清除'
+    value: 'Очистить'
   },
   'file-storage-storing': {
     hint: 'while it is in the process of storing',
     original: 'Storing',
-    value: '保存中'
+    value: 'Сохранение'
   },
   'file-storage-overwrite': {
     hint: 'overwrite what is already stored',
     original: 'Overwrite',
-    value: '覆蓋'
+    value: 'Перезаписать'
   },
   'file-storage-min-ago': {
     hint: "{x} <- needs to stay, it's a placeholder.",
     original: '{x}min ago',
-    value: '{x}分鐘前'
+    value: '{x} мин. назад'
   },
   'file-storage-hours-ago': {
     original: '{x}h ago',
-    value: '{x}小時前'
+    value: '{x} ч. назад'
   },
   'file-storage-days-ago': {
     original: '{x}d ago',
-    value: '{x}天前'
+    value: '{x} дн. назад'
   },
   'file-storage-month-ago': {
     original: '> 1month ago',
-    value: '>一個月前'
+    value: '> 1 месяц назад'
   },
   'file-storage-restored': {
     original: 'Restored from Browser Storage',
-    value: '從瀏覽器內存中恢復'
+    value: 'Восстановлено из хранилища браузера'
   },
   'file-storage-stored': {
     original: 'Stored to Browser Storage',
-    value: '保存至瀏覽器內存'
+    value: 'Сохранено в хранилище браузера'
   },
   'file-storage-failed': {
     original: 'Failed to store to Browser Storage',
-    value: '保存失敗'
+    value: 'Не удалось сохранить в хранилище браузера'
   },
   'file-storage-failed-1': {
     original: 'Failed to store. Possible causes:',
-    value: '保存失敗。可能是由於：'
+    value: 'Не удалось сохранить. Возможные причины:'
   },
   'file-storage-failed-2': {
     original: 'Out of disk space',
-    value: '磁盤空間不足'
+    value: 'Не хватает дискового пространства'
   },
   'file-storage-failed-3': {
     original: 'Storage disabled in incognito tab',
-    value: '隱身頁面中禁用存儲功能'
+    value: 'Хранилище отключено во вкладке инкогнито'
   },
   'file-storage-failed-4': {
     hint: 'as in: unsupported feature',
     original: "Browser doesn't support storage",
-    value: '瀏覽器不支持'
+    value: 'Браузер не поддерживает хранилище'
   },
   'file-storage-failed-clear': {
     original: 'Failed to clear.',
-    value: '清除失敗'
+    value: 'Не удалось очистить.'
   },
   'file-upload': {
     hint: 'verb',
     original: 'Upload',
-    value: '上傳'
+    value: 'Загрузить'
   },
   'cleared-layer': {
     hint: 'the layer has been cleared. It is now empty',
     original: 'Cleared layer',
-    value: '圖層已清除'
+    value: 'Очищенный слой'
   },
   filled: {
     hint: 'layer got filled with a color',
     original: 'Filled',
-    value: '圖層已填充'
+    value: 'Заполненный'
   },
   'new-title': {
     original: 'New Image',
-    value: '新建項目'
+    value: 'Новое изображение'
   },
   'new-current': {
     hint: 'as in "reuse the current image resolution"',
     original: 'Current',
-    value: '當前大小'
+    value: 'Текущее'
   },
   'new-fit': {
     hint: 'make dimensions of image fit your window size',
     original: 'Fit',
-    value: '適應頁面'
+    value: 'Подгонка'
   },
   'new-oversize': {
     hint: 'like oversized clothes.',
     original: 'Oversize',
-    value: '大畫布'
+    value: 'Огромная'
   },
   'new-square': {
     hint: 'square image format',
     original: 'Square',
-    value: '正方形'
+    value: 'Квадрат'
   },
   'new-landscape': {
     hint: 'https://en.wikipedia.org/wiki/Page_orientation',
     original: 'Landscape',
-    value: '橫向尺寸'
+    value: 'Альбомная'
   },
   'new-portrait': {
     original: 'Portrait',
-    value: '縱向尺寸'
+    value: 'Книжная'
   },
   'new-screen': {
     hint: 'resolution of computer screen',
     original: 'Screen',
-    value: '顯示分辨率'
+    value: 'Экран'
   },
   'new-video': {
     hint: 'dimensions of a video (usually 16:9)',
     original: 'Video',
-    value: '視頻'
+    value: 'Видео'
   },
   'new-din-paper': {
     hint: 'https://en.wikipedia.org/wiki/Paper_size',
     original: 'DIN Paper',
-    value: '紙張大小'
+    value: 'Формат бумаги'
   },
   'new-px': {
     hint: 'abbreviation of pixel',
     original: 'px',
-    value: '像素'
+    value: 'пикс.'
   },
   'new-ratio': {
     hint: 'aspect ratio',
     original: 'Ratio',
-    value: '比例'
+    value: 'Соотношение'
   },
   'upload-title': {
     hint: '"Imgur" is a website name.',
     original: 'Upload to Imgur',
-    value: '上傳到Imgur'
+    value: 'Загрузить на Imgur'
   },
   'upload-link-notice': {
     hint: 'Explaining to user even though their upload is unlisted, they should be careful who they share the link with. No password protection.',
     original: 'Anyone with the link to your uploaded image will be able to view it.',
-    value: '他人可以通過生成的圖片鏈接查看你的作品。 '
+    value: 'Любой, у кого есть ссылка на загруженное вами изображение, сможет его просмотреть.'
   },
   'upload-name': {
     hint: 'noun',
     original: 'Title',
-    value: '標題'
+    value: 'Название'
   },
   'upload-title-untitled': {
     original: 'Untitled',
-    value: '未命名'
+    value: 'Безымянный'
   },
   'upload-caption': {
     hint: 'as in image caption / description',
     original: 'Caption',
-    value: '描述'
+    value: 'Подпись'
   },
   'upload-submit': {
     hint: 'verb',
     original: 'Upload',
-    value: '上傳'
+    value: 'Загрузить'
   },
   'upload-uploading': {
     hint: 'in the process of uploading',
     original: 'Uploading...',
-    value: '上傳中...'
+    value: 'Загрузка...'
   },
   'upload-success': {
     original: 'Upload Successful',
-    value: '上傳成功'
+    value: 'Загрузка удалась'
   },
   'upload-failed': {
     original: 'Upload failed.',
-    value: '上傳失敗'
+    value: 'Загрузка не удалась.'
   },
   'upload-delete': {
     original: 'To delete your image from Imgur visit:',
-    value: '要從Imgur刪除你的圖片, 請訪問:'
+    value: 'Чтобы удалить своё изображение с Imgur, посетите сайт:'
   },
   'cropcopy-title-copy': {
     original: 'Copy To Clipboard',
-    value: '複製到剪貼板'
+    value: 'Скопировать в буфер обмена'
   },
   'cropcopy-title-crop': {
     hint: 'Cropping is a common feature in image editing.',
     original: 'Crop',
-    value: '裁剪'
+    value: 'Рамка'
   },
   'cropcopy-click-hold': {
     original: 'Right-click or press hold to copy.',
-    value: '點擊右鍵或長按進行複制。'
+    value: 'Нажмите правую кнопку мыши или нажмите и удерживайте, чтобы скопировать.'
   },
   'cropcopy-btn-copy': {
     hint: 'confirmation button. Should be short.',
     original: 'To Clipboard',
-    value: '至剪貼板'
+    value: 'В буфер обмена'
   },
   'cropcopy-copied': {
     original: 'Copied.',
-    value: '已複製'
+    value: 'Скопировано.'
   },
   'cropcopy-btn-crop': {
     hint: 'confirmation button. Should be short.',
     original: 'Apply Crop',
-    value: '應用裁剪'
+    value: 'Применение обрезки'
   },
   'crop-drag-to-crop': {
     hint: 'drag the mouse to adjust cropping',
     original: 'Drag to crop',
-    value: '拖動裁剪'
+    value: 'Перетащите для кадрирования'
   },
   'filter-crop-extend': {
     original: 'Crop/Extend',
-    value: '畫布大小'
+    value: 'Кадрир./растягив.'
   },
   'filter-flip': {
     original: 'Flip',
-    value: '翻轉'
+    value: 'Перевернуть'
   },
   'filter-perspective': {
     hint: 'perspective transformation',
     original: 'Perspective',
-    value: '透視'
+    value: 'Перспектива'
   },
   'filter-resize': {
     original: 'Resize',
-    value: '圖像大小'
+    value: 'Изм. размера'
   },
   'filter-rotate': {
     original: 'Rotate',
-    value: '旋轉'
+    value: 'Поворот'
   },
   'filter-transform': {
     hint: 'more generic transformation. Commonly known as "free transform"',
     original: 'Transform',
-    value: '自由變換'
+    value: 'Трансформ.'
   },
   'filter-bright-contrast': {
     hint: 'brightness contrast',
     original: 'Bright/Contrast',
-    value: '亮度/對比'
+    value: 'Ярк./Контраст.'
   },
   'filter-curves': {
     hint: 'color curves',
     original: 'Curves',
-    value: '曲線'
+    value: 'Кривые'
   },
   'filter-hue-sat': {
     original: 'Hue/Saturation',
-    value: '色相/飽和度'
+    value: 'Цв. тон/Насыщ.'
   },
   'filter-invert': {
     hint: 'invert the colors',
     original: 'Invert',
-    value: '反相'
+    value: 'Инверсия'
   },
   'filter-tilt-shift': {
     hint: 'or just depth-of-field. https://en.wikipedia.org/wiki/Tilt%E2%80%93shift_photography',
     original: 'Tilt Shift',
-    value: '移軸'
+    value: 'Глуб. резкости'
   },
   'filter-to-alpha': {
     hint: 'feature that can isolate line drawings if it is a black and white image.',
     original: 'To Alpha',
-    value: '轉換至Alpha'
+    value: 'Прозрачность'
   },
   'filter-triangle-blur': {
     hint: 'or just blur',
     original: 'Triangle Blur',
-    value: '模糊'
+    value: 'Треуг. размытие'
   },
   'filter-unsharp-mask': {
     hint: 'or just sharpen, https://en.wikipedia.org/wiki/Unsharp_masking',
     original: 'Unsharp Mask',
-    value: 'USM 銳化'
+    value: 'Нерезкая маска'
   },
   'filter-crop-title': {
     hint: 'same as the button, but can be longer',
     original: 'Crop / Extend',
-    value: '畫布大小'
+    value: 'Кадрирование / растягивание'
   },
   'filter-crop-description': {
     hint: 'descriptions explain the "filter" a tiny bit. Most importantly it says if it’s applied to a single layer, or the entire image (all layer)',
     original: 'Crop or extend the image.',
-    value: '裁剪圖片'
+    value: 'Обрезка или растягивание изображения.'
   },
   'filter-crop-left': {
     original: 'Left',
-    value: '左'
+    value: 'Влево'
   },
   'filter-crop-right': {
     original: 'Right',
-    value: '右'
+    value: 'Вправо'
   },
   'filter-crop-top': {
     original: 'Top',
-    value: '上'
+    value: 'Вверх'
   },
   'filter-crop-bottom': {
     original: 'Bottom',
-    value: '下'
+    value: 'Вниз'
   },
   'filter-crop-rule-thirds': {
     hint: 'https://en.wikipedia.org/wiki/Rule_of_thirds',
     original: 'Rule of Thirds',
-    value: '三分法'
+    value: 'Правило третей'
   },
   'filter-crop-fill': {
     hint: 'If image gets extended, what color to fill that new area with',
     original: 'Fill',
-    value: '填充'
+    value: 'Заполнение'
   },
   'filter-flip-title': {
     hint: 'same as the button, but can be longer',
     original: 'Flip',
-    value: '翻轉'
+    value: 'Перевернуть'
   },
   'filter-flip-description': {
     original: 'Flips layer or whole image.',
-    value: '翻轉圖層或整個圖像'
+    value: 'Переворачивание слоя или всего изображения.'
   },
   'filter-flip-horizontal': {
     original: 'Horizontal',
-    value: '水平'
+    value: 'По горизонтали'
   },
   'filter-flip-vertical': {
     original: 'Vertical',
-    value: '垂直'
+    value: 'По вертикали'
   },
   'filter-flip-image': {
     original: 'Flip Image',
-    value: '翻轉圖像'
+    value: 'Перевернуть изображение'
   },
   'filter-flip-layer': {
     original: 'Flip Layer',
-    value: '翻轉圖層'
+    value: 'Перевернуть слой'
   },
   'filter-perspective-title': {
     hint: 'same as the button, but can be longer',
     original: 'Perspective',
-    value: '透視'
+    value: 'Перспектива'
   },
   'filter-perspective-description': {
     original: 'Transforms the selected layer.',
-    value: '變換已選圖層'
+    value: 'Трансформирование выбранного слоя.'
   },
   'filter-resize-title': {
     hint: 'same as the button, but can be longer',
     original: 'Resize',
-    value: '圖像大小'
+    value: 'Изменение размера'
   },
   'filter-resize-description': {
     original: 'Resizes the image.',
-    value: '更改圖像大小'
+    value: 'Изменение размера изображения.'
   },
   'filter-rotate-title': {
     hint: 'same as the button, but can be longer',
     original: 'Rotate',
-    value: '旋轉'
+    value: 'Поворот'
   },
   'filter-rotate-description': {
     original: 'Rotates the image.',
-    value: '旋轉圖像'
+    value: 'Поворачивание изображения.'
   },
   'filter-transform-empty': {
     hint: 'nothing on the layer, just transparency',
     original: 'Layer is empty.',
-    value: '圖層為空'
+    value: 'Слой пустой.'
   },
   'filter-transform-title': {
     hint: 'same as the button, but can be longer',
     original: 'Transform',
-    value: '變換'
+    value: 'Трансформация'
   },
   'filter-transform-description': {
     hint: 'as in the Shift key.',
     original: 'Transforms selected layer. Hold Shift for additional behavior.',
-    value: '變換已選圖層。按住Shift操作。 '
+    value: 'Трансформация выбранного слоя. Удерживайте Shift для дополнительного поведения.'
   },
   'filter-transform-rotation': {
     hint: 'or Angle',
     original: 'Rotation',
-    value: '旋轉'
+    value: 'Поворот'
   },
   'filter-transform-flip': {
     original: 'Flip',
-    value: '翻轉'
+    value: 'Перевернуть'
   },
   'filter-transform-center': {
     hint: 'verb or noun',
     original: 'Center',
-    value: '居中'
+    value: 'Центрировать'
   },
   'filter-transform-constrain': {
     hint: 'short version of "constrain proportions" – feature that locks the aspect ratio',
     original: 'Constrain',
-    value: '保持'
+    value: 'Сохранить'
   },
   'filter-transform-snap': {
     hint: 'or snapping. Common feature in graphics software. Makes stuff snap into place so it’s easier to align elements in an image',
     original: 'Snap',
-    value: '對齊'
+    value: 'Привязать'
   },
   'filter-transform-snap-title': {
     hint: 'same as above, but as a tooltip',
     original: 'Snap Rotation And Position',
-    value: '旋轉對齊/水平對齊'
+    value: 'Привязать вращение и положение'
   },
   'filter-bright-contrast-title': {
     hint: 'same as the button, but can be longer',
     original: 'Brightness / Contrast',
-    value: '亮度/對比'
+    value: 'Яркость / Контрастность'
   },
   'filter-bright-contrast-description': {
     original: 'Change brightness and contrast for the selected layer.',
-    value: '更改已選圖層的亮度和對比度。 '
+    value: 'Изменение яркости и контрастности для выбранного слоя.'
   },
   'filter-bright-contrast-brightness': {
     original: 'Brightness',
-    value: '亮度'
+    value: 'Яркость'
   },
   'filter-bright-contrast-contrast': {
     original: 'Contrast',
-    value: '對比'
+    value: 'Контраст'
   },
   'filter-curves-title': {
     hint: 'same as the button, but can be longer',
     original: 'Curves',
-    value: '曲線'
+    value: 'Кривые'
   },
   'filter-curves-description': {
     original: 'Apply curves on the selected layer.',
-    value: '應用曲線到已選圖層。 '
+    value: 'Применение кривые к выбранному слою.'
   },
   'filter-curves-all': {
     original: 'All',
-    value: '全部'
+    value: 'Все'
   },
   'filter-hue-sat-title': {
     hint: 'same as the button, but can be longer',
     original: 'Hue / Saturation',
-    value: '色相/飽和度'
+    value: 'Цветовой тон / Насыщенность'
   },
   'filter-hue-sat-description': {
     original: 'Change hue and saturation for the selected layer.',
-    value: '更改已選圖層的色相和飽和度。 '
+    value: 'Изменение оттенка и насыщенность для выбранного слоя.'
   },
   'filter-hue-sat-hue': {
     original: 'Hue',
-    value: '色相'
+    value: 'Цветовой тон'
   },
   'filter-hue-sat-saturation': {
     original: 'Saturation',
-    value: '飽和度'
+    value: 'Насыщенность'
   },
   'filter-applied': {
     hint: 'used like this: „Invert“ applied. Informs that a filter was applied',
     original: 'applied',
-    value: '應用'
+    value: '- применено'
   },
   'filter-tilt-shift-title': {
     hint: 'same as the button, but can be longer',
     original: 'Tilt Shift',
-    value: '移軸'
+    value: 'Глубина резкости'
   },
   'filter-tilt-shift-description': {
     original: 'Applies tilt shift on the selected layer.',
-    value: '應用移軸到已選圖層。 '
+    value: 'Применение глубины резкости к выбранному слою.'
   },
   'filter-tilt-shift-blur': {
     hint: 'words can be individually translated',
     original: 'Blur Radius',
-    value: '模糊半徑'
+    value: 'Радиус размытия'
   },
   'filter-tilt-shift-gradient': {
     hint: 'words can be individually translated',
     original: 'Gradient Radius',
-    value: '梯度半徑'
+    value: 'Радиус градиента'
   },
   'filter-to-alpha-title': {
     hint: 'same as the button, but can be longer',
     original: 'To Alpha',
-    value: '至Alpha'
+    value: 'Прозрачность'
   },
   'filter-to-alpha-description': {
     hint: 'after ":" follow two options',
     original: 'Generates alpha channel for selected layer from:',
-    value: '對已選圖層生成Alpha通道：'
+    value: 'Создание альфа-канала для выбранного слоя:'
   },
   'filter-to-alpha-inverted-lum': {
     hint: 'luminance is same as the layer blend mode "luminosity"',
     original: 'Inverted Luminance',
-    value: '亮度翻轉'
+    value: 'Инвертированная яркость'
   },
   'filter-to-alpha-lum': {
     original: 'Luminance',
-    value: '亮度'
+    value: 'Яркость'
   },
   'filter-to-alpha-replace': {
     hint: 'What color to replace the rgb channels with',
     original: 'Replace RGB',
-    value: '替換RGB'
+    value: 'Замена RGB'
   },
   'filter-triangle-blur-title': {
     hint: 'same as the button, but can be longer',
     original: 'Triangle Blur',
-    value: '模糊'
+    value: 'Треугольное размытие'
   },
   'filter-triangle-blur-description': {
     original: 'Applies triangle blur on the selected layer.',
-    value: '應用模糊到已選圖層。 '
+    value: 'Применение треугольного размытия к выбранному слою.'
   },
   'filter-unsharp-mask-title': {
     hint: 'same as the button, but can be longer',
     original: 'Unsharp Mask',
-    value: 'USM銳化'
+    value: 'Нерезкая маска'
   },
   'filter-unsharp-mask-description': {
     original: 'Sharpens the selected layer by scaling pixels away from the average of their neighbors.',
-    value: '根據附近像素的均值應用銳化到已選圖層。 '
+    value: 'Повышение резкости выбранного слоя, масштабируя пиксели от среднего значения их соседей.'
   },
   'filter-unsharp-mask-strength': {
     original: 'Strength',
-    value: '強度'
+    value: 'Интенсивность'
   },
   'filter-grid': {
     original: 'Grid',
-    value: '網格'
+    value: 'Сетка'
   },
   'filter-grid-description': {
     original: 'Draws grid on selected layer.',
-    value: '給當前層添加網格線。'
+    value: 'Отображение сетки на выбранном слое.'
   },
   'filter-noise': {
     original: 'Noise',
-    value: '噪聲'
+    value: 'Шум'
   },
   'filter-noise-description': {
     original: 'Adds noise to selected layer.',
-    value: '應用噪聲到達選擇層。'
+    value: 'Добавление шума к выбранному слою.'
   },
   'filter-noise-scale': {
     original: 'Scale',
-    value: '圖案大小'
+    value: 'Масштаб'
   },
   'filter-noise-alpha': {
     original: 'Alpha',
-    value: 'Alpha'
+    value: 'Прозрачность'
   },
   'filter-pattern': {
     original: 'Pattern',
-    value: '圖案'
+    value: 'Шаблон'
   },
   'filter-pattern-description': {
     original: 'Generates pattern on selected layer. Drag the preview for further controls.',
-    value: '在選定圖層上生成圖案。 拖動預覽以獲得更多控制。'
+    value: 'Создание шаблона на выбранном слое. Перетащите предпросмотр для дополнительных элементов управления.'
   },
   'filter-distort': {
     original: 'Distort',
-    value: '扭曲'
+    value: 'Искажение'
   },
   'filter-distort-description': {
     original: 'Distorts the selected layer.',
-    value: '扭曲選定的圖層。'
+    value: 'Искажение выбранного слоя.'
   },
   'filter-distort-phase': {
     original: 'Phase',
-    value: '階段'
+    value: 'Фаза'
   },
   'filter-distort-stepsize': {
     original: 'Step Size',
-    value: '步長'
+    value: 'Размер шага'
   },
   'filter-distort-sync-xy': {
     original: 'Sync XY',
-    value: '同步 XY'
+    value: 'Синхронизация XY'
   },
   'filter-vanish-point': {
     original: 'Vanish Point',
-    value: '消失點'
+    value: 'Испр. перспективы'
   },
   'filter-vanish-point-title': {
     original: 'Vanishing Point',
-    value: '消失點'
+    value: 'Исправление перспективы'
   },
   'filter-vanish-point-description': {
     original: 'Adds vanishing point to selected layer. Drag preview to move.',
-    value: '添加消失點至所選圖層。'
+    value: 'Добавление исправления перспективы к выбранному слою. Перетащите предпросмотр, чтобы переместить.'
   },
   'filter-vanish-point-lines': {
     hint: 'As in: the number of lines',
     original: 'Lines',
-    value: '線條數量'
+    value: 'Линии'
   },
   'import-opening': {
     hint: 'in the process of opening a large file',
     original: 'Opening file...',
-    value: '打開文件...'
+    value: 'Открытие файла...'
   },
   'import-title': {
     original: 'Import Image',
-    value: '導入圖像'
+    value: 'Импорт изображения'
   },
   'import-too-large': {
     original: 'Image too large, will be downscaled.',
-    value: '圖像過大，將會進行縮小。 '
+    value: 'Изображение слишком большое, оно будет уменьшено.'
   },
   'import-btn-as-layer': {
     hint: 'import as layer. Button label, should be short',
     original: 'As Layer',
-    value: '作為圖層'
+    value: 'Как слой'
   },
   'import-btn-as-image': {
     hint: 'import as image. Button label, should be short',
     original: 'As Image',
-    value: '作為圖像'
+    value: 'Как изображение'
   },
   'import-as-layer-title': {
     original: 'Import Image as New Layer',
-    value: '導入圖像作為新圖層'
+    value: 'Импорт изображения как нового слоя'
   },
   'import-as-layer-description': {
     original: 'Adjust the position of the imported image.',
-    value: '調整導入圖像的位置。 '
+    value: 'Регулировка положения импортированного изображения.'
   },
   'import-as-layer-limit-reached': {
     hint: 'Kleki allows only a certain number of layers',
     original: 'Layer limit reached. Image will be placed on existing layer.',
-    value: '達到圖層數量上限。圖像將會應用到已有圖層。'
+    value: 'Достигнуто ограничение слоёв. Изображение будет помещено на существующий слой.'
   },
   'import-as-layer-fit': {
     hint: 'verb. imported image made to fit inside canvas.',
     original: 'Fit',
-    value: '適應'
+    value: 'Подгонка'
   },
   'import-flatten': {
     hint: 'Turn image that has multiple layers into an image that has only one layer.',
     original: 'Flatten image',
-    value: '拼合圖像'
+    value: 'Выполнить сведение'
   },
   'import-unsupported-file': {
     hint: 'e.g. user tried to open a WAV',
     original: 'Unsupported file type. See Help for supported types.',
-    value: '不支持此類文件類型。查看幫助。 '
+    value: 'Неподдерживаемый тип файла. Поддерживаемые типы см. во вкладке «Помощь».'
   },
   'import-broken-file': {
     hint: 'if an image file is broken',
     original: "Couldn't load image. File might be corrupted.",
-    value: '不能加載圖像。文件可能受損。 '
+    value: 'Не удалось загрузить изображение. Возможно, файл повреждён.'
   },
   'import-psd-unsupported': {
     hint: 'PSD is photoshop file format. flatten as in „flatten image“ in photoshop. Merged all layers',
     original: 'Unsupported features. PSD had to be flattened.',
-    value: '不支持該功能。 PSD需要拼合。 '
+    value: 'Неподдерживаемые функции. PSD необходимо было сведить.'
   },
   'import-psd-limited-support': {
     hint: 'PSD has lots of fancy features that Kleki doesn\'t have, so when importing a PSD it often has to simplify things. So it might look different compared to when opening in Photoshop. We’re informing the user if they "flatten" the image it will be accurate despite losing layers. The user has to weigh, do they care about having layers, or do they care about it looking right.',
     original: 'PSD support is limited. Flattened will more likely look correct.',
-    value: 'PSD支持受限。拼合功能將會更近原始圖像。 '
+    value: 'Поддержка PSD ограничена. Сведённый вариант, скорее всего, будет выглядеть правильно.'
   },
   'import-psd-too-large': {
     original: 'Image exceeds maximum dimensions of {x} x {x} pixels. Unable to import.',
-    value: '圖像超過{x} x {x}個像素。不能導入。 '
+    value: 'Изображение превышает максимальные размеры {x} x {x} пикселей. Невозможно импортировать.'
   },
   'import-psd-size': {
     original: 'Image size',
-    value: '圖像大小'
+    value: 'Размер изображения'
   },
   'hand-reset': {
     hint: 'resets zoom (to 100%) and rotation (to 0°)',
     original: 'Reset',
-    value: '重置'
+    value: 'Сброс'
   },
   'hand-fit': {
     hint: 'makes canvas cover whole working area',
     original: 'Fit',
-    value: '適應'
+    value: 'Подгонка'
   },
   'bucket-tolerance': {
     hint: 'a common feature for paint bucket',
     original: 'Tolerance',
-    value: '容差'
+    value: 'Допуск'
   },
   'bucket-sample': {
     hint: 'like "taking a sample"',
     original: 'Sample',
-    value: '採樣'
+    value: 'Образец'
   },
   'bucket-sample-title': {
     original: 'Which layers to sample color from',
-    value: '從特定圖層進行色彩採樣'
+    value: 'Из каких слоёв брать образцы цвета'
   },
   'bucket-sample-all': {
     hint: 'all layers',
     original: 'All',
-    value: '全部'
+    value: 'Всех'
   },
   'bucket-sample-active': {
     hint: 'currently active layer',
     original: 'Active',
-    value: '當前'
+    value: 'Активный'
   },
   'bucket-sample-above': {
     hint: 'layer above active layer',
     original: 'Above',
-    value: '之前'
+    value: 'Выше'
   },
   'bucket-grow': {
     hint: 'verb. Or expand.',
     original: 'Grow',
-    value: '填充擴張'
+    value: 'Расш. заполн.'
   },
   'bucket-grow-title': {
     original: 'Grow filled area (in pixels)',
-    value: '擴張填充的區域（像素）'
+    value: 'Расширить заполненную область (в пикселях)'
   },
   'bucket-contiguous': {
     hint: 'common setting for paint bucket in image editing software',
     original: 'Contiguous',
-    value: '連續的'
+    value: 'Смеж. пикс'
   },
   'bucket-contiguous-title': {
     hint: 'tooltip explaining Contiguous',
     original: 'Only fill connected areas',
-    value: '僅填充相連的區域'
+    value: 'Заполнить только соединённые области'
   },
   'gradient-linear': {
     original: 'Linear',
-    value: '線性'
+    value: 'Линейный'
   },
   'gradient-linear-mirror': {
     original: 'Linear-Mirror',
-    value: '反射性'
+    value: 'Линейно-зеркальный'
   },
   'gradient-radial': {
     original: 'Radial',
-    value: '放射狀'
+    value: 'Лучевой'
   },
   'shape-stroke': {
     original: 'Stroke',
-    value: '線條'
+    value: 'Обводка'
   },
   'shape-fill': {
     original: 'Fill',
-    value: '填充'
+    value: 'Заполнение'
   },
   'shape-rect': {
     hint: 'rectangle shape',
     original: 'Rectangle',
-    value: '方形'
+    value: 'Прямоугольник'
   },
   'shape-ellipse': {
     hint: 'ellipse shape',
     original: 'Ellipse',
-    value: '圓形'
+    value: 'Эллипс'
   },
   'shape-line': {
     original: 'Line',
-    value: '線條'
+    value: 'Линия'
   },
   'shape-line-width': {
     original: 'Line Width',
-    value: '線條寬度'
+    value: 'Ширина линии'
   },
   'shape-outwards': {
     hint: 'grows shape from the center outwards',
     original: 'Outwards',
-    value: '自中心向外'
+    value: 'Внешне'
   },
   'shape-fixed': {
     hint: 'fixed ratio of 1:1',
     original: 'Fixed 1:1',
-    value: '鎖定 1:1'
+    value: 'Фиксированная 1:1'
   },
   'text-instruction': {
     original: 'Click canvas to place text',
-    value: '點擊畫布添加文本'
+    value: 'Нажмите на холст, чтобы разместить текст'
   },
   'text-title': {
     original: 'Add Text',
-    value: '添加文本'
+    value: 'Добавить текст'
   },
   'text-text': {
     original: 'Text',
-    value: ''
+    value: 'Текст'
   },
   'text-font': {
     original: 'Font',
-    value: ''
+    value: 'Шрифт'
   },
   'text-placeholder': {
     hint: 'placeholder in text input.',
     original: 'Your text',
-    value: '請輸入'
+    value: 'Ваш текст'
   },
   'text-color': {
     original: 'Color',
-    value: '色彩'
+    value: 'Цвет'
   },
   'text-size': {
     original: 'Size',
-    value: '大小'
+    value: 'Размер'
   },
   'text-line-height': {
     original: 'Line Height',
-    value: ''
+    value: 'Высота линии'
   },
   'text-letter-spacing': {
     original: 'Letter Spacing',
-    value: ''
+    value: 'Расстояние между буквами'
   },
   'text-left': {
     hint: 'left, center, right text formatting like in Word',
     original: 'Left',
-    value: '左對齊'
+    value: 'Слева'
   },
   'text-center': {
     original: 'Center',
-    value: '居中'
+    value: 'По центру'
   },
   'text-right': {
     original: 'Right',
-    value: '右對齊'
+    value: 'Справа'
   },
   'text-italic': {
     original: 'Italic',
-    value: '斜體'
+    value: 'Курсив'
   },
   'text-bold': {
     original: 'Bold',
-    value: '加粗'
+    value: 'Жирный'
   },
   'save-reminder-title': {
     hint: 'Save Reminder is a popup that shows up after 20 minutes of not saving. Allows user to save on the spot.',
     original: 'Unsaved Work',
-    value: '作品未保存'
+    value: 'Несохранённая работа'
   },
   'save-reminder-text': {
     hint: 'turns into: "...saved in <strong>12 minutes</strong>. Save..."',
     original: 'Image was not saved in {a} minutes{b}. Save now to prevent eventual loss.',
-    value: '圖畫已{a}分鐘{b}未保存。立刻保存以避免進度丟失。'
+    value: 'Изображение не было сохранено в течение {a} мин{b}. Сохраните сейчас, чтобы предотвратить возможную потерю.'
   },
   'save-reminder-save-psd': {
     original: 'Save As PSD',
-    value: '保存為PSD'
+    value: 'Сохранить как PSD'
   },
   'save-reminder-psd-layers': {
     original: 'PSD will remember all layers.',
-    value: 'PSD可保留所有圖層。'
+    value: 'PSD запомнит все слои.'
   },
   'backup-drawing': {
     hint: '(Embed) If the upload failed, the user can backup/download their drawing.',
     original: 'You can backup your drawing.',
-    value: '您可以備份繪圖。'
+    value: 'Вы можете создать резервную копию своего рисунка.'
   },
   submit: {
     original: 'Submit',
-    value: '送出'
+    value: 'Отправить'
   },
   'submit-title': {
     hint: 'tooltip when hovering "Submit" button',
     original: 'Submit Drawing',
-    value: '送出圖像'
+    value: 'Отправка рисунка'
   },
   'submit-prompt': {
     hint: 'Dialog asking for confirmation',
     original: 'Submit drawing?',
-    value: '確認送出？'
+    value: 'Отправить рисунок?'
   },
   'submit-submitting': {
     hint: 'in the process of uploading',
     original: 'Submitting',
-    value: '送出中'
+    value: 'Отправка'
   },
   'embed-init-loading': {
     hint: 'when opening the app',
     original: 'Loading app',
-    value: '加載app'
+    value: 'Загрузка приложения'
   },
   'embed-init-waiting': {
     hint: 'The app is loaded, but it’s still waiting for image',
     original: 'Waiting for image',
-    value: '圖像上傳中'
+    value: 'Ожидание изображения'
   },
   unsaved: {
     original: 'Unsaved',
-    value: '未保存'
+    value: 'Не сохранено'
   },
   help: {
     hint: 'or user manual',
     original: 'Help',
-    value: '幫助'
+    value: 'Помощь'
   },
   'tab-settings': {
     original: 'Settings',
-    value: '設置'
+    value: 'Настройки'
   },
   'settings-language': {
     original: 'Language',
-    value: '語言'
+    value: 'Язык'
   },
   'settings-language-reload': {
     hint: 'changes will be visible after reloading the page',
     original: 'Will update after reloading.',
-    value: '刷新後更改語言'
+    value: 'Обновится после перезагрузки.'
   },
   'settings-theme': {
     original: 'Theme',
-    value: '外觀主題'
+    value: 'Тема'
   },
   'settings-save-reminder-label': {
     original: 'Save Reminder',
-    value: ''
+    value: 'Напоминание сохр.'
   },
   'settings-save-reminder-disabled': {
     original: 'disabled',
-    value: ''
+    value: 'отключено'
   },
   'settings-save-reminder-confirm-title': {
     original: 'Turn off Save Reminder?',
-    value: ''
+    value: 'Отключить напоминание о сохранении?'
   },
   'settings-save-reminder-confirm-a': {
     original: "There is no autosave and browser tabs don't last forever. If you don't periodically save you will likely lose work.",
-    value: ''
+    value: 'Здесь нет автосохранения, а вкладки браузера не хранятся вечно. Если вы не будете периодически сохранять, то, скорее всего, потеряете рисунок.'
   },
   'settings-save-reminder-confirm-b': {
     original: 'Disable at your own risk?',
-    value: ''
+    value: 'Отключить на свой страх и риск?'
   },
   'settings-save-reminder-confirm-disable': {
     original: 'Disable',
-    value: ''
+    value: 'Отключить'
   },
   'theme-dark': {
     original: 'Dark',
-    value: '深色'
+    value: 'Тёмная'
   },
   'theme-light': {
     original: 'Light',
-    value: '淺色'
+    value: 'Светлая'
   },
   'terms-of-service': {
     original: 'Terms of Service',
-    value: '服務條款'
+    value: 'Условия обслуживания'
   },
   licenses: {
     hint: 'as in software licenses',
     original: 'Licenses',
-    value: '許可'
+    value: 'Лицензии'
   },
   'source-code': {
     original: 'Source Code',
-    value: '源代碼'
+    value: 'Исходный код'
   },
   auto: {
     hint: 'automatically decided',
     original: 'auto',
-    value: '自動'
+    value: 'авто'
   },
   'zoom-in': {
     original: 'Zoom In',
-    value: '放大'
+    value: 'Приближение'
   },
   'zoom-out': {
     original: 'Zoom Out',
-    value: '縮小'
+    value: 'Отдаление'
   },
   radius: {
     original: 'Radius',
-    value: '半徑'
+    value: 'Радиус'
   },
   'constrain-proportions': {
     original: 'Constrain Proportions',
-    value: '保持縱橫比'
+    value: 'Сохранение пропорций'
   },
   width: {
     original: 'Width',
-    value: '寬度'
+    value: 'Ширина'
   },
   height: {
     original: 'Height',
-    value: '高度'
+    value: 'Высота'
   },
   opacity: {
     hint: 'for layer opacity, brush opacity, text opacity, ...',
     original: 'Opacity',
-    value: '不透明度'
+    value: 'Прозрач.'
   },
   red: {
     original: 'Red',
-    value: '紅'
+    value: 'Красный'
   },
   green: {
     original: 'Green',
-    value: '綠'
+    value: 'Зелёный'
   },
   blue: {
     original: 'Blue',
-    value: '藍'
+    value: 'Синий'
   },
   eraser: {
     hint: 'noun. As short as possible',
     original: 'Eraser',
-    value: '橡皮擦'
+    value: 'Ластик'
   },
   center: {
     hint: 'verb',
     original: 'Center',
-    value: '居中'
+    value: 'По центру'
   },
   layers: {
     hint: 'layers in the context of image editing software',
     original: 'Layers',
-    value: '圖層'
+    value: 'Слои'
   },
   background: {
     hint: 'as in background layer',
     original: 'Background',
-    value: '背景'
+    value: 'Фон'
   },
   'scaling-algorithm': {
     hint: 'Label for dropdown where user chooses which computer graphics algorithm should be used to scale the image',
     original: 'Scaling Algorithm',
-    value: '縮放算法'
+    value: 'Алгоритм масштабирования'
   },
   'algorithm-smooth': {
     original: 'Smooth',
-    value: '平滑'
+    value: 'Гладкий'
   },
   'algorithm-pixelated': {
     original: 'Pixelated',
-    value: '像素化'
+    value: 'Пиксельный'
   },
   preview: {
     hint: 'subject. When applying a filter user sees a preview of what the result would look like.',
     original: 'Preview',
-    value: '預覽'
+    value: 'Предпросмотр'
   },
   'angle-snap': {
     hint: 'Snapping. Like when transforming an image and it snaps to the side of the frame.',
     original: 'Snap',
-    value: '對齊'
+    value: 'Привязка'
   },
   'angle-snap-title': {
     original: '45° Angle Snapping',
-    value: '以45°角度對齊'
+    value: 'Угловая привязка 45°'
   },
   'lock-alpha': {
     hint: 'Short. Freezes the alpha channel of image. Images consist of 4 channels (red, green, blue, alpha). Alpha lock also found in Procreate and photoshop',
     original: 'Lock Alpha',
-    value: '鎖定'
+    value: 'Альфа-блокировка'
   },
   'lock-alpha-title': {
     hint: "same as 'lock-alpha' but longer version. Shows up as a tooltip when hovering",
     original: "Locks layer's alpha channel",
-    value: '鎖定圖層透明度'
+    value: 'Блокирует альфа-канал слоя'
   },
   reverse: {
     hint: 'Reversing the direction of a color gradient',
     original: 'Reverse',
-    value: '反向'
+    value: 'Реверсивный'
   },
   'compare-before': {
     original: 'Before',
-    value: '之前'
+    value: 'До'
   },
   'compare-after': {
     original: 'After',
-    value: '之後'
+    value: 'После'
   },
   loading: {
     original: 'Loading',
-    value: ''
+    value: 'Загрузка'
   },
   more: {
     original: 'More',
-    value: ''
+    value: 'Ещё'
   },
   'x-minutes': {
     original: '{x}min',
-    value: '{x}分鐘'
+    value: '{x} мин.'
   }
 }

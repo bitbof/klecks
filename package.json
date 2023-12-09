@@ -17,17 +17,17 @@
     "lang:sync": "node src/languages/generate.js sync",
     "lang:build": "node src/languages/generate.js build"
   },
-  "devDependencies": {},
   "dependencies": {
     "@emotion/css": "^11.11.2",
     "@parcel/transformer-glsl": "^2.9.3",
     "@parcel/transformer-image": "^2.9.3",
     "@parcel/transformer-sass": "^2.9.3",
-    "parcel": "^2.9.3",
-    "buffer": "^6.0.3",
     "ag-psd": "^17.0.0",
+    "buffer": "^6.0.3",
     "js-beautify": "^1.14.8",
     "json5": "^2.2.3",
-    "mdn-polyfills": "^5.20.0"
+    "mdn-polyfills": "^5.20.0",
+    "parcel": "^2.9.3",
+    "transformation-matrix": "^2.15.0"
   }
 }
