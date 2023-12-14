@@ -6,6 +6,7 @@ import {LANG} from '../../language/language';
 import {throwIfNull} from '../../bb/base/base';
 import {TFilterHistoryEntry} from './filters';
 import {Options} from '../ui/components/options';
+import {smallPreview} from './utils/preview-size';
 
 export type TFilterFlipInput = {
     horizontal: boolean;
@@ -32,9 +33,9 @@ export const filterFlip = {
         const fit = BB.fitInto(context.canvas.width, context.canvas.height, 280, 200, 1);
         const w = parseInt('' + fit.width), h = parseInt('' + fit.height);
 
-        const div = document.createElement('div');
+        const rootEl = BB.el();
         const result: IFilterGetDialogResult<TFilterFlipInput> = {
-            element: div,
+            element: rootEl,
         };
         let isHorizontal = true;
         let isVertical = false;
@@ -65,8 +66,8 @@ export const filterFlip = {
                 marginBottom: '10px',
             },
         });
-        div.append(horizontalCheckbox.getElement());
-        div.append(verticalCheckbox.getElement());
+        rootEl.append(horizontalCheckbox.getElement());
+        rootEl.append(verticalCheckbox.getElement());
 
         const targetOptions = new Options<boolean>({
             optionArr: [
@@ -85,14 +86,14 @@ export const filterFlip = {
             },
         });
 
-        div.append(targetOptions.getElement());
+        rootEl.append(targetOptions.getElement());
 
 
         const previewWrapper = BB.el({
             className: 'kl-preview-wrapper',
             css: {
-                width: '340px',
-                height: '220px',
+                width: smallPreview.width + 'px',
+                height: smallPreview.height + 'px',
             },
         });
 
@@ -164,7 +165,7 @@ export const filterFlip = {
         setTimeout(updatePreview, 0);
 
 
-        div.append(previewWrapper);
+        rootEl.append(previewWrapper);
         result.destroy = (): void => {
             horizontalCheckbox.destroy();
             verticalCheckbox.destroy();

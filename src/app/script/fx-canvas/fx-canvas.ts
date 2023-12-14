@@ -179,7 +179,7 @@ void main() {
             throw 'WebGLRenderingContext not set. Browser does not support WebGL.';
         }
 
-        const canvas: TFxCanvas = BB.canvas() as TFxCanvas;
+        const canvas: TFxCanvas = BB.canvas(1, 1) as TFxCanvas;
         const context = getWebGlContext(canvas, {premultipliedAlpha: false});
         if (!context) {
             throw 'This browser does not support WebGL';

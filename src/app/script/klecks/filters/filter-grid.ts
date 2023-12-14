@@ -1,12 +1,15 @@
 import {BB} from '../../bb/bb';
-import {KlCanvasPreview} from '../canvas-ui/canvas-preview';
-import {IFilterApply, IFilterGetDialogParam, IFilterGetDialogResult, IKlBasicLayer} from '../kl-types';
+import {IFilterApply, IFilterGetDialogParam, IFilterGetDialogResult} from '../kl-types';
 import {LANG} from '../../language/language';
 import {input} from '../ui/components/input';
 import {ColorOptions} from '../ui/components/color-options';
 import {drawGrid} from '../image-operations/draw-grid';
 import {TFilterHistoryEntry} from './filters';
 import {throwIfNull} from '../../bb/base/base';
+import {Preview} from '../ui/project-viewport/preview';
+import {css} from '@emotion/css/dist/emotion-css.cjs';
+import {getPreviewHeight, getPreviewWidth} from './utils/preview-size';
+import {testIsSmall} from './utils/test-is-small';
 
 export type TFilterGridInput = {
     x: number;
@@ -32,38 +35,37 @@ export const filterGrid = {
         const layers = klCanvas.getLayers();
         const selectedLayerIndex = throwIfNull(klCanvas.getLayerIndex(context.canvas));
 
-        const fit = BB.fitInto(context.canvas.width, context.canvas.height, 280, 200, 1);
-        const w = parseInt('' + fit.width), h = parseInt('' + fit.height);
-        const renderW = Math.min(w, context.canvas.width);
-        const renderH = Math.min(h, context.canvas.height);
-        const renderFactor = renderW / context.canvas.width;
-
-        const div = document.createElement('div');
+        const rootEl = BB.el();
         const result: IFilterGetDialogResult<TFilterGridInput> = {
-            element: div,
+            element: rootEl,
         };
+        const isSmall = testIsSmall();
+        if (!isSmall) {
+            result.width = getPreviewWidth(isSmall);
+        }
 
         const settingsObj: TFilterGridInput = {
             x: 2,
             y: 2,
-            thickness: 2,
+            thickness: 8,
             color: '#000',
             opacity: 1,
         };
 
         const line1 = BB.el({
-            parent: div,
+            parent: rootEl,
             css: {
                 display: 'flex',
                 alignItems: 'center',
             },
         });
         const line2 = BB.el({
-            parent: div,
+            parent: rootEl,
             css: {
                 display: 'flex',
                 alignItems: 'center',
                 marginTop: '10px',
+                marginBottom: '10px',
             },
         });
         const xInput = input({
@@ -87,7 +89,7 @@ export const filterGrid = {
             },
         });
         const thicknessInput = input({
-            init: 2,
+            init: settingsObj.thickness,
             type: 'number',
             min: 1,
             css: {width: '75px', marginRight: '20px'},
@@ -143,64 +145,50 @@ export const filterGrid = {
             colorOptions.getElement(),
         );
 
+        const previewCanvas = BB.canvas(context.canvas.width, context.canvas.height);
+        const previewCtx = BB.ctx(previewCanvas);
+        const previewLayerArr = layers.map((item, i) => {
+            return {
+                image: i === selectedLayerIndex ? previewCanvas : item.context.canvas,
+                isVisible: item.isVisible,
+                opacity: item.opacity,
+                mixModeStr: item.mixModeStr,
+                hasClipping: false,
+            };
+        });
 
-        const previewWrapper = BB.el({
-            className: 'kl-preview-wrapper',
-            css: {
-                width: '340px',
-                height: '220px',
+        const preview = new Preview({
+            width: getPreviewWidth(isSmall),
+            height: getPreviewHeight(isSmall),
+            project: {
+                width: context.canvas.width,
+                height: context.canvas.height,
+                layers: previewLayerArr,
             },
         });
 
-        const previewLayer: IKlBasicLayer = {
-            image: BB.canvas(renderW, renderH),
-            isVisible: layers[selectedLayerIndex].isVisible,
-            opacity: layers[selectedLayerIndex].opacity,
-            mixModeStr: layers[selectedLayerIndex].mixModeStr,
-        };
-        const klCanvasPreview = new KlCanvasPreview({
-            width: Math.round(w),
-            height: Math.round(h),
-            layers: layers.map((item, i) => {
-                if (i === selectedLayerIndex) {
-                    return previewLayer;
-                } else {
-                    return {
-                        image: item.context.canvas,
-                        isVisible: item.isVisible,
-                        opacity: item.opacity,
-                        mixModeStr: item.mixModeStr,
-                    };
-                }
-            }),
-        });
-
-        const previewInnerWrapper = BB.el({
-            className: 'kl-preview-wrapper__canvas',
-            css: {
-                width: parseInt('' + w) + 'px',
-                height: parseInt('' + h) + 'px',
-            },
-        });
-        previewInnerWrapper.append(klCanvasPreview.getElement());
-        previewWrapper.append(previewInnerWrapper);
+        preview.getElement().classList.add(css({
+            marginLeft: '-20px',
+            marginRight: '-20px',
+        }));
+        rootEl.append(preview.getElement());
 
         function updatePreview (): void {
-            const ctx = BB.ctx((previewLayer.image as HTMLCanvasElement));
+            const ctx = previewCtx;
             ctx.save();
-            ctx.clearRect(0, 0, renderW, renderH);
-            ctx.drawImage(context.canvas, 0, 0, renderW, renderH);
-            drawGrid(ctx, settingsObj.x, settingsObj.y, Math.max(settingsObj.thickness * renderFactor, 1), settingsObj.color, settingsObj.opacity);
-
+            ctx.clearRect(0, 0, previewCanvas.width, previewCanvas.height);
+            ctx.drawImage(context.canvas, 0, 0);
+            drawGrid(ctx, settingsObj.x, settingsObj.y, Math.max(settingsObj.thickness, 1), settingsObj.color, settingsObj.opacity);
             ctx.restore();
-            klCanvasPreview.render();
+            preview.render();
         }
-        setTimeout(updatePreview, 0);
+        updatePreview();
+        preview.render();
 
 
-        div.append(previewWrapper);
         result.destroy = (): void => {
-            klCanvasPreview.destroy();
+            preview.destroy();
+            BB.freeCanvas(previewCanvas);
             colorOptions.destroy();
         };
         result.getInput = function (): TFilterGridInput {

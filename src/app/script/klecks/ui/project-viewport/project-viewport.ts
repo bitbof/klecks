@@ -89,6 +89,14 @@ export class ProjectViewport {
         this.render();
     };
 
+    private oldDPR = devicePixelRatio;
+    private resizeListener = () => {
+        if (devicePixelRatio !== this.oldDPR) {
+            this.canvas.style.imageRendering = Math.round(devicePixelRatio) !== devicePixelRatio ? '' : 'pixelated';
+            this.oldDPR = devicePixelRatio;
+        }
+    };
+
     // ---- public ----
     constructor (p: TProjectViewportParams) {
         this.width = p.width;
@@ -112,14 +120,15 @@ export class ProjectViewport {
         BB.css(this.canvas, {
             width: this.doFillParent ? '100%' : (this.width + 'px'),
             height: this.doFillParent ? '100%' : (this.height + 'px'),
-            imageRendering: 'pixelated',
+            imageRendering: Math.round(devicePixelRatio) !== devicePixelRatio ? undefined : 'pixelated',
             display: 'block',
         });
+        window.addEventListener('resize', this.resizeListener);
 
         this.pattern = throwIfNull(this.ctx.createPattern(BB.createCheckerCanvas(10, theme.isDark()), 'repeat'));
         theme.addIsDarkListener(this.onIsDark);
 
-        this.render();
+        // this.render();
     }
 
     render (): void {
@@ -243,5 +252,6 @@ export class ProjectViewport {
     destroy (): void {
         BB.freeCanvas(this.canvas);
         theme.removeIsDarkListener(this.onIsDark);
+        window.removeEventListener('resize', this.resizeListener);
     }
 }

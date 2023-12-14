@@ -59,7 +59,7 @@ async function upload (
         marginLeft: 'auto',
         marginRight: 'auto',
         marginTop: '100px',
-        fontFamily: 'Arial, sans-serif',
+        fontFamily: 'system-ui, sans-serif',
         fontSize: '20px',
         textAlign: 'center',
         transition: 'opacity 0.3s ease-in-out',

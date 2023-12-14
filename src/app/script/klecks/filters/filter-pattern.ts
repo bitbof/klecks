@@ -9,6 +9,8 @@ import {TwoTabs} from '../ui/components/two-tabs';
 import {IVector2D} from '../../bb/bb-types';
 import {TFilterHistoryEntry} from './filters';
 import {throwIfNull} from '../../bb/base/base';
+import {testIsSmall} from './utils/test-is-small';
+import {getPreviewHeight, getPreviewWidth, mediumPreview} from './utils/preview-size';
 
 
 export type TFilterPatternInput = {
@@ -142,7 +144,7 @@ export const filterPattern = {
 
     getDialog (params: IFilterGetDialogParam) {
 
-        const isSmall = window.innerWidth < 550;
+        const isSmall = testIsSmall();
         const maxSize = 1024;
         const rootEl = BB.el();
         const context = params.context;
@@ -331,8 +333,8 @@ export const filterPattern = {
         const previewWrapper = BB.el({
             className: 'kl-preview-wrapper',
             css: {
-                width: isSmall ? '340px' : '540px',
-                height: isSmall ? '260px' : '300px',
+                width: getPreviewWidth(isSmall) + 'px',
+                height: getPreviewHeight(isSmall) + 'px',
                 marginTop: '0',
             },
         });
@@ -600,7 +602,7 @@ export const filterPattern = {
             },
         };
         if (!isSmall) {
-            result.width = 540;
+            result.width = mediumPreview.width;
         }
         return result;
     },

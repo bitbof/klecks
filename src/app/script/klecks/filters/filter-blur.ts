@@ -8,6 +8,9 @@ import {FxPreviewRenderer} from '../ui/project-viewport/fx-preview-renderer';
 import {Preview} from '../ui/project-viewport/preview';
 import {TProjectViewportProject} from '../ui/project-viewport/project-viewport';
 import {css} from '@emotion/css/dist/emotion-css.cjs';
+import {testIsSmall} from './utils/test-is-small';
+import {getPreviewHeight, getPreviewWidth} from './utils/preview-size';
+import {BB} from '../../bb/bb';
 
 export type TFilterBlurInput = {
     radius: number;
@@ -30,16 +33,20 @@ export const filterBlur = {
         const layers = klCanvas.getLayers();
         const selectedLayerIndex = klCanvas.getLayerIndex(context.canvas);
 
-        const div = document.createElement('div');
+        const rootEl = BB.el();
         const result: IFilterGetDialogResult<TFilterBlurInput> = {
-            element: div,
+            element: rootEl,
         };
+        const isSmall = testIsSmall();
+        if (!isSmall) {
+            result.width = getPreviewWidth(isSmall);
+        }
 
         let radius = 10;
         const fxPreviewRenderer = new FxPreviewRenderer({
             original: context.canvas,
             onUpdate: (fxCanvas, transform) => {
-                return fxCanvas.triangleBlur(radius * transform.scaleX);
+                return fxCanvas.multiplyAlpha().triangleBlur(radius * transform.scaleX).unmultiplyAlpha();
             },
         });
 
@@ -56,12 +63,11 @@ export const filterBlur = {
                 eventResMs: eventResMs,
                 onChange: (val): void => {
                     radius = val;
-                    fxPreviewRenderer.update();
                     preview.render();
                 },
             });
             radiusSlider.getElement().style.marginBottom = '10px';
-            div.append(radiusSlider.getElement());
+            rootEl.append(radiusSlider.getElement());
 
             const previewLayerArr: TProjectViewportProject['layers'] = [];
             {
@@ -77,8 +83,8 @@ export const filterBlur = {
             }
 
             const preview = new Preview({
-                width: 340,
-                height: 220,
+                width: getPreviewWidth(isSmall),
+                height: getPreviewHeight(isSmall),
                 project: {
                     width: context.canvas.width,
                     height: context.canvas.height,
@@ -90,7 +96,7 @@ export const filterBlur = {
                 marginLeft: '-20px',
                 marginRight: '-20px',
             }));
-            div.append(preview.getElement());
+            rootEl.append(preview.getElement());
 
             result.destroy = (): void => {
                 radiusSlider.destroy();
@@ -123,7 +129,7 @@ export const filterBlur = {
             return false; // todo more specific error?
         }
         const texture = fxCanvas.texture(context.canvas);
-        fxCanvas.draw(texture).triangleBlur(radius).update();
+        fxCanvas.draw(texture).multiplyAlpha().triangleBlur(radius).unmultiplyAlpha().update();
         context.clearRect(0, 0, context.canvas.width, context.canvas.height);
         context.drawImage(fxCanvas, 0, 0);
         texture.destroy();

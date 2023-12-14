@@ -7,6 +7,9 @@ import {Preview} from '../ui/project-viewport/preview';
 import {TProjectViewportProject} from '../ui/project-viewport/project-viewport';
 import {css} from '@emotion/css';
 import {FxPreviewRenderer} from '../ui/project-viewport/fx-preview-renderer';
+import {getPreviewHeight, getPreviewWidth} from './utils/preview-size';
+import {testIsSmall} from './utils/test-is-small';
+import {BB} from '../../bb/bb';
 
 export type TFilterUnsharpMaskInput = {
     radius: number;
@@ -29,10 +32,14 @@ export const filterUnsharpMask = {
         const layers = klCanvas.getLayers();
         const selectedLayerIndex = klCanvas.getLayerIndex(context.canvas);
 
-        const div = document.createElement('div');
+        const rootEl = BB.el();
         const result: IFilterGetDialogResult<TFilterUnsharpMaskInput> = {
-            element: div,
+            element: rootEl,
         };
+        const isSmall = testIsSmall();
+        if (!isSmall) {
+            result.width = getPreviewWidth(isSmall);
+        }
 
         let radius = 2, strength = 5.1 / 10;
         const fxPreviewRenderer = new FxPreviewRenderer({
@@ -45,7 +52,6 @@ export const filterUnsharpMask = {
         function finishInit () {
 
             function update () {
-                fxPreviewRenderer.update();
                 preview.render();
             }
 
@@ -80,8 +86,8 @@ export const filterUnsharpMask = {
             });
             radiusSlider.getElement().style.marginBottom = '10px';
             strengthSlider.getElement().style.marginBottom = '10px';
-            div.append(radiusSlider.getElement());
-            div.append(strengthSlider.getElement());
+            rootEl.append(radiusSlider.getElement());
+            rootEl.append(strengthSlider.getElement());
 
             const previewLayerArr: TProjectViewportProject['layers'] = [];
             {
@@ -97,8 +103,8 @@ export const filterUnsharpMask = {
             }
 
             const preview = new Preview({
-                width: 340,
-                height: 220,
+                width: getPreviewWidth(isSmall),
+                height: getPreviewHeight(isSmall),
                 project: {
                     width: context.canvas.width,
                     height: context.canvas.height,
@@ -110,7 +116,7 @@ export const filterUnsharpMask = {
                 marginLeft: '-20px',
                 marginRight: '-20px',
             }));
-            div.append(preview.getElement());
+            rootEl.append(preview.getElement());
 
             result.destroy = (): void => {
                 radiusSlider.destroy();

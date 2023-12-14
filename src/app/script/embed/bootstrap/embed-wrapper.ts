@@ -66,7 +66,7 @@ export class EmbedWrapper {
 
                 ['background', theme.isDark() ? 'rgb(33, 33, 33)' : 'rgb(158,158,158)'],
 
-                ['fontFamily', 'Arial, sans-serif'],
+                ['fontFamily', 'system-ui, sans-serif'],
                 ['fontSize', '30px'],
                 ['color', '#e3e3e3'],
             ];

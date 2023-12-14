@@ -24,6 +24,7 @@ export type TFilterDistort = (
 /**
  * @filter        Distort
  * @description   Distorts image (moves pixels around)
+ *                Note: Requires alpha to be premultiplied.
  */
 export const distort: TFilterDistort = function (settings) {
     gl.distort = gl.distort || warpShader(`

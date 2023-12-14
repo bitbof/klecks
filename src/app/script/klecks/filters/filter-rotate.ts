@@ -2,6 +2,7 @@ import {BB} from '../../bb/bb';
 import {IFilterApply, IFilterGetDialogParam, IFilterGetDialogResult} from '../kl-types';
 import {TFilterHistoryEntry} from './filters';
 import {theme} from '../../theme/theme';
+import {smallPreview} from './utils/preview-size';
 
 export type TFilterRotateInput = {
     deg: number;
@@ -28,9 +29,9 @@ export const filterRotate = {
         BB.ctx(tempCanvas).drawImage(klCanvas.getCompleteCanvas(previewFactor), 0, 0, w, h);
 
 
-        const div = document.createElement('div');
+        const rootEl = BB.el();
         const result: IFilterGetDialogResult<TFilterRotateInput> = {
-            element: div,
+            element: rootEl,
         };
         let deg = 0;
 
@@ -60,13 +61,13 @@ export const filterRotate = {
             update();
         };
 
-        div.append(btnMinus, btnPlus);
+        rootEl.append(btnMinus, btnPlus);
 
         const previewWrapper = BB.el({
             className: 'kl-preview-wrapper',
             css: {
-                width: '340px',
-                height: '220px',
+                width: smallPreview.width + 'px',
+                height: smallPreview.height + 'px',
                 display: 'table',
             },
         });
@@ -102,7 +103,7 @@ export const filterRotate = {
 
         canvasWrapper.style.transition = 'all 0.2s ease-out';
 
-        div.append(previewWrapper);
+        rootEl.append(previewWrapper);
         update();
 
         result.destroy = (): void => {

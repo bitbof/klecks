@@ -14,6 +14,8 @@ import {TFxCanvas} from '../fx-canvas-types';
  *                       of a planar scene might be looking at a road from above at a downward
  *                       angle. The image is then blurred with a blur radius that starts at zero
  *                       on the line and increases further from the line.
+ *                       Note: Requires alpha to be premultiplied.
+ *
  * @param startX         The x coordinate of the start of the line segment.
  * @param startY         The y coordinate of the start of the line segment.
  * @param endX           The x coordinate of the end of the line segment.
@@ -63,17 +65,11 @@ export const tiltShift: TFilterTiltShift = function (
                 float weight = 1.0 - abs(percent);\
                 vec4 sample = texture2D(texture, texCoord + delta / texSize * percent * radius);\
                 \
-                /* switch to pre-multiplied alpha to correctly blur transparent images */\
-                sample.rgb *= sample.a;\
-                \
                 color += sample * weight;\
                 total += weight;\
             }\
             \
             gl_FragColor = color / total;\
-            \
-            /* switch back from pre-multiplied alpha */\
-            gl_FragColor.rgb /= gl_FragColor.a + 0.00001;\
         }\
     ', 'tiltShift');
 

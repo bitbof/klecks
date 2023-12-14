@@ -8,6 +8,9 @@ import {FxPreviewRenderer} from '../ui/project-viewport/fx-preview-renderer';
 import {Preview} from '../ui/project-viewport/preview';
 import {css} from '@emotion/css/dist/emotion-css.cjs';
 import {TProjectViewportProject} from '../ui/project-viewport/project-viewport';
+import {getPreviewHeight, getPreviewWidth} from './utils/preview-size';
+import {testIsSmall} from './utils/test-is-small';
+import {BB} from '../../bb/bb';
 
 export type TFilterToAlphaInput = {
     sourceId: string;
@@ -30,10 +33,14 @@ export const filterToAlpha = {
         const layers = klCanvas.getLayers();
         const selectedLayerIndex = klCanvas.getLayerIndex(context.canvas);
 
-        const div = document.createElement('div');
+        const rootEl = BB.el();
         const result: IFilterGetDialogResult<TFilterToAlphaInput> = {
-            element: div,
+            element: rootEl,
         };
+        const isSmall = testIsSmall();
+        if (!isSmall) {
+            result.width = getPreviewWidth(isSmall);
+        }
 
         function finishInit () {
 
@@ -60,11 +67,10 @@ export const filterToAlpha = {
                 initId: sourceId,
                 onChange: function (id) {
                     sourceId = id;
-                    fxPreviewRenderer.update();
                     preview.render();
                 },
             });
-            div.append(sourceOptions.getElement());
+            rootEl.append(sourceOptions.getElement());
 
             // color
             let selectedRgbaObj: IRGBA | null = {r: 0, g: 0, b: 0, a: 1};
@@ -92,13 +98,12 @@ export const filterToAlpha = {
                 initialIndex: 1,
                 onChange: function (rgbaObj) {
                     selectedRgbaObj = rgbaObj;
-                    fxPreviewRenderer.update();
                     preview.render();
                 },
             });
             colorOptions.getElement().style.marginTop = '10px';
             colorOptions.getElement().style.marginBottom = '10px';
-            div.append(colorOptions.getElement());
+            rootEl.append(colorOptions.getElement());
 
 
             const previewLayerArr: TProjectViewportProject['layers'] = [];
@@ -115,8 +120,8 @@ export const filterToAlpha = {
             }
 
             const preview = new Preview({
-                width: 340,
-                height: 220,
+                width: getPreviewWidth(isSmall),
+                height: getPreviewHeight(isSmall),
                 project: {
                     width: context.canvas.width,
                     height: context.canvas.height,
@@ -128,7 +133,7 @@ export const filterToAlpha = {
                 marginLeft: '-20px',
                 marginRight: '-20px',
             }));
-            div.append(preview.getElement());
+            rootEl.append(preview.getElement());
 
             result.destroy = (): void => {
                 sourceOptions.destroy();

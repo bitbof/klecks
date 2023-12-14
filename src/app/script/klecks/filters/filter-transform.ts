@@ -8,6 +8,8 @@ import {IFilterApply, IFilterGetDialogParam, IFilterGetDialogResult, IKlBasicLay
 import {LANG} from '../../language/language';
 import {TFilterHistoryEntry} from './filters';
 import {throwIfNull} from '../../bb/base/base';
+import {testIsSmall} from './utils/test-is-small';
+import {getPreviewHeight, getPreviewWidth, mediumPreview} from './utils/preview-size';
 
 export type TFilterTransformInput = {
     bounds: {x: number; y: number; width: number; height: number};
@@ -28,7 +30,7 @@ export const filterTransform = {
             return false;
         }
 
-        const isSmall = window.innerWidth < 550;
+        const isSmall = testIsSmall();
         const layers = klCanvas.getLayers();
         const selectedLayerIndex = throwIfNull(klCanvas.getLayerIndex(context.canvas));
 
@@ -53,12 +55,12 @@ export const filterTransform = {
         };
 
 
-        const div = document.createElement('div');
+        const rootEl = BB.el();
         const result: IFilterGetDialogResult<TFilterTransformInput> = {
-            element: div,
+            element: rootEl,
         };
         if (!isSmall) {
-            result.width = 540;
+            result.width = mediumPreview.width;
         }
 
         const keyListener = new BB.KeyListener({
@@ -87,12 +89,12 @@ export const filterTransform = {
 
         });
 
-        const leftWrapper = document.createElement('div');
-        const rightWrapper = document.createElement('div');
-        const rotWrapper = document.createElement('div');
-        const inputY = document.createElement('input');
-        const inputX = document.createElement('input');
-        const inputR = document.createElement('input');
+        const leftWrapper = BB.el();
+        const rightWrapper = BB.el();
+        const rotWrapper = BB.el();
+        const inputY = BB.el({tagName: 'input'});
+        const inputX = BB.el({tagName: 'input'});
+        const inputR = BB.el({tagName: 'input'});
         leftWrapper.style.width = '100px';
         leftWrapper.style.height = '30px';
         rightWrapper.style.width = '100px';
@@ -146,7 +148,7 @@ export const filterTransform = {
         rotWrapper.append(LANG('filter-transform-rotation') + ': ', inputR);
         if (!isSmall) {
             const inputRow = BB.el({
-                parent: div,
+                parent: rootEl,
                 css: {
                     marginTop: '10px',
                 },
@@ -160,7 +162,7 @@ export const filterTransform = {
             marginTop: '10px',
         };
         const buttonRow = BB.el ({
-            parent: div,
+            parent: rootEl,
             css: {
                 display: 'flex',
                 flexWrap: 'wrap',
@@ -288,7 +290,7 @@ export const filterTransform = {
         const checkboxWrapper = BB.el();
         checkboxWrapper.append(constrainCheckbox.getElement(), snappingCheckbox.getElement());
 
-        div.append(BB.el({
+        rootEl.append(BB.el({
             css: {
                 clear: 'both',
                 height: '10px',
@@ -296,7 +298,7 @@ export const filterTransform = {
         }));
 
         const bottomRow = BB.el({
-            parent: div,
+            parent: rootEl,
             css: {
                 display: 'flex',
                 justifyContent: 'space-between',
@@ -322,8 +324,8 @@ export const filterTransform = {
         const previewWrapper = BB.el({
             className: 'kl-preview-wrapper',
             css: {
-                width: isSmall ? '340px' : '540px',
-                height: isSmall ? '260px' : '300px',
+                width: getPreviewWidth(isSmall) + 'px',
+                height: getPreviewHeight(isSmall) + 'px',
             },
         });
         previewWrapper.oncontextmenu = function () {
@@ -432,7 +434,7 @@ export const filterTransform = {
 
         updatePreview();
 
-        div.append(previewWrapper);
+        rootEl.append(previewWrapper);
         result.destroy = (): void => {
             keyListener.destroy();
             freeTransform.destroy();

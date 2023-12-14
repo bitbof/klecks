@@ -1,14 +1,19 @@
 import {BB} from '../../bb/bb';
 import {eventResMs} from './filters-consts';
 import {KlSlider} from '../ui/components/kl-slider';
-import {KlCanvasPreview} from '../canvas-ui/canvas-preview';
 import {getSharedFx} from '../../fx-canvas/shared-fx';
-import {IFilterApply, IFilterGetDialogParam, IFilterGetDialogResult, IKlBasicLayer} from '../kl-types';
+import {IFilterApply, IFilterGetDialogParam, IFilterGetDialogResult} from '../kl-types';
 import {LANG} from '../../language/language';
 import {IVector2D} from '../../bb/bb-types';
 import {TFilterHistoryEntry} from './filters';
-import {PointerListener} from '../../bb/input/pointer-listener';
-import {throwIfNull} from '../../bb/base/base';
+import {FxPreviewRenderer} from '../ui/project-viewport/fx-preview-renderer';
+import {TProjectViewportProject} from '../ui/project-viewport/project-viewport';
+import {Preview} from '../ui/project-viewport/preview';
+import {createTransformMatrix} from '../ui/project-viewport/utils/create-transform-matrix';
+import {applyToPoint} from 'transformation-matrix';
+import {DraggableInput} from '../ui/components/draggable-input';
+import {testIsSmall} from './utils/test-is-small';
+import {getPreviewHeight, getPreviewWidth} from './utils/preview-size';
 
 export type TFilterTiltShiftInput = {
     a: IVector2D;
@@ -20,12 +25,6 @@ export type TFilterTiltShiftInput = {
 export type TFilterTiltShiftHistoryEntry = TFilterHistoryEntry<
     'tiltShift',
     TFilterTiltShiftInput>;
-
-type TDraggable = HTMLDivElement & {
-    x: number;
-    y: number;
-    // copy: (p: IVector2D) => void;
-};
 
 export const filterTiltShift = {
 
@@ -39,94 +38,73 @@ export const filterTiltShift = {
         const layers = klCanvas.getLayers();
         const selectedLayerIndex = klCanvas.getLayerIndex(context.canvas);
 
-        const fit = BB.fitInto(context.canvas.width, context.canvas.height, 280, 200, 1);
-        const displayW = parseInt('' + fit.width), displayH = parseInt('' + fit.height);
-        const w = Math.min(displayW, context.canvas.width);
-        const h = Math.min(displayH, context.canvas.height);
-
-        const tempCanvas = BB.canvas(w, h);
-        {
-            const ctx = BB.ctx(tempCanvas);
-            ctx.save();
-            if (w > context.canvas.width) {
-                ctx.imageSmoothingEnabled = false;
-            }
-            ctx.drawImage(context.canvas, 0, 0, w, h);
-            ctx.restore();
-        }
-        const previewFactor = w / context.canvas.width;
-        const displayPreviewFactor = displayW / context.canvas.width;
-
-        const rootEl = document.createElement('div');
+        const rootEl = BB.el();
         const result: IFilterGetDialogResult<TFilterTiltShiftInput> = {
             element: rootEl,
         };
+        const isSmall = testIsSmall();
+        if (!isSmall) {
+            result.width = getPreviewWidth(isSmall);
+        }
 
-        const pointerListenerArr: PointerListener[] = [];
+        let blur = 20, gradient = 200;
+        let fxPreviewRenderer: FxPreviewRenderer = {destroy: () => {}} as FxPreviewRenderer;
 
         function finishInit () {
-            let blur = 20, gradient = 200;
 
-            const fxCanvas = throwIfNull(getSharedFx());
-            const texture = fxCanvas.texture(tempCanvas);
-            fxCanvas.draw(texture).update(); // update fxCanvas size
+            fxPreviewRenderer = new FxPreviewRenderer({
+                original: context.canvas,
+                onUpdate: (fxCanvas, transform) => {
+                    fa.setTransform(preview.getTransform());
+                    fb.setTransform((preview.getTransform()));
+
+                    const m = createTransformMatrix(transform);
+                    const a = applyToPoint(m, fa.getValue());
+                    const b = applyToPoint(m, fb.getValue());
+                    return fxCanvas.multiplyAlpha().tiltShift(
+                        a.x,
+                        a.y,
+                        b.x,
+                        b.y,
+                        blur * transform.scaleX,
+                        gradient * transform.scaleX
+                    ).unmultiplyAlpha();
+                },
+            });
 
             function update () {
-                try {
-                    fxCanvas.draw(texture).tiltShift(
-                        fa.x / displayPreviewFactor * previewFactor,
-                        fa.y / displayPreviewFactor * previewFactor,
-                        fb.x / displayPreviewFactor * previewFactor,
-                        fb.y / displayPreviewFactor * previewFactor,
-                        blur * previewFactor,
-                        gradient * previewFactor
-                    ).update();
-                    klCanvasPreview.render();
-                } catch(e) {
-                    (rootEl as any).errorCallback(e);
-                }
-            }
-
-            function createDraggable (x: number, y: number): TDraggable {
-                const size = 14;
-                const div = BB.el({
-                    css: {
-                        width: size + 'px',
-                        height: size + 'px',
-                        backgroundColor: '#fff',
-                        boxShadow: 'inset 0 0 0 2px #000',
-                        borderRadius: size + 'px',
-                        position: 'absolute',
-                        cursor: 'move',
-                        left: (x - size / 2) + 'px',
-                        top: (y - size / 2) + 'px',
-                        userSelect: 'none',
-                        touchAction: 'none',
-                    },
-                }) as TDraggable;
-                div.x = x;
-                div.y = y;
-                const pointerListener = new BB.PointerListener({
-                    target: div,
-                    onPointer: function (event) {
-                        event.eventPreventDefault();
-                        if (event.button === 'left' && event.type === 'pointermove') {
-                            div.x += event.dX;
-                            div.y += event.dY;
-                            div.style.left = (div.x - size / 2) + 'px';
-                            div.style.top = (div.y - size / 2) + 'px';
-                            update();
-                        }
-                    },
-                });
-                pointerListenerArr.push(pointerListener);
-                return div;
+                preview.render();
             }
 
             // focus line control points
-            const fa = createDraggable(parseInt('' + (displayW / 6)), parseInt('' + (displayH / 2)));
-            const fb = createDraggable(parseInt('' + (displayW - displayW / 6)), parseInt('' + (displayH - displayH / 3)));
+            const fa = new DraggableInput({
+                value: {x: context.canvas.width / 4, y: context.canvas.height / 2},
+                onChange: () => {
+                    update();
+                },
+            });
+            const fb = new DraggableInput({
+                value: {x: 3 * context.canvas.width / 4, y: context.canvas.height / 2},
+                onChange: () => {
+                    update();
+                },
+            });
 
+            const gradientSlider = new KlSlider({
+                label: LANG('filter-tilt-shift-gradient'),
+                width: 300,
+                height: 30,
+                min: 0,
+                max: 1000,
+                value: gradient,
+                eventResMs: eventResMs,
+                onChange: function (val) {
+                    gradient = val;
+                    update();
+                },
+            });
+            gradientSlider.getElement().style.marginBottom = '10px';
+            rootEl.append(gradientSlider.getElement());
             const blurSlider = new KlSlider({
                 label: LANG('filter-tilt-shift-blur'),
                 width: 300,
@@ -142,79 +120,54 @@ export const filterTiltShift = {
             });
             blurSlider.getElement().style.marginBottom = '10px';
             rootEl.append(blurSlider.getElement());
-            const gradientSlider = new KlSlider({
-                label: LANG('filter-tilt-shift-gradient'),
-                width: 300,
-                height: 30,
-                min: 0,
-                max: 1000,
-                value: gradient,
-                eventResMs: eventResMs,
-                onChange: function (val) {
-                    gradient = val;
-                    update();
-                },
-            });
-            rootEl.append(gradientSlider.getElement());
 
 
-            const previewWrapper = BB.el({
-                className: 'kl-preview-wrapper',
-                css: {
-                    width: '340px',
-                    height: '220px',
-                },
-            });
-            previewWrapper.oncontextmenu = function () {
-                return false;
-            };
-
-            const previewLayerArr: IKlBasicLayer[] = [];
+            const previewLayerArr: TProjectViewportProject['layers'] = [];
             {
                 for (let i = 0; i < layers.length; i++) {
                     previewLayerArr.push({
-                        image: i === selectedLayerIndex ? fxCanvas : layers[i].context.canvas,
+                        image: i === selectedLayerIndex ? fxPreviewRenderer.render : layers[i].context.canvas,
                         isVisible: layers[i].isVisible,
                         opacity: layers[i].opacity,
                         mixModeStr: layers[i].mixModeStr,
+                        hasClipping: false,
                     });
                 }
             }
-            const klCanvasPreview = new KlCanvasPreview({
-                width: parseInt('' + displayW),
-                height: parseInt('' + displayH),
-                layers: previewLayerArr,
-            });
 
-            const previewInnerWrapper = BB.el({
-                className: 'kl-preview-wrapper__canvas',
-                css: {
-                    width: parseInt('' + displayW) + 'px',
-                    height: parseInt('' + displayH) + 'px',
+            const preview = new Preview({
+                width: getPreviewWidth(isSmall),
+                height: getPreviewHeight(isSmall),
+                project: {
+                    width: context.canvas.width,
+                    height: context.canvas.height,
+                    layers: previewLayerArr,
                 },
             });
-            previewInnerWrapper.append(klCanvasPreview.getElement());
-            previewWrapper.append(previewInnerWrapper);
 
-            previewInnerWrapper.append(fa, fb);
+            preview.render();
+            BB.css(preview.getElement(), {
+                overflow: 'hidden',
+                marginLeft: '-20px',
+                marginRight: '-20px',
+            });
 
+            preview.getElement().append(fa.getElement(), fb.getElement());
+            rootEl.append(preview.getElement());
 
-            rootEl.append(previewWrapper);
-            update();
             result.destroy = (): void => {
-                for (let i = 0; i < pointerListenerArr.length; i++) {
-                    pointerListenerArr[i].destroy();
-                }
                 blurSlider.destroy();
                 gradientSlider.destroy();
-                texture.destroy();
-                klCanvasPreview.destroy();
+                fa.destroy();
+                fb.destroy();
+                fxPreviewRenderer.destroy();
+                preview.destroy();
             };
             result.getInput = function (): TFilterTiltShiftInput {
                 result.destroy!();
                 return {
-                    a: {x: fa.x / displayPreviewFactor, y: fa.y / displayPreviewFactor},
-                    b: {x: fb.x / displayPreviewFactor, y: fb.y / displayPreviewFactor},
+                    a: fa.getValue(),
+                    b: fb.getValue(),
                     blur: blur,
                     gradient: gradient,
                 };
@@ -243,7 +196,7 @@ export const filterTiltShift = {
             return false; // todo more specific error?
         }
         const texture = fxCanvas.texture(context.canvas);
-        fxCanvas.draw(texture).tiltShift(a.x, a.y, b.x, b.y, blur, gradient).update();
+        fxCanvas.draw(texture).multiplyAlpha().tiltShift(a.x, a.y, b.x, b.y, blur, gradient).unmultiplyAlpha().update();
         context.clearRect(0, 0, context.canvas.width, context.canvas.height);
         context.drawImage(fxCanvas, 0, 0);
         texture.destroy();

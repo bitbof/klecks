@@ -7,6 +7,7 @@ import {LANG} from '../../language/language';
 import {TFilterHistoryEntry} from './filters';
 import {table} from '../ui/components/table';
 import {theme} from '../../theme/theme';
+import {smallPreview} from './utils/preview-size';
 
 export type TFilterResizeInput = {
     width: number;
@@ -34,9 +35,9 @@ export const filterResize = {
         const tempCanvas = klCanvas.getCompleteCanvas(1);
 
 
-        const div = document.createElement('div');
+        const rootEl = BB.el();
         const result: IFilterGetDialogResult<TFilterResizeInput> = {
-            element: div,
+            element: rootEl,
         };
         let newWidth = klCanvas.getWidth(), newHeight = klCanvas.getHeight();
 
@@ -135,7 +136,7 @@ export const filterResize = {
             marginBottom: '10px',
         });
 
-        div.append(sizeTable);
+        rootEl.append(sizeTable);
 
         //contrain checkbox
         let heightChanged = false, widthChanged = false;
@@ -160,7 +161,7 @@ export const filterResize = {
                 updateConstrain();
             },
         });
-        div.append(BB.el({
+        rootEl.append(BB.el({
             css: {
                 clear: 'both',
             },
@@ -181,7 +182,7 @@ export const filterResize = {
         });
 
         const secondRowElement = BB.el({
-            parent: div,
+            parent: rootEl,
             css: {
                 display: 'flex',
                 justifyContent: 'space-between',
@@ -263,7 +264,7 @@ export const filterResize = {
             const previewW = parseInt('' + preview.width), previewH = parseInt('' + preview.height);
             previewFactor = previewW / newWidth;
 
-            const offset = BB.centerWithin(340, 220, previewW, previewH);
+            const offset = BB.centerWithin(smallPreview.width, smallPreview.height, previewW, previewH);
 
             draw();
 
@@ -278,9 +279,9 @@ export const filterResize = {
         const previewWrapper = BB.el({
             className: 'kl-transparent-preview',
             css: {
-                width: '340px',
+                width: smallPreview.width + 'px',
+                height: smallPreview.height + 'px',
                 marginLeft: '-20px',
-                height: '220px',
                 display: 'table',
                 marginTop: '10px',
                 position: 'relative',
@@ -309,7 +310,7 @@ export const filterResize = {
         updateCheckerboard();
 
 
-        div.append(previewWrapper);
+        rootEl.append(previewWrapper);
         update();
 
         result.destroy = (): void => {

@@ -13,6 +13,8 @@ import {FxPreviewRenderer} from '../ui/project-viewport/fx-preview-renderer';
 import {TProjectViewportProject} from '../ui/project-viewport/project-viewport';
 import {Preview} from '../ui/project-viewport/preview';
 import {css} from '@emotion/css/dist/emotion-css.cjs';
+import {testIsSmall} from './utils/test-is-small';
+import {getPreviewHeight, getPreviewWidth, mediumPreview} from './utils/preview-size';
 
 
 // see fx-canvas distort
@@ -32,7 +34,7 @@ export const filterDistort = {
 
     getDialog (params: IFilterGetDialogParam) {
 
-        const isSmall = window.innerWidth < 550;
+        const isSmall = testIsSmall();
         const rootEl = BB.el();
         const context = params.context;
 
@@ -122,7 +124,6 @@ export const filterDistort = {
             initId: '0',
             onChange: (id) => {
                 settings.distortType = Number(id) as TFilterDistortSettings['distortType'];
-                fxPreviewRenderer.update();
                 preview.render();
             },
         });
@@ -145,7 +146,6 @@ export const filterDistort = {
                 sliderArr[1].setValue(settings.strength.x);
                 sliderArr[2].setValue(settings.phase.x);
             }
-            fxPreviewRenderer.update();
             preview.render();
         }
 
@@ -201,7 +201,6 @@ export const filterDistort = {
                     if (isSynced) {
                         sync(item);
                     } else {
-                        fxPreviewRenderer.update();
                         preview.render();
                     }
                 },
@@ -223,7 +222,6 @@ export const filterDistort = {
                     if (isSynced) {
                         sync(item);
                     } else {
-                        fxPreviewRenderer.update();
                         preview.render();
                     }
                 },
@@ -246,7 +244,6 @@ export const filterDistort = {
                     if (isSynced) {
                         sync(item);
                     } else {
-                        fxPreviewRenderer.update();
                         preview.render();
                     }
                 },
@@ -270,7 +267,6 @@ export const filterDistort = {
             eventResMs: eventResMs,
             onChange: (val) => {
                 settings.stepSize = Math.round(val);
-                fxPreviewRenderer.update();
                 preview.render();
             },
         });
@@ -315,8 +311,8 @@ export const filterDistort = {
             };
         });
         const preview = new Preview({
-            width: isSmall ? 340 : 540,
-            height: isSmall ? 260 : 300,
+            width: getPreviewWidth(isSmall),
+            height: getPreviewHeight(isSmall),
             project: {
                 width: context.canvas.width,
                 height: context.canvas.height,
@@ -349,7 +345,7 @@ export const filterDistort = {
             },
         };
         if (!isSmall) {
-            result.width = 540;
+            result.width = mediumPreview.width;
         }
         return result;
     },

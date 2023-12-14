@@ -9,6 +9,7 @@ import {TFxCanvas} from '../fx-canvas-types';
  * @description  This is the most basic blur filter, which convolves the image with a
  *               pyramid filter. The pyramid filter is separable and is applied as two
  *               perpendicular triangle filters.
+ *               Note: Requires alpha to be premultiplied.
  * @param radius The radius of the pyramid convolved with the image.
  */
 export type TFilterTriangleBlur = (
@@ -35,17 +36,11 @@ export const triangleBlur: TFilterTriangleBlur = function (radius) {
                 float weight = 1.0 - abs(percent);\
                 vec4 sample = texture2D(texture, texCoord + delta * percent);\
                 \
-                /* switch to pre-multiplied alpha to correctly blur transparent images */\
-                sample.rgb *= sample.a;\
-                \
                 color += sample * weight;\
                 total += weight;\
             }\
             \
             gl_FragColor = color / total;\
-            \
-            /* switch back from pre-multiplied alpha */\
-            gl_FragColor.rgb /= gl_FragColor.a + 0.00001;\
         }\
     ', 'triangleBlur');
 

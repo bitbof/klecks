@@ -22,6 +22,7 @@ export type TPreviewParams = {
     width: number;
     height: number;
     project: TProjectViewportProject;
+    onTransformChange?: (transform: TViewportTransform) => void;
 };
 
 const padding = 10;
@@ -36,6 +37,8 @@ export class Preview {
     private readonly viewportPointerListener: PointerListener;
     private doRender = false;
     private animationFrameId: ReturnType<typeof requestAnimationFrame> | undefined;
+    private onTransformChange: TPreviewParams['onTransformChange'] | undefined;
+    private lastEmittedTransform: TViewportTransform = {x: 0, y: 0, scale: 0, angleDeg: 0};
 
 
 
@@ -45,6 +48,14 @@ export class Preview {
         if (this.doRender) {
             this.doRender = false;
             this.viewport.render();
+            const viewportTransform = this.viewport.getTransform();
+            if (
+                this.onTransformChange &&
+                JSON.stringify(this.lastEmittedTransform) !== JSON.stringify(viewportTransform)
+            ) {
+                this.onTransformChange(viewportTransform);
+                this.lastEmittedTransform = viewportTransform;
+            }
         }
     };
 
@@ -143,6 +154,7 @@ export class Preview {
         this.width = p.width;
         this.height = p.height;
         this.project = p.project;
+        this.onTransformChange = p.onTransformChange;
 
         const fit = BB.fitInto(
             this.project.width, this.project.height,
@@ -298,7 +310,7 @@ export class Preview {
             },
             [
                 this.viewport.getElement(),
-                c(',pos-absolute,right-5,bottom-5,flex,flexCol,gap-5', [
+                c(',pos-absolute,right-5,bottom-5,flex,flexCol,gap-5,z-1', [
                     c({
                         tagName: 'button',
                         title: LANG('hand-reset'),
@@ -350,6 +362,10 @@ export class Preview {
         this.viewport.setTransform(transform);
         this.requestRerender();
         this.isReset = false;
+    }
+
+    getTransform (): TViewportTransform {
+        return this.viewport.getTransform();
     }
 
     getElement (): HTMLElement {

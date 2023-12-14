@@ -1,15 +1,18 @@
 import {BB} from '../../bb/bb';
-import {KlCanvasPreview} from '../canvas-ui/canvas-preview';
-import {IFilterApply, IFilterGetDialogParam, IFilterGetDialogResult, IKlBasicLayer, IRGB} from '../kl-types';
+import {IFilterApply, IFilterGetDialogParam, IFilterGetDialogResult, IRGB} from '../kl-types';
 import {LANG} from '../../language/language';
 import {input} from '../ui/components/input';
 import {ColorOptions} from '../ui/components/color-options';
 import {drawVanishPoint} from '../image-operations/draw-vanish-point';
 import {KlSlider} from '../ui/components/kl-slider';
 import {eventResMs} from './filters-consts';
-import {IVector2D} from '../../bb/bb-types';
 import {TFilterHistoryEntry} from './filters';
 import {throwIfNull} from '../../bb/base/base';
+import {Preview} from '../ui/project-viewport/preview';
+import {TProjectViewportProject} from '../ui/project-viewport/project-viewport';
+import {DraggableInput} from '../ui/components/draggable-input';
+import {testIsSmall} from './utils/test-is-small';
+import {getPreviewHeight, getPreviewWidth} from './utils/preview-size';
 
 export type TFilterVanishPointInput = {
     x: number;
@@ -36,17 +39,17 @@ export const filterVanishPoint = {
         const layers = klCanvas.getLayers();
         const selectedLayerIndex = throwIfNull(klCanvas.getLayerIndex(context.canvas));
 
-        const fit = BB.fitInto(context.canvas.width, context.canvas.height, 280, 200, 1);
-        const w = parseInt('' + fit.width), h = parseInt('' + fit.height);
-        const renderW = Math.min(w, context.canvas.width);
-        const renderH = Math.min(h, context.canvas.height);
-        const renderFactor = renderW / context.canvas.width;
-        const previewFactor = w / context.canvas.width;
+        const previewCanvas = BB.canvas(context.canvas.width, context.canvas.height);
+        const previewCtx = BB.ctx(previewCanvas);
 
-        const div = document.createElement('div');
+        const rootEl = BB.el();
         const result: IFilterGetDialogResult<TFilterVanishPointInput> = {
-            element: div,
+            element: rootEl,
         };
+        const isSmall = testIsSmall();
+        if (!isSmall) {
+            result.width = getPreviewWidth(isSmall);
+        }
 
         const settingsObj: TFilterVanishPointInput = {
             x: context.canvas.width / 2,
@@ -68,25 +71,26 @@ export const filterVanishPoint = {
             eventResMs: eventResMs,
             onChange: function (val) {
                 settingsObj.lines = Math.round(val);
-                updatePreview();
+                update();
             },
         });
         linesSlider.getElement().style.marginBottom = '10px';
-        div.append(linesSlider.getElement());
+        rootEl.append(linesSlider.getElement());
 
         const line1 = BB.el({
-            parent: div,
+            parent: rootEl,
             css: {
                 display: 'flex',
                 alignItems: 'center',
             },
         });
         const line2 = BB.el({
-            parent: div,
+            parent: rootEl,
             css: {
                 display: 'flex',
                 alignItems: 'center',
                 marginTop: '10px',
+                marginBottom: '10px',
             },
         });
         const xInput = input({
@@ -95,7 +99,11 @@ export const filterVanishPoint = {
             css: {width: '75px', marginRight: '20px'},
             callback: function (v) {
                 settingsObj.x = parseFloat(v);
-                updatePreview();
+                dragInput.setValue({
+                    x: settingsObj.x,
+                    y: settingsObj.y,
+                });
+                update();
             },
         });
         const yInput = input({
@@ -104,7 +112,11 @@ export const filterVanishPoint = {
             css: {width: '75px', marginRight: '20px'},
             callback: function (v) {
                 settingsObj.y = parseFloat(v);
-                updatePreview();
+                dragInput.setValue({
+                    x: settingsObj.x,
+                    y: settingsObj.y,
+                });
+                update();
             },
         });
         const thicknessInput = input({
@@ -114,7 +126,7 @@ export const filterVanishPoint = {
             css: {width: '75px', marginRight: '20px'},
             callback: function (v) {
                 settingsObj.thickness = parseFloat(v);
-                updatePreview();
+                update();
             },
         });
 
@@ -143,7 +155,7 @@ export const filterVanishPoint = {
             onChange: function (rgbaObj) {
                 selectedRgbaObj = rgbaObj!;
                 settingsObj.color = BB.copyObj(selectedRgbaObj);
-                updatePreview();
+                update();
             },
         });
 
@@ -164,123 +176,91 @@ export const filterVanishPoint = {
             colorOptions.getElement(),
         );
 
-
-        const previewWrapper = BB.el({
-            className: 'kl-preview-wrapper',
-            css: {
-                width: '340px',
-                height: '220px',
-            },
-        });
-
-        const previewLayer: IKlBasicLayer = {
-            image: BB.canvas(renderW, renderH),
-            isVisible: layers[selectedLayerIndex].isVisible,
-            opacity: layers[selectedLayerIndex].opacity,
-            mixModeStr: layers[selectedLayerIndex].mixModeStr,
-        };
-        const klCanvasPreview = new KlCanvasPreview({
-            width: Math.round(w),
-            height: Math.round(h),
-            layers: layers.map((item, i) => {
-                if (i === selectedLayerIndex) {
-                    return previewLayer;
-                } else {
-                    return {
-                        image: item.context.canvas,
-                        isVisible: item.isVisible,
-                        opacity: item.opacity,
-                        mixModeStr: item.mixModeStr,
-                    };
-                }
-            }),
-        });
-
-        const previewInnerWrapper = BB.el({
-            className: 'kl-preview-wrapper__canvas',
-            css: {
-                width: parseInt('' + w) + 'px',
-                height: parseInt('' + h) + 'px',
-                cursor: 'move',
-            },
-        });
-        previewInnerWrapper.append(klCanvasPreview.getElement());
-        previewWrapper.append(previewInnerWrapper);
-
-
-
         // ---- preview input processing ----
-        const inputs = {} as {
-            start: IVector2D;
-            end: IVector2D | null;
-            state: null | 'move';
-            oldSettings: TFilterVanishPointInput;
-        };
         function syncInputs (): void {
             xInput.value = '' + settingsObj.x;
             yInput.value = '' + settingsObj.y;
         }
-        previewWrapper.oncontextmenu = function () {
-            return false;
-        };
-        previewInnerWrapper.style.touchAction = 'none';
-        const pointerListener = new BB.PointerListener({
-            target: previewInnerWrapper,
-            onPointer: (event) => {
-                if (event.type === 'pointerdown') {
-                    if (!inputs.state) {
-                        inputs.state = 'move';
-                        inputs.oldSettings = BB.copyObj(settingsObj);
-                        inputs.start = {x: event.relX / previewFactor, y: event.relY / previewFactor};
-                        inputs.end = null;
-                    }
-                } else if (event.type === 'pointermove') {
-                    if (inputs.state) {
-                        inputs.end = {x: event.relX / previewFactor, y: event.relY / previewFactor};
 
-                        settingsObj.x = Math.round(inputs.end.x - inputs.start.x + inputs.oldSettings.x);
-                        settingsObj.y = Math.round(inputs.end.y - inputs.start.y + inputs.oldSettings.y);
+        function update (): void {
+            const ctx = previewCtx;
+            const w = previewCanvas.width;
+            const h = previewCanvas.height;
 
-                        syncInputs();
-                        updatePreview();
-                    }
-                } else if (event.type === 'pointerup') {
-                    if (inputs.state) {
-                        inputs.state = null;
-                    }
-                }
-            },
-        });
-
-
-
-        function updatePreview (): void {
-            const ctx = BB.ctx((previewLayer.image as HTMLCanvasElement));
             ctx.save();
-            ctx.clearRect(0, 0, renderW, renderH);
-            ctx.drawImage(context.canvas, 0, 0, renderW, renderH);
+            ctx.clearRect(0, 0, w, h);
+            ctx.drawImage(context.canvas, 0, 0, w, h);
             drawVanishPoint(
                 ctx,
-                settingsObj.x * renderFactor,
-                settingsObj.y * renderFactor,
+                settingsObj.x,
+                settingsObj.y,
                 settingsObj.lines,
-                Math.max(settingsObj.thickness * renderFactor, 1),
+                Math.max(settingsObj.thickness, 1),
                 settingsObj.color,
                 settingsObj.opacity,
             );
 
             ctx.restore();
-            klCanvasPreview.render();
+            preview.render();
         }
-        setTimeout(updatePreview, 0);
+
+        const onRender = () => {
+            dragInput.setTransform(preview.getTransform());
+            return previewCanvas;
+        };
+
+        const previewLayerArr: TProjectViewportProject['layers'] = [];
+        {
+            for (let i = 0; i < layers.length; i++) {
+                previewLayerArr.push({
+                    image: i === selectedLayerIndex ? onRender : layers[i].context.canvas,
+                    isVisible: layers[i].isVisible,
+                    opacity: layers[i].opacity,
+                    mixModeStr: layers[i].mixModeStr,
+                    hasClipping: false,
+                });
+            }
+        }
+
+        const preview = new Preview({
+            width: getPreviewWidth(isSmall),
+            height: getPreviewHeight(isSmall),
+            project: {
+                width: context.canvas.width,
+                height: context.canvas.height,
+                layers: previewLayerArr,
+            },
+        });
+        BB.css(preview.getElement(), {
+            marginLeft: '-20px',
+            marginRight: '-20px',
+            overflow: 'hidden',
+        });
+
+        const dragInput = new DraggableInput({
+            value: {
+                x: settingsObj.x,
+                y: settingsObj.y,
+            },
+            onChange: (val) => {
+                settingsObj.x = Math.round(val.x);
+                settingsObj.y = Math.round(val.y);
+                syncInputs();
+                update();
+            },
+        });
+
+        update();
+
+        preview.getElement().append(dragInput.getElement());
+        rootEl.append(preview.getElement());
 
 
-        div.append(previewWrapper);
+
         result.destroy = () => {
             linesSlider.destroy();
-            pointerListener.destroy();
-            klCanvasPreview.destroy();
             colorOptions.destroy();
+            preview.destroy();
         };
         result.getInput = function (): TFilterVanishPointInput {
             result.destroy!();

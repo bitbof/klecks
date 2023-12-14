@@ -7,9 +7,15 @@ import {IRect} from '../../../bb/bb-types';
 import {compose, translate, applyToPoint, inverse, scale} from 'transformation-matrix';
 import {createTransformMatrix} from './utils/create-transform-matrix';
 
+type TPostMix = {
+    opacity: number;
+    operation: GlobalCompositeOperation;
+}
+
 export type TFxPreviewRendererParams = {
     original: Exclude<CanvasImageSource, VideoFrame | HTMLOrSVGImageElement> | HTMLImageElement;
     onUpdate: (fxCanvas: TFxCanvas, transform: TViewportTransformXY) => TFxCanvas;
+    postMix?: TPostMix; // mix the result with the original
 };
 
 export class FxPreviewRenderer {
@@ -18,7 +24,6 @@ export class FxPreviewRenderer {
     private texture: TWrappedTexture | undefined = undefined;
     private readonly textureSource: HTMLCanvasElement;
     private ctx: CanvasRenderingContext2D;
-    private isUpdated: boolean = true;
     private oldOnUpdateProps = {
         textureWidth: 0,
         textureHeight: 0,
@@ -31,6 +36,7 @@ export class FxPreviewRenderer {
         },
     };
     private fxCanvas: TFxCanvas;
+    private postMix: TPostMix | undefined;
 
 
     // --- public ---
@@ -40,6 +46,7 @@ export class FxPreviewRenderer {
         this.textureSource = BB.canvas(1,1);
         this.ctx = BB.ctx(this.textureSource);
         this.fxCanvas = throwIfNull(getSharedFx());
+        this.postMix = p.postMix;
     }
 
     render: TProjectViewportLayerFunc = (viewportTransform, viewportWidth, viewportHeight) => {
@@ -132,15 +139,7 @@ export class FxPreviewRenderer {
         }
 
 
-        /*if (!this.isUpdated && JSON.stringify(newRender) === JSON.stringify(this.lastRender)) {
-            return {
-                image: this.fxCanvas,
-                transform: outTransform,
-            };
-        }*/
-
-
-        if (!this.texture || JSON.stringify(onUpdateProps) !== JSON.stringify(this.oldOnUpdateProps)) {
+        if (!this.texture || JSON.stringify(onUpdateProps) !== JSON.stringify(this.oldOnUpdateProps) || this.postMix) {
             // update texture
             this.textureSource.width = onUpdateProps.textureWidth;
             this.textureSource.height = onUpdateProps.textureHeight;
@@ -165,28 +164,43 @@ export class FxPreviewRenderer {
             });
             document.body.append(this.canvas);*/
 
-            this.texture && this.texture.destroy();
-            this.texture = this.fxCanvas.texture(this.textureSource);
+            if (!this.texture || JSON.stringify(onUpdateProps) !== JSON.stringify(this.oldOnUpdateProps)) {
+                this.texture && this.texture.destroy();
+                this.texture = this.fxCanvas.texture(this.textureSource);
+            }
 
-            this.textureSource.width = 1;
-            this.textureSource.height = 1;
+            if (!this.postMix) {
+                this.textureSource.width = 1;
+                this.textureSource.height = 1;
+            }
         }
-        this.isUpdated = false;
         this.oldOnUpdateProps = onUpdateProps;
 
-        const resultImage = this.onUpdate(
+        const resultFx = this.onUpdate(
             this.fxCanvas.draw(this.texture),
             onUpdateProps.transform
         ).update();
 
+        if (this.postMix) {
+            this.ctx.save();
+            this.ctx.globalAlpha = this.postMix.opacity;
+            this.ctx.globalCompositeOperation = this.postMix.operation;
+            this.ctx.drawImage(resultFx, 0, 0);
+            this.ctx.restore();
+            return {
+                image: this.textureSource,
+                transform: resultTransform,
+            };
+        }
+
         return {
-            image: resultImage,
+            image: resultFx,
             transform: resultTransform,
         };
     };
 
-    update (): void {
-        this.isUpdated = true;
+    setPostMix (postMix: TPostMix): void {
+        this.postMix = postMix;
     }
 
     destroy (): void {

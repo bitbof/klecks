@@ -1,6 +1,5 @@
 import {BB} from '../../bb/bb';
-import {KlCanvasPreview} from '../canvas-ui/canvas-preview';
-import {IFilterApply, IFilterGetDialogParam, IFilterGetDialogResult, IKlBasicLayer, IRGB, TMixMode} from '../kl-types';
+import {IFilterApply, IFilterGetDialogParam, IFilterGetDialogResult, IRGB, TMixMode} from '../kl-types';
 import {LANG} from '../../language/language';
 import {KlSlider} from '../ui/components/kl-slider';
 import {getSharedFx} from '../../fx-canvas/shared-fx';
@@ -11,9 +10,15 @@ import {translateBlending} from '../canvas/translate-blending';
 import {KL} from '../kl';
 import {ColorConverter} from '../../bb/color/color';
 import {Checkbox} from '../ui/components/checkbox';
-import {TFxCanvas, TWrappedTexture} from '../../fx-canvas/fx-canvas-types';
+import {TFxCanvas} from '../../fx-canvas/fx-canvas-types';
 import {TKlCanvasHistoryEntry} from '../canvas/kl-canvas';
 import {throwIfNull} from '../../bb/base/base';
+import {getPreviewHeight, getPreviewWidth} from './utils/preview-size';
+import {FxPreviewRenderer} from '../ui/project-viewport/fx-preview-renderer';
+import {Preview} from '../ui/project-viewport/preview';
+import {css} from '@emotion/css/dist/emotion-css.cjs';
+import {TProjectViewportProject} from '../ui/project-viewport/project-viewport';
+import {testIsSmall} from './utils/test-is-small';
 
 // see noise(...) in fx-canvas
 interface INoisePreset {
@@ -52,10 +57,6 @@ export type TFilterNoiseInput = {
     colA: IRGB;
     colB: IRGB;
 }
-
-/*export type TFilterNoiseHistoryEntry = TFilterHistoryEntry<
-    'replaceLayer',
-    TFilterNoiseInput>;*/
 
 const presetArr: INoisePreset[] = [
     // each pixel random value
@@ -114,22 +115,13 @@ export const filterNoise = {
         const layers = klCanvas.getLayers();
         const selectedLayerIndex = throwIfNull(klCanvas.getLayerIndex(context.canvas));
 
-        const fit = BB.fitInto(context.canvas.width, context.canvas.height, 280, 200, 1);
-        const w = parseInt('' + fit.width), h = parseInt('' + fit.height);
-        const renderW = Math.min(w, context.canvas.width);
-        const renderH = Math.min(h, context.canvas.height);
-        const renderFactor = renderW / context.canvas.width;
-
-
-        const fxCanvas = throwIfNull(getSharedFx());
-        let texture: TWrappedTexture;
-
         const thumbImgArr: HTMLImageElement[] = [];
         const thumbSize = 32;
         {
+            const fxCanvas = throwIfNull(getSharedFx());
             const canvas = BB.canvas(thumbSize, thumbSize);
             const ctx = BB.ctx(canvas);
-            texture = fxCanvas.texture(canvas);
+            const texture = fxCanvas.texture(canvas);
             fxCanvas.draw(texture).update(); // update fxCanvas size
             texture.destroy();
 
@@ -144,19 +136,17 @@ export const filterNoise = {
                 thumbImgArr.push(thumbImg);
             });
 
+            texture.destroy();
         }
 
-        {
-            const tempCanvas = BB.canvas(renderW, renderH);
-            texture = fxCanvas.texture(tempCanvas);
-            fxCanvas.draw(texture).update(); // update fxCanvas size
-            BB.freeCanvas(tempCanvas);
-        }
-
-        const div = document.createElement('div');
+        const rootEl = BB.el();
         const result: IFilterGetDialogResult<TFilterNoiseInput> = {
-            element: div,
+            element: rootEl,
         };
+        const isSmall = testIsSmall();
+        if (!isSmall) {
+            result.width = getPreviewWidth(isSmall);
+        }
 
         const settingsObj: TFilterNoiseInput = {
             seed: Math.random() * 300,
@@ -169,7 +159,6 @@ export const filterNoise = {
             colA: {r: 0, g: 0, b: 0},
             colB: {r: 255, g: 255, b: 255},
         };
-
 
         const presetOptions = new Options({
             optionArr: thumbImgArr.map((img, index) => {
@@ -186,11 +175,11 @@ export const filterNoise = {
             initId: '0',
             onChange: (id) => {
                 settingsObj.presetIndex = Number(id);
-                updatePreview();
+                update();
             },
         });
         presetOptions.getElement().style.marginBottom = '10px';
-        div.append(presetOptions.getElement());
+        rootEl.append(presetOptions.getElement());
 
         const scaleSlider = new KlSlider({
             label: LANG('filter-noise-scale'),
@@ -203,7 +192,7 @@ export const filterNoise = {
             curve: BB.quadraticSplineInput(1, 1000, 0.1),
             onChange: (value) => {
                 settingsObj.scale = value;
-                updatePreview();
+                update();
             },
         });
         scaleSlider.getElement().style.marginBottom = '10px';
@@ -220,7 +209,7 @@ export const filterNoise = {
             toDisplayValue: (value) => value * 100,
             onChange: (value) => {
                 settingsObj.opacity = value;
-                updatePreview();
+                update();
             },
         });
         opacitySlider.getElement().style.marginBottom = '10px';
@@ -236,6 +225,7 @@ export const filterNoise = {
         const row2El = BB.el({
             css: {
                 display: 'flex',
+                marginBottom: '10px',
             },
         });
 
@@ -252,7 +242,7 @@ export const filterNoise = {
                 } else {
                     row2El.style.visibility = 'hidden';
                 }
-                updatePreview();
+                update();
             },
         });
 
@@ -260,7 +250,7 @@ export const filterNoise = {
             label: LANG('reverse'),
             callback: (val) => {
                 settingsObj.isReversed = val;
-                updatePreview();
+                update();
             },
             allowTab: true,
         });
@@ -297,7 +287,7 @@ export const filterNoise = {
             initValue: settingsObj.mixModeStr,
             onChange: (val: GlobalCompositeOperation) => {
                 settingsObj.mixModeStr = val;
-                updatePreview();
+                update();
             },
         });
         blendSelect.getElement().title = LANG('layers-blending');
@@ -320,7 +310,7 @@ export const filterNoise = {
                 const newColor = ColorConverter.hexToRGB(val);
                 if (newColor) {
                     settingsObj.colA = newColor;
-                    updatePreview();
+                    update();
                 }
             },
             css: colInputStyle,
@@ -333,7 +323,7 @@ export const filterNoise = {
                 const newColor = ColorConverter.hexToRGB(val);
                 if (newColor) {
                     settingsObj.colB = newColor;
-                    updatePreview();
+                    update();
                 }
             },
             css: colInputStyle,
@@ -357,7 +347,7 @@ export const filterNoise = {
             colorWrapper,
         );
 
-        div.append(
+        rootEl.append(
             scaleSlider.getElement(),
             opacitySlider.getElement(),
             row1El,
@@ -366,88 +356,90 @@ export const filterNoise = {
 
 
 
-        const previewWrapper = BB.el({
-            className: 'kl-preview-wrapper',
-            css: {
-                width: '340px',
-                height: '220px',
+
+        const fxPreviewRenderer = new FxPreviewRenderer({
+            original: context.canvas,
+            onUpdate: (fxCanvas, transform) => {
+                const settingsCopy = BB.copyObj(presetArr[settingsObj.presetIndex]) as INoiseSettings;
+                settingsCopy.seed = settingsObj.seed;
+                settingsCopy.scaleX = settingsCopy.scaleX  * settingsObj.scale / 50 * transform.scaleX;
+                settingsCopy.scaleY = settingsCopy.scaleY  * settingsObj.scale / 50 * transform.scaleY;
+                settingsCopy.colA = settingsObj.colA;
+                settingsCopy.colB = settingsObj.colB;
+                settingsCopy.isReversed = settingsObj.isReversed ? !settingsCopy.isReversed : settingsCopy.isReversed;
+                settingsCopy.channels  = settingsObj.channels;
+                settingsCopy.offsetX = context.canvas.width / 2 * transform.scaleX + transform.x;
+                settingsCopy.offsetY = context.canvas.height / 2 * transform.scaleY + transform.y;
+
+                return fxCanvas.noise(
+                    settingsCopy.seed,
+                    settingsCopy.type,
+                    [settingsCopy.scaleX, settingsCopy.scaleY],
+                    [settingsCopy.offsetX, settingsCopy.offsetY],
+                    settingsCopy.octaves,
+                    settingsCopy.samples,
+                    settingsCopy.peaks,
+                    settingsCopy.brightness,
+                    settingsCopy.contrast,
+                    settingsCopy.isReversed,
+                    settingsCopy.colA,
+                    settingsCopy.colB,
+                    settingsCopy.channels ? settingsCopy.channels : 'rgb',
+                );
+            },
+            postMix: {
+                opacity: settingsObj.opacity,
+                operation: settingsObj.channels === 'alpha' ? 'destination-out' : settingsObj.mixModeStr,
             },
         });
 
-        const previewLayer: IKlBasicLayer = {
-            image: BB.canvas(renderW, renderH),
-            isVisible: layers[selectedLayerIndex].isVisible,
-            opacity: layers[selectedLayerIndex].opacity,
-            mixModeStr: layers[selectedLayerIndex].mixModeStr,
-        };
-        const klCanvasPreview = new KlCanvasPreview({
-            width: Math.round(w),
-            height: Math.round(h),
-            layers: layers.map((item, i) => {
-                if (i === selectedLayerIndex) {
-                    return previewLayer;
-                } else {
-                    return {
-                        image: item.context.canvas,
-                        isVisible: item.isVisible,
-                        opacity: item.opacity,
-                        mixModeStr: item.mixModeStr,
-                    };
-                }
-            }),
-        });
-
-        const previewInnerWrapper = BB.el({
-            className: 'kl-preview-wrapper__canvas',
-            css: {
-                width: parseInt('' + w) + 'px',
-                height: parseInt('' + h) + 'px',
-            },
-        });
-        previewInnerWrapper.append(klCanvasPreview.getElement());
-        previewWrapper.append(previewInnerWrapper);
-
-        function updatePreview (): void {
-            const ctx = BB.ctx((previewLayer.image as HTMLCanvasElement));
-            ctx.save();
-            ctx.clearRect(0, 0, renderW, renderH);
-            ctx.drawImage(context.canvas, 0, 0, renderW, renderH);
-
-            ctx.globalAlpha = settingsObj.opacity;
-
-            const presetCopy = BB.copyObj(presetArr[settingsObj.presetIndex]) as INoiseSettings;
-            presetCopy.seed = settingsObj.seed;
-            presetCopy.scaleX = presetCopy.scaleX  * settingsObj.scale / 50 * renderFactor;
-            presetCopy.scaleY = presetCopy.scaleY  * settingsObj.scale / 50 * renderFactor;
-            presetCopy.colA = settingsObj.colA;
-            presetCopy.colB = settingsObj.colB;
-            presetCopy.isReversed = settingsObj.isReversed ? !presetCopy.isReversed : presetCopy.isReversed;
-            presetCopy.channels  = settingsObj.channels;
-            drawNoise(fxCanvas, presetCopy);
-
-            if (settingsObj.channels === 'alpha') {
-                ctx.globalCompositeOperation = 'destination-out';
-            } else {
-                ctx.globalCompositeOperation = settingsObj.mixModeStr;
+        const previewLayerArr: TProjectViewportProject['layers'] = [];
+        {
+            for (let i = 0; i < layers.length; i++) {
+                previewLayerArr.push({
+                    image: i === selectedLayerIndex ? fxPreviewRenderer.render : layers[i].context.canvas,
+                    isVisible: layers[i].isVisible,
+                    opacity: layers[i].opacity,
+                    mixModeStr: layers[i].mixModeStr,
+                    hasClipping: false,
+                });
             }
-
-            ctx.drawImage(fxCanvas, 0, 0);
-
-            ctx.restore();
-            klCanvasPreview.render();
         }
-        setTimeout(updatePreview, 0);
 
-        div.append(previewWrapper);
+        const preview = new Preview({
+            width: getPreviewWidth(isSmall),
+            height: getPreviewHeight(isSmall),
+            project: {
+                width: context.canvas.width,
+                height: context.canvas.height,
+                layers: previewLayerArr,
+            },
+        });
+        preview.render();
+        preview.getElement().classList.add(css({
+            marginLeft: '-20px',
+            marginRight: '-20px',
+        }));
+        rootEl.append(preview.getElement());
+
+        function update (): void {
+            fxPreviewRenderer.setPostMix({
+                opacity: settingsObj.opacity,
+                operation: settingsObj.channels === 'alpha' ? 'destination-out' : settingsObj.mixModeStr,
+            });
+            preview.render();
+        }
+
+
         result.destroy = (): void => {
             presetOptions.destroy();
             scaleSlider.destroy();
             opacitySlider.destroy();
             reverseToggle.destroy();
             channelsOptions.destroy();
-            texture.destroy();
             blendSelect.destroy();
-            klCanvasPreview.destroy();
+            preview.destroy();
+            fxPreviewRenderer.destroy();
         };
         result.getInput = function (): TFilterNoiseInput {
             result.destroy!();

@@ -8,6 +8,9 @@ import {FxPreviewRenderer} from '../ui/project-viewport/fx-preview-renderer';
 import {TProjectViewportProject} from '../ui/project-viewport/project-viewport';
 import {Preview} from '../ui/project-viewport/preview';
 import {css} from '@emotion/css/dist/emotion-css.cjs';
+import {getPreviewHeight, getPreviewWidth} from './utils/preview-size';
+import {testIsSmall} from './utils/test-is-small';
+import {BB} from '../../bb/bb';
 
 export type TFilterHueSaturationInput = {
     hue: number;
@@ -31,10 +34,14 @@ export const filterHueSaturation = {
         const layers = klCanvas.getLayers();
         const selectedLayerIndex = klCanvas.getLayerIndex(context.canvas);
 
-        const div = document.createElement('div');
+        const rootEl = BB.el();
         const result: IFilterGetDialogResult<TFilterHueSaturationInput> = {
-            element: div,
+            element: rootEl,
         };
+        const isSmall = testIsSmall();
+        if (!isSmall) {
+            result.width = getPreviewWidth(isSmall);
+        }
 
         let hue = 0, saturation = 0;
         const fxPreviewRenderer = new FxPreviewRenderer({
@@ -56,7 +63,6 @@ export const filterHueSaturation = {
                 eventResMs: eventResMs,
                 onChange: function (val) {
                     hue = val / 100;
-                    fxPreviewRenderer.update();
                     preview.render();
                 },
             });
@@ -70,13 +76,12 @@ export const filterHueSaturation = {
                 eventResMs: eventResMs,
                 onChange: function (val) {
                     saturation = val / 50 - 1;
-                    fxPreviewRenderer.update();
                     preview.render();
                 },
             });
             hueSlider.getElement().style.marginBottom = '10px';
             saturationSlider.getElement().style.marginBottom = '10px';
-            div.append(hueSlider.getElement(), saturationSlider.getElement());
+            rootEl.append(hueSlider.getElement(), saturationSlider.getElement());
 
 
             const previewLayerArr: TProjectViewportProject['layers'] = [];
@@ -93,8 +98,8 @@ export const filterHueSaturation = {
             }
 
             const preview = new Preview({
-                width: 340,
-                height: 220,
+                width: getPreviewWidth(isSmall),
+                height: getPreviewHeight(isSmall),
                 project: {
                     width: context.canvas.width,
                     height: context.canvas.height,
@@ -106,7 +111,7 @@ export const filterHueSaturation = {
                 marginLeft: '-20px',
                 marginRight: '-20px',
             }));
-            div.append(preview.getElement());
+            rootEl.append(preview.getElement());
 
             result.destroy = (): void => {
                 hueSlider.destroy();

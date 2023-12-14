@@ -8,6 +8,8 @@ import {FxPreviewRenderer} from '../ui/project-viewport/fx-preview-renderer';
 import {TProjectViewportProject} from '../ui/project-viewport/project-viewport';
 import {Preview} from '../ui/project-viewport/preview';
 import {css} from '@emotion/css/dist/emotion-css.cjs';
+import {testIsSmall} from './utils/test-is-small';
+import {getPreviewHeight, getPreviewWidth} from './utils/preview-size';
 
 export type TFilterCurvesInput = {
     curves: TCurvesInput;
@@ -30,10 +32,14 @@ export const filterCurves = {
         const layers = klCanvas.getLayers();
         const selectedLayerIndex = klCanvas.getLayerIndex(context.canvas);
 
-        const div = BB.el();
+        const rootEl = BB.el();
         const result: IFilterGetDialogResult<TFilterCurvesInput> = {
-            element: div,
+            element: rootEl,
         };
+        const isSmall = testIsSmall();
+        if (!isSmall) {
+            result.width = getPreviewWidth(isSmall);
+        }
 
         let curves: TCurvesInput = getDefaultCurvesInput();
         const fxPreviewRenderer = new FxPreviewRenderer({
@@ -60,8 +66,8 @@ export const filterCurves = {
             }
 
             const preview = new Preview({
-                width: 340,
-                height: 220,
+                width: getPreviewWidth(isSmall),
+                height: getPreviewHeight(isSmall),
                 project: {
                     width: context.canvas.width,
                     height: context.canvas.height,
@@ -77,14 +83,13 @@ export const filterCurves = {
                 curves,
                 callback: function (val) {
                     curves = val;
-                    fxPreviewRenderer.update();
                     preview.render();
                 },
             });
             const modeButtons: Options<string> = input.getModeButtons();
 
 
-            div.append(input.getElement(),preview.getElement());
+            rootEl.append(input.getElement(),preview.getElement());
 
             result.destroy = (): void => {
                 input.destroy();

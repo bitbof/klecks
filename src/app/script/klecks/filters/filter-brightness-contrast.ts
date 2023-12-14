@@ -8,6 +8,9 @@ import {FxPreviewRenderer} from '../ui/project-viewport/fx-preview-renderer';
 import {TProjectViewportProject} from '../ui/project-viewport/project-viewport';
 import {Preview} from '../ui/project-viewport/preview';
 import {css} from '@emotion/css/dist/emotion-css.cjs';
+import {testIsSmall} from './utils/test-is-small';
+import {getPreviewHeight, getPreviewWidth} from './utils/preview-size';
+import {BB} from '../../bb/bb';
 
 export type TFilterBrightnessContrastInput = {
     brightness: number;
@@ -21,11 +24,14 @@ export type TFilterBrightnessContrastHistoryEntry = TFilterHistoryEntry<
 export const filterBrightnessContrast = {
     getDialog (params: IFilterGetDialogParam) {
 
-        const div = document.createElement('div');
+        const rootEl = BB.el();
         const result: IFilterGetDialogResult<TFilterBrightnessContrastInput> = {
-            element: div,
+            element: rootEl,
         };
-
+        const isSmall = testIsSmall();
+        if (!isSmall) {
+            result.width = getPreviewWidth(isSmall);
+        }
 
         const context = params.context;
         const klCanvas = params.klCanvas;
@@ -56,7 +62,6 @@ export const filterBrightnessContrast = {
                 eventResMs: eventResMs,
                 onChange: function (val) {
                     brightness = val / 50 - 1;
-                    fxPreviewRenderer.update();
                     preview.render();
                 },
             });
@@ -70,13 +75,12 @@ export const filterBrightnessContrast = {
                 eventResMs: eventResMs,
                 onChange: function (val) {
                     contrast = val / 50 - 1;
-                    fxPreviewRenderer.update();
                     preview.render();
                 },
             });
             brightnessSlider.getElement().style.marginBottom = '10px';
             contrastSlider.getElement().style.marginBottom = '10px';
-            div.append(brightnessSlider.getElement(), contrastSlider.getElement());
+            rootEl.append(brightnessSlider.getElement(), contrastSlider.getElement());
 
             const previewLayerArr: TProjectViewportProject['layers'] = [];
             {
@@ -92,8 +96,8 @@ export const filterBrightnessContrast = {
             }
 
             const preview = new Preview({
-                width: 340,
-                height: 220,
+                width: getPreviewWidth(isSmall),
+                height: getPreviewHeight(isSmall),
                 project: {
                     width: context.canvas.width,
                     height: context.canvas.height,
@@ -105,7 +109,7 @@ export const filterBrightnessContrast = {
                 marginLeft: '-20px',
                 marginRight: '-20px',
             }));
-            div.append(preview.getElement());
+            rootEl.append(preview.getElement());
 
 
             result.destroy = () => {
