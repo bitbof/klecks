@@ -1,15 +1,17 @@
 import {BB} from '../../bb/bb';
 import {Checkbox} from '../ui/components/checkbox';
-import {KlCanvasPreview} from '../canvas-ui/canvas-preview';
 import {FreeTransform} from '../ui/components/free-transform';
 import {IFreeTransform} from '../ui/components/free-transform-utils';
 import {Select} from '../ui/components/select';
-import {IFilterApply, IFilterGetDialogParam, IFilterGetDialogResult, IKlBasicLayer} from '../kl-types';
+import {IFilterApply, IFilterGetDialogParam, IFilterGetDialogResult} from '../kl-types';
 import {LANG} from '../../language/language';
 import {TFilterHistoryEntry} from './filters';
 import {throwIfNull} from '../../bb/base/base';
-import {testIsSmall} from './utils/test-is-small';
-import {getPreviewHeight, getPreviewWidth, mediumPreview} from './utils/preview-size';
+import {Preview} from '../ui/project-viewport/preview';
+import {TProjectViewportProject} from '../ui/project-viewport/project-viewport';
+import {css} from '@emotion/css/dist/emotion-css.cjs';
+import {testIsSmall} from '../ui/utils/test-is-small';
+import {getPreviewHeight, getPreviewWidth, mediumPreview} from '../ui/utils/preview-size';
 
 export type TFilterTransformInput = {
     bounds: {x: number; y: number; width: number; height: number};
@@ -33,12 +35,6 @@ export const filterTransform = {
         const isSmall = testIsSmall();
         const layers = klCanvas.getLayers();
         const selectedLayerIndex = throwIfNull(klCanvas.getLayerIndex(context.canvas));
-
-        const fit = BB.fitInto(context.canvas.width, context.canvas.height, isSmall ? 280 : 490, isSmall ? 200 : 240, 1);
-        const displayW = parseInt('' + fit.width), displayH = parseInt('' + fit.height);
-        const w = Math.min(displayW, context.canvas.width);
-        const h = Math.min(displayH, context.canvas.height);
-        const displayPreviewFactor = displayW / context.canvas.width;
 
         // determine bounds and initial transformation
         const boundsObj = BB.canvasBounds(context);
@@ -174,7 +170,7 @@ export const filterTransform = {
             tagName: 'button',
             content: LANG('filter-transform-flip') + ' X',
             onClick: () => {
-                const t = freeTransform.getTransform();
+                const t = freeTransform.getValue();
                 freeTransform.setSize(-t.width, t.height);
             },
             css: actionBtnCss,
@@ -184,7 +180,7 @@ export const filterTransform = {
             tagName: 'button',
             content: LANG('filter-transform-flip') + ' Y',
             onClick: () => {
-                const t = freeTransform.getTransform();
+                const t = freeTransform.getValue();
                 freeTransform.setSize(t.width, -t.height);
             },
             css: actionBtnCss,
@@ -194,7 +190,7 @@ export const filterTransform = {
             tagName: 'button',
             content: '-90°',
             onClick: () => {
-                const t = freeTransform.getTransform();
+                const t = freeTransform.getValue();
                 t.angleDeg -= 90;
                 t.angleDeg %= 360;
                 freeTransform.setAngleDeg(t.angleDeg);
@@ -208,7 +204,7 @@ export const filterTransform = {
             tagName: 'button',
             content: '+90°',
             onClick: () => {
-                const t = freeTransform.getTransform();
+                const t = freeTransform.getValue();
                 t.angleDeg += 90;
                 t.angleDeg %= 360;
                 freeTransform.setAngleDeg(t.angleDeg);
@@ -222,7 +218,7 @@ export const filterTransform = {
             tagName: 'button',
             content: '2x',
             onClick: () => {
-                const t = freeTransform.getTransform();
+                const t = freeTransform.getValue();
                 if (constrainCheckbox.getValue()) {
                     freeTransform.setSize(freeTransform.getRatio() * t.height * 2, t.height * 2);
                 } else {
@@ -236,7 +232,7 @@ export const filterTransform = {
             tagName: 'button',
             content: '1/2x',
             onClick: () => {
-                const t = freeTransform.getTransform();
+                const t = freeTransform.getValue();
                 freeTransform.setSize(Math.round(t.width / 2), Math.round(t.height / 2));
             },
             css: actionBtnCss,
@@ -246,7 +242,7 @@ export const filterTransform = {
             tagName: 'button',
             content: LANG('center'),
             onClick: () => {
-                const t = freeTransform.getTransform();
+                const t = freeTransform.getValue();
                 freeTransform.setPos({ x: context.canvas.width / 2, y: context.canvas.height / 2 });
                 freeTransform.setAngleDeg(t.angleDeg);
                 updatePreview();
@@ -266,7 +262,7 @@ export const filterTransform = {
             allowTab: true,
             callback: function (b) {
                 isConstrained = b;
-                freeTransform.setConstrained(isConstrained);
+                freeTransform.setIsConstrained(isConstrained);
             },
             css: {
                 display: 'inline-block',
@@ -303,6 +299,7 @@ export const filterTransform = {
                 display: 'flex',
                 justifyContent: 'space-between',
                 alignItems: 'center',
+                marginBottom: '10px',
             },
         });
 
@@ -320,73 +317,61 @@ export const filterTransform = {
         });
         bottomRow.append(checkboxWrapper, algorithmSelect.getElement());
 
-
-        const previewWrapper = BB.el({
-            className: 'kl-preview-wrapper',
-            css: {
-                width: getPreviewWidth(isSmall) + 'px',
-                height: getPreviewHeight(isSmall) + 'px',
-            },
-        });
-        previewWrapper.oncontextmenu = function () {
-            return false;
-        };
-
-        const previewLayerArr: IKlBasicLayer[] = [];
+        const previewCanvas = BB.canvas(context.canvas.width, context.canvas.height);
+        const previewLayerArr: TProjectViewportProject['layers'] = [];
         {
             for (let i = 0; i < layers.length; i++) {
-                let canvas;
-                if (i === selectedLayerIndex) {
-                    canvas = BB.canvas(parseInt('' + w), parseInt('' + h));
-                    const ctx = BB.ctx(canvas);
-                    ctx.drawImage(layers[i].context.canvas, 0, 0, canvas.width, canvas.height);
-                } else {
-                    canvas = layers[i].context.canvas;
-                }
                 previewLayerArr.push({
-                    image: canvas,
+                    image: i === selectedLayerIndex ? previewCanvas : layers[i].context.canvas,
                     isVisible: layers[i].isVisible,
                     opacity: layers[i].opacity,
                     mixModeStr: layers[i].mixModeStr,
+                    hasClipping: false,
                 });
             }
         }
-        const klCanvasPreview = new KlCanvasPreview({
-            width: parseInt('' + displayW),
-            height: parseInt('' + displayH),
-            layers: previewLayerArr,
-        });
 
-        const previewInnerWrapper = BB.el({
-            className: 'kl-preview-wrapper__canvas',
-            css: {
-                width: parseInt('' + displayW) + 'px',
-                height: parseInt('' + displayH) + 'px',
+        const preview = new Preview({
+            width: getPreviewWidth(isSmall),
+            height: getPreviewHeight(isSmall),
+            project: {
+                width: context.canvas.width,
+                height: context.canvas.height,
+                layers: previewLayerArr,
             },
+            hasEditMode: true,
+            onModeChange: (m) => {
+                freeTransform.getElement().style.pointerEvents = m === 'edit' ? '' : 'none';
+                freeTransform.getElement().style.opacity = m === 'edit' ? '' : '0.5';
+            },
+            onTransformChange: (transform) => {
+                freeTransform.setViewportTransform(transform);
+            },
+            padding: 30,
         });
-        previewInnerWrapper.append(klCanvasPreview.getElement());
-        previewWrapper.append(previewInnerWrapper);
+        preview.render();
+        preview.getElement().classList.add(css({
+            overflow: 'hidden',
+            marginLeft: '-20px',
+            marginRight: '-20px',
+        }));
+        rootEl.append(preview.getElement());
+
 
         let lastDrawnTransformStr = '';
         function updatePreview (doForce: boolean = false) {
             if (!freeTransform) {
                 return;
             }
-            const transform = freeTransform.getTransform();
+            const transform = freeTransform.getValue();
             if (JSON.stringify(transform) === lastDrawnTransformStr && !doForce) {
                 return;
             }
             lastDrawnTransformStr = JSON.stringify(transform);
-            if (displayPreviewFactor < 1) {
-                transform.x *= displayPreviewFactor;
-                transform.y *= displayPreviewFactor;
-                transform.width *= displayPreviewFactor;
-                transform.height *= displayPreviewFactor;
-            }
-            const transformLayerCanvas = previewLayerArr[selectedLayerIndex].image as HTMLCanvasElement;
-            const ctx = BB.ctx(transformLayerCanvas);
+
+            const ctx = BB.ctx(previewCanvas);
             ctx.save();
-            ctx.clearRect(0, 0, transformLayerCanvas.width, transformLayerCanvas.height);
+            ctx.clearRect(0, 0, previewCanvas.width, previewCanvas.height);
             BB.drawTransformedImageWithBounds(
                 ctx,
                 layers[selectedLayerIndex].context.canvas,
@@ -396,7 +381,7 @@ export const filterTransform = {
                 BB.testShouldPixelate(transform, transform.width / initTransform.width, transform.height / initTransform.height),
             );
             ctx.restore();
-            klCanvasPreview.render();
+            preview.render();
         }
 
         const freeTransform = new FreeTransform({
@@ -414,14 +399,14 @@ export const filterTransform = {
                 inputR.value = '' + Math.round(t.angleDeg);
                 updatePreview();
             },
-            scale: displayPreviewFactor,
+            viewportTransform: preview.getTransform(),
         });
         BB.css(freeTransform.getElement(), {
             position: 'absolute',
             left: '0',
             top: '0',
         });
-        previewInnerWrapper.append(freeTransform.getElement());
+        preview.getElement().append(freeTransform.getElement());
 
         function onInputsChanged () {
             freeTransform.setPos({
@@ -434,7 +419,6 @@ export const filterTransform = {
 
         updatePreview();
 
-        rootEl.append(previewWrapper);
         result.destroy = (): void => {
             keyListener.destroy();
             freeTransform.destroy();
@@ -447,10 +431,11 @@ export const filterTransform = {
             BB.destroyEl(scaleDoubleBtn);
             BB.destroyEl(scaleHalfBtn);
             BB.destroyEl(centerBtn);
-            klCanvasPreview.destroy();
+            preview.destroy();
+            BB.freeCanvas(previewCanvas);
         };
         result.getInput = function (): TFilterTransformInput {
-            const transform = freeTransform.getTransform();
+            const transform = freeTransform.getValue();
             const input: TFilterTransformInput = {
                 transform,
                 bounds: boundsObj,

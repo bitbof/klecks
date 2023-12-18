@@ -10,6 +10,7 @@ export type TFilterDistortSettings = {
     scale: { x: number; y: number };
     strength: { x: number; y: number };
     phase: { x: number; y: number };
+    offset: { x: number; y: number };
 };
 
 /**
@@ -33,10 +34,11 @@ export const distort: TFilterDistort = function (settings) {
     uniform vec2 strength;
     uniform vec2 phase;
     uniform float type;
+    uniform vec2 offset;
 `, `
     const float PI = 3.14159265;
-    float x = coord.x;
-    float y = coord.y;
+    float x = coord.x + offset.x;
+    float y = coord.y + offset.y;
     if (stepSize > 1.0) {
         x = floor(x / stepSize) * stepSize;
         y = floor(y / stepSize) * stepSize;
@@ -50,6 +52,8 @@ export const distort: TFilterDistort = function (settings) {
         coord.x += distortX;
         coord.y += distortY;
     } else if (type == 2.0) {
+        x -= offset.x;
+        y -= offset.y;
         gl_FragColor = texture2D(texture, vec2(x, y) / texSize);
         coord.y += sin(gl_FragColor.r/scale.x*200.0 + phase.x * PI * 2.0) * strength.x;
         coord.x += cos(gl_FragColor.g/scale.y*200.0 + phase.y * PI * 2.0) * strength.y;
@@ -64,6 +68,7 @@ export const distort: TFilterDistort = function (settings) {
         scale: [settings.scale.x, settings.scale.y],
         strength: [settings.strength.x, settings.strength.y],
         phase: [settings.phase.x, settings.phase.y],
+        offset: [settings.offset.x, settings.offset.y],
         texSize: [this.width, this.height],
     });
 

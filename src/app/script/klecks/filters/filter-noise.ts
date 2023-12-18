@@ -13,12 +13,12 @@ import {Checkbox} from '../ui/components/checkbox';
 import {TFxCanvas} from '../../fx-canvas/fx-canvas-types';
 import {TKlCanvasHistoryEntry} from '../canvas/kl-canvas';
 import {throwIfNull} from '../../bb/base/base';
-import {getPreviewHeight, getPreviewWidth} from './utils/preview-size';
 import {FxPreviewRenderer} from '../ui/project-viewport/fx-preview-renderer';
 import {Preview} from '../ui/project-viewport/preview';
 import {css} from '@emotion/css/dist/emotion-css.cjs';
 import {TProjectViewportProject} from '../ui/project-viewport/project-viewport';
-import {testIsSmall} from './utils/test-is-small';
+import {getPreviewHeight, getPreviewWidth} from '../ui/utils/preview-size';
+import {testIsSmall} from '../ui/utils/test-is-small';
 
 // see noise(...) in fx-canvas
 interface INoisePreset {

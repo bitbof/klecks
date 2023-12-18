@@ -47,7 +47,7 @@ export class ChemyBrush {
                     x2: -x + this.copyCanvas.width,
                     y2: y,
                 }
-                );
+            );
         }
         if (this.settingYSymmetry) {
             bounds = BB.updateBounds(

@@ -8,8 +8,8 @@ import {TFilterHistoryEntry} from './filters';
 import {throwIfNull} from '../../bb/base/base';
 import {Preview} from '../ui/project-viewport/preview';
 import {css} from '@emotion/css/dist/emotion-css.cjs';
-import {getPreviewHeight, getPreviewWidth} from './utils/preview-size';
-import {testIsSmall} from './utils/test-is-small';
+import {testIsSmall} from '../ui/utils/test-is-small';
+import {getPreviewHeight, getPreviewWidth} from '../ui/utils/preview-size';
 
 export type TFilterGridInput = {
     x: number;

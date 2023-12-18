@@ -13,8 +13,8 @@ import {FxPreviewRenderer} from '../ui/project-viewport/fx-preview-renderer';
 import {TProjectViewportProject} from '../ui/project-viewport/project-viewport';
 import {Preview} from '../ui/project-viewport/preview';
 import {css} from '@emotion/css/dist/emotion-css.cjs';
-import {testIsSmall} from './utils/test-is-small';
-import {getPreviewHeight, getPreviewWidth, mediumPreview} from './utils/preview-size';
+import {testIsSmall} from '../ui/utils/test-is-small';
+import {getPreviewHeight, getPreviewWidth, mediumPreview} from '../ui/utils/preview-size';
 
 
 // see fx-canvas distort
@@ -24,6 +24,7 @@ export type TFilterDistortInput = {
     scale: { x: number; y: number };
     strength: { x: number; y: number };
     phase: { x: number; y: number };
+    offset: { x: number; y: number };
 };
 
 export type TFilterDistortHistoryEntry = TFilterHistoryEntry<
@@ -40,11 +41,12 @@ export const filterDistort = {
 
         let isSynced = true;
         const settings: TFilterDistortInput = {
+            stepSize: 1,
             distortType: 0,
             scale: {x: 100, y: 100},
             strength: {x: 20, y: 20},
             phase: {x: 0, y: 0},
-            stepSize: 1,
+            offset: {x: 0, y: 0},
         };
         // let lastDrawnSettings = null;
 
@@ -293,9 +295,9 @@ export const filterDistort = {
                 if (scaledSettings.distortType !== 2) {
                     scaledSettings.scale.x *= transform.scaleX;
                     scaledSettings.scale.y *= transform.scaleY;
-                    scaledSettings.phase.x -= transform.x / scaledSettings.scale.x;
-                    scaledSettings.phase.y -= transform.y / scaledSettings.scale.y;
                 }
+                scaledSettings.offset.x = -transform.x;
+                scaledSettings.offset.y = -transform.y;
 
                 return fxCanvas.multiplyAlpha().distort(scaledSettings).unmultiplyAlpha();
             },

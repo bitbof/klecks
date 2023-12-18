@@ -10,8 +10,8 @@ import {Preview} from '../ui/project-viewport/preview';
 import {TProjectViewportProject} from '../ui/project-viewport/project-viewport';
 import {throwIfNull, throwIfUndefined} from '../../bb/base/base';
 import {DraggableInput} from '../ui/components/draggable-input';
-import {testIsSmall} from './utils/test-is-small';
-import {getPreviewHeight, getPreviewWidth, mediumPreview} from './utils/preview-size';
+import {testIsSmall} from '../ui/utils/test-is-small';
+import {getPreviewHeight, getPreviewWidth, mediumPreview} from '../ui/utils/preview-size';
 
 export type TFilterPerspectiveInput = {
     before: TRectanglePoints;

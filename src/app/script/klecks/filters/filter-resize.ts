@@ -7,7 +7,7 @@ import {LANG} from '../../language/language';
 import {TFilterHistoryEntry} from './filters';
 import {table} from '../ui/components/table';
 import {theme} from '../../theme/theme';
-import {smallPreview} from './utils/preview-size';
+import {smallPreview} from '../ui/utils/preview-size';
 
 export type TFilterResizeInput = {
     width: number;

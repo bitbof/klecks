@@ -6,6 +6,7 @@
     --active-highlight-color: #{vars.$activeHighlightColor};
     --body-bg-color: #{vars.$bodyBgColor};
     --kl-color: #{vars.$klColor};
+    --ui-bg-color: #{vars.$uiBgColor};
 }
 
 @keyframes consoleIn {
@@ -89,7 +90,7 @@ a:hover, a:not([href]):hover {
 }
 
 .kl-toolspace {
-    background-color: #ddd;
+    background-color: var(--ui-bg-color);
 }
 
 .kl-toolspace--left {
@@ -665,6 +666,7 @@ iframe {
     border-radius: 4px;
     transition: all 0.1s ease-in-out;
 
+    background: var(--ui-bg-color);
     color: rgba(0, 0, 0, 0.6);
     box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.3);
 
@@ -1012,6 +1014,7 @@ iframe {
     line-height: 19px;
     font-weight: bold;
     box-shadow: inset 0 0 0 1px #000;
+    user-select: none;
 }
 
 .kl-overlay-toolspace {

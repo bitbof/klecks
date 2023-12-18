@@ -11,8 +11,8 @@ import {throwIfNull} from '../../bb/base/base';
 import {Preview} from '../ui/project-viewport/preview';
 import {TProjectViewportProject} from '../ui/project-viewport/project-viewport';
 import {DraggableInput} from '../ui/components/draggable-input';
-import {testIsSmall} from './utils/test-is-small';
-import {getPreviewHeight, getPreviewWidth} from './utils/preview-size';
+import {testIsSmall} from '../ui/utils/test-is-small';
+import {getPreviewHeight, getPreviewWidth} from '../ui/utils/preview-size';
 
 export type TFilterVanishPointInput = {
     x: number;

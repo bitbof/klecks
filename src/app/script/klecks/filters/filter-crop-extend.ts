@@ -8,7 +8,7 @@ import {LANG} from '../../language/language';
 import {TFilterHistoryEntry} from './filters';
 import {theme} from '../../theme/theme';
 import {IRect} from '../../bb/bb-types';
-import {smallPreview} from './utils/preview-size';
+import {smallPreview} from '../ui/utils/preview-size';
 
 export type TFilterCropExtendInput = {
     left: number;

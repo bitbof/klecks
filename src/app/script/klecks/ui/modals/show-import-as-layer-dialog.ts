@@ -4,6 +4,8 @@ import {showModal} from './base/showModal';
 import {KlCanvas} from '../../canvas/kl-canvas';
 import {IKlBasicLayer} from '../../kl-types';
 import {LANG} from '../../../language/language';
+import {testIsSmall} from '../utils/test-is-small';
+import {getPreviewHeight, getPreviewWidth} from '../utils/preview-size';
 
 export function showImportAsLayerDialog (
     params: {
@@ -33,7 +35,7 @@ export function showImportAsLayerDialog (
         });
         div.append(noteEl);
     }
-    const isSmall = window.innerWidth < 550;
+    const isSmall = testIsSmall();
 
     const buttonRowEl = BB.el({
         css: {
@@ -96,8 +98,8 @@ export function showImportAsLayerDialog (
 
 
     const freeTransformCanvas = new FreeTransformCanvas({
-        elementWidth: isSmall ? 340 : 540,
-        elementHeight: isSmall ? 280 : 350,
+        elementWidth: getPreviewWidth(isSmall),
+        elementHeight: getPreviewHeight(isSmall) + 50,
         imageWidth: params.klCanvas.getLayerContext(0)!.canvas.width,
         imageHeight: params.klCanvas.getLayerContext(0)!.canvas.height,
         layers: layers,

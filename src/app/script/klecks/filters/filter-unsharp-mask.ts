@@ -7,9 +7,9 @@ import {Preview} from '../ui/project-viewport/preview';
 import {TProjectViewportProject} from '../ui/project-viewport/project-viewport';
 import {css} from '@emotion/css';
 import {FxPreviewRenderer} from '../ui/project-viewport/fx-preview-renderer';
-import {getPreviewHeight, getPreviewWidth} from './utils/preview-size';
-import {testIsSmall} from './utils/test-is-small';
 import {BB} from '../../bb/bb';
+import {testIsSmall} from '../ui/utils/test-is-small';
+import {getPreviewHeight, getPreviewWidth} from '../ui/utils/preview-size';
 
 export type TFilterUnsharpMaskInput = {
     radius: number;

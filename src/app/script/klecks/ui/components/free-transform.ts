@@ -43,10 +43,10 @@ import {
 export class FreeTransform {
 
     // --- private ---
-    private readonly transform: IFreeTransform; // coordinates and dimensions of transformation
+    private readonly value: IFreeTransform; // coordinates and dimensions of transformation
     private isConstrained: boolean;
     private ratio: number; // aspect ratio of transform
-    private readonly scale: number;
+    private viewportTransform: {scale: number; x: number; y: number};
     private readonly scaled = { // scaled coordinates and dimensions for screen space
         x: 0,
         y: 0,
@@ -62,7 +62,7 @@ export class FreeTransform {
 
 
     private readonly cornerCursors = ['nw', 'n', 'ne', 'e', 'se', 's', 'sw', 'w'];
-    private readonly gripSize = 14;
+    private readonly gripSize = 16;
     private readonly edgeSize = 10;
 
     private readonly rootEl: HTMLElement; // sits at origin of image
@@ -82,12 +82,12 @@ export class FreeTransform {
     };
 
     private updateScaled (): void {
-        this.scaled.x = this.transform.x * this.scale;
-        this.scaled.y = this.transform.y * this.scale;
-        this.scaled.width = this.transform.width * this.scale;
-        this.scaled.height = this.transform.height * this.scale;
+        this.scaled.x = this.value.x * this.viewportTransform.scale;
+        this.scaled.y = this.value.y * this.viewportTransform.scale;
+        this.scaled.width = this.value.width * this.viewportTransform.scale;
+        this.scaled.height = this.value.height * this.viewportTransform.scale;
         this.scaled.corners = this.corners.map((item) => {
-            return {x: item.x * this.scale, y: item.y * this.scale};
+            return {x: item.x * this.viewportTransform.scale, y: item.y * this.viewportTransform.scale};
         });
     }
 
@@ -121,7 +121,7 @@ export class FreeTransform {
         };
         for (let e = 0; e < this.snapX.length; e++) {
             dist = Math.abs(iX - this.snapX[e]);
-            if (dist < this.minSnapDist / this.scale) {
+            if (dist < this.minSnapDist / this.viewportTransform.scale) {
                 if (snap.x === undefined || dist < snap.dist.x!) {
                     snap.x = this.snapX[e];
                     snap.dist.x = dist;
@@ -130,7 +130,7 @@ export class FreeTransform {
         }
         for (let e = 0; e < this.snapY.length; e++) {
             dist = Math.abs(iY - this.snapY[e]);
-            if (dist < this.minSnapDist / this.scale) {
+            if (dist < this.minSnapDist / this.viewportTransform.scale) {
                 if (snap.y === undefined || dist < snap.dist.y!) {
                     snap.y = this.snapY[e];
                     snap.dist.y = dist;
@@ -165,10 +165,10 @@ export class FreeTransform {
                 y: iY,
             };
         }
-        const flip = this.transform.width * this.transform.height < 0 ? -1 : 1;
+        const flip = this.value.width * this.value.height < 0 ? -1 : 1;
         return BB.projectPointOnLine(
-            {x: this.transform.x, y: this.transform.y},
-            toImageSpace(this.ratio, flip * ([0, 2].includes(cornerIndex) ? 1 : -1), this.transform),
+            {x: this.value.x, y: this.value.y},
+            toImageSpace(this.ratio, flip * ([0, 2].includes(cornerIndex) ? 1 : -1), this.value),
             {x: iX, y: iY}
         );
     }
@@ -178,17 +178,17 @@ export class FreeTransform {
      * Not their DOM.
      */
     private updateCornerPositions (): void {
-        this.corners[0].x = (-this.transform.width / 2); // top left
-        this.corners[0].y = (-this.transform.height / 2);
+        this.corners[0].x = (-this.value.width / 2); // top left
+        this.corners[0].y = (-this.value.height / 2);
 
-        this.corners[1].x = (this.transform.width / 2); // top right
-        this.corners[1].y = (-this.transform.height / 2);
+        this.corners[1].x = (this.value.width / 2); // top right
+        this.corners[1].y = (-this.value.height / 2);
 
-        this.corners[2].x = (this.transform.width / 2); // bottom right
-        this.corners[2].y = (this.transform.height / 2);
+        this.corners[2].x = (this.value.width / 2); // bottom right
+        this.corners[2].y = (this.value.height / 2);
 
-        this.corners[3].x = (-this.transform.width / 2); // bottom left
-        this.corners[3].y = (this.transform.height / 2);
+        this.corners[3].x = (-this.value.width / 2); // bottom left
+        this.corners[3].y = (this.value.height / 2);
     }
 
     /**
@@ -203,13 +203,13 @@ export class FreeTransform {
         if (!this.isConstrained) {
             return;
         }
-        const angle90 = Math.abs(this.transform.angleDeg) % 90 === 0;
-        const whSwapped = Math.abs(this.transform.angleDeg - 90) % 180 === 0;
+        const angle90 = Math.abs(this.value.angleDeg) % 90 === 0;
+        const whSwapped = Math.abs(this.value.angleDeg - 90) % 180 === 0;
         if (heightChanged && !widthChanged) {
             const newHeight = Math.abs(this.corners[3].y - this.corners[0].y);
             let newWidth = this.ratio * newHeight;
             if (angle90) {
-                newWidth = (whSwapped ? this.transform.y % 1 : this.transform.x % 1) === 0 ?
+                newWidth = (whSwapped ? this.value.y % 1 : this.value.x % 1) === 0 ?
                     BB.roundEven(newWidth) : BB.roundUneven(newWidth);
             }
             if (this.corners[1].x - this.corners[0].x < 0) {
@@ -224,7 +224,7 @@ export class FreeTransform {
             const newWidth = Math.abs(this.corners[0].x - this.corners[1].x);
             let newHeight = newWidth / this.ratio;
             if (angle90) {
-                newHeight = (whSwapped ? this.transform.x % 1 : this.transform.y % 1) === 0  ?
+                newHeight = (whSwapped ? this.value.x % 1 : this.value.y % 1) === 0  ?
                     BB.roundEven(newHeight) : BB.roundUneven(newHeight);
             }
             if (this.corners[3].y - this.corners[0].y < 0) {
@@ -251,14 +251,14 @@ export class FreeTransform {
                 x: (this.corners[0].x + this.corners[1].x) / 2,
                 y: (this.corners[0].y + this.corners[3].y) / 2,
             },
-            this.transform.angleDeg
+            this.value.angleDeg
         );
-        this.transform.x = rot.x + this.transform.x;
-        this.transform.y = rot.y + this.transform.y;
+        this.value.x = rot.x + this.value.x;
+        this.value.y = rot.y + this.value.y;
 
         // update size
-        this.transform.width = this.corners[1].x - this.corners[0].x;
-        this.transform.height = this.corners[3].y - this.corners[0].y;
+        this.value.width = this.corners[1].x - this.corners[0].x;
+        this.value.height = this.corners[3].y - this.corners[0].y;
 
         // new center means corners changed their position
         this.updateCornerPositions();
@@ -274,10 +274,10 @@ export class FreeTransform {
         this.updateScaled();
 
         BB.css(this.transEl, {
-            left: this.scaled.x + 'px',
-            top: this.scaled.y + 'px',
+            left: (this.viewportTransform.x + this.scaled.x) + 'px',
+            top: (this.viewportTransform.y + this.scaled.y) + 'px',
             transformOrigin: '0 0',
-            transform: 'rotate(' + this.transform.angleDeg + 'deg)',
+            transform: 'rotate(' + this.value.angleDeg + 'deg)',
         });
 
         BB.css(this.boundsEl, {
@@ -299,11 +299,11 @@ export class FreeTransform {
 
 
         this.angleGrip.x = 0;
-        this.angleGrip.y = (-Math.abs(this.transform.height * this.scale) / 2) - 20;
+        this.angleGrip.y = (-Math.abs(this.value.height * this.viewportTransform.scale) / 2) - 20;
         this.angleGrip.updateDOM();
         if (!skipCallback) {
             if (this.callback) { // why should updateDOM trigger the callback?
-                this.callback(copyTransform(this.transform));
+                this.callback(copyTransform(this.value));
             }
         }
     }
@@ -322,11 +322,12 @@ export class FreeTransform {
             isConstrained: boolean; // proportions constrained
             snapX: number[]; // where snapping along X axis. image space
             snapY: number[]; // where snapping along X axis. image space
-            scale: number; // ratio of screen-space / image-space
+            viewportTransform: {scale: number; x: number; y: number};
             callback: (transform: IFreeTransform) => void;
         }
     ) {
-        this.transform = { // coordinates and dimensions of transformation
+        this.viewportTransform = {...params.viewportTransform};
+        this.value = { // coordinates and dimensions of transformation
             x: params.x,
             y: params.y,
             width: params.width,
@@ -339,9 +340,8 @@ export class FreeTransform {
         this.snapX = params.snapX;
         this.snapY = params.snapY;
         this.callback = params.callback;
-        this.scale = params.scale;
         this.snappingEnabled = true;
-        this.ratio = this.transform.width / this.transform.height;
+        this.ratio = this.value.width / this.value.height;
 
         this.rootEl = BB.el({
             className: 'kl-free-transform',
@@ -384,11 +384,11 @@ export class FreeTransform {
             onPointer: (event) => {
                 event.eventPreventDefault();
                 if (event.type === 'pointerdown') {
-                    boundsStartP = {x: this.transform.x, y: this.transform.y};
+                    boundsStartP = {x: this.value.x, y: this.value.y};
                 }
                 if (event.type === 'pointermove' && event.button === 'left') {
-                    this.transform.x = boundsStartP.x + (event.pageX - event.downPageX!) / this.scale;
-                    this.transform.y = boundsStartP.y + (event.pageY - event.downPageY!) / this.scale;
+                    this.value.x = boundsStartP.x + (event.pageX - event.downPageX!) / this.viewportTransform.scale;
+                    this.value.y = boundsStartP.y + (event.pageY - event.downPageY!) / this.viewportTransform.scale;
 
 
                     let dist: number;
@@ -404,8 +404,8 @@ export class FreeTransform {
                     if (this.snappingEnabled) {
                         let i;
                         for (i = 0; i < this.snapX.length; i++) {
-                            dist = Math.abs(this.transform.x - this.snapX[i]);
-                            if (dist < this.minSnapDist / this.scale) {
+                            dist = Math.abs(this.value.x - this.snapX[i]);
+                            if (dist < this.minSnapDist / this.viewportTransform.scale) {
                                 if (snap.x === undefined || dist < snap.distX) {
                                     snap.x = this.snapX[i];
                                     snap.distX = dist;
@@ -413,8 +413,8 @@ export class FreeTransform {
                             }
                         }
                         for (i = 0; i < this.snapY.length; i++) {
-                            dist = Math.abs(this.transform.y - this.snapY[i]);
-                            if (dist < this.minSnapDist / this.scale) {
+                            dist = Math.abs(this.value.y - this.snapY[i]);
+                            if (dist < this.minSnapDist / this.viewportTransform.scale) {
                                 if (snap.y === undefined || dist < snap.distY) {
                                     snap.y = this.snapY[i];
                                     snap.distY = dist;
@@ -424,22 +424,22 @@ export class FreeTransform {
 
                         let iP;
                         for (i = 0; i < 4; i++) {
-                            iP = toImageSpace(this.corners[i].x, this.corners[i].y, this.transform);
+                            iP = toImageSpace(this.corners[i].x, this.corners[i].y, this.value);
                             let j;
                             for (j = 0; j < this.snapX.length; j++) {
                                 dist = Math.abs(iP.x - this.snapX[j]);
-                                if (dist < this.minSnapDist / this.scale) {
+                                if (dist < this.minSnapDist / this.viewportTransform.scale) {
                                     if (snap.x === undefined || dist < snap.distX) {
-                                        snap.x = this.snapX[j] - (iP.x - this.transform.x);
+                                        snap.x = this.snapX[j] - (iP.x - this.value.x);
                                         snap.distX = dist;
                                     }
                                 }
                             }
                             for (j = 0; j < this.snapY.length; j++) {
                                 dist = Math.abs(iP.y - this.snapY[j]);
-                                if (dist < this.minSnapDist / this.scale) {
+                                if (dist < this.minSnapDist / this.viewportTransform.scale) {
                                     if (snap.y === undefined || dist < snap.distY) {
-                                        snap.y = this.snapY[j] - (iP.y - this.transform.y);
+                                        snap.y = this.snapY[j] - (iP.y - this.value.y);
                                         snap.distY = dist;
                                     }
                                 }
@@ -450,8 +450,8 @@ export class FreeTransform {
                         let projected = BB.projectPointOnLine(
                             {x: 0, y: boundsStartP.y},
                             {x: 10, y: boundsStartP.y},
-                            {x: this.transform.x, y: this.transform.y});
-                        let dist = BB.dist(projected.x, projected.y, this.transform.x, this.transform.y);
+                            {x: this.value.x, y: this.value.y});
+                        let dist = BB.dist(projected.x, projected.y, this.value.x, this.value.y);
                         snap = {
                             x: projected.x,
                             y: projected.y,
@@ -462,8 +462,8 @@ export class FreeTransform {
                         projected = BB.projectPointOnLine(
                             {x: boundsStartP.x, y: 0},
                             {x: boundsStartP.x, y: 10},
-                            {x: this.transform.x, y: this.transform.y});
-                        dist = BB.dist(projected.x, projected.y, this.transform.x, this.transform.y);
+                            {x: this.value.x, y: this.value.y});
+                        dist = BB.dist(projected.x, projected.y, this.value.x, this.value.y);
                         if (dist < snap.distX) {
                             snap = {
                                 x: projected.x,
@@ -476,8 +476,8 @@ export class FreeTransform {
                         projected = BB.projectPointOnLine(
                             {x: boundsStartP.x, y: boundsStartP.y},
                             {x: boundsStartP.x + 1, y: boundsStartP.y + 1},
-                            {x: this.transform.x, y: this.transform.y});
-                        dist = BB.dist(projected.x, projected.y, this.transform.x, this.transform.y);
+                            {x: this.value.x, y: this.value.y});
+                        dist = BB.dist(projected.x, projected.y, this.value.x, this.value.y);
                         if (dist < snap.distX) {
                             snap = {
                                 x: projected.x,
@@ -490,8 +490,8 @@ export class FreeTransform {
                         projected = BB.projectPointOnLine(
                             {x: boundsStartP.x, y: boundsStartP.y},
                             {x: boundsStartP.x + 1, y: boundsStartP.y - 1},
-                            {x: this.transform.x, y: this.transform.y});
-                        dist = BB.dist(projected.x, projected.y, this.transform.x, this.transform.y);
+                            {x: this.value.x, y: this.value.y});
+                        dist = BB.dist(projected.x, projected.y, this.value.x, this.value.y);
                         if (dist < snap.distX) {
                             snap = {
                                 x: projected.x,
@@ -502,15 +502,15 @@ export class FreeTransform {
                         }
                     }
                     if (snap.x != undefined) {
-                        this.transform.x = snap.x;
+                        this.value.x = snap.x;
                     }
                     if (snap.y != undefined) {
-                        this.transform.y = snap.y;
+                        this.value.y = snap.y;
                     }
 
                     // snap to pixels
-                    if (Math.abs(this.transform.angleDeg) % 90 === 0) {
-                        snapToPixel(this.transform);
+                    if (Math.abs(this.value.angleDeg) % 90 === 0) {
+                        snapToPixel(this.value);
                         this.updateCornerPositions();
                     }
 
@@ -536,7 +536,7 @@ export class FreeTransform {
                             ][i],*/
                             borderRadius: this.gripSize + 'px',
                             position: 'absolute',
-                            boxShadow: 'inset 0 0 0 2px #000',
+                            border: '2px solid #000',
                         },
                     }) as HTMLElement,
                     x: 0,
@@ -551,8 +551,8 @@ export class FreeTransform {
                     // grip position
                     // if it gets small: slightly offset grips, so easier to handle
                     const offsetArr = [[-1, -1], [1, -1], [1, 1], [-1, 1]].map(item => {
-                        item[0] *= this.transform.width > 0 ? 1 : -1;
-                        item[1] *= this.transform.height > 0 ? 1 : -1;
+                        item[0] *= this.value.width > 0 ? 1 : -1;
+                        item[1] *= this.value.height > 0 ? 1 : -1;
                         return item;
                     });
                     const tinyOffset = Math.abs(this.scaled.width) < 20 || Math.abs(this.scaled.height) < 20 ? 10 : 0;
@@ -566,10 +566,10 @@ export class FreeTransform {
                     // cursor
                     let angle = BB.pointsToAngleDeg(
                         {
-                            x: this.transform.x,
-                            y: this.transform.y,
+                            x: this.value.x,
+                            y: this.value.y,
                         },
-                        toImageSpace(g.x, g.y, this.transform),
+                        toImageSpace(g.x, g.y, this.value),
                     ) + 135; // offset so nw is 0
                     while (angle < 0) {
                         angle += 360;
@@ -586,11 +586,11 @@ export class FreeTransform {
                     onPointer: (event) => {
                         event.eventPreventDefault();
                         if (event.type === 'pointerdown' && event.button === 'left') {
-                            this.corners[i].virtualPos = toImageSpace(this.corners[i].x, this.corners[i].y, this.transform);
+                            this.corners[i].virtualPos = toImageSpace(this.corners[i].x, this.corners[i].y, this.value);
 
                         } else if (event.type === 'pointermove' && event.button === 'left') {
-                            this.corners[i].virtualPos.x += event.dX / this.scale;
-                            this.corners[i].virtualPos.y += event.dY / this.scale;
+                            this.corners[i].virtualPos.x += event.dX / this.viewportTransform.scale;
+                            this.corners[i].virtualPos.y += event.dY / this.viewportTransform.scale;
 
                             let iP = {
                                 x: this.corners[i].virtualPos.x,
@@ -601,12 +601,12 @@ export class FreeTransform {
                                 iP = this.snapCorner(iP.x, iP.y);
                             }
 
-                            if (Math.abs(this.transform.angleDeg) % 90 === 0) {
+                            if (Math.abs(this.value.angleDeg) % 90 === 0) {
                                 iP.x = Math.round(iP.x);
                                 iP.y = Math.round(iP.y);
                             }
 
-                            const tP = toTransformSpace(iP.x, iP.y, this.transform);
+                            const tP = toTransformSpace(iP.x, iP.y, this.value);
 
                             const dX = tP.x - this.corners[i].x;
                             const dY = tP.y - this.corners[i].y;
@@ -694,7 +694,7 @@ export class FreeTransform {
                             height: Math.abs(this.scaled.height) + 'px',
                         });
                     }
-                    let angleOffset = Math.round(this.transform.angleDeg / 45);
+                    let angleOffset = Math.round(this.value.angleDeg / 45);
                     while (angleOffset < 0) {
                         angleOffset += 8;
                     }
@@ -719,13 +719,13 @@ export class FreeTransform {
                         }
                         if (event.type === 'pointermove' && event.button === 'left') {
                             const tfD = BB.rotateAround({x: 0, y: 0},
-                                {x: event.dX / this.scale, y: event.dY / this.scale},
-                                -this.transform.angleDeg);
+                                {x: event.dX / this.viewportTransform.scale, y: event.dY / this.viewportTransform.scale},
+                                -this.value.angleDeg);
                             let ti = {
                                 dX: tfD.x,
                                 dY: tfD.y,
                             };
-                            if (Math.abs(this.transform.angleDeg) % 90 === 0) {
+                            if (Math.abs(this.value.angleDeg) % 90 === 0) {
                                 ti = BB.intDxy(pointerRemainder, tfD.x, tfD.y);
                             }
 
@@ -818,25 +818,28 @@ export class FreeTransform {
 
                     const bounds = this.rootEl.getBoundingClientRect();
                     const offset = {
-                        x: bounds.left - this.rootEl.scrollLeft,
-                        y: bounds.top - this.rootEl.scrollTop,
+                        x: bounds.left - this.rootEl.scrollLeft + this.viewportTransform.x,
+                        y: bounds.top - this.rootEl.scrollTop + this.viewportTransform.y,
                     };
-                    const iP = {x: (event.clientX - offset.x) / this.scale, y: (event.clientY - offset.y) / this.scale};
+                    const iP = {
+                        x: (event.clientX - offset.x) / this.viewportTransform.scale,
+                        y: (event.clientY - offset.y) / this.viewportTransform.scale,
+                    };
 
-                    const a = BB.pointsToAngleDeg({x: this.transform.x, y: this.transform.y}, iP) + 90;
-                    this.transform.angleDeg = a;
+                    const a = BB.pointsToAngleDeg({x: this.value.x, y: this.value.y}, iP) + 90;
+                    this.value.angleDeg = a;
                     const snapDeg = Math.round(a / 360 * 8) * 45;
                     if (this.keyListener.getComboStr() === 'shift') {
-                        this.transform.angleDeg = snapDeg;
+                        this.value.angleDeg = snapDeg;
                     } else if (this.snappingEnabled && Math.abs(snapDeg - a) < 8) {
-                        this.transform.angleDeg = snapDeg;
+                        this.value.angleDeg = snapDeg;
                     }
                     this.updateDOM();
 
                 }
                 if (event.type === 'pointerup') {
-                    if (Math.abs(this.transform.angleDeg) % 90 === 0) {
-                        snapToPixel(this.transform);
+                    if (Math.abs(this.value.angleDeg) % 90 === 0) {
+                        snapToPixel(this.value);
                         this.updateCornerPositions();
                         this.updateDOM();
                     }
@@ -844,7 +847,7 @@ export class FreeTransform {
             },
         });
 
-        snapToPixel(this.transform);
+        snapToPixel(this.value);
         this.updateDOM(true);
         BB.append(this.transEl, [
             this.boundsEl,
@@ -864,50 +867,56 @@ export class FreeTransform {
 
 
 
-    getTransform (): IFreeTransform {
-        return copyTransform(this.transform);
+    getValue (): IFreeTransform {
+        return copyTransform(this.value);
     }
 
-    setConstrained (b: boolean): void {
+    setIsConstrained (b: boolean): void {
         this.isConstrained = b;
-        if (b && this.transform.width !== 0 && this.transform.height !== 0) {
-            this.ratio = Math.abs(this.transform.width / this.transform.height);
+        if (b && this.value.width !== 0 && this.value.height !== 0) {
+            this.ratio = Math.abs(this.value.width / this.value.height);
         }
     }
 
-    setSnapping (s: boolean): void {
-        this.snappingEnabled = s;
+    setSnapping (b: boolean): void {
+        this.snappingEnabled = b;
     }
 
     setPos (p: IVector2D): void {
-        this.transform.x = p.x;
-        this.transform.y = p.y;
+        this.value.x = p.x;
+        this.value.y = p.y;
         this.updateDOM(true);
     }
 
     move (dX: number, dY: number): void {
-        this.transform.x += dX;
-        this.transform.y += dY;
+        this.value.x += dX;
+        this.value.y += dY;
         this.updateDOM(false);
     }
 
     setSize (w: number, h: number): void {
-        this.transform.width = w;
-        this.transform.height = h;
-        if (Math.abs(this.transform.angleDeg) % 90 === 0) {
-            snapToPixel(this.transform);
+        this.value.width = w;
+        this.value.height = h;
+        if (Math.abs(this.value.angleDeg) % 90 === 0) {
+            snapToPixel(this.value);
         }
         this.updateCornerPositions();
         this.updateDOM(false);
     }
 
     setAngleDeg (a: number): void {
-        this.transform.angleDeg = a;
-        if (Math.abs(this.transform.angleDeg) % 90 === 0) {
-            snapToPixel(this.transform);
+        this.value.angleDeg = a;
+        if (Math.abs(this.value.angleDeg) % 90 === 0) {
+            snapToPixel(this.value);
             this.updateCornerPositions();
         }
         this.updateDOM(true);
+    }
+
+    setViewportTransform (transform: { scale: number; x: number; y: number }): void {
+        this.viewportTransform = transform;
+        this.updateScaled();
+        this.updateDOM();
     }
 
     getElement (): HTMLElement {
@@ -921,14 +930,8 @@ export class FreeTransform {
     destroy (): void {
         this.keyListener.destroy();
         this.boundsPointerListener.destroy();
-        this.corners[0].pointerListener.destroy();
-        this.corners[1].pointerListener.destroy();
-        this.corners[2].pointerListener.destroy();
-        this.corners[3].pointerListener.destroy();
-        this.edges[0].pointerListener.destroy();
-        this.edges[1].pointerListener.destroy();
-        this.edges[2].pointerListener.destroy();
-        this.edges[3].pointerListener.destroy();
+        this.corners.forEach(item => item.pointerListener.destroy());
+        this.edges.forEach(item => item.pointerListener.destroy());
         this.anglePointerListener.destroy();
     }
 

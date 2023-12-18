@@ -2,7 +2,7 @@ import {BB} from '../../bb/bb';
 import {IFilterApply, IFilterGetDialogParam, IFilterGetDialogResult} from '../kl-types';
 import {TFilterHistoryEntry} from './filters';
 import {theme} from '../../theme/theme';
-import {smallPreview} from './utils/preview-size';
+import {smallPreview} from '../ui/utils/preview-size';
 
 export type TFilterRotateInput = {
     deg: number;

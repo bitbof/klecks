@@ -12,8 +12,8 @@ import {Preview} from '../ui/project-viewport/preview';
 import {createTransformMatrix} from '../ui/project-viewport/utils/create-transform-matrix';
 import {applyToPoint} from 'transformation-matrix';
 import {DraggableInput} from '../ui/components/draggable-input';
-import {testIsSmall} from './utils/test-is-small';
-import {getPreviewHeight, getPreviewWidth} from './utils/preview-size';
+import {testIsSmall} from '../ui/utils/test-is-small';
+import {getPreviewHeight, getPreviewWidth} from '../ui/utils/preview-size';
 
 export type TFilterTiltShiftInput = {
     a: IVector2D;

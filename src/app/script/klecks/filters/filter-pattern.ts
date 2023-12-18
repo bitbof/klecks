@@ -9,8 +9,8 @@ import {TwoTabs} from '../ui/components/two-tabs';
 import {IVector2D} from '../../bb/bb-types';
 import {TFilterHistoryEntry} from './filters';
 import {throwIfNull} from '../../bb/base/base';
-import {testIsSmall} from './utils/test-is-small';
-import {getPreviewHeight, getPreviewWidth, mediumPreview} from './utils/preview-size';
+import {testIsSmall} from '../ui/utils/test-is-small';
+import {getPreviewHeight, getPreviewWidth, mediumPreview} from '../ui/utils/preview-size';
 
 
 export type TFilterPatternInput = {

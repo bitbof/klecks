@@ -6,7 +6,7 @@ import {LANG} from '../../language/language';
 import {throwIfNull} from '../../bb/base/base';
 import {TFilterHistoryEntry} from './filters';
 import {Options} from '../ui/components/options';
-import {smallPreview} from './utils/preview-size';
+import {smallPreview} from '../ui/utils/preview-size';
 
 export type TFilterFlipInput = {
     horizontal: boolean;

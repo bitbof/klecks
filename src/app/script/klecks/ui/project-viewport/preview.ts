@@ -5,6 +5,8 @@ import {PointerListener} from '../../../bb/input/pointer-listener';
 import toolZoomInImg from '/src/app/img/ui/tool-zoom-in.svg';
 import toolZoomOutImg from '/src/app/img/ui/tool-zoom-out.svg';
 import viewportResetImg from '/src/app/img/ui/viewport-reset.svg';
+import toolHandImg from '/src/app/img/ui/tool-hand.svg';
+import editPencilImg from '/src/app/img/ui/edit-pencil.svg';
 import {EventChain} from '../../../bb/input/event-chain/event-chain';
 import {DoubleTapper} from '../../../bb/input/event-chain/double-tapper';
 import {IChainElement} from '../../../bb/input/event-chain/event-chain.types';
@@ -16,16 +18,22 @@ import {LANG} from '../../../language/language';
 import {inverse, applyToPoint} from 'transformation-matrix';
 import {createTransform} from './utils/create-transform';
 import {toMetaTransform} from './utils/to-meta-transform';
+import {Options} from '../components/options';
 
+
+export type TPreviewMode = 'edit' | 'hand';
 
 export type TPreviewParams = {
     width: number;
     height: number;
     project: TProjectViewportProject;
     onTransformChange?: (transform: TViewportTransform) => void;
+    hasEditMode?: boolean; // default false
+    onModeChange?: (mode: TPreviewMode) => void;
+    padding?: number; //default -> DEFAULT_PADDING
 };
 
-const padding = 10;
+const DEFAULT_PADDING = 10;
 
 export class Preview {
     private readonly rootEl: HTMLElement;
@@ -36,9 +44,11 @@ export class Preview {
     private isReset: boolean = true;
     private readonly viewportPointerListener: PointerListener;
     private doRender = false;
+    private readonly padding: number;
     private animationFrameId: ReturnType<typeof requestAnimationFrame> | undefined;
     private onTransformChange: TPreviewParams['onTransformChange'] | undefined;
     private lastEmittedTransform: TViewportTransform = {x: 0, y: 0, scale: 0, angleDeg: 0};
+    private modeToggle: Options<TPreviewMode> | undefined;
 
 
 
@@ -84,8 +94,8 @@ export class Preview {
     private reset (): void {
         const fit = BB.fitInto(
             this.project.width, this.project.height,
-            this.width - padding * 2,
-            this.height - padding * 2,
+            this.width - this.padding * 2,
+            this.height - this.padding * 2,
         );
         const scale = fit.width / this.project.width;
         this.viewport.setTransform(createTransform(
@@ -155,11 +165,12 @@ export class Preview {
         this.height = p.height;
         this.project = p.project;
         this.onTransformChange = p.onTransformChange;
+        this.padding = p.padding ?? DEFAULT_PADDING;
 
         const fit = BB.fitInto(
             this.project.width, this.project.height,
-            this.width - padding * 2,
-            this.height - padding * 2,
+            this.width - this.padding * 2,
+            this.height - this.padding * 2,
         );
         const scale = fit.width / this.project.width;
 
@@ -292,6 +303,32 @@ export class Preview {
             e.preventDefault();
         });
 
+        if (p.hasEditMode) {
+            this.modeToggle = new Options<TPreviewMode>({
+                optionArr: (['edit', 'hand'] as const).map(id => {
+                    const el = BB.el({
+                        className: 'dark-invert',
+                        css: {
+                            width: '28px',
+                            height: '28px',
+                            backgroundSize: 'contain',
+                            margin: '5px',
+                            backgroundImage: `url(${id === 'edit' ? editPencilImg : toolHandImg})`,
+                        },
+                    });
+
+                    return {
+                        id,
+                        label: el,
+                        title: id === 'edit' ? LANG('tab-edit') : LANG('tool-hand'),
+                    };
+                }),
+                initId: 'edit',
+                onChange: (val) => {
+                    p.onModeChange && p.onModeChange(val);
+                },
+            });
+        }
 
         const elCss = css({
             borderTop: '1px solid #7f7f7f',
@@ -310,6 +347,11 @@ export class Preview {
             },
             [
                 this.viewport.getElement(),
+                ...(this.modeToggle ? [
+                    c(',pos-absolute,left-5,top-5,z-1', [
+                        this.modeToggle.getElement(),
+                    ]),
+                ] : []),
                 c(',pos-absolute,right-5,bottom-5,flex,flexCol,gap-5,z-1', [
                     c({
                         tagName: 'button',
@@ -377,5 +419,6 @@ export class Preview {
         this.viewport.destroy();
         this.viewportPointerListener.destroy();
         this.rootEl.remove();
+        this.modeToggle && this.modeToggle.destroy();
     }
 }

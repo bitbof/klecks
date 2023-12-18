@@ -1,4 +1,6 @@
-$d-bg: #333;
+:root {
+  --ui-bg-dark: #333; 
+}
 
 body.kl-theme-dark {
   color-scheme: dark;
@@ -6,7 +8,7 @@ body.kl-theme-dark {
   background: rgb(33, 33, 33);
 
   .kl-toolspace {
-    background: $d-bg;
+    background: var(--ui-bg-dark);
   }
 
   .kl-toolspace--left {
@@ -89,7 +91,7 @@ body.kl-theme-dark {
   }
 
   .kl-popup-box {
-    background-color: $d-bg;
+    background-color: var(--ui-bg-dark);
     box-shadow: 0 0 0 1px #636363;
   }
 
@@ -98,7 +100,7 @@ body.kl-theme-dark {
   }
 
   .kl-d-modal {
-    background-color: $d-bg;
+    background-color: var(--ui-bg-dark);
     box-shadow: 0 0 0 1px #636363;
   }
 
@@ -163,13 +165,14 @@ body.kl-theme-dark {
   }
 
   .kl-option {
+    background: var(--ui-bg-dark);
     color: #ccc;
     box-shadow: inset 0 0 0 1px #606060;
   }
 
   .kl-option-selected {
+    background: #444;
     color: #fff;
-    background: rgba(255, 255, 255, 0.07);
     box-shadow: inset 0 0 0 1px var(--active-highlight-color);
   }
 
@@ -422,6 +425,6 @@ body.kl-theme-dark {
   }
 
   .kl-dropdown-menu {
-    background: $d-bg;
+    background: var(--ui-bg-dark);
   }
 }

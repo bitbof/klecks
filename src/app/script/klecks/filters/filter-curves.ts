@@ -8,8 +8,8 @@ import {FxPreviewRenderer} from '../ui/project-viewport/fx-preview-renderer';
 import {TProjectViewportProject} from '../ui/project-viewport/project-viewport';
 import {Preview} from '../ui/project-viewport/preview';
 import {css} from '@emotion/css/dist/emotion-css.cjs';
-import {testIsSmall} from './utils/test-is-small';
-import {getPreviewHeight, getPreviewWidth} from './utils/preview-size';
+import {testIsSmall} from '../ui/utils/test-is-small';
+import {getPreviewHeight, getPreviewWidth} from '../ui/utils/preview-size';
 
 export type TFilterCurvesInput = {
     curves: TCurvesInput;
