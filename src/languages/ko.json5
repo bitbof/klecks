@@ -64,7 +64,7 @@
   'tool-hand': {
     hint: 'Tool for navigating (or scrolling around) the canvas. Same name in Photoshop.',
     original: 'Hand Tool',
-    value: '손'
+    value: '손 도구'
   },
   'tool-zoom': {
     original: 'Zoom',
@@ -300,7 +300,7 @@
   },
   'layers-blend-color-burn': {
     original: 'color burn',
-    value: '번'
+    value: '색상 번'
   },
   'layers-blend-lighten': {
     original: 'lighten',
@@ -348,7 +348,7 @@
   },
   'layers-blend-luminosity': {
     original: 'luminosity',
-    value: '명도'
+    value: '광도'
   },
   'layers-rename-title': {
     hint: '-title in code usually means it shows up in a tooltip, or it’s the header of a dialog box, so it can be a little bit longer.',
