@@ -1,0 +1,1562 @@
+{
+  'switch-ui-left-right': {
+    hint: 'Button that switches layout from left to right, to accommodate left handed & right handed visitors.',
+    original: 'Switch left/right UI',
+    value: 'UI 좌우 배치 전환'
+  },
+  'toggle-show-tools': {
+    hint: 'Button that hides/shows the toolbar.',
+    original: 'Show/Hide Tools',
+    value: '도구 보이기/숨기기'
+  },
+  scroll: {
+    hint: 'Verb. As in scrolling a page.',
+    original: 'Scroll',
+    value: '스크롤'
+  },
+  donate: {
+    original: 'Donate',
+    value: '기부'
+  },
+  home: {
+    hint: 'button with logo, top left of tools',
+    original: 'Home',
+    value: '홈'
+  },
+  'modal-new-tab': {
+    hint: 'as in browser tab',
+    original: 'Open in new tab',
+    value: '새 탭에서 열기'
+  },
+  'tab-edit': {
+    hint: 'label for a tab that offer filters for making color adjustments, cropping, transforming, etc.',
+    original: 'Edit',
+    value: '편집'
+  },
+  'tab-file': {
+    hint: 'label for a tab that lets user save the image, import, upload, etc.',
+    original: 'File',
+    value: '파일'
+  },
+  'tool-brush': {
+    hint: 'tool that lets user paint (like in ms paint or photoshop)',
+    original: 'Brush',
+    value: '붓'
+  },
+  'tool-paint-bucket': {
+    original: 'Paint Bucket',
+    value: '페인트통'
+  },
+  'tool-gradient': {
+    original: 'Gradient',
+    value: '그라데이션'
+  },
+  'tool-shape': {
+    hint: 'Tool for drawing rectangles, circles, lines',
+    original: 'Shape',
+    value: '도형'
+  },
+  'tool-text': {
+    hint: 'Tool for placing text on canvas',
+    original: 'Text',
+    value: '텍스트'
+  },
+  'tool-hand': {
+    hint: 'Tool for navigating (or scrolling around) the canvas. Same name in Photoshop.',
+    original: 'Hand Tool',
+    value: '손 도구'
+  },
+  'tool-zoom': {
+    original: 'Zoom',
+    value: '줌'
+  },
+  undo: {
+    original: 'Undo',
+    value: '실행 취소'
+  },
+  redo: {
+    original: 'Redo',
+    value: '다시 실행'
+  },
+  'brush-pen': {
+    hint: 'Generic "brush" that feels a bit like a pen or marker, as opposed to a paint brush.',
+    original: 'Pen',
+    value: '펜'
+  },
+  'brush-blend': {
+    hint: 'brush with watercolor feel. Makes colors blend/bleed into each other. Different from smudging though.',
+    original: 'Blend',
+    value: '수채 블렌드'
+  },
+  'brush-sketchy': {
+    hint: 'Made up brush name. Pictures drawn with this brush often look like sketches.',
+    original: 'Sketchy',
+    value: '스케치'
+  },
+  'brush-pixel': {
+    original: 'Pixel',
+    value: '픽셀'
+  },
+  'brush-chemy': {
+    hint: 'Made up brush name, derived from drawing applications "Webchemy" and "Alchemy"',
+    original: 'Chemy',
+    value: 'Chemy'
+  },
+  'brush-smudge': {
+    hint: 'Common brush/tool in image editing software. Smudges colors around canvas.',
+    original: 'Smudge',
+    value: '번지기'
+  },
+  'brush-size': {
+    original: 'Size',
+    value: '크기'
+  },
+  'brush-blending': {
+    hint: 'Wetness. How much colors will bleed into each other.',
+    original: 'Blending',
+    value: '혼합도'
+  },
+  'brush-toggle-pressure': {
+    hint: 'google "pressure sensitivity". Feature of Wacom tablets, Apple Pencil, XP Pen, etc.',
+    original: 'Toggle Pressure Sensitivity',
+    value: '필압 감지 전환'
+  },
+  'brush-pen-circle': {
+    hint: 'as in circle shape',
+    original: 'Circle',
+    value: '원형'
+  },
+  'brush-pen-chalk': {
+    hint: 'as in chalk texture',
+    original: 'Chalk',
+    value: '분필'
+  },
+  'brush-pen-calligraphy': {
+    hint: 'like a "chisel tip marker"',
+    original: 'Calligraphy',
+    value: '서예'
+  },
+  'brush-pen-square': {
+    hint: 'as in square shape',
+    original: 'Square',
+    value: '사각형'
+  },
+  'brush-sketchy-scale': {
+    hint: 'How far the connecting lines of sketchy brush can reach.',
+    original: 'Scale',
+    value: '스케치 도달 거리'
+  },
+  'brush-pixel-dither': {
+    hint: 'Dithering/halftone pattern',
+    original: 'Dither',
+    value: '디더링'
+  },
+  'brush-chemy-fill': {
+    hint: 'Like in MS Paint. A shape can have be outlined, and filled.',
+    original: 'Fill',
+    value: '채우기'
+  },
+  'brush-chemy-stroke': {
+    original: 'Stroke',
+    value: '획'
+  },
+  'brush-chemy-mirror-x': {
+    original: 'Horizontal Symmetry',
+    value: '수평 대칭'
+  },
+  'brush-chemy-mirror-y': {
+    original: 'Vertical Symmetry',
+    value: '수직 대칭'
+  },
+  'brush-chemy-gradient': {
+    hint: 'as in color gradient',
+    original: 'Gradient',
+    value: '그라데이션'
+  },
+  'brush-eraser-transparent-bg': {
+    hint: 'as in transparent background/bottom layer',
+    original: 'Transparent Background',
+    value: '투명 배경'
+  },
+  stabilizer: {
+    hint: 'Common feature in drawing software to make lines smoother',
+    original: 'Stabilizer',
+    value: '안정화'
+  },
+  'stabilizer-title': {
+    hint: '-title keys are usually more verbose description. shown as a tooltip.',
+    original: 'Stroke Stabilizer',
+    value: '획 안정화'
+  },
+  eyedropper: {
+    original: 'Eyedropper',
+    value: '스포이드'
+  },
+  'secondary-color': {
+    hint: 'or sometimes called "background" color. Photoshop, MS Paint, etc. allow user to switch between two colors.',
+    original: 'Secondary Color',
+    value: '보조 색상'
+  },
+  'manual-color-input': {
+    hint: 'A dialog where users can manually type the color, each channel a number. "mci" keys all related to this dialog.',
+    original: 'Manual Color Input',
+    value: '직접 색상 입력'
+  },
+  'mci-hex': {
+    hint: 'as in hex code. Hex representation of color. „#f00“ → red',
+    original: 'Hex',
+    value: '16진법 값'
+  },
+  'mci-copy': {
+    hint: 'verb',
+    original: 'Copy',
+    value: '복사'
+  },
+  'modal-ok': {
+    hint: 'main confirmation button in dialogs. Can be to confirm an action, not just acknowledge information.',
+    original: 'Ok',
+    value: '확인'
+  },
+  'modal-cancel': {
+    original: 'Cancel',
+    value: '취소'
+  },
+  'modal-close': {
+    hint: 'as in close a dialog box',
+    original: 'Close',
+    value: '닫기'
+  },
+  'layers-active-layer': {
+    hint: 'currently selected layer that user is drawing on',
+    original: 'Active Layer',
+    value: '활성 레이어'
+  },
+  'layers-layer': {
+    original: 'Layer',
+    value: '레이어'
+  },
+  'layers-copy': {
+    hint: 'noun',
+    original: 'copy',
+    value: '복사본'
+  },
+  'layers-blending': {
+    hint: 'Common feature in image editing & drawing software. All layers-blend- keys relate to this. https://en.wikipedia.org/wiki/Blend_modes',
+    original: 'Blending',
+    value: '혼합 모드'
+  },
+  'layers-new': {
+    hint: 'action',
+    original: 'New Layer',
+    value: '새 레이어'
+  },
+  'layers-remove': {
+    hint: 'action',
+    original: 'Remove Layer',
+    value: '레이어 제거'
+  },
+  'layers-duplicate': {
+    hint: 'action',
+    original: 'Duplicate Layer',
+    value: '레이어 복제'
+  },
+  'layers-merge': {
+    hint: 'action',
+    original: 'Merge with layer below',
+    value: '아래 레이어와 병합'
+  },
+  'layers-merge-all': {
+    original: 'Merge all',
+    value: '모두 병합'
+  },
+  'layers-rename': {
+    hint: 'action',
+    original: 'Rename',
+    value: '이름 변경'
+  },
+  'layers-active-layer-visible': {
+    original: 'Active layer is visible',
+    value: '활성 레이어가 보입니다'
+  },
+  'layers-active-layer-hidden': {
+    original: 'Active layer is hidden',
+    value: '활성된 레이어가 숨겨져 있습니다'
+  },
+  'layers-visibility-toggle': {
+    original: 'Layer Visibility',
+    value: '레이어 보이기/숨기기'
+  },
+  'layers-blend-normal': {
+    original: 'normal',
+    value: '보통'
+  },
+  'layers-blend-darken': {
+    original: 'darken',
+    value: '어둡게'
+  },
+  'layers-blend-multiply': {
+    original: 'multiply',
+    value: '곱하기'
+  },
+  'layers-blend-color-burn': {
+    original: 'color burn',
+    value: '색상 번'
+  },
+  'layers-blend-lighten': {
+    original: 'lighten',
+    value: '밝게'
+  },
+  'layers-blend-screen': {
+    original: 'screen',
+    value: '스크린'
+  },
+  'layers-blend-color-dodge': {
+    original: 'color dodge',
+    value: '색상 닷지'
+  },
+  'layers-blend-overlay': {
+    original: 'overlay',
+    value: '오버레이'
+  },
+  'layers-blend-soft-light': {
+    original: 'soft light',
+    value: '소프트 라이트'
+  },
+  'layers-blend-hard-light': {
+    original: 'hard light',
+    value: '하드 라이트'
+  },
+  'layers-blend-difference': {
+    original: 'difference',
+    value: '차이'
+  },
+  'layers-blend-exclusion': {
+    original: 'exclusion',
+    value: '제외'
+  },
+  'layers-blend-hue': {
+    original: 'hue',
+    value: '색조'
+  },
+  'layers-blend-saturation': {
+    original: 'saturation',
+    value: '채도'
+  },
+  'layers-blend-color': {
+    original: 'color',
+    value: '색상'
+  },
+  'layers-blend-luminosity': {
+    original: 'luminosity',
+    value: '광도'
+  },
+  'layers-rename-title': {
+    hint: '-title in code usually means it shows up in a tooltip, or it’s the header of a dialog box, so it can be a little bit longer.',
+    original: 'Rename Layer',
+    value: '레이어 이름 변경'
+  },
+  'layers-rename-name': {
+    hint: 'noun',
+    original: 'Name',
+    value: '이름'
+  },
+  'layers-rename-clear': {
+    hint: 'aka action of deleting entered name',
+    original: 'Clear Name',
+    value: '이름 지우기'
+  },
+  'layers-rename-sketch': {
+    hint: 'noun. Name suggestion for a layer',
+    original: 'Sketch',
+    value: '스케치'
+  },
+  'layers-rename-colors': {
+    hint: 'noun. Name suggestion for a layer',
+    original: 'Colors',
+    value: '색상'
+  },
+  'layers-rename-shading': {
+    hint: 'noun. Name suggestion for a layer',
+    original: 'Shading',
+    value: '음영'
+  },
+  'layers-rename-lines': {
+    hint: 'noun. Name suggestion for a layer',
+    original: 'Lines',
+    value: '선'
+  },
+  'layers-rename-effects': {
+    hint: 'noun. Name suggestion for a layer',
+    original: 'Effects',
+    value: '효과'
+  },
+  'layers-rename-foreground': {
+    hint: 'noun. Name suggestion for a layer',
+    original: 'Foreground',
+    value: '전경'
+  },
+  'layers-merge-modal-title': {
+    original: 'Merge/Mix Layers',
+    value: '레이어 병합/혼합'
+  },
+  'layers-merge-description': {
+    hint: 'After ":" a list of mix/blend modes is shown.',
+    original: 'Merges the selected layer with the one underneath. Select the mix mode:',
+    value: '선택한 레이어를 아래 레이어와 병합합니다. 혼합 모드를 선택하세요:'
+  },
+  'file-no-autosave': {
+    hint: "let user know they can't autosave, and there's no cloud storage. Keep short so fits on one line",
+    original: 'No autosave, no cloud storage',
+    value: '자동저장/클라우드 저장소 없음'
+  },
+  'file-new': {
+    hint: 'action',
+    original: 'New',
+    value: '새로 만들기'
+  },
+  'file-import': {
+    hint: 'action',
+    original: 'Import',
+    value: '가져오기'
+  },
+  'file-save': {
+    hint: 'action',
+    original: 'Save',
+    value: '저장'
+  },
+  'file-format': {
+    original: 'File Format',
+    value: '파일 형식'
+  },
+  'file-copy': {
+    hint: 'verb',
+    original: 'Copy',
+    value: '복사'
+  },
+  'file-copy-title': {
+    original: 'Copy To Clipboard',
+    value: '클립보드에 복사'
+  },
+  'file-share': {
+    hint: 'Common feature on phones. Pressing share button allows to send data to a different app, e.g. as a text message to someone.',
+    original: 'Share',
+    value: '공유'
+  },
+  'file-storage': {
+    hint: 'Made up term. Allows users to store drawing in the browser. (not synced across devices)',
+    original: 'Browser Storage',
+    value: '브라우저 저장소'
+  },
+  'file-storage-thumb-title': {
+    hint: 'when reopening or reloading',
+    original: 'Restores when reopening page',
+    value: '페이지를 다시 열 때 복원'
+  },
+  'file-storage-about': {
+    hint: 'link to Browser Storage help/user manual',
+    original: 'About Browser Storage',
+    value: '브라우저 저장소에 대하여'
+  },
+  'file-storage-cant-access': {
+    hint: 'an error. Can’t access the storage.',
+    original: "Can't access",
+    value: '접근할 수 없음'
+  },
+  'file-storage-empty': {
+    hint: 'nothing stored',
+    original: 'Empty',
+    value: '비어 있음'
+  },
+  'file-storage-store': {
+    hint: 'verb',
+    original: 'Store',
+    value: '저장'
+  },
+  'file-storage-clear': {
+    original: 'Clear',
+    value: '지우기'
+  },
+  'file-storage-storing': {
+    hint: 'while it is in the process of storing',
+    original: 'Storing',
+    value: '저장 중'
+  },
+  'file-storage-overwrite': {
+    hint: 'overwrite what is already stored',
+    original: 'Overwrite',
+    value: '덮어쓰기'
+  },
+  'file-storage-min-ago': {
+    hint: "{x} <- needs to stay, it's a placeholder.",
+    original: '{x}min ago',
+    value: '{x}분 전'
+  },
+  'file-storage-hours-ago': {
+    original: '{x}h ago',
+    value: '{x}시간 전'
+  },
+  'file-storage-days-ago': {
+    original: '{x}d ago',
+    value: '{x}일 전'
+  },
+  'file-storage-month-ago': {
+    original: '> 1month ago',
+    value: '1개월 이상 전'
+  },
+  'file-storage-restored': {
+    original: 'Restored from Browser Storage',
+    value: '브라우저 저장소에서 복원되었습니다'
+  },
+  'file-storage-stored': {
+    original: 'Stored to Browser Storage',
+    value: '브라우저 저장소에 저장되었습니다'
+  },
+  'file-storage-failed': {
+    original: 'Failed to store to Browser Storage',
+    value: '브라우저 저장소에 저장할 수 없습니다'
+  },
+  'file-storage-failed-1': {
+    original: 'Failed to store. Possible causes:',
+    value: '저장에 실패하였습니다. 추정 원인:'
+  },
+  'file-storage-failed-2': {
+    original: 'Out of disk space',
+    value: '디스크 공간 부족'
+  },
+  'file-storage-failed-3': {
+    original: 'Storage disabled in incognito tab',
+    value: '사생활 보호 창에서 저장소 사용 불가'
+  },
+  'file-storage-failed-4': {
+    hint: 'as in: unsupported feature',
+    original: "Browser doesn't support storage",
+    value: '브라우저가 저장소를 지원하지 않습니다'
+  },
+  'file-storage-failed-clear': {
+    original: 'Failed to clear.',
+    value: '삭제할 수 없습니다.'
+  },
+  'file-upload': {
+    hint: 'verb',
+    original: 'Upload',
+    value: '업로드'
+  },
+  'cleared-layer': {
+    hint: 'the layer has been cleared. It is now empty',
+    original: 'Cleared layer',
+    value: '레이어 비움'
+  },
+  filled: {
+    hint: 'layer got filled with a color',
+    original: 'Filled',
+    value: '채워짐'
+  },
+  'new-title': {
+    original: 'New Image',
+    value: '새 이미지'
+  },
+  'new-current': {
+    hint: 'as in "reuse the current image resolution"',
+    original: 'Current',
+    value: '현재'
+  },
+  'new-fit': {
+    hint: 'make dimensions of image fit your window size',
+    original: 'Fit',
+    value: '맞춤'
+  },
+  'new-oversize': {
+    hint: 'like oversized clothes.',
+    original: 'Oversize',
+    value: '큰 사이즈'
+  },
+  'new-square': {
+    hint: 'square image format',
+    original: 'Square',
+    value: '정사각형'
+  },
+  'new-landscape': {
+    hint: 'https://en.wikipedia.org/wiki/Page_orientation',
+    original: 'Landscape',
+    value: '가로'
+  },
+  'new-portrait': {
+    original: 'Portrait',
+    value: '세로'
+  },
+  'new-screen': {
+    hint: 'resolution of computer screen',
+    original: 'Screen',
+    value: '화면'
+  },
+  'new-video': {
+    hint: 'dimensions of a video (usually 16:9)',
+    original: 'Video',
+    value: '영상'
+  },
+  'new-din-paper': {
+    hint: 'https://en.wikipedia.org/wiki/Paper_size',
+    original: 'DIN Paper',
+    value: 'DIN 종이'
+  },
+  'new-px': {
+    hint: 'abbreviation of pixel',
+    original: 'px',
+    value: 'px'
+  },
+  'new-ratio': {
+    hint: 'aspect ratio',
+    original: 'Ratio',
+    value: '비율'
+  },
+  'upload-title': {
+    hint: '"Imgur" is a website name.',
+    original: 'Upload to Imgur',
+    value: 'Imgur에 업로드'
+  },
+  'upload-link-notice': {
+    hint: 'Explaining to user even though their upload is unlisted, they should be careful who they share the link with. No password protection.',
+    original: 'Anyone with the link to your uploaded image will be able to view it.',
+    value: '주소를 가지고 있는 모든 사람들은 업로드된 이미지를 볼 수 있습니다.'
+  },
+  'upload-name': {
+    hint: 'noun',
+    original: 'Title',
+    value: '제목'
+  },
+  'upload-title-untitled': {
+    original: 'Untitled',
+    value: '무제'
+  },
+  'upload-caption': {
+    hint: 'as in image caption / description',
+    original: 'Caption',
+    value: '설명'
+  },
+  'upload-submit': {
+    hint: 'verb',
+    original: 'Upload',
+    value: '업로드'
+  },
+  'upload-uploading': {
+    hint: 'in the process of uploading',
+    original: 'Uploading...',
+    value: '업로드 중...'
+  },
+  'upload-success': {
+    original: 'Upload Successful',
+    value: '업로드 성공'
+  },
+  'upload-failed': {
+    original: 'Upload failed.',
+    value: '업로드 실패'
+  },
+  'upload-delete': {
+    original: 'To delete your image from Imgur visit:',
+    value: 'Imgur에서 이미지를 삭제하려면 이곳에 방문하세요:'
+  },
+  'cropcopy-title-copy': {
+    original: 'Copy To Clipboard',
+    value: '클립보드에 복사'
+  },
+  'cropcopy-title-crop': {
+    hint: 'Cropping is a common feature in image editing.',
+    original: 'Crop',
+    value: '자르기'
+  },
+  'cropcopy-click-hold': {
+    original: 'Right-click or press hold to copy.',
+    value: '복사하려면 마우스 오른쪽 버튼을 클릭하거나 길게 누르세요.'
+  },
+  'cropcopy-btn-copy': {
+    hint: 'confirmation button. Should be short.',
+    original: 'To Clipboard',
+    value: '클립보드로'
+  },
+  'cropcopy-copied': {
+    original: 'Copied.',
+    value: '복사되었습니다.'
+  },
+  'cropcopy-btn-crop': {
+    hint: 'confirmation button. Should be short.',
+    original: 'Apply Crop',
+    value: '자르기 적용'
+  },
+  'crop-drag-to-crop': {
+    hint: 'drag the mouse to adjust cropping',
+    original: 'Drag to crop',
+    value: '드래그하여 잘라낼 영역을 조정하세요'
+  },
+  'filter-crop-extend': {
+    original: 'Crop/Extend',
+    value: '자르기/확장하기'
+  },
+  'filter-flip': {
+    original: 'Flip',
+    value: '뒤집기'
+  },
+  'filter-perspective': {
+    hint: 'perspective transformation',
+    original: 'Perspective',
+    value: '원근법'
+  },
+  'filter-resize': {
+    original: 'Resize',
+    value: '크기 조정'
+  },
+  'filter-rotate': {
+    original: 'Rotate',
+    value: '회전'
+  },
+  'filter-transform': {
+    hint: 'more generic transformation. Commonly known as "free transform"',
+    original: 'Transform',
+    value: '변형'
+  },
+  'filter-bright-contrast': {
+    hint: 'brightness contrast',
+    original: 'Bright/Contrast',
+    value: '밝기/대비'
+  },
+  'filter-curves': {
+    hint: 'color curves',
+    original: 'Curves',
+    value: '커브'
+  },
+  'filter-hue-sat': {
+    original: 'Hue/Saturation',
+    value: '색조/채도'
+  },
+  'filter-invert': {
+    hint: 'invert the colors',
+    original: 'Invert',
+    value: '색상 반전'
+  },
+  'filter-tilt-shift': {
+    hint: 'or just depth-of-field. https://en.wikipedia.org/wiki/Tilt%E2%80%93shift_photography',
+    original: 'Tilt Shift',
+    value: '틸트 시프트'
+  },
+  'filter-to-alpha': {
+    hint: 'feature that can isolate line drawings if it is a black and white image.',
+    original: 'To Alpha',
+    value: '알파로 변환'
+  },
+  'filter-triangle-blur': {
+    hint: 'or just blur',
+    original: 'Triangle Blur',
+    value: '삼각형 블러'
+  },
+  'filter-unsharp-mask': {
+    hint: 'or just sharpen, https://en.wikipedia.org/wiki/Unsharp_masking',
+    original: 'Unsharp Mask',
+    value: '언샤프 마스크'
+  },
+  'filter-crop-title': {
+    hint: 'same as the button, but can be longer',
+    original: 'Crop / Extend',
+    value: '자르기 / 확장하기'
+  },
+  'filter-crop-description': {
+    hint: 'descriptions explain the "filter" a tiny bit. Most importantly it says if it’s applied to a single layer, or the entire image (all layer)',
+    original: 'Crop or extend the image.',
+    value: '이미지를 자르거나 확장합니다.'
+  },
+  'filter-crop-left': {
+    original: 'Left',
+    value: '왼쪽'
+  },
+  'filter-crop-right': {
+    original: 'Right',
+    value: '오른쪽'
+  },
+  'filter-crop-top': {
+    original: 'Top',
+    value: '위쪽'
+  },
+  'filter-crop-bottom': {
+    original: 'Bottom',
+    value: '아래쪽'
+  },
+  'filter-crop-rule-thirds': {
+    hint: 'https://en.wikipedia.org/wiki/Rule_of_thirds',
+    original: 'Rule of Thirds',
+    value: '삼등분 법칙'
+  },
+  'filter-crop-fill': {
+    hint: 'If image gets extended, what color to fill that new area with',
+    original: 'Fill',
+    value: '채우기'
+  },
+  'filter-flip-title': {
+    hint: 'same as the button, but can be longer',
+    original: 'Flip',
+    value: '뒤집기'
+  },
+  'filter-flip-description': {
+    original: 'Flips layer or whole image.',
+    value: '레이어 또는 전체 이미지를 뒤집습니다.'
+  },
+  'filter-flip-horizontal': {
+    original: 'Horizontal',
+    value: '수평'
+  },
+  'filter-flip-vertical': {
+    original: 'Vertical',
+    value: '수직'
+  },
+  'filter-flip-image': {
+    original: 'Flip Image',
+    value: '이미지 뒤집기'
+  },
+  'filter-flip-layer': {
+    original: 'Flip Layer',
+    value: '레이어 뒤집기'
+  },
+  'filter-perspective-title': {
+    hint: 'same as the button, but can be longer',
+    original: 'Perspective',
+    value: '원근법'
+  },
+  'filter-perspective-description': {
+    original: 'Transforms the selected layer.',
+    value: '선택된 레이어를 변형합니다.'
+  },
+  'filter-resize-title': {
+    hint: 'same as the button, but can be longer',
+    original: 'Resize',
+    value: '크기 조정'
+  },
+  'filter-resize-description': {
+    original: 'Resizes the image.',
+    value: '이미지의 크기를 조정합니다.'
+  },
+  'filter-rotate-title': {
+    hint: 'same as the button, but can be longer',
+    original: 'Rotate',
+    value: '회전'
+  },
+  'filter-rotate-description': {
+    original: 'Rotates the image.',
+    value: '이미지를 회전합니다.'
+  },
+  'filter-transform-empty': {
+    hint: 'nothing on the layer, just transparency',
+    original: 'Layer is empty.',
+    value: '레이어가 비어있습니다.'
+  },
+  'filter-transform-title': {
+    hint: 'same as the button, but can be longer',
+    original: 'Transform',
+    value: '변형'
+  },
+  'filter-transform-description': {
+    hint: 'as in the Shift key.',
+    original: 'Transforms selected layer. Hold Shift for additional behavior.',
+    value: '선택된 레이어를 변형합니다. 추가적인 동작을 위해 Shift를 누르세요.'
+  },
+  'filter-transform-rotation': {
+    hint: 'or Angle',
+    original: 'Rotation',
+    value: '회전'
+  },
+  'filter-transform-flip': {
+    original: 'Flip',
+    value: '뒤집기'
+  },
+  'filter-transform-center': {
+    hint: 'verb or noun',
+    original: 'Center',
+    value: '중앙'
+  },
+  'filter-transform-constrain': {
+    hint: 'short version of "constrain proportions" – feature that locks the aspect ratio',
+    original: 'Constrain',
+    value: '비율 유지'
+  },
+  'filter-transform-snap': {
+    hint: 'or snapping. Common feature in graphics software. Makes stuff snap into place so it’s easier to align elements in an image',
+    original: 'Snap',
+    value: '맞춤'
+  },
+  'filter-transform-snap-title': {
+    hint: 'same as above, but as a tooltip',
+    original: 'Snap Rotation And Position',
+    value: '회전 및 위치 자동 맞춤'
+  },
+  'filter-bright-contrast-title': {
+    hint: 'same as the button, but can be longer',
+    original: 'Brightness / Contrast',
+    value: '밝기 / 대비'
+  },
+  'filter-bright-contrast-description': {
+    original: 'Change brightness and contrast for the selected layer.',
+    value: '선택된 레이어의 밝기와 대비를 변경합니다.'
+  },
+  'filter-bright-contrast-brightness': {
+    original: 'Brightness',
+    value: '밝기'
+  },
+  'filter-bright-contrast-contrast': {
+    original: 'Contrast',
+    value: '대비'
+  },
+  'filter-curves-title': {
+    hint: 'same as the button, but can be longer',
+    original: 'Curves',
+    value: '곡선'
+  },
+  'filter-curves-description': {
+    original: 'Apply curves on the selected layer.',
+    value: '선택된 레이어에 곡선을 적용합니다.'
+  },
+  'filter-curves-all': {
+    original: 'All',
+    value: '전체'
+  },
+  'filter-hue-sat-title': {
+    hint: 'same as the button, but can be longer',
+    original: 'Hue / Saturation',
+    value: '색조 / 채도'
+  },
+  'filter-hue-sat-description': {
+    original: 'Change hue and saturation for the selected layer.',
+    value: '선택된 레이어의 색조와 채도를 변경합니다.'
+  },
+  'filter-hue-sat-hue': {
+    original: 'Hue',
+    value: '색조'
+  },
+  'filter-hue-sat-saturation': {
+    original: 'Saturation',
+    value: '채도'
+  },
+  'filter-applied': {
+    hint: 'used like this: „Invert“ applied. Informs that a filter was applied',
+    original: 'applied',
+    value: '적용됨'
+  },
+  'filter-tilt-shift-title': {
+    hint: 'same as the button, but can be longer',
+    original: 'Tilt Shift',
+    value: '틸트 시프트'
+  },
+  'filter-tilt-shift-description': {
+    original: 'Applies tilt shift on the selected layer.',
+    value: '선택된 레이어에 틸트 시프트를 적용합니다.'
+  },
+  'filter-tilt-shift-blur': {
+    hint: 'words can be individually translated',
+    original: 'Blur Radius',
+    value: '블러 반경'
+  },
+  'filter-tilt-shift-gradient': {
+    hint: 'words can be individually translated',
+    original: 'Gradient Radius',
+    value: '그라디언트 반경'
+  },
+  'filter-to-alpha-title': {
+    hint: 'same as the button, but can be longer',
+    original: 'To Alpha',
+    value: '알파로'
+  },
+  'filter-to-alpha-description': {
+    hint: 'after ":" follow two options',
+    original: 'Generates alpha channel for selected layer from:',
+    value: '선택된 레이어에 대해 다음에서 알파 채널을 생성합니다:'
+  },
+  'filter-to-alpha-inverted-lum': {
+    hint: 'luminance is same as the layer blend mode "luminosity"',
+    original: 'Inverted Luminance',
+    value: '반전된 밝기'
+  },
+  'filter-to-alpha-lum': {
+    original: 'Luminance',
+    value: '밝기'
+  },
+  'filter-to-alpha-replace': {
+    hint: 'What color to replace the rgb channels with',
+    original: 'Replace RGB',
+    value: 'RGB 교체'
+  },
+  'filter-triangle-blur-title': {
+    hint: 'same as the button, but can be longer',
+    original: 'Triangle Blur',
+    value: '삼각형 블러'
+  },
+  'filter-triangle-blur-description': {
+    original: 'Applies triangle blur on the selected layer.',
+    value: '선택된 레이어에 삼각형 블러를 적용합니다.'
+  },
+  'filter-unsharp-mask-title': {
+    hint: 'same as the button, but can be longer',
+    original: 'Unsharp Mask',
+    value: '언샤프 마스크'
+  },
+  'filter-unsharp-mask-description': {
+    original: 'Sharpens the selected layer by scaling pixels away from the average of their neighbors.',
+    value: '주변 픽셀의 평균으로부터 픽셀을 조절하여 선택된 레이어를 선명하게 합니다.'
+  },
+  'filter-unsharp-mask-strength': {
+    original: 'Strength',
+    value: '강도'
+  },
+  'filter-grid': {
+    original: 'Grid',
+    value: '격자'
+  },
+  'filter-grid-description': {
+    original: 'Draws grid on selected layer.',
+    value: '선택된 레이어에 격자를 표시합니다.'
+  },
+  'filter-noise': {
+    original: 'Noise',
+    value: '잡음'
+  },
+  'filter-noise-description': {
+    original: 'Adds noise to selected layer.',
+    value: '선택된 레이어에 잡음을 추가합니다.'
+  },
+  'filter-noise-scale': {
+    original: 'Scale',
+    value: '규모'
+  },
+  'filter-noise-alpha': {
+    original: 'Alpha',
+    value: '알파'
+  },
+  'filter-pattern': {
+    original: 'Pattern',
+    value: '패턴'
+  },
+  'filter-pattern-description': {
+    original: 'Generates pattern on selected layer. Drag the preview for further controls.',
+    value: '선택된 레이어에 패턴을 생성합니다. 미리보기를 드래그하여 추가 조작이 가능합니다.'
+  },
+  'filter-distort': {
+    original: 'Distort',
+    value: '왜곡'
+  },
+  'filter-distort-description': {
+    original: 'Distorts the selected layer.',
+    value: '선택된 레이어를 왜곡합니다.'
+  },
+  'filter-distort-phase': {
+    original: 'Phase',
+    value: '위상'
+  },
+  'filter-distort-stepsize': {
+    original: 'Step Size',
+    value: '왜곡 단계 크기'
+  },
+  'filter-distort-sync-xy': {
+    original: 'Sync XY',
+    value: 'XY 동기화'
+  },
+  'filter-vanish-point': {
+    original: 'Vanish Point',
+    value: '소실점'
+  },
+  'filter-vanish-point-title': {
+    original: 'Vanishing Point',
+    value: '소실점'
+  },
+  'filter-vanish-point-description': {
+    original: 'Adds vanishing point to selected layer. Drag preview to move.',
+    value: '선택된 레이어에 소실점을 추가합니다. 미리보기를 드래그하여 이동합니다.'
+  },
+  'filter-vanish-point-lines': {
+    hint: 'As in: the number of lines',
+    original: 'Lines',
+    value: '선 개수'
+  },
+  'import-opening': {
+    hint: 'in the process of opening a large file',
+    original: 'Opening file...',
+    value: '파일을 여는 중...'
+  },
+  'import-title': {
+    original: 'Import Image',
+    value: '이미지 가져오기'
+  },
+  'import-too-large': {
+    original: 'Image too large, will be downscaled.',
+    value: '이미지가 너무 커서 축소합니다.'
+  },
+  'import-btn-as-layer': {
+    hint: 'import as layer. Button label, should be short',
+    original: 'As Layer',
+    value: '레이어로'
+  },
+  'import-btn-as-image': {
+    hint: 'import as image. Button label, should be short',
+    original: 'As Image',
+    value: '이미지로'
+  },
+  'import-as-layer-title': {
+    original: 'Import Image as New Layer',
+    value: '새 레이어로 이미지 가져오기'
+  },
+  'import-as-layer-description': {
+    original: 'Adjust the position of the imported image.',
+    value: '가져온 이미지의 위치를 조정하세요.'
+  },
+  'import-as-layer-limit-reached': {
+    hint: 'Kleki allows only a certain number of layers',
+    original: 'Layer limit reached. Image will be placed on existing layer.',
+    value: '레이어 개수 한도에 도달했습니다. 이미지는 기존 레이어에 배치됩니다.'
+  },
+  'import-as-layer-fit': {
+    hint: 'verb. imported image made to fit inside canvas.',
+    original: 'Fit',
+    value: '맞춤'
+  },
+  'import-flatten': {
+    hint: 'Turn image that has multiple layers into an image that has only one layer.',
+    original: 'Flatten image',
+    value: '이미지 평탄화'
+  },
+  'import-unsupported-file': {
+    hint: 'e.g. user tried to open a WAV',
+    original: 'Unsupported file type. See Help for supported types.',
+    value: '지원되지 않는 파일 유형입니다. 지원되는 유형에 대해서는 도움말을 참조하세요.'
+  },
+  'import-broken-file': {
+    hint: 'if an image file is broken',
+    original: "Couldn't load image. File might be corrupted.",
+    value: '이미지를 불러올 수 없습니다. 파일이 손상된 것 같습니다.'
+  },
+  'import-psd-unsupported': {
+    hint: 'PSD is photoshop file format. flatten as in „flatten image“ in photoshop. Merged all layers',
+    original: 'Unsupported features. PSD had to be flattened.',
+    value: '지원되지 않는 기능입니다. PSD는 평탄화해야 합니다.'
+  },
+  'import-psd-limited-support': {
+    hint: 'PSD has lots of fancy features that Kleki doesn\'t have, so when importing a PSD it often has to simplify things. So it might look different compared to when opening in Photoshop. We’re informing the user if they "flatten" the image it will be accurate despite losing layers. The user has to weigh, do they care about having layers, or do they care about it looking right.',
+    original: 'PSD support is limited. Flattened will more likely look correct.',
+    value: 'PSD 지원이 제한적입니다. 평탄화를 할 경우 더 정확하게 보일 수 있습니다.'
+  },
+  'import-psd-too-large': {
+    original: 'Image exceeds maximum dimensions of {x} x {x} pixels. Unable to import.',
+    value: '이미지가 최대 크기인 {x} x {x} 픽셀을 초과합니다. 가져올 수 없습니다.'
+  },
+  'import-psd-size': {
+    original: 'Image size',
+    value: '이미지 크기'
+  },
+  'hand-reset': {
+    hint: 'resets zoom (to 100%) and rotation (to 0°)',
+    original: 'Reset',
+    value: '초기화'
+  },
+  'hand-fit': {
+    hint: 'makes canvas cover whole working area',
+    original: 'Fit',
+    value: '맞춤'
+  },
+  'bucket-tolerance': {
+    hint: 'a common feature for paint bucket',
+    original: 'Tolerance',
+    value: '허용 오차'
+  },
+  'bucket-sample': {
+    hint: 'like "taking a sample"',
+    original: 'Sample',
+    value: '샘플'
+  },
+  'bucket-sample-title': {
+    original: 'Which layers to sample color from',
+    value: '색상을 샘플링할 레이어 선택'
+  },
+  'bucket-sample-all': {
+    hint: 'all layers',
+    original: 'All',
+    value: '모두'
+  },
+  'bucket-sample-active': {
+    hint: 'currently active layer',
+    original: 'Active',
+    value: '활성됨'
+  },
+  'bucket-sample-above': {
+    hint: 'layer above active layer',
+    original: 'Above',
+    value: '위'
+  },
+  'bucket-grow': {
+    hint: 'verb. Or expand.',
+    original: 'Grow',
+    value: '확장'
+  },
+  'bucket-grow-title': {
+    original: 'Grow filled area (in pixels)',
+    value: '채워진 영역 확장 (픽셀 단위)'
+  },
+  'bucket-contiguous': {
+    hint: 'common setting for paint bucket in image editing software',
+    original: 'Contiguous',
+    value: '주변 채우기'
+  },
+  'bucket-contiguous-title': {
+    hint: 'tooltip explaining Contiguous',
+    original: 'Only fill connected areas',
+    value: '연결된 영역만 채우기'
+  },
+  'gradient-linear': {
+    original: 'Linear',
+    value: '선형'
+  },
+  'gradient-linear-mirror': {
+    original: 'Linear-Mirror',
+    value: '선형-대칭'
+  },
+  'gradient-radial': {
+    original: 'Radial',
+    value: '방사형'
+  },
+  'shape-stroke': {
+    original: 'Stroke',
+    value: '획'
+  },
+  'shape-fill': {
+    original: 'Fill',
+    value: '채우기'
+  },
+  'shape-rect': {
+    hint: 'rectangle shape',
+    original: 'Rectangle',
+    value: '사각형'
+  },
+  'shape-ellipse': {
+    hint: 'ellipse shape',
+    original: 'Ellipse',
+    value: '타원형'
+  },
+  'shape-line': {
+    original: 'Line',
+    value: '선'
+  },
+  'shape-line-width': {
+    original: 'Line Width',
+    value: '선 두께'
+  },
+  'shape-outwards': {
+    hint: 'grows shape from the center outwards',
+    original: 'Outwards',
+    value: '바깥쪽으로'
+  },
+  'shape-fixed': {
+    hint: 'fixed ratio of 1:1',
+    original: 'Fixed 1:1',
+    value: '고정 1:1'
+  },
+  'text-instruction': {
+    original: 'Click canvas to place text',
+    value: '텍스트를 배치하려면 캔버스를 클릭하세요'
+  },
+  'text-title': {
+    original: 'Add Text',
+    value: '텍스트 추가'
+  },
+  'text-text': {
+    original: 'Text',
+    value: '텍스트'
+  },
+  'text-font': {
+    original: 'Font',
+    value: '폰트'
+  },
+  'text-placeholder': {
+    hint: 'placeholder in text input.',
+    original: 'Your text',
+    value: '여기에 텍스트를 입력하세요'
+  },
+  'text-color': {
+    original: 'Color',
+    value: '색상'
+  },
+  'text-size': {
+    original: 'Size',
+    value: '크기'
+  },
+  'text-line-height': {
+    original: 'Line Height',
+    value: '줄 높이'
+  },
+  'text-letter-spacing': {
+    original: 'Letter Spacing',
+    value: '자간'
+  },
+  'text-left': {
+    hint: 'left, center, right text formatting like in Word',
+    original: 'Left',
+    value: '왼쪽'
+  },
+  'text-center': {
+    original: 'Center',
+    value: '가운데'
+  },
+  'text-right': {
+    original: 'Right',
+    value: '오른쪽'
+  },
+  'text-italic': {
+    original: 'Italic',
+    value: '이탤릭'
+  },
+  'text-bold': {
+    original: 'Bold',
+    value: '굵게'
+  },
+  'save-reminder-title': {
+    hint: 'Save Reminder is a popup that shows up after 20 minutes of not saving. Allows user to save on the spot.',
+    original: 'Unsaved Work',
+    value: '저장되지 않은 작업'
+  },
+  'save-reminder-text': {
+    hint: 'turns into: "...saved in <strong>12 minutes</strong>. Save..."',
+    original: 'Image was not saved in {a} minutes{b}. Save now to prevent eventual loss.',
+    value: '이미지가 {a}분 동안{b} 저장되지 않았습니다. 손실을 방지하기 위해 지금 저장하세요.'
+  },
+  'save-reminder-save-psd': {
+    original: 'Save As PSD',
+    value: 'PSD로 저장'
+  },
+  'save-reminder-psd-layers': {
+    original: 'PSD will remember all layers.',
+    value: 'PSD는 모든 레이어를 기억합니다.'
+  },
+  'backup-drawing': {
+    hint: '(Embed) If the upload failed, the user can backup/download their drawing.',
+    original: 'You can backup your drawing.',
+    value: '그림을 백업할 수 있습니다.'
+  },
+  submit: {
+    original: 'Submit',
+    value: '제출'
+  },
+  'submit-title': {
+    hint: 'tooltip when hovering "Submit" button',
+    original: 'Submit Drawing',
+    value: '그림 제출'
+  },
+  'submit-prompt': {
+    hint: 'Dialog asking for confirmation',
+    original: 'Submit drawing?',
+    value: '그림을 제출하시겠습니까?'
+  },
+  'submit-submitting': {
+    hint: 'in the process of uploading',
+    original: 'Submitting',
+    value: '제출 중'
+  },
+  'embed-init-loading': {
+    hint: 'when opening the app',
+    original: 'Loading app',
+    value: '앱 로딩 중'
+  },
+  'embed-init-waiting': {
+    hint: 'The app is loaded, but it’s still waiting for image',
+    original: 'Waiting for image',
+    value: '이미지를 기다리는 중'
+  },
+  unsaved: {
+    original: 'Unsaved',
+    value: '저장되지 않음'
+  },
+  help: {
+    hint: 'or user manual',
+    original: 'Help',
+    value: '도움말'
+  },
+  'tab-settings': {
+    original: 'Settings',
+    value: '설정'
+  },
+  'settings-language': {
+    original: 'Language',
+    value: '언어'
+  },
+  'settings-language-reload': {
+    hint: 'changes will be visible after reloading the page',
+    original: 'Will update after reloading.',
+    value: '페이지를 새로고침하면 변경 사항이 적용됩니다.'
+  },
+  'settings-theme': {
+    original: 'Theme',
+    value: '테마'
+  },
+  'settings-save-reminder-label': {
+    original: 'Save Reminder',
+    value: '저장 알림'
+  },
+  'settings-save-reminder-disabled': {
+    original: 'disabled',
+    value: '비활성화'
+  },
+  'settings-save-reminder-confirm-title': {
+    original: 'Turn off Save Reminder?',
+    value: '저장 알림을 끄시겠습니까?'
+  },
+  'settings-save-reminder-confirm-a': {
+    original: "There is no autosave and browser tabs don't last forever. If you don't periodically save you will likely lose work.",
+    value: '자동 저장이 제공되지 않으며, 브라우저 탭은 영구적으로 유지되지 않습니다. 주기적으로 저장하지 않으면 작업 내용이 유실될 수 있습니다.'
+  },
+  'settings-save-reminder-confirm-b': {
+    original: 'Disable at your own risk?',
+    value: '위험을 감수하고 비활성화하시겠습니까?'
+  },
+  'settings-save-reminder-confirm-disable': {
+    original: 'Disable',
+    value: '비활성화'
+  },
+  'theme-dark': {
+    original: 'Dark',
+    value: '어두운 테마'
+  },
+  'theme-light': {
+    original: 'Light',
+    value: '밝은 테마'
+  },
+  'terms-of-service': {
+    original: 'Terms of Service',
+    value: '서비스 이용 약관'
+  },
+  licenses: {
+    hint: 'as in software licenses',
+    original: 'Licenses',
+    value: '라이선스'
+  },
+  'source-code': {
+    original: 'Source Code',
+    value: '소스 코드'
+  },
+  auto: {
+    hint: 'automatically decided',
+    original: 'auto',
+    value: '자동'
+  },
+  'zoom-in': {
+    original: 'Zoom In',
+    value: '확대'
+  },
+  'zoom-out': {
+    original: 'Zoom Out',
+    value: '축소'
+  },
+  radius: {
+    original: 'Radius',
+    value: '반경'
+  },
+  'constrain-proportions': {
+    original: 'Constrain Proportions',
+    value: '비율 유지'
+  },
+  width: {
+    original: 'Width',
+    value: '너비'
+  },
+  height: {
+    original: 'Height',
+    value: '높이'
+  },
+  opacity: {
+    hint: 'for layer opacity, brush opacity, text opacity, ...',
+    original: 'Opacity',
+    value: '투명도'
+  },
+  red: {
+    original: 'Red',
+    value: '빨강'
+  },
+  green: {
+    original: 'Green',
+    value: '초록'
+  },
+  blue: {
+    original: 'Blue',
+    value: '파랑'
+  },
+  eraser: {
+    hint: 'noun. As short as possible',
+    original: 'Eraser',
+    value: '지우개'
+  },
+  center: {
+    hint: 'verb',
+    original: 'Center',
+    value: '중앙'
+  },
+  layers: {
+    hint: 'layers in the context of image editing software',
+    original: 'Layers',
+    value: '레이어'
+  },
+  background: {
+    hint: 'as in background layer',
+    original: 'Background',
+    value: '배경'
+  },
+  'scaling-algorithm': {
+    hint: 'Label for dropdown where user chooses which computer graphics algorithm should be used to scale the image',
+    original: 'Scaling Algorithm',
+    value: '스케일링 알고리즘'
+  },
+  'algorithm-smooth': {
+    original: 'Smooth',
+    value: '부드러운'
+  },
+  'algorithm-pixelated': {
+    original: 'Pixelated',
+    value: '픽셀화된'
+  },
+  preview: {
+    hint: 'subject. When applying a filter user sees a preview of what the result would look like.',
+    original: 'Preview',
+    value: '미리보기'
+  },
+  'angle-snap': {
+    hint: 'Snapping. Like when transforming an image and it snaps to the side of the frame.',
+    original: 'Snap',
+    value: '스냅'
+  },
+  'angle-snap-title': {
+    original: '45° Angle Snapping',
+    value: '45° 각도 스냅'
+  },
+  'lock-alpha': {
+    hint: 'Short. Freezes the alpha channel of image. Images consist of 4 channels (red, green, blue, alpha). Alpha lock also found in Procreate and photoshop',
+    original: 'Lock Alpha',
+    value: '알파 잠금'
+  },
+  'lock-alpha-title': {
+    hint: "same as 'lock-alpha' but longer version. Shows up as a tooltip when hovering",
+    original: "Locks layer's alpha channel",
+    value: '레이어의 알파 채널 잠금'
+  },
+  reverse: {
+    hint: 'Reversing the direction of a color gradient',
+    original: 'Reverse',
+    value: '방향 뒤집기'
+  },
+  'compare-before': {
+    original: 'Before',
+    value: '적용 전'
+  },
+  'compare-after': {
+    original: 'After',
+    value: '적용 후'
+  },
+  loading: {
+    original: 'Loading',
+    value: '로딩 중'
+  },
+  more: {
+    original: 'More',
+    value: '더 보기'
+  },
+  'x-minutes': {
+    original: '{x}min',
+    value: '{x}분'
+  }
+}
