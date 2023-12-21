@@ -1,5 +1,5 @@
 import {BB} from '../../bb/bb';
-import {IFilterApply, IFilterGetDialogParam, IFilterGetDialogResult} from '../kl-types';
+import {IFilterApply, IFilterGetDialogParam, TFilterGetDialogResult} from '../kl-types';
 import {KlSlider} from '../ui/components/kl-slider';
 import {LANG} from '../../language/language';
 import {eventResMs} from './filters-consts';
@@ -338,7 +338,7 @@ export const filterDistort = {
         };
 
         // ----- result -------------------
-        const result: IFilterGetDialogResult<TFilterDistortInput> = {
+        const result: TFilterGetDialogResult<TFilterDistortInput> = {
             element: rootEl,
             destroy,
             getInput: () => {

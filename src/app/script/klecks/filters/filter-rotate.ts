@@ -1,5 +1,5 @@
 import {BB} from '../../bb/bb';
-import {IFilterApply, IFilterGetDialogParam, IFilterGetDialogResult} from '../kl-types';
+import {IFilterApply, IFilterGetDialogParam, TFilterGetDialogResult} from '../kl-types';
 import {TFilterHistoryEntry} from './filters';
 import {theme} from '../../theme/theme';
 import {smallPreview} from '../ui/utils/preview-size';
@@ -30,7 +30,7 @@ export const filterRotate = {
 
 
         const rootEl = BB.el();
-        const result: IFilterGetDialogResult<TFilterRotateInput> = {
+        const result: TFilterGetDialogResult<TFilterRotateInput> = {
             element: rootEl,
         };
         let deg = 0;

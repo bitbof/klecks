@@ -1,6 +1,6 @@
 import {BB} from '../../bb/bb';
 import {getSharedFx} from '../../fx-canvas/shared-fx';
-import {IFilterApply, IFilterGetDialogParam, IFilterGetDialogResult} from '../kl-types';
+import {IFilterApply, IFilterGetDialogParam, TFilterGetDialogResult} from '../kl-types';
 import {LANG} from '../../language/language';
 import {TwoTabs} from '../ui/components/two-tabs';
 import {TRectanglePoints} from '../../fx-canvas/filters/perspective';
@@ -36,7 +36,7 @@ export const filterPerspective = {
         const selectedLayerIndex = klCanvas.getLayerIndex(context.canvas);
 
         const rootEl = BB.el();
-        const result: IFilterGetDialogResult<TFilterPerspectiveInput> = {
+        const result: TFilterGetDialogResult<TFilterPerspectiveInput> = {
             element: rootEl,
         };
         if (!isSmall) {

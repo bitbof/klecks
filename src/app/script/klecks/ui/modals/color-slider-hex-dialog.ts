@@ -5,11 +5,14 @@ import {LANG} from '../../../language/language';
 import copyImg from '/src/app/img/ui/copy.svg';
 import {IRGB} from '../../kl-types';
 import {RGB} from '../../../bb/color/color';
+import {c} from '../../../bb/base/c';
+import {css} from '@emotion/css';
 
 
 type TInputRow = {
     update: () => void;
     destroy: () => void;
+    element: HTMLElement;
 };
 
 /**
@@ -27,8 +30,6 @@ export class HexColorDialog {
     ) {
         let lastValidRgb: RGB = new BB.RGB(p.color.r, p.color.g, p.color.b);
 
-        const div = BB.el();
-
         const previewEl = BB.el({
             css: {
                 width: '20px',
@@ -38,22 +39,11 @@ export class HexColorDialog {
                 background: '#' + BB.ColorConverter.toHexString(lastValidRgb),
             },
         });
-        div.append(previewEl);
-
 
         // --- Hex ---
-        const hexRowEl = BB.el({
-            css: {
-                display: 'flex',
-                alignItems: 'center',
-                marginBottom: '15px',
-            },
-        });
+
         const hexLabel = BB.el({
             content: LANG('mci-hex'),
-            css: {
-                width: '60px',
-            },
         });
         const hexInput = input({
             init: '#' + BB.ColorConverter.toHexString(lastValidRgb),
@@ -79,16 +69,28 @@ export class HexColorDialog {
             tagName: 'button',
             content: '<img src="' + copyImg + '" height="20" alt=""/>',
             title: LANG('mci-copy'),
-            css: {
-                marginLeft: '10px',
-            },
             onClick: function () {
                 hexInput.select();
-                document.execCommand('copy');
+                navigator.clipboard.writeText(hexInput.value).then().catch();
             },
         });
-        hexRowEl.append(hexLabel, hexInput, copyButton);
-        div.append(hexRowEl);
+
+        const hexRowEl = c({
+            css: {
+                display: 'flex',
+                alignItems: 'center',
+                marginBottom: '15px',
+                flexWrap: 'wrap',
+                gap: '5px 10px',
+                maxWidth: '250px',
+            },
+        }, [
+            hexLabel,
+            c(',flex,items-center,gap-10', [
+                hexInput,
+                copyButton,
+            ]),
+        ]);
         setTimeout(function () {
             hexInput.focus();
             hexInput.select();
@@ -97,20 +99,6 @@ export class HexColorDialog {
 
         // --- R G B ---
         function createRgbInputRow (labelStr: string, attributeStr: 'r' | 'g' | 'b'): TInputRow {
-
-            const rowEl = BB.el({
-                css: {
-                    display: 'flex',
-                    alignItems: 'center',
-                    marginTop: '5px',
-                },
-            });
-            const labelEl = BB.el({
-                content: labelStr,
-                css: {
-                    width: '60px',
-                },
-            });
 
             const inputEl = input({
                 init: lastValidRgb[attributeStr],
@@ -132,8 +120,10 @@ export class HexColorDialog {
                 },
             });
 
-            rowEl.append(labelEl, inputEl);
-            div.append(rowEl);
+            const rowEl = c('tr', [
+                c('td,pr-10', labelStr),
+                c('td', [inputEl]),
+            ]);
 
             const result = {
                 update: (): void => {
@@ -142,19 +132,32 @@ export class HexColorDialog {
                 destroy: (): void => {
                     BB.unsetEventHandler(inputEl, 'onchange');
                 },
+                element: rowEl,
             };
             return result;
         }
-        const rgbArr: TInputRow[] = [];
-        rgbArr.push(createRgbInputRow(LANG('red'), 'r'));
-        rgbArr.push(createRgbInputRow(LANG('green'), 'g'));
-        rgbArr.push(createRgbInputRow(LANG('blue'), 'b'));
+        const rgbArr: TInputRow[] = [
+            createRgbInputRow(LANG('red'), 'r'),
+            createRgbInputRow(LANG('green'), 'g'),
+            createRgbInputRow(LANG('blue'), 'b'),
+        ];
 
+        const tableCss = css({
+            borderCollapse: 'collapse',
+            'td': {
+                paddingBottom: '5px',
+            },
+        });
+        const rootEl = c('', [
+            previewEl,
+            hexRowEl,
+            c('table.' + tableCss, [c('tbody', rgbArr.map(item => item.element))]),
+        ]);
 
         showModal({
             target: document.body,
             message: `<b>${LANG('manual-color-input')}</b>`,
-            div: div,
+            div: rootEl,
             autoFocus: false,
             clickOnEnter: 'Ok',
             buttons: ['Ok', 'Cancel'],

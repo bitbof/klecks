@@ -1,7 +1,7 @@
 import {Options} from '../ui/components/options';
 import {ColorOptions} from '../ui/components/color-options';
 import {getSharedFx} from '../../fx-canvas/shared-fx';
-import {IFilterApply, IFilterGetDialogParam, IFilterGetDialogResult, IRGBA} from '../kl-types';
+import {IFilterApply, IFilterGetDialogParam, TFilterGetDialogResult, IRGBA} from '../kl-types';
 import {LANG} from '../../language/language';
 import {TFilterHistoryEntry} from './filters';
 import {FxPreviewRenderer} from '../ui/project-viewport/fx-preview-renderer';
@@ -34,7 +34,7 @@ export const filterToAlpha = {
         const selectedLayerIndex = klCanvas.getLayerIndex(context.canvas);
 
         const rootEl = BB.el();
-        const result: IFilterGetDialogResult<TFilterToAlphaInput> = {
+        const result: TFilterGetDialogResult<TFilterToAlphaInput> = {
             element: rootEl,
         };
         const isSmall = testIsSmall();

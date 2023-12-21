@@ -1,5 +1,5 @@
 import {BB} from '../../bb/bb';
-import {IFilterApply, IFilterGetDialogParam, IFilterGetDialogResult, IRGB} from '../kl-types';
+import {IFilterApply, IFilterGetDialogParam, TFilterGetDialogResult, IRGB} from '../kl-types';
 import {LANG} from '../../language/language';
 import {input} from '../ui/components/input';
 import {ColorOptions} from '../ui/components/color-options';
@@ -43,7 +43,7 @@ export const filterVanishPoint = {
         const previewCtx = BB.ctx(previewCanvas);
 
         const rootEl = BB.el();
-        const result: IFilterGetDialogResult<TFilterVanishPointInput> = {
+        const result: TFilterGetDialogResult<TFilterVanishPointInput> = {
             element: rootEl,
         };
         const isSmall = testIsSmall();

@@ -1,6 +1,6 @@
 import {BB} from '../../bb/bb';
 import {getSharedFx} from '../../fx-canvas/shared-fx';
-import {IFilterApply, IFilterGetDialogParam, IFilterGetDialogResult} from '../kl-types';
+import {IFilterApply, IFilterGetDialogParam, TFilterGetDialogResult} from '../kl-types';
 import {CurvesInput, getDefaultCurvesInput, TCurvesInput} from './filter-curves/curves-input';
 import {Options} from '../ui/components/options';
 import {TFilterHistoryEntry} from './filters';
@@ -33,7 +33,7 @@ export const filterCurves = {
         const selectedLayerIndex = klCanvas.getLayerIndex(context.canvas);
 
         const rootEl = BB.el();
-        const result: IFilterGetDialogResult<TFilterCurvesInput> = {
+        const result: TFilterGetDialogResult<TFilterCurvesInput> = {
             element: rootEl,
         };
         const isSmall = testIsSmall();

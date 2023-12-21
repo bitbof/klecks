@@ -1,5 +1,5 @@
 import {BB} from '../../bb/bb';
-import {IFilterApply, IFilterGetDialogParam, IFilterGetDialogResult, IKlBasicLayer} from '../kl-types';
+import {IFilterApply, IFilterGetDialogParam, TFilterGetDialogResult, IKlBasicLayer} from '../kl-types';
 import {input} from '../ui/components/input';
 import {KlSlider} from '../ui/components/kl-slider';
 import {LANG} from '../../language/language';
@@ -593,7 +593,7 @@ export const filterPattern = {
             pointerListener.destroy();
             klCanvasPreview.destroy();
         };
-        const result: IFilterGetDialogResult<TFilterPatternInput> = {
+        const result: TFilterGetDialogResult<TFilterPatternInput> = {
             element: rootEl,
             destroy,
             getInput: () => {

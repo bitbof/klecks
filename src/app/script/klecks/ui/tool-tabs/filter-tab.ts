@@ -6,7 +6,7 @@ import {StatusOverlay} from '../components/status-overlay';
 import {KlCanvasWorkspace} from '../../canvas-ui/kl-canvas-workspace';
 import {KlCanvas} from '../../canvas/kl-canvas';
 import {LANG} from '../../../language/language';
-import {IFilterApply, IFilterGetDialogParam, IFilterGetDialogResult} from '../../kl-types';
+import {IFilterApply, IFilterGetDialogParam, TFilterGetDialogResult} from '../../kl-types';
 import {KlColorSlider} from '../components/kl-color-slider';
 import {LayerManager} from './layer-manager/layer-manager';
 import {HandUi} from './hand-ui';
@@ -114,7 +114,10 @@ This has been reported to Google.
                     type TOptions = 'Ok' | 'Cancel';
                     const dialogButtons: TOptions[] = ['Ok', 'Cancel'];
 
-                    const finishedDialog = (result: TOptions, filterDialog: IFilterGetDialogResult<any>): void => {
+                    const finishedDialog = (result: TOptions, filterDialog: TFilterGetDialogResult<any>): void => {
+                        if ('error' in filterDialog) {
+                            return;
+                        }
                         if (result == 'Cancel') {
                             if (filterDialog.destroy) {
                                 filterDialog.destroy();
@@ -170,7 +173,7 @@ This has been reported to Google.
                         this.statusOverlay.out('"' + filterName + '" ' + LANG('filter-applied'), true);
                     } else {
                         const secondaryColorRGB = this.klColorSlider.getSecondaryRGB();
-                        let filterDialog: IFilterGetDialogResult<any> | undefined = undefined;
+                        let filterDialog: TFilterGetDialogResult<any> | undefined = undefined;
 
                         try {
                             filterDialog = filters[filterKey].getDialog!({
@@ -180,17 +183,17 @@ This has been reported to Google.
                                 maxHeight: this.getKlMaxCanvasSize(),
                                 currentColorRgb: {r: this.getCurrentColor().r, g: this.getCurrentColor().g, b: this.getCurrentColor().b},
                                 secondaryColorRgb: {r: secondaryColorRGB.r, g: secondaryColorRGB.g, b: secondaryColorRGB.b},
-                            } as IFilterGetDialogParam) as IFilterGetDialogResult;
+                            } as IFilterGetDialogParam) as TFilterGetDialogResult;
                         } catch (e) {
                             setTimeout(() => {
                                 throw e;
                             });
                         }
 
-                        if (!filterDialog) {
+                        if (!filterDialog || 'error' in filterDialog) {
                             KL.popup({
                                 target: this.klRootEl,
-                                message: 'Error: Could not perform action.',
+                                message: filterDialog ? filterDialog.error : 'Error: Could not perform action.',
                                 type: 'error',
                             });
                             return;

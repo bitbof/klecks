@@ -2,7 +2,7 @@ import {BB} from '../../bb/bb';
 import {Checkbox} from '../ui/components/checkbox';
 import {Select} from '../ui/components/select';
 import constrainImg from '/src/app/img/ui/constrain.svg';
-import {IFilterApply, IFilterGetDialogParam, IFilterGetDialogResult} from '../kl-types';
+import {IFilterApply, IFilterGetDialogParam, TFilterGetDialogResult} from '../kl-types';
 import {LANG} from '../../language/language';
 import {TFilterHistoryEntry} from './filters';
 import {table} from '../ui/components/table';
@@ -36,7 +36,7 @@ export const filterResize = {
 
 
         const rootEl = BB.el();
-        const result: IFilterGetDialogResult<TFilterResizeInput> = {
+        const result: TFilterGetDialogResult<TFilterResizeInput> = {
             element: rootEl,
         };
         let newWidth = klCanvas.getWidth(), newHeight = klCanvas.getHeight();

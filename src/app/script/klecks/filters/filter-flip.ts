@@ -1,7 +1,7 @@
 import {BB} from '../../bb/bb';
 import {Checkbox} from '../ui/components/checkbox';
 import {KlCanvasPreview} from '../canvas-ui/canvas-preview';
-import {IFilterApply, IFilterGetDialogParam, IFilterGetDialogResult, IKlBasicLayer, TMixMode} from '../kl-types';
+import {IFilterApply, IFilterGetDialogParam, TFilterGetDialogResult, IKlBasicLayer, TMixMode} from '../kl-types';
 import {LANG} from '../../language/language';
 import {throwIfNull} from '../../bb/base/base';
 import {TFilterHistoryEntry} from './filters';
@@ -34,7 +34,7 @@ export const filterFlip = {
         const w = parseInt('' + fit.width), h = parseInt('' + fit.height);
 
         const rootEl = BB.el();
-        const result: IFilterGetDialogResult<TFilterFlipInput> = {
+        const result: TFilterGetDialogResult<TFilterFlipInput> = {
             element: rootEl,
         };
         let isHorizontal = true;

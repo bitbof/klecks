@@ -1,5 +1,5 @@
 import {BB} from '../../bb/bb';
-import {IFilterApply, IFilterGetDialogParam, IFilterGetDialogResult} from '../kl-types';
+import {IFilterApply, IFilterGetDialogParam, TFilterGetDialogResult} from '../kl-types';
 import {LANG} from '../../language/language';
 import {input} from '../ui/components/input';
 import {ColorOptions} from '../ui/components/color-options';
@@ -36,7 +36,7 @@ export const filterGrid = {
         const selectedLayerIndex = throwIfNull(klCanvas.getLayerIndex(context.canvas));
 
         const rootEl = BB.el();
-        const result: IFilterGetDialogResult<TFilterGridInput> = {
+        const result: TFilterGetDialogResult<TFilterGridInput> = {
             element: rootEl,
         };
         const isSmall = testIsSmall();

@@ -3,7 +3,7 @@ import {Checkbox} from '../ui/components/checkbox';
 import {FreeTransform} from '../ui/components/free-transform';
 import {IFreeTransform} from '../ui/components/free-transform-utils';
 import {Select} from '../ui/components/select';
-import {IFilterApply, IFilterGetDialogParam, IFilterGetDialogResult} from '../kl-types';
+import {IFilterApply, IFilterGetDialogParam, TFilterGetDialogResult} from '../kl-types';
 import {LANG} from '../../language/language';
 import {TFilterHistoryEntry} from './filters';
 import {throwIfNull} from '../../bb/base/base';
@@ -39,8 +39,7 @@ export const filterTransform = {
         // determine bounds and initial transformation
         const boundsObj = BB.canvasBounds(context);
         if (!boundsObj) {
-            alert(LANG('filter-transform-empty'));
-            return false;
+            return { error: LANG('filter-transform-empty') };
         }
         const initTransform = {
             x: boundsObj.x + boundsObj.width / 2,
@@ -52,7 +51,7 @@ export const filterTransform = {
 
 
         const rootEl = BB.el();
-        const result: IFilterGetDialogResult<TFilterTransformInput> = {
+        const result: TFilterGetDialogResult<TFilterTransformInput> = {
             element: rootEl,
         };
         if (!isSmall) {

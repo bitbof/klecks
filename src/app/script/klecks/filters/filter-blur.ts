@@ -1,7 +1,7 @@
 import {KlSlider} from '../ui/components/kl-slider';
 import {eventResMs} from './filters-consts';
 import {getSharedFx} from '../../fx-canvas/shared-fx';
-import {IFilterApply, IFilterGetDialogParam, IFilterGetDialogResult} from '../kl-types';
+import {IFilterApply, IFilterGetDialogParam, TFilterGetDialogResult} from '../kl-types';
 import {LANG} from '../../language/language';
 import {TFilterHistoryEntry} from './filters';
 import {FxPreviewRenderer} from '../ui/project-viewport/fx-preview-renderer';
@@ -34,7 +34,7 @@ export const filterBlur = {
         const selectedLayerIndex = klCanvas.getLayerIndex(context.canvas);
 
         const rootEl = BB.el();
-        const result: IFilterGetDialogResult<TFilterBlurInput> = {
+        const result: TFilterGetDialogResult<TFilterBlurInput> = {
             element: rootEl,
         };
         const isSmall = testIsSmall();

@@ -137,7 +137,7 @@ export function showImportImageDialog (
     }
 
     function callback (result: string): void {
-        const croppedImage = cropCopy.getCroppedImage();
+        const croppedImage = cropCopy.getCroppedCanvas();
         const cropRect = cropCopy.getRect();
         const isCropped = p.image.width !== cropRect.width && p.image.height !== cropRect.height;
         cropCopy.destroy();
@@ -151,7 +151,9 @@ export function showImportImageDialog (
                 type: 'as-layer',
                 image: isCropped ? croppedImage : p.image.canvas,
             });
-
+            if (!isCropped) {
+                BB.freeCanvas(croppedImage);
+            }
         } else if (result === LANG('import-btn-as-image')) {
             if (p.image.type === 'psd') {
                 if (doFlatten) {
@@ -162,6 +164,7 @@ export function showImportImageDialog (
                     image: p.image,
                     cropObj: cropRect,
                 });
+                BB.freeCanvas(croppedImage);
             } else if (p.image.type === 'image') {
                 p.callback({
                     type: 'as-image',
@@ -172,6 +175,7 @@ export function showImportImageDialog (
             p.callback({
                 type: 'cancel',
             });
+            BB.freeCanvas(croppedImage);
         }
     }
     showModal({

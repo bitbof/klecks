@@ -2,7 +2,7 @@ import {BB} from '../../bb/bb';
 import {eventResMs} from './filters-consts';
 import {KlSlider} from '../ui/components/kl-slider';
 import {getSharedFx} from '../../fx-canvas/shared-fx';
-import {IFilterApply, IFilterGetDialogParam, IFilterGetDialogResult} from '../kl-types';
+import {IFilterApply, IFilterGetDialogParam, TFilterGetDialogResult} from '../kl-types';
 import {LANG} from '../../language/language';
 import {IVector2D} from '../../bb/bb-types';
 import {TFilterHistoryEntry} from './filters';
@@ -39,7 +39,7 @@ export const filterTiltShift = {
         const selectedLayerIndex = klCanvas.getLayerIndex(context.canvas);
 
         const rootEl = BB.el();
-        const result: IFilterGetDialogResult<TFilterTiltShiftInput> = {
+        const result: TFilterGetDialogResult<TFilterTiltShiftInput> = {
             element: rootEl,
         };
         const isSmall = testIsSmall();

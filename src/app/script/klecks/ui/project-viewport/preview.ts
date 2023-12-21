@@ -19,6 +19,7 @@ import {inverse, applyToPoint} from 'transformation-matrix';
 import {createTransform} from './utils/create-transform';
 import {toMetaTransform} from './utils/to-meta-transform';
 import {Options} from '../components/options';
+import {IPointerEvent, IWheelEvent} from '../../../bb/input/event.types';
 
 
 export type TPreviewMode = 'edit' | 'hand';
@@ -31,6 +32,8 @@ export type TPreviewParams = {
     hasEditMode?: boolean; // default false
     onModeChange?: (mode: TPreviewMode) => void;
     padding?: number; //default -> DEFAULT_PADDING
+    hasBorder?: boolean; // default true
+    editIcon?: string;
 };
 
 const DEFAULT_PADDING = 10;
@@ -49,6 +52,7 @@ export class Preview {
     private onTransformChange: TPreviewParams['onTransformChange'] | undefined;
     private lastEmittedTransform: TViewportTransform = {x: 0, y: 0, scale: 0, angleDeg: 0};
     private modeToggle: Options<TPreviewMode> | undefined;
+    private readonly pointerChain: EventChain;
 
 
 
@@ -227,6 +231,7 @@ export class Preview {
                         metaTransform.angleDeg,
                     ));
                     this.requestRerender();
+                    this.isReset = false;
 
                 }  else if (e.type === 'end') {
                     oldTransform = undefined;
@@ -235,14 +240,14 @@ export class Preview {
         });
 
 
-        const chain = new EventChain({
+        this.pointerChain = new EventChain({
            chainArr: [
                pinchZoomer as IChainElement,
                doubleTapper as IChainElement,
            ],
         });
-        chain.setChainOut((e) => {
-            if (e.button === 'left') {
+        this.pointerChain.setChainOut((e) => {
+            if (e.button && ['left', 'middle'].includes(e.button)) {
                 // debugOut(JSON.stringify(e));
                 this.transformCanvas({
                     type: 'translate',
@@ -278,25 +283,9 @@ export class Preview {
         this.viewportPointerListener = new PointerListener({
             target: this.viewport.getElement(),
             onPointer: (e) => {
-                chain.chainIn(e);
+                this.pointerChain.chainIn(e);
             },
-            onWheel: (e) => {
-                const viewportRect = this.viewport.getElement().getBoundingClientRect();
-                const vX = e.pageX - viewportRect.x;
-                const vY = e.pageY - viewportRect.y;
-
-
-                const oldScale = this.viewport.getTransform().scale;
-                const newScale = zoomByStep(oldScale, -e.deltaY / 2);
-
-
-                this.transformCanvas({
-                    type: 'zoom',
-                    vX,
-                    vY,
-                    fac: newScale / oldScale,
-                });
-            },
+            onWheel: this.onWheel,
             maxPointers: 2,
         });
         this.viewport.getElement().addEventListener('wheel', (e) => {
@@ -313,7 +302,9 @@ export class Preview {
                             height: '28px',
                             backgroundSize: 'contain',
                             margin: '5px',
-                            backgroundImage: `url(${id === 'edit' ? editPencilImg : toolHandImg})`,
+                            backgroundImage: `url(${id === 'edit' ? p.editIcon ?? editPencilImg : toolHandImg})`,
+                            backgroundPosition: 'center',
+                            backgroundRepeat: 'no-repeat',
                         },
                     });
 
@@ -330,7 +321,7 @@ export class Preview {
             });
         }
 
-        const elCss = css({
+        const elCss = css(p.hasBorder === false ? {} : {
             borderTop: '1px solid #7f7f7f',
             borderBottom: '1px solid #7f7f7f',
             '.kl-theme-dark &': {
@@ -338,6 +329,7 @@ export class Preview {
                 borderBottom: '1px solid #636363',
             },
         });
+        // pointer-events: auto - So the canvas can be ignored, while the buttons still work.
         this.rootEl = c(
             {
                 className: elCss,
@@ -348,11 +340,11 @@ export class Preview {
             [
                 this.viewport.getElement(),
                 ...(this.modeToggle ? [
-                    c(',pos-absolute,left-5,top-5,z-1', [
+                    c(',pos-absolute,left-5,top-5,z-1,pointer-auto', [
                         this.modeToggle.getElement(),
                     ]),
                 ] : []),
-                c(',pos-absolute,right-5,bottom-5,flex,flexCol,gap-5,z-1', [
+                c(',pos-absolute,right-5,bottom-5,flex,flexCol,gap-5,z-1,pointer-auto', [
                     c({
                         tagName: 'button',
                         title: LANG('hand-reset'),
@@ -409,6 +401,26 @@ export class Preview {
     getTransform (): TViewportTransform {
         return this.viewport.getTransform();
     }
+
+    onPointer (event: IPointerEvent): void {
+        this.pointerChain.chainIn(event);
+    }
+
+    onWheel = (e: IWheelEvent): void => {
+        const viewportRect = this.viewport.getElement().getBoundingClientRect();
+        const vX = e.pageX - viewportRect.x;
+        const vY = e.pageY - viewportRect.y;
+
+        const oldScale = this.viewport.getTransform().scale;
+        const newScale = zoomByStep(oldScale, -e.deltaY / 2);
+
+        this.transformCanvas({
+            type: 'zoom',
+            vX,
+            vY,
+            fac: newScale / oldScale,
+        });
+    };
 
     getElement (): HTMLElement {
         return this.rootEl;

@@ -69,11 +69,29 @@ function applyStyleNames (el: HTMLElement, styleNames: string[]) {
             style.paddingTop = params[0] + 'px';
             style.paddingBottom = params[0] + 'px';
         },
+        pt: (params) => {
+            style.paddingTop = params[0] + 'px';
+        },
+        pr: (params) => {
+            style.paddingRight = params[0] + 'px';
+        },
+        pb: (params) => {
+            style.paddingBottom = params[0] + 'px';
+        },
+        pl: (params) => {
+            style.paddingLeft = params[0] + 'px';
+        },
         mt: (params) => {
             style.marginTop = params[0] + 'px';
         },
+        mr: (params) => {
+            style.marginRight = params[0] + 'px';
+        },
         mb: (params) => {
             style.marginBottom = params[0] + 'px';
+        },
+        ml: (params) => {
+            style.marginLeft = params[0] + 'px';
         },
 
         // flex
@@ -142,6 +160,9 @@ function applyStyleNames (el: HTMLElement, styleNames: string[]) {
         },
         size: (params) => {
             style.fontSize = params[0] + 'px';
+        },
+        pointer: (params) => {
+            style.pointerEvents = params[0];
         },
     };
 

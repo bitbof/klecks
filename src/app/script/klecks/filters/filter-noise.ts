@@ -1,5 +1,5 @@
 import {BB} from '../../bb/bb';
-import {IFilterApply, IFilterGetDialogParam, IFilterGetDialogResult, IRGB, TMixMode} from '../kl-types';
+import {IFilterApply, IFilterGetDialogParam, TFilterGetDialogResult, IRGB, TMixMode} from '../kl-types';
 import {LANG} from '../../language/language';
 import {KlSlider} from '../ui/components/kl-slider';
 import {getSharedFx} from '../../fx-canvas/shared-fx';
@@ -140,7 +140,7 @@ export const filterNoise = {
         }
 
         const rootEl = BB.el();
-        const result: IFilterGetDialogResult<TFilterNoiseInput> = {
+        const result: TFilterGetDialogResult<TFilterNoiseInput> = {
             element: rootEl,
         };
         const isSmall = testIsSmall();

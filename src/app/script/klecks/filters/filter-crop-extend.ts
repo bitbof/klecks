@@ -3,7 +3,7 @@ import {input} from '../ui/components/input';
 import {Checkbox} from '../ui/components/checkbox';
 import {ColorOptions} from '../ui/components/color-options';
 import {Cropper} from '../ui/components/cropper';
-import {IFilterApply, IFilterGetDialogParam, IFilterGetDialogResult, IRGBA} from '../kl-types';
+import {IFilterApply, IFilterGetDialogParam, TFilterGetDialogResult, IRGBA} from '../kl-types';
 import {LANG} from '../../language/language';
 import {TFilterHistoryEntry} from './filters';
 import {theme} from '../../theme/theme';
@@ -41,7 +41,7 @@ export const filterCropExtend = {
         }
 
         const rootEl = BB.el();
-        const result: IFilterGetDialogResult<TFilterCropExtendInput> = {
+        const result: TFilterGetDialogResult<TFilterCropExtendInput> = {
             element: rootEl,
         };
         let left = 0, right = 0, top = 0, bottom = 0;
