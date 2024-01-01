@@ -131,6 +131,15 @@ body.kl-theme-dark {
     pointer-events: none;
   }
 
+  .kl-button-primary {
+    background: var(--kl-color);
+    color: #fff;
+
+    &:hover {
+      background-image: linear-gradient(to top, var(--kl-color) -50%, var(--active-highlight-color) 150%);
+    }
+  }
+
   button:not(.kl-button-primary, .kl-button-cancel) img:not(.dark-no-invert) {
     filter: invert(1) hue-rotate(180deg);
   }

@@ -35,6 +35,7 @@ export function clipboardDialog (
         height: isSmall ? 300 : 350,
         canvas: fullCanvas,
         isNotCopy: false,
+        onChange: () => setTimeout(() => updateBlob()),
     });
     BB.css(cropCopy.getEl(), {
         marginTop: '10px',
@@ -42,29 +43,47 @@ export function clipboardDialog (
     });
     div.append(cropCopy.getEl());
 
-    function toClipboard () {
-        const imgURL = cropCopy.getCroppedCanvas().toDataURL('image/png');
-        setTimeout(async function () {
-            try {
-                const data = await fetch(imgURL);
-                const blob = await data.blob();
-                await (navigator.clipboard as any).write([
-                    new ClipboardItem({
-                        [blob.type]: blob,
-                    } as any), // todo check is possible?
-                ]);
-                setTimeout(function () {
-                    output.out(LANG('cropcopy-copied'), true);
-                }, 200);
-            } catch (err) {
-                console.error((err as Error).name, (err as Error).message);
-            }
-        }, 0);
+    let blob: Blob | undefined = undefined;
+
+    // Safari doesn't allow any async operations between user interaction (click) and navigator.clipboard.write.
+    // It throws "NotAllowedError: the request is not allowed by the user agent or the platform in the current context,
+    // possibly because the user denied permission."
+    // So, we try to prepare blob beforehand.
+    let cropTimeout: ReturnType<typeof setTimeout> | undefined;
+    function updateBlob () {
+        if (!clipboardItemIsSupported) {
+            return;
+        }
+        clearTimeout(cropTimeout);
+        cropTimeout = setTimeout(() => {
+            cropCopy.getCroppedCanvas().toBlob((result) => {
+                blob = result ?? undefined;
+            }, 'image/png');
+        }, 50);
+    }
+
+    async function toClipboard () {
+        if (!blob) {
+            return;
+        }
+        try {
+            await (navigator.clipboard as any).write([
+                new ClipboardItem({
+                    [blob.type]: blob,
+                }),
+            ]);
+            setTimeout(function () {
+                output.out(LANG('cropcopy-copied'), true);
+            }, 200);
+        } catch (err) {
+            console.error((err as Error).name, (err as Error).message);
+            return;
+        }
     }
 
     const keyListener = new BB.KeyListener({
         onDown: function (keyStr, KeyEvent, comboStr) {
-            if (comboStr === 'ctrl+c') {
+            if (['ctrl+c', 'cmd+c'].includes(comboStr)) {
                 toClipboard();
                 closeFunc && closeFunc();
             }
