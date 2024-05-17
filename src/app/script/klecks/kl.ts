@@ -64,6 +64,7 @@ import {imgurUpload} from './ui/modals/imgur-upload';
 import {loadAgPsd} from './storage/load-ag-psd';
 import {SaveReminder} from './ui/components/save-reminder';
 import {SaveToComputer} from './storage/save-to-computer';
+import {UploadImage} from './storage/upload-image';
 import {UndoRedoCatchup} from './history/undo-redo-catchup';
 import {BrushSettingService} from './brushes-ui/brush-setting-service';
 import {BoxToggle} from './ui/components/box-toggle';
@@ -113,6 +114,7 @@ export const KL = {
     ProjectStore,
     loadAgPsd,
     SaveToComputer,
+    UploadImage,
     
     // --- ui - components ---
     calcSliderFalloffFactor,

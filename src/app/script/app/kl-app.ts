@@ -29,6 +29,7 @@ import {KlColorSlider} from '../klecks/ui/components/kl-color-slider';
 import {ToolspaceToolRow} from '../klecks/ui/components/toolspace-tool-row';
 import {StatusOverlay} from '../klecks/ui/components/status-overlay';
 import {SaveToComputer} from '../klecks/storage/save-to-computer';
+import {UploadImage} from '../klecks/storage/upload-image';
 import {ToolspaceCollapser} from '../klecks/ui/components/toolspace-collapser';
 import {ToolspaceScroller} from '../klecks/ui/components/toolspace-scroller';
 import {translateSmoothing} from '../klecks/utils/translate-smoothing';
@@ -82,6 +83,7 @@ export class KlApp {
     private uiState: TUiLayout;
     private readonly embed: undefined | KlAppOptionsEmbed;
     private readonly saveToComputer: SaveToComputer;
+    private readonly uploadImage: UploadImage;
     private readonly lineSanitizer: LineSanitizer;
     private readonly klCanvasWorkspace: KlCanvasWorkspace;
     private readonly collapseThreshold: number = 820;
@@ -372,7 +374,10 @@ export class KlApp {
             klCanvas: this.klCanvas,
             width: Math.max(0, this.uiWidth - this.toolWidth),
             height: this.uiHeight,
-            onDraw: (e) => drawEventChain.chainIn(e as any),
+            onDraw: (e) => {
+                drawEventChain.chainIn(e as any)
+                this.uploadImage.Send();
+            },
             onPick: (rgbObj, isDragDone) => {
                 brushSettingService.setColor(rgbObj);
                 if (isDragDone) {
@@ -1251,6 +1256,10 @@ export class KlApp {
             pOptions.saveReminder,
             () => exportType,
             () => this.klCanvas,
+        );
+
+        this.uploadImage = new KL.UploadImage(
+            () => this.klCanvas
         );
 
         const copyToClipboard = (showCrop?: boolean) => {
