@@ -233,8 +233,10 @@ export class KlApp {
             pProject ? {
                 projectObj: pProject,
             } : {
-                width: Math.max(10, Math.min(klMaxCanvasSize, window.innerWidth < this.collapseThreshold ? this.uiWidth : this.uiWidth - this.toolWidth)),
-                height: Math.max(10, Math.min(klMaxCanvasSize, this.uiHeight)),
+                   width: 720,
+                   height: 480
+                // width: Math.max(10, Math.min(klMaxCanvasSize, window.innerWidth < this.collapseThreshold ? this.uiWidth : this.uiWidth - this.toolWidth)),
+                // height: Math.max(10, Math.min(klMaxCanvasSize, this.uiHeight)),
             }, this.embed ? -1 : 0);
         this.klCanvas.setHistory(klHistory);
         let initState: IInitState;

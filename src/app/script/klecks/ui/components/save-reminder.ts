@@ -124,7 +124,7 @@ export class SaveReminder {
         private isDrawing: () => boolean,
         private projectStore: ProjectStore | null, // needed if showReminder
         private getProject: (() => IKlProject) | null, // needed if showReminder
-        private title: string = 'Klecks',
+        private title: string = 'Picture This',
     ) {
         this.setting = (localStorage.getItem(LS_REMINDER_KEY) as TSaveReminderSetting | null) ?? '20min';
     }

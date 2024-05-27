@@ -39,7 +39,6 @@ export class UploadImage {
         const extension = 'png';
         const mimeType = 'image/png';
         const filename = BB.getDate() + klConfig.filenameBase + '.' + extension;
-        console.log(sender)
         const fullCanvas = sender.getKlCanvas().getCompleteCanvas(1);
         try {
 
@@ -54,11 +53,12 @@ export class UploadImage {
     sendData(data: Blob) {
 
         const formData = new FormData();
-        formData.append('file', data[name]);
+        formData.append('file', data);
 
-        const response = fetch('https://requestbin.myworkato.com/xbpsi2xb', {
+        const response = fetch('https://ai-image.manglemoose.com/', {
             method: 'POST',
-            body: formData
+            body: formData,
+            mode: 'no-cors'
         });
 
     }

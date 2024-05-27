@@ -88,7 +88,7 @@ export class ToolspaceTopRow {
             title: LANG('home'),
             image: p.logoImg ? p.logoImg : klecksLogoImg,
             contain: true,
-            darkInvert: true,
+            darkInvert: false
         });
         logoButton.el.classList.add('kl-tool-row-border-right');
         BB.css(logoButton.el, {
