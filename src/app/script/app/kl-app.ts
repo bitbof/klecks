@@ -234,7 +234,7 @@ export class KlApp {
                 projectObj: pProject,
             } : {
                    width: 720,
-                   height: 480
+                   height: 1280
                 // width: Math.max(10, Math.min(klMaxCanvasSize, window.innerWidth < this.collapseThreshold ? this.uiWidth : this.uiWidth - this.toolWidth)),
                 // height: Math.max(10, Math.min(klMaxCanvasSize, this.uiHeight)),
             }, this.embed ? -1 : 0);
@@ -255,7 +255,7 @@ export class KlApp {
         } else {
             klHistory.pause(true);
             this.klCanvas.addLayer();
-            this.klCanvas.layerFill(0, {r: ERASE_COLOR, g: ERASE_COLOR, b: ERASE_COLOR});
+            this.klCanvas.layerFill(0, {r: 255, g: 208, b: 89});
             klHistory.pause(false);
         }
         try {
@@ -499,6 +499,8 @@ export class KlApp {
                 }
             },
         });
+
+        this.klCanvasWorkspace.fitView();
 
         const updateMainTabVisibility = () => {
             if (!mainTabRow) {

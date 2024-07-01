@@ -146,7 +146,7 @@ export const penBrushUi = (function () {
                 height: 30,
                 min: brushInterface.opacitySlider.min,
                 max: brushInterface.opacitySlider.max,
-                value: brushInterface.opacitySlider.max,
+                value: brush.getOpacity(),
                 curve: brushInterface.opacitySlider.curve,
                 eventResMs: eventResMs,
                 toDisplayValue: (val) => val * 100,
