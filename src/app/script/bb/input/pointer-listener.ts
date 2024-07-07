@@ -164,9 +164,17 @@ function correctPointerEvent (event: PointerEvent | TExtendedDOMPointerEvent): I
 
     let customPressure = null;
     if ('pointerId' in event) {
-        if ('pressure' in event && event.buttons !== 0 && (['mouse'].includes(event.pointerType) || (event.pointerType === 'touch' && event.pressure === 0))) {
-            correctedObj.pressure = 1;
-            customPressure = 1;
+        if ('pressure' in event && event.buttons !== 0) {
+            if (event.pointerType === 'touch' && event.pressure === 0) {
+                correctedObj.pressure = 1;
+                customPressure = 1;
+            }
+            // Spec: If there's no pressure support, pressure is 0.5.
+            // https://w3c.github.io/pointerevents/#dom-pointerevent-pressure
+            if (event.pointerType === 'mouse' && event.pressure === 0.5) {
+                correctedObj.pressure = 1;
+                customPressure = 1;
+            }
         }
     } else {
         correctedObj.pointerId = 0;
