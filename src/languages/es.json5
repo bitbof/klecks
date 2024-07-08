@@ -105,7 +105,7 @@
   'brush-smudge': {
     hint: 'Common brush/tool in image editing software. Smudges colors around canvas.',
     original: 'Smudge',
-    value: 'Difuminado',
+    value: 'Difuminado'
   },
   'brush-size': {
     original: 'Size',
@@ -114,17 +114,17 @@
   'brush-blending': {
     hint: 'Wetness. How much colors will bleed into each other.',
     original: 'Blending',
-    value: 'Mezcla',
+    value: 'Mezcla'
   },
   'brush-toggle-pressure': {
     hint: 'google "pressure sensitivity". Feature of Wacom tablets, Apple Pencil, XP Pen, etc.',
     original: 'Toggle Pressure Sensitivity',
-    value: 'Alternar sensibilidad a la presión',
+    value: 'Alternar sensibilidad a la presión'
   },
   'brush-pen-circle': {
     hint: 'as in circle shape',
     original: 'Circle',
-    value: 'Círculo',
+    value: 'Círculo'
   },
   'brush-pen-chalk': {
     hint: 'as in chalk texture',
