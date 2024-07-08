@@ -49,7 +49,7 @@
   },
   'tool-gradient': {
     original: 'Gradient',
-    value: 'Gradien',
+    value: 'Gradasi',
   },
   'tool-shape': {
     hint: 'Tool for drawing rectangles, circles, lines',
@@ -171,7 +171,7 @@
   'brush-chemy-gradient': {
     hint: 'as in color gradient',
     original: 'Gradient',
-    value: 'Gradien',
+    value: 'Gradasi',
   },
   'brush-eraser-transparent-bg': {
     hint: 'as in transparent background/bottom layer',
@@ -407,7 +407,7 @@
   'file-no-autosave': {
     hint: "let user know they can't autosave, and there's no cloud storage. Keep short so fits on one line",
     original: 'No autosave, no cloud storage',
-    value: 'Tak ada autosave, tak ada cloud',
+    value: 'Tak ada autosave, tidak ada cloud',
   },
   'file-new': {
     hint: 'action',
@@ -489,15 +489,15 @@
   'file-storage-min-ago': {
     hint: "{x} <- needs to stay, it's a placeholder.",
     original: '{x}min ago',
-    value: '',
+    value: '{x} menit yang lalu',
   },
   'file-storage-hours-ago': {
     original: '{x}h ago',
-    value: '',
+    value: '{x} jam yang lalu',
   },
   'file-storage-days-ago': {
     original: '{x}d ago',
-    value: '',
+    value: '{x} hari yang lalu',
   },
   'file-storage-month-ago': {
     original: '> 1month ago',
@@ -530,7 +530,7 @@
   'file-storage-failed-4': {
     hint: 'as in: unsupported feature',
     original: "Browser doesn't support storage",
-    value: 'Browser tak mendukung penyimpanan',
+    value: 'Browser tidak mendukung penyimpanan',
   },
   'file-storage-failed-clear': {
     original: 'Failed to clear.',
@@ -568,7 +568,7 @@
   'new-oversize': {
     hint: 'like oversized clothes.',
     original: 'Oversize',
-    value: 'Besar',
+    value: 'Kebesaran',
   },
   'new-square': {
     hint: 'square image format',
@@ -702,7 +702,7 @@
   },
   'filter-resize': {
     original: 'Resize',
-    value: 'Ukuran ulang',
+    value: 'Memperbesar',
   },
   'filter-rotate': {
     original: 'Rotate',
@@ -755,7 +755,7 @@
   'filter-crop-title': {
     hint: 'same as the button, but can be longer',
     original: 'Crop / Extend',
-    value: 'Pangkas / Perpanjangan',
+    value: 'Pangkas/Perpanjangan',
   },
   'filter-crop-description': {
     hint: 'descriptions explain the "filter" a tiny bit. Most importantly it says if it’s applied to a single layer, or the entire image (all layer)',
@@ -825,7 +825,7 @@
   'filter-resize-title': {
     hint: 'same as the button, but can be longer',
     original: 'Resize',
-    value: 'Ubah Ukuran',
+    value: 'Memperbesar',
   },
   'filter-resize-description': {
     original: 'Resizes the image.',
@@ -843,7 +843,7 @@
   'filter-transform-empty': {
     hint: 'nothing on the layer, just transparency',
     original: 'Layer is empty.',
-    value: 'Lapisan kosong.',
+    value: 'Lapisan sudah kosong.',
   },
   'filter-transform-title': {
     hint: 'same as the button, but can be longer',
@@ -953,7 +953,7 @@
   'filter-tilt-shift-gradient': {
     hint: 'words can be individually translated',
     original: 'Gradient Radius',
-    value: 'Radius Grandien',
+    value: 'Radius Gradasi',
   },
   'filter-to-alpha-title': {
     hint: 'same as the button, but can be longer',
@@ -995,7 +995,7 @@
   },
   'filter-unsharp-mask-description': {
     original: 'Sharpens the selected layer by scaling pixels away from the average of their neighbors.',
-    value: 'Mempertajam layer yang dipilih dengan menskalakan piksels dari rata-rata tetangganya.',
+    value: 'Mempertajam layer yang dipilih dengan menskalakan piksel dari rata-rata tetangganya.',
   },
   'filter-unsharp-mask-strength': {
     original: 'Strength',
@@ -1138,7 +1138,7 @@
   },
   'import-psd-too-large': {
     original: 'Image exceeds maximum dimensions of {x} x {x} pixels. Unable to import.',
-    value: 'Gambar melebihi dimensi maksimum {x} x {x} piksels. Tak dapat mengimpor.',
+    value: 'Gambar melebihi dimensi maksimum {x} x {x} piksel. Tak dapat mengimpor.',
   },
   'import-psd-size': {
     original: 'Image size',
@@ -1190,7 +1190,7 @@
   },
   'bucket-grow-title': {
     original: 'Grow filled area (in pixels)',
-    value: 'Menumbuhkan area yang terisi (dalam piksels)',
+    value: 'Menumbuhkan area yang terisi (dalam piksel)',
   },
   'bucket-contiguous': {
     hint: 'common setting for paint bucket in image editing software',
@@ -1400,7 +1400,7 @@
   },
   'settings-save-reminder-confirm-a': {
     original: "There is no autosave and browser tabs don't last forever. If you don't periodically save you will likely lose work.",
-    value: 'Tak ada penyimpanan otomatis dan tab peramban tak bertahan selamanya. Jika Anda tak menyimpan secara berkala, kemungkinan besar Anda akan kehilangan pekerjaan.',
+    value: 'Tak ada penyimpanan otomatis dan tab peramban tidak bertahan selamanya. Jika anda tidak menyimpan secara berkala, kemungkinan besar Anda akan kehilangan pekerjaan.',
   },
   'settings-save-reminder-confirm-b': {
     original: 'Disable at your own risk?',
@@ -1446,7 +1446,7 @@
   },
   radius: {
     original: 'Radius',
-    value: 'Radias',
+    value: 'Radius',
   },
   'constrain-proportions': {
     original: 'Constrain Proportions',
