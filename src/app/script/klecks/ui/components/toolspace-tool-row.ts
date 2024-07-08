@@ -33,13 +33,14 @@ type TToolRowTriangleButton = TBaseToolRowButton & {
 export class ToolspaceToolRow {
 
     private readonly rootEl: HTMLElement;
+    private readonly isSimple: boolean;
     private readonly toolDropdown: ToolDropdown;
-    private readonly handButton: TToolRowButton;
-    private readonly zoomInButton: TToolRowButton;
-    private readonly zoomOutButton: TToolRowButton;
+    private readonly handButton?: TToolRowButton;
+    private readonly zoomInButton?: TToolRowButton;
+    private readonly zoomOutButton?: TToolRowButton;
     private readonly undoButton: TToolRowButton;
     private readonly redoButton: TToolRowButton;
-    private readonly zoomInNOutButton: TToolRowTriangleButton;
+    private readonly zoomInNOutButton?: TToolRowTriangleButton;
     private readonly undoNRedoButton: TToolRowTriangleButton;
     private currentActiveStr: TToolType;
     private readonly onActivate: (activeStr: TToolType) => void;
@@ -49,6 +50,7 @@ export class ToolspaceToolRow {
 
     constructor (
         p: {
+            simpleUi: boolean;
             onActivate: (activeStr: TToolType) => void; // clicking on tool button - activating it
             onZoomIn: () => void;
             onZoomOut: () => void;
@@ -56,6 +58,7 @@ export class ToolspaceToolRow {
             onRedo: () => void;
         }
     ) {
+        this.isSimple = p.simpleUi;
         this.rootEl = BB.el( {
             className: 'kl-toolspace-row',
             css: {
@@ -338,44 +341,48 @@ export class ToolspaceToolRow {
             },
         });
         this.rootEl.append(this.toolDropdown.getElement());
+        if(!p.simpleUi){
+            this.handButton = createButton({
+                onClick: () => {
+                    this.setActive('hand', true);
+                },
+                image: toolHandImg,
+                contain: true,
+                doLighten: true,
+            });
+            this.handButton.el.classList.add('kl-tool-row-border-right');
+            this.handButton.el.title = LANG('tool-hand');
+            this.rootEl.append(this.handButton.el);
+    
+            this.zoomInNOutButton = createTriangleButton({
+                onLeft: p.onZoomIn,
+                onRight: p.onZoomOut,
+                leftImage: toolZoomInImg,
+                rightImage: toolZoomOutImg,
+            });
+            this.zoomInNOutButton.el.title = LANG('tool-zoom');
+            this.rootEl.append(this.zoomInNOutButton.el);
+    
+            this.zoomInButton = createButton({
+                onClick: p.onZoomIn,
+                image: toolZoomInImg,
+                contain: true,
+            });
+            this.zoomInButton.el.title = LANG('zoom-in');
+            this.rootEl.append(this.zoomInButton.el);
+    
+            this.zoomOutButton = createButton({
+                onClick: p.onZoomOut,
+                image: toolZoomOutImg,
+                contain: true,
+            });
+            this.zoomOutButton.el.title = LANG('zoom-out');
+            this.rootEl.append(this.zoomOutButton.el);
+            this.zoomInButton.el.style.display = 'none';
+            this.zoomOutButton.el.style.display = 'none';
+        }
 
-        this.handButton = createButton({
-            onClick: () => {
-                this.setActive('hand', true);
-            },
-            image: toolHandImg,
-            contain: true,
-            doLighten: true,
-        });
-        this.handButton.el.classList.add('kl-tool-row-border-right');
-        this.handButton.el.title = LANG('tool-hand');
-        this.rootEl.append(this.handButton.el);
-
-        this.zoomInNOutButton = createTriangleButton({
-            onLeft: p.onZoomIn,
-            onRight: p.onZoomOut,
-            leftImage: toolZoomInImg,
-            rightImage: toolZoomOutImg,
-        });
-        this.zoomInNOutButton.el.title = LANG('tool-zoom');
-        this.rootEl.append(this.zoomInNOutButton.el);
-
-        this.zoomInButton = createButton({
-            onClick: p.onZoomIn,
-            image: toolZoomInImg,
-            contain: true,
-        });
-        this.zoomInButton.el.title = LANG('zoom-in');
-        this.rootEl.append(this.zoomInButton.el);
-
-        this.zoomOutButton = createButton({
-            onClick: p.onZoomOut,
-            image: toolZoomOutImg,
-            contain: true,
-        });
-        this.zoomOutButton.el.title = LANG('zoom-out');
-        this.rootEl.append(this.zoomOutButton.el);
-
+        
         this.undoNRedoButton = createTriangleButton({
             onLeft: p.onUndo,
             onRight: p.onRedo,
@@ -406,8 +413,6 @@ export class ToolspaceToolRow {
         this.redoButton.el.classList.add('toolspace-row-button-disabled');
         this.rootEl.append(this.redoButton.el);
 
-        this.zoomInButton.el.style.display = 'none';
-        this.zoomOutButton.el.style.display = 'none';
         this.undoButton.el.style.display = 'none';
         this.redoButton.el.style.display = 'none';
     }
@@ -424,24 +429,31 @@ export class ToolspaceToolRow {
         });
 
         this.toolDropdown.setIsSmall(b);
-        this.handButton.setIsSmall(b);
-        this.zoomInButton.setIsSmall(b);
-        this.zoomOutButton.setIsSmall(b);
+        this.handButton?.setIsSmall(b);
+        this.zoomInButton?.setIsSmall(b);
+        this.zoomOutButton?.setIsSmall(b);
         this.undoButton.setIsSmall(b);
         this.redoButton.setIsSmall(b);
 
         if (b) {
-            this.zoomInNOutButton.el.style.display = 'none';
+            if(!this.isSimple){
+                this.zoomInNOutButton ? this.zoomInNOutButton.el.style.display = 'none' : undefined;
+                this.zoomInButton ? this.zoomInButton.el.style.display = 'block' : undefined;
+                this.zoomOutButton ? this.zoomOutButton.el.style.display = 'block' : undefined;
+            }
+            
             this.undoNRedoButton.el.style.display = 'none';
-            this.zoomInButton.el.style.display = 'block';
-            this.zoomOutButton.el.style.display = 'block';
+
             this.undoButton.el.style.display = 'block';
             this.redoButton.el.style.display = 'block';
         } else {
-            this.zoomInNOutButton.el.style.display = 'block';
+            if(!this.isSimple){
+                this.zoomInNOutButton ? this.zoomInNOutButton.el.style.display = 'block' : undefined;
+                this.zoomInButton ? this.zoomInButton.el.style.display = 'none' : undefined;
+                this.zoomOutButton ? this.zoomOutButton.el.style.display = 'none' : undefined;
+            }
+            
             this.undoNRedoButton.el.style.display = 'block';
-            this.zoomInButton.el.style.display = 'none';
-            this.zoomOutButton.el.style.display = 'none';
             this.undoButton.el.style.display = 'none';
             this.redoButton.el.style.display = 'none';
         }
@@ -449,13 +461,17 @@ export class ToolspaceToolRow {
     }
 
     setEnableZoomIn (b: boolean): void {
-        this.zoomInButton.el.classList.toggle('toolspace-row-button-disabled', !b);
-        this.zoomInNOutButton.setIsEnabledLeft(b);
+        if(!this.isSimple){
+            this.zoomInButton?.el.classList.toggle('toolspace-row-button-disabled', !b);
+            this.zoomInNOutButton?.setIsEnabledLeft(b);
+        }
     }
 
     setEnableZoomOut (b: boolean): void {
-        this.zoomOutButton.el.classList.toggle('toolspace-row-button-disabled', !b);
-        this.zoomInNOutButton.setIsEnabledRight(b);
+        if(!this.isSimple){
+            this.zoomOutButton?.el.classList.toggle('toolspace-row-button-disabled', !b);
+            this.zoomInNOutButton?.setIsEnabledRight(b);
+        }
     }
 
     setEnableUndo (b: boolean): void {

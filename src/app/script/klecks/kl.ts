@@ -52,6 +52,7 @@ import * as indexedDb from './storage/indexed-db';
 import {setDbName} from './storage/indexed-db';
 import {filterLib, filterLibStatus} from './filters/filters';
 import {brushes} from './brushes/brushes';
+import {simpleBrushesUI} from './brushes-ui/brushes-ui';
 import {brushesUI} from './brushes-ui/brushes-ui';
 import {showIframeModal} from './ui/modals/show-iframe-modal';
 import {RadioList} from './ui/components/radio-list';
@@ -80,6 +81,7 @@ export const KL = {
 
     // --- brushes ---
     brushes,
+    simpleBrushesUI,
     brushesUI,
     BrushSettingService,
 

@@ -64,6 +64,7 @@ export class Embed {
                         url: this.p.embedUrl,
                         onSubmit: this.p.onSubmit,
                     },
+                    simpleUi: true
                 }
             );
             saveReminder.init();

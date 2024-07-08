@@ -133,7 +133,7 @@ export class UndoRedoCatchup {
         }
         this.layerManager.update(layerIndex);
         this.layerPreview.setLayer(throwIfNull(klCanvas.getLayer(layerIndex)));
-        this.brushUiMap.sketchyBrush.setSeed(brushes.SketchyBrush.getSeed());
+        this.brushUiMap.sketchyBrush?.setSeed(brushes.SketchyBrush.getSeed());
         this.getCurrentBrush().setContext(this.getCurrentLayerCtx()! as KlCanvasContext);
         this.klCanvasWorkspace.setLastDrawEvent();
 
@@ -160,7 +160,7 @@ export class UndoRedoCatchup {
             brushes[b] = new brush();
             brushes[b].setContext(this.getCurrentLayerCtx());
         });
-        brushes.SketchyBrush.setSeed(this.brushUiMap.sketchyBrush.getSeed());
+        brushes.SketchyBrush?.setSeed(this.brushUiMap.sketchyBrush?.getSeed());
         execHistoryEntry(
             entry,
             0, // doesn't matter, because result not used
@@ -177,7 +177,7 @@ export class UndoRedoCatchup {
         const currentLayerIndex = throwIfNull(klCanvas.getLayerIndex(this.getCurrentLayerCtx()!.canvas));
         this.layerManager.update(currentLayerIndex);
         this.layerPreview.setLayer(klCanvas.getLayer(currentLayerIndex)!);
-        this.brushUiMap.sketchyBrush.setSeed(brushes.SketchyBrush.getSeed());
+        this.brushUiMap.sketchyBrush?.setSeed(brushes.SketchyBrush.getSeed());
         this.getCurrentBrush().setContext(this.getCurrentLayerCtx()! as KlCanvasContext);
         this.klCanvasWorkspace.setLastDrawEvent();
         klHistory.pause(false);

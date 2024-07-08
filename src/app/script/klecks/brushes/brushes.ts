@@ -24,3 +24,8 @@ export const brushes = {
     SmudgeBrush,
     EraserBrush,
 };
+
+
+export const simpleUiBrushes = {
+    PenBrush,
+};

@@ -24,3 +24,9 @@ export const brushesUI: {
     smudgeBrush: smudgeBrushUi,
     eraserBrush: eraserBrushUi,
 };
+
+export const simpleBrushesUI: {
+    [key: string]: IBrushUi<any>;
+} = {
+    penBrush: penBrushUi
+};

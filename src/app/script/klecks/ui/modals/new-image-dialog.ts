@@ -6,7 +6,6 @@ import {LANG} from '../../../language/language';
 import {IRGB, IRGBA} from '../../kl-types';
 import {ISize2D} from '../../../bb/bb-types';
 import {table} from '../components/table';
-import {ERASE_COLOR} from '../../brushes/erase-color';
 import {theme} from '../../../theme/theme';
 
 export function newImageDialog (
@@ -227,10 +226,10 @@ export function newImageDialog (
     templateWrapper.append(select.getElement());
 
 
-
-    let backgroundRGBA = {r: 255, g: 255, b: 255, a: 1};
+    let backgroundRGBA = {r: 255, g: 208, b: 89, a: 1};
 
     const colorOptionsArr = [
+        {r: 255, g: 208, b: 89, a: 1},
         {r: 255, g: 255, b: 255, a: 1},
         {r: 0, g: 0, b: 0, a: 1},
         {r: 0, g: 0, b: 0, a: 0},
@@ -248,14 +247,6 @@ export function newImageDialog (
         },
     ];
     let initColorIndex = 0;
-    if (theme.isDark()) {
-        colorOptionsArr.forEach((item, index) => {
-            if (item.r === ERASE_COLOR && item.g === ERASE_COLOR && item.b === ERASE_COLOR) {
-                initColorIndex = index;
-                backgroundRGBA = item;
-            }
-        });
-    }
 
     const colorOptions = new ColorOptions({
         colorArr: colorOptionsArr,

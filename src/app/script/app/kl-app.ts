@@ -62,6 +62,7 @@ interface IKlAppOptions {
     logoImg?: string; // app logo
     bottomBar?: HTMLElement; // row at bottom of toolspace
     embed?: KlAppOptionsEmbed;
+    simpleUi: boolean;
     app?: {
         imgurKey?: string; // for imgur uploads
     };
@@ -75,6 +76,7 @@ export class KlApp {
     private readonly klRootEl: HTMLElement;
     private uiWidth: number;
     private uiHeight: number;
+    private simpleUi: boolean;
     private readonly layerPreview: LayerPreview;
     private readonly klColorSlider: KlColorSlider;
     private readonly toolspaceToolRow: ToolspaceToolRow;
@@ -241,6 +243,7 @@ export class KlApp {
         this.klCanvas.setHistory(klHistory);
         let initState: IInitState;
         let mainTabRow: TabRow | undefined = undefined;
+        this.simpleUi = pOptions.simpleUi;
 
         if (!pOptions.saveReminder) {
             pOptions.saveReminder = {init: () => {}, reset: () => {}} as SaveReminder;
@@ -507,13 +510,17 @@ export class KlApp {
                 return;
             }
 
-            const toolObj = {
+            const toolObj = this.simpleUi ? {
+                'draw': {}
+            }
+            :
+            {
                 'draw': {},
                 'hand': {},
                 'fill': {},
                 'gradient': {},
                 'text': {},
-                'shape': {},
+                'shape': {}
             };
 
             const activeStr = this.toolspaceToolRow.getActive();
@@ -719,7 +726,7 @@ export class KlApp {
             [key: string]: any;
         } = {};
         // create brush UIs
-        Object.entries(KL.brushesUI).forEach(([b, brushUi]) => {
+        Object.entries(this.simpleUi ? KL.simpleBrushesUI : KL.brushesUI).forEach(([b, brushUi]) => {
             const ui = new (brushUi.Ui as any)({
                 onSizeChange: sizeWatcher,
                 onOpacityChange: (opacity: number) => {
@@ -892,6 +899,7 @@ export class KlApp {
         this.toolspaceInner.append(toolspaceTopRow.getElement());
 
         this.toolspaceToolRow = new KL.ToolspaceToolRow({
+            simpleUi: this.simpleUi,
             onActivate: (activeStr) => {
                 if (activeStr === 'draw') {
                     this.klCanvasWorkspace.setMode('draw');
@@ -1047,7 +1055,7 @@ export class KlApp {
         });
         BB.append(brushDiv, [
             brushTabRow.getElement(),
-            ...Object.entries(KL.brushesUI).map(([b]) => brushUiMap[b].getElement()),
+            ...Object.entries(this.simpleUi ? KL.simpleBrushesUI : KL.brushesUI).map(([b]) => brushUiMap[b].getElement()),
         ]);
 
         const handUi = new KL.HandUi({
@@ -1350,7 +1358,8 @@ export class KlApp {
                         minWidth: '45px',
                     },
                 },
-                {
+                ...!this.simpleUi ?
+                [{
                     id: 'hand',
                     title: LANG('tool-hand'),
                     image: toolHandImg,
@@ -1456,7 +1465,7 @@ export class KlApp {
                     css: {
                         padding: '0 7px',
                     },
-                },
+                }] : [],
                 {
                     id: 'file',
                     label: LANG('tab-file'),
@@ -1524,9 +1533,12 @@ export class KlApp {
 
 
         BB.append(this.toolspaceInner, [
+            ...!this.simpleUi ? [
             this.layerPreview.getElement(),
             mainTabRow.getElement(),
+            ] : [],
             brushDiv,
+            ...!this.simpleUi ? [
             handUi.getElement(),
             fillUi.getElement(),
             gradientUi.getElement(),
@@ -1536,6 +1548,7 @@ export class KlApp {
             filterTab.getElement(),
             fileTab ? fileTab.getElement() : undefined,
             settingsTab.getElement(),
+        ] : [],
             BB.el({
                 css: {
                     height: '10px', // a bit of spacing at the bottom

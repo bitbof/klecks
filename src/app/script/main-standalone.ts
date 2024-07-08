@@ -57,11 +57,19 @@ function initError (e: Error): void {
             null,
             null,
         );
+        const params = new Proxy(new URLSearchParams(window.location.search), {
+            get: (searchParams, prop) => searchParams.get("simpleUi") ?? searchParams.get("simpleui") ?? searchParams.get("simple"),
+          });
+          
+        let simpleUi = params.get;
+        console.log(params.get)
+        console.log(simpleUi)
         klApp = new KlApp(
             project,
             {
                 saveReminder,
                 projectStore,
+                simpleUi: simpleUi ? simpleUi.toString() === 'true' : false
             }
         );
         saveReminder.init();
