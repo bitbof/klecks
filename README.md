@@ -8,7 +8,7 @@ Klecks can run in standalone mode (e.g. on [kleki.com](https://kleki.com)), or e
 
 ## Features
 - Layers
-- Pen support
+- Pen-support with pressure and stabilizer
 - Touch gestures
 - Brushes: pen, blend, sketchy, pixel, chemy, smudge, eraser
 - Tools: paint bucket, text, shapes, gradient
@@ -16,6 +16,7 @@ Klecks can run in standalone mode (e.g. on [kleki.com](https://kleki.com)), or e
 - Lineart extraction
 - Editing tools: transform, crop/expand, resize, perspective
 - Supports all major form factors: desktop, tablet and phone
+- Multi-language (10+ languages)
 
 ---
 
