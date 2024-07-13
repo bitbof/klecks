@@ -52,13 +52,7 @@ It is then accessible through: http://localhost:5050
 
 # Translations
 Are you a native speaker or have advanced skills in a language with no translation yet?
-Any contribution by you is highly encouraged and appreciated! These are the currently available languages:
-- English
-- French
-- German
-- Japanese
-- Chinese (simplified)
-- Chinese (traditional)
+Any contribution by you is highly encouraged and appreciated!
 
 ### Where are translation files?
 Translations are located in `src/languages` where each translation is its own JSON5 file, e.g. `de.json5` for German.
