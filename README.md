@@ -3,14 +3,31 @@
 </p>
 
 Klecks (German for "splash of color", pronounced "clex") is the official open-source release of the community-funded online painting app [Kleki](https://kleki.com).
-Klecks and Kleki are by developer/artist [bitbof](https://bitbof.com). Klecks offers the same features as Kleki but might diverge slightly in the future.
 
-Klecks was originally written in JavaScript and made the switch to TypeScript in December 2021. It uses Parcel as a bundler.
-[Glfx.js](https://github.com/evanw/glfx.js) is used for the filters. [Ag-psd](https://github.com/Agamnentzar/ag-psd) is used for PSD import/export.
+Klecks can run in standalone mode (e.g. on [kleki.com](https://kleki.com)), or embed (e.g. on [2draw.net](https://2draw.net)) for drawing communities.
 
-Klecks can either run in standalone mode (e.g. on [kleki.com](https://kleki.com)), or as an embed (e.g. on [2draw.net](https://2draw.net)). The embed can be included on an existing page, and used for something like a drawing community where people draw and revise their works with Klecks, which are then uploaded. Using it inside of an iframe is not recommended due to various browser bugs.
+## Features
+- Layers
+- Pen support
+- Touch gestures
+- Brushes: pen, blend, sketchy, pixel, chemy, smudge, eraser
+- Tools: paint bucket, text, shapes, gradient
+- WebGL-powered filters: blur, tilt-shift, curves, distort, noise.
+- Lineart extraction
+- Editing tools: transform, crop/expand, resize, perspective
+- Supports all major form factors: desktop, tablet and phone
 
-For a demo and list of features visit [kleki.com/home](https://kleki.com/home/). For future plans check here: [kleki.com/about](https://kleki.com/about/).
+---
+
+🖌️ [Demo](https://kleki.com/)
+
+❓ [About](https://kleki.com/about/)
+
+📝 [Dev Blog](https://blog.kleki.com/)
+
+Created by developer/artist [bitbof](https://bitbof.com)
+
+---
 
 # Commands
 - initialize via `npm install` (requires node and npm to be installed already)
