@@ -874,6 +874,7 @@ export class KlApp {
             });
         } else {
             toolspaceTopRow = new KL.ToolspaceTopRow({
+                simpleUi: pOptions.simpleUi,
                 logoImg: pOptions.logoImg!,
                 onLogo: () => {
                     showIframeModal('./home/', !!this.embed);
@@ -948,6 +949,7 @@ export class KlApp {
         };
 
         this.klColorSlider = new KL.KlColorSlider({
+            simpleUi: this.simpleUi,
             width: 250,
             height: 30,
             svHeight: 100,
@@ -1005,6 +1007,7 @@ export class KlApp {
             },
         });
         const toolspaceStabilizerRow = new KL.ToolspaceStabilizerRow({
+            simpleUi: this.simpleUi,
             smoothing: 1,
             onSelect: (v) => {
                 lineSmoothing.setSmoothing(translateSmoothing(v));
@@ -1053,10 +1056,17 @@ export class KlApp {
                 return result;
             })(),
         });
+
+        if(!this.simpleUi){
+            BB.append(brushDiv, [
+                brushTabRow.getElement(),
+            ]);
+        }
         BB.append(brushDiv, [
-            brushTabRow.getElement(),
-            ...Object.entries(this.simpleUi ? KL.simpleBrushesUI : KL.brushesUI).map(([b]) => brushUiMap[b].getElement()),
-        ]);
+                ...Object.entries(this.simpleUi ? KL.simpleBrushesUI : KL.brushesUI).map(([b]) => brushUiMap[b].getElement()),
+            ]);
+
+        
 
         const handUi = new KL.HandUi({
             scale: this.klCanvasWorkspace.getScale(),

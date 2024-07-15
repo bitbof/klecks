@@ -94,6 +94,7 @@ export class KlColorSlider {
 
     constructor (
         p: {
+            simpleUi: boolean;
             width: number;
             height: number; // hue slider and output height
             svHeight: number;
@@ -277,6 +278,7 @@ export class KlColorSlider {
                 backgroundRepeat:  'no-repeat',
                 backgroundSize: '70%',
                 backgroundPosition: 'center',
+                display: p.simpleUi ? 'none' : ''
             },
             onClick: () => {
                 if (this.isPicking) {
@@ -313,6 +315,7 @@ export class KlColorSlider {
                 width: this.height + 'px',
                 lineHeight: this.height + 'px',
                 fontSize: (this.height * 0.65) + 'px',
+                display: p.simpleUi ? 'none' : ''
             },
             onClick: () => {
                 new HexColorDialog({
@@ -462,6 +465,7 @@ export class KlColorSlider {
                 marginLeft: '5px',
                 width: '22px',
                 height: '22px',
+                display: p.simpleUi ? 'none' : ''
             },
             onClick: (e) => {
                 e.preventDefault();

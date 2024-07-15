@@ -19,6 +19,7 @@ export class ToolspaceTopRow {
     // ---- public ----
     constructor (
         p: {
+            simpleUi: boolean;
             logoImg: string;
             onLogo: () => void;
             onNew: () => void;
@@ -134,10 +135,15 @@ export class ToolspaceTopRow {
             darkInvert: true,
         });
 
+        if(!p.simpleUi){
+            BB.append(this.rootEl, [
+                importButton.el,
+            ]);    
+        }
+
         BB.append(this.rootEl, [
             logoButton.el,
             newButton.el,
-            importButton.el,
             saveButton.el,
             shareButton ? shareButton.el : undefined,
             helpButton.el,

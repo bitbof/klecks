@@ -14,6 +14,7 @@ export class ToolspaceStabilizerRow {
     // ---- public ----
     constructor (
         p: {
+            simpleUi: boolean
             smoothing: number; // initial level [0,3]
             onSelect: (level: number) => void; // [0-3], when level changes
         }
@@ -23,6 +24,9 @@ export class ToolspaceStabilizerRow {
             className: 'kl-stabilizer',
             content: LANG('stabilizer') + '&nbsp;',
             title: LANG('stabilizer-title'),
+            css: {
+                display: p.simpleUi ? 'none' : ''
+            }
         });
 
         const strengthSelect = new Select({

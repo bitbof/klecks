@@ -34,7 +34,7 @@ export class ToolspaceToolRow {
 
     private readonly rootEl: HTMLElement;
     private readonly isSimple: boolean;
-    private readonly toolDropdown: ToolDropdown;
+    private readonly toolDropdown?: ToolDropdown;
     private readonly handButton?: TToolRowButton;
     private readonly zoomInButton?: TToolRowButton;
     private readonly zoomOutButton?: TToolRowButton;
@@ -137,7 +137,7 @@ export class ToolspaceToolRow {
 
             const svg = BB.createSvg({
                 elementType: 'svg',
-                width: '67px', // can't think of a way doing with percentage
+                width: 'max', // can't think of a way doing with percentage
                 height: '54px',
                 viewBox: '0 0 100 100',
                 preserveAspectRatio: 'none',
@@ -335,13 +335,17 @@ export class ToolspaceToolRow {
             };
         };
 
-        this.toolDropdown = new ToolDropdown({
-            onChange: (activeStr) => {
-                this.setActive(activeStr, true);
-            },
-        });
-        this.rootEl.append(this.toolDropdown.getElement());
+        
+        
         if(!p.simpleUi){
+            
+            this.toolDropdown = new ToolDropdown({
+                onChange: (activeStr) => {
+                    this.setActive(activeStr, true);
+                },
+            });
+            this.rootEl.append(this.toolDropdown.getElement());
+
             this.handButton = createButton({
                 onClick: () => {
                     this.setActive('hand', true);
@@ -428,7 +432,10 @@ export class ToolspaceToolRow {
             height: b ? '36px' : '54px',
         });
 
-        this.toolDropdown.setIsSmall(b);
+        if(!this.isSimple){
+            this.toolDropdown?.setIsSmall(b);
+        }
+
         this.handButton?.setIsSmall(b);
         this.zoomInButton?.setIsSmall(b);
         this.zoomOutButton?.setIsSmall(b);
@@ -491,9 +498,13 @@ export class ToolspaceToolRow {
 
         this.currentActiveStr = activeStr;
 
-        this.toolDropdown.setActive(this.currentActiveStr);
-        this.handButton.el.classList.toggle('toolspace-row-button-activated', this.currentActiveStr === 'hand');
+        if(!this.isSimple){
+            this.toolDropdown?.setActive(this.currentActiveStr);
+            this.handButton?.el.classList.toggle('toolspace-row-button-activated', this.currentActiveStr === 'hand');
+        }
 
+        
+        
         if (doEmit) {
             this.onActivate(this.currentActiveStr);
         }

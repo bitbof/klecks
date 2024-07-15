@@ -13,7 +13,7 @@ import {Options} from '../ui/components/options';
 import {PenBrush} from '../brushes/pen-brush';
 
 
-export const penBrushUi = (function () {
+export const penBrushUi = (function() {
     const brushInterface = {
         image: brushIconImg,
         tooltip: LANG('brush-pen'),
@@ -104,7 +104,7 @@ export const penBrushUi = (function () {
             doHighlight: true,
             title: LANG('lock-alpha-title'),
             css: {
-                display: 'inline-block',
+                display: 'none' //'inline-block',
             },
         });
 
