@@ -113,8 +113,13 @@ export function newImageDialog (
         },
     });
 
-    const templateWrapper = BB.el();
-    //BB.appendTextDiv(templateWrapper, "Preset Resolutions: <br />");
+    const templateWrapper = BB.el({
+        css: {
+            display: 'flex',
+            flexWrap: 'wrap',
+            gap: '5px',
+        },
+    });
     const presetFitBtn = BB.el({tagName: 'button'});
     templateWrapper.style.marginBottom = '10px';
     const presetCurrentBtn = BB.el({tagName: 'button'});
@@ -129,14 +134,6 @@ export function newImageDialog (
     presetLandscapeBtn.textContent = LANG('new-landscape');
     presetPortraitBtn.textContent = LANG('new-portrait');
     presetSquareBtn.textContent = LANG('new-square');
-
-    presetCurrentBtn.style.marginRight = '5px';
-    presetFitBtn.style.marginRight = '5px';
-    presetOversizeBtn.style.marginRight = '5px';
-    presetLandscapeBtn.style.marginTop = '5px';
-    presetLandscapeBtn.style.marginRight = '5px';
-    presetPortraitBtn.style.marginTop = '5px';
-    presetPortraitBtn.style.marginRight = '5px';
 
     templateWrapper.append(
         presetCurrentBtn,

@@ -93,6 +93,37 @@ const globalKey = ((): TGlobalKey => {
     } = {};
     const listenerArr: TKeyListenerRef[] = [];
 
+    /**
+     * Windows bug in all browsers: Pressing the Windows key leads to keyboard events not firing.
+     * It breaks key state tracking.
+     * Workaround: If after a timeout, only the meta key is pressed, fire a keyup for the meta key.
+     */
+    let metaClearTimeout: ReturnType<typeof setTimeout> | undefined;
+    const setupMetaClear = (keyStr: string, code: string) => {
+        metaClearTimeout = setTimeout(() => {
+            if (comboArr.length !== 1 || comboArr[0] === 'cmd') {
+                return;
+            }
+            const oldComboStr = comboArr.join('+');
+            isDownObj[keyStr] = false;
+            codeIsDownObj[code] = undefined;
+            // remove from combo
+            for (let i = 0; i < comboArr.length; i++) {
+                if (comboArr[i] == keyStr) {
+                    comboArr.splice(i, 1);
+                    i--;
+                }
+            }
+            emitUp(
+                keyStr, {
+                    preventDefault: function () {},
+                    stopPropagation: function () {},
+                } as KeyboardEvent,
+                oldComboStr);
+            metaClearTimeout = undefined;
+        }, 1000);
+    };
+
 
     const emitDown: TOnKeyDown = function (a, b, c, d?): void {
         listenerArr.forEach(item => {
@@ -130,6 +161,12 @@ const globalKey = ((): TGlobalKey => {
             if (isDownObj[keyStr]) {
                 emitDown(keyStr, e, comboArr.join('+'), true);
                 return;
+            } else {
+                if (keyStr === 'cmd') {
+                    setupMetaClear(keyStr, code);
+                } else {
+                    clearTimeout(metaClearTimeout);
+                }
             }
             isDownObj[keyStr] = true;
             codeIsDownObj[code] = keyStr;
@@ -152,6 +189,11 @@ const globalKey = ((): TGlobalKey => {
             'Meta', 'MetaLeft', 'MetaRight',
             'OSLeft', 'OSRight', // Firefox
         ].includes(code)) {
+            blur();
+            return;
+        } else if (isDownObj['cmd']) {
+            // Workaround for Windows bug. Windows doesn't fire keyup for Meta key when pressing Windows Key + Space,
+            // neither does it fire blur
             blur();
             return;
         }

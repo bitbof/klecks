@@ -1,0 +1,1562 @@
+{
+  'switch-ui-left-right': {
+    hint: 'Button that switches layout from left to right, to accommodate left handed & right handed visitors.',
+    original: 'Switch left/right UI',
+    value: 'Beralih ke kiri/kanan'
+  },
+  'toggle-show-tools': {
+    hint: 'Button that hides/shows the toolbar.',
+    original: 'Show/Hide Tools',
+    value: 'Menampilkan/Menyembunyikan Alat'
+  },
+  scroll: {
+    hint: 'Verb. As in scrolling a page.',
+    original: 'Scroll',
+    value: 'Gulir'
+  },
+  donate: {
+    original: 'Donate',
+    value: 'Donasi'
+  },
+  home: {
+    hint: 'button with logo, top left of tools',
+    original: 'Home',
+    value: 'Beranda'
+  },
+  'modal-new-tab': {
+    hint: 'as in browser tab',
+    original: 'Open in new tab',
+    value: 'Buka di tab baru'
+  },
+  'tab-edit': {
+    hint: 'label for a tab that offer filters for making color adjustments, cropping, transforming, etc.',
+    original: 'Edit',
+    value: 'Sunting'
+  },
+  'tab-file': {
+    hint: 'label for a tab that lets user save the image, import, upload, etc.',
+    original: 'File',
+    value: 'File'
+  },
+  'tool-brush': {
+    hint: 'tool that lets user paint (like in ms paint or photoshop)',
+    original: 'Brush',
+    value: 'Kuas'
+  },
+  'tool-paint-bucket': {
+    original: 'Paint Bucket',
+    value: 'Ember Cat'
+  },
+  'tool-gradient': {
+    original: 'Gradient',
+    value: 'Gradasi'
+  },
+  'tool-shape': {
+    hint: 'Tool for drawing rectangles, circles, lines',
+    original: 'Shape',
+    value: 'Bentuk'
+  },
+  'tool-text': {
+    hint: 'Tool for placing text on canvas',
+    original: 'Text',
+    value: 'Teks'
+  },
+  'tool-hand': {
+    hint: 'Tool for navigating (or scrolling around) the canvas. Same name in Photoshop.',
+    original: 'Hand Tool',
+    value: 'Alat Bantu Tangan'
+  },
+  'tool-zoom': {
+    original: 'Zoom',
+    value: 'Zoom'
+  },
+  undo: {
+    original: 'Undo',
+    value: 'Urungkan'
+  },
+  redo: {
+    original: 'Redo',
+    value: 'Ulangi'
+  },
+  'brush-pen': {
+    hint: 'Generic "brush" that feels a bit like a pen or marker, as opposed to a paint brush.',
+    original: 'Pen',
+    value: 'Pena'
+  },
+  'brush-blend': {
+    hint: 'brush with watercolor feel. Makes colors blend/bleed into each other. Different from smudging though.',
+    original: 'Blend',
+    value: 'Mencampur'
+  },
+  'brush-sketchy': {
+    hint: 'Made up brush name. Pictures drawn with this brush often look like sketches.',
+    original: 'Sketchy',
+    value: 'Samar-samar'
+  },
+  'brush-pixel': {
+    original: 'Pixel',
+    value: 'Piksel'
+  },
+  'brush-chemy': {
+    hint: 'Made up brush name, derived from drawing applications "Webchemy" and "Alchemy"',
+    original: 'Chemy',
+    value: 'Chemy'
+  },
+  'brush-smudge': {
+    hint: 'Common brush/tool in image editing software. Smudges colors around canvas.',
+    original: 'Smudge',
+    value: 'Noda'
+  },
+  'brush-size': {
+    original: 'Size',
+    value: 'Ukuran'
+  },
+  'brush-blending': {
+    hint: 'Wetness. How much colors will bleed into each other.',
+    original: 'Blending',
+    value: 'Pencampuran'
+  },
+  'brush-toggle-pressure': {
+    hint: 'google "pressure sensitivity". Feature of Wacom tablets, Apple Pencil, XP Pen, etc.',
+    original: 'Toggle Pressure Sensitivity',
+    value: 'Mengalihkan Sensitivitas Tekanan'
+  },
+  'brush-pen-circle': {
+    hint: 'as in circle shape',
+    original: 'Circle',
+    value: 'Lingkaran'
+  },
+  'brush-pen-chalk': {
+    hint: 'as in chalk texture',
+    original: 'Chalk',
+    value: 'Kapur'
+  },
+  'brush-pen-calligraphy': {
+    hint: 'like a "chisel tip marker"',
+    original: 'Calligraphy',
+    value: 'Kaligrafi'
+  },
+  'brush-pen-square': {
+    hint: 'as in square shape',
+    original: 'Square',
+    value: 'Persegi'
+  },
+  'brush-sketchy-scale': {
+    hint: 'How far the connecting lines of sketchy brush can reach.',
+    original: 'Scale',
+    value: 'Skala'
+  },
+  'brush-pixel-dither': {
+    hint: 'Dithering/halftone pattern',
+    original: 'Dither',
+    value: 'Baik'
+  },
+  'brush-chemy-fill': {
+    hint: 'Like in MS Paint. A shape can have be outlined, and filled.',
+    original: 'Fill',
+    value: 'Isi'
+  },
+  'brush-chemy-stroke': {
+    original: 'Stroke',
+    value: 'Stroke'
+  },
+  'brush-chemy-mirror-x': {
+    original: 'Horizontal Symmetry',
+    value: 'Simetri Horisontal'
+  },
+  'brush-chemy-mirror-y': {
+    original: 'Vertical Symmetry',
+    value: 'Simetri Vertikal'
+  },
+  'brush-chemy-gradient': {
+    hint: 'as in color gradient',
+    original: 'Gradient',
+    value: 'Gradasi'
+  },
+  'brush-eraser-transparent-bg': {
+    hint: 'as in transparent background/bottom layer',
+    original: 'Transparent Background',
+    value: 'Latar Belakang Transparan'
+  },
+  stabilizer: {
+    hint: 'Common feature in drawing software to make lines smoother',
+    original: 'Stabilizer',
+    value: 'Penstabil'
+  },
+  'stabilizer-title': {
+    hint: '-title keys are usually more verbose description. shown as a tooltip.',
+    original: 'Stroke Stabilizer',
+    value: 'Penstabil Stroke'
+  },
+  eyedropper: {
+    original: 'Eyedropper',
+    value: 'Penetes mata'
+  },
+  'secondary-color': {
+    hint: 'or sometimes called "background" color. Photoshop, MS Paint, etc. allow user to switch between two colors.',
+    original: 'Secondary Color',
+    value: 'Warna Sekunder'
+  },
+  'manual-color-input': {
+    hint: 'A dialog where users can manually type the color, each channel a number. "mci" keys all related to this dialog.',
+    original: 'Manual Color Input',
+    value: 'Input Warna Secara Manual'
+  },
+  'mci-hex': {
+    hint: 'as in hex code. Hex representation of color. „#f00“ → red',
+    original: 'Hex',
+    value: 'Hex'
+  },
+  'mci-copy': {
+    hint: 'verb',
+    original: 'Copy',
+    value: 'Salin'
+  },
+  'modal-ok': {
+    hint: 'main confirmation button in dialogs. Can be to confirm an action, not just acknowledge information.',
+    original: 'Ok',
+    value: 'Oke'
+  },
+  'modal-cancel': {
+    original: 'Cancel',
+    value: 'Batal'
+  },
+  'modal-close': {
+    hint: 'as in close a dialog box',
+    original: 'Close',
+    value: 'Tutup'
+  },
+  'layers-active-layer': {
+    hint: 'currently selected layer that user is drawing on',
+    original: 'Active Layer',
+    value: 'Lapisan Aktif'
+  },
+  'layers-layer': {
+    original: 'Layer',
+    value: 'Lapisan'
+  },
+  'layers-copy': {
+    hint: 'noun',
+    original: 'copy',
+    value: 'salin'
+  },
+  'layers-blending': {
+    hint: 'Common feature in image editing & drawing software. All layers-blend- keys relate to this. https://en.wikipedia.org/wiki/Blend_modes',
+    original: 'Blending',
+    value: 'Campuran'
+  },
+  'layers-new': {
+    hint: 'action',
+    original: 'New Layer',
+    value: 'Lapisan Baru'
+  },
+  'layers-remove': {
+    hint: 'action',
+    original: 'Remove Layer',
+    value: 'Hapus Lapisan'
+  },
+  'layers-duplicate': {
+    hint: 'action',
+    original: 'Duplicate Layer',
+    value: 'Gandakan Lapisan'
+  },
+  'layers-merge': {
+    hint: 'action',
+    original: 'Merge with layer below',
+    value: 'Gabung dengan layer di bawah ini'
+  },
+  'layers-merge-all': {
+    original: 'Merge all',
+    value: 'Gabungkan semua'
+  },
+  'layers-rename': {
+    hint: 'action',
+    original: 'Rename',
+    value: 'Ganti nama'
+  },
+  'layers-active-layer-visible': {
+    original: 'Active layer is visible',
+    value: 'Lapisan aktif terlihat'
+  },
+  'layers-active-layer-hidden': {
+    original: 'Active layer is hidden',
+    value: 'Lapisan aktif tak terlihat'
+  },
+  'layers-visibility-toggle': {
+    original: 'Layer Visibility',
+    value: 'Ketampakan Lapisan'
+  },
+  'layers-blend-normal': {
+    original: 'normal',
+    value: 'normal'
+  },
+  'layers-blend-darken': {
+    original: 'darken',
+    value: 'gelapkan'
+  },
+  'layers-blend-multiply': {
+    original: 'multiply',
+    value: 'gandakan'
+  },
+  'layers-blend-color-burn': {
+    original: 'color burn',
+    value: 'membakar warna'
+  },
+  'layers-blend-lighten': {
+    original: 'lighten',
+    value: 'cerahkan'
+  },
+  'layers-blend-screen': {
+    original: 'screen',
+    value: 'layar'
+  },
+  'layers-blend-color-dodge': {
+    original: 'color dodge',
+    value: 'menghindari warna'
+  },
+  'layers-blend-overlay': {
+    original: 'overlay',
+    value: 'hamparan'
+  },
+  'layers-blend-soft-light': {
+    original: 'soft light',
+    value: 'cahaya lembut'
+  },
+  'layers-blend-hard-light': {
+    original: 'hard light',
+    value: 'cahaya keras'
+  },
+  'layers-blend-difference': {
+    original: 'difference',
+    value: 'perbedaan'
+  },
+  'layers-blend-exclusion': {
+    original: 'exclusion',
+    value: 'pengecualian'
+  },
+  'layers-blend-hue': {
+    original: 'hue',
+    value: 'rona'
+  },
+  'layers-blend-saturation': {
+    original: 'saturation',
+    value: 'saturasi'
+  },
+  'layers-blend-color': {
+    original: 'color',
+    value: 'warna'
+  },
+  'layers-blend-luminosity': {
+    original: 'luminosity',
+    value: 'kilau'
+  },
+  'layers-rename-title': {
+    hint: '-title in code usually means it shows up in a tooltip, or it’s the header of a dialog box, so it can be a little bit longer.',
+    original: 'Rename Layer',
+    value: 'Ganti nama lapisan'
+  },
+  'layers-rename-name': {
+    hint: 'noun',
+    original: 'Name',
+    value: 'Nama'
+  },
+  'layers-rename-clear': {
+    hint: 'aka action of deleting entered name',
+    original: 'Clear Name',
+    value: 'Bersih nama'
+  },
+  'layers-rename-sketch': {
+    hint: 'noun. Name suggestion for a layer',
+    original: 'Sketch',
+    value: 'Sketsa'
+  },
+  'layers-rename-colors': {
+    hint: 'noun. Name suggestion for a layer',
+    original: 'Colors',
+    value: 'Warna'
+  },
+  'layers-rename-shading': {
+    hint: 'noun. Name suggestion for a layer',
+    original: 'Shading',
+    value: 'Bayangan'
+  },
+  'layers-rename-lines': {
+    hint: 'noun. Name suggestion for a layer',
+    original: 'Lines',
+    value: 'Garis'
+  },
+  'layers-rename-effects': {
+    hint: 'noun. Name suggestion for a layer',
+    original: 'Effects',
+    value: 'Efek'
+  },
+  'layers-rename-foreground': {
+    hint: 'noun. Name suggestion for a layer',
+    original: 'Foreground',
+    value: 'Latar depan'
+  },
+  'layers-merge-modal-title': {
+    original: 'Merge/Mix Layers',
+    value: 'Gabung/Campur Lapisan'
+  },
+  'layers-merge-description': {
+    hint: 'After ":" a list of mix/blend modes is shown.',
+    original: 'Merges the selected layer with the one underneath. Select the mix mode:',
+    value: 'Menggabungkan layer yang dipilih dengan layer di bawahnya. Pilih mode campuran:'
+  },
+  'file-no-autosave': {
+    hint: "let user know they can't autosave, and there's no cloud storage. Keep short so fits on one line",
+    original: 'No autosave, no cloud storage',
+    value: 'Tak ada autosave, tidak ada cloud'
+  },
+  'file-new': {
+    hint: 'action',
+    original: 'New',
+    value: 'Baru'
+  },
+  'file-import': {
+    hint: 'action',
+    original: 'Import',
+    value: 'Impor'
+  },
+  'file-save': {
+    hint: 'action',
+    original: 'Save',
+    value: 'Simpan'
+  },
+  'file-format': {
+    original: 'File Format',
+    value: 'Format File'
+  },
+  'file-copy': {
+    hint: 'verb',
+    original: 'Copy',
+    value: 'Salin'
+  },
+  'file-copy-title': {
+    original: 'Copy To Clipboard',
+    value: 'Salin ke Clipboard'
+  },
+  'file-share': {
+    hint: 'Common feature on phones. Pressing share button allows to send data to a different app, e.g. as a text message to someone.',
+    original: 'Share',
+    value: 'Bagikan'
+  },
+  'file-storage': {
+    hint: 'Made up term. Allows users to store drawing in the browser. (not synced across devices)',
+    original: 'Browser Storage',
+    value: 'Penyimpanan Peramban '
+  },
+  'file-storage-thumb-title': {
+    hint: 'when reopening or reloading',
+    original: 'Restores when reopening page',
+    value: 'Memulihkan saat membuka kembali halaman'
+  },
+  'file-storage-about': {
+    hint: 'link to Browser Storage help/user manual',
+    original: 'About Browser Storage',
+    value: 'Tentang Penyimpanan Peramban'
+  },
+  'file-storage-cant-access': {
+    hint: 'an error. Can’t access the storage.',
+    original: "Can't access",
+    value: 'Tak bisa akses'
+  },
+  'file-storage-empty': {
+    hint: 'nothing stored',
+    original: 'Empty',
+    value: 'Kosong'
+  },
+  'file-storage-store': {
+    hint: 'verb',
+    original: 'Store',
+    value: 'Menyimpan'
+  },
+  'file-storage-clear': {
+    original: 'Clear',
+    value: 'Bersih'
+  },
+  'file-storage-storing': {
+    hint: 'while it is in the process of storing',
+    original: 'Storing',
+    value: 'Penyimpanan'
+  },
+  'file-storage-overwrite': {
+    hint: 'overwrite what is already stored',
+    original: 'Overwrite',
+    value: 'Timpa'
+  },
+  'file-storage-min-ago': {
+    hint: "{x} <- needs to stay, it's a placeholder.",
+    original: '{x}min ago',
+    value: '{x} menit yang lalu'
+  },
+  'file-storage-hours-ago': {
+    original: '{x}h ago',
+    value: '{x} jam yang lalu'
+  },
+  'file-storage-days-ago': {
+    original: '{x}d ago',
+    value: '{x} hari yang lalu'
+  },
+  'file-storage-month-ago': {
+    original: '> 1month ago',
+    value: '> 1 bulan yang lalu'
+  },
+  'file-storage-restored': {
+    original: 'Restored from Browser Storage',
+    value: 'Dipulihkan dari Penyimpanan Browser'
+  },
+  'file-storage-stored': {
+    original: 'Stored to Browser Storage',
+    value: 'Disimpan ke Penyimpanan Browser'
+  },
+  'file-storage-failed': {
+    original: 'Failed to store to Browser Storage',
+    value: 'Gagal menyimpan ke Penyimpanan Browser'
+  },
+  'file-storage-failed-1': {
+    original: 'Failed to store. Possible causes:',
+    value: 'Gagal menyimpan. Kemungkinan penyebab:'
+  },
+  'file-storage-failed-2': {
+    original: 'Out of disk space',
+    value: 'Kepenuhan Penyimpanan'
+  },
+  'file-storage-failed-3': {
+    original: 'Storage disabled in incognito tab',
+    value: 'Penyimpanan dinonaktifkan di tab penyamaran'
+  },
+  'file-storage-failed-4': {
+    hint: 'as in: unsupported feature',
+    original: "Browser doesn't support storage",
+    value: 'Browser tidak mendukung penyimpanan'
+  },
+  'file-storage-failed-clear': {
+    original: 'Failed to clear.',
+    value: 'Gagal untuk bersih.'
+  },
+  'file-upload': {
+    hint: 'verb',
+    original: 'Upload',
+    value: 'Unggah'
+  },
+  'cleared-layer': {
+    hint: 'the layer has been cleared. It is now empty',
+    original: 'Cleared layer',
+    value: 'Lapisan yang dihapus'
+  },
+  filled: {
+    hint: 'layer got filled with a color',
+    original: 'Filled',
+    value: 'Terisi'
+  },
+  'new-title': {
+    original: 'New Image',
+    value: 'Gambar Baru'
+  },
+  'new-current': {
+    hint: 'as in "reuse the current image resolution"',
+    original: 'Current',
+    value: 'Saat ini'
+  },
+  'new-fit': {
+    hint: 'make dimensions of image fit your window size',
+    original: 'Fit',
+    value: 'Sesuai'
+  },
+  'new-oversize': {
+    hint: 'like oversized clothes.',
+    original: 'Oversize',
+    value: 'Kebesaran'
+  },
+  'new-square': {
+    hint: 'square image format',
+    original: 'Square',
+    value: 'Persegi'
+  },
+  'new-landscape': {
+    hint: 'https://en.wikipedia.org/wiki/Page_orientation',
+    original: 'Landscape',
+    value: 'Lanskap'
+  },
+  'new-portrait': {
+    original: 'Portrait',
+    value: 'Potret'
+  },
+  'new-screen': {
+    hint: 'resolution of computer screen',
+    original: 'Screen',
+    value: 'Layar'
+  },
+  'new-video': {
+    hint: 'dimensions of a video (usually 16:9)',
+    original: 'Video',
+    value: 'Video'
+  },
+  'new-din-paper': {
+    hint: 'https://en.wikipedia.org/wiki/Paper_size',
+    original: 'DIN Paper',
+    value: 'Kertas DIN'
+  },
+  'new-px': {
+    hint: 'abbreviation of pixel',
+    original: 'px',
+    value: 'px'
+  },
+  'new-ratio': {
+    hint: 'aspect ratio',
+    original: 'Ratio',
+    value: 'Rasio'
+  },
+  'upload-title': {
+    hint: '"Imgur" is a website name.',
+    original: 'Upload to Imgur',
+    value: 'Unggah ke Imgur'
+  },
+  'upload-link-notice': {
+    hint: 'Explaining to user even though their upload is unlisted, they should be careful who they share the link with. No password protection.',
+    original: 'Anyone with the link to your uploaded image will be able to view it.',
+    value: 'Siapa pun yang memiliki tautan ke gambar yang Anda unggah akan dapat melihatnya.'
+  },
+  'upload-name': {
+    hint: 'noun',
+    original: 'Title',
+    value: 'Judul'
+  },
+  'upload-title-untitled': {
+    original: 'Untitled',
+    value: 'Tak berjudul'
+  },
+  'upload-caption': {
+    hint: 'as in image caption / description',
+    original: 'Caption',
+    value: 'Deskripsi'
+  },
+  'upload-submit': {
+    hint: 'verb',
+    original: 'Upload',
+    value: 'Unggah'
+  },
+  'upload-uploading': {
+    hint: 'in the process of uploading',
+    original: 'Uploading...',
+    value: 'Sedang mengunggah'
+  },
+  'upload-success': {
+    original: 'Upload Successful',
+    value: 'Unggah selesai'
+  },
+  'upload-failed': {
+    original: 'Upload failed.',
+    value: 'Unggah gagal.'
+  },
+  'upload-delete': {
+    original: 'To delete your image from Imgur visit:',
+    value: 'Untuk menghapus gambar Anda dari Imgur, kunjungi:'
+  },
+  'cropcopy-title-copy': {
+    original: 'Copy To Clipboard',
+    value: 'Salin ke Clipboard'
+  },
+  'cropcopy-title-crop': {
+    hint: 'Cropping is a common feature in image editing.',
+    original: 'Crop',
+    value: 'Pangkas'
+  },
+  'cropcopy-click-hold': {
+    original: 'Right-click or press hold to copy.',
+    value: 'Klik kanan atau tekan terus untuk menyalin.'
+  },
+  'cropcopy-btn-copy': {
+    hint: 'confirmation button. Should be short.',
+    original: 'To Clipboard',
+    value: 'Ke Clipboard'
+  },
+  'cropcopy-copied': {
+    original: 'Copied.',
+    value: 'Disalin.'
+  },
+  'cropcopy-btn-crop': {
+    hint: 'confirmation button. Should be short.',
+    original: 'Apply Crop',
+    value: 'Terapkan Pangkas'
+  },
+  'crop-drag-to-crop': {
+    hint: 'drag the mouse to adjust cropping',
+    original: 'Drag to crop',
+    value: 'Seret untuk memotong'
+  },
+  'filter-crop-extend': {
+    original: 'Crop/Extend',
+    value: 'Pangkas/Perpanjangan'
+  },
+  'filter-flip': {
+    original: 'Flip',
+    value: 'Balik'
+  },
+  'filter-perspective': {
+    hint: 'perspective transformation',
+    original: 'Perspective',
+    value: 'Perspektif'
+  },
+  'filter-resize': {
+    original: 'Resize',
+    value: 'Memperbesar'
+  },
+  'filter-rotate': {
+    original: 'Rotate',
+    value: 'Putar'
+  },
+  'filter-transform': {
+    hint: 'more generic transformation. Commonly known as "free transform"',
+    original: 'Transform',
+    value: 'Mengubah'
+  },
+  'filter-bright-contrast': {
+    hint: 'brightness contrast',
+    original: 'Bright/Contrast',
+    value: 'Cerah/Kontras'
+  },
+  'filter-curves': {
+    hint: 'color curves',
+    original: 'Curves',
+    value: 'Kurva'
+  },
+  'filter-hue-sat': {
+    original: 'Hue/Saturation',
+    value: 'Rona/Kejenuhan'
+  },
+  'filter-invert': {
+    hint: 'invert the colors',
+    original: 'Invert',
+    value: 'Membalikkan'
+  },
+  'filter-tilt-shift': {
+    hint: 'or just depth-of-field. https://en.wikipedia.org/wiki/Tilt%E2%80%93shift_photography',
+    original: 'Tilt Shift',
+    value: 'Pergeseran Miring'
+  },
+  'filter-to-alpha': {
+    hint: 'feature that can isolate line drawings if it is a black and white image.',
+    original: 'To Alpha',
+    value: 'Untuk Alpha'
+  },
+  'filter-triangle-blur': {
+    hint: 'or just blur',
+    original: 'Triangle Blur',
+    value: 'Segitiga Kabur'
+  },
+  'filter-unsharp-mask': {
+    hint: 'or just sharpen, https://en.wikipedia.org/wiki/Unsharp_masking',
+    original: 'Unsharp Mask',
+    value: 'Topeng Tak Tajam'
+  },
+  'filter-crop-title': {
+    hint: 'same as the button, but can be longer',
+    original: 'Crop / Extend',
+    value: 'Pangkas/Perpanjangan'
+  },
+  'filter-crop-description': {
+    hint: 'descriptions explain the "filter" a tiny bit. Most importantly it says if it’s applied to a single layer, or the entire image (all layer)',
+    original: 'Crop or extend the image.',
+    value: 'Pangkas atau perpanjangan gambar'
+  },
+  'filter-crop-left': {
+    original: 'Left',
+    value: 'Kiri'
+  },
+  'filter-crop-right': {
+    original: 'Right',
+    value: 'Kanan'
+  },
+  'filter-crop-top': {
+    original: 'Top',
+    value: 'Bagian Atas'
+  },
+  'filter-crop-bottom': {
+    original: 'Bottom',
+    value: 'Bawah'
+  },
+  'filter-crop-rule-thirds': {
+    hint: 'https://en.wikipedia.org/wiki/Rule_of_thirds',
+    original: 'Rule of Thirds',
+    value: 'Aturan Thrids'
+  },
+  'filter-crop-fill': {
+    hint: 'If image gets extended, what color to fill that new area with',
+    original: 'Fill',
+    value: 'Isi'
+  },
+  'filter-flip-title': {
+    hint: 'same as the button, but can be longer',
+    original: 'Flip',
+    value: 'Balik'
+  },
+  'filter-flip-description': {
+    original: 'Flips layer or whole image.',
+    value: 'Membalik lapisan atau seluruh gambar.'
+  },
+  'filter-flip-horizontal': {
+    original: 'Horizontal',
+    value: 'Horisontal'
+  },
+  'filter-flip-vertical': {
+    original: 'Vertical',
+    value: 'Vertikal'
+  },
+  'filter-flip-image': {
+    original: 'Flip Image',
+    value: 'Balik Gambar'
+  },
+  'filter-flip-layer': {
+    original: 'Flip Layer',
+    value: 'Balik Lapisan'
+  },
+  'filter-perspective-title': {
+    hint: 'same as the button, but can be longer',
+    original: 'Perspective',
+    value: 'Perspektif'
+  },
+  'filter-perspective-description': {
+    original: 'Transforms the selected layer.',
+    value: 'Mentransformasi layer yang dipilih.'
+  },
+  'filter-resize-title': {
+    hint: 'same as the button, but can be longer',
+    original: 'Resize',
+    value: 'Memperbesar'
+  },
+  'filter-resize-description': {
+    original: 'Resizes the image.',
+    value: 'Memperbesar ukuran gambar.'
+  },
+  'filter-rotate-title': {
+    hint: 'same as the button, but can be longer',
+    original: 'Rotate',
+    value: 'Putar'
+  },
+  'filter-rotate-description': {
+    original: 'Rotates the image.',
+    value: 'Putar gambar.'
+  },
+  'filter-transform-empty': {
+    hint: 'nothing on the layer, just transparency',
+    original: 'Layer is empty.',
+    value: 'Lapisan sudah kosong.'
+  },
+  'filter-transform-title': {
+    hint: 'same as the button, but can be longer',
+    original: 'Transform',
+    value: 'Mengubah'
+  },
+  'filter-transform-description': {
+    hint: 'as in the Shift key.',
+    original: 'Transforms selected layer. Hold Shift for additional behavior.',
+    value: 'Mengubah lapisan yang dipilih. Tahan Shift untuk perilaku tambahan.'
+  },
+  'filter-transform-rotation': {
+    hint: 'or Angle',
+    original: 'Rotation',
+    value: 'Rotasi'
+  },
+  'filter-transform-flip': {
+    original: 'Flip',
+    value: 'Balik'
+  },
+  'filter-transform-center': {
+    hint: 'verb or noun',
+    original: 'Center',
+    value: 'Tengah'
+  },
+  'filter-transform-constrain': {
+    hint: 'short version of "constrain proportions" – feature that locks the aspect ratio',
+    original: 'Constrain',
+    value: 'Membatasi'
+  },
+  'filter-transform-snap': {
+    hint: 'or snapping. Common feature in graphics software. Makes stuff snap into place so it’s easier to align elements in an image',
+    original: 'Snap',
+    value: 'Jepret'
+  },
+  'filter-transform-snap-title': {
+    hint: 'same as above, but as a tooltip',
+    original: 'Snap Rotation And Position',
+    value: 'Rotasi dan Posisi Jepret'
+  },
+  'filter-bright-contrast-title': {
+    hint: 'same as the button, but can be longer',
+    original: 'Brightness / Contrast',
+    value: 'Kecerahan/Kontras'
+  },
+  'filter-bright-contrast-description': {
+    original: 'Change brightness and contrast for the selected layer.',
+    value: 'Mengubah kecerahan dan kontras untuk lapisan yang dipilih.'
+  },
+  'filter-bright-contrast-brightness': {
+    original: 'Brightness',
+    value: 'Kecerahan'
+  },
+  'filter-bright-contrast-contrast': {
+    original: 'Contrast',
+    value: 'Kontras'
+  },
+  'filter-curves-title': {
+    hint: 'same as the button, but can be longer',
+    original: 'Curves',
+    value: 'Kurva'
+  },
+  'filter-curves-description': {
+    original: 'Apply curves on the selected layer.',
+    value: 'Menerapkan kurva pada layer yang dipilih.'
+  },
+  'filter-curves-all': {
+    original: 'All',
+    value: 'Semua'
+  },
+  'filter-hue-sat-title': {
+    hint: 'same as the button, but can be longer',
+    original: 'Hue / Saturation',
+    value: 'Rona Warna / Saturasi'
+  },
+  'filter-hue-sat-description': {
+    original: 'Change hue and saturation for the selected layer.',
+    value: 'Mengubah rona warna dan saturasi untuk layer yang dipilih.'
+  },
+  'filter-hue-sat-hue': {
+    original: 'Hue',
+    value: 'Rona'
+  },
+  'filter-hue-sat-saturation': {
+    original: 'Saturation',
+    value: 'Saturasi'
+  },
+  'filter-applied': {
+    hint: 'used like this: „Invert“ applied. Informs that a filter was applied',
+    original: 'applied',
+    value: 'diterapkan'
+  },
+  'filter-tilt-shift-title': {
+    hint: 'same as the button, but can be longer',
+    original: 'Tilt Shift',
+    value: 'Pergeseran Miring'
+  },
+  'filter-tilt-shift-description': {
+    original: 'Applies tilt shift on the selected layer.',
+    value: 'Menerapkan pergeseran kemiringan pada layer yang dipilih.'
+  },
+  'filter-tilt-shift-blur': {
+    hint: 'words can be individually translated',
+    original: 'Blur Radius',
+    value: 'Radius Keburaman'
+  },
+  'filter-tilt-shift-gradient': {
+    hint: 'words can be individually translated',
+    original: 'Gradient Radius',
+    value: 'Radius Gradasi'
+  },
+  'filter-to-alpha-title': {
+    hint: 'same as the button, but can be longer',
+    original: 'To Alpha',
+    value: 'Untuk Alpha'
+  },
+  'filter-to-alpha-description': {
+    hint: 'after ":" follow two options',
+    original: 'Generates alpha channel for selected layer from:',
+    value: 'Menghasilkan saluran alfa untuk layer yang dipilih dari:'
+  },
+  'filter-to-alpha-inverted-lum': {
+    hint: 'luminance is same as the layer blend mode "luminosity"',
+    original: 'Inverted Luminance',
+    value: 'Pencahayaan Terbalik'
+  },
+  'filter-to-alpha-lum': {
+    original: 'Luminance',
+    value: 'Pencahayaan'
+  },
+  'filter-to-alpha-replace': {
+    hint: 'What color to replace the rgb channels with',
+    original: 'Replace RGB',
+    value: 'Gantikan RGB'
+  },
+  'filter-triangle-blur-title': {
+    hint: 'same as the button, but can be longer',
+    original: 'Triangle Blur',
+    value: 'Segitiga Buram'
+  },
+  'filter-triangle-blur-description': {
+    original: 'Applies triangle blur on the selected layer.',
+    value: 'Menerapkan keburaman segitiga pada layer yang dipilih.'
+  },
+  'filter-unsharp-mask-title': {
+    hint: 'same as the button, but can be longer',
+    original: 'Unsharp Mask',
+    value: 'Topeng Tak Tajam'
+  },
+  'filter-unsharp-mask-description': {
+    original: 'Sharpens the selected layer by scaling pixels away from the average of their neighbors.',
+    value: 'Mempertajam layer yang dipilih dengan menskalakan piksel dari rata-rata tetangganya.'
+  },
+  'filter-unsharp-mask-strength': {
+    original: 'Strength',
+    value: 'Kekuatan'
+  },
+  'filter-grid': {
+    original: 'Grid',
+    value: 'Grid'
+  },
+  'filter-grid-description': {
+    original: 'Draws grid on selected layer.',
+    value: 'Menggambar kisi-kisi pada layer yang dipilih.'
+  },
+  'filter-noise': {
+    original: 'Noise',
+    value: 'Kebisingan'
+  },
+  'filter-noise-description': {
+    original: 'Adds noise to selected layer.',
+    value: 'Menambahkan kebisingan ke layer yang dipilih.'
+  },
+  'filter-noise-scale': {
+    original: 'Scale',
+    value: 'Skala'
+  },
+  'filter-noise-alpha': {
+    original: 'Alpha',
+    value: 'Alpha'
+  },
+  'filter-pattern': {
+    original: 'Pattern',
+    value: 'Pola'
+  },
+  'filter-pattern-description': {
+    original: 'Generates pattern on selected layer. Drag the preview for further controls.',
+    value: 'Menghasilkan pola pada lapisan yang dipilih. Seret pratinjau untuk kontrol lebih lanjut.'
+  },
+  'filter-distort': {
+    original: 'Distort',
+    value: 'Mendistorsi'
+  },
+  'filter-distort-description': {
+    original: 'Distorts the selected layer.',
+    value: 'Mendistorsi lapisan yang dipilih.'
+  },
+  'filter-distort-phase': {
+    original: 'Phase',
+    value: 'Fase'
+  },
+  'filter-distort-stepsize': {
+    original: 'Step Size',
+    value: 'Ukuran Langkah'
+  },
+  'filter-distort-sync-xy': {
+    original: 'Sync XY',
+    value: 'Sinkronisasi XY'
+  },
+  'filter-vanish-point': {
+    original: 'Vanish Point',
+    value: 'Titik Lenyap'
+  },
+  'filter-vanish-point-title': {
+    original: 'Vanishing Point',
+    value: 'Titik Hilang'
+  },
+  'filter-vanish-point-description': {
+    original: 'Adds vanishing point to selected layer. Drag preview to move.',
+    value: 'Menambahkan titik lenyap ke lapisan yang dipilih. Seret pratinjau untuk memindahkan.'
+  },
+  'filter-vanish-point-lines': {
+    hint: 'As in: the number of lines',
+    original: 'Lines',
+    value: 'Garis'
+  },
+  'import-opening': {
+    hint: 'in the process of opening a large file',
+    original: 'Opening file...',
+    value: 'Membuka file...'
+  },
+  'import-title': {
+    original: 'Import Image',
+    value: 'Impor Gambar'
+  },
+  'import-too-large': {
+    original: 'Image too large, will be downscaled.',
+    value: 'Gambar terlalu besar, akan diperkecil.'
+  },
+  'import-btn-as-layer': {
+    hint: 'import as layer. Button label, should be short',
+    original: 'As Layer',
+    value: 'Sebagai Lapisan'
+  },
+  'import-btn-as-image': {
+    hint: 'import as image. Button label, should be short',
+    original: 'As Image',
+    value: 'Sebagai Gambar'
+  },
+  'import-as-layer-title': {
+    original: 'Import Image as New Layer',
+    value: 'Impor Gambar sebagai Lapisan Baru'
+  },
+  'import-as-layer-description': {
+    original: 'Adjust the position of the imported image.',
+    value: 'Sesuaikan posisi gambar yang diimpor.'
+  },
+  'import-as-layer-limit-reached': {
+    hint: 'Kleki allows only a certain number of layers',
+    original: 'Layer limit reached. Image will be placed on existing layer.',
+    value: 'Batas lapisan tercapai. Gambar akan ditempatkan pada layer yang ada.'
+  },
+  'import-as-layer-fit': {
+    hint: 'verb. imported image made to fit inside canvas.',
+    original: 'Fit',
+    value: 'Sesuai'
+  },
+  'import-flatten': {
+    hint: 'Turn image that has multiple layers into an image that has only one layer.',
+    original: 'Flatten image',
+    value: 'Meratakan gambar'
+  },
+  'import-unsupported-file': {
+    hint: 'e.g. user tried to open a WAV',
+    original: 'Unsupported file type. See Help for supported types.',
+    value: 'Jenis file yang tak didukung. Lihat Bantuan untuk jenis yang didukung.'
+  },
+  'import-broken-file': {
+    hint: 'if an image file is broken',
+    original: "Couldn't load image. File might be corrupted.",
+    value: 'Tak dapat memuat gambar. Berkas mungkin rusak.'
+  },
+  'import-psd-unsupported': {
+    hint: 'PSD is photoshop file format. flatten as in „flatten image“ in photoshop. Merged all layers',
+    original: 'Unsupported features. PSD had to be flattened.',
+    value: 'Fitur yang tak didukung. PSD harus diratakan.'
+  },
+  'import-psd-limited-support': {
+    hint: 'PSD has lots of fancy features that Kleki doesn\'t have, so when importing a PSD it often has to simplify things. So it might look different compared to when opening in Photoshop. We’re informing the user if they "flatten" the image it will be accurate despite losing layers. The user has to weigh, do they care about having layers, or do they care about it looking right.',
+    original: 'PSD support is limited. Flattened will more likely look correct.',
+    value: 'Dukungan PSD terbatas. Ratakan kemungkinan besar akan terlihat benar.'
+  },
+  'import-psd-too-large': {
+    original: 'Image exceeds maximum dimensions of {x} x {x} pixels. Unable to import.',
+    value: 'Gambar melebihi dimensi maksimum {x} x {x} piksel. Tak dapat mengimpor.'
+  },
+  'import-psd-size': {
+    original: 'Image size',
+    value: 'Ukuran Gambar'
+  },
+  'hand-reset': {
+    hint: 'resets zoom (to 100%) and rotation (to 0°)',
+    original: 'Reset',
+    value: 'Atur ulang'
+  },
+  'hand-fit': {
+    hint: 'makes canvas cover whole working area',
+    original: 'Fit',
+    value: 'Sesuai'
+  },
+  'bucket-tolerance': {
+    hint: 'a common feature for paint bucket',
+    original: 'Tolerance',
+    value: 'Toleransi'
+  },
+  'bucket-sample': {
+    hint: 'like "taking a sample"',
+    original: 'Sample',
+    value: 'Contoh'
+  },
+  'bucket-sample-title': {
+    original: 'Which layers to sample color from',
+    value: 'Lapisan mana yang akan diambil sampel warnanya'
+  },
+  'bucket-sample-all': {
+    hint: 'all layers',
+    original: 'All',
+    value: 'Semua'
+  },
+  'bucket-sample-active': {
+    hint: 'currently active layer',
+    original: 'Active',
+    value: 'Aktif'
+  },
+  'bucket-sample-above': {
+    hint: 'layer above active layer',
+    original: 'Above',
+    value: 'Atas'
+  },
+  'bucket-grow': {
+    hint: 'verb. Or expand.',
+    original: 'Grow',
+    value: 'Tumbuh'
+  },
+  'bucket-grow-title': {
+    original: 'Grow filled area (in pixels)',
+    value: 'Menumbuhkan area yang terisi (dalam piksel)'
+  },
+  'bucket-contiguous': {
+    hint: 'common setting for paint bucket in image editing software',
+    original: 'Contiguous',
+    value: 'Bersebelahan'
+  },
+  'bucket-contiguous-title': {
+    hint: 'tooltip explaining Contiguous',
+    original: 'Only fill connected areas',
+    value: 'Hanya mengisi area yang terhubung'
+  },
+  'gradient-linear': {
+    original: 'Linear',
+    value: 'Linier'
+  },
+  'gradient-linear-mirror': {
+    original: 'Linear-Mirror',
+    value: 'Cermin-Linier'
+  },
+  'gradient-radial': {
+    original: 'Radial',
+    value: 'Radial'
+  },
+  'shape-stroke': {
+    original: 'Stroke',
+    value: 'Stroke'
+  },
+  'shape-fill': {
+    original: 'Fill',
+    value: 'Isi'
+  },
+  'shape-rect': {
+    hint: 'rectangle shape',
+    original: 'Rectangle',
+    value: 'Persegi Panjang'
+  },
+  'shape-ellipse': {
+    hint: 'ellipse shape',
+    original: 'Ellipse',
+    value: 'Elipsis'
+  },
+  'shape-line': {
+    original: 'Line',
+    value: 'Baris'
+  },
+  'shape-line-width': {
+    original: 'Line Width',
+    value: 'Baris Lebar'
+  },
+  'shape-outwards': {
+    hint: 'grows shape from the center outwards',
+    original: 'Outwards',
+    value: 'Ke luar'
+  },
+  'shape-fixed': {
+    hint: 'fixed ratio of 1:1',
+    original: 'Fixed 1:1',
+    value: 'Tetap 1:1'
+  },
+  'text-instruction': {
+    original: 'Click canvas to place text',
+    value: 'Klik kanvas untuk menempatkan teks'
+  },
+  'text-title': {
+    original: 'Add Text',
+    value: 'Tambah Teks'
+  },
+  'text-text': {
+    original: 'Text',
+    value: 'Teks'
+  },
+  'text-font': {
+    original: 'Font',
+    value: 'Font'
+  },
+  'text-placeholder': {
+    hint: 'placeholder in text input.',
+    original: 'Your text',
+    value: 'Teks Anda'
+  },
+  'text-color': {
+    original: 'Color',
+    value: 'Warna'
+  },
+  'text-size': {
+    original: 'Size',
+    value: 'Ukuran'
+  },
+  'text-line-height': {
+    original: 'Line Height',
+    value: 'Tinggi Baris'
+  },
+  'text-letter-spacing': {
+    original: 'Letter Spacing',
+    value: 'Pengaturan Jarak Huruf'
+  },
+  'text-left': {
+    hint: 'left, center, right text formatting like in Word',
+    original: 'Left',
+    value: 'Kiri'
+  },
+  'text-center': {
+    original: 'Center',
+    value: 'Tengah'
+  },
+  'text-right': {
+    original: 'Right',
+    value: 'Kanan'
+  },
+  'text-italic': {
+    original: 'Italic',
+    value: 'Miring'
+  },
+  'text-bold': {
+    original: 'Bold',
+    value: 'Tebal'
+  },
+  'save-reminder-title': {
+    hint: 'Save Reminder is a popup that shows up after 20 minutes of not saving. Allows user to save on the spot.',
+    original: 'Unsaved Work',
+    value: 'Pekerjaan yang Belum Disimpan'
+  },
+  'save-reminder-text': {
+    hint: 'turns into: "...saved in <strong>12 minutes</strong>. Save..."',
+    original: 'Image was not saved in {a} minutes{b}. Save now to prevent eventual loss.',
+    value: 'Gambar tak disimpan dalam {a} menit{b}. Menabung sekarang untuk mencegah kerugian di kemudian hari.'
+  },
+  'save-reminder-save-psd': {
+    original: 'Save As PSD',
+    value: 'Simpan Sebagai PSD'
+  },
+  'save-reminder-psd-layers': {
+    original: 'PSD will remember all layers.',
+    value: 'PSD akan mengingat semua lapisan.'
+  },
+  'backup-drawing': {
+    hint: '(Embed) If the upload failed, the user can backup/download their drawing.',
+    original: 'You can backup your drawing.',
+    value: 'Anda dapat mencadangkan gambar Anda.'
+  },
+  submit: {
+    original: 'Submit',
+    value: 'Kirim'
+  },
+  'submit-title': {
+    hint: 'tooltip when hovering "Submit" button',
+    original: 'Submit Drawing',
+    value: 'Kirim Gambar'
+  },
+  'submit-prompt': {
+    hint: 'Dialog asking for confirmation',
+    original: 'Submit drawing?',
+    value: 'Kirim Gambar?'
+  },
+  'submit-submitting': {
+    hint: 'in the process of uploading',
+    original: 'Submitting',
+    value: 'Mengirimkan'
+  },
+  'embed-init-loading': {
+    hint: 'when opening the app',
+    original: 'Loading app',
+    value: 'Memuat Aplikasi'
+  },
+  'embed-init-waiting': {
+    hint: 'The app is loaded, but it’s still waiting for image',
+    original: 'Waiting for image',
+    value: 'Tunggu untuk gambar'
+  },
+  unsaved: {
+    original: 'Unsaved',
+    value: 'Tak disimpan'
+  },
+  help: {
+    hint: 'or user manual',
+    original: 'Help',
+    value: 'Bantuan'
+  },
+  'tab-settings': {
+    original: 'Settings',
+    value: 'Pengaturan'
+  },
+  'settings-language': {
+    original: 'Language',
+    value: 'Bahasa'
+  },
+  'settings-language-reload': {
+    hint: 'changes will be visible after reloading the page',
+    original: 'Will update after reloading.',
+    value: 'Akan diperbarui setelah memuat ulang.'
+  },
+  'settings-theme': {
+    original: 'Theme',
+    value: 'Tema'
+  },
+  'settings-save-reminder-label': {
+    original: 'Save Reminder',
+    value: 'Simpan Pengingat'
+  },
+  'settings-save-reminder-disabled': {
+    original: 'disabled',
+    value: 'dimatikan'
+  },
+  'settings-save-reminder-confirm-title': {
+    original: 'Turn off Save Reminder?',
+    value: 'Matikan Simpan Pengingat'
+  },
+  'settings-save-reminder-confirm-a': {
+    original: "There is no autosave and browser tabs don't last forever. If you don't periodically save you will likely lose work.",
+    value: 'Tak ada penyimpanan otomatis dan tab peramban tidak bertahan selamanya. Jika anda tidak menyimpan secara berkala, kemungkinan besar Anda akan kehilangan pekerjaan.'
+  },
+  'settings-save-reminder-confirm-b': {
+    original: 'Disable at your own risk?',
+    value: 'Mematikan pada resiko anda sendiri?'
+  },
+  'settings-save-reminder-confirm-disable': {
+    original: 'Disable',
+    value: 'Mematikan'
+  },
+  'theme-dark': {
+    original: 'Dark',
+    value: 'Gelap'
+  },
+  'theme-light': {
+    original: 'Light',
+    value: 'Terang'
+  },
+  'terms-of-service': {
+    original: 'Terms of Service',
+    value: 'Ketentuan Layanan'
+  },
+  licenses: {
+    hint: 'as in software licenses',
+    original: 'Licenses',
+    value: 'Lisensi'
+  },
+  'source-code': {
+    original: 'Source Code',
+    value: 'Kode Sumber'
+  },
+  auto: {
+    hint: 'automatically decided',
+    original: 'auto',
+    value: 'otomatis'
+  },
+  'zoom-in': {
+    original: 'Zoom In',
+    value: 'Perbesar'
+  },
+  'zoom-out': {
+    original: 'Zoom Out',
+    value: 'Perkecil'
+  },
+  radius: {
+    original: 'Radius',
+    value: 'Radius'
+  },
+  'constrain-proportions': {
+    original: 'Constrain Proportions',
+    value: 'Batasi Proporsi'
+  },
+  width: {
+    original: 'Width',
+    value: 'Lebar'
+  },
+  height: {
+    original: 'Height',
+    value: 'Panjang'
+  },
+  opacity: {
+    hint: 'for layer opacity, brush opacity, text opacity, ...',
+    original: 'Opacity',
+    value: 'Kapasitas'
+  },
+  red: {
+    original: 'Red',
+    value: 'Merah'
+  },
+  green: {
+    original: 'Green',
+    value: 'Hijau'
+  },
+  blue: {
+    original: 'Blue',
+    value: 'Biru'
+  },
+  eraser: {
+    hint: 'noun. As short as possible',
+    original: 'Eraser',
+    value: 'Penghapus'
+  },
+  center: {
+    hint: 'verb',
+    original: 'Center',
+    value: 'Tengah'
+  },
+  layers: {
+    hint: 'layers in the context of image editing software',
+    original: 'Layers',
+    value: 'Lapisan'
+  },
+  background: {
+    hint: 'as in background layer',
+    original: 'Background',
+    value: 'Latar Belakang'
+  },
+  'scaling-algorithm': {
+    hint: 'Label for dropdown where user chooses which computer graphics algorithm should be used to scale the image',
+    original: 'Scaling Algorithm',
+    value: 'Algoritma Penskalaan'
+  },
+  'algorithm-smooth': {
+    original: 'Smooth',
+    value: 'Halus'
+  },
+  'algorithm-pixelated': {
+    original: 'Pixelated',
+    value: 'Pikselasi'
+  },
+  preview: {
+    hint: 'subject. When applying a filter user sees a preview of what the result would look like.',
+    original: 'Preview',
+    value: 'Pratinjau'
+  },
+  'angle-snap': {
+    hint: 'Snapping. Like when transforming an image and it snaps to the side of the frame.',
+    original: 'Snap',
+    value: 'Jepret'
+  },
+  'angle-snap-title': {
+    original: '45° Angle Snapping',
+    value: 'Gertakan Sudut 45°'
+  },
+  'lock-alpha': {
+    hint: 'Short. Freezes the alpha channel of image. Images consist of 4 channels (red, green, blue, alpha). Alpha lock also found in Procreate and photoshop',
+    original: 'Lock Alpha',
+    value: 'Kunci Alpha'
+  },
+  'lock-alpha-title': {
+    hint: "same as 'lock-alpha' but longer version. Shows up as a tooltip when hovering",
+    original: "Locks layer's alpha channel",
+    value: 'Mengunci saluran alfa layer'
+  },
+  reverse: {
+    hint: 'Reversing the direction of a color gradient',
+    original: 'Reverse',
+    value: 'Membalikkan'
+  },
+  'compare-before': {
+    original: 'Before',
+    value: 'Sebelum'
+  },
+  'compare-after': {
+    original: 'After',
+    value: 'Sesudah'
+  },
+  loading: {
+    original: 'Loading',
+    value: 'Memuat'
+  },
+  more: {
+    original: 'More',
+    value: 'Lebih lanjut'
+  },
+  'x-minutes': {
+    original: '{x}min',
+    value: '{x} menit'
+  }
+}

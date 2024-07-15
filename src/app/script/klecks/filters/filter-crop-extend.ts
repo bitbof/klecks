@@ -54,10 +54,10 @@ export const filterCropExtend = {
         // --- input elements ---
 
         const lrWrapper = BB.el({
-            css: {lineHeight: '30px', height: '35px'},
+            css: {display: 'flex', alignItems: 'center'},
         });
         const tbWrapper = BB.el({
-            css: {lineHeight: '30px', height: '35px'},
+            css: {display: 'flex', alignItems: 'center', marginTop: '5px'},
         });
         rootEl.append(lrWrapper, tbWrapper);
 
