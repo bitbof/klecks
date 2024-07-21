@@ -66,7 +66,7 @@ export class FileTab {
             clipboardButton.innerHTML = `<img src='${copyImg}' alt='icon' height='20'/>${LANG('file-copy')}`;
             clipboardButton.title = LANG('file-copy-title');
             newButton.className = 'grid-button';
-            saveButton.className = 'grid-button';
+            saveButton.className = 'grid-button grid-button--filter';
             shareButton.className = 'grid-button';
             uploadImgurButton.className = 'grid-button';
             clipboardButton.className = 'grid-button';

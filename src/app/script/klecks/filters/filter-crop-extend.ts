@@ -108,7 +108,8 @@ export const filterCropExtend = {
 
         const labelStyle = {
             display: 'inline-block',
-            width: '60px',
+            width: '65px',
+            wordBreak: 'break-word',
         };
         lrWrapper.append(
             BB.el({content: LANG('filter-crop-left') + ':', css: labelStyle}),

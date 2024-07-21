@@ -190,6 +190,10 @@ export class FillUi {
      * [0, 1]
      */
     getTolerance (): number {
+        // slider may display 0 when value is 1 -> avoid confusing users
+        if (Math.round(this.toleranceSlider.getDisplayValue()) === 0) {
+            return 0;
+        }
         return this.toleranceSlider.getValue();
     }
 

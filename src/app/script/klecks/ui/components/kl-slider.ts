@@ -388,6 +388,10 @@ export class KlSlider {
         return this.value;
     }
 
+    getDisplayValue (): number {
+        return this.valueToDisplayValue(this.value);
+    }
+
     update (config: IKlSliderConfig): void {
         this.min = config.min;
         this.max = config.max;

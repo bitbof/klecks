@@ -40,6 +40,7 @@ export class ColorOptions {
                 display: 'flex',
                 alignItems: 'center',
                 gap: '7px',
+                position: 'relative',
             },
         });
 
@@ -143,7 +144,7 @@ export class ColorOptions {
             })(i);
         }
 
-        this.rootEl.append(c(',w-0,h-0,overflow-hidden', [this.colorInput]));
+        this.rootEl.append(c(',w-0,h-0,overflow-hidden,abs-0-0', [this.colorInput]));
 
 
         const update = () => {

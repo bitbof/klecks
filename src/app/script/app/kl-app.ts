@@ -631,10 +631,10 @@ export class KlApp {
 
 
                 if (comboStr === 'sqbr_open') {
-                    currentBrushUi.decreaseSize(0.03 / this.klCanvasWorkspace.getScale());
+                    currentBrushUi.decreaseSize(Math.max(0.005, 0.03 / this.klCanvasWorkspace.getScale()));
                 }
                 if (comboStr === 'sqbr_close') {
-                    currentBrushUi.increaseSize(0.03 / this.klCanvasWorkspace.getScale());
+                    currentBrushUi.increaseSize(Math.max(0.005, 0.03 / this.klCanvasWorkspace.getScale()));
                 }
                 if (comboStr === 'enter') {
                     this.klCanvas.layerFill(
