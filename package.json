@@ -9,6 +9,7 @@
     "ios_saf 9"
   ],
   "scripts": {
+    "legacy": "parcel serve src/index.html --no-cache --target default",
     "start": "parcel serve src/index.html --no-cache",
     "build": "parcel build src/index.html",
     "build:embed": "parcel build src/embed.ts",

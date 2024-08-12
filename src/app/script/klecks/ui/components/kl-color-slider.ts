@@ -129,7 +129,7 @@ export class KlColorSlider {
         this.secondaryColorHSV = BB.ColorConverter._RGBtoHSV(this.secondaryColorRGB); // BB.HSV
 
         const svWrapper = BB.el();
-        this.svSvg = new DOMParser().parseFromString('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="none"><defs><linearGradient id="value" gradientTransform="rotate(90)"><stop offset="0" stop-color="#fff"/><stop offset="100%" stop-color="#000"/></linearGradient><linearGradient id="hue" gradientTransform="rotate(0)"><stop offset="0" stop-color="#fff"/><stop id="hue-stop" offset="100%" stop-color="#f00"/></linearGradient></defs><rect x="0" y="0" width="100" height="100" fill="url(\'#hue\')"/><rect x="0" y="0" width="100" height="100" fill="url(\'#value\')" style="mix-blend-mode: multiply"/></svg>', 'image/svg+xml').documentElement;
+        this.svSvg = new DOMParser().parseFromString(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="none"><defs><linearGradient id="value" gradientTransform="rotate(90)"><stop offset="0" stop-color="#fff"/><stop offset="100%" stop-color="#000"/></linearGradient><linearGradient id="hue" gradientTransform="rotate(0)"><stop offset="0" stop-color="#fff"/><stop id="hue-stop" offset="100%" stop-color="#f00"/></linearGradient></defs><rect x="0" y="0" width="100" height="100" fill="url(\'${window.location.href}#hue\')"/><rect x="0" y="0" width="100" height="100" fill="url(\'${window.location.href}#value\')" style="mix-blend-mode: multiply"/></svg>`, 'image/svg+xml').documentElement;
         {
             const hueStop = this.svSvg.querySelector('#hue-stop');
             if (!hueStop) {
