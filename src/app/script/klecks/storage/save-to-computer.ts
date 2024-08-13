@@ -59,15 +59,11 @@ export class SaveToComputer {
         } else if (format === 'layers') {
             const extension = 'png';
             const mimeType = 'image/png';
-            const fileBase = BB.getDate() + klConfig.filenameBase;
+            const fileBase = ''; // tired of removing the damn fileBase
             const layerArr = this.getKlCanvas().getLayersFast();
             for (let i = 0; i < layerArr.length; i++) {
                 const item = layerArr[i];
                 const fnameArr = [
-                    fileBase,
-                    '_',
-                    ('' + (i + 1)).padStart(2, '0'),
-                    '_',
                     item.name,
                     '.',
                     extension,
