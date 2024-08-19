@@ -40,6 +40,7 @@ import {FillUi} from './ui/tool-tabs/fill-ui';
 import {TextUi} from './ui/tool-tabs/text-ui';
 import {ShapeUi} from './ui/tool-tabs/shape-ui';
 import {newImageDialog} from './ui/modals/new-image-dialog';
+import {shareDialog} from './ui/modals/share-dialog';
 import {ToolspaceCollapser} from './ui/components/toolspace-collapser';
 import {renderText} from './image-operations/render-text';
 import {textToolDialog} from './ui/modals/text-tool-dialog/text-tool-dialog';
@@ -160,6 +161,7 @@ export const KL = {
     clipboardDialog,
     showImportAsLayerDialog,
     newImageDialog,
+    shareDialog,
     textToolDialog,
     showImportImageDialog,
     showIframePopup: showIframeModal,

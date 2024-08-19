@@ -1266,12 +1266,7 @@ export class KlApp {
         };
 
         const shareImage = (callback?: () => void) => {
-            BB.shareCanvas({
-                canvas: this.klCanvas.getCompleteCanvas(1),
-                fileName: BB.getDate() + klConfig.filenameBase + '.png',
-                title: BB.getDate() + klConfig.filenameBase + '.png',
-                callback: callback ? callback : () => {},
-            });
+            KL.shareDialog({});
         };
 
         this.saveToComputer = new KL.SaveToComputer(

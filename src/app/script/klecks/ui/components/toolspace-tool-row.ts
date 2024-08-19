@@ -137,7 +137,7 @@ export class ToolspaceToolRow {
 
             const svg = BB.createSvg({
                 elementType: 'svg',
-                width: 'max', // can't think of a way doing with percentage
+                width: '100%', // can't think of a way doing with percentage
                 height: '54px',
                 viewBox: '0 0 100 100',
                 preserveAspectRatio: 'none',

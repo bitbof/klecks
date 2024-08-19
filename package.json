@@ -29,6 +29,8 @@
     "json5": "^2.2.3",
     "mdn-polyfills": "^5.20.0",
     "parcel": "^2.9.3",
-    "transformation-matrix": "^2.15.0"
+    "transformation-matrix": "^2.15.0",
+    "qrcode": "^1.5.4",
+    "@types/qrcode": "^1.5.5"
   }
 }
