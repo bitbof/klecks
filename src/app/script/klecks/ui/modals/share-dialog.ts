@@ -10,19 +10,23 @@ import {theme} from '../../../theme/theme';
 import QRCode from 'qrcode';
 export function shareDialog (
     p: {
-        
+        image: Blob
     }
 ): void {
 
-    const imgDiv = BB.el();
+    const mainDiv = BB.el();
     const canvas = BB.canvas(400, 400)
     QRCode.toCanvas(canvas, "https://ai-image.manglemoose.com/result")
-    imgDiv.append(canvas)
+    mainDiv.append(canvas)
+    var url = URL.createObjectURL(p.image)
+    var image = new Image()
+    image.src = url;
+    mainDiv.append(image)
 
     showModal({
         target: document.body,
         message: `<b>${LANG('share-title')}</b>`,
-        div: imgDiv,
+        div: mainDiv,
         buttons: ['Ok',],
         callback: function (result) {
             if (

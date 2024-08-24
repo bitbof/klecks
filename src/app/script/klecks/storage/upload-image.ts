@@ -3,8 +3,8 @@ import { KlCanvas } from '../canvas/kl-canvas';
 import { klConfig } from '../kl-config';
 
 export class UploadImage {
-    private timeout: number | undefined
-
+    private timeout: number | any
+    private latestGeneration: Blob;
     private getImage(canvas: HTMLCanvasElement, filename: string, mimeType: string): Blob {
         const parts = canvas.toDataURL(mimeType).match(/data:([^;]*)(;base64)?,([0-9A-Za-z+/]+)/);
 
@@ -25,7 +25,9 @@ export class UploadImage {
 
     constructor(
         private getKlCanvas: () => KlCanvas
-    ) { }
+    ) {
+        this.latestGeneration = new Blob();
+     }
 
     Send(): void {
         if(this.timeout){
@@ -35,7 +37,7 @@ export class UploadImage {
         
     }
 
-    private sendImpl(sender : UploadImage){
+    private async sendImpl(sender : UploadImage){
         const extension = 'png';
         const mimeType = 'image/png';
         const filename = BB.getDate() + klConfig.filenameBase + '.' + extension;
@@ -43,24 +45,30 @@ export class UploadImage {
         try {
 
             const image = sender.getImage(fullCanvas, filename, mimeType);
-            sender.sendData(image);
+            await sender.sendData(image);
         } catch (error) { //fallback for old browsers
             alert('could not save');
             throw new Error('failed png export');
         }
     }
 
-    sendData(data: Blob) {
+    async sendData(data: Blob) {
 
         const formData = new FormData();
         formData.append('file', data);
+        formData.append('negativePrompt', 'ugly');
+        formData.append('positivePrompt', 'picasso style, painting, vibrant strokes');
 
-        const response = fetch('https://ai-image.manglemoose.com/', {
+        var response = await fetch('https://localhost:7243/api', {
             method: 'POST',
             body: formData,
-            mode: 'no-cors'
         });
 
+        this.latestGeneration = await response.blob()
+    }
+
+    public getLatestGeneration(){
+        return this.latestGeneration;
     }
 
 }

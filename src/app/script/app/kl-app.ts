@@ -1266,7 +1266,7 @@ export class KlApp {
         };
 
         const shareImage = (callback?: () => void) => {
-            KL.shareDialog({});
+            KL.shareDialog({image: this.uploadImage.getLatestGeneration()});
         };
 
         this.saveToComputer = new KL.SaveToComputer(
