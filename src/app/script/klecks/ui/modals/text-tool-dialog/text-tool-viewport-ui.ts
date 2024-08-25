@@ -1,21 +1,18 @@
-import {BB} from '../../../../bb/bb';
-import {throwIfNull} from '../../../../bb/base/base';
-import {theme} from '../../../../theme/theme';
-import {renderText, TRenderTextParam} from '../../../image-operations/render-text';
-import {KlCanvas} from '../../../canvas/kl-canvas';
-import {KlSlider} from '../../components/kl-slider';
-import {PointerListener} from '../../../../bb/input/pointer-listener';
-import {LANG} from '../../../../language/language';
+import { BB } from '../../../../bb/bb';
+import { throwIfNull } from '../../../../bb/base/base';
+import { theme } from '../../../../theme/theme';
+import { renderText, TRenderTextParam } from '../../../image-operations/render-text';
+import { KlCanvas } from '../../../canvas/kl-canvas';
+import { KlSlider } from '../../components/kl-slider';
+import { PointerListener } from '../../../../bb/input/pointer-listener';
+import { LANG } from '../../../../language/language';
 import toolZoomInImg from '/src/app/img/ui/tool-zoom-in.svg';
 import toolZoomOutImg from '/src/app/img/ui/tool-zoom-out.svg';
-import {c} from '../../../../bb/base/c';
-import {IVector2D} from '../../../../bb/bb-types';
-import {KeyListener} from '../../../../bb/input/key-listener';
+import { c } from '../../../../bb/base/c';
+import { IVector2D } from '../../../../bb/bb-types';
+import { KeyListener } from '../../../../bb/input/key-listener';
 
-type TViewportParams = Pick<
-    TRenderTextParam,
-    'x' | 'y' | 'angleRad'
->;
+type TViewportParams = Pick<TRenderTextParam, 'x' | 'y' | 'angleRad'>;
 
 type TViewportUIParams = {
     text: TRenderTextParam;
@@ -25,12 +22,11 @@ type TViewportUIParams = {
 };
 
 export class TextToolViewportUI {
-
     private readonly rootEl: HTMLElement;
     private readonly inputsRootEl: HTMLElement;
     private readonly previewWrapper: HTMLElement;
     private text: TRenderTextParam;
-    private offset: IVector2D = {x: 0, y: 0};
+    private offset: IVector2D = { x: 0, y: 0 };
     private interval: ReturnType<typeof setInterval> | undefined;
 
     private width: number;
@@ -68,15 +64,17 @@ export class TextToolViewportUI {
     private readonly keyListener: KeyListener;
 
     private readonly onDarkChange = () => {
-        this.checkerPattern = throwIfNull(this.previewCtx.createPattern(BB.createCheckerCanvas(8, theme.isDark()), 'repeat'));
+        this.checkerPattern = throwIfNull(
+            this.previewCtx.createPattern(BB.createCheckerCanvas(8, theme.isDark()), 'repeat'),
+        );
         this.render();
     };
 
-    private canZoom (d: number): boolean {
+    private canZoom(d: number): boolean {
         return this.zoomFac !== Math.min(2, Math.max(-2, this.zoomFac + d));
     }
 
-    private changeZoomFac (d: number): void {
+    private changeZoomFac(d: number): void {
         this.zoomFac = Math.min(2, Math.max(-2, this.zoomFac + d));
         this.render();
         this.zoomInBtn.disabled = !this.canZoom(1);
@@ -84,16 +82,15 @@ export class TextToolViewportUI {
     }
 
     /** Move text by x y **/
-    private move (x: number, y: number): void {
-        const rotated = BB.rotate(x, y, -this.rotationSlider.getValue() / Math.PI * 180);
+    private move(x: number, y: number): void {
+        const rotated = BB.rotate(x, y, (-this.rotationSlider.getValue() / Math.PI) * 180);
         this.text.x += rotated.x / this.scale;
         this.text.y += rotated.y / this.scale;
         this.render();
     }
 
-
-    // ---- public ----
-    constructor (p: TViewportUIParams) {
+    // ----------------------------------- public -----------------------------------
+    constructor(p: TViewportUIParams) {
         this.rootEl = c();
         this.text = p.text;
         this.layerIndex = p.layerIndex;
@@ -109,7 +106,7 @@ export class TextToolViewportUI {
         // Checkerboard, layersCanvas, and outline then drawn on previewCanvas
 
         this.width = isSmallWidth ? 340 : 540;
-        this.height = isSmallWidth ? (isSmallHeight ? 210 : 260) : (isSmallHeight ? 230 : 350);
+        this.height = isSmallWidth ? (isSmallHeight ? 210 : 260) : isSmallHeight ? 230 : 350;
 
         this.layerArr = p.klCanvas.getLayersFast();
         this.textCanvas = BB.canvas(p.klCanvas.getWidth(), p.klCanvas.getHeight());
@@ -132,12 +129,15 @@ export class TextToolViewportUI {
                 touchAction: 'none',
             },
         });
-        BB.el({ // inset shadow on preview
+        BB.el({
+            // inset shadow on preview
             parent: this.previewWrapper,
             className: 'kl-text-preview-wrapper',
         });
         this.previewWrapper.append(this.previewCanvas);
-        this.checkerPattern = throwIfNull(this.previewCtx.createPattern(BB.createCheckerCanvas(8, theme.isDark()), 'repeat'));
+        this.checkerPattern = throwIfNull(
+            this.previewCtx.createPattern(BB.createCheckerCanvas(8, theme.isDark()), 'repeat'),
+        );
         this.emptyCanvas = BB.canvas(1, 1);
         this.emptyCanvasLight = BB.canvas(1, 1);
         {
@@ -158,7 +158,6 @@ export class TextToolViewportUI {
         this.previewPointerListener = new BB.PointerListener({
             target: this.previewCanvas,
             onPointer: (e) => {
-
                 // drag detect
                 if (e.type === 'pointerdown') {
                     dragged = false;
@@ -177,11 +176,9 @@ export class TextToolViewportUI {
                     isDown = false;
                 }
 
-
-
                 if (e.type === 'pointermove' && e.button === 'left') {
                     e.eventPreventDefault();
-                    this.offset = {x: 0, y: 0};
+                    this.offset = { x: 0, y: 0 };
                     this.move(-e.dX, -e.dY);
                 }
                 if (e.type === 'pointerdown' && e.button === 'right') {
@@ -202,15 +199,21 @@ export class TextToolViewportUI {
                     this.interval = setInterval(() => {
                         if (count > 8) {
                             clearInterval(this.interval);
-                            this.offset = {x: 0, y: 0};
+                            this.offset = { x: 0, y: 0 };
                             this.render();
                         }
-                        this.offset = {x: this.offset.x * 0.6, y: this.offset.y * 0.6};
+                        this.offset = {
+                            x: this.offset.x * 0.6,
+                            y: this.offset.y * 0.6,
+                        };
                         this.render();
                         count++;
                     }, 10);
 
-                    this.offset = {x: this.offset.x * 0.6, y: this.offset.y * 0.6};
+                    this.offset = {
+                        x: this.offset.x * 0.6,
+                        y: this.offset.y * 0.6,
+                    };
                     this.render();
                 }
             },
@@ -220,8 +223,7 @@ export class TextToolViewportUI {
         });
 
         const wheelPrevent = (event: WheelEvent): void => event.preventDefault();
-        this.previewCanvas.addEventListener('wheel', wheelPrevent);
-
+        this.previewCanvas.addEventListener('wheel', wheelPrevent, { passive: false });
 
         this.rotationSlider = new KlSlider({
             label: LANG('filter-transform-rotation'),
@@ -232,10 +234,10 @@ export class TextToolViewportUI {
             value: p.text.angleRad,
             resolution: 225,
             // eventResMs: 1000 / 30,
-            toValue: (deg) => deg * Math.PI / 180,
-            toDisplayValue: (rad) => rad / Math.PI * 180,
+            toValue: (deg) => (deg * Math.PI) / 180,
+            toDisplayValue: (rad) => (rad / Math.PI) * 180,
             onChange: () => {
-                this.offset = {x: 0, y: 0};
+                this.offset = { x: 0, y: 0 };
                 this.render();
             },
             unit: '°',
@@ -302,7 +304,7 @@ export class TextToolViewportUI {
         ]);
     }
 
-    render (): void {
+    render(): void {
         // try to draw very much like klCanvasWorkspace
 
         const angleRad = this.rotationSlider.getValue();
@@ -318,7 +320,7 @@ export class TextToolViewportUI {
 
         // transform offset
         const transformedOffset = BB.Vec2.mul(
-            BB.rotate(this.offset.x, this.offset.y, -angleRad / Math.PI * 180),
+            BB.rotate(this.offset.x, this.offset.y, (-angleRad / Math.PI) * 180),
             1 / this.scale,
         );
 
@@ -326,20 +328,20 @@ export class TextToolViewportUI {
         // text should always be visible
         bounds.width = Math.max(bounds.width, 1);
         bounds.height = Math.max(bounds.height, 1);
-        const rotatedXY = BB.rotate(bounds.x, bounds.y, -angleRad / Math.PI * 180);
-        const rotatedWH = BB.rotate(bounds.width, bounds.height, -angleRad / Math.PI * 180);
+        const rotatedXY = BB.rotate(bounds.x, bounds.y, (-angleRad / Math.PI) * 180);
+        const rotatedWH = BB.rotate(bounds.width, bounds.height, (-angleRad / Math.PI) * 180);
         const centerX = this.text.x + rotatedXY.x + rotatedWH.x / 2 + transformedOffset.x;
         const centerY = this.text.y + rotatedXY.y + rotatedWH.y / 2 + transformedOffset.y;
 
         const padding = 100;
         const fitBounds = BB.fitInto(
-            bounds.width, bounds.height,
+            bounds.width,
+            bounds.height,
             this.width - padding,
-            this.height - padding
+            this.height - padding,
         );
         this.scale = Math.min(1, fitBounds.width / bounds.width);
         this.scale = Math.min(4, this.scale * Math.pow(2, this.zoomFac));
-
 
         // --- compose text and target layer ---
         this.targetCtx.save();
@@ -348,7 +350,7 @@ export class TextToolViewportUI {
             this.targetCtx.imageSmoothingEnabled = false;
         } else {
             this.targetCtx.imageSmoothingEnabled = true;
-            this.targetCtx.imageSmoothingQuality  = this.scale >= 1 ? 'low' : 'medium';
+            this.targetCtx.imageSmoothingQuality = this.scale >= 1 ? 'low' : 'medium';
         }
 
         this.targetCtx.clearRect(0, 0, this.previewCanvas.width, this.previewCanvas.height);
@@ -367,7 +369,8 @@ export class TextToolViewportUI {
         this.layersCtx.fillStyle = isDark ? 'rgb(33,33,33)' : 'rgb(158,158,158)';
         this.layersCtx.fillRect(0, 0, this.width, this.height);
 
-        { // bg
+        {
+            // bg
             this.layersCtx.save();
 
             this.layersCtx.translate(this.width / 2, this.height / 2);
@@ -390,18 +393,25 @@ export class TextToolViewportUI {
 
             //erase
             this.layersCtx.globalCompositeOperation = 'destination-out';
-            this.layersCtx.drawImage(this.emptyCanvas, -centerX, -centerY, this.textCanvas.width, this.textCanvas.height);
+            this.layersCtx.drawImage(
+                this.emptyCanvas,
+                -centerX,
+                -centerY,
+                this.textCanvas.width,
+                this.textCanvas.height,
+            );
 
             this.layersCtx.restore();
         }
 
-        { // individual layers
+        {
+            // individual layers
 
             if (this.scale >= 4) {
                 this.layersCtx.imageSmoothingEnabled = false;
             } else {
                 this.layersCtx.imageSmoothingEnabled = true;
-                this.layersCtx.imageSmoothingQuality  = this.scale >= 1 ? 'low' : 'medium';
+                this.layersCtx.imageSmoothingQuality = this.scale >= 1 ? 'low' : 'medium';
             }
 
             // layers below
@@ -419,10 +429,9 @@ export class TextToolViewportUI {
             this.layersCtx.restore();
 
             // target layer
-            this.layersCtx.globalAlpha = (
+            this.layersCtx.globalAlpha =
                 this.layerArr[this.layerIndex].opacity *
-                (this.layerArr[this.layerIndex].isVisible ? 1 : 0)
-            );
+                (this.layerArr[this.layerIndex].isVisible ? 1 : 0);
             this.layersCtx.globalCompositeOperation = this.layerArr[this.layerIndex].mixModeStr;
             this.layersCtx.drawImage(this.targetCanvas, 0, 0);
 
@@ -439,12 +448,9 @@ export class TextToolViewportUI {
                 }
             }
             this.layersCtx.restore();
-
         }
 
         this.layersCtx.restore();
-
-
 
         // --- final composite ---
         this.previewCtx.save();
@@ -463,20 +469,20 @@ export class TextToolViewportUI {
             Math.round(this.width / 2 - (bounds.width / 2) * this.scale) + 0.5,
             Math.round(this.height / 2 - (bounds.height / 2) * this.scale) + 0.5,
             Math.round(bounds.width * this.scale),
-            Math.round(bounds.height * this.scale)
+            Math.round(bounds.height * this.scale),
         );
         this.previewCtx.restore();
     }
 
-    getElement (): HTMLElement {
+    getElement(): HTMLElement {
         return this.rootEl;
     }
 
-    getInputsElement (): HTMLElement {
+    getInputsElement(): HTMLElement {
         return this.inputsRootEl;
     }
 
-    getValues (): TViewportParams {
+    getValues(): TViewportParams {
         return {
             x: this.text.x,
             y: this.text.y,
@@ -484,10 +490,10 @@ export class TextToolViewportUI {
         };
     }
 
-    setText (text: Omit<TRenderTextParam, 'x' | 'y' | 'angleRad'>): void {
-        const x = this. text.x;
-        const y = this. text.y;
-        const angleRad = this. text.angleRad;
+    setText(text: Omit<TRenderTextParam, 'x' | 'y' | 'angleRad'>): void {
+        const x = this.text.x;
+        const y = this.text.y;
+        const angleRad = this.text.angleRad;
         this.text = {
             ...text,
             x,
@@ -497,7 +503,7 @@ export class TextToolViewportUI {
         this.render();
     }
 
-    setSize (width: number, height: number): void {
+    setSize(width: number, height: number): void {
         if (width === this.width && height === this.height) {
             return;
         }
@@ -519,7 +525,7 @@ export class TextToolViewportUI {
         this.render();
     }
 
-    destroy (): void {
+    destroy(): void {
         BB.destroyEl(this.rootEl);
         BB.destroyEl(this.inputsRootEl);
         BB.destroyEl(this.previewWrapper);

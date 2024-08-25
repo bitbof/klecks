@@ -1,7 +1,6 @@
-
 // ideas: padding, gutter, other shapes
 
-export function drawGrid (
+export function drawGrid(
     ctx: CanvasRenderingContext2D,
     cellsX: number,
     cellsY: number,
@@ -20,8 +19,8 @@ export function drawGrid (
     ctx.strokeStyle = color;
     ctx.globalAlpha = opacity;
 
-    for(let i = 0; i < cellsX - 1; i++) {
-        const cw = w / (cellsX);
+    for (let i = 0; i < cellsX - 1; i++) {
+        const cw = w / cellsX;
         let pos = cw * (i + 1);
         if (thickIsRound) {
             pos = Math.round(pos);
@@ -30,10 +29,9 @@ export function drawGrid (
         }
         ctx.moveTo(pos, 0);
         ctx.lineTo(pos, h);
-
     }
-    for(let i = 0; i < cellsY - 1; i++) {
-        const ch = h / (cellsY);
+    for (let i = 0; i < cellsY - 1; i++) {
+        const ch = h / cellsY;
         let pos = ch * (i + 1);
         if (thickIsRound) {
             pos = Math.round(pos);

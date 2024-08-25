@@ -1,9 +1,8 @@
-import {BB} from '../../bb/bb';
-import {IRGB} from '../kl-types';
-import {IBounds} from '../../bb/bb-types';
-import {IHistoryEntry, KlHistoryInterface, THistoryInnerActions} from '../history/kl-history';
-import {ERASE_COLOR} from './erase-color';
-import {KL} from '../kl';
+import { BB } from '../../bb/bb';
+import { IRGB } from '../kl-types';
+import { IBounds } from '../../bb/bb-types';
+import { IHistoryEntry, KlHistory, THistoryInnerActions } from '../history/kl-history';
+import { ERASE_COLOR } from './erase-color';
 
 export interface IChemyBrushHistoryEntry extends IHistoryEntry {
     tool: ['brush', 'ChemyBrush'];
@@ -13,7 +12,6 @@ export interface IChemyBrushHistoryEntry extends IHistoryEntry {
 type TChemyMode = 'fill' | 'stroke';
 
 export class ChemyBrush {
-
     private context: CanvasRenderingContext2D = {} as CanvasRenderingContext2D;
     private settingColor: IRGB = {} as IRGB;
     private settingSize: number = 0.25; // radius - 0.5 - 99999
@@ -28,37 +26,31 @@ export class ChemyBrush {
 
     private isDrawing: boolean = false;
 
-    private history: KlHistoryInterface = new KL.DecoyKlHistory();
+    private history: KlHistory | undefined;
 
     private copyCanvas: HTMLCanvasElement = {} as HTMLCanvasElement;
-    private path: {x: number; y: number}[] = [];
+    private path: { x: number; y: number }[] = [];
     private minY: number = 0;
     private maxY: number = 0;
     private completeRedrawBounds: IBounds | undefined;
 
-    private updateCompleteRedrawBounds (x: number, y: number): void {
-        let bounds = { x1: x, y1: y, x2: x, y2: y};
+    private updateCompleteRedrawBounds(x: number, y: number): void {
+        let bounds = { x1: x, y1: y, x2: x, y2: y };
         if (this.settingXSymmetry) {
-            bounds = BB.updateBounds(
-                bounds,
-                {
-                    x1: -x + this.copyCanvas.width,
-                    y1: y,
-                    x2: -x + this.copyCanvas.width,
-                    y2: y,
-                }
-            );
+            bounds = BB.updateBounds(bounds, {
+                x1: -x + this.copyCanvas.width,
+                y1: y,
+                x2: -x + this.copyCanvas.width,
+                y2: y,
+            });
         }
         if (this.settingYSymmetry) {
-            bounds = BB.updateBounds(
-                bounds,
-                {
-                    x1: x,
-                    y1: -y + this.copyCanvas.height,
-                    x2: x,
-                    y2: -y + this.copyCanvas.height,
-                }
-            );
+            bounds = BB.updateBounds(bounds, {
+                x1: x,
+                y1: -y + this.copyCanvas.height,
+                x2: x,
+                y2: -y + this.copyCanvas.height,
+            });
         }
         const buffer = this.settingMode === 'stroke' ? this.settingSize + 1 : 1;
         bounds.x1 = Math.floor(bounds.x1 - buffer);
@@ -69,12 +61,12 @@ export class ChemyBrush {
         this.completeRedrawBounds = BB.updateBounds(this.completeRedrawBounds, bounds);
     }
 
-    private drawShape (): void {
+    private drawShape(): void {
         this.context.save();
         this.context.clearRect(0, 0, this.context.canvas.width, this.context.canvas.height);
         this.context.drawImage(this.copyCanvas, 0, 0);
 
-        const color = {...this.settingColor};
+        const color = { ...this.settingColor };
         if (this.settingIsEraser) {
             color.r = ERASE_COLOR;
             color.g = ERASE_COLOR;
@@ -91,7 +83,6 @@ export class ChemyBrush {
         }
 
         if (this.path.length > 1) {
-
             // path
             const path = new Path2D();
             this.path.forEach((item, index) => {
@@ -111,8 +102,10 @@ export class ChemyBrush {
             if (this.settingGradient) {
                 const startAtTop = this.path[0].x > this.path[this.path.length - 1].x;
                 const gradient = this.context.createLinearGradient(
-                    0, startAtTop ? this.minY : this.maxY,
-                    0, startAtTop ? this.maxY : this.minY,
+                    0,
+                    startAtTop ? this.minY : this.maxY,
+                    0,
+                    startAtTop ? this.maxY : this.minY,
                 );
                 gradient.addColorStop(
                     0,
@@ -121,7 +114,7 @@ export class ChemyBrush {
                         g: color.g,
                         b: color.b,
                         a: this.settingOpacity,
-                    })
+                    }),
                 );
                 gradient.addColorStop(
                     1,
@@ -130,7 +123,7 @@ export class ChemyBrush {
                         g: color.g,
                         b: color.b,
                         a: 0,
-                    })
+                    }),
                 );
                 style = gradient;
             }
@@ -138,7 +131,6 @@ export class ChemyBrush {
             // setup params
             if (this.settingMode === 'fill') {
                 this.context.fillStyle = style;
-
             } else {
                 this.context.lineWidth = this.settingSize * 2;
                 this.context.lineJoin = 'bevel';
@@ -172,9 +164,15 @@ export class ChemyBrush {
                 this.context.restore();
                 if (this.settingXSymmetry) {
                     this.context.save();
-                    this.context.translate(this.context.canvas.width / 2, this.context.canvas.height / 2);
+                    this.context.translate(
+                        this.context.canvas.width / 2,
+                        this.context.canvas.height / 2,
+                    );
                     this.context.scale(-1, -1);
-                    this.context.translate(-this.context.canvas.width / 2, -this.context.canvas.height / 2);
+                    this.context.translate(
+                        -this.context.canvas.width / 2,
+                        -this.context.canvas.height / 2,
+                    );
                     draw();
                     this.context.restore();
                 }
@@ -184,101 +182,100 @@ export class ChemyBrush {
         this.context.restore();
     }
 
-    // --- public ----
-    constructor () {
-    }
+    // ----------------------------------- public -----------------------------------
+    constructor() {}
 
-    setHistory (h: KlHistoryInterface): void {
+    setHistory(h: KlHistory): void {
         this.history = h;
     }
 
-    getSize (): number {
+    getSize(): number {
         return this.settingMode === 'stroke' ? this.settingSize : 0;
     }
 
-    setSize (s: number): void {
+    setSize(s: number): void {
         this.settingSize = s;
     }
 
-    getOpacity (): number {
+    getOpacity(): number {
         return this.settingOpacity;
     }
 
-    setOpacity (o: number): void {
+    setOpacity(o: number): void {
         this.settingOpacity = o;
     }
 
-    setColor (c: IRGB): void {
+    setColor(c: IRGB): void {
         this.settingColor = BB.copyObj(c);
     }
 
-    setContext (c: CanvasRenderingContext2D) {
+    setContext(c: CanvasRenderingContext2D) {
         this.context = c;
     }
 
-    setMode (mode: TChemyMode): void {
+    setMode(mode: TChemyMode): void {
         this.settingMode = mode;
     }
 
-    getMode (): TChemyMode {
+    getMode(): TChemyMode {
         return this.settingMode;
     }
 
-    setDistort (distort: number): void {
+    setDistort(distort: number): void {
         this.settingDistort = BB.clamp(distort, 0, 1);
     }
 
-    getDistort (): number {
+    getDistort(): number {
         return this.settingDistort;
     }
 
-    setXSymmetry (b: boolean): void {
+    setXSymmetry(b: boolean): void {
         this.settingXSymmetry = b;
     }
 
-    getXSymmetry (): boolean {
+    getXSymmetry(): boolean {
         return this.settingXSymmetry;
     }
 
-    setYSymmetry (b: boolean): void {
+    setYSymmetry(b: boolean): void {
         this.settingYSymmetry = b;
     }
 
-    getYSymmetry (): boolean {
+    getYSymmetry(): boolean {
         return this.settingYSymmetry;
     }
 
-    setGradient (b: boolean): void {
+    setGradient(b: boolean): void {
         this.settingGradient = b;
     }
 
-    getGradient (): boolean {
+    getGradient(): boolean {
         return this.settingGradient;
     }
 
-    getLockAlpha (): boolean {
+    getLockAlpha(): boolean {
         return this.settingLockLayerAlpha;
     }
 
-    setLockAlpha (b: boolean): void {
+    setLockAlpha(b: boolean): void {
         this.settingLockLayerAlpha = b;
     }
 
-    getIsEraser (): boolean {
+    getIsEraser(): boolean {
         return this.settingIsEraser;
     }
 
-    setIsEraser (b: boolean): void {
+    setIsEraser(b: boolean): void {
         this.settingIsEraser = b;
     }
 
-    getIsDrawing (): boolean {
+    getIsDrawing(): boolean {
         return this.isDrawing;
     }
 
-    startLine (x: number, y: number): void {
+    startLine(x: number, y: number): void {
         this.isDrawing = true;
-        this.path = [{x, y}];
+        this.path = [{ x, y }];
         this.minY = y;
         this.maxY = y;
         this.copyCanvas = BB.canvas(this.context.canvas.width, this.context.canvas.height);
@@ -287,7 +284,7 @@ export class ChemyBrush {
         this.updateCompleteRedrawBounds(x, y);
     }
 
-    goLine (x: number, y: number): void {
+    goLine(x: number, y: number): void {
         if (!this.isDrawing) {
             return;
         }
@@ -305,18 +302,26 @@ export class ChemyBrush {
         this.drawShape();
     }
 
-    endLine (): void {
+    endLine(): void {
         this.isDrawing = false;
-        this.completeRedrawBounds = BB.boundsInArea(this.completeRedrawBounds, this.copyCanvas.width, this.copyCanvas.height);
+        this.completeRedrawBounds = BB.boundsInArea(
+            this.completeRedrawBounds,
+            this.copyCanvas.width,
+            this.copyCanvas.height,
+        );
         if (this.path.length > 1 && this.completeRedrawBounds) {
             const historyCanvas = BB.canvas(
                 this.completeRedrawBounds.x2 - this.completeRedrawBounds.x1 + 1,
-                this.completeRedrawBounds.y2 - this.completeRedrawBounds.y1 + 1
+                this.completeRedrawBounds.y2 - this.completeRedrawBounds.y1 + 1,
             );
             const historyCtx = BB.ctx(historyCanvas);
-            historyCtx.drawImage(this.context.canvas, -this.completeRedrawBounds.x1, -this.completeRedrawBounds.y1);
+            historyCtx.drawImage(
+                this.context.canvas,
+                -this.completeRedrawBounds.x1,
+                -this.completeRedrawBounds.y1,
+            );
 
-            this.history.push({
+            this.history?.push({
                 tool: ['brush', 'ChemyBrush'],
                 actions: [
                     {
@@ -334,14 +339,14 @@ export class ChemyBrush {
         this.copyCanvas = {} as HTMLCanvasElement;
     }
 
-    drawImage (im: HTMLCanvasElement, x: number, y: number): void {
+    drawImage(im: HTMLCanvasElement, x: number, y: number): void {
         this.context.save();
         this.context.clearRect(x, y, im.width, im.height);
         this.context.drawImage(im, x, y);
         this.context.restore();
     }
 
-    drawLineSegment (x1: number, y1: number, x2: number, y2: number): void {
+    drawLineSegment(x1: number, y1: number, x2: number, y2: number): void {
         // might make sense for stroke
     }
 }

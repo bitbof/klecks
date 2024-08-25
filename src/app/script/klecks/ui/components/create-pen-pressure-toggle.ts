@@ -1,7 +1,7 @@
-import {BB} from '../../../bb/bb';
-import {LANG} from '../../../language/language';
+import { BB } from '../../../bb/bb';
+import { LANG } from '../../../language/language';
 import iconImg from '/src/app/img/ui/brush-pressure.svg';
-import {BoxToggle} from './box-toggle';
+import { BoxToggle } from './box-toggle';
 
 /**
  * small toggle button with a pen icon - representing toggling pressure sensitivity
@@ -12,7 +12,6 @@ export const createPenPressureToggle = function (
     isChecked: boolean,
     changeCallback: (b: boolean) => void,
 ): HTMLElement {
-
     const toggleEl = new BoxToggle({
         label: BB.el({
             className: 'dark-invert',
@@ -32,7 +31,6 @@ export const createPenPressureToggle = function (
             changeCallback(b);
         },
     });
-
 
     return toggleEl.getElement();
 };

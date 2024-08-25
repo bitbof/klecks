@@ -36,4 +36,3 @@ export const fonts: {
     { name: 'Tehroc', url: fontTehroc },
     { name: 'YUNGA', url: fontYunga },
 ];
-

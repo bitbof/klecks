@@ -1,8 +1,8 @@
-import {IPointerEvent} from '../event.types';
-import {copyObj} from '../../base/base';
+import { IPointerEvent } from '../event.types';
+import { copyObj } from '../../base/base';
 
 export interface ICoalescedPointerEvent extends IPointerEvent {
-    isCoalesced?: true;
+    isCoalesced: boolean;
 }
 
 /**
@@ -15,21 +15,21 @@ export interface ICoalescedPointerEvent extends IPointerEvent {
  * but how could that even work?
  */
 export class CoalescedExploder {
-
     private chainOut: ((e: ICoalescedPointerEvent) => void) | undefined;
 
-    // ---- public ----
+    // ----------------------------------- public -----------------------------------
 
-    setChainOut (func: (e: ICoalescedPointerEvent) => void) {
+    setChainOut(func: (e: ICoalescedPointerEvent) => void) {
         this.chainOut = func;
     }
 
-    chainIn (event: IPointerEvent): IPointerEvent | null {
+    chainIn(event: IPointerEvent): IPointerEvent | null {
         if (event.type === 'pointermove') {
-
             if (event.coalescedArr && event.coalescedArr.length > 0) {
                 for (let i = 0; i < event.coalescedArr.length; i++) {
-                    const eventCopy: ICoalescedPointerEvent = copyObj(event);
+                    const eventCopy: ICoalescedPointerEvent = copyObj(
+                        event,
+                    ) as ICoalescedPointerEvent;
                     if (i === 0) {
                         eventCopy.coalescedArr = [];
                     }
@@ -42,13 +42,10 @@ export class CoalescedExploder {
                     eventCopy.dX = coalescedItem.dX;
                     eventCopy.dY = coalescedItem.dY;
                     eventCopy.time = coalescedItem.time;
-                    if (i < event.coalescedArr.length - 1) {
-                        eventCopy.isCoalesced = true;
-                    }
+                    eventCopy.isCoalesced = i < event.coalescedArr.length - 1;
 
                     this.chainOut && this.chainOut(eventCopy);
                 }
-
             } else {
                 return event;
             }
@@ -58,5 +55,4 @@ export class CoalescedExploder {
 
         return null;
     }
-
 }

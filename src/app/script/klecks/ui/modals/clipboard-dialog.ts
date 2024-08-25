@@ -1,34 +1,36 @@
-import {BB} from '../../../bb/bb';
-import {showModal} from './base/showModal';
-import {CropCopy} from '../components/crop-copy';
-import {LANG} from '../../../language/language';
-import {StatusOverlay} from '../components/status-overlay';
-import {ICropRect} from '../../../bb/bb-types';
+import { BB } from '../../../bb/bb';
+import { showModal } from './base/showModal';
+import { CropCopy } from '../components/crop-copy';
+import { LANG } from '../../../language/language';
+import { StatusOverlay } from '../components/status-overlay';
+import { ICropRect } from '../../../bb/bb-types';
 
-export function clipboardDialog (
+export function clipboardDialog(
     parent: HTMLElement,
     fullCanvas: HTMLCanvasElement,
     cropCallback: (crop: ICropRect) => void,
     output: StatusOverlay,
     showCropButton: boolean,
 ): void {
-
     let clipboardItemIsSupported: boolean = false;
     try {
         clipboardItemIsSupported = !!ClipboardItem;
-    } catch (e) { /* empty */ }
+    } catch (e) {
+        /* empty */
+    }
 
     const div = document.createElement('div');
     const isSmall = window.innerWidth < 550 || window.innerHeight < 550;
 
     const topWrapper = BB.el({
-        content: LANG('crop-drag-to-crop') + (clipboardItemIsSupported ? '' : '<br>' + LANG('cropcopy-click-hold')),
+        content:
+            LANG('crop-drag-to-crop') +
+            (clipboardItemIsSupported ? '' : '<br>' + LANG('cropcopy-click-hold')),
         css: {
             textAlign: 'center',
         },
     });
     div.append(topWrapper);
-
 
     const cropCopy = new CropCopy({
         width: isSmall ? 340 : 540,
@@ -50,7 +52,7 @@ export function clipboardDialog (
     // possibly because the user denied permission."
     // So, we try to prepare blob beforehand.
     let cropTimeout: ReturnType<typeof setTimeout> | undefined;
-    function updateBlob () {
+    function updateBlob() {
         if (!clipboardItemIsSupported) {
             return;
         }
@@ -62,7 +64,7 @@ export function clipboardDialog (
         }, 50);
     }
 
-    async function toClipboard () {
+    async function toClipboard() {
         if (!blob) {
             return;
         }
@@ -91,7 +93,7 @@ export function clipboardDialog (
     });
 
     let closeFunc: () => void;
-    function blur () {
+    function blur() {
         closeFunc && closeFunc();
     }
     window.addEventListener('blur', blur);
@@ -107,11 +109,18 @@ export function clipboardDialog (
 
     showModal({
         target: parent,
-        message: '<b>' + (showCropButton ? `${LANG('cropcopy-title-copy')} / ${LANG('cropcopy-title-crop')}` : `${LANG('cropcopy-title-copy')}`) + '</b>',
+        message:
+            '<b>' +
+            (showCropButton
+                ? `${LANG('cropcopy-title-copy')} / ${LANG('cropcopy-title-crop')}`
+                : `${LANG('cropcopy-title-copy')}`) +
+            '</b>',
         div: div,
-        style: isSmall ? {} : {
-            width: '540px',
-        },
+        style: isSmall
+            ? {}
+            : {
+                  width: '540px',
+              },
         buttons: buttonArr,
         primaries: [LANG('cropcopy-btn-copy')],
         callback: function (result) {

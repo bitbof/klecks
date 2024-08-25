@@ -1,4 +1,3 @@
-
 type TKlConfig = {
     filenameBase: string; // part of filename when downloading drawing
     disableAutoFit?: boolean;

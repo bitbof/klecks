@@ -1,29 +1,26 @@
-import {Options} from '../ui/components/options';
-import {ColorOptions} from '../ui/components/color-options';
-import {getSharedFx} from '../../fx-canvas/shared-fx';
-import {IFilterApply, IFilterGetDialogParam, TFilterGetDialogResult, IRGBA} from '../kl-types';
-import {LANG} from '../../language/language';
-import {TFilterHistoryEntry} from './filters';
-import {FxPreviewRenderer} from '../ui/project-viewport/fx-preview-renderer';
-import {Preview} from '../ui/project-viewport/preview';
-import {css} from '@emotion/css/dist/emotion-css.cjs';
-import {TProjectViewportProject} from '../ui/project-viewport/project-viewport';
-import {BB} from '../../bb/bb';
-import {testIsSmall} from '../ui/utils/test-is-small';
-import {getPreviewHeight, getPreviewWidth} from '../ui/utils/preview-size';
+import { Options } from '../ui/components/options';
+import { ColorOptions } from '../ui/components/color-options';
+import { getSharedFx } from '../../fx-canvas/shared-fx';
+import { IFilterApply, IFilterGetDialogParam, TFilterGetDialogResult, IRGBA } from '../kl-types';
+import { LANG } from '../../language/language';
+import { TFilterHistoryEntry } from './filters';
+import { FxPreviewRenderer } from '../ui/project-viewport/fx-preview-renderer';
+import { Preview } from '../ui/project-viewport/preview';
+import { css } from '@emotion/css/dist/emotion-css.cjs';
+import { TProjectViewportProject } from '../ui/project-viewport/project-viewport';
+import { BB } from '../../bb/bb';
+import { testIsSmall } from '../ui/utils/test-is-small';
+import { getPreviewHeight, getPreviewWidth } from '../ui/utils/preview-size';
 
 export type TFilterToAlphaInput = {
     sourceId: string;
     selectedRgbaObj: IRGBA | null;
 };
 
-export type TFilterToAlphaHistoryEntry = TFilterHistoryEntry<
-    'toAlpha',
-    TFilterToAlphaInput>;
+export type TFilterToAlphaHistoryEntry = TFilterHistoryEntry<'toAlpha', TFilterToAlphaInput>;
 
 export const filterToAlpha = {
-
-    getDialog (params: IFilterGetDialogParam) {
+    getDialog(params: IFilterGetDialogParam) {
         const context = params.context;
         const klCanvas = params.klCanvas;
         if (!context || !klCanvas) {
@@ -42,8 +39,7 @@ export const filterToAlpha = {
             result.width = getPreviewWidth(isSmall);
         }
 
-        function finishInit () {
-
+        function finishInit() {
             const fxPreviewRenderer = new FxPreviewRenderer({
                 original: context.canvas,
                 onUpdate: (fxCanvas) => {
@@ -73,11 +69,11 @@ export const filterToAlpha = {
             rootEl.append(sourceOptions.getElement());
 
             // color
-            let selectedRgbaObj: IRGBA | null = {r: 0, g: 0, b: 0, a: 1};
+            let selectedRgbaObj: IRGBA | null = { r: 0, g: 0, b: 0, a: 1 };
             const colorOptionsArr = [
                 null,
-                {r: 0, g: 0, b: 0, a: 1},
-                {r: 255, g: 255, b: 255, a: 1},
+                { r: 0, g: 0, b: 0, a: 1 },
+                { r: 255, g: 255, b: 255, a: 1 },
                 {
                     r: params.currentColorRgb.r,
                     g: params.currentColorRgb.g,
@@ -105,12 +101,14 @@ export const filterToAlpha = {
             colorOptions.getElement().style.marginBottom = '10px';
             rootEl.append(colorOptions.getElement());
 
-
             const previewLayerArr: TProjectViewportProject['layers'] = [];
             {
                 for (let i = 0; i < layers.length; i++) {
                     previewLayerArr.push({
-                        image: i === selectedLayerIndex ? fxPreviewRenderer.render : layers[i].context.canvas,
+                        image:
+                            i === selectedLayerIndex
+                                ? fxPreviewRenderer.render
+                                : layers[i].context.canvas,
                         isVisible: layers[i].isVisible,
                         opacity: layers[i].opacity,
                         mixModeStr: layers[i].mixModeStr,
@@ -129,10 +127,12 @@ export const filterToAlpha = {
                 },
             });
             preview.render();
-            preview.getElement().classList.add(css({
-                marginLeft: '-20px',
-                marginRight: '-20px',
-            }));
+            preview.getElement().classList.add(
+                css({
+                    marginLeft: '-20px',
+                    marginRight: '-20px',
+                }),
+            );
             rootEl.append(preview.getElement());
 
             result.destroy = (): void => {
@@ -155,34 +155,37 @@ export const filterToAlpha = {
         return result;
     },
 
-
-    apply (params: IFilterApply<TFilterToAlphaInput>): boolean {
+    apply(params: IFilterApply<TFilterToAlphaInput>): boolean {
         const context = params.context;
         const history = params.history;
         const sourceId = params.input.sourceId;
         const selectedRgbaObj = params.input.selectedRgbaObj;
-        if (!context || !sourceId || !history) {
+        if (!context || !sourceId) {
             return false;
         }
-        history.pause(true);
+        history?.pause(true);
         const fxCanvas = getSharedFx();
         if (!fxCanvas) {
             return false; // todo more specific error?
         }
         const texture = fxCanvas.texture(context.canvas);
-        fxCanvas.draw(texture).toAlpha(sourceId === 'inverted-luminance', selectedRgbaObj).update();
+        fxCanvas
+            .draw(texture)
+            .toAlpha(sourceId === 'inverted-luminance', selectedRgbaObj)
+            .update();
         context.clearRect(0, 0, context.canvas.width, context.canvas.height);
         context.drawImage(fxCanvas, 0, 0);
         texture.destroy();
-        history.pause(false);
-        history.push({
+        history?.pause(false);
+        history?.push({
             tool: ['filter', 'toAlpha'],
             action: 'apply',
-            params: [{
-                input: params.input,
-            }],
+            params: [
+                {
+                    input: params.input,
+                },
+            ],
         } as TFilterToAlphaHistoryEntry);
         return true;
     },
-
 };

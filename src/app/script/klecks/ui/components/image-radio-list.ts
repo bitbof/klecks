@@ -1,5 +1,5 @@
-import {BB} from '../../../bb/bb';
-import {ImageToggle} from './image-toggle';
+import { BB } from '../../../bb/bb';
+import { ImageToggle } from './image-toggle';
 
 type TOptionItem<IdType> = {
     id: IdType;
@@ -12,7 +12,6 @@ type TOptionItem<IdType> = {
  * Radio input group. each one has an image
  */
 export class ImageRadioList<IdType> {
-
     private readonly rootEl: HTMLElement;
     private activeIndex: number;
     private readonly optionArr: {
@@ -20,14 +19,12 @@ export class ImageRadioList<IdType> {
         radioEl: ImageToggle;
     }[];
 
-    // --- public ---
-    constructor (
-        p: {
-            optionArr: TOptionItem<IdType>[];
-            initId: string;
-            onChange: (id: IdType) => void;
-        }
-    ) {
+    // ----------------------------------- public -----------------------------------
+    constructor(p: {
+        optionArr: TOptionItem<IdType>[];
+        initId: string;
+        onChange: (id: IdType) => void;
+    }) {
         this.rootEl = BB.el({
             className: 'image-radio-wrapper',
             css: {
@@ -46,7 +43,10 @@ export class ImageRadioList<IdType> {
         };
 
         let initialIndex;
-        const createOption = (index: number, o: TOptionItem<IdType>): {
+        const createOption = (
+            index: number,
+            o: TOptionItem<IdType>,
+        ): {
             id: IdType;
             radioEl: ImageToggle;
         } => {
@@ -82,16 +82,16 @@ export class ImageRadioList<IdType> {
     }
 
     // --- interface ---
-    getElement (): HTMLElement {
+    getElement(): HTMLElement {
         return this.rootEl;
     }
 
-    getValue (): IdType {
+    getValue(): IdType {
         return this.optionArr[this.activeIndex].id;
     }
 
-    destroy (): void {
-        this.optionArr.forEach(item => {
+    destroy(): void {
+        this.optionArr.forEach((item) => {
             item.radioEl.destroy();
         });
     }

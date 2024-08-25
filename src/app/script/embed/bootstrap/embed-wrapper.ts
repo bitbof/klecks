@@ -1,20 +1,20 @@
-import {Embed, IEmbedParams, IReadPSD} from '../../main-embed';
-import {IKlProject} from '../../klecks/kl-types';
+import { Embed, IEmbedParams, IReadPSD } from '../../main-embed';
+import { IKlProject } from '../../klecks/kl-types';
 import logoImg from '/src/app/img/klecks-logo.png';
-import {getEmbedUrl} from './get-embed-url';
-import {initLANG, LANG} from '../../language/language';
-import {theme} from '../../theme/theme';
-import {loadAgPsd} from '../../klecks/storage/load-ag-psd';
+import { getEmbedUrl } from './get-embed-url';
+import { initLANG, LANG } from '../../language/language';
+import { theme } from '../../theme/theme';
+import { loadAgPsd } from '../../klecks/storage/load-ag-psd';
 
 // only one instance can exist
 let wrapperCreated = false;
 
 // add missing props. modifies project object
-function processProject (project: IKlProject | undefined): void {
+function processProject(project: IKlProject | undefined): void {
     if (!project) {
         return;
     }
-    project.layers.forEach(layer => {
+    project.layers.forEach((layer) => {
         layer.isVisible = layer.isVisible === undefined ? true : layer.isVisible;
     });
 }
@@ -26,16 +26,14 @@ function processProject (project: IKlProject | undefined): void {
  * Lazy loads rest of library, shows a loading screen, exposes Embed interface
  */
 export class EmbedWrapper {
-
     private project: IKlProject | undefined;
     private errorStr: string | undefined;
-    private psds: IReadPSD[] = [];// if instance not loaded yet, these are psds to be read
+    private psds: IReadPSD[] = []; // if instance not loaded yet, these are psds to be read
 
     private instance: Embed | undefined; // instance of loaded Embed
 
-
-    // ------ public ------------------
-    constructor (p: IEmbedParams) {
+    // ----------------------------------- public -----------------------------------
+    constructor(p: IEmbedParams) {
         if (wrapperCreated) {
             throw new Error('Already created an embed');
         }
@@ -75,10 +73,17 @@ export class EmbedWrapper {
             }
             loadingScreen.id = 'loading-screen';
             const logoStyle = theme.isDark() && !p.logoImg ? ' style="filter: invert(1)"' : '';
-            loadingScreen.innerHTML = '<img width="150" height="54"' + logoStyle + ' src="' + (p.logoImg ? p.logoImg : logoImg) + '" alt="Logo"/>\n' +
+            loadingScreen.innerHTML =
+                '<img width="150" height="54"' +
+                logoStyle +
+                ' src="' +
+                (p.logoImg ? p.logoImg : logoImg) +
+                '" alt="Logo"/>\n' +
                 '<div style="margin: 15px 0 0 0; display: flex; align-items: center">\n' +
                 '<div class="spinner"></div>\n' +
-                '<span id="loading-screen-text">' + LANG('embed-init-loading') + '</span>' +
+                '<span id="loading-screen-text">' +
+                LANG('embed-init-loading') +
+                '</span>' +
                 '</div>';
             document.body.appendChild(loadingScreen);
 
@@ -103,7 +108,7 @@ export class EmbedWrapper {
         loadAgPsd();
     }
 
-    openProject (project: IKlProject) {
+    openProject(project: IKlProject) {
         processProject(project);
         if (this.instance) {
             this.instance.openProject(project);
@@ -115,7 +120,7 @@ export class EmbedWrapper {
         }
     }
 
-    initError (error: string) {
+    initError(error: string) {
         if (this.instance) {
             this.instance.initError(error);
         } else {
@@ -123,7 +128,7 @@ export class EmbedWrapper {
         }
     }
 
-    async readPSD (blob: Blob)  {
+    async readPSD(blob: Blob) {
         return new Promise((resolve, reject) => {
             const item: IReadPSD = {
                 blob,

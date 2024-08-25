@@ -1,9 +1,9 @@
-import {BB} from '../../bb/bb';
-import {IRGB, IRGBA} from '../kl-types';
-import {IBounds, IPressureInput} from '../../bb/bb-types';
-import {IHistoryEntry, KlHistoryInterface, THistoryInnerActions} from '../history/kl-history';
-import {clamp} from '../../bb/math/math';
-import {BezierLine, TBezierLineCallback} from '../../bb/math/line';
+import { BB } from '../../bb/bb';
+import { IRGB, IRGBA } from '../kl-types';
+import { IBounds, IPressureInput } from '../../bb/bb-types';
+import { IHistoryEntry, KlHistory, THistoryInnerActions } from '../history/kl-history';
+import { clamp } from '../../bb/math/math';
+import { BezierLine, TBezierLineCallback } from '../../bb/math/line';
 
 export interface IBlendBrushHistoryEntry extends IHistoryEntry {
     tool: ['brush', 'BlendBrush'];
@@ -27,7 +27,6 @@ interface IDrawBufferItem {
 }
 
 export class BlendBrush {
-
     private isTesting: boolean = false; // testing mode - context only gets updated when line is finished
 
     private context: CanvasRenderingContext2D = {} as CanvasRenderingContext2D;
@@ -40,27 +39,27 @@ export class BlendBrush {
     private settingSizePressure: boolean = true;
     private settingOpacityPressure: boolean = false;
 
-    private blendCol: IRGBA = {r: 0, g: 0, b: 0, a: 1}; // todo docs
+    private blendCol: IRGBA = { r: 0, g: 0, b: 0, a: 1 }; // todo docs
     private blendMix: number = 0.45; // todo docs
-    private mixCol: IRGB = {r: 0, g: 0, b: 0}; // todo docs
+    private mixCol: IRGB = { r: 0, g: 0, b: 0 }; // todo docs
     private localColOld: IRGBA = {} as IRGBA; // todo docs
 
     private isDrawing: boolean = false;
-    private lastInput: IPressureInput = {x: 0, y: 0, pressure: 0}; // todo docs
-    private lastInput2: IPressureInput = {x: 0, y: 0, pressure: 0}; // todo docs
+    private lastInput: IPressureInput = { x: 0, y: 0, pressure: 0 }; // todo docs
+    private lastInput2: IPressureInput = { x: 0, y: 0, pressure: 0 }; // todo docs
     private bezierLine: undefined | BezierLine;
 
-    private history: KlHistoryInterface | undefined;
+    private history: KlHistory | undefined;
     private historyEntry: IBlendBrushHistoryEntry | undefined;
     private redrawBounds: IBounds | undefined;
     private cells: (ImageData | undefined)[] = [];
     private drawBuffer: IDrawBufferItem[] = [];
 
-    private updateRedrawBounds (bounds: IBounds): void {
+    private updateRedrawBounds(bounds: IBounds): void {
         this.redrawBounds = BB.updateBounds(this.redrawBounds, bounds);
     }
 
-    private getCellsWidth (): number {
+    private getCellsWidth(): number {
         return Math.ceil(this.context.canvas.width / cellSize);
     }
 
@@ -68,7 +67,7 @@ export class BlendBrush {
      * draw changed cells (changed by brushstroke) onto context
      * @private
      */
-    private drawChangedCells (): void {
+    private drawChangedCells(): void {
         if (!this.redrawBounds) {
             return;
         }
@@ -84,7 +83,7 @@ export class BlendBrush {
         this.redrawBounds = undefined;
     }
 
-    private getTouchedCells (bounds: IBounds): boolean[] {
+    private getTouchedCells(bounds: IBounds): boolean[] {
         const touchedCells = this.cells.map(() => false);
         const cellsW = this.getCellsWidth();
         bounds = {
@@ -106,9 +105,9 @@ export class BlendBrush {
      * @param bounds
      * @private
      */
-    private sliceBounds (bounds: IBounds): {index: number; bounds: IBounds}[] {
+    private sliceBounds(bounds: IBounds): { index: number; bounds: IBounds }[] {
         const cellsW = this.getCellsWidth();
-        const result: {index: number; bounds: IBounds}[] = [];
+        const result: { index: number; bounds: IBounds }[] = [];
         const touchedCells = this.getTouchedCells(bounds);
 
         touchedCells.forEach((cell, i) => {
@@ -142,7 +141,7 @@ export class BlendBrush {
     /**
      * update copyImageData. copy over new regions if needed
      */
-    private copyFromCanvas (bounds: IBounds | undefined): void {
+    private copyFromCanvas(bounds: IBounds | undefined): void {
         if (!bounds) {
             return;
         }
@@ -157,8 +156,11 @@ export class BlendBrush {
             }
             const x = i % cellsW;
             const y = Math.floor(i / cellsW);
-            const w = (Math.min(x * cellSize + cellSize, this.context.canvas.width) - 1) % cellSize + 1;
-            const h = (Math.min(y * cellSize + cellSize, this.context.canvas.height) - 1) % cellSize + 1;
+            const w =
+                ((Math.min(x * cellSize + cellSize, this.context.canvas.width) - 1) % cellSize) + 1;
+            const h =
+                ((Math.min(y * cellSize + cellSize, this.context.canvas.height) - 1) % cellSize) +
+                1;
 
             // temp canvas to prevent main canvas from getting slowed down in chrome
             const tmpCanvas = BB.canvas(w, h);
@@ -169,8 +171,7 @@ export class BlendBrush {
         });
     }
 
-    private getAverage (x: number, y: number, size: number): IRGBA {
-
+    private getAverage(x: number, y: number, size: number): IRGBA {
         size = Math.max(0.5, size * 0.75);
         const x1 = Math.max(0, Math.floor(x - size));
         const y1 = Math.max(0, Math.floor(y - size));
@@ -185,16 +186,24 @@ export class BlendBrush {
             };
         }
 
-        let ar = 0, ag = 0, ab = 0, aa = 0, alpha;
+        let ar = 0,
+            ag = 0,
+            ab = 0,
+            aa = 0,
+            alpha;
 
         const slicedBounds = this.sliceBounds({ x1, y1, x2, y2 });
-        slicedBounds.forEach(slice => {
+        slicedBounds.forEach((slice) => {
             const width = this.cells[slice.index]!.width;
             const data = this.cells[slice.index]!.data;
             const bounds = slice.bounds;
 
             for (let i = bounds.y1; i <= bounds.y2; i += 4) {
-                for (let e = bounds.x1, e2 = i * width * 4 + bounds.x1 * 4; e <= bounds.x2; e += 4, e2 += 4 * 4) {
+                for (
+                    let e = bounds.x1, e2 = i * width * 4 + bounds.x1 * 4;
+                    e <= bounds.x2;
+                    e += 4, e2 += 4 * 4
+                ) {
                     alpha = data[e2 + 3];
                     ar += data[e2] * alpha;
                     ag += data[e2 + 1] * alpha;
@@ -218,7 +227,7 @@ export class BlendBrush {
         };
     }
 
-    private prepDot (x: number, y: number, size: number): IBounds | undefined {
+    private prepDot(x: number, y: number, size: number): IBounds | undefined {
         size = Math.max(0.5, size);
         const x1 = Math.max(0, Math.floor(x - size));
         const y1 = Math.max(0, Math.floor(y - size));
@@ -230,7 +239,7 @@ export class BlendBrush {
         return { x1, y1, x2, y2 };
     }
 
-    private drawDot (params: IDrawBufferItem): void {
+    private drawDot(params: IDrawBufferItem): void {
         // array with random numbers. faster than Math.random()
         let randI = 0;
         const randLen = params.size > 30 ? 1024 : 512; // lower lengths lead to noticeable patterns
@@ -240,7 +249,7 @@ export class BlendBrush {
         }
 
         // thin lines take more than just 1 sample
-        const sampleArr = [8,4,4,4,2,2,2,2,2,2]; // <0.5, 0.5, 1, 1.5, etc.
+        const sampleArr = [8, 4, 4, 4, 2, 2, 2, 2, 2, 2]; // <0.5, 0.5, 1, 1.5, etc.
         const samples = sampleArr[Math.floor(params.size * 2)];
         const samplesSquared: number = samples ? samples * samples : 0;
         const sampleOffsets: number[] = [];
@@ -259,9 +268,8 @@ export class BlendBrush {
         const invSharpness = 1 - sharpness;
         const sharpnessSubtrahend = sharpness / invSharpness;
         const sizeSquared = params.size * params.size;
-        const distDivisor = sizeSquared * invSharpness / params.opacity;
+        const distDivisor = (sizeSquared * invSharpness) / params.opacity;
         const alphaMinuend = (1 + sharpnessSubtrahend) * params.opacity;
-
 
         const slicedBounds = this.sliceBounds({
             x1: params.x1,
@@ -271,7 +279,7 @@ export class BlendBrush {
         });
 
         const cellsW = this.getCellsWidth();
-        slicedBounds.forEach(slice => {
+        slicedBounds.forEach((slice) => {
             const cellOffsetX = (slice.index % cellsW) * cellSize;
             const cellOffsetY = Math.floor(slice.index / cellsW) * cellSize;
             const cellWidth = this.cells[slice.index]!.width;
@@ -285,15 +293,17 @@ export class BlendBrush {
             // ri - y index within image relative to dot-center
             // re - x index within image relative to dot-center
 
-            for (let i = slice.bounds.y1, ri = i + cellOffsetY - params.y; i <= slice.bounds.y2; i++, ri++) {
+            for (
+                let i = slice.bounds.y1, ri = i + cellOffsetY - params.y;
+                i <= slice.bounds.y2;
+                i++, ri++
+            ) {
                 for (
                     let e = slice.bounds.x1,
                         e2 = i * cellWidth * 4 + slice.bounds.x1 * 4,
                         re = e + cellOffsetX - params.x;
                     e <= slice.bounds.x2;
-                    e++,
-                        e2 += 4,
-                        re++
+                    e++, e2 += 4, re++
                 ) {
                     // O = over -> brush-dot
                     // U = under -> image
@@ -301,7 +311,10 @@ export class BlendBrush {
                     let alphaO = 0;
                     if (samplesSquared) {
                         for (let f = 0; f < sampleOffsets.length; f += 2) {
-                            const dist = BB.lenSquared(re + sampleOffsets[f], ri + sampleOffsets[f + 1]);
+                            const dist = BB.lenSquared(
+                                re + sampleOffsets[f],
+                                ri + sampleOffsets[f + 1],
+                            );
                             if (dist >= sizeSquared) {
                                 continue;
                             }
@@ -321,58 +334,62 @@ export class BlendBrush {
                     }
 
                     const invAlphaO = 1 - alphaO;
-                    const alphaU =data[e2 + 3] / 255;
+                    const alphaU = data[e2 + 3] / 255;
 
                     if (this.settingLockLayerAlpha) {
-                        const underR = (params.r * alphaO) + ((data[e2]) * invAlphaO);
-                        const underG = (params.g * alphaO) + ((data[e2 + 1]) * invAlphaO);
-                        const underB = (params.b * alphaO) + ((data[e2 + 2]) * invAlphaO);
+                        const underR = params.r * alphaO + data[e2] * invAlphaO;
+                        const underG = params.g * alphaO + data[e2 + 1] * invAlphaO;
+                        const underB = params.b * alphaO + data[e2 + 2] * invAlphaO;
                         if (alphaU) {
                             data[e2] = Math.floor(underR + randArr[randI]);
                             data[e2 + 1] = Math.floor(underG + randArr[randI]);
                             data[e2 + 2] = Math.floor(underB + randArr[randI]);
                         }
                     } else {
-                        const underR = (params.r * alphaO) + ((data[e2] * alphaU) * invAlphaO);
-                        const underG = (params.g * alphaO) + ((data[e2 + 1] * alphaU) * invAlphaO);
-                        const underB = (params.b * alphaO) + ((data[e2 + 2] * alphaU) * invAlphaO);
+                        const underR = params.r * alphaO + data[e2] * alphaU * invAlphaO;
+                        const underG = params.g * alphaO + data[e2 + 1] * alphaU * invAlphaO;
+                        const underB = params.b * alphaO + data[e2 + 2] * alphaU * invAlphaO;
 
                         const newAlpha = 1 - invAlphaO * (1 - alphaU);
                         data[e2 + 3] = Math.floor(Math.min(255, newAlpha * 255) + 0.5);
                         if (newAlpha) {
-                            data[e2] = Math.floor(underR / (newAlpha) + randArr[randI]);
-                            data[e2 + 1] = Math.floor(underG / (newAlpha) + randArr[randI]);
-                            data[e2 + 2] = Math.floor(underB / (newAlpha) + randArr[randI]);
+                            data[e2] = Math.floor(underR / newAlpha + randArr[randI]);
+                            data[e2 + 1] = Math.floor(underG / newAlpha + randArr[randI]);
+                            data[e2 + 2] = Math.floor(underB / newAlpha + randArr[randI]);
                         }
                     }
                     randI = (randI + 1) % randLen;
-
                 }
             }
-
         });
     }
 
-    private calcSpacing (size: number): number {
+    private calcSpacing(size: number): number {
         return BB.mix(
             (size * 2) / 2, // until size 5.3
             (size * 2) / 9, // at size 24
-            clamp((size - 2.7) / (12 - 2.7), 0, 1)
+            clamp((size - 2.7) / (12 - 2.7), 0, 1),
         );
     }
 
-    private continueLine (x: number | undefined, y: number | undefined, p: number, isCoalesced: boolean): void {
-
+    private continueLine(
+        x: number | undefined,
+        y: number | undefined,
+        p: number,
+        isCoalesced: boolean,
+    ): void {
         this.drawBuffer = [];
 
         let localPressure;
         let localOpacity;
-        let localSize = (this.settingSizePressure) ? Math.max(1, p * this.size) : Math.max(1, this.size);
+        let localSize = this.settingSizePressure
+            ? Math.max(1, p * this.size)
+            : Math.max(1, this.size);
 
         const bDist = this.calcSpacing(localSize);
 
-        const avgX = (x === undefined) ? this.lastInput.x : x;
-        const avgY = (y === undefined) ? this.lastInput.y : y;
+        const avgX = x === undefined ? this.lastInput.x : x;
+        const avgY = y === undefined ? this.lastInput.y : y;
 
         let localColNew: IRGBA;
 
@@ -383,16 +400,27 @@ export class BlendBrush {
         } else {
             let average;
             if (isCoalesced) {
-                average = {r: this.localColOld.r, g: this.localColOld.g, b: this.localColOld.b, a: 0};
+                average = {
+                    r: this.localColOld.r,
+                    g: this.localColOld.g,
+                    b: this.localColOld.b,
+                    a: 0,
+                };
             } else {
-                const avgParams = [avgX, avgY, ((this.settingSizePressure) ? Math.max(0.5, p * this.size) : Math.max(0.5, this.size))];
+                const avgParams = [
+                    avgX,
+                    avgY,
+                    this.settingSizePressure
+                        ? Math.max(0.5, p * this.size)
+                        : Math.max(0.5, this.size),
+                ];
                 const bounds = this.prepDot(avgParams[0], avgParams[1], avgParams[2]);
                 if (bounds) {
                     this.copyFromCanvas(bounds);
                 }
                 average = this.getAverage(avgParams[0], avgParams[1], avgParams[2]);
             }
-            localColNew = {r: 0, g: 0, b: 0, a: 0};
+            localColNew = { r: 0, g: 0, b: 0, a: 0 };
 
             if (average.a > 0 && this.blendCol.a === 0) {
                 this.blendCol.r = average.r;
@@ -403,7 +431,6 @@ export class BlendBrush {
                 localColNew.g = this.blendCol.g;
                 localColNew.b = this.blendCol.b;
                 localColNew.a = this.blendCol.a;
-
             } else {
                 if (average.a === 0) {
                     average.r = this.color.r;
@@ -412,27 +439,41 @@ export class BlendBrush {
                     average.a = 1 - this.blending;
                 }
 
-                this.blendCol.r = BB.mix(this.blendCol.r, BB.mix(this.blendCol.r, average.r, this.blendMix), average.a);
-                this.blendCol.g = BB.mix(this.blendCol.g, BB.mix(this.blendCol.g, average.g, this.blendMix), average.a);
-                this.blendCol.b = BB.mix(this.blendCol.b, BB.mix(this.blendCol.b, average.b, this.blendMix), average.a);
+                this.blendCol.r = BB.mix(
+                    this.blendCol.r,
+                    BB.mix(this.blendCol.r, average.r, this.blendMix),
+                    average.a,
+                );
+                this.blendCol.g = BB.mix(
+                    this.blendCol.g,
+                    BB.mix(this.blendCol.g, average.g, this.blendMix),
+                    average.a,
+                );
+                this.blendCol.b = BB.mix(
+                    this.blendCol.b,
+                    BB.mix(this.blendCol.b, average.b, this.blendMix),
+                    average.a,
+                );
                 this.blendCol.a = Math.min(1, this.blendCol.a + average.a);
                 localColNew.r = this.blendCol.r;
                 localColNew.g = this.blendCol.g;
                 localColNew.b = this.blendCol.b;
                 localColNew.a = this.blendCol.a;
             }
-
         }
 
-
-        const bezierCallback: TBezierLineCallback  = (val) => {
+        const bezierCallback: TBezierLineCallback = (val) => {
             if (this.blending >= 1 && this.blendCol.a <= 0) {
                 return;
             }
             const factor = val.t;
             localPressure = this.lastInput2.pressure * (1 - factor) + p * factor;
-            localOpacity = (this.settingOpacityPressure) ? (this.opacity * localPressure * localPressure) : this.opacity;
-            localSize = (this.settingSizePressure) ? Math.max(0.1, localPressure * this.size) : Math.max(0.1, this.size);
+            localOpacity = this.settingOpacityPressure
+                ? this.opacity * localPressure * localPressure
+                : this.opacity;
+            localSize = this.settingSizePressure
+                ? Math.max(0.1, localPressure * this.size)
+                : Math.max(0.1, this.size);
             if (this.blending != 0) {
                 this.mixCol.r = BB.mix(this.localColOld.r, localColNew.r, factor);
                 this.mixCol.g = BB.mix(this.localColOld.g, localColNew.g, factor);
@@ -469,7 +510,7 @@ export class BlendBrush {
         }
 
         this.copyFromCanvas(this.redrawBounds);
-        this.drawBuffer.forEach(item => {
+        this.drawBuffer.forEach((item) => {
             this.drawDot(item);
         });
         this.drawBuffer = [];
@@ -477,89 +518,90 @@ export class BlendBrush {
         this.localColOld = localColNew!;
     }
 
+    // ----------------------------------- public -----------------------------------
+    constructor() {}
 
-
-
-
-    // --- public ----
-    constructor () {
-    }
-
-    setHistory (h: KlHistoryInterface): void {
+    setHistory(h: KlHistory): void {
         this.history = h;
     }
 
-    getSize (): number {
+    getSize(): number {
         return this.size;
     }
 
-    setSize (s: number): void {
+    setSize(s: number): void {
         this.size = s;
     }
 
-    getOpacity (): number {
+    getOpacity(): number {
         return this.opacity;
     }
 
-    setOpacity (o: number): void {
+    setOpacity(o: number): void {
         this.opacity = o;
     }
 
-    getBlending (): number {
+    getBlending(): number {
         return this.blending;
     }
 
-    setBlending (b: number): void {
+    setBlending(b: number): void {
         this.blending = b;
     }
 
-    setColor (c: IRGB): void {
+    setColor(c: IRGB): void {
         this.color = BB.copyObj(c);
     }
 
-    setContext (c: CanvasRenderingContext2D): void {
+    setContext(c: CanvasRenderingContext2D): void {
         this.context = c;
     }
 
-    setSizePressure (b: boolean): void {
+    setSizePressure(b: boolean): void {
         this.settingSizePressure = b;
     }
 
-    setOpacityPressure (b: boolean): void {
+    setOpacityPressure(b: boolean): void {
         this.settingOpacityPressure = b;
     }
 
-    getLockAlpha (): boolean {
+    getLockAlpha(): boolean {
         return this.settingLockLayerAlpha;
     }
 
-    setLockAlpha (b: boolean): void {
+    setLockAlpha(b: boolean): void {
         this.settingLockLayerAlpha = b;
     }
 
-    getIsDrawing (): boolean {
+    getIsDrawing(): boolean {
         return this.isDrawing;
     }
 
-    setIsTesting (b: boolean): void {
+    setIsTesting(b: boolean): void {
         this.isTesting = b;
     }
 
-    startLine (x: number, y: number, p: number): void {
+    startLine(x: number, y: number, p: number): void {
         this.historyEntry = {
             tool: ['brush', 'BlendBrush'],
             actions: [],
         };
 
-
-        const totalCells = Math.ceil(this.context.canvas.width / cellSize) * Math.ceil(this.context.canvas.height / cellSize);
-        this.cells = '0'.repeat(totalCells).split('').map(() => undefined);
+        const totalCells =
+            Math.ceil(this.context.canvas.width / cellSize) *
+            Math.ceil(this.context.canvas.height / cellSize);
+        this.cells = '0'
+            .repeat(totalCells)
+            .split('')
+            .map(() => undefined);
 
         this.isDrawing = true;
 
         p = Math.max(0, Math.min(1, p));
-        const localOpacity = (this.settingOpacityPressure) ? (this.opacity * p * p) : this.opacity;
-        const localSize = (this.settingSizePressure) ? Math.max(0.1, p * this.size) : Math.max(0.1, this.size);
+        const localOpacity = this.settingOpacityPressure ? this.opacity * p * p : this.opacity;
+        const localSize = this.settingSizePressure
+            ? Math.max(0.1, p * this.size)
+            : Math.max(0.1, this.size);
         if (this.blending === 0) {
             this.mixCol.r = this.color.r;
             this.mixCol.g = this.color.g;
@@ -570,7 +612,7 @@ export class BlendBrush {
             const average = this.getAverage(
                 x,
                 y,
-                ((this.settingSizePressure) ? Math.max(0.1, p * this.size) : Math.max(0.1, this.size))
+                this.settingSizePressure ? Math.max(0.1, p * this.size) : Math.max(0.1, this.size),
             );
             if (average.a === 0) {
                 this.blendCol = {
@@ -593,7 +635,12 @@ export class BlendBrush {
             this.mixCol.b = this.blendCol.b;
         }
 
-        this.localColOld = {r: this.mixCol.r, g: this.mixCol.g, b: this.mixCol.b, a: this.blendCol.a};
+        this.localColOld = {
+            r: this.mixCol.r,
+            g: this.mixCol.g,
+            b: this.mixCol.b,
+            a: this.blendCol.a,
+        };
 
         this.redrawBounds = undefined;
         this.drawBuffer = [];
@@ -619,14 +666,13 @@ export class BlendBrush {
         }
 
         this.copyFromCanvas(this.redrawBounds);
-        this.drawBuffer.forEach(item => {
+        this.drawBuffer.forEach((item) => {
             this.drawDot(item);
         });
         this.drawBuffer = [];
 
         this.bezierLine = new BB.BezierLine();
-        this.bezierLine.add(x, y, 0, function () {
-        });
+        this.bezierLine.add(x, y, 0, function () {});
 
         this.lastInput.x = x;
         this.lastInput.y = y;
@@ -638,7 +684,7 @@ export class BlendBrush {
         }
     }
 
-    goLine (x: number, y: number, p: number, isCoalesced: boolean): void {
+    goLine(x: number, y: number, p: number, isCoalesced: boolean): void {
         if (!this.isDrawing) {
             return;
         }
@@ -654,7 +700,7 @@ export class BlendBrush {
         }
     }
 
-    endLine (): void {
+    endLine(): void {
         if (this.bezierLine) {
             this.continueLine(undefined, undefined, this.lastInput.pressure, false);
         }
@@ -662,10 +708,9 @@ export class BlendBrush {
         this.isDrawing = false;
         this.bezierLine = undefined;
 
-
         this.drawChangedCells();
 
-        if (this.historyEntry && this.history && this.cells.find(item => !!item)) {
+        if (this.historyEntry && this.history && this.cells.find((item) => !!item)) {
             this.historyEntry.actions.push({
                 action: 'drawCells',
                 params: [this.cells],
@@ -680,7 +725,7 @@ export class BlendBrush {
      * draw cells onto context
      * @param cells
      */
-    drawCells (cells: (ImageData | undefined)[]): void {
+    drawCells(cells: (ImageData | undefined)[]): void {
         const cellsW = this.getCellsWidth();
         cells.forEach((imageData, index) => {
             if (!imageData) {
@@ -692,7 +737,7 @@ export class BlendBrush {
         });
     }
 
-    drawLineSegment (x1: number, y1: number, x2: number, y2: number): void {
+    drawLineSegment(x1: number, y1: number, x2: number, y2: number): void {
         this.lastInput.x = x2;
         this.lastInput.y = y2;
 
@@ -700,8 +745,13 @@ export class BlendBrush {
             return;
         }
 
-        const totalCells = Math.ceil(this.context.canvas.width / cellSize) * Math.ceil(this.context.canvas.height / cellSize);
-        this.cells = '0'.repeat(totalCells).split('').map(() => undefined);
+        const totalCells =
+            Math.ceil(this.context.canvas.width / cellSize) *
+            Math.ceil(this.context.canvas.height / cellSize);
+        this.cells = '0'
+            .repeat(totalCells)
+            .split('')
+            .map(() => undefined);
         this.redrawBounds = undefined;
         this.drawBuffer = [];
 
@@ -724,15 +774,24 @@ export class BlendBrush {
             };
         }
 
-        this.mixCol.r = this.color.r * (1 - this.blendCol.a) + (this.blending * this.blendCol.r + this.color.r * (1 - this.blending)) * this.blendCol.a;
-        this.mixCol.g = this.color.g * (1 - this.blendCol.a) + (this.blending * this.blendCol.g + this.color.g * (1 - this.blending)) * this.blendCol.a;
-        this.mixCol.b = this.color.b * (1 - this.blendCol.a) + (this.blending * this.blendCol.b + this.color.b * (1 - this.blending)) * this.blendCol.a;
-
+        this.mixCol.r =
+            this.color.r * (1 - this.blendCol.a) +
+            (this.blending * this.blendCol.r + this.color.r * (1 - this.blending)) *
+                this.blendCol.a;
+        this.mixCol.g =
+            this.color.g * (1 - this.blendCol.a) +
+            (this.blending * this.blendCol.g + this.color.g * (1 - this.blending)) *
+                this.blendCol.a;
+        this.mixCol.b =
+            this.color.b * (1 - this.blendCol.a) +
+            (this.blending * this.blendCol.b + this.color.b * (1 - this.blending)) *
+                this.blendCol.a;
 
         const p = 1;
-        const localOpacity = (this.settingOpacityPressure) ? (this.opacity * p * p) : this.opacity;
-        const localSize = (this.settingSizePressure) ? Math.max(0.1, p * this.size) : Math.max(0.1, this.size);
-
+        const localOpacity = this.settingOpacityPressure ? this.opacity * p * p : this.opacity;
+        const localSize = this.settingSizePressure
+            ? Math.max(0.1, p * this.size)
+            : Math.max(0.1, this.size);
 
         const mouseDist = Math.sqrt(Math.pow(x2 - x1, 2.0) + Math.pow(y2 - y1, 2.0));
         const eX = (x2 - x1) / mouseDist;
@@ -757,19 +816,21 @@ export class BlendBrush {
                 });
             }
         }
-        this.drawBuffer.forEach(item => {
+        this.drawBuffer.forEach((item) => {
             this.drawDot(item);
         });
         this.drawBuffer = [];
 
-        if (this.history && this.cells.find(item => !!item)) {
+        if (this.history && this.cells.find((item) => !!item)) {
             this.drawCells(this.cells);
             this.historyEntry = {
                 tool: ['brush', 'BlendBrush'],
-                actions: [{
-                    action: 'drawCells',
-                    params: [this.cells],
-                }],
+                actions: [
+                    {
+                        action: 'drawCells',
+                        params: [this.cells],
+                    },
+                ],
             };
             this.history.push(this.historyEntry);
             this.historyEntry = undefined;

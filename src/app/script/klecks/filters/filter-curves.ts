@@ -1,28 +1,24 @@
-import {BB} from '../../bb/bb';
-import {getSharedFx} from '../../fx-canvas/shared-fx';
-import {IFilterApply, IFilterGetDialogParam, TFilterGetDialogResult} from '../kl-types';
-import {CurvesInput, getDefaultCurvesInput, TCurvesInput} from './filter-curves/curves-input';
-import {Options} from '../ui/components/options';
-import {TFilterHistoryEntry} from './filters';
-import {FxPreviewRenderer} from '../ui/project-viewport/fx-preview-renderer';
-import {TProjectViewportProject} from '../ui/project-viewport/project-viewport';
-import {Preview} from '../ui/project-viewport/preview';
-import {css} from '@emotion/css/dist/emotion-css.cjs';
-import {testIsSmall} from '../ui/utils/test-is-small';
-import {getPreviewHeight, getPreviewWidth} from '../ui/utils/preview-size';
+import { BB } from '../../bb/bb';
+import { getSharedFx } from '../../fx-canvas/shared-fx';
+import { IFilterApply, IFilterGetDialogParam, TFilterGetDialogResult } from '../kl-types';
+import { CurvesInput, getDefaultCurvesInput, TCurvesInput } from './filter-curves/curves-input';
+import { Options } from '../ui/components/options';
+import { TFilterHistoryEntry } from './filters';
+import { FxPreviewRenderer } from '../ui/project-viewport/fx-preview-renderer';
+import { TProjectViewportProject } from '../ui/project-viewport/project-viewport';
+import { Preview } from '../ui/project-viewport/preview';
+import { css } from '@emotion/css/dist/emotion-css.cjs';
+import { testIsSmall } from '../ui/utils/test-is-small';
+import { getPreviewHeight, getPreviewWidth } from '../ui/utils/preview-size';
 
 export type TFilterCurvesInput = {
     curves: TCurvesInput;
 };
 
-export type TFilterCurvesHistoryEntry = TFilterHistoryEntry<
-    'curves',
-    TFilterCurvesInput>;
+export type TFilterCurvesHistoryEntry = TFilterHistoryEntry<'curves', TFilterCurvesInput>;
 
 export const filterCurves = {
-
-    getDialog (params: IFilterGetDialogParam) {
-
+    getDialog(params: IFilterGetDialogParam) {
         const context = params.context;
         const klCanvas = params.klCanvas;
         if (!context || !klCanvas) {
@@ -49,14 +45,15 @@ export const filterCurves = {
             },
         });
 
-
-        function finishInit (): void {
-
+        function finishInit(): void {
             const previewLayerArr: TProjectViewportProject['layers'] = [];
             {
                 for (let i = 0; i < layers.length; i++) {
                     previewLayerArr.push({
-                        image: i === selectedLayerIndex ? fxPreviewRenderer.render : layers[i].context.canvas,
+                        image:
+                            i === selectedLayerIndex
+                                ? fxPreviewRenderer.render
+                                : layers[i].context.canvas,
                         isVisible: layers[i].isVisible,
                         opacity: layers[i].opacity,
                         mixModeStr: layers[i].mixModeStr,
@@ -74,10 +71,12 @@ export const filterCurves = {
                     layers: previewLayerArr,
                 },
             });
-            preview.getElement().classList.add(css({
-                marginLeft: '-20px',
-                marginRight: '-20px',
-            }));
+            preview.getElement().classList.add(
+                css({
+                    marginLeft: '-20px',
+                    marginRight: '-20px',
+                }),
+            );
 
             const input = new CurvesInput({
                 curves,
@@ -88,8 +87,7 @@ export const filterCurves = {
             });
             const modeButtons: Options<string> = input.getModeButtons();
 
-
-            rootEl.append(input.getElement(),preview.getElement());
+            rootEl.append(input.getElement(), preview.getElement());
 
             result.destroy = (): void => {
                 input.destroy();
@@ -110,14 +108,14 @@ export const filterCurves = {
         return result;
     },
 
-    apply (params: IFilterApply<TFilterCurvesInput>): boolean {
+    apply(params: IFilterApply<TFilterCurvesInput>): boolean {
         const context = params.context;
         const curves = params.input.curves;
         const history = params.history;
-        if (!context || !history) {
+        if (!context) {
             return false;
         }
-        history.pause(true);
+        history?.pause(true);
         const fxCanvas = getSharedFx();
         if (!fxCanvas) {
             return false; // todo more specific error?
@@ -127,17 +125,17 @@ export const filterCurves = {
         context.clearRect(0, 0, context.canvas.width, context.canvas.height);
         context.drawImage(fxCanvas, 0, 0);
         texture.destroy();
-        history.pause(false);
-        history.push({
+        history?.pause(false);
+        history?.push({
             tool: ['filter', 'curves'],
             action: 'apply',
-            params: [{
-                input: params.input,
-            }],
+            params: [
+                {
+                    input: params.input,
+                },
+            ],
         } as TFilterCurvesHistoryEntry);
 
         return true;
     },
-
-
 };

@@ -66,6 +66,10 @@
     original: 'Hand Tool',
     value: 'Hand-Werkzeug'
   },
+  'tool-select': {
+    original: 'Select Tool',
+    value: 'Auswahl-Werkzeug'
+  },
   'tool-zoom': {
     original: 'Zoom',
     value: 'Zoom-Werkzeug'
@@ -546,10 +550,18 @@
     original: 'Cleared layer',
     value: 'Ebene geleert'
   },
+  'cleared-selected-area': {
+    original: 'Cleared selected area',
+    value: 'Ausgewählte Fläche geleert'
+  },
   filled: {
     hint: 'layer got filled with a color',
     original: 'Filled',
     value: 'Ebene gefüllt'
+  },
+  'filled-selected-area': {
+    original: 'Filled selection',
+    value: 'Auswahl gefüllt'
   },
   'new-title': {
     original: 'New Image',
@@ -1308,6 +1320,74 @@
     original: 'Bold',
     value: 'Fett'
   },
+  'select-select': {
+    original: 'Select',
+    value: 'Auswahl'
+  },
+  'select-transform': {
+    original: 'Transform',
+    value: 'Transformier.'
+  },
+  'select-lasso': {
+    original: 'Lasso',
+    value: 'Lasso'
+  },
+  'select-polygon': {
+    original: 'Polygon',
+    value: 'Polygon'
+  },
+  'select-boolean-replace': {
+    original: 'Replace',
+    value: 'Ersetzen'
+  },
+  'select-boolean-add': {
+    original: 'Add',
+    value: 'Hinzufügen'
+  },
+  'select-boolean-subtract': {
+    original: 'Subtract',
+    value: 'Abziehen'
+  },
+  'select-all': {
+    original: 'All',
+    value: 'Alles'
+  },
+  'select-invert': {
+    original: 'Invert',
+    value: 'Umkehren'
+  },
+  'select-reset': {
+    original: 'Reset',
+    value: 'Zurücksetzen'
+  },
+  'select-fill': {
+    original: 'Fill',
+    value: 'Füllen'
+  },
+  'select-erase': {
+    original: 'Erase',
+    value: 'Leeren'
+  },
+  'select-transform-clone': {
+    original: 'Clone',
+    value: 'Klonen'
+  },
+  'select-transform-clone-applied': {
+    original: 'Cloned',
+    value: 'Geklont'
+  },
+  'select-transform-move-to-layer': {
+    original: 'Move to layer:',
+    value: 'Auf Ebene verschieben:'
+  },
+  'select-transform-applied': {
+    original: 'Transformation applied',
+    value: 'Transformation angewendet'
+  },
+  'select-transform-empty': {
+    original: 'Selected area on active layer is empty.',
+    value: 'Die ausgewählte Fläche der Ebene ist leer.'
+  },
   'save-reminder-title': {
     hint: 'Save Reminder is a popup that shows up after 20 minutes of not saving. Allows user to save on the spot.',
     original: 'Unsaved Work',
@@ -1558,5 +1638,9 @@
   'x-minutes': {
     original: '{x}min',
     value: '{x} Min'
+  },
+  wip: {
+    original: 'Work in progress',
+    value: 'In Arbeit'
   }
 }

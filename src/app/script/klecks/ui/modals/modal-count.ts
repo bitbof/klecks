@@ -1,4 +1,3 @@
-
 // not the best
 
 /**
@@ -9,13 +8,13 @@ export class DialogCounter {
     private listeners: ((v: number) => void)[] = [];
     private count = 0;
 
-    private emit (): void {
-        this.listeners.forEach(item => {
+    private emit(): void {
+        this.listeners.forEach((item) => {
             item(this.count);
         });
     }
 
-    increase (v?: number): void {
+    increase(v?: number): void {
         if (v !== undefined) {
             this.count += v;
         } else {
@@ -23,7 +22,7 @@ export class DialogCounter {
         }
         this.emit();
     }
-    decrease (v?: number): void {
+    decrease(v?: number): void {
         if (v !== undefined) {
             this.count -= v;
         } else {
@@ -31,10 +30,10 @@ export class DialogCounter {
         }
         this.emit();
     }
-    get (): number {
+    get(): number {
         return this.count;
     }
-    subscribe (listener: (v: number) => void): void {
+    subscribe(listener: (v: number) => void): void {
         this.listeners.push(listener);
     }
 }

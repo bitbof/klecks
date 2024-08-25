@@ -1,18 +1,20 @@
-import {gl} from '../core/gl';
-import {FxShader} from '../core/fx-shader';
-import {simpleShader} from '../core/simple-shader';
-import {TFxCanvas} from '../fx-canvas-types';
+import { gl } from '../core/gl';
+import { FxShader } from '../core/fx-shader';
+import { simpleShader } from '../core/simple-shader';
+import { TFxCanvas } from '../fx-canvas-types';
 
 /**
  * unmultiplyAlpha
  * reverses alpha multiply
  */
-export type TFilterUnmultiplyAlpha = (
-    this: TFxCanvas,
-) => TFxCanvas;
+export type TFilterUnmultiplyAlpha = (this: TFxCanvas) => TFxCanvas;
 
 export const unmultiplyAlpha: TFilterUnmultiplyAlpha = function () {
-    gl.unmultiplyAlpha = gl.unmultiplyAlpha || new FxShader(null, '\
+    gl.unmultiplyAlpha =
+        gl.unmultiplyAlpha ||
+        new FxShader(
+            null,
+            '\
     uniform sampler2D texture;\
     uniform vec2 texSize;\
     varying vec2 texCoord;\
@@ -24,7 +26,9 @@ export const unmultiplyAlpha: TFilterUnmultiplyAlpha = function () {
         }\
         gl_FragColor = color;\
     }\
-', 'unmultiplyAlpha');
+',
+            'unmultiplyAlpha',
+        );
 
     simpleShader.call(this, gl.unmultiplyAlpha, {
         texSize: [this.width, this.height],

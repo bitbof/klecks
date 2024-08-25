@@ -1,27 +1,25 @@
-import {IKeyString} from '../../../../bb/bb-types';
-import {dialogCounter} from '../modal-count';
-import {BB} from '../../../../bb/bb';
-import {LANG} from '../../../../language/language';
+import { IKeyString } from '../../../../bb/bb-types';
+import { dialogCounter } from '../modal-count';
+import { BB } from '../../../../bb/bb';
+import { LANG } from '../../../../language/language';
 import './scroll-fix';
 import cancelImg from '/src/app/img/ui/cancel.svg';
 import checkImg from '/src/app/img/ui/check.svg';
 
-export function showModal (
-    p: {
-        target: HTMLElement;
-        div?: HTMLElement; // node with content
-        message: string | Element; // can be html
-        callback?: (result: string) => void;
-        buttons?: string[]; // "Ok", and "Cancel" will be automatically translated
-        primaries?: string[];
-        type?: 'error' | 'warning' | 'upload' | 'ok'; // todo
-        closeFunc?: (f: () => void) => void; // returns a function you can call to close (Cancel) the dialog
-        style?: IKeyString;
-        clickOnEnter?: string; // name of button - will be clicked if enter key pressed
-        autoFocus?: false | string; // name of  to automatically focus - default 'Ok' - false -> none
-        ignoreBackground?: boolean; // default false; if true clicking on background doesn't close
-    }
-): {
+export function showModal(p: {
+    target: HTMLElement;
+    div?: HTMLElement; // node with content
+    message: string | Element; // can be html
+    callback?: (result: string) => void;
+    buttons?: string[]; // "Ok", and "Cancel" will be automatically translated
+    primaries?: string[];
+    type?: 'error' | 'warning' | 'upload' | 'ok'; // todo
+    closeFunc?: (f: () => void) => void; // returns a function you can call to close (Cancel) the dialog
+    style?: IKeyString;
+    clickOnEnter?: string; // name of button - will be clicked if enter key pressed
+    autoFocus?: false | string; // name of  to automatically focus - default 'Ok' - false -> none
+    ignoreBackground?: boolean; // default false; if true clicking on background doesn't close
+}): {
     setIgnoreBackground: (b: boolean) => void;
 } {
     dialogCounter.increase();
@@ -100,7 +98,6 @@ export function showModal (
 
     let icon: HTMLElement | undefined = undefined;
     if (p.type) {
-
         icon = BB.el({
             className: {
                 error: 'kl-popup__icon-error',
@@ -141,7 +138,7 @@ export function showModal (
             css: {
                 flex: '1',
             },
-        })
+        }),
     );
 
     const keyListener = new BB.KeyListener({
@@ -167,7 +164,7 @@ export function showModal (
             event.preventDefault();
         }
     };
-    rootEl.addEventListener('wheel', wheelPrevent);
+    rootEl.addEventListener('wheel', wheelPrevent, { passive: false });
     rootEl.onclick = BB.handleClick;
 
     let autoFocus: string | undefined;
@@ -179,20 +176,23 @@ export function showModal (
         autoFocus = 'Ok';
     }
 
-    const buttonRowEl = p.buttons && p.buttons.length > 0 ? BB.el({
-        parent: boxEl,
-        css: {
-            display: 'flex',
-            flexWrap: 'wrap',
-            justifyContent: 'flex-end',
-            marginTop: '12px', // 8px already via buttons
-            marginLeft: '-8px',
-        },
-    }) : undefined;
+    const buttonRowEl =
+        p.buttons && p.buttons.length > 0
+            ? BB.el({
+                  parent: boxEl,
+                  css: {
+                      display: 'flex',
+                      flexWrap: 'wrap',
+                      justifyContent: 'flex-end',
+                      marginTop: '12px', // 8px already via buttons
+                      marginLeft: '-8px',
+                  },
+              })
+            : undefined;
     let clickOnEnterBtn: HTMLButtonElement | undefined;
     const btnElArr: HTMLButtonElement[] = [];
     if (p.buttons) {
-        p.buttons.forEach(buttonName => {
+        p.buttons.forEach((buttonName) => {
             const btnClasses = ['kl-popup__btn'];
             if (buttonName === 'Ok' || (p.primaries && p.primaries.includes(buttonName))) {
                 btnClasses.push('kl-button-primary');
@@ -250,7 +250,7 @@ export function showModal (
         });
     }
 
-    function close (value: string): void {
+    function close(value: string): void {
         if (isClosed) {
             return;
         }
@@ -266,7 +266,7 @@ export function showModal (
         rootEl.removeEventListener('wheel', wheelPrevent);
         // (disabled) eslint-disable-next-line no-null/no-null
         rootEl.onclick = null;
-        btnElArr.forEach(item => BB.destroyEl(item));
+        btnElArr.forEach((item) => BB.destroyEl(item));
         btnElArr.splice(0, btnElArr.length);
 
         if (p.callback) {

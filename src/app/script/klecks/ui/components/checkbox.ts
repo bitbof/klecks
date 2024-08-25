@@ -1,18 +1,17 @@
-import {BB} from '../../../bb/bb';
-import {IKeyStringOptional} from '../../../bb/bb-types';
+import { BB } from '../../../bb/bb';
+import { IKeyStringOptional } from '../../../bb/bb-types';
 
 /**
  * Checkbox - with label
  */
 export class Checkbox {
-
     private readonly element: HTMLElement;
     private check: HTMLInputElement;
     private readonly doHighlight: boolean;
 
-    // --- public ---
+    // ----------------------------------- public -----------------------------------
 
-    constructor (params: {
+    constructor(params: {
         init?: boolean; // default false
         label: string;
         callback?: (b: boolean) => void;
@@ -80,23 +79,22 @@ export class Checkbox {
         }
     }
 
-    getValue (): boolean {
+    getValue(): boolean {
         return this.check.checked;
     }
 
-    setValue (b: boolean): void {
+    setValue(b: boolean): void {
         this.check.checked = !!b;
         if (this.doHighlight) {
             this.element.classList.toggle('kl-checkbox--highlight', this.check.checked);
         }
     }
 
-    getElement (): HTMLElement {
+    getElement(): HTMLElement {
         return this.element;
     }
 
-    destroy (): void {
+    destroy(): void {
         this.check.onchange = null;
     }
-
 }

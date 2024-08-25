@@ -1,15 +1,12 @@
-import {TRenderTextParam} from '../../../image-operations/render-text';
-import {IRGB, IRGBA} from '../../../kl-types';
-import {ColorOptions} from '../../components/color-options';
-import {KlSlider} from '../../components/kl-slider';
-import {LANG} from '../../../../language/language';
-import {c} from '../../../../bb/base/c';
-import {createSvg} from '../../../../bb/base/base';
+import { TRenderTextParam } from '../../../image-operations/render-text';
+import { IRGB, IRGBA } from '../../../kl-types';
+import { ColorOptions } from '../../components/color-options';
+import { KlSlider } from '../../components/kl-slider';
+import { LANG } from '../../../../language/language';
+import { c } from '../../../../bb/base/c';
+import { createSvg } from '../../../../bb/base/base';
 
-type TFillParams = Pick<
-    TRenderTextParam,
-    'fill'
->;
+type TFillParams = Pick<TRenderTextParam, 'fill'>;
 
 export type TFillUIParams = TFillParams & {
     primaryColor: IRGB;
@@ -23,20 +20,20 @@ export class TextToolFillUI {
     private readonly colorOptions: ColorOptions;
     private readonly opacitySlider: KlSlider;
 
-
-    // ---- public ----
-    constructor (p: TFillUIParams) {
-
+    // ----------------------------------- public -----------------------------------
+    constructor(p: TFillUIParams) {
         const emit = (): void => {
             p.onUpdate(this.getValues());
         };
 
         const colorOptionsArr: (IRGBA | null)[] = [
             null,
-            p.fill ? {
-                ...p.fill.color,
-                a: 1,
-            } : null,
+            p.fill
+                ? {
+                      ...p.fill.color,
+                      a: 1,
+                  }
+                : null,
             {
                 ...p.primaryColor,
                 a: 1,
@@ -45,8 +42,8 @@ export class TextToolFillUI {
                 ...p.secondaryColor,
                 a: 1,
             },
-            {r: 0, g: 0, b: 0, a: 1},
-            {r: 255, g: 255, b: 255, a: 1},
+            { r: 0, g: 0, b: 0, a: 1 },
+            { r: 255, g: 255, b: 255, a: 1 },
         ];
 
         this.colorOptions = new ColorOptions({
@@ -99,11 +96,11 @@ export class TextToolFillUI {
         ]);
     }
 
-    getElement (): HTMLElement {
+    getElement(): HTMLElement {
         return this.rootEl;
     }
 
-    getValues (): TFillParams {
+    getValues(): TFillParams {
         const c = this.colorOptions.getValue();
         if (c === null || c?.a === 0) {
             return {
@@ -121,7 +118,7 @@ export class TextToolFillUI {
         };
     }
 
-    destroy (): void {
+    destroy(): void {
         this.colorOptions.destroy();
         this.opacitySlider.destroy();
     }

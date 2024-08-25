@@ -1,10 +1,10 @@
-import {BB} from '../../../bb/bb';
+import { BB } from '../../../bb/bb';
+import { IKeyStringOptional } from '../../../bb/bb-types';
 
 /**
  * selectable options
  */
 export class Options<IdType> {
-
     private readonly rootEl: HTMLElement;
     private selectedId: IdType;
     private readonly optionArr: {
@@ -13,7 +13,7 @@ export class Options<IdType> {
     }[];
     private readonly onChange: ((id: IdType) => void) | undefined;
 
-    private getIndex (): number {
+    private getIndex(): number {
         for (let i = 0; i < this.optionArr.length; i++) {
             if (this.optionArr[i].id === this.selectedId) {
                 return i;
@@ -22,29 +22,30 @@ export class Options<IdType> {
         return -1;
     }
 
-    private update (): void {
+    private update(): void {
         for (let i = 0; i < this.optionArr.length; i++) {
             this.optionArr[i].el.classList.toggle(
                 'kl-option-selected',
-                this.optionArr[i].id === this.selectedId
+                this.optionArr[i].id === this.selectedId,
             );
         }
     }
 
-    // ---- public ----
-    constructor (
-        p: {
-            optionArr: {
-                id: IdType;
-                label: string | HTMLElement | SVGElement;
-                title?: string;
-            }[];
-            initId?: IdType;
-            onChange?: (id: IdType) => void;
-            changeOnInit?: boolean; // trigger change on creation
-            isSmall? :boolean;
-        }
-    ) {
+    // ----------------------------------- public -----------------------------------
+    constructor(p: {
+        optionArr: {
+            id: IdType;
+            label: string | HTMLElement | SVGElement;
+            title?: string;
+        }[];
+        initId?: IdType;
+        onChange?: (id: IdType) => void;
+        /** before the change happens, check if you allow it. true -> yes */
+        onBeforeChange?: (id: IdType) => boolean;
+        changeOnInit?: boolean; // trigger change on creation
+        isSmall?: boolean;
+        optionCss?: IKeyStringOptional;
+    }) {
         this.rootEl = BB.el();
 
         const wrapperEl = BB.el({
@@ -59,14 +60,13 @@ export class Options<IdType> {
             this.onChange = p.onChange;
         }
         this.optionArr = [];
-        this.selectedId = ('initialId' in p && p.initId !== undefined) ? p.initId : p.optionArr[0].id;
+        this.selectedId = 'initialId' in p && p.initId !== undefined ? p.initId : p.optionArr[0].id;
 
         const createOption = (o: {
             id: IdType;
             label: string | HTMLElement | SVGElement;
             title?: string;
         }) => {
-
             const classArr = ['kl-option'];
             if (p.isSmall) {
                 classArr.push('kl-option--small');
@@ -87,11 +87,16 @@ export class Options<IdType> {
                     className: classArr.join(' '),
                     onClick: () => {
                         if (this.selectedId !== optionObj.id) {
+                            if (p.onBeforeChange && !p.onBeforeChange(optionObj.id)) {
+                                return;
+                            }
+
                             this.selectedId = optionObj.id;
                             this.update();
                             this.onChange && this.onChange(this.selectedId);
                         }
                     },
+                    css: p.optionCss,
                 }),
             };
 
@@ -115,32 +120,43 @@ export class Options<IdType> {
         }
     }
 
-    getElement (): HTMLElement {
+    getElement(): HTMLElement {
         return this.rootEl;
     }
 
-    getValue (): IdType {
+    getValue(): IdType {
         return this.selectedId;
     }
 
-    next (): void {
+    next(): void {
         this.selectedId = this.optionArr[(this.getIndex() + 1) % this.optionArr.length].id;
         this.update();
         this.onChange && this.onChange(this.selectedId);
     }
 
-    previous (): void {
-        this.selectedId = this.optionArr[(this.optionArr.length + this.getIndex() - 1) % this.optionArr.length].id;
+    setValue(val: IdType): void {
+        if (this.selectedId === val) {
+            return;
+        }
+        this.selectedId = val;
         this.update();
         this.onChange && this.onChange(this.selectedId);
     }
 
-    destroy (): void {
+    previous(): void {
+        this.selectedId =
+            this.optionArr[
+                (this.optionArr.length + this.getIndex() - 1) % this.optionArr.length
+            ].id;
+        this.update();
+        this.onChange && this.onChange(this.selectedId);
+    }
+
+    destroy(): void {
         this.rootEl.remove();
-        this.optionArr.forEach(item => {
+        this.optionArr.forEach((item) => {
             BB.destroyEl(item.el);
         });
         this.optionArr.splice(0, this.optionArr.length);
     }
 }
-

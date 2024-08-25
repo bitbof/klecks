@@ -1,10 +1,9 @@
-import {TViewportTransform} from '../project-viewport/project-viewport';
-import {BB} from '../../../bb/bb';
-import {IVector2D} from '../../../bb/bb-types';
-import {applyToPoint} from 'transformation-matrix';
-import {createTransformMatrix} from '../project-viewport/utils/create-transform-matrix';
-import {PointerListener} from '../../../bb/input/pointer-listener';
-
+import { TViewportTransform } from '../project-viewport/project-viewport';
+import { BB } from '../../../bb/bb';
+import { IVector2D } from '../../../bb/bb-types';
+import { applyToPoint } from 'transformation-matrix';
+import { createMatrixFromTransform } from '../../../bb/transform/create-matrix-from-transform';
+import { PointerListener } from '../../../bb/input/pointer-listener';
 
 export type TDraggableInputParams = {
     value: IVector2D;
@@ -19,20 +18,17 @@ export class DraggableInput {
     private value: IVector2D;
     private readonly pointerListener: PointerListener;
 
-    private update (): void {
-        const p = applyToPoint(
-            createTransformMatrix(this.transform),
-            this.value,
-        );
+    private update(): void {
+        const p = applyToPoint(createMatrixFromTransform(this.transform), this.value);
         BB.css(this.rootEl, {
-            left: (p.x - SIZE / 2) + 'px',
-            top: (p.y - SIZE / 2) + 'px',
+            left: p.x - SIZE / 2 + 'px',
+            top: p.y - SIZE / 2 + 'px',
         });
     }
 
-    // ------ public ------
-    constructor (p: TDraggableInputParams) {
-        this.value = {...p.value};
+    // ----------------------------------- public -----------------------------------
+    constructor(p: TDraggableInputParams) {
+        this.value = { ...p.value };
         this.transform = {
             x: 0,
             y: 0,
@@ -68,7 +64,7 @@ export class DraggableInput {
         });
     }
 
-    setTransform (transform: TViewportTransform): void {
+    setTransform(transform: TViewportTransform): void {
         if (JSON.stringify(this.transform) === JSON.stringify(transform)) {
             return;
         }
@@ -76,20 +72,20 @@ export class DraggableInput {
         this.update();
     }
 
-    getValue (): IVector2D {
+    getValue(): IVector2D {
         return this.value;
     }
 
-    setValue (p: IVector2D): void {
-        this.value = {...p};
+    setValue(p: IVector2D): void {
+        this.value = { ...p };
         this.update();
     }
 
-    getElement (): HTMLElement {
+    getElement(): HTMLElement {
         return this.rootEl;
     }
 
-    destroy (): void {
+    destroy(): void {
         this.rootEl.remove();
         this.pointerListener.destroy();
     }

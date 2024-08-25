@@ -1,31 +1,28 @@
-import {BB} from '../../../../bb/bb';
-import { TRenderTextParam} from '../../../image-operations/render-text';
-import {showModal} from '../base/showModal';
-import {IRGB} from '../../../kl-types';
-import {KlCanvas} from '../../../canvas/kl-canvas';
-import {LANG} from '../../../../language/language';
-import {TextToolFillUI} from './text-tool-fill-ui';
-import {TextToolFontUI} from './text-tool-font-ui';
-import {TextToolStrokeUI} from './text-tool-stroke-ui';
-import {TextToolTextUI} from './text-tool-text-ui';
-import {TextToolViewportUI} from './text-tool-viewport-ui';
+import { BB } from '../../../../bb/bb';
+import { TRenderTextParam } from '../../../image-operations/render-text';
+import { showModal } from '../base/showModal';
+import { IRGB } from '../../../kl-types';
+import { KlCanvas } from '../../../canvas/kl-canvas';
+import { LANG } from '../../../../language/language';
+import { TextToolFillUI } from './text-tool-fill-ui';
+import { TextToolFontUI } from './text-tool-font-ui';
+import { TextToolStrokeUI } from './text-tool-stroke-ui';
+import { TextToolTextUI } from './text-tool-text-ui';
+import { TextToolViewportUI } from './text-tool-viewport-ui';
 import * as classes from './text-tool-dialog.module.scss';
-import {c} from '../../../../bb/base/c';
-import {css} from '@emotion/css';
-import {TabRow} from '../../components/tab-row';
+import { c } from '../../../../bb/base/c';
+import { css } from '@emotion/css';
+import { TabRow } from '../../components/tab-row';
 
-export function textToolDialog (
-    p: {
-        klCanvas: KlCanvas;
-        layerIndex: number;
-        primaryColor: IRGB;
-        secondaryColor: IRGB;
+export function textToolDialog(p: {
+    klCanvas: KlCanvas;
+    layerIndex: number;
+    primaryColor: IRGB;
+    secondaryColor: IRGB;
 
-        text: TRenderTextParam;
-        onConfirm: (confirmP: TRenderTextParam) => void;
-
-    }
-): void {
+    text: TRenderTextParam;
+    onConfirm: (confirmP: TRenderTextParam) => void;
+}): void {
     const rootEl = BB.el({});
     let text = BB.copyObj(p.text);
 
@@ -37,11 +34,11 @@ export function textToolDialog (
         text: text,
         klCanvas: p.klCanvas,
         layerIndex: p.layerIndex,
-        onDragEnd: () => tabs.getOpenedTabId() === 'text' ? textUI.focus() : 0,
+        onDragEnd: () => (tabs.getOpenedTabId() === 'text' ? textUI.focus() : 0),
     });
     viewportUI.render();
 
-    function onUpdate (p: Partial<TRenderTextParam>) {
+    function onUpdate(p: Partial<TRenderTextParam>) {
         text = {
             ...text,
             ...p,
@@ -124,12 +121,14 @@ export function textToolDialog (
             },
         ],
     });
-    tabs.getElement().classList.add(css({
-        minWidth: '200px',
-        maxWidth: '500px',
-        flexGrow: '1',
-        borderBottom: 'none !important',
-    }));
+    tabs.getElement().classList.add(
+        css({
+            minWidth: '200px',
+            maxWidth: '500px',
+            flexGrow: '1',
+            borderBottom: 'none !important',
+        }),
+    );
 
     const viewportInputsCss = css({
         position: 'relative',
@@ -154,8 +153,6 @@ export function textToolDialog (
         },
     });
 
-
-
     const inputsCss = css({
         minHeight: 72,
         marginTop: '10px',
@@ -169,25 +166,19 @@ export function textToolDialog (
         },
     });
 
-    rootEl.append(c('', [
-        c(viewportWrapper, [viewportUI.getElement()]),
-        c('.' + viewportInputsCss, [viewportUI.getInputsElement()]),
-        c('.tabrow.' + tabWrapperCss, [
-            c(',w-240,h-40'),
-            tabs.getElement(),
-        ]),
+    rootEl.append(
+        c('', [
+            c(viewportWrapper, [viewportUI.getElement()]),
+            c('.' + viewportInputsCss, [viewportUI.getInputsElement()]),
+            c('.tabrow.' + tabWrapperCss, [c(',w-240,h-40'), tabs.getElement()]),
 
-        c('.' + inputsCss, [
-            c(colorWrapper, [
-                fillUI.getElement(),
-                strokeUI.getElement(),
+            c('.' + inputsCss, [
+                c(colorWrapper, [fillUI.getElement(), strokeUI.getElement()]),
+                fontUI.getElement(),
+                textUI.getElement(),
             ]),
-            fontUI.getElement(),
-            textUI.getElement(),
         ]),
-    ]));
-
-
+    );
 
     const onResize = () => {
         const b = viewportWrapper.getBoundingClientRect();
@@ -203,12 +194,11 @@ export function textToolDialog (
         textUI.focus();
     }, 100);
 
-
     // prevent mobile keyboards scrolling page
-    function onScroll (): void {
+    function onScroll(): void {
         window.scrollTo(0, 0);
     }
-    window.addEventListener('scroll', onScroll);
+    window.addEventListener('scroll', onScroll, { passive: false });
 
     const onModalExit = (val: string) => {
         window.removeEventListener('resize', onResize);
@@ -230,7 +220,6 @@ export function textToolDialog (
             });
         }
     };
-
 
     const modal = showModal({
         target: document.body,

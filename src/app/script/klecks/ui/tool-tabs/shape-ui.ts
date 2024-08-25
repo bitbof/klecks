@@ -1,16 +1,15 @@
-import {BB} from '../../../bb/bb';
-import {Options} from '../components/options';
-import {Checkbox} from '../components/checkbox';
-import {KlSlider} from '../components/kl-slider';
-import {LANG} from '../../../language/language';
-import {TShapeToolMode, TShapeToolType} from '../../kl-types';
-import {KlColorSlider} from '../components/kl-color-slider';
+import { BB } from '../../../bb/bb';
+import { Options } from '../components/options';
+import { Checkbox } from '../components/checkbox';
+import { KlSlider } from '../components/kl-slider';
+import { LANG } from '../../../language/language';
+import { TShapeToolMode, TShapeToolType } from '../../kl-types';
+import { KlColorSlider } from '../components/kl-color-slider';
 
 /**
  * Shape Tool tab contents
  */
 export class ShapeUi {
-
     private readonly rootEl: HTMLElement;
     private isVisible: boolean;
     private readonly colorDiv: HTMLElement;
@@ -22,17 +21,14 @@ export class ShapeUi {
     private readonly lineWidthSlider: KlSlider;
     private readonly outwardsToggle: Checkbox;
     private readonly fixedToggle: Checkbox;
-    private readonly snapToggle:Checkbox;
+    private readonly snapToggle: Checkbox;
     private readonly lockAlphaToggle: Checkbox;
 
+    // ----------------------------------- public -----------------------------------
 
-    // ---- public ----
-
-    constructor (
-        p: {
-            colorSlider: KlColorSlider; // when opening tab, inserts it (snatches it from where else it was)
-        }
-    ) {
+    constructor(p: {
+        colorSlider: KlColorSlider; // when opening tab, inserts it (snatches it from where else it was)
+    }) {
         this.rootEl = BB.el({
             css: {
                 margin: '10px',
@@ -51,7 +47,6 @@ export class ShapeUi {
 
         const previewSize = 35;
         const previewPadding = 8;
-
 
         const rectStrokeSvgRect = BB.createSvg({
             elementType: 'rect',
@@ -85,11 +80,10 @@ export class ShapeUi {
             display: 'block',
         });
 
-
         const ellipseStrokeSvgEllipse = BB.createSvg({
             elementType: 'ellipse',
-            cx: '' + (previewSize / 2),
-            cy: '' + (previewSize / 2),
+            cx: '' + previewSize / 2,
+            cy: '' + previewSize / 2,
             rx: '' + (previewSize / 2 - previewPadding),
         });
         const ellipseStrokeSvg = BB.createSvg({
@@ -105,8 +99,8 @@ export class ShapeUi {
 
         const ellipseFilledSvgEllipse = BB.createSvg({
             elementType: 'ellipse',
-            cx: '' + (previewSize / 2),
-            cy: '' + (previewSize / 2),
+            cx: '' + previewSize / 2,
+            cy: '' + previewSize / 2,
             rx: '' + (previewSize / 2 - previewPadding),
         });
         const ellipseFilledSvg = BB.createSvg({
@@ -119,7 +113,6 @@ export class ShapeUi {
         BB.css(ellipseFilledSvg, {
             display: 'block',
         });
-
 
         const lineSvgLine = BB.createSvg({
             elementType: 'line',
@@ -138,20 +131,30 @@ export class ShapeUi {
         });
 
         const updatePreviews = () => {
-            const strokeWidth = BB.clamp(Math.round(this.lineWidthSlider.getValue() / 10), 1, 10) + 'px';
+            const strokeWidth =
+                BB.clamp(Math.round(this.lineWidthSlider.getValue() / 10), 1, 10) + 'px';
 
             const squish = 1.35;
 
-            BB.css(rectStrokeSvgRect, { fill: 'none', stroke: 'black', strokeWidth: strokeWidth });
+            BB.css(rectStrokeSvgRect, {
+                fill: 'none',
+                stroke: 'black',
+                strokeWidth: strokeWidth,
+            });
             BB.css(rectFilledSvgRect, { fill: 'black', stroke: 'none' });
 
-            BB.css(ellipseStrokeSvgEllipse, { fill: 'none', stroke: 'black', strokeWidth: strokeWidth });
+            BB.css(ellipseStrokeSvgEllipse, {
+                fill: 'none',
+                stroke: 'black',
+                strokeWidth: strokeWidth,
+            });
             BB.css(ellipseFilledSvgEllipse, { fill: 'black', stroke: 'none' });
 
-            BB.css(
-                lineSvgLine,
-                { fill: 'none', stroke: 'black', strokeWidth: strokeWidth }
-            );
+            BB.css(lineSvgLine, {
+                fill: 'none',
+                stroke: 'black',
+                strokeWidth: strokeWidth,
+            });
 
             if (this.fixedToggle.getValue()) {
                 rectStrokeSvgRect.setAttribute('y', '' + previewPadding);
@@ -162,13 +165,25 @@ export class ShapeUi {
                 ellipseStrokeSvgEllipse.setAttribute('ry', '' + (previewSize / 2 - previewPadding));
                 ellipseFilledSvgEllipse.setAttribute('ry', '' + (previewSize / 2 - previewPadding));
             } else {
-                rectStrokeSvgRect.setAttribute('y', '' + (previewPadding * squish));
-                rectStrokeSvgRect.setAttribute('height', '' + (previewSize - previewPadding * squish * 2));
-                rectFilledSvgRect.setAttribute('y', '' + (previewPadding * squish));
-                rectFilledSvgRect.setAttribute('height', '' + (previewSize - previewPadding * squish * 2));
+                rectStrokeSvgRect.setAttribute('y', '' + previewPadding * squish);
+                rectStrokeSvgRect.setAttribute(
+                    'height',
+                    '' + (previewSize - previewPadding * squish * 2),
+                );
+                rectFilledSvgRect.setAttribute('y', '' + previewPadding * squish);
+                rectFilledSvgRect.setAttribute(
+                    'height',
+                    '' + (previewSize - previewPadding * squish * 2),
+                );
 
-                ellipseStrokeSvgEllipse.setAttribute('ry', '' + (previewSize / 2 - previewPadding * squish));
-                ellipseFilledSvgEllipse.setAttribute('ry', '' + (previewSize / 2 - previewPadding * squish));
+                ellipseStrokeSvgEllipse.setAttribute(
+                    'ry',
+                    '' + (previewSize / 2 - previewPadding * squish),
+                );
+                ellipseFilledSvgEllipse.setAttribute(
+                    'ry',
+                    '' + (previewSize / 2 - previewPadding * squish),
+                );
             }
 
             if (this.snapToggle.getValue()) {
@@ -176,7 +191,7 @@ export class ShapeUi {
                 lineSvgLine.setAttribute('y2', '' + previewPadding);
             } else {
                 lineSvgLine.setAttribute('y1', '' + (previewSize - previewPadding * squish));
-                lineSvgLine.setAttribute('y2', '' + (previewPadding * squish));
+                lineSvgLine.setAttribute('y2', '' + previewPadding * squish);
             }
         };
 
@@ -230,7 +245,7 @@ export class ShapeUi {
                     display: this.shape === 'line' ? '' : 'none',
                 });
                 BB.css(this.lineWidthSlider.getElement(), {
-                    display: (this.shape !== 'line' && this.mode === 'fill') ? 'none' : '',
+                    display: this.shape !== 'line' && this.mode === 'fill' ? 'none' : '',
                 });
             },
             changeOnInit: true,
@@ -254,12 +269,11 @@ export class ShapeUi {
         });
         this.lockAlphaToggle.getElement().style.marginTop = '10px';
 
-        row1.append(BB.el({
-            content: [
-                this.eraserToggle.getElement(),
-                this.lockAlphaToggle.getElement(),
-            ],
-        }));
+        row1.append(
+            BB.el({
+                content: [this.eraserToggle.getElement(), this.lockAlphaToggle.getElement()],
+            }),
+        );
 
         this.lineWidthSlider = new KlSlider({
             label: LANG('shape-line-width'),
@@ -337,15 +351,14 @@ export class ShapeUi {
         });
         row2.append(this.snapToggle.getElement());
 
-
         updatePreviews();
     }
 
-    getElement (): HTMLElement {
+    getElement(): HTMLElement {
         return this.rootEl;
     }
 
-    setIsVisible (pIsVisible: boolean): void {
+    setIsVisible(pIsVisible: boolean): void {
         this.isVisible = !!pIsVisible;
         this.rootEl.style.display = this.isVisible ? 'block' : 'none';
         if (this.isVisible) {
@@ -355,39 +368,39 @@ export class ShapeUi {
         }
     }
 
-    getShape (): TShapeToolType {
+    getShape(): TShapeToolType {
         return this.shape;
     }
 
-    getMode (): TShapeToolMode {
+    getMode(): TShapeToolMode {
         return this.mode;
     }
 
-    getIsEraser (): boolean {
+    getIsEraser(): boolean {
         return this.eraserToggle.getValue();
     }
 
-    getOpacity (): number {
+    getOpacity(): number {
         return this.opacitySlider.getValue();
     }
 
-    getLineWidth (): number {
+    getLineWidth(): number {
         return this.lineWidthSlider.getValue();
     }
 
-    getIsOutwards (): boolean {
+    getIsOutwards(): boolean {
         return this.outwardsToggle.getValue();
     }
 
-    getIsFixed (): boolean {
+    getIsFixed(): boolean {
         return this.fixedToggle.getValue();
     }
 
-    getIsSnap (): boolean {
+    getIsSnap(): boolean {
         return this.snapToggle.getValue();
     }
 
-    getDoLockAlpha (): boolean {
+    getDoLockAlpha(): boolean {
         return this.lockAlphaToggle.getValue();
     }
 }

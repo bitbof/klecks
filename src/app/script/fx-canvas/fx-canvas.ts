@@ -1,22 +1,22 @@
-import {brightnessContrast} from './filters/brightness-contrast';
-import {FxShader} from './core/fx-shader';
-import {gl, setGl} from './core/gl';
-import {FxTexture} from './core/fx-texture';
-import {curves} from './filters/curves';
-import {hueSaturation} from './filters/hue-saturation';
-import {noise} from './filters/noise';
-import {triangleBlur} from './filters/triangle-blur';
-import {tiltShift} from './filters/tilt-shift';
-import {matrixWarp} from './filters/matrix-warp';
-import {unsharpMask} from './filters/unsharp-mask';
-import {toAlpha} from './filters/to-alpha';
-import {invert} from './filters/invert';
-import {perspective} from './filters/perspective';
-import {unmultiplyAlpha} from './filters/unmultiply-alpha';
-import {distort} from './filters/distort';
-import {multiplyAlpha} from './filters/multiply-alpha';
-import {TFxCanvas, TFxGl, TFxSupportedElements, TWrappedTexture} from './fx-canvas-types';
-import {BB} from '../bb/bb';
+import { brightnessContrast } from './filters/brightness-contrast';
+import { FxShader } from './core/fx-shader';
+import { gl, setGl } from './core/gl';
+import { FxTexture } from './core/fx-texture';
+import { curves } from './filters/curves';
+import { hueSaturation } from './filters/hue-saturation';
+import { noise } from './filters/noise';
+import { triangleBlur } from './filters/triangle-blur';
+import { tiltShift } from './filters/tilt-shift';
+import { matrixWarp } from './filters/matrix-warp';
+import { unsharpMask } from './filters/unsharp-mask';
+import { toAlpha } from './filters/to-alpha';
+import { invert } from './filters/invert';
+import { perspective } from './filters/perspective';
+import { unmultiplyAlpha } from './filters/unmultiply-alpha';
+import { distort } from './filters/distort';
+import { multiplyAlpha } from './filters/multiply-alpha';
+import { TFxCanvas, TFxGl, TFxSupportedElements, TWrappedTexture } from './fx-canvas-types';
+import { BB } from '../bb/bb';
 
 /*
  * based on glfx.js
@@ -35,9 +35,8 @@ import {BB} from '../bb/bb';
  * - filter - an image effect (represents one or more WebGL shaders)
  * - canvas - an image buffer that stores the results (a WebGL <canvas> tag)
  */
-export const fxCanvas: (() => TFxCanvas) = (function () {
-
-    function wrapTexture (texture: FxTexture): TWrappedTexture {
+export const fxCanvas: () => TFxCanvas = (function () {
+    function wrapTexture(texture: FxTexture): TWrappedTexture {
         return {
             _: texture,
             loadContentsOf: function (element) {
@@ -53,11 +52,11 @@ export const fxCanvas: (() => TFxCanvas) = (function () {
         };
     }
 
-    function texture (element: TFxSupportedElements) {
+    function texture(element: TFxSupportedElements) {
         return wrapTexture(FxTexture.fromElement(element));
     }
 
-    function getTextureType (): GLenum {
+    function getTextureType(): GLenum {
         let textureType: GLenum = gl.UNSIGNED_BYTE;
 
         // Go for floating point buffer textures if we can, it'll make the bokeh
@@ -83,7 +82,7 @@ export const fxCanvas: (() => TFxCanvas) = (function () {
         return textureType;
     }
 
-    function initialize (this: TFxCanvas, width: number, height: number): void {
+    function initialize(this: TFxCanvas, width: number, height: number): void {
         const textureType = getTextureType();
         if (this._.texture) {
             this._.texture.destroy();
@@ -96,19 +95,38 @@ export const fxCanvas: (() => TFxCanvas) = (function () {
         this._.texture = new FxTexture(width, height, gl.RGBA, textureType);
         this._.spareTexture = new FxTexture(width, height, gl.RGBA, textureType);
         this._.extraTexture = this._.extraTexture || new FxTexture(0, 0, gl.RGBA, textureType);
-        this._.flippedShader = this._.flippedShader || new FxShader(null, `
+        this._.flippedShader =
+            this._.flippedShader ||
+            new FxShader(
+                null,
+                `
 uniform sampler2D texture;
 varying vec2 texCoord;
 void main() {
     gl_FragColor = texture2D(texture, vec2(texCoord.x, 1.0 - texCoord.y));
 }
-        `, 'flippedShader');
+        `,
+                'flippedShader',
+            );
         this._.isInitialized = true;
     }
 
-    function draw (this: TFxCanvas, texture: TWrappedTexture, width?: number, height?: number): TFxCanvas {
-        if (!this._.isInitialized || texture._.width != this.width || texture._.height != this.height) {
-            initialize.call(this, width ? width : texture._.width, height ? height : texture._.height);
+    function draw(
+        this: TFxCanvas,
+        texture: TWrappedTexture,
+        width?: number,
+        height?: number,
+    ): TFxCanvas {
+        if (
+            !this._.isInitialized ||
+            texture._.width != this.width ||
+            texture._.height != this.height
+        ) {
+            initialize.call(
+                this,
+                width ? width : texture._.width,
+                height ? height : texture._.height,
+            );
         }
 
         texture._.use();
@@ -119,14 +137,19 @@ void main() {
         return this;
     }
 
-    function update (this: TFxCanvas): TFxCanvas {
+    function update(this: TFxCanvas): TFxCanvas {
         this._.texture.use();
         this._.flippedShader.drawRect();
         return this;
     }
 
-    function contents (this: TFxCanvas): TWrappedTexture {
-        const texture = new FxTexture(this._.texture.width, this._.texture.height, gl.RGBA, gl.UNSIGNED_BYTE);
+    function contents(this: TFxCanvas): TWrappedTexture {
+        const texture = new FxTexture(
+            this._.texture.width,
+            this._.texture.height,
+            gl.RGBA,
+            gl.UNSIGNED_BYTE,
+        );
         this._.texture.use();
         texture.drawTo(function () {
             FxShader.getDefaultShader().drawRect();
@@ -138,7 +161,7 @@ void main() {
        Get a Uint8 array of pixel values: [r, g, b, a, r, g, b, a, ...]
        Length of the array will be width * height * 4.
     */
-    function getPixelArray (this: TFxCanvas): Uint8Array {
+    function getPixelArray(this: TFxCanvas): Uint8Array {
         const w = this._.texture.width;
         const h = this._.texture.height;
         const array = new Uint8Array(w * h * 4);
@@ -157,16 +180,19 @@ void main() {
         };
     }
 
-    function getWebGlContext (canvas: HTMLCanvasElement, options?: WebGLContextAttributes): WebGLRenderingContext | null {
+    function getWebGlContext(
+        canvas: HTMLCanvasElement,
+        options?: WebGLContextAttributes,
+    ): WebGLRenderingContext | null {
         const contextNames = ['webgl', 'experimental-webgl', 'webgl2'];
         let context: WebGLRenderingContext | null = null;
-        contextNames.forEach(name => {
+        contextNames.forEach((name) => {
             if (context) {
                 return;
             }
             // get.webgl.org does a try-catch
             try {
-                context = canvas.getContext(name, options) as (typeof context);
+                context = canvas.getContext(name, options) as typeof context;
             } catch (e) {
                 /* empty */
             }
@@ -180,7 +206,7 @@ void main() {
         }
 
         const canvas: TFxCanvas = BB.canvas(1, 1) as TFxCanvas;
-        const context = getWebGlContext(canvas, {premultipliedAlpha: false});
+        const context = getWebGlContext(canvas, { premultipliedAlpha: false });
         if (!context) {
             throw 'This browser does not support WebGL';
         }

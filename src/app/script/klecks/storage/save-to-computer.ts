@@ -1,19 +1,18 @@
-import {BB} from '../../bb/bb';
-import {KL} from '../kl';
-import {KlCanvas} from '../canvas/kl-canvas';
-import {TExportType} from '../kl-types';
-import {SaveReminder} from '../ui/components/save-reminder';
-import {saveAs} from '../../bb/base/save-as';
-import {Psd} from 'ag-psd/dist/psd';
-import {klConfig} from '../kl-config';
+import { BB } from '../../bb/bb';
+import { KL } from '../kl';
+import { KlCanvas } from '../canvas/kl-canvas';
+import { TExportType } from '../kl-types';
+import { SaveReminder } from '../ui/components/save-reminder';
+import { saveAs } from '../../bb/base/save-as';
+import { Psd } from 'ag-psd/dist/psd';
+import { klConfig } from '../kl-config';
 
 export class SaveToComputer {
-
     /**
      * Using old code, because saving somehow doesn't work for ipad before ios 13,
      * and it doesn't even throw an exception.
      */
-    private saveImage (canvas: HTMLCanvasElement, filename: string, mimeType: string): void {
+    private saveImage(canvas: HTMLCanvasElement, filename: string, mimeType: string): void {
         const parts = canvas.toDataURL(mimeType).match(/data:([^;]*)(;base64)?,([0-9A-Za-z+/]+)/);
 
         if (!parts) {
@@ -28,17 +27,17 @@ export class SaveToComputer {
         for (let i = 0; i < view.length; i++) {
             view[i] = binStr.charCodeAt(i);
         }
-        const blob = new Blob([view], {'type': parts[1]});
+        const blob = new Blob([view], { type: parts[1] });
         saveAs(blob, filename);
     }
 
-    constructor (
+    constructor(
         private saveReminder: SaveReminder,
         private getExportType: () => TExportType,
-        private getKlCanvas: () => KlCanvas,
+        private klCanvas: KlCanvas,
     ) {}
 
-    save (format?: 'psd' | 'layers' | 'png'): void {
+    save(format?: 'psd' | 'layers' | 'png'): void {
         this.saveReminder.reset();
 
         if (!format) {
@@ -49,10 +48,11 @@ export class SaveToComputer {
             const extension = 'png';
             const mimeType = 'image/png';
             const filename = BB.getDate() + klConfig.filenameBase + '.' + extension;
-            const fullCanvas = this.getKlCanvas().getCompleteCanvas(1);
+            const fullCanvas = this.klCanvas.getCompleteCanvas(1);
             try {
                 this.saveImage(fullCanvas, filename, mimeType);
-            } catch (error) { //fallback for old browsers
+            } catch (error) {
+                //fallback for old browsers
                 alert('could not save');
                 throw new Error('failed png export');
             }
@@ -60,7 +60,7 @@ export class SaveToComputer {
             const extension = 'png';
             const mimeType = 'image/png';
             const fileBase = BB.getDate() + klConfig.filenameBase;
-            const layerArr = this.getKlCanvas().getLayersFast();
+            const layerArr = this.klCanvas.getLayersFast();
             for (let i = 0; i < layerArr.length; i++) {
                 const item = layerArr[i];
                 const fnameArr = [
@@ -75,14 +75,13 @@ export class SaveToComputer {
                 this.saveImage(item.canvas, fnameArr.join(''), mimeType);
             }
         } else if (format === 'psd') {
-
-            const layerArr = this.getKlCanvas().getLayersFast();
+            const layerArr = this.klCanvas.getLayersFast();
 
             const psdConfig: Psd = {
-                width: this.getKlCanvas().getWidth(),
-                height: this.getKlCanvas().getHeight(),
+                width: this.klCanvas.getWidth(),
+                height: this.klCanvas.getHeight(),
                 children: [],
-                canvas: this.getKlCanvas().getCompleteCanvas(1),
+                canvas: this.klCanvas.getCompleteCanvas(1),
             };
             for (let i = 0; i < layerArr.length; i++) {
                 const item = layerArr[i];
@@ -97,16 +96,17 @@ export class SaveToComputer {
                 });
             }
 
-            KL.loadAgPsd().then((agPsdLazy) => {
-                const buffer = agPsdLazy.writePsdBuffer(psdConfig);
-                const blob = new Blob([buffer], { type: 'application/octet-stream' });
-                saveAs(blob, BB.getDate() + klConfig.filenameBase + '.psd');
-            }).catch(() => {
-                alert('Error: failed to load PSD library');
-            });
-
+            KL.loadAgPsd()
+                .then((agPsdLazy) => {
+                    const buffer = agPsdLazy.writePsdBuffer(psdConfig);
+                    const blob = new Blob([buffer], {
+                        type: 'application/octet-stream',
+                    });
+                    saveAs(blob, BB.getDate() + klConfig.filenameBase + '.psd');
+                })
+                .catch(() => {
+                    alert('Error: failed to load PSD library');
+                });
         }
-
     }
-
 }

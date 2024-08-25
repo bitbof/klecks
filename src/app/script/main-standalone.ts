@@ -3,22 +3,22 @@
  */
 
 import './polyfills/polyfills';
-import {KL} from './klecks/kl';
-import {klHistory} from './klecks/history/kl-history';
-import {KlApp} from './app/kl-app';
-import {IKlProject} from './klecks/kl-types';
-import {ProjectStore} from './klecks/storage/project-store';
-import {initLANG, LANG} from './language/language';
+import { KL } from './klecks/kl';
+import { KlApp } from './app/kl-app';
+import { IKlProject } from './klecks/kl-types';
+import { ProjectStore } from './klecks/storage/project-store';
+import { initLANG, LANG } from './language/language';
 import '../script/theme/theme';
+import { nullToUndefined } from './bb/base/base';
 
-function initError (e: Error): void {
+function initError(e: Error): void {
     const el = document.createElement('div');
     el.style.textAlign = 'center';
     el.style.background = '#fff';
     el.style.padding = '20px';
     el.innerHTML = '<h1>App failed to initialize</h1>';
     const errorMsg = document.createElement('div');
-    errorMsg.textContent = 'Error: ' + (e.message ? e.message : ('' + e));
+    errorMsg.textContent = 'Error: ' + (e.message ? e.message : '' + e);
     el.append(errorMsg);
     document.body.append(el);
     console.error(e);
@@ -38,7 +38,7 @@ function initError (e: Error): void {
         return;
     }
 
-    function onProjectLoaded (project: IKlProject | null, projectStore: ProjectStore) {
+    function onProjectLoaded(project: IKlProject | null, projectStore: ProjectStore) {
         if (klApp) {
             throw 'onKlProjectObjLoaded called more than once';
         }
@@ -47,7 +47,6 @@ function initError (e: Error): void {
         loadingScreenEl?.remove();
 
         const saveReminder = new KL.SaveReminder(
-            klHistory,
             true,
             true,
             () => klApp.saveAsPsd(),
@@ -57,13 +56,7 @@ function initError (e: Error): void {
             null,
             null,
         );
-        klApp = new KlApp(
-            project,
-            {
-                saveReminder,
-                projectStore,
-            }
-        );
+        klApp = new KlApp({ project: nullToUndefined(project), saveReminder, projectStore });
         saveReminder.init();
         if (project) {
             setTimeout(() => {
@@ -74,7 +67,7 @@ function initError (e: Error): void {
         document.body.append(klApp.getEl());
     }
 
-    async function onDomLoaded () {
+    async function onDomLoaded() {
         try {
             window.removeEventListener('DOMContentLoaded', onDomLoaded);
             const projectStore = new KL.ProjectStore();
@@ -84,7 +77,7 @@ function initError (e: Error): void {
                 if (readResult) {
                     project = readResult.project;
                 }
-            } catch(e) {
+            } catch (e) {
                 let message: string;
                 if ((e as Error).message.indexOf('db-error') === 0) {
                     message = 'Failed to access Browser Storage';
@@ -104,7 +97,6 @@ function initError (e: Error): void {
         } catch (e) {
             initError(e as Error);
         }
-
     }
     if (domIsLoaded) {
         onDomLoaded();
@@ -112,4 +104,3 @@ function initError (e: Error): void {
         window.addEventListener('DOMContentLoaded', onDomLoaded);
     }
 })();
-

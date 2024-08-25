@@ -1,4 +1,4 @@
-import {EmbedWrapper} from './app/script/embed/bootstrap/embed-wrapper';
+import { EmbedWrapper } from './app/script/embed/bootstrap/embed-wrapper';
 /**
  * by bitbof (bitbof.com)
  */

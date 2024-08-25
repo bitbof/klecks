@@ -1,12 +1,18 @@
-import {BB} from '../../bb/bb';
-import {Checkbox} from '../ui/components/checkbox';
-import {KlCanvasPreview} from '../canvas-ui/canvas-preview';
-import {IFilterApply, IFilterGetDialogParam, TFilterGetDialogResult, IKlBasicLayer, TMixMode} from '../kl-types';
-import {LANG} from '../../language/language';
-import {throwIfNull} from '../../bb/base/base';
-import {TFilterHistoryEntry} from './filters';
-import {Options} from '../ui/components/options';
-import {smallPreview} from '../ui/utils/preview-size';
+import { BB } from '../../bb/bb';
+import { Checkbox } from '../ui/components/checkbox';
+import { KlCanvasPreview } from '../ui/project-viewport/kl-canvas-preview';
+import {
+    IFilterApply,
+    IFilterGetDialogParam,
+    TFilterGetDialogResult,
+    IKlBasicLayer,
+    TMixMode,
+} from '../kl-types';
+import { LANG } from '../../language/language';
+import { throwIfNull } from '../../bb/base/base';
+import { TFilterHistoryEntry } from './filters';
+import { Options } from '../ui/components/options';
+import { smallPreview } from '../ui/utils/preview-size';
 
 export type TFilterFlipInput = {
     horizontal: boolean;
@@ -14,13 +20,10 @@ export type TFilterFlipInput = {
     flipCanvas: boolean;
 };
 
-export type TFilterFlipHistoryEntry = TFilterHistoryEntry<
-    'flip',
-    TFilterFlipInput>;
+export type TFilterFlipHistoryEntry = TFilterHistoryEntry<'flip', TFilterFlipInput>;
 
 export const filterFlip = {
-
-    getDialog (params: IFilterGetDialogParam) {
+    getDialog(params: IFilterGetDialogParam) {
         const context = params.context;
         const klCanvas = params.klCanvas;
         if (!context || !klCanvas) {
@@ -31,7 +34,8 @@ export const filterFlip = {
         const selectedLayerIndex = klCanvas.getLayerIndex(context.canvas);
 
         const fit = BB.fitInto(context.canvas.width, context.canvas.height, 280, 200, 1);
-        const w = parseInt('' + fit.width), h = parseInt('' + fit.height);
+        const w = parseInt('' + fit.width),
+            h = parseInt('' + fit.height);
 
         const rootEl = BB.el();
         const result: TFilterGetDialogResult<TFilterFlipInput> = {
@@ -40,7 +44,6 @@ export const filterFlip = {
         let isHorizontal = true;
         let isVertical = false;
         let doFlipCanvas = true;
-
 
         const horizontalCheckbox = new Checkbox({
             init: isHorizontal,
@@ -88,7 +91,6 @@ export const filterFlip = {
 
         rootEl.append(targetOptions.getElement());
 
-
         const previewWrapper = BB.el({
             className: 'kl-preview-wrapper',
             css: {
@@ -119,8 +121,8 @@ export const filterFlip = {
         previewInnerWrapper.append(klCanvasPreview.getElement());
         previewWrapper.append(previewInnerWrapper);
 
-        function updatePreview (): void {
-            const ctx = BB.ctx((previewLayer.image as HTMLCanvasElement));
+        function updatePreview(): void {
+            const ctx = BB.ctx(previewLayer.image as HTMLCanvasElement);
             ctx.save();
             ctx.clearRect(0, 0, previewLayer.image.width, previewLayer.image.height);
 
@@ -156,14 +158,19 @@ export const filterFlip = {
                 }
                 ctx.globalAlpha = layers[i].opacity;
                 ctx.globalCompositeOperation = layers[i].mixModeStr;
-                ctx.drawImage(layers[i].context.canvas, 0, 0, previewLayer.image.width, previewLayer.image.height);
+                ctx.drawImage(
+                    layers[i].context.canvas,
+                    0,
+                    0,
+                    previewLayer.image.width,
+                    previewLayer.image.height,
+                );
                 ctx.restore();
             }
             klCanvasPreview.render();
             ctx.restore();
         }
         setTimeout(updatePreview, 0);
-
 
         rootEl.append(previewWrapper);
         result.destroy = (): void => {
@@ -183,33 +190,34 @@ export const filterFlip = {
         return result;
     },
 
-    apply (params: IFilterApply<TFilterFlipInput>): boolean {
+    apply(params: IFilterApply<TFilterFlipInput>): boolean {
         const context = params.context;
         const klCanvas = params.klCanvas;
         const history = params.history;
         const horizontal = params.input.horizontal;
         const vertical = params.input.vertical;
         const flipCanvas = params.input.flipCanvas;
-        if (!context || !klCanvas || !history) {
+        if (!context || !klCanvas) {
             return false;
         }
 
-        history.pause(true);
+        history?.pause(true);
         klCanvas.flip(
             horizontal,
             vertical,
             flipCanvas ? undefined : throwIfNull(klCanvas.getLayerIndex(context.canvas)),
         );
-        history.pause(false);
+        history?.pause(false);
 
-        history.push({
+        history?.push({
             tool: ['filter', 'flip'],
             action: 'apply',
-            params: [{
-                input: params.input,
-            }],
+            params: [
+                {
+                    input: params.input,
+                },
+            ],
         } as TFilterFlipHistoryEntry);
         return true;
     },
-
 };

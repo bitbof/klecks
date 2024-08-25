@@ -1,5 +1,5 @@
-import {dist} from '../../math/math';
-import {IPointerEvent} from '../event.types';
+import { dist } from '../../math/math';
+import { IPointerEvent } from '../event.types';
 
 /**
  * A ChainElement. Detects a single tap with N 'touch' pointers
@@ -8,7 +8,6 @@ import {IPointerEvent} from '../event.types';
  * out IPointerEvent
  */
 export class NFingerTapper {
-
     private readonly minSilenceBeforeDurationMs = 50;
     private readonly maxTapMs = 500;
     private readonly maxFirstLastFingerDownMs = 250;
@@ -37,7 +36,7 @@ export class NFingerTapper {
         tapTimeout: null,
     };
 
-    private failGesture (): void {
+    private failGesture(): void {
         if (this.eventQueueArr.length === 0) {
             return;
         }
@@ -50,7 +49,7 @@ export class NFingerTapper {
         this.fingerArr = [];
     }
 
-    private success (): void {
+    private success(): void {
         this.timeoutObj.firstLastDownTimeout && clearTimeout(this.timeoutObj.firstLastDownTimeout);
         this.timeoutObj.tapTimeout && clearTimeout(this.timeoutObj.tapTimeout);
         this.eventQueueArr = []; // events get swallowed
@@ -58,18 +57,21 @@ export class NFingerTapper {
         this.onTap();
     }
 
-    private setupTimeout (timeoutStr: 'firstLastDownTimeout' | 'tapTimeout', timeMS: number): boolean {
+    private setupTimeout(
+        timeoutStr: 'firstLastDownTimeout' | 'tapTimeout',
+        timeMS: number,
+    ): boolean {
         const diff = timeMS - this.nowTime;
         //console.log(fingers + ': ' + timeoutStr + ' diff', diff);
-        if (diff <= 0) { // time already up
+        if (diff <= 0) {
+            // time already up
             return false;
         }
         this.timeoutObj[timeoutStr] = setTimeout(() => this.failGesture(), diff);
         return true;
     }
 
-    private processEvent (event: IPointerEvent): true | void {
-
+    private processEvent(event: IPointerEvent): true | void {
         const tempLastEventTime = this.lastEventTime;
         this.lastEventTime = event.time;
 
@@ -85,7 +87,8 @@ export class NFingerTapper {
         }
 
         if (event.pointerType !== 'touch') {
-            if (this.fingerArr.length > 0) { // already in gesture -> fail
+            if (this.fingerArr.length > 0) {
+                // already in gesture -> fail
                 this.failGesture();
             }
             return;
@@ -95,21 +98,31 @@ export class NFingerTapper {
 
         if (event.type === 'pointerdown') {
             //console.log('down');
-            if (this.fingerArr.length + 1 !== this.pointersDownIdArr.length) { // failed before, and some fingers are still down -> fail
+            if (this.fingerArr.length + 1 !== this.pointersDownIdArr.length) {
+                // failed before, and some fingers are still down -> fail
                 this.failGesture();
                 return;
             }
-            if (this.fingerArr.length === this.fingers) { // too many fingers down -> fail
+            if (this.fingerArr.length === this.fingers) {
+                // too many fingers down -> fail
                 //console.log(fingers + ': too many fingers down -> fail');
                 this.failGesture();
                 return;
             }
-            if (this.fingerArr.length > 0 && event.time - this.maxFirstLastFingerDownMs > this.fingerArr[0].downTimeMs) { // took too long to touch with all fingers -> fail
+            if (
+                this.fingerArr.length > 0 &&
+                event.time - this.maxFirstLastFingerDownMs > this.fingerArr[0].downTimeMs
+            ) {
+                // took too long to touch with all fingers -> fail
                 //console.log(fingers + ': took too long to touch with all fingers -> fail');
                 this.failGesture();
                 return;
             }
-            if (this.fingerArr.length === 0 && event.time - this.minSilenceBeforeDurationMs < tempLastEventTime) { // not enough silence before -> fail
+            if (
+                this.fingerArr.length === 0 &&
+                event.time - this.minSilenceBeforeDurationMs < tempLastEventTime
+            ) {
+                // not enough silence before -> fail
                 //console.log(fingers + ': not enough silence before -> fail');
                 this.failGesture();
                 return;
@@ -118,11 +131,17 @@ export class NFingerTapper {
             if (this.fingerArr.length === 0) {
                 this.firstDownTime = event.time;
 
-                if (!this.setupTimeout('firstLastDownTimeout', event.time + this.maxFirstLastFingerDownMs) || !this.setupTimeout('tapTimeout', event.time + this.maxTapMs)) { // timeouts already up -> fail
+                if (
+                    !this.setupTimeout(
+                        'firstLastDownTimeout',
+                        event.time + this.maxFirstLastFingerDownMs,
+                    ) ||
+                    !this.setupTimeout('tapTimeout', event.time + this.maxTapMs)
+                ) {
+                    // timeouts already up -> fail
                     this.failGesture();
                     return;
                 }
-
             }
             this.fingerArr.push({
                 pointerId: event.pointerId,
@@ -131,11 +150,9 @@ export class NFingerTapper {
                 downPageY: event.pageY,
             });
             return;
-
         }
 
         if (event.type === 'pointermove') {
-
             if (this.fingerArr.length === 0) {
                 //not in a gesture -> ignore
                 return;
@@ -148,35 +165,42 @@ export class NFingerTapper {
                     break;
                 }
             }
-            if (fingerObj === null) { // finger not part of the tap is on screen -> fail
+            if (fingerObj === null) {
+                // finger not part of the tap is on screen -> fail
                 this.failGesture();
                 return;
             }
 
-            if (event.time - this.maxTapMs > this.firstDownTime) { // tap took too long -> fail
+            if (event.time - this.maxTapMs > this.firstDownTime) {
+                // tap took too long -> fail
                 //console.log(fingers + ': tap took too long -> fail');
                 this.failGesture();
                 return;
             }
 
-            const distance = dist(event.pageX, event.pageY, fingerObj.downPageX, fingerObj.downPageY);
-            if (distance > this.maxPressedDistancePx) { // finger moved too much -> fail
+            const distance = dist(
+                event.pageX,
+                event.pageY,
+                fingerObj.downPageX,
+                fingerObj.downPageY,
+            );
+            if (distance > this.maxPressedDistancePx) {
+                // finger moved too much -> fail
                 //console.log(fingers + ': a finger moved too much -> fail', distance);
                 this.failGesture();
                 return;
             }
-
         }
 
         if (event.type === 'pointerup') {
-
             if (this.fingerArr.length === 0) {
                 //not in a gesture -> ignore
                 return;
             }
 
             //console.log('up', event.pageX, event.pageY);
-            if (this.fingerArr.length !== this.fingers) { // not enough fingers -> fail
+            if (this.fingerArr.length !== this.fingers) {
+                // not enough fingers -> fail
                 //console.log(fingers + ': not enough fingers -> fail');
                 this.failGesture();
                 return;
@@ -195,14 +219,21 @@ export class NFingerTapper {
                 return;
             }
 
-            if (event.time - this.maxTapMs > this.firstDownTime) { // tap took too long -> fail
+            if (event.time - this.maxTapMs > this.firstDownTime) {
+                // tap took too long -> fail
                 //console.log(fingers + ': tap took too long -> fail');
                 this.failGesture();
                 return;
             }
 
-            const distance = dist(event.pageX, event.pageY, fingerObj.downPageX, fingerObj.downPageY);
-            if (distance > this.maxPressedDistancePx) { // finger moved too much -> fail
+            const distance = dist(
+                event.pageX,
+                event.pageY,
+                fingerObj.downPageX,
+                fingerObj.downPageY,
+            );
+            if (distance > this.maxPressedDistancePx) {
+                // finger moved too much -> fail
                 //console.log(fingers + ': b finger moved too much -> fail', distance, event.pageX, event.pageY);
                 //console.log(fingerArr);
                 this.failGesture();
@@ -220,30 +251,21 @@ export class NFingerTapper {
             }
             //console.log('fingerArr', fingerArr);
 
-            if (allAreUp) { // success
+            if (allAreUp) {
+                // success
                 this.success();
                 return true;
             }
-
         }
-
-
     }
 
-    // ---- public ----
-    constructor (
-        p: {
-            fingers: number;
-            onTap: () => void;
-        }
-    ) {
+    // ----------------------------------- public -----------------------------------
+    constructor(p: { fingers: number; onTap: () => void }) {
         this.fingers = p.fingers;
         this.onTap = p.onTap;
     }
 
-
-    chainIn (event: IPointerEvent): (IPointerEvent | null) {
-
+    chainIn(event: IPointerEvent): IPointerEvent | null {
         const result = this.processEvent(event);
 
         //console.log(fingerArr.length);
@@ -259,12 +281,9 @@ export class NFingerTapper {
         }
 
         return null;
-
     }
 
-    setChainOut (func: (e: IPointerEvent) => void): void {
+    setChainOut(func: (e: IPointerEvent) => void): void {
         this.chainOut = func;
     }
-
-
 }

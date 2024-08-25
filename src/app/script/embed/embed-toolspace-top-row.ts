@@ -1,8 +1,8 @@
-import {BB} from '../bb/bb';
+import { BB } from '../bb/bb';
 import uiSwapImg from '/src/app/img/ui/ui-swap-lr.svg';
 import helpImg from '/src/app/img/ui/help.svg';
-import {LANG} from '../language/language';
-import {PointerListener} from '../bb/input/pointer-listener';
+import { LANG } from '../language/language';
+import { PointerListener } from '../bb/input/pointer-listener';
 
 /**
  * Topmost row of buttons in toolspace. (embed)
@@ -11,12 +11,11 @@ import {PointerListener} from '../bb/input/pointer-listener';
  * @constructor
  */
 export class EmbedToolspaceTopRow {
-
     private readonly rootEl: HTMLElement;
 
-    // ---- public ----
+    // ----------------------------------- public -----------------------------------
 
-    constructor (p: {onSubmit: () => void; onLeftRight: () => void; onHelp: () => void}) {
+    constructor(p: { onSubmit: () => void; onLeftRight: () => void; onHelp: () => void }) {
         this.rootEl = BB.el({
             className: 'kl-toolspace-row',
             css: {
@@ -25,7 +24,7 @@ export class EmbedToolspaceTopRow {
             },
         });
 
-        function createButton (p: {
+        function createButton(p: {
             title: string;
             content?: HTMLElement;
             image?: string;
@@ -42,7 +41,7 @@ export class EmbedToolspaceTopRow {
                 title: p.title,
                 onClick: p.onClick,
                 css: {
-                    padding: p.content ? '' : (p.contain ? padding + 'px 0' : ''),
+                    padding: p.content ? '' : p.contain ? padding + 'px 0' : '',
                 },
             });
             if (p.content) {
@@ -51,7 +50,7 @@ export class EmbedToolspaceTopRow {
                 const im = BB.el({
                     className: 'dark-invert',
                     css: {
-                        backgroundImage: 'url(\'' + p.image + '\')',
+                        backgroundImage: "url('" + p.image + "')",
                         backgroundRepeat: 'no-repeat',
                         backgroundPosition: 'center',
                         backgroundSize: p.contain ? 'contain' : '',
@@ -62,7 +61,8 @@ export class EmbedToolspaceTopRow {
                 im.style.pointerEvents = 'none';
                 el.append(im);
             }
-            const pointerListener = new BB.PointerListener({ // because :hover causes problems w touch
+            const pointerListener = new BB.PointerListener({
+                // because :hover causes problems w touch
                 target: el,
                 onEnterLeave: function (isOver): void {
                     el.classList.toggle('toolspace-row-button-hover', isOver);
@@ -110,7 +110,7 @@ export class EmbedToolspaceTopRow {
         this.rootEl.append(submitButton.el, leftRightButton.el, helpButton.el);
     }
 
-    getElement (): HTMLElement {
+    getElement(): HTMLElement {
         return this.rootEl;
     }
 }

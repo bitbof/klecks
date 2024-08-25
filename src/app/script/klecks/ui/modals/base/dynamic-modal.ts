@@ -1,7 +1,7 @@
-import {KeyListener} from '../../../../bb/input/key-listener';
-import {dialogCounter} from '../modal-count';
-import {BB} from '../../../../bb/bb';
-import {LANG} from '../../../../language/language';
+import { KeyListener } from '../../../../bb/input/key-listener';
+import { dialogCounter } from '../modal-count';
+import { BB } from '../../../../bb/bb';
+import { LANG } from '../../../../language/language';
 import './scroll-fix';
 import cancelImg from '/src/app/img/ui/cancel.svg';
 
@@ -10,7 +10,6 @@ import cancelImg from '/src/app/img/ui/cancel.svg';
  * currently only used for iframe popups.
  */
 export class DynamicModal {
-
     private readonly parent: HTMLElement;
     private readonly rootEl: HTMLElement;
     private readonly updatePos: () => void;
@@ -19,22 +18,19 @@ export class DynamicModal {
     private readonly bgEl: HTMLElement;
     private readonly onClose: ((result?: string) => void) | undefined;
 
+    // ----------------------------------- public -----------------------------------
+    constructor(p: {
+        title?: HTMLElement;
+        content?: HTMLElement;
+        buttonArr?: string[];
+        autoFocus?: string | false; // todo - not implemented
+        clickOnEnter?: string; // button name - todo not implemented
+        onClose?: (result?: string) => void;
 
-    // ---- public ----
-    constructor (
-        p: {
-            title?: HTMLElement;
-            content?: HTMLElement;
-            buttonArr?: string[];
-            autoFocus?: string | false; // todo - not implemented
-            clickOnEnter?: string; // button name - todo not implemented
-            onClose?: (result?: string) => void;
-
-            //size and position
-            width: number;
-            isMaxHeight: boolean; // todo - not implemented
-        }
-    ) {
+        //size and position
+        width: number;
+        isMaxHeight: boolean; // todo - not implemented
+    }) {
         dialogCounter.increase();
         this.onClose = p.onClose;
         this.parent = document.body;
@@ -74,9 +70,9 @@ export class DynamicModal {
             className: 'kl-d-modal',
             css: {
                 position: 'absolute',
-                width: (BB.isCssMinMaxSupported() ?
-                    'min(calc(100% - 40px), ' + (p.width ? p.width : 400) + 'px)' :
-                    (p.width ? p.width : 400) + 'px'),
+                width: BB.isCssMinMaxSupported()
+                    ? 'min(calc(100% - 40px), ' + (p.width ? p.width : 400) + 'px)'
+                    : (p.width ? p.width : 400) + 'px',
                 height: 'calc(100% - 40px)',
                 borderRadius: '10px',
                 overflow: 'hidden',
@@ -90,7 +86,7 @@ export class DynamicModal {
 
             BB.css(popupEl, {
                 left: Math.max(0, (window.innerWidth - elW) / 2) + 'px',
-                top: Math.max(20, (window.innerHeight - elH) / 2 - (elH * 0.20)) + 'px',
+                top: Math.max(20, (window.innerHeight - elH) / 2 - elH * 0.2) + 'px',
             });
         };
 
@@ -106,7 +102,7 @@ export class DynamicModal {
                 display: 'flex',
                 justifyContent: 'space-between',
                 alignItems: 'center',
-                paddingLeft: (titleHeight / 2) + 'px',
+                paddingLeft: titleHeight / 2 + 'px',
             },
         });
         if (p.title) {
@@ -152,7 +148,7 @@ export class DynamicModal {
     }
 
     // ---- interface ----
-    close (): void {
+    close(): void {
         dialogCounter.decrease();
         BB.destroyEl(this.rootEl);
         this.rootEl.remove();

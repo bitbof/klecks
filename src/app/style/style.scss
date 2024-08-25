@@ -11,32 +11,34 @@
 
 @keyframes consoleIn {
     from {
-        opacity: 0.0;
+        opacity: 0;
     }
     to {
-        opacity: 1.0;
+        opacity: 1;
     }
 }
 
 @keyframes consoleInFast {
     0% {
-        opacity: 0.0;
+        opacity: 0;
     }
     10% {
-        opacity: 1.0;
+        opacity: 1;
     }
 }
 
 @keyframes consoleOut {
     from {
-        opacity: 1.0;
+        opacity: 1;
     }
     to {
-        opacity: 0.0;
+        opacity: 0;
     }
 }
 
-*, *::before, *::after {
+*,
+*::before,
+*::after {
     box-sizing: border-box;
 }
 
@@ -47,8 +49,9 @@ body {
     color-scheme: light;
 }
 
-body, html {
-    -webkit-tap-highlight-color: rgba(0,0,0,0);
+body,
+html {
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
     touch-action: none;
 
     text-size-adjust: none;
@@ -57,22 +60,25 @@ body, html {
     -ms-text-size-adjust: none;
 }
 
-.g-root { /* some browsers like to overwrite body */
+.g-root {
+    /* some browsers like to overwrite body */
     font-size: 16px;
     font-family: system-ui, sans-serif;
 }
 
-a:link, a:not([href]) {
+a:link,
+a:not([href]) {
     color: var(--kl-color);
     text-decoration: underline;
     cursor: pointer;
 }
 a:visited {
     color: #536184;
-     text-decoration: underline;
- }
+    text-decoration: underline;
+}
 
-a:hover, a:not([href]):hover {
+a:hover,
+a:not([href]):hover {
     color: #000;
     text-decoration: underline;
 }
@@ -103,11 +109,13 @@ a:hover, a:not([href]):hover {
 
 .kl-toolspace-row {
     background: linear-gradient(to top, rgba(255, 255, 255, 0) 20%, rgba(255, 255, 255, 0.6) 100%);
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px #cecece;
+    box-shadow:
+        0 1px 3px rgba(0, 0, 0, 0.1),
+        0 1px #cecece;
 }
 
 .nohighlight {
-    -webkit-tap-highlight-color:  rgba(255, 255, 255, 0);
+    -webkit-tap-highlight-color: rgba(255, 255, 255, 0);
 }
 
 .toolspace-row-button {
@@ -122,25 +130,25 @@ a:hover, a:not([href]):hover {
     top: 0;
     width: 100%;
     height: 100%;
-    -webkit-tap-highlight-color:  rgba(255, 255, 255, 0);
+    -webkit-tap-highlight-color: rgba(255, 255, 255, 0);
 }
 .toolspace-svg-triangle-button {
     cursor: pointer;
-    -webkit-tap-highlight-color:  rgba(255, 255, 255, 0);
+    -webkit-tap-highlight-color: rgba(255, 255, 255, 0);
 }
 
 .toolspace-row-button-hover {
     background: rgba(255, 255, 255, 0.7);
 }
 
-.toolspace-row-button:active, .toolspace-triangle-button:active {
+.toolspace-row-button:active,
+.toolspace-triangle-button:active {
     background-color: #ddd;
     box-shadow: inset 2px 2px 10px rgba(0, 0, 0, 0.2) !important;
 }
 
 .toolspace-svg-triangle-button-hover {
     fill: rgba(255, 255, 255, 0.7);
-
 }
 
 .toolspace-svg-triangle-button:active {
@@ -159,9 +167,9 @@ a:hover, a:not([href]):hover {
 }
 
 .toolspace-row-button-disabled {
-     opacity: 0.5;
-     pointer-events: none;
- }
+    opacity: 0.5;
+    pointer-events: none;
+}
 
 .kl-tool-row-border-right {
     border-right: 1px solid rgb(212, 212, 212);
@@ -170,7 +178,9 @@ a:hover, a:not([href]):hover {
 .kl-color-picker {
 }
 
-.kl-color-picker__h, .kl-color-picker__sv, .kl-color-picker__preview {
+.kl-color-picker__h,
+.kl-color-picker__sv,
+.kl-color-picker__preview {
     box-shadow: 0 0 0 1px rgb(188, 188, 188);
 }
 
@@ -207,7 +217,7 @@ a:hover, a:not([href]):hover {
 
 .slider-wrapper {
     border-radius: 8px;
-    box-shadow: 0.5px 1px 0 0 rgba(255,255,255,0.8);
+    box-shadow: 0.5px 1px 0 0 rgba(255, 255, 255, 0.8);
     text-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
     background: linear-gradient(to bottom, #909090 1%, #b3b3b3 73%);
     color: #333;
@@ -227,12 +237,10 @@ a:hover, a:not([href]):hover {
 
 .slider-inner {
     background-color: #fff;
-    background-image: linear-gradient(
-            to top,
-            rgb(232, 232, 232) 0%,
-            rgba(255, 255, 255, 1) 70%
-    );
-    box-shadow: inset 1px 1px 1px rgba(0, 0, 0, 0.3), 2px 2px 6px rgba(145, 145, 145, 0.49);
+    background-image: linear-gradient(to top, rgb(232, 232, 232) 0%, rgba(255, 255, 255, 1) 70%);
+    box-shadow:
+        inset 1px 1px 1px rgba(0, 0, 0, 0.3),
+        2px 2px 6px rgba(145, 145, 145, 0.49);
     border-radius: 6px 0 0 0;
 }
 
@@ -247,13 +255,12 @@ a:hover, a:not([href]):hover {
     background-color: #eaeaea;
     cursor: ew-resize;
     transition: box-shadow 0.2s ease-in-out;
-    box-shadow: 0 0 3px rgba(0,0,0,0.8);
+    box-shadow: 0 0 3px rgba(0, 0, 0, 0.8);
 
     &:active {
-        box-shadow: 0 0 6px rgba(0,0,0,1);
+        box-shadow: 0 0 6px rgba(0, 0, 0, 1);
     }
 }
-
 
 button {
     padding: 5px;
@@ -263,16 +270,19 @@ button {
     color: #666;
     border: none;
     background-color: #f3f3f3;
-    border-radius: 3px;
+    border-radius: 4px;
 
     background-image: linear-gradient(
-            to top,
-            rgba(111, 111, 111, 0.1) 0%,
-            rgba(255, 255, 255, 0) 60%,
-            rgba(255, 255, 255, 0.3) 100%
+        to top,
+        rgba(111, 111, 111, 0.1) 0%,
+        rgba(255, 255, 255, 0) 60%,
+        rgba(255, 255, 255, 0.3) 100%
     );
 
-    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.04), 0 1px rgba(0,0,0,0.1), 0 2px 3px rgba(0,0,0,0.05);
+    box-shadow:
+        0 0 0 1px rgba(0, 0, 0, 0.04),
+        0 1px rgba(0, 0, 0, 0.1),
+        0 2px 3px rgba(0, 0, 0, 0.05);
     user-select: none;
     -webkit-user-select: none;
 }
@@ -285,7 +295,9 @@ button:hover {
 
 button:active {
     background-color: #ddd;
-    box-shadow: inset 2px 2px 10px rgba(0, 0, 0, 0.2), 0 2px 2px #ddd;
+    box-shadow:
+        inset 2px 2px 10px rgba(0, 0, 0, 0.2),
+        0 2px 2px #ddd;
 }
 
 button:disabled {
@@ -295,12 +307,12 @@ button:disabled {
     color: #999;
     border: none;
     background-color: #ddd;
-    border-radius: 3px;
+    border-radius: 4px;
 
     background-image: linear-gradient(
-            to top,
-            rgba(255, 255, 255, 0) 60%,
-            rgba(255, 255, 255, 0.3) 100%
+        to top,
+        rgba(255, 255, 255, 0) 60%,
+        rgba(255, 255, 255, 0.3) 100%
     );
     cursor: default;
     box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.05);
@@ -321,17 +333,17 @@ button img {
 }
 .kl-button-primary:hover {
     background-image: linear-gradient(
-                    to top,
-                    var(--kl-color) -50%,
-                    var(--active-highlight-color) 150%
+        to top,
+        var(--kl-color) -50%,
+        var(--active-highlight-color) 150%
     );
     color: #fff;
 }
 .kl-button-primary:active {
     background-image: linear-gradient(
-                    to top,
-                    var(--kl-color) -50%,
-                    var(--active-highlight-color) 120%
+        to top,
+        var(--kl-color) -50%,
+        var(--active-highlight-color) 120%
     );
     color: #fff;
     box-shadow: unset;
@@ -397,8 +409,7 @@ button img {
 .kl-popup__icon-error,
 .kl-popup__icon-ok,
 .kl-popup__icon-warning,
-.kl-popup__icon-upload,
-{
+.kl-popup__icon-upload {
     background-size: cover;
     background-repeat: no-repeat;
     width: 1.1rem;
@@ -430,7 +441,6 @@ button img {
 
 @keyframes topOverlayPulse {
     0% {
-
     }
     10% {
         padding-top: 12px;
@@ -441,7 +451,6 @@ button img {
         background-color: var(--kl-color);
     }
     100% {
-
     }
 }
 
@@ -477,8 +486,8 @@ button img {
     -webkit-user-select: none; // safari
 }
 .kl-checkbox--highlight {
-     background: #bed5ff;
- }
+    background: #bed5ff;
+}
 
 .kl-checkbox__inner {
     cursor: pointer;
@@ -500,9 +509,14 @@ button img {
     transition: all 0.1s linear;
     // border-radius: 5px;
     box-sizing: border-box;
-    background-image: linear-gradient(to top, rgba(188, 188, 188, 0.1) 0%, rgba(255, 255, 255, 0.3) 100%);
+    background-image: linear-gradient(
+        to top,
+        rgba(188, 188, 188, 0.1) 0%,
+        rgba(255, 255, 255, 0.3) 100%
+    );
 
-    .kl-layer__label, .kl-layer__opacity-label {
+    .kl-layer__label,
+    .kl-layer__opacity-label {
         color: #666;
     }
 }
@@ -525,7 +539,8 @@ button img {
     margin-bottom: 10px;
 }
 
-textarea, input {
+textarea,
+input {
     border: 1px solid #b2b2b2;
     box-sizing: border-box;
     background: #fff;
@@ -533,13 +548,15 @@ textarea, input {
     font-size: 0.95em;
 }
 
-textarea:focus, input:focus {
+textarea:focus,
+input:focus {
     border: 1px solid #636363;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     background: #fff;
 }
 
-.kl-textarea::placeholder, .kl-input::placeholder {
+.kl-textarea::placeholder,
+.kl-input::placeholder {
     color: #929292;
 }
 
@@ -558,7 +575,8 @@ textarea:focus, input:focus {
     filter: brightness(0.5);
 }
 
-.brush-alpha, .brush-alpha--selected {
+.brush-alpha,
+.brush-alpha--selected {
     width: 35px;
     height: 35px;
     cursor: pointer;
@@ -588,7 +606,7 @@ iframe {
 }
 
 .tabrow {
-    background: linear-gradient( to top, rgb(208, 208, 208) 0%, rgba(208, 208, 208, 0) 80% );
+    background: linear-gradient(to top, rgb(208, 208, 208) 0%, rgba(208, 208, 208, 0) 80%);
     border-bottom: 1px solid rgba(255, 255, 255, 0.7);
     display: flex;
 }
@@ -613,10 +631,13 @@ iframe {
 
 .tabrow__tab:active:not(.tabrow__tab--opened-accented, .tabrow__tab--opened) {
     background-color: #ddd;
-    box-shadow: inset 2px 2px 10px rgba(0, 0, 0, 0.2), 0 2px 2px #ddd;
+    box-shadow:
+        inset 2px 2px 10px rgba(0, 0, 0, 0.2),
+        0 2px 2px #ddd;
 }
 
-.tabrow__tab--opened, .tabrow__tab--opened-accented {
+.tabrow__tab--opened,
+.tabrow__tab--opened-accented {
     background-color: #f5f5f5;
     opacity: 1;
     cursor: default;
@@ -627,8 +648,9 @@ iframe {
     box-shadow: inset 0 2px 0 0 var(--active-highlight-color);
 }
 
-.tabrow__tab--opened-accented:not(:first-child):before, .tabrow__tab--opened:not(:first-child):before {
-    content:" ";
+.tabrow__tab--opened-accented:not(:first-child):before,
+.tabrow__tab--opened:not(:first-child):before {
+    content: ' ';
     width: 0;
     height: 0;
     border-left: 2px solid transparent;
@@ -639,8 +661,9 @@ iframe {
     bottom: 0px;
 }
 
-.tabrow__tab--opened-accented:not(:last-child):after, .tabrow__tab--opened:not(:last-child):after {
-    content:" ";
+.tabrow__tab--opened-accented:not(:last-child):after,
+.tabrow__tab--opened:not(:last-child):after {
+    content: ' ';
     width: 0;
     height: 0;
     border-left: 0px solid transparent;
@@ -664,7 +687,7 @@ iframe {
     margin: 4px 0 0 4px;
     font-size: 16px;
     border-radius: 4px;
-    transition: all 0.1s ease-in-out;
+    // transition: all 0.1s ease-in-out;
 
     background: var(--ui-bg-color);
     color: rgba(0, 0, 0, 0.6);
@@ -672,6 +695,15 @@ iframe {
 
     user-select: none;
     -webkit-user-select: none; // safari
+
+    &:not(.kl-option-selected) {
+        &:hover {
+            background: #eee;
+        }
+        &:active {
+            box-shadow: inset 0 0 0 2px rgba(0, 0, 0, 0.3);
+        }
+    }
 }
 
 .kl-option--small {
@@ -683,13 +715,13 @@ iframe {
 }
 
 .kl-option--custom-el:not(.kl-option-selected) > * {
-    opacity: 0.5;
+    opacity: 0.6;
 }
 
 .kl-option-selected {
     background: #fff;
     color: #000;
-    box-shadow: inset 0 0 0 1px var(--active-highlight-color);
+    box-shadow: inset 0 0 0 2px var(--active-highlight-color);
     cursor: default;
 }
 
@@ -698,19 +730,28 @@ iframe {
     padding: 6px 10px;
     font-size: 16px;
     border-radius: 4px;
-    transition: all 0.1s ease-in-out;
+    //transition: all 0.1s ease-in-out;
 
     color: rgba(0, 0, 0, 0.6);
     box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.3);
 
     user-select: none;
     -webkit-user-select: none; // safari
+
+    &:not(.kl-box-toggle--active) {
+        &:hover {
+            background: #eee;
+        }
+        &:active {
+            box-shadow: inset 0 0 0 2px rgba(0, 0, 0, 0.3);
+        }
+    }
 }
 
 .kl-box-toggle--active {
     background: #fff;
     color: #000;
-    box-shadow: inset 0 0 0 1px var(--active-highlight-color);
+    box-shadow: inset 0 0 0 2px var(--active-highlight-color);
     cursor: default;
 }
 
@@ -728,19 +769,25 @@ iframe {
     user-select: none;
     text-align: center;
     color: #aaa;
+    border-radius: 4px;
+
+    &:not(.kl-color-option--active):active {
+        box-shadow: 0 0 0 2px #aaa;
+    }
 }
 
 .kl-color-option--active {
-    box-shadow: 0 0 0 2px var(--active-highlight-color), 0 0 5px 0 var(--active-highlight-color);
+    box-shadow:
+        0 0 0 2px var(--active-highlight-color),
+        0 0 5px 0 var(--active-highlight-color);
 }
-
 
 .tool-dropdown-wrapper {
     background: rgb(241, 241, 241);
     animation-name: dropdownOpen;
     animation-duration: 0.1s;
     animation-timing-function: ease-in-out;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
 }
 
 .tool-dropdown-button:hover {
@@ -766,10 +813,20 @@ iframe {
     width: 23px;
     height: 23px;
     cursor: pointer;
+    border-radius: 4px;
+
+    &:not(.image-toggle-active) {
+        &:hover {
+            background: #fff;
+        }
+        &:active {
+            box-shadow: #838383 0 0 0 2px;
+        }
+    }
 }
 .image-toggle:not(.image-toggle-active) {
     box-shadow: #838383 0 0 0 1px;
-    opacity: 0.4;
+    opacity: 0.6;
 }
 .image-toggle-active {
     box-shadow: var(--active-highlight-color) 0 0 0 2px;
@@ -782,7 +839,6 @@ iframe {
     background-repeat: no-repeat;
     background-position: center;
 }
-
 
 .image-radio-wrapper {
     display: flex;
@@ -831,7 +887,8 @@ iframe {
     display: flex;
     justify-content: center;
 
-    .kl-2-tabs__left, .kl-2-tabs__right {
+    .kl-2-tabs__left,
+    .kl-2-tabs__right {
         width: 150px;
         padding: 10px 5px;
         text-align: center;
@@ -883,7 +940,10 @@ iframe {
 
 .kl-edit-crop-preview__sel {
     position: absolute;
-    box-shadow: 0 0 0 1px #fff, 0 0 0 2px #000, 0 0 40px 1px #000;
+    box-shadow:
+        0 0 0 1px #fff,
+        0 0 0 2px #000,
+        0 0 40px 1px #000;
     pointer-events: none;
 }
 
@@ -896,7 +956,7 @@ iframe {
     margin-top: 10px;
     background: rgb(243, 243, 161);
     padding: 5px 5px;
-    color: rgba(0,0,0,0.65);
+    color: rgba(0, 0, 0, 0.65);
     font-size: 15px;
 }
 
@@ -904,7 +964,9 @@ iframe {
     margin-left: -20px;
     background-color: #9e9e9e;
     margin-top: 10px;
-    box-shadow: rgba(0, 0, 0, 0.2) 0px 1px inset, rgba(0, 0, 0, 0.2) 0px -1px inset;
+    box-shadow:
+        rgba(0, 0, 0, 0.2) 0px 1px inset,
+        rgba(0, 0, 0, 0.2) 0px -1px inset;
     overflow: hidden;
     position: relative;
     user-select: none;
@@ -915,15 +977,17 @@ iframe {
 
 .kl-preview-wrapper__canvas {
     position: relative;
-    box-shadow: 0 0 5px rgba(0,0,0,0.5);
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
 }
 
 .kl-transparent-preview {
-    box-shadow: rgba(0, 0, 0, 0.2) 0px 1px inset, rgba(0, 0, 0, 0.2) 0px -1px inset;
+    box-shadow:
+        rgba(0, 0, 0, 0.2) 0px 1px inset,
+        rgba(0, 0, 0, 0.2) 0px -1px inset;
 }
 
 .kl-transparent-preview__canvas {
-    box-shadow: 0 0 5px rgba(0,0,0,0.5);
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
 }
 
 .kl-text-preview-wrapper {
@@ -939,20 +1003,20 @@ iframe {
     display: block;
     margin-left: auto;
     margin-right: auto;
-    box-shadow: 0 0 3px rgba(0,0,0,0.5);
+    box-shadow: 0 0 3px rgba(0, 0, 0, 0.5);
 }
 
 .kl-stabilizer {
     display: flex;
     align-items: center;
     font-size: 13px;
-    color: rgba(0,0,0,0.6);
+    color: rgba(0, 0, 0, 0.6);
     margin-right: -1px;
 }
 
 .kl-toolspace-note {
     color: #534a3c;
-    background: rgba(255,255,0,0.5);
+    background: rgba(255, 255, 0, 0.5);
     border: 1px solid #e7d321;
     border-radius: 5px;
     padding: 8px;
@@ -960,7 +1024,7 @@ iframe {
 }
 
 .kl-import-note {
-    background: rgba(255,255,0,0.5);
+    background: rgba(255, 255, 0, 0.5);
     padding: 8px;
     margin-top: 5px;
     margin-bottom: 5px;
@@ -971,7 +1035,7 @@ iframe {
 .kl-curves-graph {
     canvas {
         background: #c6c6c6;
-        box-shadow: 0 0 0 1px rgba(0,0,0,0.3);
+        box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.3);
     }
 }
 
@@ -1025,11 +1089,11 @@ iframe {
     background: rgb(221, 221, 221);
     display: none;
     border: 1px solid #fff;
-    box-shadow: 0 0 10px rgba(0,0,0,0.5);
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
 }
 
 .kl-file-save-row {
-    box-shadow: inset 0 0 0 1px rgba(0,0,0,0.2);
+    box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.2);
     border-radius: 5px;
     margin: 10px 10px 0 10px;
     padding-bottom: 10px;
@@ -1044,5 +1108,9 @@ iframe {
 
     background: #ddd;
     box-shadow: 0 2px 5px #00000080;
-    border-radius: 3px;
+    border-radius: 4px;
+}
+
+.kl-pinch-overlay {
+    background: rgba(255,255,255,0.5);
 }

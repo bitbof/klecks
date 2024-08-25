@@ -1,5 +1,5 @@
-import {c} from '../../../bb/base/c';
-import {makeUnfocusable} from '../../../bb/base/ui';
+import { c } from '../../../bb/base/c';
+import { makeUnfocusable } from '../../../bb/base/ui';
 
 export type TDropdownMenuParams = {
     button: string | HTMLElement;
@@ -13,8 +13,8 @@ export class DropdownMenu {
     private isExpanded: boolean = false;
     private readonly onSetEnabled: (id: string, enabled: boolean) => void = () => 0;
 
-    // ---- public ----
-    constructor (p: TDropdownMenuParams) {
+    // ----------------------------------- public -----------------------------------
+    constructor(p: TDropdownMenuParams) {
         const button = c('button,w-full,h-full', [p.button]) as HTMLButtonElement;
         button.onclick = () => {
             toggle(!this.isExpanded);
@@ -26,7 +26,7 @@ export class DropdownMenu {
 
         const items: HTMLButtonElement[] = [];
         const itemMap: Record<string, HTMLButtonElement> = {};
-        p.items.forEach(item => {
+        p.items.forEach((item) => {
             const itemButton = c('button', item[1]) as HTMLButtonElement;
             makeUnfocusable(itemButton);
             itemButton.onclick = () => {
@@ -41,21 +41,15 @@ export class DropdownMenu {
             itemMap[id].disabled = !enabled;
         };
 
-        const menu = c(
-            '.kl-dropdown-menu,right-0,top-full,nowrap,hidden',
-            items
-        );
+        const menu = c('.kl-dropdown-menu,right-0,top-full,nowrap,hidden', items);
 
-        this.rootElement = c(',pos-relative', [
-            button,
-            menu,
-        ]);
+        this.rootElement = c(',pos-relative', [button, menu]);
 
         const toggle = (force: boolean) => {
             this.isExpanded = force;
             menu.style.display = this.isExpanded ? 'block' : 'none';
             if (this.isExpanded) {
-                document.addEventListener('pointerdown', onPointerDown);
+                document.addEventListener('pointerdown', onPointerDown, { passive: false });
                 window.addEventListener('blur', onBlur);
             } else {
                 document.removeEventListener('pointerdown', onPointerDown);
@@ -74,11 +68,11 @@ export class DropdownMenu {
         const onBlur = () => toggle(false);
     }
 
-    getElement (): HTMLElement {
+    getElement(): HTMLElement {
         return this.rootElement;
     }
 
-    setEnabled (id: string, enabled: boolean): void {
+    setEnabled(id: string, enabled: boolean): void {
         this.onSetEnabled(id, enabled);
     }
 }

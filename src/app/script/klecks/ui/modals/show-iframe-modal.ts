@@ -1,12 +1,8 @@
-import {BB} from '../../../bb/bb';
-import {DynamicModal} from './base/dynamic-modal';
-import {LANG} from '../../../language/language';
+import { BB } from '../../../bb/bb';
+import { DynamicModal } from './base/dynamic-modal';
+import { LANG } from '../../../language/language';
 
-export function showIframeModal (
-    url: string,
-    isEmbed: boolean,
-) {
-
+export function showIframeModal(url: string, isEmbed: boolean) {
     // window very small, modal might look bad
     if (!isEmbed && (window.innerHeight < 500 || window.innerWidth < 700)) {
         window.open(url);
@@ -54,7 +50,6 @@ export function showIframeModal (
         };
     }
 
-
     const popup = new DynamicModal({
         title: titleEl,
         content: iframe,
@@ -68,5 +63,4 @@ export function showIframeModal (
             }
         },
     });
-
 }

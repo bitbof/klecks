@@ -1,0 +1,31 @@
+
+.whitePath, .blackPath {
+  fill: none;
+  stroke-dasharray: 4;
+  shape-rendering: crispEdges;
+
+  animation-duration: 1.5s;
+  animation-iteration-count: infinite;
+  animation-timing-function: linear;
+  //animation-timing-function: steps(8);
+}
+
+
+@keyframes whiteAnim {
+  0% {stroke-dashoffset: 0;}
+  100% {stroke-dashoffset: 8;}
+}
+.whitePath {
+  stroke: white;
+  animation-name: whiteAnim;
+}
+
+
+@keyframes blackAnim {
+  0% {stroke-dashoffset: 4;}
+  100% {stroke-dashoffset: 12;}
+}
+.blackPath {
+  stroke: black;
+  animation-name: blackAnim;
+}

@@ -1,17 +1,15 @@
-import {BB} from '../../bb/bb';
-import {brushes} from '../brushes/brushes';
-import {eventResMs} from './brushes-consts';
-import {klHistory} from '../history/kl-history';
-import {Checkbox} from '../ui/components/checkbox';
-import {KlSlider} from '../ui/components/kl-slider';
-import {createPenPressureToggle} from '../ui/components/create-pen-pressure-toggle';
+import { BB } from '../../bb/bb';
+import { brushes } from '../brushes/brushes';
+import { eventResMs } from './brushes-consts';
+import { Checkbox } from '../ui/components/checkbox';
+import { KlSlider } from '../ui/components/kl-slider';
+import { createPenPressureToggle } from '../ui/components/create-pen-pressure-toggle';
 import brushIconImg from '/src/app/img/ui/brush-pen.svg';
-import {genBrushAlpha01, genBrushAlpha02} from '../brushes/alphas/brush-alphas';
-import {IBrushUi} from '../kl-types';
-import {LANG, languageStrings} from '../../language/language';
-import {Options} from '../ui/components/options';
-import {PenBrush} from '../brushes/pen-brush';
-
+import { genBrushAlpha01, genBrushAlpha02 } from '../brushes/alphas/brush-alphas';
+import { IBrushUi } from '../kl-types';
+import { LANG, languageStrings } from '../../language/language';
+import { Options } from '../ui/components/options';
+import { PenBrush } from '../brushes/pen-brush';
 
 export const penBrushUi = (function () {
     const brushInterface = {
@@ -23,9 +21,13 @@ export const penBrushUi = (function () {
             curve: BB.quadraticSplineInput(0.5, 100, 0.1),
         },
         opacitySlider: {
-            min: 1/100,
+            min: 1 / 100,
             max: 1,
-            curve: [[0, 1/100], [0.5, 30/100], [1, 1]],
+            curve: [
+                [0, 1 / 100],
+                [0.5, 30 / 100],
+                [1, 1],
+            ],
         },
     } as IBrushUi<PenBrush>;
 
@@ -48,14 +50,13 @@ export const penBrushUi = (function () {
     brushInterface.Ui = function (p) {
         const div = document.createElement('div'); // the gui
         const brush = new brushes.PenBrush();
-        brush.setHistory(klHistory);
+        brush.setHistory(p.history);
         p.onSizeChange(brush.getSize());
         let sizeSlider: KlSlider;
         let opacitySlider: KlSlider;
 
         const alphaOptions = new Options({
-            optionArr: [0, 1, 2, 3].map(id => {
-
+            optionArr: [0, 1, 2, 3].map((id) => {
                 const alpha = BB.el({
                     className: 'dark-invert',
                     css: {
@@ -108,14 +109,21 @@ export const penBrushUi = (function () {
             },
         });
 
-        const spacingSpline = new BB.SplineInterpolator([[0, 15], [8, 7], [14, 4], [30, 3], [50, 2.7], [100, 2]]);
+        const spacingSpline = new BB.SplineInterpolator([
+            [0, 15],
+            [8, 7],
+            [14, 4],
+            [30, 3],
+            [50, 2.7],
+            [100, 2],
+        ]);
 
-        function setSize (size: number) {
+        function setSize(size: number) {
             brush.setSize(size);
             brush.setSpacing(Math.max(2, spacingSpline.interpolate(size)) / 15);
         }
 
-        function init () {
+        function init() {
             sizeSlider = new KlSlider({
                 label: LANG('brush-size'),
                 width: 225,
@@ -166,10 +174,7 @@ export const penBrushUi = (function () {
 
             div.append(
                 BB.el({
-                    content: [
-                        sizeSlider.getElement(),
-                        pressureSizeToggle,
-                    ],
+                    content: [sizeSlider.getElement(), pressureSizeToggle],
                     css: {
                         display: 'flex',
                         justifyContent: 'space-between',
@@ -178,10 +183,7 @@ export const penBrushUi = (function () {
                     },
                 }),
                 BB.el({
-                    content: [
-                        opacitySlider.getElement(),
-                        pressureOpacityToggle,
-                    ],
+                    content: [opacitySlider.getElement(), pressureOpacityToggle],
                     css: {
                         display: 'flex',
                         justifyContent: 'space-between',
@@ -201,7 +203,6 @@ export const penBrushUi = (function () {
                     },
                 }),
             );
-
         }
 
         init();

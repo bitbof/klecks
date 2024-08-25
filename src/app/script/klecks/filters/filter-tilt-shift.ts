@@ -1,19 +1,19 @@
-import {BB} from '../../bb/bb';
-import {eventResMs} from './filters-consts';
-import {KlSlider} from '../ui/components/kl-slider';
-import {getSharedFx} from '../../fx-canvas/shared-fx';
-import {IFilterApply, IFilterGetDialogParam, TFilterGetDialogResult} from '../kl-types';
-import {LANG} from '../../language/language';
-import {IVector2D} from '../../bb/bb-types';
-import {TFilterHistoryEntry} from './filters';
-import {FxPreviewRenderer} from '../ui/project-viewport/fx-preview-renderer';
-import {TProjectViewportProject} from '../ui/project-viewport/project-viewport';
-import {Preview} from '../ui/project-viewport/preview';
-import {createTransformMatrix} from '../ui/project-viewport/utils/create-transform-matrix';
-import {applyToPoint} from 'transformation-matrix';
-import {DraggableInput} from '../ui/components/draggable-input';
-import {testIsSmall} from '../ui/utils/test-is-small';
-import {getPreviewHeight, getPreviewWidth} from '../ui/utils/preview-size';
+import { BB } from '../../bb/bb';
+import { eventResMs } from './filters-consts';
+import { KlSlider } from '../ui/components/kl-slider';
+import { getSharedFx } from '../../fx-canvas/shared-fx';
+import { IFilterApply, IFilterGetDialogParam, TFilterGetDialogResult } from '../kl-types';
+import { LANG } from '../../language/language';
+import { IVector2D } from '../../bb/bb-types';
+import { TFilterHistoryEntry } from './filters';
+import { FxPreviewRenderer } from '../ui/project-viewport/fx-preview-renderer';
+import { TProjectViewportProject } from '../ui/project-viewport/project-viewport';
+import { Preview } from '../ui/project-viewport/preview';
+import { createMatrixFromTransform } from '../../bb/transform/create-matrix-from-transform';
+import { applyToPoint } from 'transformation-matrix';
+import { DraggableInput } from '../ui/components/draggable-input';
+import { testIsSmall } from '../ui/utils/test-is-small';
+import { getPreviewHeight, getPreviewWidth } from '../ui/utils/preview-size';
 
 export type TFilterTiltShiftInput = {
     a: IVector2D;
@@ -22,13 +22,10 @@ export type TFilterTiltShiftInput = {
     gradient: number;
 };
 
-export type TFilterTiltShiftHistoryEntry = TFilterHistoryEntry<
-    'tiltShift',
-    TFilterTiltShiftInput>;
+export type TFilterTiltShiftHistoryEntry = TFilterHistoryEntry<'tiltShift', TFilterTiltShiftInput>;
 
 export const filterTiltShift = {
-
-    getDialog (params: IFilterGetDialogParam) {
+    getDialog(params: IFilterGetDialogParam) {
         const context = params.context;
         const klCanvas = params.klCanvas;
         if (!context || !klCanvas) {
@@ -47,44 +44,55 @@ export const filterTiltShift = {
             result.width = getPreviewWidth(isSmall);
         }
 
-        let blur = 20, gradient = 200;
-        let fxPreviewRenderer: FxPreviewRenderer = {destroy: () => {}} as FxPreviewRenderer;
+        let blur = 20,
+            gradient = 200;
+        let fxPreviewRenderer: FxPreviewRenderer = {
+            destroy: () => {},
+        } as FxPreviewRenderer;
 
-        function finishInit () {
-
+        function finishInit() {
             fxPreviewRenderer = new FxPreviewRenderer({
                 original: context.canvas,
                 onUpdate: (fxCanvas, transform) => {
                     fa.setTransform(preview.getTransform());
-                    fb.setTransform((preview.getTransform()));
+                    fb.setTransform(preview.getTransform());
 
-                    const m = createTransformMatrix(transform);
+                    const m = createMatrixFromTransform(transform);
                     const a = applyToPoint(m, fa.getValue());
                     const b = applyToPoint(m, fb.getValue());
-                    return fxCanvas.multiplyAlpha().tiltShift(
-                        a.x,
-                        a.y,
-                        b.x,
-                        b.y,
-                        blur * transform.scaleX,
-                        gradient * transform.scaleX
-                    ).unmultiplyAlpha();
+                    return fxCanvas
+                        .multiplyAlpha()
+                        .tiltShift(
+                            a.x,
+                            a.y,
+                            b.x,
+                            b.y,
+                            blur * transform.scaleX,
+                            gradient * transform.scaleX,
+                        )
+                        .unmultiplyAlpha();
                 },
             });
 
-            function update () {
+            function update() {
                 preview.render();
             }
 
             // focus line control points
             const fa = new DraggableInput({
-                value: {x: context.canvas.width / 4, y: context.canvas.height / 2},
+                value: {
+                    x: context.canvas.width / 4,
+                    y: context.canvas.height / 2,
+                },
                 onChange: () => {
                     update();
                 },
             });
             const fb = new DraggableInput({
-                value: {x: 3 * context.canvas.width / 4, y: context.canvas.height / 2},
+                value: {
+                    x: (3 * context.canvas.width) / 4,
+                    y: context.canvas.height / 2,
+                },
                 onChange: () => {
                     update();
                 },
@@ -121,12 +129,14 @@ export const filterTiltShift = {
             blurSlider.getElement().style.marginBottom = '10px';
             rootEl.append(blurSlider.getElement());
 
-
             const previewLayerArr: TProjectViewportProject['layers'] = [];
             {
                 for (let i = 0; i < layers.length; i++) {
                     previewLayerArr.push({
-                        image: i === selectedLayerIndex ? fxPreviewRenderer.render : layers[i].context.canvas,
+                        image:
+                            i === selectedLayerIndex
+                                ? fxPreviewRenderer.render
+                                : layers[i].context.canvas,
                         isVisible: layers[i].isVisible,
                         opacity: layers[i].opacity,
                         mixModeStr: layers[i].mixModeStr,
@@ -176,39 +186,44 @@ export const filterTiltShift = {
 
         setTimeout(finishInit, 1);
 
-
         return result;
     },
 
-    apply (params: IFilterApply<TFilterTiltShiftInput>): boolean {
+    apply(params: IFilterApply<TFilterTiltShiftInput>): boolean {
         const context = params.context;
         const history = params.history;
         const a = params.input.a;
         const b = params.input.b;
         const blur = params.input.blur;
         const gradient = params.input.gradient;
-        if (!context || !history) {
+        if (!context) {
             return false;
         }
-        history.pause(true);
+        history?.pause(true);
         const fxCanvas = getSharedFx();
         if (!fxCanvas) {
             return false; // todo more specific error?
         }
         const texture = fxCanvas.texture(context.canvas);
-        fxCanvas.draw(texture).multiplyAlpha().tiltShift(a.x, a.y, b.x, b.y, blur, gradient).unmultiplyAlpha().update();
+        fxCanvas
+            .draw(texture)
+            .multiplyAlpha()
+            .tiltShift(a.x, a.y, b.x, b.y, blur, gradient)
+            .unmultiplyAlpha()
+            .update();
         context.clearRect(0, 0, context.canvas.width, context.canvas.height);
         context.drawImage(fxCanvas, 0, 0);
         texture.destroy();
-        history.pause(false);
-        history.push({
+        history?.pause(false);
+        history?.push({
             tool: ['filter', 'tiltShift'],
             action: 'apply',
-            params: [{
-                input: params.input,
-            }],
+            params: [
+                {
+                    input: params.input,
+                },
+            ],
         } as TFilterTiltShiftHistoryEntry);
         return true;
     },
-
 };
