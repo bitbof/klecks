@@ -4,7 +4,10 @@ import { klConfig } from '../kl-config';
 
 export class UploadImage {
     private timeout: number | any
-    private latestGeneration: Blob;
+    private latestGeneration: string;
+    private imageId: string;
+    private generating: boolean;
+    private queueNew: boolean;
     private getImage(canvas: HTMLCanvasElement, filename: string, mimeType: string): Blob {
         const parts = canvas.toDataURL(mimeType).match(/data:([^;]*)(;base64)?,([0-9A-Za-z+/]+)/);
 
@@ -12,7 +15,6 @@ export class UploadImage {
             throw new Error('saveImage: empty parts');
         }
 
-        //assume base64 encoding
         const binStr = atob(parts[3]);
         //convert to binary in ArrayBuffer
         const buf = new ArrayBuffer(binStr.length);
@@ -24,20 +26,29 @@ export class UploadImage {
     }
 
     constructor(
-        private getKlCanvas: () => KlCanvas
+        private getKlCanvas: () => KlCanvas,
+        private backendUrl: string
     ) {
-        this.latestGeneration = new Blob();
+        this.latestGeneration = "";
+        this.imageId = "";
+        this.generating = false;
+        this.queueNew = false;
+        this.backendUrl = backendUrl;
      }
 
     Send(): void {
         if(this.timeout){
             clearTimeout(this.timeout);
         }
+        if(this.generating){
+            this.queueNew = true;
+            return;
+        }
         this.timeout = setTimeout(this.sendImpl, 100, this);
-        
     }
 
     private async sendImpl(sender : UploadImage){
+        sender.generating = true;
         const extension = 'png';
         const mimeType = 'image/png';
         const filename = BB.getDate() + klConfig.filenameBase + '.' + extension;
@@ -47,8 +58,13 @@ export class UploadImage {
             const image = sender.getImage(fullCanvas, filename, mimeType);
             await sender.sendData(image);
         } catch (error) { //fallback for old browsers
-            alert('could not save');
             throw new Error('failed png export');
+        } finally{
+            sender.generating = false;
+            if(sender.queueNew){
+                sender.queueNew = false;
+                sender.Send();
+            }
         }
     }
 
@@ -59,16 +75,25 @@ export class UploadImage {
         formData.append('negativePrompt', 'ugly');
         formData.append('positivePrompt', 'picasso style, painting, vibrant strokes');
 
-        var response = await fetch('https://localhost:7243/api', {
+        var response = await fetch(this.backendUrl + '/generate', {
             method: 'POST',
             body: formData,
         });
 
-        this.latestGeneration = await response.blob()
+        const responseJson = await response.json();
+
+        this.latestGeneration = responseJson.imageBase64;
+        this.imageId = responseJson.imageId;
+
+        console.log('generation done: ' + this.imageId)
     }
 
     public getLatestGeneration(){
         return this.latestGeneration;
+    }
+
+    public getimageId(){
+        return this.imageId;
     }
 
 }

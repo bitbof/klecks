@@ -7,24 +7,36 @@ import {IRGB, IRGBA} from '../../kl-types';
 import {IKeyString, ISize2D} from '../../../bb/bb-types';
 import {table} from '../components/table';
 import {theme} from '../../../theme/theme';
+import dotenv from 'dotenv'; 
+
 import QRCode from 'qrcode';
-export function shareDialog (
+export async function shareDialog (
     p: {
-        image: Blob
+        backendUrl: string;
+        image: string,
+        imageId: string
     }
-): void {
+):  Promise<void> {
     const mainDiv = BB.el();
     const canvas = BB.canvas(800, 800)
-    QRCode.toCanvas(canvas, "https://ai-image.manglemoose.com/result", { width: 500})
-    canvas.style.marginLeft = 'auto';
-    canvas.style.marginRight = 'auto';
-    canvas.style.paddingLeft = '0';
-    canvas.style.paddingRight = '0';
-    canvas.style.display = 'block';
+    dotenv.config();
 
-    var url = URL.createObjectURL(p.image)
+    QRCode.toCanvas(canvas, p.backendUrl + "/share/" + p.imageId, { width: 200})
+
+    const formData = new FormData();
+    formData.append('image', p.image);
+    await fetch(p.backendUrl + "/share/" + p.imageId, {
+        method: 'POST',
+        body: formData,
+    })
+
+    canvas.style.position = 'absolute';
+    canvas.style.bottom = '67px';
+    canvas.style.left = '20px';
+
+    
     var image = new Image()
-    image.src = url;
+    image.src = "data:image/png;base64," + p.image;
     image.style.width = "100%"
     image.style.marginLeft = 'auto';
     image.style.marginRight = 'auto';
@@ -40,7 +52,7 @@ export function shareDialog (
         buttons: ['Ok',],
         style: {
             width: 'calc(100% - 50px)',
-            maxWidth: '1000px',
+            maxWidth: '800px',
             minWidth: '300px',
             boxSizing: 'border-box',
         },

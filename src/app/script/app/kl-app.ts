@@ -77,6 +77,7 @@ export class KlApp {
     private uiWidth: number;
     private uiHeight: number;
     private simpleUi: boolean;
+    private backendUrl: string;
     private readonly layerPreview: LayerPreview;
     private readonly klColorSlider: KlColorSlider;
     private readonly toolspaceToolRow: ToolspaceToolRow;
@@ -244,6 +245,8 @@ export class KlApp {
         let initState: IInitState;
         let mainTabRow: TabRow | undefined = undefined;
         this.simpleUi = pOptions.simpleUi;
+        console.log(process.env.BACKEND_URL);
+        this.backendUrl = process.env.BACKEND_URL ?? "";
 
         if (!pOptions.saveReminder) {
             pOptions.saveReminder = {init: () => {}, reset: () => {}} as SaveReminder;
@@ -888,8 +891,8 @@ export class KlApp {
                 onSave: () => {
                     this.saveToComputer.save();
                 },
-                onShare: () => {
-                    shareImage();
+                onShare: async () => {
+                    await shareImage();
                 },
                 onHelp: () => {
                     showIframeModal('./help/', !!this.embed);
@@ -1266,7 +1269,7 @@ export class KlApp {
         };
 
         const shareImage = (callback?: () => void) => {
-            KL.shareDialog({image: this.uploadImage.getLatestGeneration()});
+            KL.shareDialog({image: this.uploadImage.getLatestGeneration(), imageId: this.uploadImage.getimageId(), backendUrl: this.backendUrl});
         };
 
         this.saveToComputer = new KL.SaveToComputer(
@@ -1276,7 +1279,8 @@ export class KlApp {
         );
 
         this.uploadImage = new KL.UploadImage(
-            () => this.klCanvas
+            () => this.klCanvas,
+            this.backendUrl
         );
 
         const copyToClipboard = (showCrop?: boolean) => {
