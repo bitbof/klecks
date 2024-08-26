@@ -449,6 +449,9 @@ export class Easel<GToolId extends string> {
                     }
                     e.deltaY *= factor;
                 }
+                if (this.keyListener.isPressed('shift')) {
+                    e.deltaY /= 4;
+                }
                 // zoom
                 const transform = this.viewport.getTransform();
                 const viewportPoint = {
