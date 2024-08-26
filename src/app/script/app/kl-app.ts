@@ -245,7 +245,6 @@ export class KlApp {
         let initState: IInitState;
         let mainTabRow: TabRow | undefined = undefined;
         this.simpleUi = pOptions.simpleUi;
-        console.log(process.env.BACKEND_URL);
         this.backendUrl = process.env.BACKEND_URL ?? "";
 
         if (!pOptions.saveReminder) {

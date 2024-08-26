@@ -7,7 +7,6 @@ import {IRGB, IRGBA} from '../../kl-types';
 import {IKeyString, ISize2D} from '../../../bb/bb-types';
 import {table} from '../components/table';
 import {theme} from '../../../theme/theme';
-import dotenv from 'dotenv'; 
 
 import QRCode from 'qrcode';
 export async function shareDialog (
@@ -19,8 +18,6 @@ export async function shareDialog (
 ):  Promise<void> {
     const mainDiv = BB.el();
     const canvas = BB.canvas(800, 800)
-    dotenv.config();
-
     QRCode.toCanvas(canvas, p.backendUrl + "/share/" + p.imageId, { width: 200})
 
     const formData = new FormData();
