@@ -1,17 +1,16 @@
-import {BB} from '../../../bb/bb';
-import {Select} from './select';
-import {LANG} from '../../../language/language';
-import {PointerListener} from '../../../bb/input/pointer-listener';
+import { BB } from '../../../bb/bb';
+import { Select } from './select';
+import { LANG } from '../../../language/language';
+import { PointerListener } from '../../../bb/input/pointer-listener';
 
 /**
  * Ui to select stabilizer level. 4 options. returned as 0-3
  */
 export class ToolspaceStabilizerRow {
-
     private readonly rootEl: HTMLElement;
     private readonly pointerListener: PointerListener;
 
-    // ---- public ----
+    // ----------------------------------- public -----------------------------------
     constructor (
         p: {
             simpleUi: boolean
@@ -53,8 +52,7 @@ export class ToolspaceStabilizerRow {
         });
     }
 
-    getElement (): HTMLElement {
+    getElement(): HTMLElement {
         return this.rootEl;
     }
 }
-

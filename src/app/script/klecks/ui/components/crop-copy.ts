@@ -1,26 +1,24 @@
-import {BB} from '../../../bb/bb';
-import {KeyListener} from '../../../bb/input/key-listener';
-import {PointerListener} from '../../../bb/input/pointer-listener';
-import {IRect, IVector2D} from '../../../bb/bb-types';
-import {Preview, TPreviewMode} from '../project-viewport/preview';
-import {applyToPoint, inverse} from 'transformation-matrix';
-import {createTransformMatrix} from '../project-viewport/utils/create-transform-matrix';
-import {clamp} from '../../../bb/math/math';
-import {LANG} from '../../../language/language';
+import { BB } from '../../../bb/bb';
+import { KeyListener } from '../../../bb/input/key-listener';
+import { PointerListener } from '../../../bb/input/pointer-listener';
+import { IRect, IVector2D } from '../../../bb/bb-types';
+import { Preview, TPreviewMode } from '../project-viewport/preview';
+import { applyToPoint, inverse } from 'transformation-matrix';
+import { createMatrixFromTransform } from '../../../bb/transform/create-matrix-from-transform';
+import { clamp } from '../../../bb/math/math';
+import { LANG } from '../../../language/language';
 import editCropImg from '/src/app/img/ui/edit-crop.svg';
-import {EventChain} from '../../../bb/input/event-chain/event-chain';
-import {OnePointerLimiter} from '../../../bb/input/event-chain/one-pointer-limiter';
-import {IChainElement} from '../../../bb/input/event-chain/event-chain.types';
-
+import { EventChain } from '../../../bb/input/event-chain/event-chain';
+import { OnePointerLimiter } from '../../../bb/input/event-chain/one-pointer-limiter';
+import { IChainElement } from '../../../bb/input/event-chain/event-chain.types';
 
 /**
  * element that lets you crop an image and copy it via right click
  */
 export class CropCopy {
-
     private readonly rootEl: HTMLElement;
     private readonly eventTarget: HTMLElement;
-    private crop: IRect = {x: 0, y: 0, width: 0, height: 0}; // canvas coordinates
+    private crop: IRect = { x: 0, y: 0, width: 0, height: 0 }; // canvas coordinates
     private readonly croppedCanvas: HTMLCanvasElement;
     private readonly croppedImage: undefined | HTMLImageElement; // isn't canvas enough?
     private readonly keyListener: KeyListener;
@@ -31,8 +29,7 @@ export class CropCopy {
     private readonly preview: Preview;
     private mode: TPreviewMode = 'edit';
 
-
-    private resetCrop (): void {
+    private resetCrop(): void {
         this.crop = {
             x: 0,
             y: 0,
@@ -41,9 +38,9 @@ export class CropCopy {
         };
     }
 
-    private getViewportSelectionRect (): IRect {
+    private getViewportSelectionRect(): IRect {
         const transform = this.preview.getTransform();
-        const mat = createTransformMatrix(transform);
+        const mat = createMatrixFromTransform(transform);
         const p = applyToPoint(mat, this.crop);
         return {
             x: p.x,
@@ -53,7 +50,7 @@ export class CropCopy {
         };
     }
 
-    private updateCroppedCanvas (): void {
+    private updateCroppedCanvas(): void {
         this.croppedCanvas.width = Math.round(this.crop.width);
         this.croppedCanvas.height = Math.round(this.crop.height);
         const ctx = BB.ctx(this.croppedCanvas);
@@ -63,7 +60,7 @@ export class CropCopy {
         }
         this.onChange && this.onChange(this.croppedCanvas.width, this.croppedCanvas.height);
     }
-    private updateSelectionRect (): void {
+    private updateSelectionRect(): void {
         const rect = this.getViewportSelectionRect();
 
         BB.css(this.selectionRectEl, {
@@ -76,17 +73,15 @@ export class CropCopy {
         this.onChange && this.onChange(Math.round(this.crop.width), Math.round(this.crop.height));
     }
 
-    // ---- public ----
+    // ----------------------------------- public -----------------------------------
 
-    constructor (
-        param: {
-            width: number;
-            height: number;
-            canvas: HTMLImageElement | HTMLCanvasElement;
-            isNotCopy: boolean;
-            onChange?: (width: number, height: number) => void;
-        }
-    ) {
+    constructor(param: {
+        width: number;
+        height: number;
+        canvas: HTMLImageElement | HTMLCanvasElement;
+        isNotCopy: boolean;
+        onChange?: (width: number, height: number) => void;
+    }) {
         this.rootEl = BB.el({
             className: 'kl-edit-crop-preview',
             css: {
@@ -102,9 +97,6 @@ export class CropCopy {
         this.canvas = param.canvas;
 
         this.resetCrop();
-
-
-
 
         const isInsideSelectionRect = (p: IVector2D): boolean => {
             return BB.isInsideRect(p, this.getViewportSelectionRect());
@@ -129,13 +121,15 @@ export class CropCopy {
             project: {
                 width: param.canvas.width,
                 height: param.canvas.height,
-                layers: [{
-                    image: param.canvas,
-                    opacity: 1,
-                    isVisible: true,
-                    mixModeStr: 'source-over',
-                    hasClipping: false,
-                }],
+                layers: [
+                    {
+                        image: param.canvas,
+                        opacity: 1,
+                        isVisible: true,
+                        mixModeStr: 'source-over',
+                        hasClipping: false,
+                    },
+                ],
             },
             hasEditMode: true,
             onModeChange: (mode) => {
@@ -166,7 +160,7 @@ export class CropCopy {
 
         //gen crop from viewport points
         const genCrop = (p1: IVector2D, p2: IVector2D): IRect => {
-            const mat = createTransformMatrix(this.preview.getTransform());
+            const mat = createMatrixFromTransform(this.preview.getTransform());
             const inverseMat = inverse(mat);
             const topLeftP = {
                 x: Math.min(p1.x, p2.x),
@@ -190,17 +184,13 @@ export class CropCopy {
             };
         };
 
-
-
         let startP: IVector2D | null;
         let startCrop: IRect | null = null;
         let isDragging = false;
         let didMove = false;
         let updateCropTimeout: ReturnType<typeof setTimeout>;
         const pointerChain = new EventChain({
-            chainArr: [
-                new OnePointerLimiter() as IChainElement,
-            ],
+            chainArr: [new OnePointerLimiter() as IChainElement],
         });
         pointerChain.setChainOut((event) => {
             if (event.type === 'pointerdown' && event.button === 'left') {
@@ -225,12 +215,17 @@ export class CropCopy {
                 didMove = true;
                 if (startCrop) {
                     const transform = this.preview.getTransform();
-                    this.crop.x = startCrop.x + Math.round((event.relX - startP!.x) / transform.scale);
-                    this.crop.y = startCrop.y + Math.round((event.relY - startP!.y) / transform.scale);
+                    this.crop.x =
+                        startCrop.x + Math.round((event.relX - startP!.x) / transform.scale);
+                    this.crop.y =
+                        startCrop.y + Math.round((event.relY - startP!.y) / transform.scale);
                     this.crop.x = BB.clamp(this.crop.x, 0, this.canvas.width - this.crop.width);
                     this.crop.y = BB.clamp(this.crop.y, 0, this.canvas.height - this.crop.height);
                 } else {
-                    this.crop = genCrop(startP!, {x: event.relX, y: event.relY});
+                    this.crop = genCrop(startP!, {
+                        x: event.relX,
+                        y: event.relY,
+                    });
                 }
                 this.updateSelectionRect();
             } else if (event.type === 'pointerup' && startP) {
@@ -276,33 +271,65 @@ export class CropCopy {
 
                 if (keyStr === 'left') {
                     if (shiftIsPressed) {
-                        this.crop.width = BB.clamp(this.crop.width - stepSize, 1, this.canvas.width - this.crop.x);
+                        this.crop.width = BB.clamp(
+                            this.crop.width - stepSize,
+                            1,
+                            this.canvas.width - this.crop.x,
+                        );
                     } else {
-                        this.crop.x = BB.clamp(this.crop.x - stepSize, 0, this.canvas.width - this.crop.width);
+                        this.crop.x = BB.clamp(
+                            this.crop.x - stepSize,
+                            0,
+                            this.canvas.width - this.crop.width,
+                        );
                     }
                     doUpdate = true;
                 }
                 if (keyStr === 'right') {
                     if (shiftIsPressed) {
-                        this.crop.width = BB.clamp(this.crop.width + stepSize, 1, this.canvas.width - this.crop.x);
+                        this.crop.width = BB.clamp(
+                            this.crop.width + stepSize,
+                            1,
+                            this.canvas.width - this.crop.x,
+                        );
                     } else {
-                        this.crop.x = BB.clamp(this.crop.x + stepSize, 0, this.canvas.width - this.crop.width);
+                        this.crop.x = BB.clamp(
+                            this.crop.x + stepSize,
+                            0,
+                            this.canvas.width - this.crop.width,
+                        );
                     }
                     doUpdate = true;
                 }
                 if (keyStr === 'up') {
                     if (shiftIsPressed) {
-                        this.crop.height = BB.clamp(this.crop.height - stepSize, 1, this.canvas.height - this.crop.y);
+                        this.crop.height = BB.clamp(
+                            this.crop.height - stepSize,
+                            1,
+                            this.canvas.height - this.crop.y,
+                        );
                     } else {
-                        this.crop.y = BB.clamp(this.crop.y - stepSize, 0, this.canvas.height - this.crop.height);
+                        this.crop.y = BB.clamp(
+                            this.crop.y - stepSize,
+                            0,
+                            this.canvas.height - this.crop.height,
+                        );
                     }
                     doUpdate = true;
                 }
                 if (keyStr === 'down') {
                     if (shiftIsPressed) {
-                        this.crop.height = BB.clamp(this.crop.height + stepSize, 1, this.canvas.height - this.crop.y);
+                        this.crop.height = BB.clamp(
+                            this.crop.height + stepSize,
+                            1,
+                            this.canvas.height - this.crop.y,
+                        );
                     } else {
-                        this.crop.y = BB.clamp(this.crop.y + stepSize, 0, this.canvas.height - this.crop.height);
+                        this.crop.y = BB.clamp(
+                            this.crop.y + stepSize,
+                            0,
+                            this.canvas.height - this.crop.height,
+                        );
                     }
                     doUpdate = true;
                 }
@@ -319,15 +346,29 @@ export class CropCopy {
 
     // ---- interface ----
 
-    getEl (): HTMLElement {
+    getEl(): HTMLElement {
         return this.rootEl;
     }
-    reset (): void {
+    reset(): void {
         this.resetCrop();
         this.updateCroppedCanvas();
         this.updateSelectionRect();
     }
-    destroy (): void {
+    isReset(): boolean {
+        return (
+            this.crop.x === 0 &&
+            this.crop.y === 0 &&
+            this.crop.width === this.canvas.width &&
+            this.crop.height === this.canvas.height
+        );
+    }
+    getRect(): IRect {
+        return BB.copyObj(this.crop);
+    }
+    getCroppedCanvas(): HTMLCanvasElement {
+        return this.croppedCanvas;
+    }
+    destroy(): void {
         this.rootEl.remove();
         this.eventTarget.style.removeProperty('width');
         this.eventTarget.style.removeProperty('height');
@@ -335,14 +376,4 @@ export class CropCopy {
         this.pointerListener.destroy();
         this.preview.destroy();
     }
-    isReset (): boolean {
-        return this.crop.x === 0 && this.crop.y === 0 && this.crop.width === this.canvas.width && this.crop.height === this.canvas.height;
-    }
-    getRect (): IRect {
-        return BB.copyObj(this.crop);
-    }
-    getCroppedCanvas (): HTMLCanvasElement {
-        return this.croppedCanvas;
-    }
 }
-

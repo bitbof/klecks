@@ -11,7 +11,7 @@ window['printCanvases'] = () => {
     console.log('total: ' + (total * 4 / 1000 / 1000) + 'mb');
 };*/
 
-export function createCanvas (w?: number, h?: number): HTMLCanvasElement {
+export function createCanvas(w?: number, h?: number): HTMLCanvasElement {
     const result = document.createElement('canvas');
     if (w && h) {
         result.width = w;

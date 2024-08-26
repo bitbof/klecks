@@ -1,4 +1,4 @@
-import {IFilter} from '../kl-types';
+import { IFilter } from '../kl-types';
 import glBrightnessContrastImg from '/src/app/img/ui/edit-brightness-contrast.svg';
 import cropExtendImg from '/src/app/img/ui/edit-crop.svg';
 import glCurvesImg from '/src/app/img/ui/edit-curves.svg';
@@ -18,15 +18,19 @@ import noiseImg from '/src/app/img/ui/edit-noise.svg';
 import patternImg from '/src/app/img/ui/edit-pattern.svg';
 import vanishPointImg from '/src/app/img/ui/edit-vanish-point.svg';
 import distortImg from '/src/app/img/ui/edit-distort.svg';
-import {THistoryEntryG} from '../history/kl-history';
+import { THistoryEntryG } from '../history/kl-history';
 
-export type TFilterHistoryEntry<Filter extends string, Input> = THistoryEntryG<['filter', Filter], 'apply', [{ input: Input }]>;
+export type TFilterHistoryEntry<Filter extends string, Input> = THistoryEntryG<
+    ['filter', Filter],
+    'apply',
+    [{ input: Input }]
+>;
 
 export const filterLibStatus = {
     isLoaded: false,
 };
 export const filterLib: {
-    [key:string]: IFilter;
+    [key: string]: IFilter;
 } = {
     brightnessContrast: {
         lang: {

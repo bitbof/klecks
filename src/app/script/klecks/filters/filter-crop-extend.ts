@@ -1,14 +1,14 @@
-import {BB} from '../../bb/bb';
-import {input} from '../ui/components/input';
-import {Checkbox} from '../ui/components/checkbox';
-import {ColorOptions} from '../ui/components/color-options';
-import {Cropper} from '../ui/components/cropper';
-import {IFilterApply, IFilterGetDialogParam, TFilterGetDialogResult, IRGBA} from '../kl-types';
-import {LANG} from '../../language/language';
-import {TFilterHistoryEntry} from './filters';
-import {theme} from '../../theme/theme';
-import {IRect} from '../../bb/bb-types';
-import {smallPreview} from '../ui/utils/preview-size';
+import { BB } from '../../bb/bb';
+import { input } from '../ui/components/input';
+import { Checkbox } from '../ui/components/checkbox';
+import { ColorOptions } from '../ui/components/color-options';
+import { Cropper } from '../ui/components/cropper';
+import { IFilterApply, IFilterGetDialogParam, TFilterGetDialogResult, IRGBA } from '../kl-types';
+import { LANG } from '../../language/language';
+import { TFilterHistoryEntry } from './filters';
+import { theme } from '../../theme/theme';
+import { IRect } from '../../bb/bb-types';
+import { smallPreview } from '../ui/utils/preview-size';
 
 export type TFilterCropExtendInput = {
     left: number;
@@ -20,11 +20,11 @@ export type TFilterCropExtendInput = {
 
 export type TFilterCropExtendHistoryEntry = TFilterHistoryEntry<
     'cropExtend',
-    TFilterCropExtendInput>;
+    TFilterCropExtendInput
+>;
 
 export const filterCropExtend = {
-
-    getDialog (params: IFilterGetDialogParam) {
+    getDialog(params: IFilterGetDialogParam) {
         const klCanvas = params.klCanvas;
         if (!klCanvas) {
             return false;
@@ -32,7 +32,8 @@ export const filterCropExtend = {
         const tempCanvas = BB.canvas();
         {
             const fit = BB.fitInto(klCanvas.getWidth(), klCanvas.getHeight(), 560, 400, 1);
-            const w = parseInt('' + fit.width), h = parseInt('' + fit.height);
+            const w = parseInt('' + fit.width),
+                h = parseInt('' + fit.height);
             const previewFactor = w / klCanvas.getWidth();
             tempCanvas.width = w;
             tempCanvas.height = h;
@@ -44,20 +45,25 @@ export const filterCropExtend = {
         const result: TFilterGetDialogResult<TFilterCropExtendInput> = {
             element: rootEl,
         };
-        let left = 0, right = 0, top = 0, bottom = 0;
-        let leftChanged = false, rightChanged = false, topChanged = false, bottomChanged = false;
-        const maxWidth = params.maxWidth, maxHeight = params.maxHeight;
+        let left = 0,
+            right = 0,
+            top = 0,
+            bottom = 0;
+        let leftChanged = false,
+            rightChanged = false,
+            topChanged = false,
+            bottomChanged = false;
+        const maxWidth = params.maxWidth,
+            maxHeight = params.maxHeight;
         let scale: number = 1;
-
-
 
         // --- input elements ---
 
         const lrWrapper = BB.el({
-            css: {display: 'flex', alignItems: 'center'},
+            css: { display: 'flex', alignItems: 'center' },
         });
         const tbWrapper = BB.el({
-            css: {display: 'flex', alignItems: 'center', marginTop: '5px'},
+            css: { display: 'flex', alignItems: 'center', marginTop: '5px' },
         });
         rootEl.append(lrWrapper, tbWrapper);
 
@@ -66,7 +72,7 @@ export const filterCropExtend = {
             type: 'number',
             min: -klCanvas.getWidth(),
             max: maxWidth,
-            css: {width: '75px', marginRight: '20px'},
+            css: { width: '75px', marginRight: '20px' },
             callback: function () {
                 leftChanged = true;
                 updateInput();
@@ -77,7 +83,7 @@ export const filterCropExtend = {
             type: 'number',
             min: -klCanvas.getWidth(),
             max: maxWidth,
-            css: {width: '75px'},
+            css: { width: '75px' },
             callback: function () {
                 rightChanged = true;
                 updateInput();
@@ -88,7 +94,7 @@ export const filterCropExtend = {
             type: 'number',
             min: -klCanvas.getHeight(),
             max: maxHeight,
-            css: {width: '75px', marginRight: '20px'},
+            css: { width: '75px', marginRight: '20px' },
             callback: function () {
                 topChanged = true;
                 updateInput();
@@ -99,7 +105,7 @@ export const filterCropExtend = {
             type: 'number',
             min: -klCanvas.getHeight(),
             max: maxHeight,
-            css: {width: '75px'},
+            css: { width: '75px' },
             callback: function () {
                 bottomChanged = true;
                 updateInput();
@@ -108,22 +114,29 @@ export const filterCropExtend = {
 
         const labelStyle = {
             display: 'inline-block',
-            width: '60px',
+            width: '65px',
+            wordBreak: 'break-word',
         };
         lrWrapper.append(
-            BB.el({content: LANG('filter-crop-left') + ':', css: labelStyle}),
+            BB.el({ content: LANG('filter-crop-left') + ':', css: labelStyle }),
             leftInput,
-            BB.el({content: LANG('filter-crop-right') + ':', css: labelStyle}),
-            rightInput
+            BB.el({
+                content: LANG('filter-crop-right') + ':',
+                css: labelStyle,
+            }),
+            rightInput,
         );
         tbWrapper.append(
-            BB.el({content: LANG('filter-crop-top') + ':', css: labelStyle}),
+            BB.el({ content: LANG('filter-crop-top') + ':', css: labelStyle }),
             topInput,
-            BB.el({content: LANG('filter-crop-bottom') + ':', css: labelStyle}),
-            bottomInput
+            BB.el({
+                content: LANG('filter-crop-bottom') + ':',
+                css: labelStyle,
+            }),
+            bottomInput,
         );
 
-        function updateInput (): void {
+        function updateInput(): void {
             left = parseInt(leftInput.value);
             right = parseInt(rightInput.value);
             top = parseInt(topInput.value);
@@ -182,7 +195,6 @@ export const filterCropExtend = {
                 height: newHeight,
             });
 
-
             leftChanged = false;
             rightChanged = false;
             topChanged = false;
@@ -199,17 +211,19 @@ export const filterCropExtend = {
                 cropper.showThirds(useRuleOfThirds);
             },
         });
-        rootEl.append(BB.el({
-            css: {
-                clear: 'both',
-            },
-        }));
+        rootEl.append(
+            BB.el({
+                css: {
+                    clear: 'both',
+                },
+            }),
+        );
 
-        let selectedRgbaObj = {r: 0, g: 0, b: 0, a: 0};
+        let selectedRgbaObj = { r: 0, g: 0, b: 0, a: 0 };
         const colorOptionsArr = [
-            {r: 0, g: 0, b: 0, a: 0},
-            {r: 255, g: 255, b: 255, a: 1},
-            {r: 0, g: 0, b: 0, a: 1},
+            { r: 0, g: 0, b: 0, a: 0 },
+            { r: 255, g: 255, b: 255, a: 1 },
+            { r: 0, g: 0, b: 0, a: 1 },
         ];
         colorOptionsArr.push({
             r: params.currentColorRgb.r,
@@ -233,7 +247,6 @@ export const filterCropExtend = {
             },
         });
 
-
         const flexRow = BB.el({
             css: {
                 display: 'flex',
@@ -245,20 +258,24 @@ export const filterCropExtend = {
         rootEl.append(flexRow);
         flexRow.append(ruleOThirdsCheckbox.getElement(), colorOptions.getElement());
 
-
         // when input field changed, or dragging in preview finished
         // adjusts the zoom
-        function update (transform: IRect): void {
+        function update(transform: IRect): void {
             const fit = BB.fitInto(transform.width, transform.height, 260, 180, 1);
             scale = fit.width / transform.width;
 
-            const offset = BB.centerWithin(smallPreview.width, previewHeight, fit.width, fit.height);
+            const offset = BB.centerWithin(
+                smallPreview.width,
+                previewHeight,
+                fit.width,
+                fit.height,
+            );
 
             tempCanvas.style.width = klCanvas.getWidth() * scale + 'px';
             tempCanvas.style.height = klCanvas.getHeight() * scale + 'px';
 
-            offsetWrapper.style.left = (offset.x - transform.x * scale) + 'px';
-            offsetWrapper.style.top = (offset.y - transform.y * scale) + 'px';
+            offsetWrapper.style.left = offset.x - transform.x * scale + 'px';
+            offsetWrapper.style.top = offset.y - transform.y * scale + 'px';
 
             left = parseInt('' + -transform.x);
             top = parseInt('' + -transform.y);
@@ -269,13 +286,17 @@ export const filterCropExtend = {
             rightInput.value = '' + right;
             bottomInput.value = '' + bottom;
 
-            BB.createCheckerDataUrl(parseInt('' + (50 * scale)), function (url) {
-                previewWrapper.style.background = 'url(' + url + ')';
-                if (selectedRgbaObj.a !== 0) {
-                    tempCanvas.style.background = 'url(' + url + ')';
-                }
-            }, theme.isDark());
-            previewWrapper.style.backgroundPosition = (offset.x) + 'px ' + (offset.y) + 'px';
+            BB.createCheckerDataUrl(
+                parseInt('' + 50 * scale),
+                function (url) {
+                    previewWrapper.style.background = 'url(' + url + ')';
+                    if (selectedRgbaObj.a !== 0) {
+                        tempCanvas.style.background = 'url(' + url + ')';
+                    }
+                },
+                theme.isDark(),
+            );
+            previewWrapper.style.backgroundPosition = offset.x + 'px ' + offset.y + 'px';
 
             cropper.setScale(scale);
         }
@@ -331,7 +352,6 @@ export const filterCropExtend = {
             },
         });
 
-
         rootEl.append(previewWrapper);
         const cropper = new Cropper({
             x: 0,
@@ -346,20 +366,24 @@ export const filterCropExtend = {
         update(cropper.getTransform());
         offsetWrapper.append(cropper.getElement());
 
-        function updateBg (): void {
+        function updateBg(): void {
             if (selectedRgbaObj.a === 0) {
                 bgColorOverlay.style.background = '';
                 tempCanvas.style.background = '';
             } else {
                 bgColorOverlay.style.background = BB.ColorConverter.toRgbStr(selectedRgbaObj);
 
-                BB.createCheckerDataUrl(parseInt('' + (50 * scale)), function (url) {
-                    tempCanvas.style.background = 'url(' + url + ')';
-                }, theme.isDark());
+                BB.createCheckerDataUrl(
+                    parseInt('' + 50 * scale),
+                    function (url) {
+                        tempCanvas.style.background = 'url(' + url + ')';
+                    },
+                    theme.isDark(),
+                );
             }
         }
 
-        function updateIsDark (): void {
+        function updateIsDark(): void {
             updateInput();
         }
         theme.addIsDarkListener(updateIsDark);
@@ -383,12 +407,11 @@ export const filterCropExtend = {
         return result;
     },
 
-    apply (params: IFilterApply<TFilterCropExtendInput>): boolean {
+    apply(params: IFilterApply<TFilterCropExtendInput>): boolean {
         const klCanvas = params.klCanvas;
         const history = params.history;
         if (
             !klCanvas ||
-            !history ||
             isNaN(params.input.left) ||
             isNaN(params.input.right) ||
             isNaN(params.input.top) ||
@@ -396,17 +419,18 @@ export const filterCropExtend = {
         ) {
             return false;
         }
-        history.pause(true);
+        history?.pause(true);
         klCanvas.resizeCanvas(params.input);
-        history.pause(false);
-        history.push({
+        history?.pause(false);
+        history?.push({
             tool: ['filter', 'cropExtend'],
             action: 'apply',
-            params: [{
-                input: BB.copyObj(params.input),
-            }],
+            params: [
+                {
+                    input: BB.copyObj(params.input),
+                },
+            ],
         } as TFilterCropExtendHistoryEntry);
         return true;
     },
-
 };

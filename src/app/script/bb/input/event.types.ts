@@ -43,4 +43,5 @@ export interface IWheelEvent {
     pageY: number;
     relX: number; // todo docs
     relY: number;
+    event?: WheelEvent;
 }

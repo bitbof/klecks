@@ -1,10 +1,10 @@
-import {fxCanvas} from './fx-canvas';
-import {TFxCanvas} from './fx-canvas-types';
+import { fxCanvas } from './fx-canvas';
+import { TFxCanvas } from './fx-canvas-types';
 
 let failed = false;
 let fx: TFxCanvas | null = null;
 
-export function getSharedFx (): TFxCanvas | null {
+export function getSharedFx(): TFxCanvas | null {
     // failed previously, don't need to try again.
     if (failed) {
         return fx;

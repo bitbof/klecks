@@ -1,14 +1,14 @@
-import {BB} from '../../../bb/bb';
-import {dialogCounter} from '../modals/modal-count';
+import { BB } from '../../../bb/bb';
+import { dialogCounter } from '../modals/modal-count';
 import toolPaintImg from '/src/app/img/ui/tool-paint.svg';
 import toolFillImg from '/src/app/img/ui/tool-fill.svg';
 import toolGradientImg from '/src/app/img/ui/tool-gradient.svg';
 import toolTextImg from '/src/app/img/ui/tool-text.svg';
 import toolShapeImg from '/src/app/img/ui/tool-shape.svg';
+import toolSelectImg from '/src/app/img/ui/tool-select.svg';
 import caretDownImg from '/src/app/img/ui/caret-down.svg';
-import {LANG} from '../../../language/language';
-import {TToolType} from '../../kl-types';
-
+import { LANG } from '../../../language/language';
+import { TToolType } from '../../kl-types';
 
 type TDropdownButton = {
     wrapper: HTMLElement;
@@ -20,11 +20,17 @@ type TDropdownButton = {
  * Toolrow Dropdown. The button where you select: brush, fill, select, transform, etc.
  */
 export class ToolDropdown {
-
     private readonly rootEl: HTMLElement;
     private readonly activeButton: HTMLElement;
     private readonly smallMargin: string = '6px 0';
-    private readonly optionArr: TToolType[] = ['draw', 'fill', 'gradient', 'text', 'shape'];
+    private readonly optionArr: TToolType[] = [
+        'brush',
+        'paintBucket',
+        'gradient',
+        'text',
+        'shape',
+        'select',
+    ];
     private readonly dropdownBtnArr: TDropdownButton[];
     private readonly arrowButton: HTMLElement;
     private isActive: boolean;
@@ -33,25 +39,21 @@ export class ToolDropdown {
     private activeButtonIm: HTMLElement;
     private readonly imArr;
 
-    private updateButton () {
+    private updateButton() {
         this.activeButton.title = this.titleArr[this.currentActiveIndex];
-        this.activeButtonIm.style.backgroundImage = 'url(\'' + this.imArr[this.currentActiveIndex] + '\')';
+        this.activeButtonIm.style.backgroundImage =
+            "url('" + this.imArr[this.currentActiveIndex] + "')";
     }
 
-
-
-    // ---- public ----
-    constructor (
-        p: {
-            onChange: (activeStr: TToolType) => void;
-        }
-    ) {
+    // ----------------------------------- public -----------------------------------
+    constructor(p: { onChange: (activeStr: TToolType) => void }) {
         this.imArr = [
             toolPaintImg,
             toolFillImg,
             toolGradientImg,
             toolTextImg,
             toolShapeImg,
+            toolSelectImg,
         ];
         this.titleArr = [
             `${LANG('tool-brush')} [B]`,
@@ -59,6 +61,7 @@ export class ToolDropdown {
             `${LANG('tool-gradient')} [G]`,
             `${LANG('tool-text')} [T]`,
             `${LANG('tool-shape')} [U]`,
+            `${LANG('tool-select')} [L]`,
         ];
         this.currentActiveIndex = 0;
         this.isActive = true;
@@ -99,16 +102,15 @@ export class ToolDropdown {
                         isDragging = true;
                         startX = event.pageX;
                         startY = event.pageY;
-
-                    } else if (event.type === 'pointermove') {
-                        if (isDragging && !isOpen && BB.dist(startX, startY, event.pageX, event.pageY) > 5) {
+                    } else if (event.type === 'pointermove' && isDragging) {
+                        if (!isOpen && BB.dist(startX, startY, event.pageX, event.pageY) > 5) {
                             clearTimeout(openTimeout);
                             showDropdown();
                         }
-
-                    } else if (event.type === 'pointerup') {
+                    } else if (event.type === 'pointerup' && isDragging) {
                         clearTimeout(openTimeout);
-                        if (isOpen && isDragging) {
+                        isDragging = false;
+                        if (isOpen) {
                             const target = document.elementFromPoint(event.pageX, event.pageY);
                             for (let i = 0; i < this.dropdownBtnArr.length; i++) {
                                 if (target === this.dropdownBtnArr[i].wrapper) {
@@ -121,7 +123,6 @@ export class ToolDropdown {
                                 }
                             }
                         }
-                        isDragging = false;
                     }
                 },
             });
@@ -180,7 +181,7 @@ export class ToolDropdown {
                 //borderRadius: '2px',
                 cursor: 'pointer',
 
-                backgroundImage: 'url(\'' + caretDownImg + '\')',
+                backgroundImage: "url('" + caretDownImg + "')",
                 backgroundRepeat: 'no-repeat',
                 backgroundPosition: 'center',
                 backgroundSize: '60%',
@@ -192,7 +193,6 @@ export class ToolDropdown {
                 showDropdown();
             },
         });
-
 
         const overlay = BB.el({
             css: {
@@ -219,7 +219,7 @@ export class ToolDropdown {
             css: {
                 position: 'absolute',
                 width: '100%',
-                height: (100 * (this.optionArr.length - 1)) + '%',
+                height: 100 * (this.optionArr.length - 1) + '%',
                 top: '100%',
                 left: '0',
                 zIndex: '1',
@@ -234,22 +234,20 @@ export class ToolDropdown {
 
         this.dropdownBtnArr = [];
 
-        const createDropdownButton = (
-            p: {
-                index: number;
-                id: TToolType;
-                image: string;
-                title: string;
-                onClick: (index: number) => void;
-            }
-        ): TDropdownButton => {
+        const createDropdownButton = (p: {
+            index: number;
+            id: TToolType;
+            image: string;
+            title: string;
+            onClick: (index: number) => void;
+        }): TDropdownButton => {
             const wrapper = BB.el({
                 parent: dropdownWrapper,
                 className: 'tool-dropdown-button',
                 title: p.title,
                 css: {
                     padding: '10px 0',
-                    height: (100 / (this.optionArr.length - 1)) + '%',
+                    height: 100 / (this.optionArr.length - 1) + '%',
                     boxSizing: 'border-box',
                 },
                 onClick: (e) => {
@@ -263,7 +261,7 @@ export class ToolDropdown {
                 parent: wrapper,
                 className: 'dark-invert',
                 css: {
-                    backgroundImage: 'url(\'' + p.image + '\')',
+                    backgroundImage: "url('" + p.image + "')",
                     backgroundRepeat: 'no-repeat',
                     backgroundPosition: 'center',
                     backgroundSize: 'contain',
@@ -301,13 +299,15 @@ export class ToolDropdown {
         };
 
         for (let i = 0; i < this.optionArr.length; i++) {
-            this.dropdownBtnArr.push(createDropdownButton({
-                index: i,
-                id: this.optionArr[i],
-                image: this.imArr[i],
-                title: this.titleArr[i],
-                onClick: onClickDropdownBtn,
-            }));
+            this.dropdownBtnArr.push(
+                createDropdownButton({
+                    index: i,
+                    id: this.optionArr[i],
+                    image: this.imArr[i],
+                    title: this.titleArr[i],
+                    onClick: onClickDropdownBtn,
+                }),
+            );
         }
 
         const showDropdown = () => {
@@ -338,7 +338,7 @@ export class ToolDropdown {
 
     // ---- interface ----
 
-    setIsSmall (b: boolean): void {
+    setIsSmall(b: boolean): void {
         this.activeButton.style.padding = b ? this.smallMargin : '10px 0';
         for (let i = 0; i < this.optionArr.length; i++) {
             this.dropdownBtnArr[i].setIsSmall(b);
@@ -352,7 +352,7 @@ export class ToolDropdown {
         }
     }
 
-    setActive (activeStr: TToolType): void {
+    setActive(activeStr: TToolType): void {
         if (this.optionArr.includes(activeStr)) {
             this.isActive = true;
             for (let i = 0; i < this.optionArr.length; i++) {
@@ -369,11 +369,11 @@ export class ToolDropdown {
         }
     }
 
-    getActive (): TToolType {
+    getActive(): TToolType {
         return this.optionArr[this.currentActiveIndex];
     }
 
-    getElement (): HTMLElement {
+    getElement(): HTMLElement {
         return this.rootEl;
     }
 }

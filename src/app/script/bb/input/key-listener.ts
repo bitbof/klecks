@@ -1,65 +1,66 @@
-import {IKeyString} from '../bb-types';
+import { IKeyString } from '../bb-types';
 
 type TGlobalKey = {
     add: (keyListenerRef: TKeyListenerRef) => void;
     remove: (keyListenerRef: TKeyListenerRef) => void;
     getIsDown: () => TIsDown;
     getCombo: () => string[];
-}
+};
 
 type TIsDown = {
     [key: string]: boolean;
 };
 
-export type TOnKeyDown = (keyStr: string, e: KeyboardEvent, comboStr: string, isRepeat?: boolean) => void;
+export type TOnKeyDown = (
+    keyStr: string,
+    e: KeyboardEvent,
+    comboStr: string,
+    isRepeat?: boolean,
+) => void;
 export type TOnKeyUp = (keyStr: string, e: KeyboardEvent, oldComboStr: string) => void;
-type TOnBlur = () => void;
-type TKeyListenerRef = [
-    TOnKeyDown | undefined,
-    TOnKeyUp | undefined,
-    TOnBlur | undefined,
-];
-
+export type TOnBlur = () => void;
+type TKeyListenerRef = [TOnKeyDown | undefined, TOnKeyUp | undefined, TOnBlur | undefined];
 
 const globalKey = ((): TGlobalKey => {
-
     // keyStr - our key naming system
     // key - KeyboardEvent.key
     // code - KeyboardEvent.code
 
-    const keyStrToKeyObj = { // keyStr not to contain a '+', because that's used for the comboStr
-        'space': [' ', 'Spacebar'], // Spacebar in IE
-        'alt': ['Alt', 'AltGraph'],
-        'shift': 'Shift',
-        'ctrl': 'Control',
-        'cmd': ['Meta', 'MetaLeft', 'MetaRight'],
-        'enter': 'Enter',
-        'esc': 'Escape',
-        'backspace': 'Backspace',
-        'delete': 'Delete',
-        'sqbr_open': '[',
-        'sqbr_close': ']',
-        'a': ['a', 'A'],
-        'b': ['b', 'B'],
-        'c': ['c', 'C'],
-        'e': ['e', 'E'],
-        'f': ['f', 'F'],
-        'g': ['g', 'G'],
-        'r': ['r', 'R'], // when holding shift
-        's': ['s', 'S'],
-        't': ['t', 'T'],
-        'u': ['u', 'U'],
-        'x': ['x', 'X'],
-        'y': ['y', 'Y'],
-        'z': ['z', 'Z'],
-        'plus': '+',
-        'minus': '-',
-        'left': 'ArrowLeft',
-        'right': 'ArrowRight',
-        'up': 'ArrowUp',
-        'down': 'ArrowDown',
-        'home': 'Home',
-        'end': 'End',
+    const keyStrToKeyObj = {
+        // keyStr not to contain a '+', because that's used for the comboStr
+        space: [' ', 'Spacebar'], // Spacebar in IE
+        alt: ['Alt', 'AltGraph'],
+        shift: 'Shift',
+        ctrl: 'Control',
+        cmd: ['Meta', 'MetaLeft', 'MetaRight'],
+        enter: 'Enter',
+        esc: 'Escape',
+        backspace: 'Backspace',
+        delete: 'Delete',
+        sqbr_open: '[',
+        sqbr_close: ']',
+        a: ['a', 'A'],
+        b: ['b', 'B'],
+        c: ['c', 'C'],
+        e: ['e', 'E'],
+        f: ['f', 'F'],
+        g: ['g', 'G'],
+        l: ['l', 'L'],
+        r: ['r', 'R'], // when holding shift
+        s: ['s', 'S'],
+        t: ['t', 'T'],
+        u: ['u', 'U'],
+        x: ['x', 'X'],
+        y: ['y', 'Y'],
+        z: ['z', 'Z'],
+        plus: '+',
+        minus: '-',
+        left: 'ArrowLeft',
+        right: 'ArrowRight',
+        up: 'ArrowUp',
+        down: 'ArrowDown',
+        home: 'Home',
+        end: 'End',
     };
 
     // ['space', 'alt', ... ]
@@ -77,7 +78,7 @@ const globalKey = ((): TGlobalKey => {
         if (typeof code === 'string') {
             acc[code] = key;
         } else {
-            code.forEach(item => {
+            code.forEach((item) => {
                 acc[item] = key;
             });
         }
@@ -115,18 +116,19 @@ const globalKey = ((): TGlobalKey => {
                 }
             }
             emitUp(
-                keyStr, {
+                keyStr,
+                {
                     preventDefault: function () {},
                     stopPropagation: function () {},
                 } as KeyboardEvent,
-                oldComboStr);
+                oldComboStr,
+            );
             metaClearTimeout = undefined;
         }, 1000);
     };
 
-
     const emitDown: TOnKeyDown = function (a, b, c, d?): void {
-        listenerArr.forEach(item => {
+        listenerArr.forEach((item) => {
             if (!item[0]) {
                 return;
             }
@@ -135,7 +137,7 @@ const globalKey = ((): TGlobalKey => {
     };
 
     const emitUp: TOnKeyUp = function (a, b, c): void {
-        listenerArr.forEach(item => {
+        listenerArr.forEach((item) => {
             if (!item[1]) {
                 return;
             }
@@ -144,7 +146,7 @@ const globalKey = ((): TGlobalKey => {
     };
 
     const emitBlur: TOnBlur = function (): void {
-        listenerArr.forEach(item => {
+        listenerArr.forEach((item) => {
             if (!item[2]) {
                 return;
             }
@@ -152,7 +154,7 @@ const globalKey = ((): TGlobalKey => {
         });
     };
 
-    function keyDown (e: KeyboardEvent): void {
+    function keyDown(e: KeyboardEvent): void {
         const key = e.key;
         const code = e.code;
 
@@ -178,17 +180,21 @@ const globalKey = ((): TGlobalKey => {
         }
     }
 
-
-    function keyUp (e: KeyboardEvent): void {
+    function keyUp(e: KeyboardEvent): void {
         const code = e.code;
         const oldComboStr = comboArr.join('+');
 
         // because of a macOS bug: when meta key is down, keyup of other keys does not fire.
         // https://stackoverflow.com/questions/25438608/javascript-keyup-isnt-called-when-command-and-another-is-pressed
-        if ([
-            'Meta', 'MetaLeft', 'MetaRight',
-            'OSLeft', 'OSRight', // Firefox
-        ].includes(code)) {
+        if (
+            [
+                'Meta',
+                'MetaLeft',
+                'MetaRight',
+                'OSLeft',
+                'OSRight', // Firefox
+            ].includes(code)
+        ) {
             blur();
             return;
         } else if (isDownObj['cmd']) {
@@ -215,13 +221,13 @@ const globalKey = ((): TGlobalKey => {
         }
     }
 
-    function blur (): void {
+    function blur(): void {
         const oldComboStr = comboArr.join('+');
         comboArr = [];
         codeIsDownObj = {};
 
         const eventArr: string[] = [];
-        keyStrArr.forEach(keyStr => {
+        keyStrArr.forEach((keyStr) => {
             if (isDownObj[keyStr]) {
                 isDownObj[keyStr] = false;
                 eventArr.push(keyStr);
@@ -239,8 +245,6 @@ const globalKey = ((): TGlobalKey => {
         }
         emitBlur();
     }
-
-
 
     return {
         add: (keyListenerRef: TKeyListenerRef): void => {
@@ -278,7 +282,11 @@ const globalKey = ((): TGlobalKey => {
     };
 })();
 
-
+export type TKeyListenerParams = {
+    onDown?: TOnKeyDown;
+    onUp?: TOnKeyUp;
+    onBlur?: TOnBlur; // on window blur
+};
 
 /**
  * Listens to key events in window. Makes combos easier - e.g. ctrl + z
@@ -289,19 +297,12 @@ const globalKey = ((): TGlobalKey => {
  *
  */
 export class KeyListener {
-
     private readonly onDown: TOnKeyDown | undefined;
     private readonly onUp: TOnKeyUp | undefined;
     private readonly onBlur: TOnBlur | undefined;
     private readonly ref: TKeyListenerRef;
 
-    constructor (
-        p: {
-            onDown?: TOnKeyDown;
-            onUp?: TOnKeyUp;
-            onBlur?: TOnBlur;
-        },
-    ) {
+    constructor(p: TKeyListenerParams) {
         this.onDown = p.onDown;
         this.onUp = p.onUp;
         this.onBlur = p.onBlur;
@@ -309,18 +310,18 @@ export class KeyListener {
         globalKey.add(this.ref);
     }
 
-    isPressed (keyStr: string): boolean {
+    isPressed(keyStr: string): boolean {
         if (!(keyStr in globalKey.getIsDown())) {
             throw 'key "' + keyStr + '" not found';
         }
         return globalKey.getIsDown()[keyStr];
     }
 
-    getComboStr (): string {
+    getComboStr(): string {
         return globalKey.getCombo().join('+');
     }
 
-    comboOnlyContains (keyStrArr: string[]): boolean {
+    comboOnlyContains(keyStrArr: string[]): boolean {
         for (let i = 0; i < globalKey.getCombo().length; i++) {
             if (!keyStrArr.includes(globalKey.getCombo()[i])) {
                 return false;
@@ -329,7 +330,7 @@ export class KeyListener {
         return true;
     }
 
-    destroy (): void {
+    destroy(): void {
         globalKey.remove(this.ref);
     }
 }
@@ -337,6 +338,6 @@ export class KeyListener {
 /**
  * Test, are the same keys pressed. Order does not matter.
  */
-export function sameKeys (comboAStr: string, comboBStr: string): boolean {
+export function sameKeys(comboAStr: string, comboBStr: string): boolean {
     return comboAStr.split('+').sort().join('+') === comboBStr.split('+').sort().join('+');
 }

@@ -1,10 +1,10 @@
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-nocheck
-import {gl} from '../core/gl';
-import {Shader} from '../core/shader';
-import {randomShaderFunc} from '../shaders/random-shader-func';
-import {simpleShader} from '../core/simple-shader';
-import {BB} from '../../bb/bb';
+import { gl } from '../core/gl';
+import { Shader } from '../core/shader';
+import { randomShaderFunc } from '../shaders/random-shader-func';
+import { simpleShader } from '../core/simple-shader';
+import { BB } from '../../bb/bb';
 
 /**
  * @filter           Lens Blur
@@ -22,13 +22,17 @@ import {BB} from '../../bb/bb';
  * @param brightness -1 to 1 (the brightness of the bokeh, negative values will create dark bokeh)
  * @param angle      the rotation of the bokeh in radians
  */
-export function lensBlur (radius, brightness, angle) {
+export function lensBlur(radius, brightness, angle) {
     // All averaging is done on values raised to a power to make more obvious bokeh
     // (we will raise the average to the inverse power at the end to compensate).
     // Without this the image looks almost like a normal blurred image. This hack is
     // obviously not realistic, but to accurately simulate this we would need a high
     // dynamic range source photograph which we don't have.
-    gl.lensBlurPrePass = gl.lensBlurPrePass || new Shader(null, '\
+    gl.lensBlurPrePass =
+        gl.lensBlurPrePass ||
+        new Shader(
+            null,
+            '\
         uniform sampler2D texture;\
         uniform float power;\
         varying vec2 texCoord;\
@@ -37,16 +41,21 @@ export function lensBlur (radius, brightness, angle) {
             color = pow(color, vec4(power));\
             gl_FragColor = vec4(color);\
         }\
-    ', 'lensBlurPrePass');
+    ',
+            'lensBlurPrePass',
+        );
 
-    const common = '\
+    const common =
+        '\
         uniform sampler2D texture0;\
         uniform sampler2D texture1;\
         uniform vec2 delta0;\
         uniform vec2 delta1;\
         uniform float power;\
         varying vec2 texCoord;\
-        ' + randomShaderFunc + '\
+        ' +
+        randomShaderFunc +
+        '\
         vec4 sample(vec2 delta) {\
             /* randomize the lookup values to hide the fixed number of samples */\
             float offset = random(vec3(delta, 151.7182), 0.0);\
@@ -62,28 +71,49 @@ export function lensBlur (radius, brightness, angle) {
         }\
     ';
 
-    gl.lensBlur0 = gl.lensBlur0 || new Shader(null, common + '\
+    gl.lensBlur0 =
+        gl.lensBlur0 ||
+        new Shader(
+            null,
+            common +
+                '\
         void main() {\
             gl_FragColor = sample(delta0);\
         }\
-    ', 'lensBlur0');
-    gl.lensBlur1 = gl.lensBlur1 || new Shader(null, common + '\
+    ',
+            'lensBlur0',
+        );
+    gl.lensBlur1 =
+        gl.lensBlur1 ||
+        new Shader(
+            null,
+            common +
+                '\
         void main() {\
             gl_FragColor = (sample(delta0) + sample(delta1)) * 0.5;\
         }\
-    ', 'lensBlur1');
-    gl.lensBlur2 = gl.lensBlur2 || new Shader(null, common + '\
+    ',
+            'lensBlur1',
+        );
+    gl.lensBlur2 =
+        gl.lensBlur2 ||
+        new Shader(
+            null,
+            common +
+                '\
         void main() {\
             vec4 color = (sample(delta0) + 2.0 * texture2D(texture1, texCoord)) / 3.0;\
             gl_FragColor = pow(color, vec4(power));\
         }\
-    ', 'lensBlur2').textures({texture1: 1});
+    ',
+            'lensBlur2',
+        ).textures({ texture1: 1 });
 
     // Generate
     const dir = [];
     for (let i = 0; i < 3; i++) {
-        const a = angle + i * Math.PI * 2 / 3;
-        dir.push([radius * Math.sin(a) / this.width, radius * Math.cos(a) / this.height]);
+        const a = angle + (i * Math.PI * 2) / 3;
+        dir.push([(radius * Math.sin(a)) / this.width, (radius * Math.cos(a)) / this.height]);
     }
     const power = Math.pow(10, BB.clamp(brightness, -1, 1));
 
@@ -94,13 +124,25 @@ export function lensBlur (radius, brightness, angle) {
 
     // Blur two rhombi in parallel into extraTexture
     this._.extraTexture.ensureFormatViaTexture(this._.texture);
-    simpleShader.call(this, gl.lensBlur0, {
-        delta0: dir[0],
-    }, this._.texture, this._.extraTexture);
-    simpleShader.call(this, gl.lensBlur1, {
-        delta0: dir[1],
-        delta1: dir[2],
-    }, this._.extraTexture, this._.extraTexture);
+    simpleShader.call(
+        this,
+        gl.lensBlur0,
+        {
+            delta0: dir[0],
+        },
+        this._.texture,
+        this._.extraTexture,
+    );
+    simpleShader.call(
+        this,
+        gl.lensBlur1,
+        {
+            delta0: dir[1],
+            delta1: dir[2],
+        },
+        this._.extraTexture,
+        this._.extraTexture,
+    );
 
     // Blur the last rhombus and combine with extraTexture
     simpleShader.call(this, gl.lensBlur0, {

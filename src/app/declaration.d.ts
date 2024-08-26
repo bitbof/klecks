@@ -4,29 +4,29 @@ declare module '*.png' {
     const path: string;
     export default path;
 }
-declare module '*.jpg'{
+declare module '*.jpg' {
     const path: string;
     export default path;
 }
-declare module '*.svg'{
+declare module '*.svg' {
     const path: string;
     export default path;
 }
-declare module '*.gif'{
+declare module '*.gif' {
     const path: string;
     export default path;
 }
-declare module '*.glsl'{
+declare module '*.glsl' {
     const value: string;
     export default value;
 }
 declare module '*.json';
 declare module '*.scss';
-declare module '*.ttf'{
+declare module '*.ttf' {
     const path: string;
     export default path;
 }
-declare module '*.woff2'{
+declare module '*.woff2' {
     const path: string;
     export default path;
 }

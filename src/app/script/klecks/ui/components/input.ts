@@ -1,6 +1,6 @@
-import {BB} from '../../../bb/bb';
-import {IKeyString} from '../../../bb/bb-types';
-import {KeyListener} from '../../../bb/input/key-listener';
+import { BB } from '../../../bb/bb';
+import { IKeyString } from '../../../bb/bb-types';
+import { KeyListener } from '../../../bb/input/key-listener';
 
 type TInputType = 'button' | 'checkbox' | 'number' | 'text' | 'color';
 
@@ -28,10 +28,12 @@ export class Input {
     private readonly input: HTMLInputElement;
     private readonly type: TInputType;
     private readonly pointerListener;
-    private readonly keyListener: KeyListener = {destroy: () => {}} as KeyListener;
+    private readonly keyListener: KeyListener = {
+        destroy: () => {},
+    } as KeyListener;
 
-    // ---- public ----
-    constructor (p: TInputParams) {
+    // ----------------------------------- public -----------------------------------
+    constructor(p: TInputParams) {
         this.rootEl = BB.el({
             tagName: 'label',
             content: p.label,
@@ -41,7 +43,6 @@ export class Input {
                 gap: '5px',
             },
         });
-
 
         this.input = BB.el({
             tagName: 'input',
@@ -54,7 +55,7 @@ export class Input {
         this.type = p.type ?? 'text';
         try {
             this.input.type = this.type;
-        } catch(e) {
+        } catch (e) {
             // ie can't deal with number
         }
 
@@ -126,26 +127,27 @@ export class Input {
                         return;
                     }*/
                     const fac = this.keyListener.isPressed('shift') ? 4 : 1;
-                    this.input.value = '' + (parseFloat(this.input.value) - e.deltaY * stepSize * fac);
+                    this.input.value =
+                        '' + (parseFloat(this.input.value) - e.deltaY * stepSize * fac);
                     handleChange() && onChange(this.input.value);
                 },
             });
         }
     }
 
-    getElement (): HTMLElement {
+    getElement(): HTMLElement {
         return this.rootEl;
     }
 
-    getValue (): string {
+    getValue(): string {
         return this.input.value;
     }
 
-    setValue (v: string | number): void {
+    setValue(v: string | number): void {
         this.input.value = '' + v;
     }
 
-    destroy (): void {
+    destroy(): void {
         this.pointerListener && this.pointerListener.destroy();
         this.keyListener.destroy();
     }
@@ -164,7 +166,7 @@ export const input = function (params: {
     if (params.type) {
         try {
             result.type = params.type;
-        } catch(e) {
+        } catch (e) {
             /* empty */
             // ie can't deal with number
         }

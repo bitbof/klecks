@@ -1,12 +1,11 @@
 import './polyfills/polyfills';
-import {KlApp} from './app/kl-app';
-import {IKlProject} from './klecks/kl-types';
-import {SaveReminder} from './klecks/ui/components/save-reminder';
-import {klHistory} from './klecks/history/kl-history';
-import {klPsdToKlProject, readPsd} from './klecks/storage/psd';
-import {LANG} from './language/language';
-import {loadAgPsd, TAgPsd} from './klecks/storage/load-ag-psd';
-import {klConfig} from './klecks/kl-config';
+import { KlApp } from './app/kl-app';
+import { IKlProject } from './klecks/kl-types';
+import { SaveReminder } from './klecks/ui/components/save-reminder';
+import { klPsdToKlProject, readPsd } from './klecks/storage/psd';
+import { LANG } from './language/language';
+import { loadAgPsd, TAgPsd } from './klecks/storage/load-ag-psd';
+import { klConfig } from './klecks/kl-config';
 
 export interface IEmbedParams {
     project?: IKlProject;
@@ -29,7 +28,6 @@ export interface IReadPSD {
  * Embed runs when the main bundle is loaded. It instantiates Klecks.
  */
 export class Embed {
-
     private isInitialized: boolean = false;
     private klApp: KlApp | undefined;
     private readonly psdQueue: IReadPSD[] = []; // queue of psds waiting while ag-psd is loading
@@ -37,8 +35,7 @@ export class Embed {
     private loadingScreenEl: HTMLElement | null;
     private loadingScreenTextEl: HTMLElement | null;
 
-
-    onProjectReady (project: IKlProject) {
+    onProjectReady(project: IKlProject) {
         try {
             if (this.isInitialized) {
                 throw new Error('Already called openProject');
@@ -46,27 +43,24 @@ export class Embed {
             this.isInitialized = true;
 
             const saveReminder = new SaveReminder(
-                klHistory,
                 false,
                 false,
                 () => {},
-                () => this.klApp ? this.klApp.isDrawing() : false,
+                () => (this.klApp ? this.klApp.isDrawing() : false),
                 null,
                 null,
             );
-            this.klApp = new KlApp(
+            this.klApp = new KlApp({
                 project,
-                {
-                    saveReminder,
-                    bottomBar: this.p.bottomBar,
-                    aboutEl: this.p.aboutEl,
-                    embed: {
-                        url: this.p.embedUrl,
-                        onSubmit: this.p.onSubmit,
-                    },
-                    simpleUi: true
-                }
-            );
+                saveReminder,
+                bottomBar: this.p.bottomBar,
+                aboutEl: this.p.aboutEl,
+                embed: {
+                    url: this.p.embedUrl,
+                    onSubmit: this.p.onSubmit,
+                },
+                simpleUi: false
+            });
             saveReminder.init();
 
             this.loadingScreenEl && this.loadingScreenEl.remove();
@@ -85,9 +79,8 @@ export class Embed {
         }
     }
 
-    // ----- public ----------
-    constructor (private p: IEmbedParams) {
-
+    // ----------------------------------- public -----------------------------------
+    constructor(private p: IEmbedParams) {
         this.loadingScreenEl = document.getElementById('loading-screen');
         this.loadingScreenTextEl = document.getElementById('loading-screen-text');
         if (this.loadingScreenTextEl) {
@@ -106,7 +99,7 @@ export class Embed {
         this.onProjectReady(project);
     };
 
-    initError (error: string) {
+    initError(error: string) {
         if (this.loadingScreenTextEl) {
             this.loadingScreenTextEl.textContent = '❌ ' + error;
         }
@@ -115,21 +108,21 @@ export class Embed {
         }
     }
 
-    getPNG (): Blob {
+    getPNG(): Blob {
         if (!this.klApp) {
             throw new Error('App not initialized');
         }
         return this.klApp.getPNG();
     }
 
-    async getPSD (): Promise<Blob> {
+    async getPSD(): Promise<Blob> {
         if (!this.klApp) {
             throw new Error('App not initialized');
         }
         return await this.klApp.getPSD();
     }
 
-    readPSDs (psds: IReadPSD[]) {
+    readPSDs(psds: IReadPSD[]) {
         if (psds.length === 0) {
             return;
         }
@@ -160,12 +153,11 @@ export class Embed {
                     }
                 })();
             }
-            psds.forEach(item => {
+            psds.forEach((item) => {
                 this.psdQueue.push(item);
             });
         } else {
             psds.forEach(readItem);
         }
     }
-
 }

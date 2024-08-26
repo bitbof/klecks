@@ -1,13 +1,12 @@
-import {BB} from '../../../bb/bb';
-import {input} from '../components/input';
-import {showModal} from './base/showModal';
-import {LANG} from '../../../language/language';
+import { BB } from '../../../bb/bb';
+import { input } from '../components/input';
+import { showModal } from './base/showModal';
+import { LANG } from '../../../language/language';
 import copyImg from '/src/app/img/ui/copy.svg';
-import {IRGB} from '../../kl-types';
-import {RGB} from '../../../bb/color/color';
-import {c} from '../../../bb/base/c';
-import {css} from '@emotion/css';
-
+import { IRGB } from '../../kl-types';
+import { RGB } from '../../../bb/color/color';
+import { c } from '../../../bb/base/c';
+import { css } from '@emotion/css';
 
 type TInputRow = {
     update: () => void;
@@ -19,15 +18,8 @@ type TInputRow = {
  * dialog for manually inputting the color
  */
 export class HexColorDialog {
-
-
-    // ---- public ----
-    constructor (
-        p: {
-            color: IRGB;
-            onClose: (rgb: IRGB | undefined) => void;
-        }
-    ) {
+    // ----------------------------------- public -----------------------------------
+    constructor(p: { color: IRGB; onClose: (rgb: IRGB | undefined) => void }) {
         let lastValidRgb: RGB = new BB.RGB(p.color.r, p.color.g, p.color.b);
 
         const previewEl = BB.el({
@@ -75,31 +67,26 @@ export class HexColorDialog {
             },
         });
 
-        const hexRowEl = c({
-            css: {
-                display: 'flex',
-                alignItems: 'center',
-                marginBottom: '15px',
-                flexWrap: 'wrap',
-                gap: '5px 10px',
-                maxWidth: '250px',
+        const hexRowEl = c(
+            {
+                css: {
+                    display: 'flex',
+                    alignItems: 'center',
+                    marginBottom: '15px',
+                    flexWrap: 'wrap',
+                    gap: '5px 10px',
+                    maxWidth: '250px',
+                },
             },
-        }, [
-            hexLabel,
-            c(',flex,items-center,gap-10', [
-                hexInput,
-                copyButton,
-            ]),
-        ]);
+            [hexLabel, c(',flex,items-center,gap-10', [hexInput, copyButton])],
+        );
         setTimeout(function () {
             hexInput.focus();
             hexInput.select();
         }, 0);
 
-
         // --- R G B ---
-        function createRgbInputRow (labelStr: string, attributeStr: 'r' | 'g' | 'b'): TInputRow {
-
+        function createRgbInputRow(labelStr: string, attributeStr: 'r' | 'g' | 'b'): TInputRow {
             const inputEl = input({
                 init: lastValidRgb[attributeStr],
                 min: 0,
@@ -109,7 +96,11 @@ export class HexColorDialog {
                     width: '80px',
                 },
                 callback: function () {
-                    if (inputEl.value === '' || parseFloat(inputEl.value) < 0 || parseFloat(inputEl.value) > 255) {
+                    if (
+                        inputEl.value === '' ||
+                        parseFloat(inputEl.value) < 0 ||
+                        parseFloat(inputEl.value) > 255
+                    ) {
                         result.update();
                         return;
                     }
@@ -120,10 +111,7 @@ export class HexColorDialog {
                 },
             });
 
-            const rowEl = c('tr', [
-                c('td,pr-10', labelStr),
-                c('td', [inputEl]),
-            ]);
+            const rowEl = c('tr', [c('td,pr-10', labelStr), c('td', [inputEl])]);
 
             const result = {
                 update: (): void => {
@@ -144,14 +132,19 @@ export class HexColorDialog {
 
         const tableCss = css({
             borderCollapse: 'collapse',
-            'td': {
+            td: {
                 paddingBottom: '5px',
             },
         });
         const rootEl = c('', [
             previewEl,
             hexRowEl,
-            c('table.' + tableCss, [c('tbody', rgbArr.map(item => item.element))]),
+            c('table.' + tableCss, [
+                c(
+                    'tbody',
+                    rgbArr.map((item) => item.element),
+                ),
+            ]),
         ]);
 
         showModal({
@@ -163,12 +156,13 @@ export class HexColorDialog {
             buttons: ['Ok', 'Cancel'],
             callback: function (resultStr) {
                 BB.destroyEl(copyButton);
-                rgbArr.forEach(item => item.destroy());
+                rgbArr.forEach((item) => item.destroy());
                 rgbArr.splice(0, rgbArr.length);
 
-                p.onClose(resultStr === 'Ok' ? BB.ColorConverter.hexToRGB(hexInput.value) : undefined);
+                p.onClose(
+                    resultStr === 'Ok' ? BB.ColorConverter.hexToRGB(hexInput.value) : undefined,
+                );
             },
         });
     }
-
 }

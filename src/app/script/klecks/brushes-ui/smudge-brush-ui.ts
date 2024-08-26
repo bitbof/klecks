@@ -1,14 +1,13 @@
-import {BB} from '../../bb/bb';
-import {brushes} from '../brushes/brushes';
-import {eventResMs} from './brushes-consts';
-import {klHistory} from '../history/kl-history';
-import {Checkbox} from '../ui/components/checkbox';
-import {KlSlider} from '../ui/components/kl-slider';
-import {createPenPressureToggle} from '../ui/components/create-pen-pressure-toggle';
+import { BB } from '../../bb/bb';
+import { brushes } from '../brushes/brushes';
+import { eventResMs } from './brushes-consts';
+import { Checkbox } from '../ui/components/checkbox';
+import { KlSlider } from '../ui/components/kl-slider';
+import { createPenPressureToggle } from '../ui/components/create-pen-pressure-toggle';
 import brushIconImg from '/src/app/img/ui/brush-smudge.svg';
-import {IBrushUi} from '../kl-types';
-import {LANG, languageStrings} from '../../language/language';
-import {SmudgeBrush} from '../brushes/smudge-brush';
+import { IBrushUi } from '../kl-types';
+import { LANG, languageStrings } from '../../language/language';
+import { SmudgeBrush } from '../brushes/smudge-brush';
 
 export const smudgeBrushUi = (function () {
     const brushInterface = {
@@ -22,7 +21,11 @@ export const smudgeBrushUi = (function () {
         opacitySlider: {
             min: 1 / 100,
             max: 1,
-            curve: [[0, 1 / 100], [0.5, 0.3], [1, 1]],
+            curve: [
+                [0, 1 / 100],
+                [0.5, 0.3],
+                [1, 1],
+            ],
         },
     } as IBrushUi<SmudgeBrush>;
 
@@ -33,7 +36,7 @@ export const smudgeBrushUi = (function () {
     brushInterface.Ui = function (p) {
         const div = document.createElement('div'); // the gui
         const brush = new brushes.SmudgeBrush();
-        brush.setHistory(klHistory);
+        brush.setHistory(p.history);
         p.onSizeChange(brush.getSize());
         let sizeSlider: KlSlider;
         let opacitySlider: KlSlider;
@@ -48,14 +51,21 @@ export const smudgeBrushUi = (function () {
             title: LANG('lock-alpha-title'),
         });
 
-        const spacingSpline = new BB.SplineInterpolator([[0, 15], [8, 7], [14, 4], [30, 3], [50, 2.7], [100, 2]]);
+        const spacingSpline = new BB.SplineInterpolator([
+            [0, 15],
+            [8, 7],
+            [14, 4],
+            [30, 3],
+            [50, 2.7],
+            [100, 2],
+        ]);
 
-        function setSize (size: number) {
+        function setSize(size: number) {
             brush.setSize(size);
             brush.setSpacing(Math.max(2, spacingSpline.interpolate(size)) / 15);
         }
 
-        function init () {
+        function init() {
             sizeSlider = new KlSlider({
                 label: LANG('brush-size'),
                 width: 225,
@@ -106,10 +116,7 @@ export const smudgeBrushUi = (function () {
 
             div.append(
                 BB.el({
-                    content: [
-                        sizeSlider.getElement(),
-                        pressureSizeToggle,
-                    ],
+                    content: [sizeSlider.getElement(), pressureSizeToggle],
                     css: {
                         display: 'flex',
                         justifyContent: 'space-between',
@@ -118,16 +125,13 @@ export const smudgeBrushUi = (function () {
                     },
                 }),
                 BB.el({
-                    content: [
-                        opacitySlider.getElement(),
-                        pressureOpacityToggle,
-                    ],
+                    content: [opacitySlider.getElement(), pressureOpacityToggle],
                     css: {
                         display: 'flex',
                         justifyContent: 'space-between',
                         alignItems: 'center',
                     },
-                })
+                }),
             );
 
             const bottomRow = BB.el({
@@ -137,7 +141,6 @@ export const smudgeBrushUi = (function () {
                 },
             });
             bottomRow.append(lockAlphaToggle.getElement());
-
         }
 
         init();

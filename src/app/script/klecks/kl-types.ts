@@ -1,12 +1,12 @@
-import {KlHistoryInterface} from './history/kl-history';
-import {KlCanvas} from './canvas/kl-canvas';
-import {TTranslationCode} from '../../languages/languages';
+import { KlHistory } from './history/kl-history';
+import { KlCanvas } from './canvas/kl-canvas';
+import { TTranslationCode } from '../../languages/languages';
 
 export interface IFilterApply<T = unknown> {
     context: CanvasRenderingContext2D; // context of selected layer
     klCanvas: KlCanvas;
     input: T; // parameters chosen in modal
-    history: KlHistoryInterface;
+    history?: KlHistory;
 }
 
 export interface IFilterGetDialogParam {
@@ -18,13 +18,15 @@ export interface IFilterGetDialogParam {
     secondaryColorRgb: IRGB;
 }
 
-export type TFilterGetDialogResult<T = unknown> =  {
-    element: HTMLElement; // contents of modal (excluding title, dialog buttons)
-    destroy?: () => void; // called when modal closed
-    width?: number; // custom modal width
-    getInput?: () => T; // called when Ok pressed
-    errorCallback?: (e: Error) => void; // dialog can call this if error happens and cancel dialog
-} | { error: string }
+export type TFilterGetDialogResult<T = unknown> =
+    | {
+          element: HTMLElement; // contents of modal (excluding title, dialog buttons)
+          destroy?: () => void; // called when modal closed
+          width?: number; // custom modal width
+          getInput?: () => T; // called when Ok pressed
+          errorCallback?: (e: Error) => void; // dialog can call this if error happens and cancel dialog
+      }
+    | { error: string };
 
 export interface IFilter {
     lang: {
@@ -58,24 +60,23 @@ export type TKlCanvasLayer = {
 };
 
 // a subset of CanvasRenderingContext2D.globalCompositeOperation
-export type TMixMode = (
-    'source-over' | // default aka normal
-    'darken' |
-    'multiply' |
-    'color-burn' |
-    'lighten' |
-    'screen' |
-    'color-dodge' |
-    'overlay' |
-    'soft-light' |
-    'hard-light' |
-    'difference' |
-    'exclusion' |
-    'hue' |
-    'saturation' |
-    'color' |
-    'luminosity'
-    );
+export type TMixMode =
+    | 'source-over' // default aka normal
+    | 'darken'
+    | 'multiply'
+    | 'color-burn'
+    | 'lighten'
+    | 'screen'
+    | 'color-dodge'
+    | 'overlay'
+    | 'soft-light'
+    | 'hard-light'
+    | 'difference'
+    | 'exclusion'
+    | 'hue'
+    | 'saturation'
+    | 'color'
+    | 'luminosity';
 
 export type IKlBasicLayer = {
     opacity: number; // 0 - 1
@@ -127,7 +128,7 @@ export interface IRGBA {
     a: number; // [0, 1]
 }
 
-export interface IInitState {
+export interface TOldestProjectState {
     canvas: KlCanvas;
     focus: number; // index of selected layer
     brushes: any; // todo type
@@ -211,10 +212,11 @@ export interface IBrushUi<GBrush> extends ISliderConfig {
     Ui: (
         this: TBrushUiInstance<GBrush>,
         p: {
+            history: KlHistory;
             onSizeChange: (size: number) => void;
             onOpacityChange: (size: number) => void;
             onConfigChange: () => void;
-        }
+        },
     ) => TBrushUiInstance<GBrush>;
 }
 
@@ -251,7 +253,7 @@ export interface IDrawUpEvent {
     isCoalesced: boolean;
 }
 
-export type TDrawEvent = IDrawDownEvent | IDrawMoveEvent | IDrawUpEvent | {
+export interface IDrawLine {
     type: 'line';
     x0: number | null;
     y0: number | null;
@@ -259,12 +261,14 @@ export type TDrawEvent = IDrawDownEvent | IDrawMoveEvent | IDrawUpEvent | {
     y1: number;
     pressure0: number | null;
     pressure1: number;
-};
+}
 
-export type TToolType = 'draw' | 'fill' | 'text' | 'shape' | 'gradient' | 'hand';
+export type TDrawEvent = IDrawDownEvent | IDrawMoveEvent | IDrawUpEvent | IDrawLine;
+
+export type TToolType = 'brush' | 'paintBucket' | 'text' | 'shape' | 'gradient' | 'hand' | 'select';
 
 export type TKlPsdError =
-    'mask'
+    | 'mask'
     | 'clipping'
     | 'group'
     | 'adjustment'

@@ -1,15 +1,15 @@
-import {BB} from '../../bb/bb';
-import {IFilterApply, IFilterGetDialogParam, TFilterGetDialogResult} from '../kl-types';
-import {LANG} from '../../language/language';
-import {input} from '../ui/components/input';
-import {ColorOptions} from '../ui/components/color-options';
-import {drawGrid} from '../image-operations/draw-grid';
-import {TFilterHistoryEntry} from './filters';
-import {throwIfNull} from '../../bb/base/base';
-import {Preview} from '../ui/project-viewport/preview';
-import {css} from '@emotion/css/dist/emotion-css.cjs';
-import {testIsSmall} from '../ui/utils/test-is-small';
-import {getPreviewHeight, getPreviewWidth} from '../ui/utils/preview-size';
+import { BB } from '../../bb/bb';
+import { IFilterApply, IFilterGetDialogParam, TFilterGetDialogResult } from '../kl-types';
+import { LANG } from '../../language/language';
+import { input } from '../ui/components/input';
+import { ColorOptions } from '../ui/components/color-options';
+import { drawGrid } from '../image-operations/draw-grid';
+import { TFilterHistoryEntry } from './filters';
+import { throwIfNull } from '../../bb/base/base';
+import { Preview } from '../ui/project-viewport/preview';
+import { css } from '@emotion/css/dist/emotion-css.cjs';
+import { testIsSmall } from '../ui/utils/test-is-small';
+import { getPreviewHeight, getPreviewWidth } from '../ui/utils/preview-size';
 
 export type TFilterGridInput = {
     x: number;
@@ -19,13 +19,10 @@ export type TFilterGridInput = {
     opacity: number;
 };
 
-export type TFilterGridHistoryEntry = TFilterHistoryEntry<
-    'grid',
-    TFilterGridInput>;
+export type TFilterGridHistoryEntry = TFilterHistoryEntry<'grid', TFilterGridInput>;
 
 export const filterGrid = {
-
-    getDialog (params: IFilterGetDialogParam) {
+    getDialog(params: IFilterGetDialogParam) {
         const context = params.context;
         const klCanvas = params.klCanvas;
         if (!context || !klCanvas) {
@@ -72,7 +69,7 @@ export const filterGrid = {
             init: 2,
             type: 'number',
             min: 1,
-            css: {width: '75px', marginRight: '20px'},
+            css: { width: '75px', marginRight: '20px' },
             callback: function (v) {
                 settingsObj.x = parseFloat(v);
                 updatePreview();
@@ -82,7 +79,7 @@ export const filterGrid = {
             init: 2,
             type: 'number',
             min: 1,
-            css: {width: '75px', marginRight: '20px'},
+            css: { width: '75px', marginRight: '20px' },
             callback: function (v) {
                 settingsObj.y = parseFloat(v);
                 updatePreview();
@@ -92,17 +89,17 @@ export const filterGrid = {
             init: settingsObj.thickness,
             type: 'number',
             min: 1,
-            css: {width: '75px', marginRight: '20px'},
+            css: { width: '75px', marginRight: '20px' },
             callback: function (v) {
                 settingsObj.thickness = parseFloat(v);
                 updatePreview();
             },
         });
 
-        let selectedRgbaObj = {r: 0, g: 0, b: 0, a: 1};
+        let selectedRgbaObj = { r: 0, g: 0, b: 0, a: 1 };
         const colorOptionsArr = [
-            {r: 0, g: 0, b: 0, a: 1},
-            {r: 255, g: 255, b: 255, a: 1},
+            { r: 0, g: 0, b: 0, a: 1 },
+            { r: 255, g: 255, b: 255, a: 1 },
         ];
         colorOptionsArr.push({
             r: params.currentColorRgb.r,
@@ -133,15 +130,15 @@ export const filterGrid = {
             marginRight: '5px',
         };
         line1.append(
-            BB.el({content: 'X:', css: labelStyle}),
+            BB.el({ content: 'X:', css: labelStyle }),
             xInput,
-            BB.el({content: 'Y:', css: labelStyle}),
+            BB.el({ content: 'Y:', css: labelStyle }),
             yInput,
         );
         line2.append(
-            BB.el({content: LANG('shape-line-width') + ':', css: labelStyle}),
+            BB.el({ content: LANG('shape-line-width') + ':', css: labelStyle }),
             thicknessInput,
-            BB.el({css:{flexGrow: '1'}}),
+            BB.el({ css: { flexGrow: '1' } }),
             colorOptions.getElement(),
         );
 
@@ -167,24 +164,32 @@ export const filterGrid = {
             },
         });
 
-        preview.getElement().classList.add(css({
-            marginLeft: '-20px',
-            marginRight: '-20px',
-        }));
+        preview.getElement().classList.add(
+            css({
+                marginLeft: '-20px',
+                marginRight: '-20px',
+            }),
+        );
         rootEl.append(preview.getElement());
 
-        function updatePreview (): void {
+        function updatePreview(): void {
             const ctx = previewCtx;
             ctx.save();
             ctx.clearRect(0, 0, previewCanvas.width, previewCanvas.height);
             ctx.drawImage(context.canvas, 0, 0);
-            drawGrid(ctx, settingsObj.x, settingsObj.y, Math.max(settingsObj.thickness, 1), settingsObj.color, settingsObj.opacity);
+            drawGrid(
+                ctx,
+                settingsObj.x,
+                settingsObj.y,
+                Math.max(settingsObj.thickness, 1),
+                settingsObj.color,
+                settingsObj.opacity,
+            );
             ctx.restore();
             preview.render();
         }
         updatePreview();
         preview.render();
-
 
         result.destroy = (): void => {
             preview.destroy();
@@ -198,15 +203,15 @@ export const filterGrid = {
         return result;
     },
 
-    apply (params: IFilterApply<TFilterGridInput>): boolean {
+    apply(params: IFilterApply<TFilterGridInput>): boolean {
         const context = params.context;
         const klCanvas = params.klCanvas;
         const history = params.history;
-        if (!context || !klCanvas || !history) {
+        if (!context || !klCanvas) {
             return false;
         }
 
-        history.pause(true);
+        history?.pause(true);
         drawGrid(
             context,
             params.input.x,
@@ -215,16 +220,17 @@ export const filterGrid = {
             params.input.color,
             params.input.opacity,
         );
-        history.pause(false);
+        history?.pause(false);
 
-        history.push({
+        history?.push({
             tool: ['filter', 'grid'],
             action: 'apply',
-            params: [{
-                input: params.input,
-            }],
+            params: [
+                {
+                    input: params.input,
+                },
+            ],
         } as TFilterGridHistoryEntry);
         return true;
     },
-
 };

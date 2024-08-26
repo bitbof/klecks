@@ -20,17 +20,20 @@
   },
   "dependencies": {
     "@emotion/css": "^11.11.2",
-    "@parcel/transformer-glsl": "^2.9.3",
-    "@parcel/transformer-image": "^2.9.3",
-    "@parcel/transformer-sass": "^2.9.3",
-    "ag-psd": "^17.0.0",
+    "@parcel/transformer-glsl": "^2.12.0",
+    "@parcel/transformer-sass": "^2.12.0",
+    "ag-psd": "^20.2.0",
     "buffer": "^6.0.3",
-    "js-beautify": "^1.14.8",
+    "js-beautify": "^1.15.1",
     "json5": "^2.2.3",
     "mdn-polyfills": "^5.20.0",
-    "parcel": "^2.9.3",
-    "transformation-matrix": "^2.15.0",
+    "parcel": "^2.12.0",
+    "polygon-clipping": "^0.15.7",
+    "transformation-matrix": "^2.16.1",
     "qrcode": "^1.5.4",
     "@types/qrcode": "^1.5.5"
+  },
+  "devDependencies": {
+    "process": "^0.11.10"
   }
 }

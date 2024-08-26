@@ -1,5 +1,4 @@
-
-export function zoomByStep (oldScale: number, stepNum: number): number {
+export function zoomByStep(oldScale: number, stepNum: number): number {
     const step = Math.log2(oldScale);
 
     let newStep = step / Math.abs(stepNum);

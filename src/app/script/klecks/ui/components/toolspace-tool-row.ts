@@ -1,13 +1,12 @@
-import {BB} from '../../../bb/bb';
-import {ToolDropdown} from './tool-dropdown';
+import { BB } from '../../../bb/bb';
+import { ToolDropdown } from './tool-dropdown';
 import toolHandImg from '/src/app/img/ui/tool-hand.svg';
 import toolZoomInImg from '/src/app/img/ui/tool-zoom-in.svg';
 import toolZoomOutImg from '/src/app/img/ui/tool-zoom-out.svg';
 import toolUndoImg from '/src/app/img/ui/tool-undo.svg';
-import {LANG} from '../../../language/language';
-import {PointerListener} from '../../../bb/input/pointer-listener';
-import {TToolType} from '../../kl-types';
-
+import { LANG } from '../../../language/language';
+import { PointerListener } from '../../../bb/input/pointer-listener';
+import { TToolType } from '../../kl-types';
 
 type TBaseToolRowButton = {
     el: HTMLElement;
@@ -31,7 +30,6 @@ type TToolRowTriangleButton = TBaseToolRowButton & {
  * heights: 54px tall, 36px small -> via setIsSmall
  */
 export class ToolspaceToolRow {
-
     private readonly rootEl: HTMLElement;
     private readonly isSimple: boolean;
     private readonly toolDropdown?: ToolDropdown;
@@ -46,7 +44,7 @@ export class ToolspaceToolRow {
     private readonly onActivate: (activeStr: TToolType) => void;
 
 
-    // ---- public ----
+    // ----------------------------------- public -----------------------------------
 
     constructor (
         p: {
@@ -68,8 +66,7 @@ export class ToolspaceToolRow {
         });
 
         this.onActivate = p.onActivate;
-        this.currentActiveStr = 'draw'; // 'draw' | 'hand' | 'fill'
-
+        this.currentActiveStr = 'brush';
 
         const createButton = (p: {
             onClick: () => void;
@@ -78,7 +75,6 @@ export class ToolspaceToolRow {
             doLighten?: boolean;
             doMirror?: boolean;
         }): TToolRowButton => {
-
             const smallMargin = p.doLighten ? '6px 0' : '8px 0';
 
             const el = BB.el({
@@ -92,7 +88,7 @@ export class ToolspaceToolRow {
             const im = BB.el({
                 className: 'dark-invert',
                 css: {
-                    backgroundImage: 'url(\'' + p.image + '\')',
+                    backgroundImage: "url('" + p.image + "')",
                     backgroundRepeat: 'no-repeat',
                     backgroundPosition: 'center',
                     backgroundSize: p.contain ? 'contain' : '',
@@ -104,7 +100,8 @@ export class ToolspaceToolRow {
                 },
             });
             el.append(im);
-            const pointerListener = new BB.PointerListener({ // because :hover causes problems w touch
+            const pointerListener = new BB.PointerListener({
+                // because :hover causes problems w touch
                 target: el,
                 onEnterLeave: (isOver) => {
                     el.classList.toggle('toolspace-row-button-hover', isOver);
@@ -120,13 +117,13 @@ export class ToolspaceToolRow {
             };
         };
 
-
         const createTriangleButton = (p: {
             onLeft: () => void;
             onRight: () => void;
             leftImage: string;
             rightImage: string | null;
-        }): TToolRowTriangleButton => { // because IE and Edge don't support clip path
+        }): TToolRowTriangleButton => {
+            // because IE and Edge don't support clip path
 
             const result = BB.el({
                 css: {
@@ -152,7 +149,8 @@ export class ToolspaceToolRow {
             const blurOffsetX = 2;
             const blurOffsetY = 2;
 
-            const defs = BB.createSvg( { // inset shadow via svg
+            const defs = BB.createSvg({
+                // inset shadow via svg
                 elementType: 'defs',
                 childrenArr: [
                     {
@@ -168,11 +166,13 @@ export class ToolspaceToolRow {
                                 in: 'SourceAlpha',
                                 stdDeviation: '' + blurRadius,
                                 result: 'blur',
-                            }, {
+                            },
+                            {
                                 elementType: 'feOffset',
                                 dx: '' + blurOffsetX,
                                 dy: '' + blurOffsetY,
-                            }, {
+                            },
+                            {
                                 elementType: 'feComposite',
                                 in2: 'SourceAlpha',
                                 operator: 'arithmetic',
@@ -185,11 +185,13 @@ export class ToolspaceToolRow {
                                 elementType: 'feFlood',
                                 'flood-color': '#000',
                                 'flood-opacity': '0.2',
-                            }, {
+                            },
+                            {
                                 elementType: 'feComposite',
                                 in2: 'shadowDiff',
                                 operator: 'in',
-                            }, {
+                            },
+                            {
                                 elementType: 'feComposite',
                                 in2: 'SourceGraphic',
                                 operator: 'over',
@@ -201,11 +203,13 @@ export class ToolspaceToolRow {
                                 in: 'firstfilter',
                                 stdDeviation: '' + blurRadius,
                                 result: 'blur2',
-                            }, {
+                            },
+                            {
                                 elementType: 'feOffset',
                                 dx: '' + blurOffsetX,
                                 dy: '' + blurOffsetY,
-                            }, {
+                            },
+                            {
                                 elementType: 'feComposite',
                                 in2: 'firstfilter',
                                 operator: 'arithmetic',
@@ -218,11 +222,13 @@ export class ToolspaceToolRow {
                                 elementType: 'feFlood',
                                 'flood-color': '#000',
                                 'flood-opacity': '0.2',
-                            }, {
+                            },
+                            {
                                 elementType: 'feComposite',
                                 in2: 'shadowDiff',
                                 operator: 'in',
-                            }, {
+                            },
+                            {
                                 elementType: 'feComposite',
                                 in2: 'firstfilter',
                                 operator: 'over',
@@ -231,7 +237,6 @@ export class ToolspaceToolRow {
                     },
                 ],
             });
-
 
             const svgTriangleLeft = BB.createSvg({
                 elementType: 'path',
@@ -267,20 +272,21 @@ export class ToolspaceToolRow {
             const rightPointerListener = new BB.PointerListener({
                 target: svgTriangleRight,
                 onEnterLeave: (isOver) => {
-                    svgTriangleRight.classList.toggle('toolspace-svg-triangle-button-hover', isOver);
+                    svgTriangleRight.classList.toggle(
+                        'toolspace-svg-triangle-button-hover',
+                        isOver,
+                    );
                 },
             });
 
-
             svg.append(defs, svgTriangleLeft, svgTriangleRight);
             result.append(svg);
-
 
             const leftIm = BB.el({
                 parent: result,
                 className: 'dark-invert',
                 css: {
-                    backgroundImage: 'url(\'' + p.leftImage + '\')',
+                    backgroundImage: "url('" + p.leftImage + "')",
                     backgroundRepeat: 'no-repeat',
                     backgroundSize: 'contain',
                     width: '20px',
@@ -294,12 +300,11 @@ export class ToolspaceToolRow {
             });
             result.append(leftIm);
 
-
             const rightIm = BB.el({
                 parent: result,
                 className: 'dark-invert',
                 css: {
-                    backgroundImage: 'url(\'' + (p.rightImage ? p.rightImage : p.leftImage) + '\')',
+                    backgroundImage: "url('" + (p.rightImage ? p.rightImage : p.leftImage) + "')",
                     backgroundRepeat: 'no-repeat',
                     backgroundSize: 'contain',
                     width: '20px',
@@ -311,10 +316,6 @@ export class ToolspaceToolRow {
                     pointerEvents: 'none',
                 },
             });
-
-
-
-
 
             const setIsEnabledLeft = (b: boolean) => {
                 svgTriangleLeft.classList.toggle('toolspace-row-button-disabled', !b);
@@ -423,11 +424,11 @@ export class ToolspaceToolRow {
 
     // ---- interface ----
 
-    getElement (): HTMLElement {
+    getElement(): HTMLElement {
         return this.rootEl;
     }
 
-    setIsSmall (b: boolean): void {
+    setIsSmall(b: boolean): void {
         BB.css(this.rootEl, {
             height: b ? '36px' : '54px',
         });
@@ -464,7 +465,6 @@ export class ToolspaceToolRow {
             this.undoButton.el.style.display = 'none';
             this.redoButton.el.style.display = 'none';
         }
-
     }
 
     setEnableZoomIn (b: boolean): void {
@@ -481,17 +481,17 @@ export class ToolspaceToolRow {
         }
     }
 
-    setEnableUndo (b: boolean): void {
+    setEnableUndo(b: boolean): void {
         this.undoButton.el.classList.toggle('toolspace-row-button-disabled', !b);
         this.undoNRedoButton.setIsEnabledLeft(b);
     }
 
-    setEnableRedo (b: boolean): void {
+    setEnableRedo(b: boolean): void {
         this.redoButton.el.classList.toggle('toolspace-row-button-disabled', !b);
         this.undoNRedoButton.setIsEnabledRight(b);
     }
 
-    setActive (activeStr: TToolType, doEmit?: boolean): void {
+    setActive(activeStr: TToolType, doEmit?: boolean): void {
         if (this.currentActiveStr === activeStr) {
             return;
         }
@@ -500,7 +500,11 @@ export class ToolspaceToolRow {
 
         if(!this.isSimple){
             this.toolDropdown?.setActive(this.currentActiveStr);
-            this.handButton?.el.classList.toggle('toolspace-row-button-activated', this.currentActiveStr === 'hand');
+            this.handButton?.el.classList.toggle(
+                'toolspace-row-button-activated',
+                this.currentActiveStr === 'hand',
+            );
+    
         }
 
         
@@ -510,7 +514,7 @@ export class ToolspaceToolRow {
         }
     }
 
-    getActive (): TToolType {
+    getActive(): TToolType {
         return this.currentActiveStr;
     }
 }

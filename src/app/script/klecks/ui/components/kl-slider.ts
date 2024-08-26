@@ -1,12 +1,12 @@
-import {BB} from '../../../bb/bb';
-import {calcSliderFalloffFactor} from './slider-falloff';
-import {IKlSliderConfig} from '../../kl-types';
-import {languageStrings} from '../../../language/language';
-import {KlSliderManualInput} from './kl-slider-manual-input';
-import {SplineInterpolator} from '../../../bb/math/line';
-import {PointerListener} from '../../../bb/input/pointer-listener';
-import {IPointerEvent} from '../../../bb/input/event.types';
-import {IChainElement} from '../../../bb/input/event-chain/event-chain.types';
+import { BB } from '../../../bb/bb';
+import { calcSliderFalloffFactor } from './slider-falloff';
+import { IKlSliderConfig } from '../../kl-types';
+import { languageStrings } from '../../../language/language';
+import { KlSliderManualInput } from './kl-slider-manual-input';
+import { SplineInterpolator } from '../../../bb/math/line';
+import { PointerListener } from '../../../bb/input/pointer-listener';
+import { IPointerEvent } from '../../../bb/input/event.types';
+import { IChainElement } from '../../../bb/input/event-chain/event-chain.types';
 
 /**
  * Horizontal slider, can be changed by dragging anywhere on it. Has a label & value.
@@ -22,7 +22,6 @@ import {IChainElement} from '../../../bb/input/event-chain/event-chain.types';
  *
  */
 export class KlSlider {
-
     /*
     Three types of values
     - value - the actual value, when using setValue(), getValue(), and what is emitted
@@ -52,7 +51,6 @@ export class KlSlider {
     private readonly valueToDisplayValue: (value: number) => number;
     private readonly displayValueToValue: (displayValue: number) => number;
 
-
     private readonly rootEl: HTMLElement;
     private readonly sliderWrapperEl: HTMLElement;
     private readonly textEl: HTMLElement; // displays label, displayValue
@@ -66,16 +64,16 @@ export class KlSlider {
 
     private readonly eventResMs: undefined | number;
     private emitValue: undefined | number; // next value for interval
-    private emitInterval: (ReturnType<typeof setTimeout> | undefined); // interval of eventResMs which calls onChange()
+    private emitInterval: ReturnType<typeof setTimeout> | undefined; // interval of eventResMs which calls onChange()
 
-    private valueToSliderValue (value: number): number {
+    private valueToSliderValue(value: number): number {
         if (this.useSpline && this.splineInterpolator) {
             return this.splineInterpolator.findX(value, Math.floor(this.resolution)) || 0;
         }
         return (value - this.min) / (this.max - this.min);
     }
 
-    private sliderValueToValue (sliderValue: number): number {
+    private sliderValueToValue(sliderValue: number): number {
         let result = this.min + sliderValue * (this.max - this.min);
         if (this.useSpline && this.splineInterpolator) {
             result = this.splineInterpolator.interpolate(sliderValue) || 0;
@@ -83,18 +81,23 @@ export class KlSlider {
         return result;
     }
 
-    private updateLabel (): void {
+    private updateLabel(): void {
         let displayValue: number | string = this.valueToDisplayValue(this.value);
         displayValue = this.formatFunc ? this.formatFunc(displayValue) : Math.round(displayValue);
         displayValue = displayValue.toLocaleString(languageStrings.getCode());
         const unit = this.unit !== undefined ? this.unit : '';
-        this.textEl.innerHTML = this.label + '&nbsp;&nbsp;<span style="font-weight:bold">' + displayValue + unit + '</span>';
+        this.textEl.innerHTML =
+            this.label +
+            '&nbsp;&nbsp;<span style="font-weight:bold">' +
+            displayValue +
+            unit +
+            '</span>';
 
         const sliderValue = this.valueToSliderValue(this.value);
-        this.control.style.width = (sliderValue * this.elementWidth) + 'px';
+        this.control.style.width = sliderValue * this.elementWidth + 'px';
     }
 
-    private emit (isFinal: boolean): void {
+    private emit(isFinal: boolean): void {
         if (!isFinal && this.isChangeOnFinal) {
             return;
         }
@@ -110,7 +113,6 @@ export class KlSlider {
 
         if (this.emitInterval) {
             this.emitValue = this.value;
-
         } else {
             this.onChange(this.value);
 
@@ -126,7 +128,7 @@ export class KlSlider {
         }
     }
 
-    private updateEnable (): void {
+    private updateEnable(): void {
         this.sliderWrapperEl.classList.toggle('slider-wrapper--disabled', !this.isEnabled);
         BB.css(this.sliderWrapperEl, {
             opacity: this.isEnabled ? '' : '0.5',
@@ -137,8 +139,7 @@ export class KlSlider {
         }
     }
 
-    private showManualInput (): void {
-
+    private showManualInput(): void {
         this.manualInput = new KlSliderManualInput(
             this.valueToDisplayValue(this.value),
             this.valueToDisplayValue(this.min),
@@ -159,7 +160,9 @@ export class KlSlider {
                 }
                 this.manualInput = undefined;
             },
-            (this.manualInputRoundDigits && this.manualInputRoundDigits > 0) ? this.manualInputRoundDigits : 0,
+            this.manualInputRoundDigits && this.manualInputRoundDigits > 0
+                ? this.manualInputRoundDigits
+                : 0,
         );
         this.manualInput.setIsEnabled(this.isEnabled);
         this.rootEl.append(this.manualInput.getElement());
@@ -171,30 +174,27 @@ export class KlSlider {
         });
     }
 
+    // ----------------------------------- public -----------------------------------
 
-    // --- public ---
-
-    constructor (
-        p: {
-            label: string;
-            width: number; // px
-            height: number; // px
-            min: number; // min value
-            max: number;
-            value: number;
-            resolution?: number; // int, if you want spline.findX() to use a custom resolution
-            curve?: 'quadratic' | [number, number][]; // optional. array is BB.SplineInterpolator points. 0-1
-            formatFunc?: (val: number) => number | string; // function to display a different number than value
-            onChange?: (val: number) => void;
-            isChangeOnFinal?: boolean; // only fire onChange on pointerUp
-            eventResMs?: number; // frequency of change events
-            isEnabled?: boolean; // default = true
-            manualInputRoundDigits?: number; // default 0, how value should be rounded for manual input
-            toDisplayValue?: (value: number) => number;
-            toValue?: (displayValue: number) => number;
-            unit?: string; // attached to end of value in output
-        }
-    ) {
+    constructor(p: {
+        label: string;
+        width: number; // px
+        height: number; // px
+        min: number; // min value
+        max: number;
+        value: number;
+        resolution?: number; // int, if you want spline.findX() to use a custom resolution
+        curve?: 'quadratic' | [number, number][]; // optional. array is BB.SplineInterpolator points. 0-1
+        formatFunc?: (val: number) => number | string; // function to display a different number than value
+        onChange?: (val: number) => void;
+        isChangeOnFinal?: boolean; // only fire onChange on pointerUp
+        eventResMs?: number; // frequency of change events
+        isEnabled?: boolean; // default = true
+        manualInputRoundDigits?: number; // default 0, how value should be rounded for manual input
+        toDisplayValue?: (value: number) => number;
+        toValue?: (displayValue: number) => number;
+        unit?: string; // attached to end of value in output
+    }) {
         this.isEnabled = p.isEnabled !== false;
         this.manualInputRoundDigits = p.manualInputRoundDigits;
         this.useSpline = !!p.curve;
@@ -233,7 +233,10 @@ export class KlSlider {
             if (!p.curve) {
                 throw new Error('curve needs to be set if useSpline true');
             }
-            const curveArr: [number, number][] = p.curve === 'quadratic' ? BB.quadraticSplineInput(this.min, this.max, 0.1) : p.curve;
+            const curveArr: [number, number][] =
+                p.curve === 'quadratic'
+                    ? BB.quadraticSplineInput(this.min, this.max, 0.1)
+                    : p.curve;
             this.splineInterpolator = new BB.SplineInterpolator(curveArr);
         }
 
@@ -276,7 +279,7 @@ export class KlSlider {
                 position: 'absolute',
                 left: '0',
                 top: '0',
-                width: (this.valueToSliderValue(this.value) * this.elementWidth) + 'px',
+                width: this.valueToSliderValue(this.value) * this.elementWidth + 'px',
                 height: this.elementHeight + 'px',
             },
         });
@@ -287,7 +290,6 @@ export class KlSlider {
 
         this.updateEnable();
 
-
         const doubleTapper = new BB.DoubleTapper({
             onDoubleTap: () => {
                 this.showManualInput();
@@ -295,9 +297,7 @@ export class KlSlider {
         });
         doubleTapper.setAllowedButtonArr(['left', 'right']);
         const eventChain = new BB.EventChain({
-            chainArr: [
-                doubleTapper as IChainElement,
-            ],
+            chainArr: [doubleTapper as IChainElement],
         });
 
         let virtualVal: number;
@@ -309,7 +309,6 @@ export class KlSlider {
             }
 
             if (event.type === 'pointerdown') {
-
                 // unfocus manual slider input
                 BB.unfocusAnyInput();
 
@@ -326,7 +325,6 @@ export class KlSlider {
             }
 
             if (event.type === 'pointermove' && ['left', 'right'].includes(event.button || '')) {
-
                 let deltaX = event.dX;
                 const deltaY = Math.abs(event.pageY - (event.downPageY || 0));
                 const factor = calcSliderFalloffFactor(deltaY, event.button === 'right');
@@ -345,7 +343,6 @@ export class KlSlider {
                 this.sliderWrapperEl.className = 'slider-wrapper';
                 this.emit(true);
             }
-
         };
 
         this.pointerListenerTimeout = setTimeout(() => {
@@ -368,7 +365,7 @@ export class KlSlider {
         }, 1);
     }
 
-    changeSliderValue (f: number): void {
+    changeSliderValue(f: number): void {
         if (!this.isEnabled) {
             return;
         }
@@ -379,16 +376,20 @@ export class KlSlider {
         this.onChange(this.value);
     }
 
-    setValue (v: number): void {
+    setValue(v: number): void {
         this.value = BB.clamp(v, this.min, this.max);
         this.updateLabel();
     }
 
-    getValue (): number {
+    getValue(): number {
         return this.value;
     }
 
-    update (config: IKlSliderConfig): void {
+    getDisplayValue(): number {
+        return this.valueToDisplayValue(this.value);
+    }
+
+    update(config: IKlSliderConfig): void {
         this.min = config.min;
         this.max = config.max;
         this.useSpline = !!config.curve;
@@ -396,7 +397,10 @@ export class KlSlider {
             if (!config.curve) {
                 throw new Error('curve needs to be set if useSpline true');
             }
-            const curveArr = config.curve === 'quadratic' ? BB.quadraticSplineInput(this.min, this.max, 0.1) : config.curve;
+            const curveArr =
+                config.curve === 'quadratic'
+                    ? BB.quadraticSplineInput(this.min, this.max, 0.1)
+                    : config.curve;
             this.splineInterpolator = new BB.SplineInterpolator(curveArr);
         } else {
             this.splineInterpolator = undefined;
@@ -404,12 +408,16 @@ export class KlSlider {
         this.setIsEnabled(!config.isDisabled);
     }
 
-    setIsEnabled (e: boolean): void {
+    setIsEnabled(e: boolean): void {
         this.isEnabled = !!e;
         this.updateEnable();
     }
 
-    destroy (): void {
+    getElement(): HTMLElement {
+        return this.rootEl;
+    }
+
+    destroy(): void {
         clearTimeout(this.pointerListenerTimeout);
         this.pointerListener && this.pointerListener.destroy();
         if (this.manualInput) {
@@ -419,9 +427,4 @@ export class KlSlider {
             clearInterval(this.emitInterval);
         }
     }
-
-    getElement (): HTMLElement {
-        return this.rootEl;
-    }
-
 }

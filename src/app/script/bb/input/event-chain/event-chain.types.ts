@@ -1,4 +1,4 @@
-import {IPointerEvent} from '../event.types';
+import { IPointerEvent } from '../event.types';
 
 export type TChainOutFunc = (event: IPointerEvent) => void;
 

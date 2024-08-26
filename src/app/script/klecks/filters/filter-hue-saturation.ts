@@ -1,16 +1,16 @@
-import {eventResMs} from './filters-consts';
-import {KlSlider} from '../ui/components/kl-slider';
-import {getSharedFx} from '../../fx-canvas/shared-fx';
-import {IFilterApply, IFilterGetDialogParam, TFilterGetDialogResult} from '../kl-types';
-import {LANG} from '../../language/language';
-import {TFilterHistoryEntry} from './filters';
-import {FxPreviewRenderer} from '../ui/project-viewport/fx-preview-renderer';
-import {TProjectViewportProject} from '../ui/project-viewport/project-viewport';
-import {Preview} from '../ui/project-viewport/preview';
-import {css} from '@emotion/css/dist/emotion-css.cjs';
-import {BB} from '../../bb/bb';
-import {testIsSmall} from '../ui/utils/test-is-small';
-import {getPreviewHeight, getPreviewWidth} from '../ui/utils/preview-size';
+import { eventResMs } from './filters-consts';
+import { KlSlider } from '../ui/components/kl-slider';
+import { getSharedFx } from '../../fx-canvas/shared-fx';
+import { IFilterApply, IFilterGetDialogParam, TFilterGetDialogResult } from '../kl-types';
+import { LANG } from '../../language/language';
+import { TFilterHistoryEntry } from './filters';
+import { FxPreviewRenderer } from '../ui/project-viewport/fx-preview-renderer';
+import { TProjectViewportProject } from '../ui/project-viewport/project-viewport';
+import { Preview } from '../ui/project-viewport/preview';
+import { css } from '@emotion/css/dist/emotion-css.cjs';
+import { BB } from '../../bb/bb';
+import { testIsSmall } from '../ui/utils/test-is-small';
+import { getPreviewHeight, getPreviewWidth } from '../ui/utils/preview-size';
 
 export type TFilterHueSaturationInput = {
     hue: number;
@@ -19,12 +19,11 @@ export type TFilterHueSaturationInput = {
 
 export type TFilterHueSaturationHistoryEntry = TFilterHistoryEntry<
     'hueSaturation',
-    TFilterHueSaturationInput>;
+    TFilterHueSaturationInput
+>;
 
 export const filterHueSaturation = {
-
-    getDialog (params: IFilterGetDialogParam) {
-
+    getDialog(params: IFilterGetDialogParam) {
         const context = params.context;
         const klCanvas = params.klCanvas;
         if (!context || !klCanvas) {
@@ -43,7 +42,8 @@ export const filterHueSaturation = {
             result.width = getPreviewWidth(isSmall);
         }
 
-        let hue = 0, saturation = 0;
+        let hue = 0,
+            saturation = 0;
         const fxPreviewRenderer = new FxPreviewRenderer({
             original: context.canvas,
             onUpdate: (fxCanvas) => {
@@ -51,8 +51,7 @@ export const filterHueSaturation = {
             },
         });
 
-        function finishInit (): void {
-
+        function finishInit(): void {
             const hueSlider = new KlSlider({
                 label: LANG('filter-hue-sat-hue'),
                 width: 300,
@@ -83,12 +82,14 @@ export const filterHueSaturation = {
             saturationSlider.getElement().style.marginBottom = '10px';
             rootEl.append(hueSlider.getElement(), saturationSlider.getElement());
 
-
             const previewLayerArr: TProjectViewportProject['layers'] = [];
             {
                 for (let i = 0; i < layers.length; i++) {
                     previewLayerArr.push({
-                        image: i === selectedLayerIndex ? fxPreviewRenderer.render : layers[i].context.canvas,
+                        image:
+                            i === selectedLayerIndex
+                                ? fxPreviewRenderer.render
+                                : layers[i].context.canvas,
                         isVisible: layers[i].isVisible,
                         opacity: layers[i].opacity,
                         mixModeStr: layers[i].mixModeStr,
@@ -107,10 +108,12 @@ export const filterHueSaturation = {
                 },
             });
             preview.render();
-            preview.getElement().classList.add(css({
-                marginLeft: '-20px',
-                marginRight: '-20px',
-            }));
+            preview.getElement().classList.add(
+                css({
+                    marginLeft: '-20px',
+                    marginRight: '-20px',
+                }),
+            );
             rootEl.append(preview.getElement());
 
             result.destroy = (): void => {
@@ -132,15 +135,15 @@ export const filterHueSaturation = {
         return result;
     },
 
-    apply (params: IFilterApply<TFilterHueSaturationInput>): boolean {
+    apply(params: IFilterApply<TFilterHueSaturationInput>): boolean {
         const context = params.context;
         const hue = params.input.hue;
         const history = params.history;
         const saturation = params.input.saturation;
-        if (!context || hue === null || saturation === null || !history) {
+        if (!context || hue === null || saturation === null) {
             return false;
         }
-        history.pause(true);
+        history?.pause(true);
         const fxCanvas = getSharedFx();
         if (!fxCanvas) {
             return false; // todo more specific error?
@@ -150,15 +153,16 @@ export const filterHueSaturation = {
         context.clearRect(0, 0, context.canvas.width, context.canvas.height);
         context.drawImage(fxCanvas, 0, 0);
         texture.destroy();
-        history.pause(false);
-        history.push({
+        history?.pause(false);
+        history?.push({
             tool: ['filter', 'hueSaturation'],
             action: 'apply',
-            params: [{
-                input: params.input,
-            }],
+            params: [
+                {
+                    input: params.input,
+                },
+            ],
         } as TFilterHueSaturationHistoryEntry);
         return true;
     },
-
 };

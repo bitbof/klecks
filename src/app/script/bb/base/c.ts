@@ -1,8 +1,8 @@
-import {IKeyStringOptional} from '../bb-types';
-import {BB} from '../bb';
-import {el} from './ui';
+import { IKeyStringOptional } from '../bb-types';
+import { BB } from '../bb';
+import { el } from './ui';
 
-function decomposeElString (el: string) {
+function decomposeElString(el: string) {
     if (el === '') {
         return {};
     }
@@ -16,7 +16,6 @@ function decomposeElString (el: string) {
     if (split.length === 1) {
         split = split[0].split(',');
         tagName = split.shift()!;
-
     } else {
         tagName = split.shift()!;
         split.forEach((item, index) => {
@@ -50,7 +49,7 @@ function decomposeElString (el: string) {
     return result;
 }
 
-function applyStyleNames (el: HTMLElement, styleNames: string[]) {
+function applyStyleNames(el: HTMLElement, styleNames: string[]) {
     const style: IKeyStringOptional = {};
 
     const operations: {
@@ -98,14 +97,14 @@ function applyStyleNames (el: HTMLElement, styleNames: string[]) {
         flex: () => {
             style.display = 'flex';
         },
-        'flexCol': () => {
+        flexCol: () => {
             style.flexDirection = 'column';
         },
-        'flexWrap': () => {
+        flexWrap: () => {
             style.flexWrap = 'wrap';
         },
         gap: (params) => {
-            style.gap = params.map(item => item + 'px').join(' ');
+            style.gap = params.map((item) => item + 'px').join(' ');
         },
         grow: () => {
             style.flexGrow = '1';
@@ -166,7 +165,7 @@ function applyStyleNames (el: HTMLElement, styleNames: string[]) {
         },
     };
 
-    styleNames.forEach(item => {
+    styleNames.forEach((item) => {
         const params = item.split('-');
         const operation = params.shift()!;
         operations[operation](params);
@@ -177,9 +176,9 @@ function applyStyleNames (el: HTMLElement, styleNames: string[]) {
 /**
  * composes HTML
  */
-export function c (
+export function c(
     element?: HTMLElement | string | Parameters<typeof el>[0],
-    inner?: string | (SVGElement | HTMLElement | string)[]
+    inner?: string | (SVGElement | HTMLElement | string)[],
 ): HTMLElement {
     if (element === undefined) {
         return document.createElement('div');

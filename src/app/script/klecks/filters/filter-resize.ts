@@ -1,13 +1,13 @@
-import {BB} from '../../bb/bb';
-import {Checkbox} from '../ui/components/checkbox';
-import {Select} from '../ui/components/select';
+import { BB } from '../../bb/bb';
+import { Checkbox } from '../ui/components/checkbox';
+import { Select } from '../ui/components/select';
 import constrainImg from '/src/app/img/ui/constrain.svg';
-import {IFilterApply, IFilterGetDialogParam, TFilterGetDialogResult} from '../kl-types';
-import {LANG} from '../../language/language';
-import {TFilterHistoryEntry} from './filters';
-import {table} from '../ui/components/table';
-import {theme} from '../../theme/theme';
-import {smallPreview} from '../ui/utils/preview-size';
+import { IFilterApply, IFilterGetDialogParam, TFilterGetDialogResult } from '../kl-types';
+import { LANG } from '../../language/language';
+import { TFilterHistoryEntry } from './filters';
+import { table } from '../ui/components/table';
+import { theme } from '../../theme/theme';
+import { smallPreview } from '../ui/utils/preview-size';
 
 export type TFilterResizeInput = {
     width: number;
@@ -15,33 +15,32 @@ export type TFilterResizeInput = {
     algorithm: 'smooth' | 'pixelated';
 };
 
-export type TFilterResizeHistoryEntry = TFilterHistoryEntry<
-    'resize',
-    TFilterResizeInput>;
+export type TFilterResizeHistoryEntry = TFilterHistoryEntry<'resize', TFilterResizeInput>;
 
 export const filterResize = {
-
-    getDialog (params: IFilterGetDialogParam) {
+    getDialog(params: IFilterGetDialogParam) {
         //BB.centerWithin
         const klCanvas = params.klCanvas;
         if (!klCanvas) {
             return false;
         }
 
-        const fit = BB.fitInto( klCanvas.getWidth(), klCanvas.getHeight(), 280, 200,1);
-        const w = parseInt('' + fit.width), h = parseInt('' + fit.height);
+        const fit = BB.fitInto(klCanvas.getWidth(), klCanvas.getHeight(), 280, 200, 1);
+        const w = parseInt('' + fit.width),
+            h = parseInt('' + fit.height);
 
         let previewFactor = w / klCanvas.getWidth();
         const tempCanvas = klCanvas.getCompleteCanvas(1);
-
 
         const rootEl = BB.el();
         const result: TFilterGetDialogResult<TFilterResizeInput> = {
             element: rootEl,
         };
-        let newWidth = klCanvas.getWidth(), newHeight = klCanvas.getHeight();
+        let newWidth = klCanvas.getWidth(),
+            newHeight = klCanvas.getHeight();
 
-        const maxWidth = params.maxWidth, maxHeight = params.maxHeight;
+        const maxWidth = params.maxWidth,
+            maxHeight = params.maxHeight;
 
         const widthWrapper = BB.el({
             css: {
@@ -114,24 +113,16 @@ export const filterResize = {
         constrainIm.src = constrainImg;
         constrainIm.height = 40;
 
-        const sizeTable = table([
+        const sizeTable = table(
             [
-                LANG('width') + ':&nbsp;',
-                widthInput,
-                constrainIm,
+                [LANG('width') + ':&nbsp;', widthInput, constrainIm],
+                [BB.el({ css: { height: '5px' } }), '', ''],
+                [LANG('height') + ':&nbsp;', heightInput],
             ],
-            [
-                BB.el({css: {height: '5px'}}),
-                '',
-                '',
-            ],
-            [
-                LANG('height') + ':&nbsp;',
-                heightInput,
-            ],
-        ], {
-            '0.2': {rowspan: 3},
-        });
+            {
+                '0.2': { rowspan: 3 },
+            },
+        );
         BB.css(sizeTable, {
             marginBottom: '10px',
         });
@@ -139,10 +130,11 @@ export const filterResize = {
         rootEl.append(sizeTable);
 
         //contrain checkbox
-        let heightChanged = false, widthChanged = false;
+        let heightChanged = false,
+            widthChanged = false;
         const ratio = klCanvas.getWidth() / klCanvas.getHeight();
 
-        function updateConstrain (): void {
+        function updateConstrain(): void {
             constrainIm.style.display = isConstrained ? '' : 'none';
             if (isConstrained) {
                 widthInput.value = '' + klCanvas.getWidth();
@@ -161,12 +153,13 @@ export const filterResize = {
                 updateConstrain();
             },
         });
-        rootEl.append(BB.el({
-            css: {
-                clear: 'both',
-            },
-        }));
-
+        rootEl.append(
+            BB.el({
+                css: {
+                    clear: 'both',
+                },
+            }),
+        );
 
         const algorithmSelect = new Select({
             isFocusable: true,
@@ -186,7 +179,7 @@ export const filterResize = {
             css: {
                 display: 'flex',
                 justifyContent: 'space-between',
-                'alignItems': 'center',
+                alignItems: 'center',
             },
         });
         secondRowElement.append(constrainCheckbox.getElement(), algorithmSelect.getElement());
@@ -194,11 +187,9 @@ export const filterResize = {
         const previewCanvas = BB.canvas(w, h);
         previewCanvas.style.imageRendering = 'pixelated';
 
-
         const previewCtx = BB.ctx(previewCanvas);
 
-
-        function draw (): void {
+        function draw(): void {
             if (algorithmSelect.getValue() === 'smooth') {
                 previewCanvas.style.imageRendering = previewFactor > 1 ? 'pixelated' : '';
 
@@ -210,7 +201,6 @@ export const filterResize = {
                 previewCtx.drawImage(tempCanvas, 0, 0);
                 BB.resizeCanvas(previewCanvas, newWidth, newHeight);
                 previewCtx.restore();
-
             } else {
                 previewCanvas.style.imageRendering = 'pixelated';
 
@@ -221,11 +211,13 @@ export const filterResize = {
                 previewCtx.drawImage(tempCanvas, 0, 0, previewCanvas.width, previewCanvas.height);
                 previewCtx.restore();
             }
-
         }
 
-        function update (): void {
-            if ((widthInput.value.length === 0 && widthChanged) || (heightInput.value.length === 0 && heightChanged)) {
+        function update(): void {
+            if (
+                (widthInput.value.length === 0 && widthChanged) ||
+                (heightInput.value.length === 0 && heightChanged)
+            ) {
                 heightChanged = false;
                 widthChanged = false;
                 return;
@@ -234,14 +226,23 @@ export const filterResize = {
             heightInput.value = '' + Math.max(1, parseInt(heightInput.value));
             if (isConstrained) {
                 if (heightChanged) {
-                    widthInput.value = '' + parseInt('' + (parseInt(heightInput.value) * ratio));
+                    widthInput.value = '' + parseInt('' + parseInt(heightInput.value) * ratio);
                 }
                 if (widthChanged) {
-                    heightInput.value = '' + parseInt('' + (parseInt(widthInput.value) / ratio));
+                    heightInput.value = '' + parseInt('' + parseInt(widthInput.value) / ratio);
                 }
 
-                if (parseInt(widthInput.value) > maxWidth || parseInt(heightInput.value) > maxHeight) {
-                    const fit = BB.fitInto(parseInt(widthInput.value), parseInt(heightInput.value), maxWidth, maxHeight, 1);
+                if (
+                    parseInt(widthInput.value) > maxWidth ||
+                    parseInt(heightInput.value) > maxHeight
+                ) {
+                    const fit = BB.fitInto(
+                        parseInt(widthInput.value),
+                        parseInt(heightInput.value),
+                        maxWidth,
+                        maxHeight,
+                        1,
+                    );
                     widthInput.value = '' + parseInt('' + fit.width);
                     heightInput.value = '' + parseInt('' + fit.height);
                 }
@@ -261,10 +262,16 @@ export const filterResize = {
             newHeight = parseInt(heightInput.value);
 
             const preview = BB.fitInto(newWidth, newHeight, 280, 200, 1);
-            const previewW = parseInt('' + preview.width), previewH = parseInt('' + preview.height);
+            const previewW = parseInt('' + preview.width),
+                previewH = parseInt('' + preview.height);
             previewFactor = previewW / newWidth;
 
-            const offset = BB.centerWithin(smallPreview.width, smallPreview.height, previewW, previewH);
+            const offset = BB.centerWithin(
+                smallPreview.width,
+                smallPreview.height,
+                previewW,
+                previewH,
+            );
 
             draw();
 
@@ -301,14 +308,17 @@ export const filterResize = {
             },
         });
 
-        function updateCheckerboard (): void {
-            BB.createCheckerDataUrl(8, function (url) {
-                previewWrapper.style.background = 'url(' + url + ')';
-            }, theme.isDark());
+        function updateCheckerboard(): void {
+            BB.createCheckerDataUrl(
+                8,
+                function (url) {
+                    previewWrapper.style.background = 'url(' + url + ')';
+                },
+                theme.isDark(),
+            );
         }
         theme.addIsDarkListener(updateCheckerboard);
         updateCheckerboard();
-
 
         rootEl.append(previewWrapper);
         update();
@@ -328,26 +338,27 @@ export const filterResize = {
         return result;
     },
 
-    apply (params: IFilterApply<TFilterResizeInput>): boolean {
+    apply(params: IFilterApply<TFilterResizeInput>): boolean {
         const klCanvas = params.klCanvas;
         const history = params.history;
         const width = params.input.width;
         const height = params.input.height;
         const algorithm = params.input.algorithm;
-        if (!klCanvas || !history) {
+        if (!klCanvas) {
             return false;
         }
-        history.pause(true);
+        history?.pause(true);
         klCanvas.resize(width, height, algorithm);
-        history.pause(false);
-        history.push({
+        history?.pause(false);
+        history?.push({
             tool: ['filter', 'resize'],
             action: 'apply',
-            params: [{
-                input: params.input,
-            }],
+            params: [
+                {
+                    input: params.input,
+                },
+            ],
         } as TFilterResizeHistoryEntry);
         return true;
     },
-
 };

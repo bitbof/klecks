@@ -1,15 +1,14 @@
-import {BB} from '../../bb/bb';
-import {eventResMs} from './brushes-consts';
-import {Checkbox} from '../ui/components/checkbox';
-import {brushes} from '../brushes/brushes';
-import {klHistory} from '../history/kl-history';
-import {KlSlider} from '../ui/components/kl-slider';
+import { BB } from '../../bb/bb';
+import { eventResMs } from './brushes-consts';
+import { Checkbox } from '../ui/components/checkbox';
+import { brushes } from '../brushes/brushes';
+import { KlSlider } from '../ui/components/kl-slider';
 import brushIconImg from '/src/app/img/ui/brush-chemy.svg';
-import {IBrushUi} from '../kl-types';
-import {Options} from '../ui/components/options';
-import {BoxToggle} from '../ui/components/box-toggle';
-import {LANG, languageStrings} from '../../language/language';
-import {ChemyBrush} from '../brushes/chemy-brush';
+import { IBrushUi } from '../kl-types';
+import { Options } from '../ui/components/options';
+import { BoxToggle } from '../ui/components/box-toggle';
+import { LANG, languageStrings } from '../../language/language';
+import { ChemyBrush } from '../brushes/chemy-brush';
 
 export const chemyBrushUi = (function () {
     const brushInterface = {
@@ -34,19 +33,19 @@ export const chemyBrushUi = (function () {
     brushInterface.Ui = function (p) {
         const div = document.createElement('div'); // the gui
         const brush = new brushes.ChemyBrush();
-        brush.setHistory(klHistory);
+        brush.setHistory(p.history);
         p.onSizeChange(brush.getSize());
 
         let sizeSlider: KlSlider;
         let opacitySlider: KlSlider;
 
-        function setSize (size: number) {
+        function setSize(size: number) {
             brush.setSize(size);
         }
 
         let eraserToggle: Checkbox;
 
-        function init () {
+        function init() {
             sizeSlider = new KlSlider({
                 label: LANG('brush-size'),
                 width: 250,
@@ -300,14 +299,11 @@ export const chemyBrushUi = (function () {
                 opacitySlider.getElement(),
                 toggleRow,
                 BB.el({
-                    content: [
-                        lockAlphaToggle.getElement(),
-                        eraserToggle.getElement(),
-                    ],
+                    content: [lockAlphaToggle.getElement(), eraserToggle.getElement()],
                     css: {
                         display: 'flex',
                     },
-                })
+                }),
             );
         }
 

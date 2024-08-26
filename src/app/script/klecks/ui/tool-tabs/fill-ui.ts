@@ -1,16 +1,15 @@
-import {BB} from '../../../bb/bb';
-import {KlSlider} from '../components/kl-slider';
-import {Select} from '../components/select';
-import {Checkbox} from '../components/checkbox';
-import {LANG} from '../../../language/language';
-import {TFillSampling} from '../../kl-types';
-import {KlColorSlider} from '../components/kl-color-slider';
+import { BB } from '../../../bb/bb';
+import { KlSlider } from '../components/kl-slider';
+import { Select } from '../components/select';
+import { Checkbox } from '../components/checkbox';
+import { LANG } from '../../../language/language';
+import { TFillSampling } from '../../kl-types';
+import { KlColorSlider } from '../components/kl-color-slider';
 
 /**
  * Paint Bucket tab contents (color slider, opacity slider, etc)
  */
 export class FillUi {
-
     private readonly rootEl: HTMLElement;
     private isVisible: boolean;
     private readonly colorDiv: HTMLElement;
@@ -22,14 +21,11 @@ export class FillUi {
     private isContiguous: boolean;
     private readonly eraserToggle: Checkbox;
 
+    // ----------------------------------- public -----------------------------------
 
-    // ---- public ----
-
-    constructor (
-        p: {
-            colorSlider: KlColorSlider; // when opening tab, inserts it (snatches it from where else it was)
-        }
-    ) {
+    constructor(p: {
+        colorSlider: KlColorSlider; // when opening tab, inserts it (snatches it from where else it was)
+    }) {
         this.rootEl = BB.el({
             css: {
                 margin: '10px',
@@ -135,7 +131,6 @@ export class FillUi {
         growWrapper.append(this.growSelect.getElement());
         selectRow.append(growWrapper);
 
-
         this.isContiguous = true;
         const contiguousToggle = new Checkbox({
             init: true,
@@ -155,62 +150,66 @@ export class FillUi {
             init: false,
             label: LANG('eraser'),
             css: {
-
                 paddingRight: '5px',
                 display: 'inline-block',
                 width: '50%',
             },
         });
 
-        this.rootEl.append(BB.el({
-            content: [
-                contiguousToggle.getElement(),
-                this.eraserToggle.getElement(),
-            ],
-            css: {
-                display: 'flex',
-                marginTop: '10px',
-            },
-        }));
+        this.rootEl.append(
+            BB.el({
+                content: [contiguousToggle.getElement(), this.eraserToggle.getElement()],
+                css: {
+                    display: 'flex',
+                    marginTop: '10px',
+                },
+            }),
+        );
     }
 
-    getElement (): HTMLElement {
+    getElement(): HTMLElement {
         return this.rootEl;
     }
 
-    setIsVisible (pIsVisible: boolean): void {
+    setIsVisible(pIsVisible: boolean): void {
         this.isVisible = !!pIsVisible;
         this.rootEl.style.display = this.isVisible ? 'block' : 'none';
         if (this.isVisible) {
-            this.colorDiv.append(this.colorSlider.getElement(), this.colorSlider.getOutputElement());
+            this.colorDiv.append(
+                this.colorSlider.getElement(),
+                this.colorSlider.getOutputElement(),
+            );
         }
     }
 
     /**
      * [0, 1]
      */
-    getTolerance (): number {
+    getTolerance(): number {
+        // slider may display 0 when value is 1 -> avoid confusing users
+        if (Math.round(this.toleranceSlider.getDisplayValue()) === 0) {
+            return 0;
+        }
         return this.toleranceSlider.getValue();
     }
 
-    getOpacity (): number {
+    getOpacity(): number {
         return this.opacitySlider.getValue();
     }
 
-    getSample (): TFillSampling {
+    getSample(): TFillSampling {
         return this.modeSelect.getValue() as TFillSampling;
     }
 
-    getGrow (): number {
+    getGrow(): number {
         return parseInt(this.growSelect.getValue(), 10);
     }
 
-    getContiguous (): boolean {
+    getContiguous(): boolean {
         return this.isContiguous;
     }
 
-    getIsEraser (): boolean {
+    getIsEraser(): boolean {
         return this.eraserToggle.getValue();
     }
-
 }

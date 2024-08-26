@@ -1,9 +1,9 @@
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-nocheck
-import {gl} from '../core/gl';
-import {Shader} from '../core/shader';
-import {randomShaderFunc} from '../shaders/random-shader-func';
-import {simpleShader} from '../core/simple-shader';
+import { gl } from '../core/gl';
+import { Shader } from '../core/shader';
+import { randomShaderFunc } from '../shaders/random-shader-func';
+import { simpleShader } from '../core/simple-shader';
 
 /**
  * @filter       Edge Work
@@ -11,12 +11,18 @@ import {simpleShader} from '../core/simple-shader';
  *               copies of the image blurred with different radii.
  * @param radius The radius of the effect in pixels.
  */
-export function edgeWork (radius) {
-    gl.edgeWork1 = gl.edgeWork1 || new Shader(null, '\
+export function edgeWork(radius) {
+    gl.edgeWork1 =
+        gl.edgeWork1 ||
+        new Shader(
+            null,
+            '\
         uniform sampler2D texture;\
         uniform vec2 delta;\
         varying vec2 texCoord;\
-        ' + randomShaderFunc + '\
+        ' +
+                randomShaderFunc +
+                '\
         void main() {\
             vec2 color = vec2(0.0);\
             vec2 total = vec2(0.0);\
@@ -39,12 +45,20 @@ export function edgeWork (radius) {
             }\
             gl_FragColor = vec4(color / total, 0.0, 1.0);\
         }\
-    ', 'edgeWork1');
-    gl.edgeWork2 = gl.edgeWork2 || new Shader(null, '\
+    ',
+            'edgeWork1',
+        );
+    gl.edgeWork2 =
+        gl.edgeWork2 ||
+        new Shader(
+            null,
+            '\
         uniform sampler2D texture;\
         uniform vec2 delta;\
         varying vec2 texCoord;\
-        ' + randomShaderFunc + '\
+        ' +
+                randomShaderFunc +
+                '\
         void main() {\
             vec2 color = vec2(0.0);\
             vec2 total = vec2(0.0);\
@@ -67,7 +81,9 @@ export function edgeWork (radius) {
             float c = clamp(10000.0 * (color.y / total.y - color.x / total.x) + 0.5, 0.0, 1.0);\
             gl_FragColor = vec4(c, c, c, 1.0);\
         }\
-    ', 'edgeWork2');
+    ',
+            'edgeWork2',
+        );
 
     simpleShader.call(this, gl.edgeWork1, {
         delta: [radius / this.width, 0],

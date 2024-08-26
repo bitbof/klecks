@@ -1,8 +1,8 @@
-import {gl} from '../core/gl';
-import {FxShader} from '../core/fx-shader';
-import {simpleShader} from '../core/simple-shader';
-import {BB} from '../../bb/bb';
-import {TFxCanvas} from '../fx-canvas-types';
+import { gl } from '../core/gl';
+import { FxShader } from '../core/fx-shader';
+import { simpleShader } from '../core/simple-shader';
+import { BB } from '../../bb/bb';
+import { TFxCanvas } from '../fx-canvas-types';
 
 /**
  * Hue / Saturation
@@ -16,14 +16,14 @@ import {TFxCanvas} from '../fx-canvas-types';
  *                   and 1 is 180 degree rotation in the positive direction)
  * @param saturation -1 to 1 (-1 is solid gray, 0 is no change, and 1 is maximum contrast)
  */
-export type TFilterHueSaturation = (
-    this: TFxCanvas,
-    hue: number,
-    saturation: number,
-) => TFxCanvas;
+export type TFilterHueSaturation = (this: TFxCanvas, hue: number, saturation: number) => TFxCanvas;
 
 export const hueSaturation: TFilterHueSaturation = function (hue, saturation) {
-    gl.hueSaturation = gl.hueSaturation || new FxShader(null, '\
+    gl.hueSaturation =
+        gl.hueSaturation ||
+        new FxShader(
+            null,
+            '\
         uniform sampler2D texture;\
         uniform float hue;\
         uniform float saturation;\
@@ -52,7 +52,9 @@ export const hueSaturation: TFilterHueSaturation = function (hue, saturation) {
             \
             gl_FragColor = color;\
         }\
-    ', 'hueSaturation');
+    ',
+            'hueSaturation',
+        );
 
     simpleShader.call(this, gl.hueSaturation, {
         hue: BB.clamp(hue, -1, 1),

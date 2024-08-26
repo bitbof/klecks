@@ -1,26 +1,25 @@
-import {c} from '../../../bb/base/c';
-import {ProjectViewport, TProjectViewportProject, TViewportTransform} from './project-viewport';
-import {BB} from '../../../bb/bb';
-import {PointerListener} from '../../../bb/input/pointer-listener';
+import { c } from '../../../bb/base/c';
+import { ProjectViewport, TProjectViewportProject, TViewportTransform } from './project-viewport';
+import { BB } from '../../../bb/bb';
+import { PointerListener } from '../../../bb/input/pointer-listener';
 import toolZoomInImg from '/src/app/img/ui/tool-zoom-in.svg';
 import toolZoomOutImg from '/src/app/img/ui/tool-zoom-out.svg';
 import viewportResetImg from '/src/app/img/ui/viewport-reset.svg';
 import toolHandImg from '/src/app/img/ui/tool-hand.svg';
 import editPencilImg from '/src/app/img/ui/edit-pencil.svg';
-import {EventChain} from '../../../bb/input/event-chain/event-chain';
-import {DoubleTapper} from '../../../bb/input/event-chain/double-tapper';
-import {IChainElement} from '../../../bb/input/event-chain/event-chain.types';
-import {css} from '@emotion/css';
-import {createTransformMatrix} from './utils/create-transform-matrix';
-import {zoomByStep} from './utils/zoom-by-step';
-import {PinchZoomer} from '../../../bb/input/event-chain/pinch-zoomer';
-import {LANG} from '../../../language/language';
-import {inverse, applyToPoint} from 'transformation-matrix';
-import {createTransform} from './utils/create-transform';
-import {toMetaTransform} from './utils/to-meta-transform';
-import {Options} from '../components/options';
-import {IPointerEvent, IWheelEvent} from '../../../bb/input/event.types';
-
+import { EventChain } from '../../../bb/input/event-chain/event-chain';
+import { DoubleTapper } from '../../../bb/input/event-chain/double-tapper';
+import { IChainElement } from '../../../bb/input/event-chain/event-chain.types';
+import { css } from '@emotion/css';
+import { zoomByStep } from './utils/zoom-by-step';
+import { PinchZoomer } from '../../../bb/input/event-chain/pinch-zoomer';
+import { LANG } from '../../../language/language';
+import { inverse, applyToPoint } from 'transformation-matrix';
+import { createTransform } from '../../../bb/transform/create-transform';
+import { toMetaTransform } from '../../../bb/transform/to-meta-transform';
+import { Options } from '../components/options';
+import { IPointerEvent, IWheelEvent } from '../../../bb/input/event.types';
+import { createMatrixFromTransform } from '../../../bb/transform/create-matrix-from-transform';
 
 export type TPreviewMode = 'edit' | 'hand';
 
@@ -50,11 +49,14 @@ export class Preview {
     private readonly padding: number;
     private animationFrameId: ReturnType<typeof requestAnimationFrame> | undefined;
     private onTransformChange: TPreviewParams['onTransformChange'] | undefined;
-    private lastEmittedTransform: TViewportTransform = {x: 0, y: 0, scale: 0, angleDeg: 0};
+    private lastEmittedTransform: TViewportTransform = {
+        x: 0,
+        y: 0,
+        scale: 0,
+        angleDeg: 0,
+    };
     private modeToggle: Options<TPreviewMode> | undefined;
     private readonly pointerChain: EventChain;
-
-
 
     private renderLoop = (): void => {
         this.animationFrameId = requestAnimationFrame(this.renderLoop);
@@ -73,61 +75,67 @@ export class Preview {
         }
     };
 
-    private requestRerender (): void {
+    private requestRerender(): void {
         this.doRender = true;
     }
 
-    private resetOrZoom (x: number, y: number): void {
+    private resetOrZoom(x: number, y: number): void {
         if (this.isReset) {
             this.isReset = false;
 
-            const canvasP = applyToPoint(inverse(createTransformMatrix(this.viewport.getTransform())), {x, y});
+            const canvasP = applyToPoint(
+                inverse(createMatrixFromTransform(this.viewport.getTransform())),
+                { x, y },
+            );
 
-            this.viewport.setTransform(createTransform(
-                {x: this.width / 2, y: this.height / 2},
-                canvasP,
-                1,
-                0,
-            ));
+            this.viewport.setTransform(
+                createTransform({ x: this.width / 2, y: this.height / 2 }, canvasP, 1, 0),
+            );
             this.requestRerender();
         } else {
             this.reset();
         }
     }
 
-    private reset (): void {
+    private reset(): void {
         const fit = BB.fitInto(
-            this.project.width, this.project.height,
+            this.project.width,
+            this.project.height,
             this.width - this.padding * 2,
             this.height - this.padding * 2,
         );
         const scale = fit.width / this.project.width;
-        this.viewport.setTransform(createTransform(
-            {x: this.width / 2, y: this.height / 2},
-            {x: this.project.width / 2, y: this.project.height / 2},
-            scale,
-            0
-        ));
+        this.viewport.setTransform(
+            createTransform(
+                { x: this.width / 2, y: this.height / 2 },
+                { x: this.project.width / 2, y: this.project.height / 2 },
+                scale,
+                0,
+            ),
+        );
         this.isReset = true;
         this.requestRerender();
     }
 
-    private transformCanvas (
-        t: {
-            type: 'translate';
-            x: number;
-            y: number;
-        } | {
-            type: 'rotate';
-            cX: number;
-            cY: number;
-            angleDeg: number;
-        } | {
-            type: 'zoom';
-            vX?: number;
-            vY?: number;
-            fac: number;
-        }
+    private transformCanvas(
+        t:
+            | {
+                  type: 'translate';
+                  x: number;
+                  y: number;
+              }
+            | {
+                  type: 'rotate';
+                  cX: number;
+                  cY: number;
+                  angleDeg: number;
+              }
+            | {
+                  type: 'zoom';
+                  vX?: number;
+                  vY?: number;
+                  fac: number;
+              },
     ): void {
         if (t.type === 'translate') {
             const old = this.viewport.getTransform();
@@ -145,26 +153,25 @@ export class Preview {
             t.vX = t.vX ?? viewportRect.width / 2;
             t.vY = t.vY ?? viewportRect.height / 2;
 
-            const metaTransform = toMetaTransform(
-                old,
-                    {x: t.vX, y: t.vY},
-            );
+            const metaTransform = toMetaTransform(old, { x: t.vX, y: t.vY });
             metaTransform.scale *= t.fac;
 
-            this.viewport.setTransform(createTransform(
-                metaTransform.viewportP,
-                metaTransform.canvasP,
-                metaTransform.scale,
-                metaTransform.angleDeg,
-            ));
+            this.viewport.setTransform(
+                createTransform(
+                    metaTransform.viewportP,
+                    metaTransform.canvasP,
+                    metaTransform.scale,
+                    metaTransform.angleDeg,
+                ),
+            );
         }
         this.isReset = false;
 
         this.requestRerender();
     }
 
-    // ---- public ----
-    constructor (p: TPreviewParams) {
+    // ----------------------------------- public -----------------------------------
+    constructor(p: TPreviewParams) {
         this.width = p.width;
         this.height = p.height;
         this.project = p.project;
@@ -172,7 +179,8 @@ export class Preview {
         this.padding = p.padding ?? DEFAULT_PADDING;
 
         const fit = BB.fitInto(
-            this.project.width, this.project.height,
+            this.project.width,
+            this.project.height,
             this.width - this.padding * 2,
             this.height - this.padding * 2,
         );
@@ -182,10 +190,10 @@ export class Preview {
             width: this.width,
             height: this.height,
             transform: createTransform(
-                {x: this.width / 2, y: this.height / 2},
-                {x: this.project.width / 2, y: this.project.height / 2},
+                { x: this.width / 2, y: this.height / 2 },
+                { x: this.project.width / 2, y: this.project.height / 2 },
                 scale,
-                0
+                0,
             ),
             project: this.project,
             useNativeResolution: false,
@@ -194,11 +202,11 @@ export class Preview {
 
         const doubleTapper = new DoubleTapper({
             onDoubleTap: (e) => {
-                const m = createTransformMatrix(this.viewport.getTransform());
-                const tl = applyToPoint(m, {x: 0, y: 0});
-                const br = applyToPoint(m, {x: this.project.width, y: this.project.height});
+                const m = createMatrixFromTransform(this.viewport.getTransform());
+                const tl = applyToPoint(m, { x: 0, y: 0 });
+                const br = applyToPoint(m, { x: this.project.width, y: this.project.height });
                 const isInside = BB.isInsideRect(
-                    {x: e.relX, y: e.relY},
+                    { x: e.relX, y: e.relY },
                     {
                         x: tl.x,
                         y: tl.y,
@@ -220,31 +228,31 @@ export class Preview {
                     if (!oldTransform) {
                         oldTransform = this.viewport.getTransform();
                     }
-                    const metaTransform = toMetaTransform(oldTransform, {x: e.downRelX, y: e.downRelY});
+                    const metaTransform = toMetaTransform(oldTransform, {
+                        x: e.downRelX,
+                        y: e.downRelY,
+                    });
                     metaTransform.scale *= e.scale;
                     metaTransform.viewportP.x += e.relX - e.downRelX;
                     metaTransform.viewportP.y += e.relY - e.downRelY;
-                    this.viewport.setTransform(createTransform(
-                        metaTransform.viewportP,
-                        metaTransform.canvasP,
-                        metaTransform.scale,
-                        metaTransform.angleDeg,
-                    ));
+                    this.viewport.setTransform(
+                        createTransform(
+                            metaTransform.viewportP,
+                            metaTransform.canvasP,
+                            metaTransform.scale,
+                            metaTransform.angleDeg,
+                        ),
+                    );
                     this.requestRerender();
                     this.isReset = false;
-
-                }  else if (e.type === 'end') {
+                } else if (e.type === 'end') {
                     oldTransform = undefined;
                 }
             },
         });
 
-
         this.pointerChain = new EventChain({
-           chainArr: [
-               pinchZoomer as IChainElement,
-               doubleTapper as IChainElement,
-           ],
+            chainArr: [pinchZoomer as IChainElement, doubleTapper as IChainElement],
         });
         this.pointerChain.setChainOut((e) => {
             if (e.button && ['left', 'middle'].includes(e.button)) {
@@ -257,17 +265,19 @@ export class Preview {
             }
         });
 
-        this.viewport.getElement().classList.add(css({
-            cursor: 'grab',
-            ':active': {
-                cursor: 'grabbing',
-            },
-        }));
+        this.viewport.getElement().classList.add(
+            css({
+                cursor: 'grab',
+                ':active': {
+                    cursor: 'grabbing',
+                },
+            }),
+        );
         BB.css(this.viewport.getElement(), {
             userSelect: 'none',
             touchAction: 'none',
         });
-        this.viewport.getElement().addEventListener( 'touchend', (e) => {
+        this.viewport.getElement().addEventListener('touchend', (e) => {
             e.preventDefault();
             return false;
         });
@@ -294,7 +304,7 @@ export class Preview {
 
         if (p.hasEditMode) {
             this.modeToggle = new Options<TPreviewMode>({
-                optionArr: (['edit', 'hand'] as const).map(id => {
+                optionArr: (['edit', 'hand'] as const).map((id) => {
                     const el = BB.el({
                         className: 'dark-invert',
                         css: {
@@ -302,7 +312,7 @@ export class Preview {
                             height: '28px',
                             backgroundSize: 'contain',
                             margin: '5px',
-                            backgroundImage: `url(${id === 'edit' ? p.editIcon ?? editPencilImg : toolHandImg})`,
+                            backgroundImage: `url(${id === 'edit' ? (p.editIcon ?? editPencilImg) : toolHandImg})`,
                             backgroundPosition: 'center',
                             backgroundRepeat: 'no-repeat',
                         },
@@ -321,14 +331,18 @@ export class Preview {
             });
         }
 
-        const elCss = css(p.hasBorder === false ? {} : {
-            borderTop: '1px solid #7f7f7f',
-            borderBottom: '1px solid #7f7f7f',
-            '.kl-theme-dark &': {
-                borderTop: '1px solid #636363',
-                borderBottom: '1px solid #636363',
-            },
-        });
+        const elCss = css(
+            p.hasBorder === false
+                ? {}
+                : {
+                      borderTop: '1px solid #7f7f7f',
+                      borderBottom: '1px solid #7f7f7f',
+                      '.kl-theme-dark &': {
+                          borderTop: '1px solid #636363',
+                          borderBottom: '1px solid #636363',
+                      },
+                  },
+        );
         // pointer-events: auto - So the canvas can be ignored, while the buttons still work.
         this.rootEl = c(
             {
@@ -339,11 +353,13 @@ export class Preview {
             },
             [
                 this.viewport.getElement(),
-                ...(this.modeToggle ? [
-                    c(',pos-absolute,left-5,top-5,z-1,pointer-auto', [
-                        this.modeToggle.getElement(),
-                    ]),
-                ] : []),
+                ...(this.modeToggle
+                    ? [
+                          c(',pos-absolute,left-5,top-5,z-1,pointer-auto', [
+                              this.modeToggle.getElement(),
+                          ]),
+                      ]
+                    : []),
                 c(',pos-absolute,right-5,bottom-5,flex,flexCol,gap-5,z-1,pointer-auto', [
                     c({
                         tagName: 'button',
@@ -388,21 +404,21 @@ export class Preview {
         this.renderLoop();
     }
 
-    render (): void {
+    render(): void {
         this.requestRerender();
     }
 
-    setTransform (transform: TViewportTransform): void {
+    setTransform(transform: TViewportTransform): void {
         this.viewport.setTransform(transform);
         this.requestRerender();
         this.isReset = false;
     }
 
-    getTransform (): TViewportTransform {
+    getTransform(): TViewportTransform {
         return this.viewport.getTransform();
     }
 
-    onPointer (event: IPointerEvent): void {
+    onPointer(event: IPointerEvent): void {
         this.pointerChain.chainIn(event);
     }
 
@@ -422,11 +438,11 @@ export class Preview {
         });
     };
 
-    getElement (): HTMLElement {
+    getElement(): HTMLElement {
         return this.rootEl;
     }
 
-    destroy (): void {
+    destroy(): void {
         this.animationFrameId !== undefined && cancelAnimationFrame(this.animationFrameId);
         this.viewport.destroy();
         this.viewportPointerListener.destroy();

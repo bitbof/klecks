@@ -3,10 +3,9 @@
  * If cookies disabled in Safari localStorage interactions throw exception "insecure operation"
  */
 export class LocalStorage {
-
     private static error: unknown | undefined;
 
-    static getItem (key: string): string | null {
+    static getItem(key: string): string | null {
         // (disabled) eslint-disable-next-line no-null/no-null
         let result = null;
         try {
@@ -17,7 +16,7 @@ export class LocalStorage {
         return result;
     }
 
-    static setItem (key: string, value: string): void {
+    static setItem(key: string, value: string): void {
         try {
             localStorage.setItem(key, value);
         } catch (e) {
@@ -25,7 +24,7 @@ export class LocalStorage {
         }
     }
 
-    static removeItem (key: string): void {
+    static removeItem(key: string): void {
         try {
             localStorage.removeItem(key);
         } catch (e) {
@@ -33,7 +32,7 @@ export class LocalStorage {
         }
     }
 
-    static getError (): unknown {
+    static getError(): unknown {
         return this.error;
     }
 }

@@ -1,10 +1,10 @@
-import {BB} from '../../bb/bb';
-import {IKlProject} from '../kl-types';
+import { BB } from '../../bb/bb';
+import { IKlProject } from '../kl-types';
 
-export function drawProject (project: IKlProject, factor: number): HTMLCanvasElement {
+export function drawProject(project: IKlProject, factor: number): HTMLCanvasElement {
     const resultCanvas = BB.canvas(
         Math.max(1, Math.round(project.width * factor)),
-        Math.max(1, Math.round(project.height * factor))
+        Math.max(1, Math.round(project.height * factor)),
     );
     const ctx = BB.ctx(resultCanvas);
     ctx.save();

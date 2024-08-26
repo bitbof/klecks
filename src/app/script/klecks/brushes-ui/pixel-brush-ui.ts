@@ -1,14 +1,13 @@
-import {BB} from '../../bb/bb';
-import {brushes} from '../brushes/brushes';
-import {eventResMs} from './brushes-consts';
-import {klHistory} from '../history/kl-history';
-import {Checkbox} from '../ui/components/checkbox';
-import {KlSlider} from '../ui/components/kl-slider';
-import {createPenPressureToggle} from '../ui/components/create-pen-pressure-toggle';
+import { BB } from '../../bb/bb';
+import { brushes } from '../brushes/brushes';
+import { eventResMs } from './brushes-consts';
+import { Checkbox } from '../ui/components/checkbox';
+import { KlSlider } from '../ui/components/kl-slider';
+import { createPenPressureToggle } from '../ui/components/create-pen-pressure-toggle';
 import brushIconImg from '/src/app/img/ui/brush-pixel.svg';
-import {IBrushUi} from '../kl-types';
-import {LANG, languageStrings} from '../../language/language';
-import {PixelBrush} from '../brushes/pixel-brush';
+import { IBrushUi } from '../kl-types';
+import { LANG, languageStrings } from '../../language/language';
+import { PixelBrush } from '../brushes/pixel-brush';
 
 export const pixelBrushUi = (function () {
     const brushInterface = {
@@ -22,7 +21,11 @@ export const pixelBrushUi = (function () {
         opacitySlider: {
             min: 1 / 100,
             max: 1,
-            curve: [[0, 1 / 100], [0.5, 0.3], [1, 1]],
+            curve: [
+                [0, 1 / 100],
+                [0.5, 0.3],
+                [1, 1],
+            ],
         },
     } as IBrushUi<PixelBrush>;
 
@@ -33,7 +36,7 @@ export const pixelBrushUi = (function () {
     brushInterface.Ui = function (p) {
         const div = document.createElement('div'); // the gui
         const brush = new brushes.PixelBrush();
-        brush.setHistory(klHistory);
+        brush.setHistory(p.history);
         p.onSizeChange(brush.getSize());
         let sizeSlider: KlSlider;
         let opacitySlider: KlSlider;
@@ -70,14 +73,17 @@ export const pixelBrushUi = (function () {
             },
         });
 
-        const spacingSpline = new BB.SplineInterpolator([[0.5, 0.45], [100, 4]]);
+        const spacingSpline = new BB.SplineInterpolator([
+            [0.5, 0.45],
+            [100, 4],
+        ]);
 
-        function setSize (size: number) {
+        function setSize(size: number) {
             brush.setSize(size);
             brush.setSpacing(spacingSpline.interpolate(size) / size);
         }
 
-        function init () {
+        function init() {
             sizeSlider = new KlSlider({
                 label: LANG('brush-size'),
                 width: 225,
@@ -116,10 +122,7 @@ export const pixelBrushUi = (function () {
 
             div.append(
                 BB.el({
-                    content: [
-                        sizeSlider.getElement(),
-                        pressureSizeToggle,
-                    ],
+                    content: [sizeSlider.getElement(), pressureSizeToggle],
                     css: {
                         display: 'flex',
                         justifyContent: 'space-between',
@@ -127,7 +130,7 @@ export const pixelBrushUi = (function () {
                         marginBottom: '10px',
                     },
                 }),
-                opacitySlider.getElement()
+                opacitySlider.getElement(),
             );
 
             const toggleRow = BB.el({

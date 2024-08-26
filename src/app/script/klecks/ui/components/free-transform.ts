@@ -1,8 +1,8 @@
-import {BB} from '../../../bb/bb';
+import { BB } from '../../../bb/bb';
 import rotateImg from '/src/app/img/ui/cursor-rotate.png';
-import {KeyListener} from '../../../bb/input/key-listener';
-import {IVector2D} from '../../../bb/bb-types';
-import {PointerListener} from '../../../bb/input/pointer-listener';
+import { KeyListener } from '../../../bb/input/key-listener';
+import { IVector2D } from '../../../bb/bb-types';
+import { PointerListener } from '../../../bb/input/pointer-listener';
 import {
     copyTransform,
     IFreeTransform,
@@ -41,25 +41,24 @@ import {
  *
  */
 export class FreeTransform {
-
     // --- private ---
     private readonly value: IFreeTransform; // coordinates and dimensions of transformation
     private isConstrained: boolean;
     private ratio: number; // aspect ratio of transform
-    private viewportTransform: {scale: number; x: number; y: number};
-    private readonly scaled = { // scaled coordinates and dimensions for screen space
+    private viewportTransform: { scale: number; x: number; y: number };
+    private readonly scaled = {
+        // scaled coordinates and dimensions for screen space
         x: 0,
         y: 0,
         width: 0,
         height: 0,
-        corners: [{x: 0, y: 0}], // in transform space
+        corners: [{ x: 0, y: 0 }], // in transform space
     };
     private readonly minSnapDist = 7; // minimal snapping distance in px screen space
     private snappingEnabled: boolean;
     private readonly snapX: number[];
     private readonly snapY: number[];
     private readonly callback: (transform: IFreeTransform) => void;
-
 
     private readonly cornerCursors = ['nw', 'n', 'ne', 'e', 'se', 's', 'sw', 'w'];
     private readonly gripSize = 16;
@@ -81,13 +80,16 @@ export class FreeTransform {
         updateDOM: () => void;
     };
 
-    private updateScaled (): void {
+    private updateScaled(): void {
         this.scaled.x = this.value.x * this.viewportTransform.scale;
         this.scaled.y = this.value.y * this.viewportTransform.scale;
         this.scaled.width = this.value.width * this.viewportTransform.scale;
         this.scaled.height = this.value.height * this.viewportTransform.scale;
         this.scaled.corners = this.corners.map((item) => {
-            return {x: item.x * this.viewportTransform.scale, y: item.y * this.viewportTransform.scale};
+            return {
+                x: item.x * this.viewportTransform.scale,
+                y: item.y * this.viewportTransform.scale,
+            };
         });
     }
 
@@ -99,9 +101,9 @@ export class FreeTransform {
      * @param iY - image space
      * @private
      */
-    private snapCorner (iX: number, iY: number): IVector2D {
+    private snapCorner(iX: number, iY: number): IVector2D {
         if (!this.snappingEnabled) {
-            return {x: iX, y: iY};
+            return { x: iX, y: iY };
         }
         let dist: number;
         const snap: {
@@ -158,7 +160,7 @@ export class FreeTransform {
      * @param iY
      * @private
      */
-    private constrainCorner (cornerIndex: number, iX: number, iY: number): IVector2D {
+    private constrainCorner(cornerIndex: number, iX: number, iY: number): IVector2D {
         if (!this.isConstrained) {
             return {
                 x: iX,
@@ -167,9 +169,9 @@ export class FreeTransform {
         }
         const flip = this.value.width * this.value.height < 0 ? -1 : 1;
         return BB.projectPointOnLine(
-            {x: this.value.x, y: this.value.y},
+            { x: this.value.x, y: this.value.y },
             toImageSpace(this.ratio, flip * ([0, 2].includes(cornerIndex) ? 1 : -1), this.value),
-            {x: iX, y: iY}
+            { x: iX, y: iY },
         );
     }
 
@@ -177,18 +179,18 @@ export class FreeTransform {
      * Update corners according to width height.
      * Not their DOM.
      */
-    private updateCornerPositions (): void {
-        this.corners[0].x = (-this.value.width / 2); // top left
-        this.corners[0].y = (-this.value.height / 2);
+    private updateCornerPositions(): void {
+        this.corners[0].x = -this.value.width / 2; // top left
+        this.corners[0].y = -this.value.height / 2;
 
-        this.corners[1].x = (this.value.width / 2); // top right
-        this.corners[1].y = (-this.value.height / 2);
+        this.corners[1].x = this.value.width / 2; // top right
+        this.corners[1].y = -this.value.height / 2;
 
-        this.corners[2].x = (this.value.width / 2); // bottom right
-        this.corners[2].y = (this.value.height / 2);
+        this.corners[2].x = this.value.width / 2; // bottom right
+        this.corners[2].y = this.value.height / 2;
 
-        this.corners[3].x = (-this.value.width / 2); // bottom left
-        this.corners[3].y = (this.value.height / 2);
+        this.corners[3].x = -this.value.width / 2; // bottom left
+        this.corners[3].y = this.value.height / 2;
     }
 
     /**
@@ -199,7 +201,7 @@ export class FreeTransform {
      * @param heightChanged
      * @private
      */
-    private restoreRatio (widthChanged: boolean, heightChanged: boolean): void {
+    private restoreRatio(widthChanged: boolean, heightChanged: boolean): void {
         if (!this.isConstrained) {
             return;
         }
@@ -209,8 +211,10 @@ export class FreeTransform {
             const newHeight = Math.abs(this.corners[3].y - this.corners[0].y);
             let newWidth = this.ratio * newHeight;
             if (angle90) {
-                newWidth = (whSwapped ? this.value.y % 1 : this.value.x % 1) === 0 ?
-                    BB.roundEven(newWidth) : BB.roundUneven(newWidth);
+                newWidth =
+                    (whSwapped ? this.value.y % 1 : this.value.x % 1) === 0
+                        ? BB.roundEven(newWidth)
+                        : BB.roundUneven(newWidth);
             }
             if (this.corners[1].x - this.corners[0].x < 0) {
                 newWidth *= -1;
@@ -224,8 +228,10 @@ export class FreeTransform {
             const newWidth = Math.abs(this.corners[0].x - this.corners[1].x);
             let newHeight = newWidth / this.ratio;
             if (angle90) {
-                newHeight = (whSwapped ? this.value.x % 1 : this.value.y % 1) === 0  ?
-                    BB.roundEven(newHeight) : BB.roundUneven(newHeight);
+                newHeight =
+                    (whSwapped ? this.value.x % 1 : this.value.y % 1) === 0
+                        ? BB.roundEven(newHeight)
+                        : BB.roundUneven(newHeight);
             }
             if (this.corners[3].y - this.corners[0].y < 0) {
                 newHeight *= -1;
@@ -237,21 +243,19 @@ export class FreeTransform {
         }
     }
 
-
     /**
      * update transform based on corners
      * @private
      */
-    private updateTransformViaCorners (): void {
-
+    private updateTransformViaCorners(): void {
         // calc transform center in image space
         const rot = BB.rotateAround(
-            {x: 0, y: 0},
+            { x: 0, y: 0 },
             {
                 x: (this.corners[0].x + this.corners[1].x) / 2,
                 y: (this.corners[0].y + this.corners[3].y) / 2,
             },
-            this.value.angleDeg
+            this.value.angleDeg,
         );
         this.value.x = rot.x + this.value.x;
         this.value.y = rot.y + this.value.y;
@@ -270,12 +274,12 @@ export class FreeTransform {
      * updates DOM according to transform
      * @param skipCallback
      */
-    private updateDOM (skipCallback?: boolean): void {
+    private updateDOM(skipCallback?: boolean): void {
         this.updateScaled();
 
         BB.css(this.transEl, {
-            left: (this.viewportTransform.x + this.scaled.x) + 'px',
-            top: (this.viewportTransform.y + this.scaled.y) + 'px',
+            left: this.viewportTransform.x + this.scaled.x + 'px',
+            top: this.viewportTransform.y + this.scaled.y + 'px',
             transformOrigin: '0 0',
             transform: 'rotate(' + this.value.angleDeg + 'deg)',
         });
@@ -297,37 +301,34 @@ export class FreeTransform {
         this.edges[2].updateDOM();
         this.edges[3].updateDOM();
 
-
         this.angleGrip.x = 0;
-        this.angleGrip.y = (-Math.abs(this.value.height * this.viewportTransform.scale) / 2) - 20;
+        this.angleGrip.y = -Math.abs(this.value.height * this.viewportTransform.scale) / 2 - 20;
         this.angleGrip.updateDOM();
         if (!skipCallback) {
-            if (this.callback) { // why should updateDOM trigger the callback?
+            if (this.callback) {
+                // why should updateDOM trigger the callback?
                 this.callback(copyTransform(this.value));
             }
         }
     }
 
+    // ----------------------------------- public -----------------------------------
+    constructor(params: {
+        x: number; // center of transform region. image space
+        y: number;
+        width: number; // size of transform region. image space
+        height: number;
+        angleDeg: number; // angle of transform region. degrees
 
-
-    // --- public ---
-    constructor (
-        params: {
-            x: number; // center of transform region. image space
-            y: number;
-            width: number; // size of transform region. image space
-            height: number;
-            angleDeg: number; // angle of transform region. degrees
-
-            isConstrained: boolean; // proportions constrained
-            snapX: number[]; // where snapping along X axis. image space
-            snapY: number[]; // where snapping along X axis. image space
-            viewportTransform: {scale: number; x: number; y: number};
-            callback: (transform: IFreeTransform) => void;
-        }
-    ) {
-        this.viewportTransform = {...params.viewportTransform};
-        this.value = { // coordinates and dimensions of transformation
+        isConstrained: boolean; // proportions constrained
+        snapX: number[]; // where snapping along X axis. image space
+        snapY: number[]; // where snapping along X axis. image space
+        viewportTransform: { scale: number; x: number; y: number };
+        callback: (transform: IFreeTransform) => void;
+    }) {
+        this.viewportTransform = { ...params.viewportTransform };
+        this.value = {
+            // coordinates and dimensions of transformation
             x: params.x,
             y: params.y,
             width: params.width,
@@ -368,7 +369,7 @@ export class FreeTransform {
             x: 0,
             y: 0,
         };
-        function resetRemainder (): void {
+        function resetRemainder(): void {
             pointerRemainder.x = 0;
             pointerRemainder.y = 0;
         }
@@ -384,12 +385,15 @@ export class FreeTransform {
             onPointer: (event) => {
                 event.eventPreventDefault();
                 if (event.type === 'pointerdown') {
-                    boundsStartP = {x: this.value.x, y: this.value.y};
+                    boundsStartP = { x: this.value.x, y: this.value.y };
                 }
                 if (event.type === 'pointermove' && event.button === 'left') {
-                    this.value.x = boundsStartP.x + (event.pageX - event.downPageX!) / this.viewportTransform.scale;
-                    this.value.y = boundsStartP.y + (event.pageY - event.downPageY!) / this.viewportTransform.scale;
-
+                    this.value.x =
+                        boundsStartP.x +
+                        (event.pageX - event.downPageX!) / this.viewportTransform.scale;
+                    this.value.y =
+                        boundsStartP.y +
+                        (event.pageY - event.downPageY!) / this.viewportTransform.scale;
 
                     let dist: number;
                     let snap: {
@@ -448,9 +452,10 @@ export class FreeTransform {
                     }
                     if (this.keyListener.getComboStr() === 'shift') {
                         let projected = BB.projectPointOnLine(
-                            {x: 0, y: boundsStartP.y},
-                            {x: 10, y: boundsStartP.y},
-                            {x: this.value.x, y: this.value.y});
+                            { x: 0, y: boundsStartP.y },
+                            { x: 10, y: boundsStartP.y },
+                            { x: this.value.x, y: this.value.y },
+                        );
                         let dist = BB.dist(projected.x, projected.y, this.value.x, this.value.y);
                         snap = {
                             x: projected.x,
@@ -460,9 +465,10 @@ export class FreeTransform {
                         };
 
                         projected = BB.projectPointOnLine(
-                            {x: boundsStartP.x, y: 0},
-                            {x: boundsStartP.x, y: 10},
-                            {x: this.value.x, y: this.value.y});
+                            { x: boundsStartP.x, y: 0 },
+                            { x: boundsStartP.x, y: 10 },
+                            { x: this.value.x, y: this.value.y },
+                        );
                         dist = BB.dist(projected.x, projected.y, this.value.x, this.value.y);
                         if (dist < snap.distX) {
                             snap = {
@@ -474,9 +480,10 @@ export class FreeTransform {
                         }
 
                         projected = BB.projectPointOnLine(
-                            {x: boundsStartP.x, y: boundsStartP.y},
-                            {x: boundsStartP.x + 1, y: boundsStartP.y + 1},
-                            {x: this.value.x, y: this.value.y});
+                            { x: boundsStartP.x, y: boundsStartP.y },
+                            { x: boundsStartP.x + 1, y: boundsStartP.y + 1 },
+                            { x: this.value.x, y: this.value.y },
+                        );
                         dist = BB.dist(projected.x, projected.y, this.value.x, this.value.y);
                         if (dist < snap.distX) {
                             snap = {
@@ -488,9 +495,10 @@ export class FreeTransform {
                         }
 
                         projected = BB.projectPointOnLine(
-                            {x: boundsStartP.x, y: boundsStartP.y},
-                            {x: boundsStartP.x + 1, y: boundsStartP.y - 1},
-                            {x: this.value.x, y: this.value.y});
+                            { x: boundsStartP.x, y: boundsStartP.y },
+                            { x: boundsStartP.x + 1, y: boundsStartP.y - 1 },
+                            { x: this.value.x, y: this.value.y },
+                        );
                         dist = BB.dist(projected.x, projected.y, this.value.x, this.value.y);
                         if (dist < snap.distX) {
                             snap = {
@@ -521,7 +529,7 @@ export class FreeTransform {
 
         for (let i = 0; i < 4; i++) {
             ((i) => {
-                const g = this.corners[i] = {
+                const g = (this.corners[i] = {
                     i: i,
                     el: BB.el({
                         css: {
@@ -545,32 +553,47 @@ export class FreeTransform {
                         x: 0,
                         y: 0,
                     },
-                } as TFreeTransformCorner;
+                } as TFreeTransformCorner);
                 g.updateDOM = (): void => {
-
                     // grip position
                     // if it gets small: slightly offset grips, so easier to handle
-                    const offsetArr = [[-1, -1], [1, -1], [1, 1], [-1, 1]].map(item => {
+                    const offsetArr = [
+                        [-1, -1],
+                        [1, -1],
+                        [1, 1],
+                        [-1, 1],
+                    ].map((item) => {
                         item[0] *= this.value.width > 0 ? 1 : -1;
                         item[1] *= this.value.height > 0 ? 1 : -1;
                         return item;
                     });
-                    const tinyOffset = Math.abs(this.scaled.width) < 20 || Math.abs(this.scaled.height) < 20 ? 10 : 0;
+                    const tinyOffset =
+                        Math.abs(this.scaled.width) < 20 || Math.abs(this.scaled.height) < 20
+                            ? 10
+                            : 0;
 
                     BB.css(g.el, {
-                        left: (this.scaled.corners[g.i].x - this.gripSize / 2 + offsetArr[i][0] * tinyOffset) + 'px',
-                        top: (this.scaled.corners[g.i].y - this.gripSize / 2 + offsetArr[i][1] * tinyOffset) + 'px',
+                        left:
+                            this.scaled.corners[g.i].x -
+                            this.gripSize / 2 +
+                            offsetArr[i][0] * tinyOffset +
+                            'px',
+                        top:
+                            this.scaled.corners[g.i].y -
+                            this.gripSize / 2 +
+                            offsetArr[i][1] * tinyOffset +
+                            'px',
                     });
 
-
                     // cursor
-                    let angle = BB.pointsToAngleDeg(
-                        {
-                            x: this.value.x,
-                            y: this.value.y,
-                        },
-                        toImageSpace(g.x, g.y, this.value),
-                    ) + 135; // offset so nw is 0
+                    let angle =
+                        BB.pointsToAngleDeg(
+                            {
+                                x: this.value.x,
+                                y: this.value.y,
+                            },
+                            toImageSpace(g.x, g.y, this.value),
+                        ) + 135; // offset so nw is 0
                     while (angle < 0) {
                         angle += 360;
                     }
@@ -586,8 +609,11 @@ export class FreeTransform {
                     onPointer: (event) => {
                         event.eventPreventDefault();
                         if (event.type === 'pointerdown' && event.button === 'left') {
-                            this.corners[i].virtualPos = toImageSpace(this.corners[i].x, this.corners[i].y, this.value);
-
+                            this.corners[i].virtualPos = toImageSpace(
+                                this.corners[i].x,
+                                this.corners[i].y,
+                                this.value,
+                            );
                         } else if (event.type === 'pointermove' && event.button === 'left') {
                             this.corners[i].virtualPos.x += event.dX / this.viewportTransform.scale;
                             this.corners[i].virtualPos.y += event.dY / this.viewportTransform.scale;
@@ -614,13 +640,17 @@ export class FreeTransform {
                             this.corners[i].y = tP.y;
 
                             let indexes: number[] = [];
-                            if (i === 0) { // top left
+                            if (i === 0) {
+                                // top left
                                 indexes = [3, 1, 2];
-                            } else if (i === 1) { // top right
+                            } else if (i === 1) {
+                                // top right
                                 indexes = [2, 0, 3];
-                            } else if (i === 2) { // bottom right
+                            } else if (i === 2) {
+                                // bottom right
                                 indexes = [1, 3, 0];
-                            } else if (i === 3) { // bottom left
+                            } else if (i === 3) {
+                                // bottom left
                                 indexes = [0, 2, 1];
                             }
 
@@ -634,11 +664,9 @@ export class FreeTransform {
                             }
 
                             this.updateTransformViaCorners();
-
                         }
                     },
                 });
-
             })(i);
         }
 
@@ -667,29 +695,41 @@ export class FreeTransform {
                 g.updateDOM = () => {
                     if (i === 0) {
                         BB.css(g.el, {
-                            left: Math.min(this.scaled.corners[0].x, this.scaled.corners[1].x) + 'px',
-                            top: (Math.min(this.scaled.corners[0].y, this.scaled.corners[3].y) - this.edgeSize) + 'px',
+                            left:
+                                Math.min(this.scaled.corners[0].x, this.scaled.corners[1].x) + 'px',
+                            top:
+                                Math.min(this.scaled.corners[0].y, this.scaled.corners[3].y) -
+                                this.edgeSize +
+                                'px',
                             width: Math.abs(this.scaled.width) + 'px',
                             height: this.edgeSize + 'px',
                         });
                     } else if (i === 1) {
                         BB.css(g.el, {
-                            left: Math.max(this.scaled.corners[0].x, this.scaled.corners[1].x) + 'px',
-                            top: Math.min(this.scaled.corners[1].y, this.scaled.corners[2].y) + 'px',
+                            left:
+                                Math.max(this.scaled.corners[0].x, this.scaled.corners[1].x) + 'px',
+                            top:
+                                Math.min(this.scaled.corners[1].y, this.scaled.corners[2].y) + 'px',
                             width: this.edgeSize + 'px',
                             height: Math.abs(this.scaled.height) + 'px',
                         });
                     } else if (i === 2) {
                         BB.css(g.el, {
-                            left: Math.min(this.scaled.corners[3].x, this.scaled.corners[2].x) + 'px',
-                            top: Math.max(this.scaled.corners[0].y,this.scaled.corners[3].y) + 'px',
+                            left:
+                                Math.min(this.scaled.corners[3].x, this.scaled.corners[2].x) + 'px',
+                            top:
+                                Math.max(this.scaled.corners[0].y, this.scaled.corners[3].y) + 'px',
                             width: Math.abs(this.scaled.width) + 'px',
                             height: this.edgeSize + 'px',
                         });
                     } else if (i === 3) {
                         BB.css(g.el, {
-                            left: (Math.min(this.scaled.corners[0].x, this.scaled.corners[1].x) - this.edgeSize) + 'px',
-                            top: Math.min(this.scaled.corners[0].y, this.scaled.corners[3].y) + 'px',
+                            left:
+                                Math.min(this.scaled.corners[0].x, this.scaled.corners[1].x) -
+                                this.edgeSize +
+                                'px',
+                            top:
+                                Math.min(this.scaled.corners[0].y, this.scaled.corners[3].y) + 'px',
                             width: this.edgeSize + 'px',
                             height: Math.abs(this.scaled.height) + 'px',
                         });
@@ -700,7 +740,6 @@ export class FreeTransform {
                     }
                     angleOffset = (i * 2 + 1 + angleOffset) % this.cornerCursors.length;
                     g.el.style.cursor = this.cornerCursors[angleOffset] + '-resize';
-
                 };
 
                 const isVertical = [0, 2].includes(i);
@@ -710,17 +749,24 @@ export class FreeTransform {
                     onPointer: (event) => {
                         event.eventPreventDefault();
                         if (event.type === 'pointerdown' && event.button === 'left') {
-                            if (isVertical) { // top bottom
+                            if (isVertical) {
+                                // top bottom
                                 isInverted = this.corners[0].y >= this.corners[3].y;
-                            } else { // left right
+                            } else {
+                                // left right
                                 isInverted = this.corners[0].x >= this.corners[1].x;
                             }
                             resetRemainder();
                         }
                         if (event.type === 'pointermove' && event.button === 'left') {
-                            const tfD = BB.rotateAround({x: 0, y: 0},
-                                {x: event.dX / this.viewportTransform.scale, y: event.dY / this.viewportTransform.scale},
-                                -this.value.angleDeg);
+                            const tfD = BB.rotateAround(
+                                { x: 0, y: 0 },
+                                {
+                                    x: event.dX / this.viewportTransform.scale,
+                                    y: event.dY / this.viewportTransform.scale,
+                                },
+                                -this.value.angleDeg,
+                            );
                             let ti = {
                                 dX: tfD.x,
                                 dY: tfD.y,
@@ -730,13 +776,17 @@ export class FreeTransform {
                             }
 
                             let indexes: number[] = [];
-                            if (i === 0) { // top
+                            if (i === 0) {
+                                // top
                                 indexes = [2, 3, 0, 1];
-                            } else if (i === 1) { // right
+                            } else if (i === 1) {
+                                // right
                                 indexes = [0, 3, 1, 2];
-                            } else if (i === 2) { // bottom
+                            } else if (i === 2) {
+                                // bottom
                                 indexes = [0, 1, 2, 3];
-                            } else if (i === 3) { // left
+                            } else if (i === 3) {
+                                // left
                                 indexes = [1, 2, 0, 3];
                             }
 
@@ -760,18 +810,18 @@ export class FreeTransform {
                                 }
                             }
 
-                            if (isVertical) { // top bottom
+                            if (isVertical) {
+                                // top bottom
                                 this.restoreRatio(false, true);
-                            } else { // left right
+                            } else {
+                                // left right
                                 this.restoreRatio(true, false);
                             }
 
                             this.updateTransformViaCorners();
-
                         }
                     },
                 });
-
             })(i);
         }
 
@@ -792,8 +842,8 @@ export class FreeTransform {
             snap: false,
             updateDOM: () => {
                 BB.css(this.angleGrip.el, {
-                    left: (this.angleGrip.x - this.gripSize / 2) + 'px',
-                    top: (this.angleGrip.y - this.gripSize / 2) + 'px',
+                    left: this.angleGrip.x - this.gripSize / 2 + 'px',
+                    top: this.angleGrip.y - this.gripSize / 2 + 'px',
                 });
             },
         };
@@ -802,7 +852,7 @@ export class FreeTransform {
             css: {
                 width: '2px',
                 height: '13px',
-                left: (this.gripSize / 2 - 1) + 'px',
+                left: this.gripSize / 2 - 1 + 'px',
                 top: this.gripSize + 'px',
                 background: '#0ff',
                 position: 'absolute',
@@ -815,7 +865,6 @@ export class FreeTransform {
             onPointer: (event) => {
                 event.eventPreventDefault();
                 if (event.type === 'pointermove' && event.button === 'left') {
-
                     const bounds = this.rootEl.getBoundingClientRect();
                     const offset = {
                         x: bounds.left - this.rootEl.scrollLeft + this.viewportTransform.x,
@@ -826,16 +875,15 @@ export class FreeTransform {
                         y: (event.clientY - offset.y) / this.viewportTransform.scale,
                     };
 
-                    const a = BB.pointsToAngleDeg({x: this.value.x, y: this.value.y}, iP) + 90;
+                    const a = BB.pointsToAngleDeg({ x: this.value.x, y: this.value.y }, iP) + 90;
                     this.value.angleDeg = a;
-                    const snapDeg = Math.round(a / 360 * 8) * 45;
+                    const snapDeg = Math.round((a / 360) * 8) * 45;
                     if (this.keyListener.getComboStr() === 'shift') {
                         this.value.angleDeg = snapDeg;
                     } else if (this.snappingEnabled && Math.abs(snapDeg - a) < 8) {
                         this.value.angleDeg = snapDeg;
                     }
                     this.updateDOM();
-
                 }
                 if (event.type === 'pointerup') {
                     if (Math.abs(this.value.angleDeg) % 90 === 0) {
@@ -861,40 +909,36 @@ export class FreeTransform {
             this.corners[3].el,
             this.angleGrip.el,
         ]);
-
-
     }
 
-
-
-    getValue (): IFreeTransform {
+    getValue(): IFreeTransform {
         return copyTransform(this.value);
     }
 
-    setIsConstrained (b: boolean): void {
+    setIsConstrained(b: boolean): void {
         this.isConstrained = b;
         if (b && this.value.width !== 0 && this.value.height !== 0) {
             this.ratio = Math.abs(this.value.width / this.value.height);
         }
     }
 
-    setSnapping (b: boolean): void {
+    setSnapping(b: boolean): void {
         this.snappingEnabled = b;
     }
 
-    setPos (p: IVector2D): void {
+    setPos(p: IVector2D): void {
         this.value.x = p.x;
         this.value.y = p.y;
         this.updateDOM(true);
     }
 
-    move (dX: number, dY: number): void {
+    move(dX: number, dY: number): void {
         this.value.x += dX;
         this.value.y += dY;
         this.updateDOM(false);
     }
 
-    setSize (w: number, h: number): void {
+    setSize(w: number, h: number): void {
         this.value.width = w;
         this.value.height = h;
         if (Math.abs(this.value.angleDeg) % 90 === 0) {
@@ -904,7 +948,7 @@ export class FreeTransform {
         this.updateDOM(false);
     }
 
-    setAngleDeg (a: number): void {
+    setAngleDeg(a: number): void {
         this.value.angleDeg = a;
         if (Math.abs(this.value.angleDeg) % 90 === 0) {
             snapToPixel(this.value);
@@ -913,26 +957,25 @@ export class FreeTransform {
         this.updateDOM(true);
     }
 
-    setViewportTransform (transform: { scale: number; x: number; y: number }): void {
+    setViewportTransform(transform: { scale: number; x: number; y: number }): void {
         this.viewportTransform = transform;
         this.updateScaled();
         this.updateDOM();
     }
 
-    getElement (): HTMLElement {
+    getElement(): HTMLElement {
         return this.rootEl;
     }
 
-    getRatio (): number {
+    getRatio(): number {
         return this.ratio;
     }
 
-    destroy (): void {
+    destroy(): void {
         this.keyListener.destroy();
         this.boundsPointerListener.destroy();
-        this.corners.forEach(item => item.pointerListener.destroy());
-        this.edges.forEach(item => item.pointerListener.destroy());
+        this.corners.forEach((item) => item.pointerListener.destroy());
+        this.edges.forEach((item) => item.pointerListener.destroy());
         this.anglePointerListener.destroy();
     }
-
 }

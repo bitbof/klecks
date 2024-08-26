@@ -1,12 +1,9 @@
-import {TRenderTextParam} from '../../../image-operations/render-text';
-import {BB} from '../../../../bb/bb';
-import {LANG} from '../../../../language/language';
-import {c} from '../../../../bb/base/c';
+import { TRenderTextParam } from '../../../image-operations/render-text';
+import { BB } from '../../../../bb/bb';
+import { LANG } from '../../../../language/language';
+import { c } from '../../../../bb/base/c';
 
-type TTextParams = Pick<
-    TRenderTextParam,
-    'text'
->;
+type TTextParams = Pick<TRenderTextParam, 'text'>;
 
 export type TTextUIParams = TTextParams & {
     onUpdate: (v: Partial<TTextParams>) => void;
@@ -23,7 +20,7 @@ export class TextToolTextUI {
         this.emit();
     };
 
-    private emit (): void {
+    private emit(): void {
         const text = this.textInput.value;
         if (text === this.lastEmittedText) {
             return;
@@ -34,8 +31,8 @@ export class TextToolTextUI {
         });
     }
 
-    // ---- public ----
-    constructor (p: TTextUIParams) {
+    // ----------------------------------- public -----------------------------------
+    constructor(p: TTextUIParams) {
         this.lastEmittedText = p.text;
         this.onUpdate = p.onUpdate;
 
@@ -63,21 +60,21 @@ export class TextToolTextUI {
         this.textInput.addEventListener('input', this.onInput);
     }
 
-    getElement (): HTMLElement {
+    getElement(): HTMLElement {
         return this.rootEl;
     }
 
-    getValues (): TTextParams {
+    getValues(): TTextParams {
         return {
             text: this.textInput.value,
         };
     }
 
-    focus (): void {
+    focus(): void {
         this.textInput.focus();
     }
 
-    destroy (): void {
+    destroy(): void {
         BB.destroyEl(this.textInput);
         this.textInput.removeEventListener('input', this.onInput);
     }

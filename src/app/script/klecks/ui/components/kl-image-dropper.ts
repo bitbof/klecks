@@ -1,4 +1,4 @@
-import {BB} from '../../../bb/bb';
+import { BB } from '../../../bb/bb';
 
 type TDropOption = 'default' | 'layer' | 'image';
 
@@ -7,17 +7,14 @@ type TDropOption = 'default' | 'layer' | 'image';
  * The moment you create it, it will listen.
  * */
 export class KlImageDropper {
-
     private readonly rootEl: HTMLElement;
 
-    // ---- public ----
-    constructor (
-        p: {
-            onDrop: (files: FileList, optionStr: TDropOption) => void;
-            target: HTMLElement;
-            enabledTest: () => boolean;
-        }
-    ) {
+    // ----------------------------------- public -----------------------------------
+    constructor(p: {
+        onDrop: (files: FileList, optionStr: TDropOption) => void;
+        target: HTMLElement;
+        enabledTest: () => boolean;
+    }) {
         //set up DOM
         this.rootEl = BB.el({
             content: 'Drop to import',
@@ -37,9 +34,9 @@ export class KlImageDropper {
         });
         const wrapperEl = BB.el({
             css: {
-                'marginTop': '50px',
-                'display': 'flex',
-                'justifyContent': 'center',
+                marginTop: '50px',
+                display: 'flex',
+                justifyContent: 'center',
             },
         });
         const optionStyle = {
@@ -63,7 +60,6 @@ export class KlImageDropper {
 
         this.rootEl.append(wrapperEl);
         wrapperEl.append(optionLayerEl, optionImageEl);
-
 
         let rootCounter = 0;
         let optionLayerCounter = 0;
@@ -97,23 +93,38 @@ export class KlImageDropper {
             }
         };
 
-        optionLayerEl.addEventListener('dragenter', () => {
-            optionLayerCounter++;
-            updateOptions();
-        });
-        optionLayerEl.addEventListener('dragleave', () => {
-            optionLayerCounter--;
-            updateOptions();
-        });
-        optionImageEl.addEventListener('dragenter', () => {
-            optionImageCounter++;
-            updateOptions();
-        });
-        optionImageEl.addEventListener('dragleave', () => {
-            optionImageCounter--;
-            updateOptions();
-        });
-
+        optionLayerEl.addEventListener(
+            'dragenter',
+            () => {
+                optionLayerCounter++;
+                updateOptions();
+            },
+            { passive: false },
+        );
+        optionLayerEl.addEventListener(
+            'dragleave',
+            () => {
+                optionLayerCounter--;
+                updateOptions();
+            },
+            { passive: false },
+        );
+        optionImageEl.addEventListener(
+            'dragenter',
+            () => {
+                optionImageCounter++;
+                updateOptions();
+            },
+            { passive: false },
+        );
+        optionImageEl.addEventListener(
+            'dragleave',
+            () => {
+                optionImageCounter--;
+                updateOptions();
+            },
+            { passive: false },
+        );
 
         const rootDragOver = (event: DragEvent): void => {
             if (!testAcceptType(event)) {
@@ -144,7 +155,11 @@ export class KlImageDropper {
         };
 
         const rootDrop = (event: DragEvent): void => {
-            if (!testAcceptType(event) || !event.dataTransfer || event.dataTransfer.files.length === 0) {
+            if (
+                !testAcceptType(event) ||
+                !event.dataTransfer ||
+                event.dataTransfer.files.length === 0
+            ) {
                 destroy();
                 return;
             }
@@ -160,7 +175,6 @@ export class KlImageDropper {
 
             p.onDrop(event.dataTransfer.files, optionStr);
 
-
             if (rootCounter > 0) {
                 this.rootEl.remove();
             }
@@ -170,15 +184,19 @@ export class KlImageDropper {
             updateOptions();
         };
 
-        window.addEventListener('dragover', rootDragOver, false);
-        window.addEventListener('dragenter', rootDragEnter, false);
-        window.addEventListener('dragleave', rootDragLeave, false);
-        window.addEventListener('drop', rootDrop, false);
+        window.addEventListener('dragover', rootDragOver, { passive: false });
+        window.addEventListener('dragenter', rootDragEnter, { passive: false });
+        window.addEventListener('dragleave', rootDragLeave, { passive: false });
+        window.addEventListener('drop', rootDrop, { passive: false });
 
         // if something goes wrong and you're stuck with overlay
-        this.rootEl.addEventListener('pointerdown', () => {
-            destroy();
-        });
+        this.rootEl.addEventListener(
+            'pointerdown',
+            () => {
+                destroy();
+            },
+            { passive: false },
+        );
         const keyListener = new BB.KeyListener({
             onDown: (keyStr) => {
                 if (rootCounter > 0 && keyStr === 'esc') {

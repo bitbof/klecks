@@ -1,24 +1,27 @@
-import {BB} from '../../../bb/bb';
-import {FreeTransformCanvas} from '../components/free-transform-canvas';
-import {showModal} from './base/showModal';
-import {KlCanvas} from '../../canvas/kl-canvas';
-import {IKlBasicLayer} from '../../kl-types';
-import {LANG} from '../../../language/language';
-import {testIsSmall} from '../utils/test-is-small';
-import {getPreviewHeight, getPreviewWidth} from '../utils/preview-size';
+import { BB } from '../../../bb/bb';
+import { FreeTransformCanvas } from '../components/free-transform-canvas';
+import { showModal } from './base/showModal';
+import { KlCanvas } from '../../canvas/kl-canvas';
+import { IKlBasicLayer } from '../../kl-types';
+import { LANG } from '../../../language/language';
+import { testIsSmall } from '../utils/test-is-small';
+import { getPreviewHeight, getPreviewWidth } from '../utils/preview-size';
 
-export function showImportAsLayerDialog (
-    params: {
-        target: HTMLElement;
-        klCanvas: KlCanvas;
-        importImage: HTMLImageElement | HTMLCanvasElement;
-        callback: (
-            p?: {x: number; y: number; width:number; height: number; angleDeg: number},
-            isPixelated?: boolean
-        ) => void;
-    }
-): void {
-
+export function showImportAsLayerDialog(params: {
+    target: HTMLElement;
+    klCanvas: KlCanvas;
+    importImage: HTMLImageElement | HTMLCanvasElement;
+    callback: (
+        p?: {
+            x: number;
+            y: number;
+            width: number;
+            height: number;
+            angleDeg: number;
+        },
+        isPixelated?: boolean,
+    ) => void;
+}): void {
     const div = document.createElement('div');
     BB.appendTextDiv(div, LANG('import-as-layer-description'));
     if (params.klCanvas.isLayerLimitReached()) {
@@ -75,8 +78,6 @@ export function showImportAsLayerDialog (
     buttonRowEl.append(originalSizeBtn, fitSizeBtn, centerBtn);
     div.append(buttonRowEl);
 
-
-
     const layers: IKlBasicLayer[] = [];
     {
         const klCanvasLayerArr = params.klCanvas.getLayers();
@@ -96,7 +97,6 @@ export function showImportAsLayerDialog (
         mixModeStr: 'source-over',
     });
 
-
     const freeTransformCanvas = new FreeTransformCanvas({
         elementWidth: getPreviewWidth(isSmall),
         elementHeight: getPreviewHeight(isSmall) + 50,
@@ -111,7 +111,7 @@ export function showImportAsLayerDialog (
     });
     div.append(freeTransformCanvas.getElement());
 
-    function move (x: number, y: number): void {
+    function move(x: number, y: number): void {
         freeTransformCanvas.move(x, y);
     }
 
@@ -136,9 +136,11 @@ export function showImportAsLayerDialog (
         target: params.target,
         message: `<b>${LANG('import-as-layer-title')}</b>`,
         div: div,
-        style: isSmall ? undefined : {
-            width: '540px',
-        },
+        style: isSmall
+            ? undefined
+            : {
+                  width: '540px',
+              },
         buttons: ['Ok', 'Cancel'],
         clickOnEnter: 'Ok',
         callback: function (buttonStr) {
@@ -148,11 +150,13 @@ export function showImportAsLayerDialog (
             BB.destroyEl(fitSizeBtn);
             BB.destroyEl(centerBtn);
             if (buttonStr === 'Ok') {
-                params.callback(freeTransformCanvas.getTransformation(), freeTransformCanvas.getIsPixelated());
+                params.callback(
+                    freeTransformCanvas.getTransformation(),
+                    freeTransformCanvas.getIsPixelated(),
+                );
             } else {
                 params.callback();
             }
         },
     });
-
 }

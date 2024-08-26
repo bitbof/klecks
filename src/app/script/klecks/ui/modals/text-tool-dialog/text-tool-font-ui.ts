@@ -1,18 +1,18 @@
-import {BB} from '../../../../bb/bb';
-import {TRenderTextParam, TTextFormat} from '../../../image-operations/render-text';
-import {Input} from '../../components/input';
-import {LANG} from '../../../../language/language';
-import {ImageRadioList} from '../../components/image-radio-list';
+import { BB } from '../../../../bb/bb';
+import { TRenderTextParam, TTextFormat } from '../../../image-operations/render-text';
+import { Input } from '../../components/input';
+import { LANG } from '../../../../language/language';
+import { ImageRadioList } from '../../components/image-radio-list';
 import alignLeftImg from '/src/app/img/ui/align-left.svg';
 import alignCenterImg from '/src/app/img/ui/align-center.svg';
 import alignRightImg from '/src/app/img/ui/align-right.svg';
 import typoItalicImg from '/src/app/img/ui/typo-italic.svg';
 import typoBoldImg from '/src/app/img/ui/typo-bold.svg';
-import {ImageToggle} from '../../components/image-toggle';
-import {Select} from '../../components/select';
-import {c} from '../../../../bb/base/c';
-import {PointerListener} from '../../../../bb/input/pointer-listener';
-import {fonts} from '../../../../../fonts/fonts';
+import { ImageToggle } from '../../components/image-toggle';
+import { Select } from '../../components/select';
+import { c } from '../../../../bb/base/c';
+import { PointerListener } from '../../../../bb/input/pointer-listener';
+import { fonts } from '../../../../../fonts/fonts';
 
 type TFontParams = Pick<
     TRenderTextParam,
@@ -23,17 +23,16 @@ export type TFontUIParams = TFontParams & {
     onUpdate: (v: Partial<TFontParams>) => void;
 };
 
-
 const importedFonts: {
     fontFamily: string;
     fontName: string; // visible to user
 }[] = [
-    {fontFamily: 'sans-serif', fontName: 'Sans-serif'},
-    {fontFamily: 'serif', fontName: 'Serif'},
-    {fontFamily: 'monospace', fontName: 'Monospace'},
-    {fontFamily: 'cursive', fontName: 'Cursive'},
-    {fontFamily: 'fantasy', fontName: 'Fantasy'},
-    ...fonts.map(item => {
+    { fontFamily: 'sans-serif', fontName: 'Sans-serif' },
+    { fontFamily: 'serif', fontName: 'Serif' },
+    { fontFamily: 'monospace', fontName: 'Monospace' },
+    { fontFamily: 'cursive', fontName: 'Cursive' },
+    { fontFamily: 'fantasy', fontName: 'Fantasy' },
+    ...fonts.map((item) => {
         return {
             fontFamily: item.name,
             fontName: item.name,
@@ -42,20 +41,22 @@ const importedFonts: {
 ];
 
 let didLoadBundledFonts = false;
-async function loadBundledFonts (): Promise<void> {
+async function loadBundledFonts(): Promise<void> {
     if (didLoadBundledFonts) {
         return;
     }
     didLoadBundledFonts = true;
     const promises: Promise<void>[] = [];
     for (let i = 0; i < fonts.length; i++) {
-        promises.push((async () => {
-            const item = fonts[i];
-            const response = await fetch(item.url);
-            const buffer = await response.arrayBuffer();
-            const font = new FontFace(item.name, buffer);
-            document.fonts.add(font);
-        })());
+        promises.push(
+            (async () => {
+                const item = fonts[i];
+                const response = await fetch(item.url);
+                const buffer = await response.arrayBuffer();
+                const font = new FontFace(item.name, buffer);
+                document.fonts.add(font);
+            })(),
+        );
     }
     await Promise.all(promises);
 }
@@ -80,15 +81,16 @@ export class TextToolFontUI {
     private readonly onFocus: () => void;
 
     // only load fonts when interacting with the font input
-    private loadBundledFonts (): void {
-        !didLoadBundledFonts && loadBundledFonts().then(() => {
-            this.onUpdate({
-                font: this.fontSelect.getValue(),
+    private loadBundledFonts(): void {
+        !didLoadBundledFonts &&
+            loadBundledFonts().then(() => {
+                this.onUpdate({
+                    font: this.fontSelect.getValue(),
+                });
             });
-        });
     }
 
-    private importFont (): void {
+    private importFont(): void {
         const input = document.createElement('input');
         input.type = 'file';
         input.multiple = true;
@@ -101,7 +103,7 @@ export class TextToolFontUI {
             }
             let toSelect: string | undefined = undefined;
 
-            const fontFamilies = importedFonts.map(i => i.fontFamily);
+            const fontFamilies = importedFonts.map((i) => i.fontFamily);
             for (let i = 0; i < input.files.length; i++) {
                 const file = input.files[i];
                 const fontName = 'kl-' + importedFonts.length;
@@ -127,18 +129,20 @@ export class TextToolFontUI {
 
             // update font selection
             setTimeout(() => {
-                this.fontSelect.setOptionArr(importedFonts.map(i => {
-                    return [
-                        i.fontFamily,
-                        i.fontName,
-                        {
-                            css: {
-                                fontFamily: i.fontFamily,
-                                fontSize: '1.2em',
+                this.fontSelect.setOptionArr(
+                    importedFonts.map((i) => {
+                        return [
+                            i.fontFamily,
+                            i.fontName,
+                            {
+                                css: {
+                                    fontFamily: i.fontFamily,
+                                    fontSize: '1.2em',
+                                },
                             },
-                        },
-                    ];
-                }));
+                        ];
+                    }),
+                );
                 this.fontSelect.setValue(toSelect);
                 this.onUpdate({
                     font: toSelect,
@@ -149,14 +153,13 @@ export class TextToolFontUI {
         };
     }
 
-
-    // ---- public ----
-    constructor (p: TFontUIParams) {
+    // ----------------------------------- public -----------------------------------
+    constructor(p: TFontUIParams) {
         this.onUpdate = p.onUpdate;
 
         this.fontSelect = new Select<string>({
             initValue: p.font,
-            optionArr: importedFonts.map(i => {
+            optionArr: importedFonts.map((i) => {
                 return [
                     i.fontFamily,
                     i.fontName,
@@ -261,8 +264,6 @@ export class TextToolFontUI {
             },
         });
 
-
-
         this.alignRadioList = new ImageRadioList<TTextFormat>({
             optionArr: [
                 {
@@ -285,18 +286,20 @@ export class TextToolFontUI {
                 },
             ],
             initId: p.align,
-            onChange: (v) => p.onUpdate({
-                align: v,
-            }),
+            onChange: (v) =>
+                p.onUpdate({
+                    align: v,
+                }),
         });
 
         this.italicToggle = new ImageToggle({
             image: typoItalicImg,
             title: LANG('text-italic'),
             initValue: p.isItalic,
-            onChange: (v) => p.onUpdate({
-                isItalic: v,
-            }),
+            onChange: (v) =>
+                p.onUpdate({
+                    isItalic: v,
+                }),
             darkInvert: true,
         });
 
@@ -304,21 +307,16 @@ export class TextToolFontUI {
             image: typoBoldImg,
             title: LANG('text-bold'),
             initValue: p.isBold,
-            onChange: (v) => p.onUpdate({
-                isBold: v,
-            }),
+            onChange: (v) =>
+                p.onUpdate({
+                    isBold: v,
+                }),
             darkInvert: true,
         });
 
         this.rootEl = c(',flex,flexWrap,gap-10-15,items-center', [
-            c(',flex,gap-5,items-center', [
-                sizeLabel,
-                this.sizeInput.getElement(),
-            ]),
-            c(',flex,gap-5', [
-                this.fontSelect.getElement(),
-                this.importButton,
-            ]),
+            c(',flex,gap-5,items-center', [sizeLabel, this.sizeInput.getElement()]),
+            c(',flex,gap-5', [this.fontSelect.getElement(), this.importButton]),
             c(',flex,gap-7', [
                 this.alignRadioList.getElement(),
                 this.italicToggle.getElement(),
@@ -329,11 +327,11 @@ export class TextToolFontUI {
         ]);
     }
 
-    getElement (): HTMLElement {
+    getElement(): HTMLElement {
         return this.rootEl;
     }
 
-    getValues (): TFontParams {
+    getValues(): TFontParams {
         return {
             font: this.fontSelect.getValue(),
             size: +this.sizeInput.getValue(),
@@ -345,7 +343,7 @@ export class TextToolFontUI {
         };
     }
 
-    destroy (): void {
+    destroy(): void {
         this.fontPointerListener.destroy();
         this.fontSelect.getElement().removeEventListener('focus', this.onFocus);
         this.fontSelect.destroy();

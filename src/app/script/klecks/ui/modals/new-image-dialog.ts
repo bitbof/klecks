@@ -8,6 +8,8 @@ import {ISize2D} from '../../../bb/bb-types';
 import {table} from '../components/table';
 import {theme} from '../../../theme/theme';
 
+
+
 export function newImageDialog (
     p: {
         currentColor: IRGB; // current color
@@ -21,7 +23,6 @@ export function newImageDialog (
         onCancel: () => void;
     }
 ): void {
-
     const currentColor = p.currentColor;
     const secondaryColor = p.secondaryColor;
     const maxCanvasSize = p.maxCanvasSize;
@@ -32,17 +33,24 @@ export function newImageDialog (
     const onConfirm = p.onConfirm;
     const onCancel = p.onCancel;
 
-    function createRatioSize (ratioX: number, ratioY: number, width: number, height: number, padding: number): ISize2D {
+    function createRatioSize(
+        ratioX: number,
+        ratioY: number,
+        width: number,
+        height: number,
+        padding: number,
+    ): ISize2D {
         return BB.fitInto(
             ratioX,
             ratioY,
-            Math.min(maxCanvasSize, width - padding), Math.min(maxCanvasSize, height - padding),
-            1
+            Math.min(maxCanvasSize, width - padding),
+            Math.min(maxCanvasSize, height - padding),
+            1,
         );
     }
 
     const newImDiv = BB.el();
-    const widthInput = BB.el({tagName: 'input'});
+    const widthInput = BB.el({ tagName: 'input' });
     const unitStyle = {
         color: '#888',
         fontSize: '12px',
@@ -52,7 +60,7 @@ export function newImageDialog (
         textContent: LANG('new-px'),
         css: unitStyle,
     });
-    const heightInput = BB.el({tagName: 'input'});
+    const heightInput = BB.el({ tagName: 'input' });
     const heightUnit = BB.el({
         textContent: LANG('new-px'),
         css: unitStyle,
@@ -83,28 +91,14 @@ export function newImageDialog (
         updateRatio();
     };
 
-
     const sizeTable = table([
-        [
-            LANG('width') + ':&nbsp;',
-            widthInput,
-            widthUnit,
-        ],
-        [
-            BB.el({css: {height: '5px'}}),
-            '',
-            '',
-        ],
-        [
-            LANG('height') + ':&nbsp;',
-            heightInput,
-            heightUnit,
-        ],
+        [LANG('width') + ':&nbsp;', widthInput, widthUnit],
+        [BB.el({ css: { height: '5px' } }), '', ''],
+        [LANG('height') + ':&nbsp;', heightInput, heightUnit],
     ]);
     BB.css(sizeTable, {
         marginBottom: '10px',
     });
-
 
     const ratioWrapper = BB.el({
         css: {
@@ -120,13 +114,13 @@ export function newImageDialog (
             gap: '5px',
         },
     });
-    const presetFitBtn = BB.el({tagName: 'button'});
+    const presetFitBtn = BB.el({ tagName: 'button' });
     templateWrapper.style.marginBottom = '10px';
-    const presetCurrentBtn = BB.el({tagName: 'button'});
-    const presetSquareBtn = BB.el({tagName: 'button'});
-    const presetLandscapeBtn = BB.el({tagName: 'button'});
-    const presetPortraitBtn = BB.el({tagName: 'button'});
-    const presetOversizeBtn = BB.el({tagName: 'button'});
+    const presetCurrentBtn = BB.el({ tagName: 'button' });
+    const presetSquareBtn = BB.el({ tagName: 'button' });
+    const presetLandscapeBtn = BB.el({ tagName: 'button' });
+    const presetPortraitBtn = BB.el({ tagName: 'button' });
+    const presetOversizeBtn = BB.el({ tagName: 'button' });
 
     presetCurrentBtn.textContent = LANG('new-current');
     presetFitBtn.textContent = LANG('new-fit');
@@ -141,7 +135,7 @@ export function newImageDialog (
         presetOversizeBtn,
         presetSquareBtn,
         presetLandscapeBtn,
-        presetPortraitBtn
+        presetPortraitBtn,
     );
 
     const templatePadding = 0;
@@ -200,12 +194,24 @@ export function newImageDialog (
                 widthInput.value = '' + window.screen.width;
                 heightInput.value = '' + window.screen.height;
             } else if (val === 'paper') {
-                const sizeObj = createRatioSize(Math.sqrt(2), 1, workspaceWidth, workspaceHeight, templatePadding);
+                const sizeObj = createRatioSize(
+                    Math.sqrt(2),
+                    1,
+                    workspaceWidth,
+                    workspaceHeight,
+                    templatePadding,
+                );
                 widthInput.value = '' + Math.round(sizeObj.width);
                 heightInput.value = '' + Math.round(sizeObj.height);
             } else {
                 const split = val.split(' ');
-                const sizeObj = createRatioSize(parseFloat(split[0]), parseFloat(split[1]), workspaceWidth, workspaceHeight, templatePadding);
+                const sizeObj = createRatioSize(
+                    parseFloat(split[0]),
+                    parseFloat(split[1]),
+                    workspaceWidth,
+                    workspaceHeight,
+                    templatePadding,
+                );
                 widthInput.value = '' + Math.round(sizeObj.width);
                 heightInput.value = '' + Math.round(sizeObj.height);
             }
@@ -250,7 +256,16 @@ export function newImageDialog (
         initialIndex: initColorIndex,
         onChange: function (rgbaObj): void {
             backgroundRGBA = rgbaObj!;
-            preview.style.backgroundColor = 'rgba(' + rgbaObj!.r + ',' + rgbaObj!.g + ',' + rgbaObj!.b + ', ' + rgbaObj!.a + ')';
+            preview.style.backgroundColor =
+                'rgba(' +
+                rgbaObj!.r +
+                ',' +
+                rgbaObj!.g +
+                ',' +
+                rgbaObj!.b +
+                ', ' +
+                rgbaObj!.a +
+                ')';
         },
     });
 
@@ -271,7 +286,16 @@ export function newImageDialog (
         css: {
             width: 200 + 'px',
             height: 100 + 'px',
-            backgroundColor: 'rgba(' + backgroundRGBA.r + ',' + backgroundRGBA.g + ',' + backgroundRGBA.b + ', ' + backgroundRGBA.a + ')',
+            backgroundColor:
+                'rgba(' +
+                backgroundRGBA.r +
+                ',' +
+                backgroundRGBA.g +
+                ',' +
+                backgroundRGBA.b +
+                ', ' +
+                backgroundRGBA.a +
+                ')',
             marginLeft: 'auto',
             marginRight: 'auto',
             color: '#aaa',
@@ -299,12 +323,13 @@ export function newImageDialog (
         },
     });
 
-    function updateRatio (): void {
+    function updateRatio(): void {
         widthInput.value = '' + Math.min(maxCanvasSize, parseInt(widthInput.value));
         heightInput.value = '' + Math.min(maxCanvasSize, parseInt(heightInput.value));
 
-        function hcf (u: number, v: number): number {
-            let U = u, V = v;
+        function hcf(u: number, v: number): number {
+            let U = u,
+                V = v;
             // eslint-disable-next-line no-constant-condition
             while (true) {
                 if (!(U %= V)) {
@@ -331,28 +356,45 @@ export function newImageDialog (
 
         //generated canvas size doesn't always match ratio. so check if a common ratio is very close
         const commonRatios = [
-            [1, 2], [2, 1],
-            [2, 3], [3, 2],
-            [3, 4], [4, 3],
-            [4, 5], [5, 4],
-            [16, 9], [9, 16],
-            [3, 2], [2, 3],
-            [5, 3], [3, 5],
-            [2, 1], [1, 2],
-            [1.414, 1], [1, 1.414],
+            [1, 2],
+            [2, 1],
+            [2, 3],
+            [3, 2],
+            [3, 4],
+            [4, 3],
+            [4, 5],
+            [5, 4],
+            [16, 9],
+            [9, 16],
+            [3, 2],
+            [2, 3],
+            [5, 3],
+            [3, 5],
+            [2, 1],
+            [1, 2],
+            [1.414, 1],
+            [1, 1.414],
         ];
         const reducedArr = BB.reduce(w, h);
         let closestRatio = commonRatios[0];
-        let closestDistance = Math.abs(commonRatios[0][0] / commonRatios[0][1] - reducedArr[0] / reducedArr[1]);
+        let closestDistance = Math.abs(
+            commonRatios[0][0] / commonRatios[0][1] - reducedArr[0] / reducedArr[1],
+        );
         for (let i = 0; i < commonRatios.length; i++) {
-            if (Math.abs(commonRatios[i][0] / commonRatios[i][1] - reducedArr[0] / reducedArr[1]) < closestDistance) {
+            if (
+                Math.abs(commonRatios[i][0] / commonRatios[i][1] - reducedArr[0] / reducedArr[1]) <
+                closestDistance
+            ) {
                 closestRatio = commonRatios[i];
-                closestDistance = Math.abs(commonRatios[i][0] / commonRatios[i][1] - reducedArr[0] / reducedArr[1]);
+                closestDistance = Math.abs(
+                    commonRatios[i][0] / commonRatios[i][1] - reducedArr[0] / reducedArr[1],
+                );
             }
         }
         //display ratio
         if (closestDistance > 0 && closestDistance < 0.005) {
-            ratioWrapper.innerText = LANG('new-ratio') + ': ~' + closestRatio[0] + ':' + closestRatio[1];
+            ratioWrapper.innerText =
+                LANG('new-ratio') + ': ~' + closestRatio[0] + ':' + closestRatio[1];
         } else {
             ratioWrapper.innerText = LANG('new-ratio') + ': ' + reducedArr[0] + ':' + reducedArr[1];
         }
@@ -364,20 +406,23 @@ export function newImageDialog (
         w *= 260;
         h *= 260;
         if (w > 260) {
-            h = 260 / w * h;
+            h = (260 / w) * h;
             w = 260;
         }
         if (h > 100) {
-            w = 100 / h * w;
+            w = (100 / h) * w;
             h = 100;
-
         }
 
         preview.style.width = w + 'px';
         preview.style.height = h + 'px';
-        BB.createCheckerDataUrl(parseInt('' + (30 * (w / realw))), function (url) {
-            previewWrapper.style.background = 'url(' + url + ')';
-        }, theme.isDark());
+        BB.createCheckerDataUrl(
+            parseInt('' + 30 * (w / realw)),
+            function (url) {
+                previewWrapper.style.background = 'url(' + url + ')';
+            },
+            theme.isDark(),
+        );
     }
     theme.addIsDarkListener(updateRatio);
 
@@ -439,22 +484,17 @@ export function newImageDialog (
             theme.removeIsDarkListener(updateRatio);
 
             if (
-                result === 'Cancel'
-                || parseInt(widthInput.value) <= 0
-                || parseInt(heightInput.value) <= 0
-                || isNaN(parseInt(widthInput.value))
-                || isNaN(parseInt(heightInput.value))
+                result === 'Cancel' ||
+                parseInt(widthInput.value) <= 0 ||
+                parseInt(heightInput.value) <= 0 ||
+                isNaN(parseInt(widthInput.value)) ||
+                isNaN(parseInt(heightInput.value))
             ) {
                 onCancel();
                 return;
             }
-            onConfirm(
-                parseInt(widthInput.value),
-                parseInt(heightInput.value),
-                backgroundRGBA
-            );
+            onConfirm(parseInt(widthInput.value), parseInt(heightInput.value), backgroundRGBA);
         },
         clickOnEnter: 'Ok',
     });
-
 }

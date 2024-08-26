@@ -1,11 +1,15 @@
-import {getInverse, getSquareToQuad, multiply} from '../math/matrix';
-import {TFxCanvas} from '../fx-canvas-types';
+import { getInverse, getSquareToQuad, multiply } from '../math/matrix';
+import { TFxCanvas } from '../fx-canvas-types';
 
 export type TRectanglePoints = [
-    number, number, // point a
-    number, number, // point b
-    number, number, // point c
-    number, number, // point d
+    number,
+    number, // point a
+    number,
+    number, // point b
+    number,
+    number, // point c
+    number,
+    number, // point d
 ];
 
 /**

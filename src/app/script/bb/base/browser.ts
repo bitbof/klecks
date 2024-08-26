@@ -1,7 +1,6 @@
-
 export const isFirefox = navigator.userAgent.toLowerCase().indexOf('firefox') > -1;
 
-export const eventUsesHighResTimeStamp = (function (): (() => boolean) {
+export const eventUsesHighResTimeStamp = (function (): () => boolean {
     const eventUsesHighResTimeStamp: boolean = new Event('').timeStamp < 1000 * 60 * 60;
     return function (): boolean {
         return eventUsesHighResTimeStamp;
@@ -10,10 +9,10 @@ export const eventUsesHighResTimeStamp = (function (): (() => boolean) {
 
 export const hasPointerEvents = !!window.PointerEvent;
 
-export const isCssMinMaxSupported = (function (): (() => boolean) {
+export const isCssMinMaxSupported = (function (): () => boolean {
     let result: boolean | undefined;
 
-    function test (): void {
+    function test(): void {
         const div = document.createElement('div');
         div.style.position = 'absolute';
         div.style.top = '0';
@@ -46,8 +45,8 @@ export const canShareFiles = function (): boolean {
 };
 
 type THandler = 'onchange' | 'onclick' | 'onkeyup';
-export function unsetEventHandler (obj: HTMLElement, ...handlers: [...THandler[]]): void {
-    handlers.forEach(handler => {
+export function unsetEventHandler(obj: HTMLElement, ...handlers: [...THandler[]]): void {
+    handlers.forEach((handler) => {
         // (disabled) eslint-disable-next-line no-null/no-null
         obj[handler] = null;
     });

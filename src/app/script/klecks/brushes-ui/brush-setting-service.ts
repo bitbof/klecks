@@ -1,21 +1,40 @@
-import {IRGB, ISliderConfig} from '../kl-types';
+import { IRGB, ISliderConfig } from '../kl-types';
 
-export type TBrushSettingEmit = { type: 'color'; value: IRGB } |
-    { type: 'opacity'; value: number } |
-    { type: 'size'; value: number } |
-    { type: 'sliderConfig'; value: ISliderConfig };
+export type TBrushSettingEmit =
+    | { type: 'color'; value: IRGB }
+    | { type: 'opacity'; value: number }
+    | { type: 'size'; value: number }
+    | { type: 'sliderConfig'; value: ISliderConfig };
 
-export type TBrushSettingSubscriber = (p : TBrushSettingEmit) => void;
+export type TBrushSettingSubscriber = (p: TBrushSettingEmit) => void;
+
+export type TBrushSettingServiceParams = {
+    onSetColor: (rgb: IRGB) => void;
+    onSetSize: (size: number) => void;
+    onSetOpacity: (opacity: number) => void;
+    onGetColor: () => IRGB;
+    onGetSize: () => number;
+    onGetOpacity: () => number;
+    onGetSliderConfig: () => ISliderConfig;
+};
 
 /**
  * Central place to update brush settings, and to subscribe to changes.
  */
 export class BrushSettingService {
-
     private static instance: BrushSettingService;
     subscriberArr: TBrushSettingSubscriber[] = [];
 
-    private emit (obj: TBrushSettingEmit, skipSubscriber?: TBrushSettingSubscriber): void {
+    // from params
+    private readonly onSetColor: (rgb: IRGB) => void;
+    private readonly onSetSize: (size: number) => void;
+    private readonly onSetOpacity: (opacity: number) => void;
+    private readonly onGetColor: () => IRGB;
+    private readonly onGetSize: () => number;
+    private readonly onGetOpacity: () => number;
+    private readonly onGetSliderConfig: () => ISliderConfig;
+
+    private emit(obj: TBrushSettingEmit, skipSubscriber?: TBrushSettingSubscriber): void {
         for (let i = 0; i < this.subscriberArr.length; i++) {
             if (this.subscriberArr[i] === skipSubscriber) {
                 continue;
@@ -24,60 +43,60 @@ export class BrushSettingService {
         }
     }
 
-    // --- public ---
+    // ----------------------------------- public -----------------------------------
 
-    constructor (
-        private onSetColor: (rgb: IRGB) => void,
-        private onSetSize: (size: number) => void,
-        private onSetOpacity: (opacity: number) => void,
-        private onGetColor: () => IRGB,
-        private onGetSize: () => number,
-        private onGetOpacity: () => number,
-        private onGetSliderConfig: () => ISliderConfig,
-    ) {
+    constructor(p: TBrushSettingServiceParams) {
+        this.onSetColor = p.onSetColor;
+        this.onSetSize = p.onSetSize;
+        this.onSetOpacity = p.onSetOpacity;
+        this.onGetColor = p.onGetColor;
+        this.onGetSize = p.onGetSize;
+        this.onGetOpacity = p.onGetOpacity;
+        this.onGetSliderConfig = p.onGetSliderConfig;
+
         if (BrushSettingService.instance) {
             throw new Error('BrushSettingService already instantiated');
         }
         BrushSettingService.instance = this;
     }
 
-    emitColor (color: IRGB, skipSubscriber?: TBrushSettingSubscriber): void {
+    emitColor(color: IRGB, skipSubscriber?: TBrushSettingSubscriber): void {
         this.emit(
             {
                 type: 'color',
                 value: color,
             },
-            skipSubscriber
+            skipSubscriber,
         );
     }
 
-    emitSize (size: number, skipSubscriber?: TBrushSettingSubscriber): void {
+    emitSize(size: number, skipSubscriber?: TBrushSettingSubscriber): void {
         this.emit(
             {
                 type: 'size',
                 value: size,
             },
-            skipSubscriber
+            skipSubscriber,
         );
     }
 
-    emitOpacity (opacity: number, skipSubscriber?: TBrushSettingSubscriber): void {
+    emitOpacity(opacity: number, skipSubscriber?: TBrushSettingSubscriber): void {
         this.emit(
             {
                 type: 'opacity',
                 value: opacity,
             },
-            skipSubscriber
+            skipSubscriber,
         );
     }
 
-    emitSliderConfig (sliderConfig: ISliderConfig, skipSubscriber?: TBrushSettingSubscriber) {
+    emitSliderConfig(sliderConfig: ISliderConfig, skipSubscriber?: TBrushSettingSubscriber) {
         this.emit(
             {
                 type: 'sliderConfig',
                 value: sliderConfig,
             },
-            skipSubscriber
+            skipSubscriber,
         );
     }
 
@@ -86,7 +105,7 @@ export class BrushSettingService {
      * @param color
      * @param skipSubscriber
      */
-    setColor (color: IRGB, skipSubscriber?: TBrushSettingSubscriber) {
+    setColor(color: IRGB, skipSubscriber?: TBrushSettingSubscriber) {
         this.onSetColor(color);
         this.emitColor(color, skipSubscriber);
     }
@@ -96,7 +115,7 @@ export class BrushSettingService {
      * @param size
      * @param skipSubscriber
      */
-    setSize (size: number, skipSubscriber?: TBrushSettingSubscriber) {
+    setSize(size: number, skipSubscriber?: TBrushSettingSubscriber) {
         this.onSetSize(size);
         // why not emitting?
     }
@@ -106,7 +125,7 @@ export class BrushSettingService {
      * @param opacity
      * @param skipSubscriber
      */
-    setOpacity (opacity: number, skipSubscriber?: TBrushSettingSubscriber) {
+    setOpacity(opacity: number, skipSubscriber?: TBrushSettingSubscriber) {
         this.onSetOpacity(opacity);
         // why not emitting?
     }
@@ -114,19 +133,19 @@ export class BrushSettingService {
     /**
      * get current brush color
      */
-    getColor (): IRGB {
+    getColor(): IRGB {
         return this.onGetColor();
     }
 
-    getSize (): number {
+    getSize(): number {
         return this.onGetSize();
     }
 
-    getOpacity (): number {
+    getOpacity(): number {
         return this.onGetOpacity();
     }
 
-    getSliderConfig (): ISliderConfig {
+    getSliderConfig(): ISliderConfig {
         return this.onGetSliderConfig();
     }
 
@@ -134,14 +153,14 @@ export class BrushSettingService {
      * subscribe to changes
      * @param func
      */
-    subscribe (func: TBrushSettingSubscriber): void {
+    subscribe(func: TBrushSettingSubscriber): void {
         if (this.subscriberArr.includes(func)) {
             return;
         }
         this.subscriberArr.push(func);
     }
 
-    unsubscribe (func: TBrushSettingSubscriber): void {
+    unsubscribe(func: TBrushSettingSubscriber): void {
         for (let i = 0; i < this.subscriberArr.length; i++) {
             if (func === this.subscriberArr[i]) {
                 this.subscriberArr.splice(i, 1);
@@ -150,4 +169,3 @@ export class BrushSettingService {
         }
     }
 }
-

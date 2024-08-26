@@ -1,11 +1,11 @@
-import {el} from './ui';
+import { el } from './ui';
 
 // if no access to console
 
 let debugOutEl: HTMLElement;
 const outArr: string[] = [];
 
-export function debugOut (str: string): void {
+export function debugOut(str: string): void {
     if (!debugOutEl) {
         debugOutEl = el({
             css: {

@@ -1,7 +1,6 @@
-import {BB} from '../../bb/bb';
-import {IHistoryEntry, KlHistoryInterface, THistoryInnerActions} from '../history/kl-history';
-import {KL} from '../kl';
-import {IRGB, TPressureInput} from '../kl-types';
+import { BB } from '../../bb/bb';
+import { IHistoryEntry, KlHistory, THistoryInnerActions } from '../history/kl-history';
+import { IRGB, TPressureInput } from '../kl-types';
 
 export interface ISketchyBrushHistoryEntry extends IHistoryEntry {
     tool: ['brush', 'SketchyBrush'];
@@ -12,7 +11,6 @@ const sampleCanvas = BB.canvas(32, 32);
 const sampleCtx = BB.ctx(sampleCanvas);
 
 export class SketchyBrush {
-
     private context: CanvasRenderingContext2D = {} as CanvasRenderingContext2D;
     private settingColor: IRGB = {} as IRGB;
     private settingSize: number = 1;
@@ -22,8 +20,8 @@ export class SketchyBrush {
     private lastX: number = 0;
     private lastY: number = 0;
     private inputIsDrawing: boolean = false;
-    private lastInput: TPressureInput = {x: 0, y: 0, pressure: 0};
-    private history: KlHistoryInterface = new KL.DecoyKlHistory();
+    private lastInput: TPressureInput = { x: 0, y: 0, pressure: 0 };
+    private history: KlHistory | undefined;
     private historyEntry: ISketchyBrushHistoryEntry | undefined;
     private sketchySeed: number = 0;
     private points: [number, number][] = []; // x y
@@ -32,7 +30,8 @@ export class SketchyBrush {
         (c1: IRGB): IRGB => {
             return c1;
         },
-        (c1: IRGB, c2: IRGB): IRGB => { // why
+        (c1: IRGB, c2: IRGB): IRGB => {
+            // why
             const result = new BB.RGB(c1.r, c1.g, c1.b);
             result.r *= c2.r / 255;
             result.g *= c2.g / 255;
@@ -41,70 +40,69 @@ export class SketchyBrush {
         },
     ];
 
-
-    private rand (): number {
+    private rand(): number {
         this.sketchySeed++;
         return Math.sin(6324634.2345 * Math.cos(this.sketchySeed * 5342.3423)) * 0.5 + 0.5;
     }
 
-    // ---- public ----
-    constructor () {}
+    // ----------------------------------- public -----------------------------------
+    constructor() {}
 
     // ---- interface ----
 
-    setHistory (l: KlHistoryInterface): void {
+    setHistory(l: KlHistory): void {
         this.history = l;
     }
 
-    setSeed (s: number): void {
+    setSeed(s: number): void {
         this.sketchySeed = parseInt('' + s);
     }
 
-    getSeed (): number {
+    getSeed(): number {
         return parseInt('' + this.sketchySeed);
     }
 
-    getSize (): number {
+    getSize(): number {
         return this.settingSize / 2;
     }
 
-    setColor (c: IRGB): void {
+    setColor(c: IRGB): void {
         this.settingColor = c;
     }
 
-    getOpacity (): number {
+    getOpacity(): number {
         return this.settingOpacity;
     }
 
-    setOpacity (o: number): void {
+    setOpacity(o: number): void {
         this.settingOpacity = o;
     }
 
-    getBlending (): number {
+    getBlending(): number {
         return this.settingBlending;
     }
 
-    setBlending (b: number): void {
+    setBlending(b: number): void {
         this.settingBlending = b;
     }
 
-    setSize (s: number): void {
+    setSize(s: number): void {
         this.settingSize = s * 2;
     }
 
-    getScale (): number {
+    getScale(): number {
         return this.settingScale;
     }
 
-    setScale (s: number): void {
+    setScale(s: number): void {
         this.settingScale = s;
     }
 
-    setContext (c: CanvasRenderingContext2D): void {
+    setContext(c: CanvasRenderingContext2D): void {
         this.context = c;
     }
 
-    startLine (x: number, y: number, pressure: number, shift?: boolean): void {
+    startLine(x: number, y: number, pressure: number, shift?: boolean): void {
         if (shift && this.lastInput.x) {
             this.inputIsDrawing = true;
             this.endLine();
@@ -144,10 +142,9 @@ export class SketchyBrush {
                 ],
             };
         }
-
     }
 
-    goLine (p_x: number, p_y: number, pressure: number, preMixedColor: IRGB | undefined): void {
+    goLine(p_x: number, p_y: number, pressure: number, preMixedColor: IRGB | undefined): void {
         if (!this.inputIsDrawing || (p_x === this.lastInput.x && p_y === this.lastInput.y)) {
             return;
         }
@@ -167,7 +164,12 @@ export class SketchyBrush {
             mixb = preMixedColor.b;
         } else {
             if (this.settingBlending !== 0) {
-                if (x + 5 >= 0 && y + 5 >= 0 && x - 5 < this.context.canvas.width - 1 && y - 5 < this.context.canvas.height - 1) {
+                if (
+                    x + 5 >= 0 &&
+                    y + 5 >= 0 &&
+                    x - 5 < this.context.canvas.width - 1 &&
+                    y - 5 < this.context.canvas.height - 1
+                ) {
                     mixr = 0;
                     mixg = 0;
                     mixb = 0;
@@ -193,15 +195,22 @@ export class SketchyBrush {
                     }
 
                     const mixed = this.mixMode[0](new BB.RGB(mixr, mixg, mixb), this.settingColor);
-                    mixr = parseInt('' + BB.mix(this.settingColor.r, mixed.r, this.settingBlending));
-                    mixg = parseInt('' + BB.mix(this.settingColor.g, mixed.g, this.settingBlending));
-                    mixb = parseInt('' + BB.mix(this.settingColor.b, mixed.b, this.settingBlending));
+                    mixr = parseInt(
+                        '' + BB.mix(this.settingColor.r, mixed.r, this.settingBlending),
+                    );
+                    mixg = parseInt(
+                        '' + BB.mix(this.settingColor.g, mixed.g, this.settingBlending),
+                    );
+                    mixb = parseInt(
+                        '' + BB.mix(this.settingColor.b, mixed.b, this.settingBlending),
+                    );
                 }
             }
         }
 
         this.context.save();
-        this.context.strokeStyle = 'rgba(' + mixr + ', ' + mixg + ', ' + mixb + ', ' + this.settingOpacity + ')';
+        this.context.strokeStyle =
+            'rgba(' + mixr + ', ' + mixg + ', ' + mixb + ', ' + this.settingOpacity + ')';
         this.context.lineWidth = this.settingSize;
 
         this.context.beginPath();
@@ -212,15 +221,20 @@ export class SketchyBrush {
             b = this.points[e][0] - this.points[this.count][0];
             a = this.points[e][1] - this.points[this.count][1];
             g = b * b + a * a;
-            if (g < 4000 * this.settingScale * this.settingScale && this.rand() > g / 2000 / this.settingScale / this.settingScale) {
-                this.context.moveTo(this.points[this.count][0] + (b * 0.3), this.points[this.count][1] + (a * 0.3));
-                this.context.lineTo(this.points[e][0] - (b * 0.3), this.points[e][1] - (a * 0.3));
+            if (
+                g < 4000 * this.settingScale * this.settingScale &&
+                this.rand() > g / 2000 / this.settingScale / this.settingScale
+            ) {
+                this.context.moveTo(
+                    this.points[this.count][0] + b * 0.3,
+                    this.points[this.count][1] + a * 0.3,
+                );
+                this.context.lineTo(this.points[e][0] - b * 0.3, this.points[e][1] - a * 0.3);
             }
         }
 
         this.context.stroke();
         this.context.restore();
-
 
         this.count++;
         this.lastX = x;
@@ -229,11 +243,11 @@ export class SketchyBrush {
         this.lastInput.y = y;
         this.historyEntry!.actions!.push({
             action: 'goLine',
-            params: [p_x, p_y, pressure, {r: mixr, g: mixg, b: mixb}],
+            params: [p_x, p_y, pressure, { r: mixr, g: mixg, b: mixb }],
         });
     }
 
-    endLine (): void {
+    endLine(): void {
         this.inputIsDrawing = false;
         this.count = 0;
         this.points = [];
@@ -242,20 +256,19 @@ export class SketchyBrush {
                 action: 'endLine',
                 params: [],
             });
-            this.history.push(this.historyEntry);
+            this.history?.push(this.historyEntry);
             this.historyEntry = undefined;
         }
     }
     //cheap 'n' ugly
 
-    drawLineSegment (x1: number, y1: number, x2: number, y2: number): void {
+    drawLineSegment(x1: number, y1: number, x2: number, y2: number): void {
         this.lastInput.x = x2;
         this.lastInput.y = y2;
 
         if (this.inputIsDrawing || x1 === undefined) {
             return;
         }
-
 
         this.context.save();
         this.context.lineWidth = this.settingSize;
@@ -265,7 +278,12 @@ export class SketchyBrush {
             g: this.settingColor.g,
             b: this.settingColor.b,
         };
-        if (x1 + 5 >= 0 && y1 + 5 >= 0 && x1 - 5 < this.context.canvas.width - 1 && y1 - 5 < this.context.canvas.height - 1) {
+        if (
+            x1 + 5 >= 0 &&
+            y1 + 5 >= 0 &&
+            x1 - 5 < this.context.canvas.width - 1 &&
+            y1 - 5 < this.context.canvas.height - 1
+        ) {
             mixCol.r = 0;
             mixCol.g = 0;
             mixCol.b = 0;
@@ -297,15 +315,42 @@ export class SketchyBrush {
             }
         }
         const mixed = this.mixMode[0](new BB.RGB(mixCol.r, mixCol.g, mixCol.b), this.settingColor);
-        mixCol.r = parseInt('' + (this.settingBlending * mixed.r + this.settingColor.r * (1 - this.settingBlending)));
-        mixCol.g = parseInt('' + (this.settingBlending * mixed.g + this.settingColor.g * (1 - this.settingBlending)));
-        mixCol.b = parseInt('' + (this.settingBlending * mixed.b + this.settingColor.b * (1 - this.settingBlending)));
-        this.context.strokeStyle = 'rgba(' + mixCol.r + ', ' + mixCol.g + ', ' + mixCol.b + ', ' + this.settingOpacity + ')';
+        mixCol.r = parseInt(
+            '' +
+                (this.settingBlending * mixed.r + this.settingColor.r * (1 - this.settingBlending)),
+        );
+        mixCol.g = parseInt(
+            '' +
+                (this.settingBlending * mixed.g + this.settingColor.g * (1 - this.settingBlending)),
+        );
+        mixCol.b = parseInt(
+            '' +
+                (this.settingBlending * mixed.b + this.settingColor.b * (1 - this.settingBlending)),
+        );
+        this.context.strokeStyle =
+            'rgba(' +
+            mixCol.r +
+            ', ' +
+            mixCol.g +
+            ', ' +
+            mixCol.b +
+            ', ' +
+            this.settingOpacity +
+            ')';
         this.context.beginPath();
         this.context.moveTo(x1, y1);
         this.context.lineTo(x2, y2);
         this.context.stroke();
-        this.context.strokeStyle = 'rgba(' + mixCol.r + ', ' + mixCol.g + ', ' + mixCol.b + ', ' + this.settingOpacity + ')';
+        this.context.strokeStyle =
+            'rgba(' +
+            mixCol.r +
+            ', ' +
+            mixCol.g +
+            ', ' +
+            mixCol.b +
+            ', ' +
+            this.settingOpacity +
+            ')';
         this.context.restore();
 
         const historyEntry: ISketchyBrushHistoryEntry = {
@@ -337,11 +382,10 @@ export class SketchyBrush {
                 },
             ],
         };
-        this.history.push(historyEntry);
+        this.history?.push(historyEntry);
     }
 
-
-    isDrawing (): boolean {
+    isDrawing(): boolean {
         return this.inputIsDrawing;
     }
 }

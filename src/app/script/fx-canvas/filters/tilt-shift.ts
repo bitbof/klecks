@@ -1,8 +1,8 @@
-import {gl} from '../core/gl';
-import {FxShader} from '../core/fx-shader';
-import {randomShaderFunc} from '../shaders/random-shader-func';
-import {simpleShader} from '../core/simple-shader';
-import {TFxCanvas} from '../fx-canvas-types';
+import { gl } from '../core/gl';
+import { FxShader } from '../core/fx-shader';
+import { randomShaderFunc } from '../shaders/random-shader-func';
+import { simpleShader } from '../core/simple-shader';
+import { TFxCanvas } from '../fx-canvas-types';
 
 /**
  * Tilt Shift
@@ -41,7 +41,11 @@ export const tiltShift: TFilterTiltShift = function (
     blurRadius,
     gradientRadius,
 ) {
-    gl.tiltShift = gl.tiltShift || new FxShader(null, '\
+    gl.tiltShift =
+        gl.tiltShift ||
+        new FxShader(
+            null,
+            '\
         uniform sampler2D texture;\
         uniform float blurRadius;\
         uniform float gradientRadius;\
@@ -50,7 +54,9 @@ export const tiltShift: TFilterTiltShift = function (
         uniform vec2 delta;\
         uniform vec2 texSize;\
         varying vec2 texCoord;\
-        ' + randomShaderFunc + '\
+        ' +
+                randomShaderFunc +
+                '\
         void main() {\
             vec4 color = vec4(0.0);\
             float total = 0.0;\
@@ -71,7 +77,9 @@ export const tiltShift: TFilterTiltShift = function (
             \
             gl_FragColor = color / total;\
         }\
-    ', 'tiltShift');
+    ',
+            'tiltShift',
+        );
 
     const dx = endX - startX;
     const dy = endY - startY;

@@ -1,28 +1,25 @@
-import {BB} from '../../../bb/bb';
+import { BB } from '../../../bb/bb';
 
 /**
  * Toggle button with an image
  */
 export class ImageToggle {
-
     private readonly rootEl: HTMLElement;
     private isActive: boolean;
 
-    private update (): void {
+    private update(): void {
         this.rootEl.classList.toggle('image-toggle-active', this.isActive);
     }
 
-    // --- public ---
-    constructor (
-        p: {
-            initValue: boolean;
-            title: string;
-            isRadio?: boolean; // if true, can't click when active
-            onChange: (b: boolean) => void;
-            image: string;
-            darkInvert?: boolean;
-        }
-    ) {
+    // ----------------------------------- public -----------------------------------
+    constructor(p: {
+        initValue: boolean;
+        title: string;
+        isRadio?: boolean; // if true, can't click when active
+        onChange: (b: boolean) => void;
+        image: string;
+        darkInvert?: boolean;
+    }) {
         this.isActive = !!p.initValue;
         this.rootEl = BB.el({
             className: 'image-toggle',
@@ -44,25 +41,24 @@ export class ImageToggle {
             },
         });
 
-
         this.update();
     }
 
     // --- interface ---
-    setValue (b: boolean): void {
+    setValue(b: boolean): void {
         this.isActive = !!b;
         this.update();
     }
 
-    getElement (): HTMLElement {
+    getElement(): HTMLElement {
         return this.rootEl;
     }
 
-    getValue (): boolean {
+    getValue(): boolean {
         return this.isActive;
     }
 
-    destroy (): void {
+    destroy(): void {
         BB.destroyEl(this.rootEl);
     }
 }

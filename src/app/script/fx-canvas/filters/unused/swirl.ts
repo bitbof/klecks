@@ -1,8 +1,8 @@
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-nocheck
-import {gl} from '../core/gl';
-import {warpShader} from '../shaders/warp-shader';
-import {simpleShader} from '../core/simple-shader';
+import { gl } from '../core/gl';
+import { warpShader } from '../shaders/warp-shader';
+import { simpleShader } from '../core/simple-shader';
 
 /**
  * @filter        Swirl
@@ -13,12 +13,16 @@ import {simpleShader} from '../core/simple-shader';
  * @param angle   The angle in radians that the pixels in the center of
  *                the circular region will be rotated by.
  */
-export function swirl (centerX, centerY, radius, angle) {
-    gl.swirl = gl.swirl || warpShader('\
+export function swirl(centerX, centerY, radius, angle) {
+    gl.swirl =
+        gl.swirl ||
+        warpShader(
+            '\
         uniform float radius;\
         uniform float angle;\
         uniform vec2 center;\
-    ', '\
+    ',
+            '\
         coord -= center;\
         float distance = length(coord);\
         if (distance < radius) {\
@@ -32,7 +36,8 @@ export function swirl (centerX, centerY, radius, angle) {
             );\
         }\
         coord += center;\
-    ');
+    ',
+        );
 
     simpleShader.call(this, gl.swirl, {
         radius: radius,

@@ -1,3 +1,4 @@
+/* eslint max-lines: 0 */
 export const fontLicenses: {
     title: string;
     full: string;

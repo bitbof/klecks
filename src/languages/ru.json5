@@ -66,6 +66,10 @@
     original: 'Hand Tool',
     value: 'Инструмент «Рука»'
   },
+  'tool-select': {
+    original: 'Select Tool',
+    value: ''
+  },
   'tool-zoom': {
     original: 'Zoom',
     value: 'Приблизить/отдалить'
@@ -546,10 +550,18 @@
     original: 'Cleared layer',
     value: 'Очищенный слой'
   },
+  'cleared-selected-area': {
+    original: 'Cleared selected area',
+    value: ''
+  },
   filled: {
     hint: 'layer got filled with a color',
     original: 'Filled',
     value: 'Заполненный'
+  },
+  'filled-selected-area': {
+    original: 'Filled selection',
+    value: ''
   },
   'new-title': {
     original: 'New Image',
@@ -1308,6 +1320,74 @@
     original: 'Bold',
     value: 'Жирный'
   },
+  'select-select': {
+    original: 'Select',
+    value: ''
+  },
+  'select-transform': {
+    original: 'Transform',
+    value: ''
+  },
+  'select-lasso': {
+    original: 'Lasso',
+    value: ''
+  },
+  'select-polygon': {
+    original: 'Polygon',
+    value: ''
+  },
+  'select-boolean-replace': {
+    original: 'Replace',
+    value: ''
+  },
+  'select-boolean-add': {
+    original: 'Add',
+    value: ''
+  },
+  'select-boolean-subtract': {
+    original: 'Subtract',
+    value: ''
+  },
+  'select-all': {
+    original: 'All',
+    value: ''
+  },
+  'select-invert': {
+    original: 'Invert',
+    value: ''
+  },
+  'select-reset': {
+    original: 'Reset',
+    value: ''
+  },
+  'select-fill': {
+    original: 'Fill',
+    value: ''
+  },
+  'select-erase': {
+    original: 'Erase',
+    value: ''
+  },
+  'select-transform-clone': {
+    original: 'Clone',
+    value: ''
+  },
+  'select-transform-clone-applied': {
+    original: 'Cloned',
+    value: ''
+  },
+  'select-transform-move-to-layer': {
+    original: 'Move to layer:',
+    value: ''
+  },
+  'select-transform-applied': {
+    original: 'Transformation applied',
+    value: ''
+  },
+  'select-transform-empty': {
+    original: 'Selected area on active layer is empty.',
+    value: ''
+  },
   'save-reminder-title': {
     hint: 'Save Reminder is a popup that shows up after 20 minutes of not saving. Allows user to save on the spot.',
     original: 'Unsaved Work',
@@ -1558,5 +1638,9 @@
   'x-minutes': {
     original: '{x}min',
     value: '{x} мин.'
+  },
+  wip: {
+    original: 'Work in progress',
+    value: ''
   }
 }

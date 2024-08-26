@@ -1,15 +1,15 @@
-import {KlSlider} from '../ui/components/kl-slider';
-import {getSharedFx} from '../../fx-canvas/shared-fx';
-import {IFilterApply, IFilterGetDialogParam, TFilterGetDialogResult} from '../kl-types';
-import {LANG} from '../../language/language';
-import {TFilterHistoryEntry} from './filters';
-import {Preview} from '../ui/project-viewport/preview';
-import {TProjectViewportProject} from '../ui/project-viewport/project-viewport';
-import {css} from '@emotion/css';
-import {FxPreviewRenderer} from '../ui/project-viewport/fx-preview-renderer';
-import {BB} from '../../bb/bb';
-import {testIsSmall} from '../ui/utils/test-is-small';
-import {getPreviewHeight, getPreviewWidth} from '../ui/utils/preview-size';
+import { KlSlider } from '../ui/components/kl-slider';
+import { getSharedFx } from '../../fx-canvas/shared-fx';
+import { IFilterApply, IFilterGetDialogParam, TFilterGetDialogResult } from '../kl-types';
+import { LANG } from '../../language/language';
+import { TFilterHistoryEntry } from './filters';
+import { Preview } from '../ui/project-viewport/preview';
+import { TProjectViewportProject } from '../ui/project-viewport/project-viewport';
+import { css } from '@emotion/css';
+import { FxPreviewRenderer } from '../ui/project-viewport/fx-preview-renderer';
+import { BB } from '../../bb/bb';
+import { testIsSmall } from '../ui/utils/test-is-small';
+import { getPreviewHeight, getPreviewWidth } from '../ui/utils/preview-size';
 
 export type TFilterUnsharpMaskInput = {
     radius: number;
@@ -18,11 +18,11 @@ export type TFilterUnsharpMaskInput = {
 
 export type TFilterUnsharpMaskHistoryEntry = TFilterHistoryEntry<
     'unsharpMask',
-    TFilterUnsharpMaskInput>;
+    TFilterUnsharpMaskInput
+>;
 
 export const filterUnsharpMask = {
-
-    getDialog (params: IFilterGetDialogParam) {
+    getDialog(params: IFilterGetDialogParam) {
         const context = params.context;
         const klCanvas = params.klCanvas;
         if (!context || !klCanvas) {
@@ -41,7 +41,8 @@ export const filterUnsharpMask = {
             result.width = getPreviewWidth(isSmall);
         }
 
-        let radius = 2, strength = 5.1 / 10;
+        let radius = 2,
+            strength = 5.1 / 10;
         const fxPreviewRenderer = new FxPreviewRenderer({
             original: context.canvas,
             onUpdate: (fxCanvas, transform) => {
@@ -49,9 +50,8 @@ export const filterUnsharpMask = {
             },
         });
 
-        function finishInit () {
-
-            function update () {
+        function finishInit() {
+            function update() {
                 preview.render();
             }
 
@@ -67,7 +67,12 @@ export const filterUnsharpMask = {
                     radius = val;
                     update();
                 },
-                curve: [[0, 0], [0.1, 2], [0.5, 50], [1, 200]],
+                curve: [
+                    [0, 0],
+                    [0.1, 2],
+                    [0.5, 50],
+                    [1, 200],
+                ],
             });
             const strengthSlider = new KlSlider({
                 label: LANG('filter-unsharp-mask-strength'),
@@ -80,9 +85,13 @@ export const filterUnsharpMask = {
                 onChange: function (val) {
                     strength = val / 10;
                     update();
-
                 },
-                curve: [[0, 0], [0.1, 2], [0.5, 10], [1, 50]],
+                curve: [
+                    [0, 0],
+                    [0.1, 2],
+                    [0.5, 10],
+                    [1, 50],
+                ],
             });
             radiusSlider.getElement().style.marginBottom = '10px';
             strengthSlider.getElement().style.marginBottom = '10px';
@@ -93,7 +102,10 @@ export const filterUnsharpMask = {
             {
                 for (let i = 0; i < layers.length; i++) {
                     previewLayerArr.push({
-                        image: i === selectedLayerIndex ? fxPreviewRenderer.render : layers[i].context.canvas,
+                        image:
+                            i === selectedLayerIndex
+                                ? fxPreviewRenderer.render
+                                : layers[i].context.canvas,
                         isVisible: layers[i].isVisible,
                         opacity: layers[i].opacity,
                         mixModeStr: layers[i].mixModeStr,
@@ -112,10 +124,12 @@ export const filterUnsharpMask = {
                 },
             });
             update();
-            preview.getElement().classList.add(css({
-                marginLeft: '-20px',
-                marginRight: '-20px',
-            }));
+            preview.getElement().classList.add(
+                css({
+                    marginLeft: '-20px',
+                    marginRight: '-20px',
+                }),
+            );
             rootEl.append(preview.getElement());
 
             result.destroy = (): void => {
@@ -138,16 +152,15 @@ export const filterUnsharpMask = {
         return result;
     },
 
-
-    apply (params: IFilterApply<TFilterUnsharpMaskInput>): boolean {
+    apply(params: IFilterApply<TFilterUnsharpMaskInput>): boolean {
         const context = params.context;
         const history = params.history;
         const radius = params.input.radius;
         const strength = params.input.strength;
-        if (!context || radius === null || strength === null || !history) {
+        if (!context || radius === null || strength === null) {
             return false;
         }
-        history.pause(true);
+        history?.pause(true);
         const fxCanvas = getSharedFx();
         if (!fxCanvas) {
             return false; // todo more specific error?
@@ -157,15 +170,16 @@ export const filterUnsharpMask = {
         context.clearRect(0, 0, context.canvas.width, context.canvas.height);
         context.drawImage(fxCanvas, 0, 0);
         texture.destroy();
-        history.pause(false);
-        history.push({
+        history?.pause(false);
+        history?.push({
             tool: ['filter', 'unsharpMask'],
             action: 'apply',
-            params: [{
-                input: params.input,
-            }],
+            params: [
+                {
+                    input: params.input,
+                },
+            ],
         } as TFilterUnsharpMaskHistoryEntry);
         return true;
     },
-
 };
