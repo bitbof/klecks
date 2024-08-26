@@ -1112,12 +1112,18 @@ export class KlApp {
             },
             onZoomIn: () => {
                 const oldScale = this.easel.getTransform().scale;
-                const newScale = zoomByStep(oldScale, keyListener.isPressed('shift') ? 1 / 4 : 1);
+                const newScale = zoomByStep(
+                    oldScale,
+                    keyListener.isPressed('shift') ? 1 / 8 : 1 / 2,
+                );
                 this.easel.scale(newScale / oldScale);
             },
             onZoomOut: () => {
                 const oldScale = this.easel.getTransform().scale;
-                const newScale = zoomByStep(oldScale, keyListener.isPressed('shift') ? -1 / 4 : -1);
+                const newScale = zoomByStep(
+                    oldScale,
+                    keyListener.isPressed('shift') ? -1 / 8 : -1 / 2,
+                );
                 this.easel.scale(newScale / oldScale);
             },
             onUndo: () => {
