@@ -1,8 +1,7 @@
-import {gl} from '../core/gl';
-import {warpShader} from '../shaders/warp-shader';
-import {simpleShader} from '../core/simple-shader';
-import {TFxCanvas} from '../fx-canvas-types';
-
+import { gl } from '../core/gl';
+import { warpShader } from '../shaders/warp-shader';
+import { simpleShader } from '../core/simple-shader';
+import { TFxCanvas } from '../fx-canvas-types';
 
 export type TFilterDistortSettings = {
     stepSize: number; // [1, inf]
@@ -17,10 +16,7 @@ export type TFilterDistortSettings = {
  * Distort
  * Distorts image (moves pixels around)
  */
-export type TFilterDistort = (
-    this: TFxCanvas,
-    settings: TFilterDistortSettings,
-) => TFxCanvas;
+export type TFilterDistort = (this: TFxCanvas, settings: TFilterDistortSettings) => TFxCanvas;
 
 /**
  * @filter        Distort
@@ -28,14 +24,18 @@ export type TFilterDistort = (
  *                Note: Requires alpha to be premultiplied.
  */
 export const distort: TFilterDistort = function (settings) {
-    gl.distort = gl.distort || warpShader(`
+    gl.distort =
+        gl.distort ||
+        warpShader(
+            `
     uniform float stepSize;
     uniform vec2 scale;
     uniform vec2 strength;
     uniform vec2 phase;
     uniform float type;
     uniform vec2 offset;
-`, `
+`,
+            `
     const float PI = 3.14159265;
     float x = coord.x + offset.x;
     float y = coord.y + offset.y;
@@ -60,7 +60,8 @@ export const distort: TFilterDistort = function (settings) {
     }
     coord.x = mod(coord.x, texSize.x);
     coord.y = mod(coord.y, texSize.y);
-`);
+`,
+        );
 
     simpleShader.call(this, gl.distort, {
         stepSize: settings.stepSize,
@@ -74,4 +75,3 @@ export const distort: TFilterDistort = function (settings) {
 
     return this;
 };
-

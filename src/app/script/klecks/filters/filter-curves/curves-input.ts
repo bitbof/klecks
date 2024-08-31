@@ -1,8 +1,8 @@
-import {Options} from '../../ui/components/options';
-import {LANG} from '../../../language/language';
-import {BB} from '../../../bb/bb';
-import {IVector2D} from '../../../bb/bb-types';
-import {PointerListener} from '../../../bb/input/pointer-listener';
+import { Options } from '../../ui/components/options';
+import { LANG } from '../../../language/language';
+import { BB } from '../../../bb/bb';
+import { IVector2D } from '../../../bb/bb-types';
+import { PointerListener } from '../../../bb/input/pointer-listener';
 
 type TCurvePoint = {
     el: HTMLElement;
@@ -14,18 +14,32 @@ export type TCurvesInput = {
     r: [number, number][];
     g: [number, number][];
     b: [number, number][];
-}
+};
 
-export function getDefaultCurvesInput (): TCurvesInput {
+export function getDefaultCurvesInput(): TCurvesInput {
     return BB.copyObj({
-        r: [[0, 0], [1 / 3, 1 / 3], [2 / 3, 2 / 3], [1, 1]],
-        g: [[0, 0], [1 / 3, 1 / 3], [2 / 3, 2 / 3], [1, 1]],
-        b: [[0, 0], [1 / 3, 1 / 3], [2 / 3, 2 / 3], [1, 1]],
+        r: [
+            [0, 0],
+            [1 / 3, 1 / 3],
+            [2 / 3, 2 / 3],
+            [1, 1],
+        ],
+        g: [
+            [0, 0],
+            [1 / 3, 1 / 3],
+            [2 / 3, 2 / 3],
+            [1, 1],
+        ],
+        b: [
+            [0, 0],
+            [1 / 3, 1 / 3],
+            [2 / 3, 2 / 3],
+            [1, 1],
+        ],
     });
 }
 
 export class CurvesInput {
-
     private readonly rootEl: HTMLElement;
     private readonly p0: TCurvePoint;
     private readonly p1: TCurvePoint;
@@ -33,13 +47,8 @@ export class CurvesInput {
     private readonly p3: TCurvePoint;
     private readonly modeButtons: Options<string>;
 
-    // ---- public ----
-    constructor (
-        p: {
-            curves: TCurvesInput;
-            callback: (val: TCurvesInput) => void;
-        },
-    ) {
+    // ----------------------------------- public -----------------------------------
+    constructor(p: { curves: TCurvesInput; callback: (val: TCurvesInput) => void }) {
         this.rootEl = BB.el({
             css: {
                 position: 'relative',
@@ -49,7 +58,7 @@ export class CurvesInput {
         this.rootEl.oncontextmenu = () => false;
         let mode = 'All';
         let curves = p.curves;
-        this.modeButtons = new Options( {
+        this.modeButtons = new Options({
             optionArr: [
                 {
                     id: 'All',
@@ -100,7 +109,8 @@ export class CurvesInput {
             },
         });
 
-        const areaW = 300, areaH = 100;
+        const areaW = 300,
+            areaH = 100;
         const canvas = BB.canvas(areaW, areaH);
         let ctx = BB.ctx(canvas);
         curveArea.append(canvas);
@@ -116,12 +126,13 @@ export class CurvesInput {
             lock?: boolean,
         ): TCurvePoint => {
             const gripSize = 14;
-            let internalY = y, internalX = x;
+            let internalY = y,
+                internalX = x;
             const pointEl = BB.el({
                 className: 'kl-curves-graph__grip',
                 css: {
-                    left: (x - gripSize / 2) + 'px',
-                    top: (y - gripSize / 2) + 'px',
+                    left: x - gripSize / 2 + 'px',
+                    top: y - gripSize / 2 + 'px',
                     width: gripSize + 'px',
                     height: gripSize + 'px',
                     borderRadius: gripSize + 'px',
@@ -130,8 +141,8 @@ export class CurvesInput {
 
             const update = () => {
                 BB.css(pointEl, {
-                    left: (x - gripSize / 2) + 'px',
-                    top: (y - gripSize / 2) + 'px',
+                    left: x - gripSize / 2 + 'px',
+                    top: y - gripSize / 2 + 'px',
                 });
             };
 
@@ -167,8 +178,8 @@ export class CurvesInput {
                 internalY = y;
                 internalX = x;
                 BB.css(pointEl, {
-                    left: (x - gripSize / 2) + 'px',
-                    top: (y - gripSize / 2) + 'px',
+                    left: x - gripSize / 2 + 'px',
+                    top: y - gripSize / 2 + 'px',
                 });
             };
 
@@ -196,23 +207,32 @@ export class CurvesInput {
             }
         };
 
-        this.p0 = createPoint(0, areaH, (val: IVector2D) => {
-            updateControl(0, val.x, val.y);
-            update();
-        }, true);
-        this.p1 = createPoint(areaW / 3, areaH / 3 * 2, (val: IVector2D) => {
+        this.p0 = createPoint(
+            0,
+            areaH,
+            (val: IVector2D) => {
+                updateControl(0, val.x, val.y);
+                update();
+            },
+            true,
+        );
+        this.p1 = createPoint(areaW / 3, (areaH / 3) * 2, (val: IVector2D) => {
             updateControl(1, val.x, val.y);
             update();
         });
-        this.p2 = createPoint(areaW / 3 * 2, areaH / 3, (val: IVector2D) => {
+        this.p2 = createPoint((areaW / 3) * 2, areaH / 3, (val: IVector2D) => {
             updateControl(2, val.x, val.y);
             update();
         });
-        this.p3 = createPoint(areaW, 0, (val: IVector2D) => {
-            updateControl(3, val.x, val.y);
-            update();
-        }, true);
-
+        this.p3 = createPoint(
+            areaW,
+            0,
+            (val: IVector2D) => {
+                updateControl(3, val.x, val.y);
+                update();
+            },
+            true,
+        );
 
         const update = () => {
             ctx = BB.ctx(canvas);
@@ -237,9 +257,9 @@ export class CurvesInput {
                     y = Math.max(0, Math.min(1, y));
 
                     if (i === 0) {
-                        ctx.moveTo(i / 100 * areaW, areaH - y * areaH);
+                        ctx.moveTo((i / 100) * areaW, areaH - y * areaH);
                     } else {
-                        ctx.lineTo(i / 100 * areaW, areaH - y * areaH);
+                        ctx.lineTo((i / 100) * areaW, areaH - y * areaH);
                     }
                 }
                 ctx.stroke();
@@ -266,18 +286,18 @@ export class CurvesInput {
     }
 
     // ---- interface ----
-    getElement (): HTMLElement {
+    getElement(): HTMLElement {
         return this.rootEl;
     }
 
-    destroy (): void {
+    getModeButtons(): Options<string> {
+        return this.modeButtons;
+    }
+
+    destroy(): void {
         this.p0.pointerListener.destroy();
         this.p1.pointerListener.destroy();
         this.p2.pointerListener.destroy();
         this.p3.pointerListener.destroy();
-    }
-
-    getModeButtons (): Options<string> {
-        return this.modeButtons;
     }
 }

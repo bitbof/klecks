@@ -1,33 +1,29 @@
-import {BB} from '../../../bb/bb';
+import { BB } from '../../../bb/bb';
 import klecksLogoImg from '/src/app/img/klecks-logo.png';
 import newImageImg from '/src/app/img/ui/new-image.svg';
 import importImg from '/src/app/img/ui/import.svg';
 import exportImg from '/src/app/img/ui/export.svg';
 import shareImg from '/src/app/img/ui/share.svg';
 import helpImg from '/src/app/img/ui/help.svg';
-import {LANG} from '../../../language/language';
-import {PointerListener} from '../../../bb/input/pointer-listener';
-
+import { LANG } from '../../../language/language';
+import { PointerListener } from '../../../bb/input/pointer-listener';
 
 /**
  * Topmost row of buttons in toolspace (with the app logo)
  */
 export class ToolspaceTopRow {
-    
     private readonly rootEl: HTMLElement;
-    
-    // ---- public ----
-    constructor (
-        p: {
-            logoImg: string;
-            onLogo: () => void;
-            onNew: () => void;
-            onImport: () => void;
-            onSave: () => void;
-            onShare: () => void;
-            onHelp: () => void;
-        }
-    ) {
+
+    // ----------------------------------- public -----------------------------------
+    constructor(p: {
+        logoImg: string;
+        onLogo: () => void;
+        onNew: () => void;
+        onImport: () => void;
+        onSave: () => void;
+        onShare: () => void;
+        onHelp: () => void;
+    }) {
         this.rootEl = BB.el({
             className: 'kl-toolspace-row',
             css: {
@@ -36,16 +32,14 @@ export class ToolspaceTopRow {
             },
         });
 
-        function createButton (
-            p: {
-                onClick: () => void;
-                title: string;
-                image: string;
-                contain: boolean;
-                extraPadding?: number;
-                darkInvert?: boolean;
-            }
-        ): {
+        function createButton(p: {
+            onClick: () => void;
+            title: string;
+            image: string;
+            contain: boolean;
+            extraPadding?: number;
+            darkInvert?: boolean;
+        }): {
             el: HTMLElement;
             pointerListener: PointerListener;
         } {
@@ -61,7 +55,7 @@ export class ToolspaceTopRow {
             const im = BB.el({
                 className: p.darkInvert ? 'dark-invert' : undefined,
                 css: {
-                    backgroundImage: 'url(\'' + p.image + '\')',
+                    backgroundImage: "url('" + p.image + "')",
                     backgroundRepeat: 'no-repeat',
                     backgroundPosition: 'center',
                     backgroundSize: p.contain ? 'contain' : '',
@@ -71,7 +65,8 @@ export class ToolspaceTopRow {
             });
             im.style.pointerEvents = 'none';
             el.append(im);
-            const pointerListener = new BB.PointerListener({ // because :hover causes problems w touch
+            const pointerListener = new BB.PointerListener({
+                // because :hover causes problems w touch
                 target: el,
                 onEnterLeave: function (isOver) {
                     el.classList.toggle('toolspace-row-button-hover', isOver);
@@ -143,8 +138,8 @@ export class ToolspaceTopRow {
             helpButton.el,
         ]);
     }
-    
-    getElement (): HTMLElement {
+
+    getElement(): HTMLElement {
         return this.rootEl;
     }
 }

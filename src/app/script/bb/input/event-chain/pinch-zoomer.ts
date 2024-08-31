@@ -1,19 +1,21 @@
-import {dist, pointsToAngleRad} from '../../math/math';
-import {IPointerEvent} from '../event.types';
+import { dist, pointsToAngleRad } from '../../math/math';
+import { IPointerEvent } from '../event.types';
 
-export type TPinchZoomerEvent = { type: 'end' } | {
-    type: 'move';
+export type TPinchZoomerEvent =
+    | { type: 'end' }
+    | {
+          type: 'move';
 
-    downRelX: number;
-    downRelY: number;
-    relX: number;
-    relY: number;
+          downRelX: number;
+          downRelY: number;
+          relX: number;
+          relY: number;
 
-    angleRad: number;
-    scale: number;
-};
+          angleRad: number;
+          scale: number;
+      };
 
-type TTouchPointer =  {
+type TTouchPointer = {
     pointerId: number;
     relX: number;
     relY: number;
@@ -37,10 +39,8 @@ type TPinchGesture = {
  * out IPointerEvent
  */
 export class PinchZoomer {
-
     private readonly firstFingerMaxDistancePx = 10;
     private readonly untilSecondFingerDurationMs = 250;
-
 
     private chainOut: ((e: IPointerEvent) => void) | undefined;
     private readonly pointersDownIdArr: number[] = [];
@@ -61,14 +61,14 @@ export class PinchZoomer {
     }[] = [];
     private readonly onPinch: (e: TPinchZoomerEvent) => void;
 
-
-    private end (): void {
+    private end(): void {
         this.gestureObj = null;
         this.eventQueueArr = [];
     }
 
-    private fail (doSwallow?: boolean): void {
-        if (!this.gestureObj) { // no gesture happening -> ignore
+    private fail(doSwallow?: boolean): void {
+        if (!this.gestureObj) {
+            // no gesture happening -> ignore
             return;
         }
 
@@ -81,20 +81,19 @@ export class PinchZoomer {
         this.end();
     }
 
-    private setupFailTimeout (timeMS: number): boolean {
+    private setupFailTimeout(timeMS: number): boolean {
         const diff = timeMS - this.nowTime;
-        if (diff <= 0) { // time already up
+        if (diff <= 0) {
+            // time already up
             return false;
         }
         this.timeoutObj.secondFingerTimeout = setTimeout(() => this.fail(), diff);
         return true;
     }
 
-    private processEvent (event: IPointerEvent): void {
-
+    private processEvent(event: IPointerEvent): void {
         if (event.type === 'pointerdown') {
             this.pointersDownIdArr.push(event.pointerId);
-
         } else if (event.type === 'pointerup') {
             for (let i = 0; i < this.pointersDownIdArr.length; i++) {
                 if (this.pointersDownIdArr[i] === event.pointerId) {
@@ -106,24 +105,22 @@ export class PinchZoomer {
 
         //pass through scenarios
         if (
-            !this.gestureObj && (
-                event.pointerType !== 'touch' || // wrong pointer type
+            !this.gestureObj &&
+            (event.pointerType !== 'touch' || // wrong pointer type
                 (event.type === 'pointermove' && this.pointersDownIdArr.length > 0) || // failed before
                 this.pointersDownIdArr.length > 1 || // failed before
-                event.type === 'pointerup' // failed before
-            )
+                event.type === 'pointerup') // failed before
         ) {
             return;
         }
 
         this.nowTime = performance.now();
 
-
         //pointer down
         if (event.type === 'pointerdown') {
-
             if (this.gestureObj) {
-                if (event.pointerType === 'touch') { // touch finger down - as nth pointer
+                if (event.pointerType === 'touch') {
+                    // touch finger down - as nth pointer
 
                     this.gestureObj.touchPointerArr.push({
                         pointerId: event.pointerId,
@@ -137,43 +134,45 @@ export class PinchZoomer {
                             index: this.gestureObj.touchPointerArr.length - 1,
                         });
                     } else {
-                        this.timeoutObj.secondFingerTimeout && clearTimeout(this.timeoutObj.secondFingerTimeout);
+                        this.timeoutObj.secondFingerTimeout &&
+                            clearTimeout(this.timeoutObj.secondFingerTimeout);
                         this.gestureObj.isInProgress = true;
                         this.beginPinch(this.gestureObj);
                     }
                     return;
-
-                } else { // non-touch finger down - as nth pointer
+                } else {
+                    // non-touch finger down - as nth pointer
 
                     if (this.gestureObj.isInProgress) {
                         this.gestureObj.otherPointerIdArr.push(event.pointerId);
-                    } else { // second pointer wrong type -> fail
+                    } else {
+                        // second pointer wrong type -> fail
                         this.fail();
                     }
                     return;
                 }
-
-
             } else {
                 // first finger down - can only be touch if no gestureObj
                 this.gestureObj = {
-                    touchPointerArr: [{
-                        pointerId: event.pointerId,
-                        relX: event.relX,
-                        relY: event.relY,
-                        downRelX: event.relX,
-                        downRelY: event.relY,
-                    }],
+                    touchPointerArr: [
+                        {
+                            pointerId: event.pointerId,
+                            relX: event.relX,
+                            relY: event.relY,
+                            downRelX: event.relX,
+                            downRelY: event.relY,
+                        },
+                    ],
                     otherPointerIdArr: [],
                     isInProgress: false,
                 };
-                if (!this.setupFailTimeout(event.time + this.untilSecondFingerDurationMs)) { // time ran out -> fail
+                if (!this.setupFailTimeout(event.time + this.untilSecondFingerDurationMs)) {
+                    // time ran out -> fail
                     this.fail();
                     return;
                 }
                 return;
             }
-
         }
 
         // should not happen. something went wrong
@@ -206,7 +205,8 @@ export class PinchZoomer {
             touchPointerObj.relX = event.relX;
             touchPointerObj.relY = event.relY;
 
-            if (!this.gestureObj.isInProgress) { // only one finger down & pinching hasn't started
+            if (!this.gestureObj.isInProgress) {
+                // only one finger down & pinching hasn't started
 
                 // should not happen. something went wrong
                 if (
@@ -217,14 +217,20 @@ export class PinchZoomer {
                     return;
                 }
 
-                const distance = dist(touchPointerObj.downRelX, touchPointerObj.downRelY, touchPointerObj.relX, touchPointerObj.relY);
-                if (distance > this.firstFingerMaxDistancePx) { // moved too much -> fail
+                const distance = dist(
+                    touchPointerObj.downRelX,
+                    touchPointerObj.downRelY,
+                    touchPointerObj.relX,
+                    touchPointerObj.relY,
+                );
+                if (distance > this.firstFingerMaxDistancePx) {
+                    // moved too much -> fail
                     this.fail();
                     return;
                 }
-
             } else {
-                if (i < 2) { // only first two touches can affect pinching
+                if (i < 2) {
+                    // only first two touches can affect pinching
                     this.continuePinch(this.gestureObj, {
                         type: 'move',
                         index: i,
@@ -234,7 +240,6 @@ export class PinchZoomer {
 
             return;
         }
-
 
         //pointer up
         if (event.type === 'pointerup') {
@@ -254,8 +259,8 @@ export class PinchZoomer {
                         index: i,
                     });
                 }
-
-            } else { // non-touch
+            } else {
+                // non-touch
                 for (let i = 0; i < this.gestureObj.otherPointerIdArr.length; i++) {
                     if (this.gestureObj.otherPointerIdArr[i] === event.pointerId) {
                         this.gestureObj.otherPointerIdArr.splice(i, 1);
@@ -265,23 +270,24 @@ export class PinchZoomer {
             }
 
             //all fingers lifted?
-            if (this.gestureObj.touchPointerArr.length === 0 && this.gestureObj.otherPointerIdArr.length === 0) {
-                if (this.gestureObj.isInProgress) { // lifted last finger -> end of pinching
+            if (
+                this.gestureObj.touchPointerArr.length === 0 &&
+                this.gestureObj.otherPointerIdArr.length === 0
+            ) {
+                if (this.gestureObj.isInProgress) {
+                    // lifted last finger -> end of pinching
                     this.end();
                     this.endPinch();
-                } else { // lifted finger again before pinching started -> fail
+                } else {
+                    // lifted finger again before pinching started -> fail
                     this.fail();
                 }
                 return;
             }
-
         }
-
-
     }
 
-    private beginPinch (gestureObj: TPinchGesture): void {
-
+    private beginPinch(gestureObj: TPinchGesture): void {
         for (let i = 0; i < gestureObj.touchPointerArr.length; i++) {
             const pointerObj = gestureObj.touchPointerArr[i];
             this.pincherArr.push({
@@ -317,30 +323,29 @@ export class PinchZoomer {
         event.downRelY = event.relY;
 
         this.onPinch(event);
-
     }
 
     //actionObj = {type: 'down'|'move'|'up', index: number}
-    private continuePinch (
+    private continuePinch(
         gestureObj: TPinchGesture,
         actionObj: {
             type: 'down' | 'move' | 'up';
             index: number;
-        }
+        },
     ): void {
-
-        if (actionObj.index > 1) { // only first two pointers matter
+        if (actionObj.index > 1) {
+            // only first two pointers matter
             return;
         }
 
         if (actionObj.type === 'move') {
-
             let event: TPinchZoomerEvent;
-            this.pincherArr[actionObj.index].relX = gestureObj.touchPointerArr[actionObj.index].relX;
-            this.pincherArr[actionObj.index].relY = gestureObj.touchPointerArr[actionObj.index].relY;
+            this.pincherArr[actionObj.index].relX =
+                gestureObj.touchPointerArr[actionObj.index].relX;
+            this.pincherArr[actionObj.index].relY =
+                gestureObj.touchPointerArr[actionObj.index].relY;
 
             if (this.pincherArr.length === 1) {
-
                 event = {
                     type: 'move',
                     downRelX: this.pincherArr[0].downRelX,
@@ -350,20 +355,37 @@ export class PinchZoomer {
                     angleRad: 0,
                     scale: 1,
                 };
-
             } else {
+                const startDist = dist(
+                    this.pincherArr[0].downRelX,
+                    this.pincherArr[0].downRelY,
+                    this.pincherArr[1].downRelX,
+                    this.pincherArr[1].downRelY,
+                );
+                const distance = dist(
+                    this.pincherArr[0].relX,
+                    this.pincherArr[0].relY,
+                    this.pincherArr[1].relX,
+                    this.pincherArr[1].relY,
+                );
 
-                const startDist = dist(this.pincherArr[0].downRelX, this.pincherArr[0].downRelY, this.pincherArr[1].downRelX, this.pincherArr[1].downRelY);
-                const distance = dist(this.pincherArr[0].relX, this.pincherArr[0].relY, this.pincherArr[1].relX, this.pincherArr[1].relY);
-
-                const startAngle = pointsToAngleRad({
-                    x: this.pincherArr[0].downRelX,
-                    y: this.pincherArr[0].downRelY,
-                }, {x: this.pincherArr[1].downRelX, y: this.pincherArr[1].downRelY});
-                const angle = pointsToAngleRad({
-                    x: this.pincherArr[0].relX,
-                    y: this.pincherArr[0].relY,
-                }, {x: this.pincherArr[1].relX, y: this.pincherArr[1].relY});
+                const startAngle = pointsToAngleRad(
+                    {
+                        x: this.pincherArr[0].downRelX,
+                        y: this.pincherArr[0].downRelY,
+                    },
+                    {
+                        x: this.pincherArr[1].downRelX,
+                        y: this.pincherArr[1].downRelY,
+                    },
+                );
+                const angle = pointsToAngleRad(
+                    {
+                        x: this.pincherArr[0].relX,
+                        y: this.pincherArr[0].relY,
+                    },
+                    { x: this.pincherArr[1].relX, y: this.pincherArr[1].relY },
+                );
 
                 event = {
                     type: 'move',
@@ -374,39 +396,32 @@ export class PinchZoomer {
                     angleRad: angle - startAngle,
                     scale: distance / startDist,
                 };
-
             }
 
             this.onPinch(event);
-
         } else if (actionObj.type === 'down' || actionObj.type === 'up') {
             this.endPinch();
             this.beginPinch(gestureObj);
         }
-
     }
 
-    private endPinch (): void {
+    private endPinch(): void {
         this.pincherArr = [];
         this.onPinch({
             type: 'end',
         });
     }
 
-
-    // ---- public ----
-    constructor (
-        p: {
-            onPinch: (e: TPinchZoomerEvent) => void;
-        }
-    ) {
+    // ----------------------------------- public -----------------------------------
+    constructor(p: { onPinch: (e: TPinchZoomerEvent) => void }) {
         this.onPinch = p.onPinch;
     }
 
-    chainIn (event: IPointerEvent): IPointerEvent | null {
+    chainIn(event: IPointerEvent): IPointerEvent | null {
         this.processEvent(event);
         if (this.gestureObj) {
-            if (!this.gestureObj.isInProgress) { // might still fail -> into queue
+            if (!this.gestureObj.isInProgress) {
+                // might still fail -> into queue
                 this.eventQueueArr.push(event);
             }
         } else {
@@ -415,8 +430,7 @@ export class PinchZoomer {
         return null;
     }
 
-    setChainOut (func: (e: IPointerEvent) => void): void {
+    setChainOut(func: (e: IPointerEvent) => void): void {
         this.chainOut = func;
     }
-
 }

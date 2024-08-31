@@ -1,11 +1,15 @@
-import {BB} from '../../../bb/bb';
+import { BB } from '../../../bb/bb';
 
 export class RadioList {
-
     el: HTMLDivElement;
     inputs: HTMLInputElement[] = [];
 
-    constructor ({name, init, items, ignoreFocus}: {
+    constructor({
+        name,
+        init,
+        items,
+        ignoreFocus,
+    }: {
         name: string;
         init?: string;
         items: {
@@ -18,7 +22,7 @@ export class RadioList {
             className: 'kl-radio',
         });
 
-        items.forEach(item => {
+        items.forEach((item) => {
             const label = BB.el({
                 tagName: 'label',
             });
@@ -43,8 +47,7 @@ export class RadioList {
         });
     }
 
-
-    getValue (): string | null {
+    getValue(): string | null {
         for (let i = 0; i < this.inputs.length; i++) {
             if (this.inputs[i].checked) {
                 return this.inputs[i].value;
@@ -53,8 +56,7 @@ export class RadioList {
         return null;
     }
 
-    getElement () {
+    getElement() {
         return this.el;
     }
-
 }

@@ -1,12 +1,11 @@
-import {BB} from '../../../bb/bb';
-import {klHistory} from '../../history/kl-history';
-import {LANG} from '../../../language/language';
-import {TKlCanvasLayer, TUiLayout} from '../../kl-types';
-import {ISize2D} from '../../../bb/bb-types';
-import {theme} from '../../../theme/theme';
-import {KlCanvasLayer} from '../../canvas/kl-canvas';
-import {throwIfNull} from '../../../bb/base/base';
-
+import { BB } from '../../../bb/bb';
+import { KlHistory } from '../../history/kl-history';
+import { LANG } from '../../../language/language';
+import { TKlCanvasLayer, TUiLayout } from '../../kl-types';
+import { ISize2D } from '../../../bb/bb-types';
+import { theme } from '../../../theme/theme';
+import { KlCanvasLayer } from '../../canvas/kl-canvas';
+import { throwIfNull } from '../../../bb/base/base';
 
 /**
  * Previews currently active layer
@@ -18,10 +17,10 @@ import {throwIfNull} from '../../../bb/base/base';
  * update visibility for performance
  */
 export class LayerPreview {
-
     private readonly rootEl: HTMLElement;
     private readonly contentWrapperEl: HTMLElement;
     private readonly height: number;
+    private readonly history: KlHistory;
     private layerObj: TKlCanvasLayer | undefined;
     private isVisible: boolean;
     private uiState: TUiLayout;
@@ -51,14 +50,17 @@ export class LayerPreview {
     private readonly largeCanvasCtx: CanvasRenderingContext2D;
     private largeCanvasCheckerPattern: CanvasPattern = {} as CanvasPattern;
 
-
-    private updateCheckerPatterns (): void {
+    private updateCheckerPatterns(): void {
         const checker = BB.createCheckerCanvas(4, theme.isDark());
-        this.animationCanvasCheckerPattern = throwIfNull(this.animationCanvasCtx.createPattern(checker, 'repeat'));
-        this.largeCanvasCheckerPattern = throwIfNull(this.canvasCtx.createPattern(checker, 'repeat'));
+        this.animationCanvasCheckerPattern = throwIfNull(
+            this.animationCanvasCtx.createPattern(checker, 'repeat'),
+        );
+        this.largeCanvasCheckerPattern = throwIfNull(
+            this.canvasCtx.createPattern(checker, 'repeat'),
+        );
     }
-    
-    private animate (): void {
+
+    private animate(): void {
         if (this.animationCount === 0) {
             return;
         }
@@ -66,7 +68,10 @@ export class LayerPreview {
         this.animationCount--;
 
         this.canvasCtx.save();
-        this.canvasCtx.globalAlpha = Math.pow((this.animationLength - this.animationCount) / this.animationLength, 2);
+        this.canvasCtx.globalAlpha = Math.pow(
+            (this.animationLength - this.animationCount) / this.animationLength,
+            2,
+        );
         this.canvasCtx.drawImage(this.animationCanvas, 0, 0);
         this.canvasCtx.restore();
 
@@ -78,15 +83,20 @@ export class LayerPreview {
     /**
      * is always instant
      */
-    private drawLargeCanvas (): void {
-
+    private drawLargeCanvas(): void {
         if (!this.largeCanvasIsVisible || !this.layerObj) {
             return;
         }
 
         const layerCanvas = this.layerObj.context.canvas;
 
-        const canvasDimensions = BB.fitInto(layerCanvas.width, layerCanvas.height, this.largeCanvasSize, this.largeCanvasSize, 1);
+        const canvasDimensions = BB.fitInto(
+            layerCanvas.width,
+            layerCanvas.height,
+            this.largeCanvasSize,
+            this.largeCanvasSize,
+            1,
+        );
         this.largeCanvas.width = Math.round(canvasDimensions.width);
         this.largeCanvas.height = Math.round(canvasDimensions.height);
         this.largeCanvasCtx.save();
@@ -98,37 +108,55 @@ export class LayerPreview {
         }
         this.largeCanvasCtx.fillStyle = this.largeCanvasCheckerPattern;
         this.largeCanvasCtx.fillRect(0, 0, this.largeCanvas.width, this.largeCanvas.height);
-        this.largeCanvasCtx.drawImage(layerCanvas, 0, 0, this.largeCanvas.width, this.largeCanvas.height);
+        this.largeCanvasCtx.drawImage(
+            layerCanvas,
+            0,
+            0,
+            this.largeCanvas.width,
+            this.largeCanvas.height,
+        );
         this.largeCanvasCtx.restore();
 
         const bounds = this.rootEl.getBoundingClientRect();
         BB.css(this.largeCanvasWrapper, {
-            top: Math.max(10, (bounds.top + this.height / 2 - this.largeCanvas.height / 2)) + 'px',
+            top: Math.max(10, bounds.top + this.height / 2 - this.largeCanvas.height / 2) + 'px',
         });
-
     }
 
-    private draw (isInstant: boolean): void {
+    private draw(isInstant: boolean): void {
         if (!this.isVisible || !this.layerObj) {
             return;
         }
 
         const layerIsVisible = this.layerObj.isVisible;
-        this.checkEl.parentElement!.title = layerIsVisible ? LANG('layers-active-layer-visible') : LANG('layers-active-layer-hidden');
+        this.checkEl.parentElement!.title = layerIsVisible
+            ? LANG('layers-active-layer-visible')
+            : LANG('layers-active-layer-hidden');
         this.checkEl.checked = layerIsVisible;
         this.checkEl.style.boxShadow = layerIsVisible ? '' : '0 0 0 1px red';
 
         this.nameLabelEl.textContent = this.layerObj.name;
         if (this.layerObj.isVisible) {
-            this.opacityEl.innerHTML = LANG('opacity') + '<br>' + Math.round(this.layerObj.opacity * 100) + '%';
+            this.opacityEl.innerHTML =
+                LANG('opacity') + '<br>' + Math.round(this.layerObj.opacity * 100) + '%';
         } else {
-            this.opacityEl.innerHTML = LANG('opacity') + '<br><s>' + Math.round(this.layerObj.opacity * 100) + '%</s>';
+            this.opacityEl.innerHTML =
+                LANG('opacity') + '<br><s>' + Math.round(this.layerObj.opacity * 100) + '%</s>';
         }
 
         const layerCanvas = this.layerObj.context.canvas;
 
-        if (layerCanvas.width !== this.lastDrawnSize.width || layerCanvas.height !== this.lastDrawnSize.height) {
-            const canvasDimensions = BB.fitInto(layerCanvas.width, layerCanvas.height, this.canvasSize, this.canvasSize, 1);
+        if (
+            layerCanvas.width !== this.lastDrawnSize.width ||
+            layerCanvas.height !== this.lastDrawnSize.height
+        ) {
+            const canvasDimensions = BB.fitInto(
+                layerCanvas.width,
+                layerCanvas.height,
+                this.canvasSize,
+                this.canvasSize,
+                1,
+            );
             this.canvas.width = Math.round(canvasDimensions.width);
             this.canvas.height = Math.round(canvasDimensions.height);
 
@@ -141,8 +169,19 @@ export class LayerPreview {
         this.animationCanvasCtx.save();
         this.animationCanvasCtx.imageSmoothingEnabled = false;
         this.animationCanvasCtx.fillStyle = this.animationCanvasCheckerPattern;
-        this.animationCanvasCtx.fillRect(0, 0, this.animationCanvas.width, this.animationCanvas.height);
-        this.animationCanvasCtx.drawImage(layerCanvas, 0, 0, this.animationCanvas.width, this.animationCanvas.height);
+        this.animationCanvasCtx.fillRect(
+            0,
+            0,
+            this.animationCanvas.width,
+            this.animationCanvas.height,
+        );
+        this.animationCanvasCtx.drawImage(
+            layerCanvas,
+            0,
+            0,
+            this.animationCanvas.width,
+            this.animationCanvas.height,
+        );
         this.animationCanvasCtx.restore();
 
         if (isInstant) {
@@ -150,29 +189,25 @@ export class LayerPreview {
             this.canvasCtx.save();
             this.canvasCtx.drawImage(this.animationCanvas, 0, 0);
             this.canvasCtx.restore();
-
         } else {
             this.animationCount = this.animationLength;
             this.animate();
-
         }
 
         this.drawLargeCanvas();
 
-        this.lastDrawnState = klHistory.getState();
+        this.lastDrawnState = this.history.getChangeCount();
         this.lastDrawnSize.width = layerCanvas.width;
         this.lastDrawnSize.height = layerCanvas.height;
     }
 
-
-    // ---- public ----
-    constructor (
-        p: {
-            onClick: () => void; // when clicking on layer name
-            klRootEl: HTMLElement;
-            uiState: TUiLayout;
-        }
-    ) {
+    // ----------------------------------- public -----------------------------------
+    constructor(p: {
+        onClick: () => void; // when clicking on layer name
+        klRootEl: HTMLElement;
+        uiState: TUiLayout;
+        history: KlHistory;
+    }) {
         // internally redraws with in an interval. checks history is something changed
         // this update will be animated
         // it will not be animated if the resolution changed
@@ -183,6 +218,7 @@ export class LayerPreview {
         this.rootEl = BB.el({
             className: 'kl-layer-preview',
         });
+        this.history = p.history;
         this.isVisible = true;
         this.height = 40;
         this.canvasSize = this.height - 10;
@@ -201,7 +237,6 @@ export class LayerPreview {
         const largeCanvasAnimationDurationMs = 300;
         this.uiState = p.uiState;
 
-
         // --- setup dom ---
         this.contentWrapperEl = BB.el({
             css: {
@@ -210,7 +245,6 @@ export class LayerPreview {
                 height: this.height + 'px',
             },
         });
-
 
         const checkWrapper = BB.el({
             css: {
@@ -274,9 +308,9 @@ export class LayerPreview {
             },
         });
         if (p.onClick) {
-            clickableEl.addEventListener('click', () => p.onClick());
-            this.canvas.addEventListener('click', () => p.onClick());
-            checkWrapper.addEventListener('click', () => p.onClick());
+            clickableEl.addEventListener('click', () => p.onClick(), { passive: false });
+            this.canvas.addEventListener('click', () => p.onClick(), { passive: false });
+            checkWrapper.addEventListener('click', () => p.onClick(), { passive: false });
         }
         this.opacityEl = BB.el({
             content: LANG('opacity') + '<br>100%',
@@ -297,7 +331,7 @@ export class LayerPreview {
                 top: '10px',
                 border: '1px solid #aaa',
                 boxShadow: '1px 1px 3px rgba(0,0,0,0.3)',
-                transition: 'opacity '+largeCanvasAnimationDurationMs+'ms ease-in-out',
+                transition: 'opacity ' + largeCanvasAnimationDurationMs + 'ms ease-in-out',
                 userSelect: 'none',
                 display: 'block',
                 webkitTouchCallout: 'none',
@@ -310,20 +344,16 @@ export class LayerPreview {
             display: 'block',
         });
 
-
         canvasWrapperEl.append(this.canvas);
         nameWrapper.append(this.nameLabelEl, clickableEl);
         this.contentWrapperEl.append(checkWrapper, canvasWrapperEl, nameWrapper, this.opacityEl);
         this.rootEl.append(this.contentWrapperEl);
-
 
         this.updateCheckerPatterns();
         theme.addIsDarkListener(() => {
             this.updateCheckerPatterns();
             this.draw(true);
         });
-
-
 
         // --- update logic ---
 
@@ -332,12 +362,11 @@ export class LayerPreview {
         // -> no "lighter" is needed for accurate cross-fading
 
         setInterval(() => {
-
             if (!this.layerObj) {
                 return;
             }
 
-            const currentState = klHistory.getState();
+            const currentState = this.history.getChangeCount();
             if (currentState === this.lastDrawnState) {
                 return;
             }
@@ -346,9 +375,7 @@ export class LayerPreview {
             this.layerObj.opacity = (this.layerObj.context.canvas as KlCanvasLayer).opacity;
 
             this.draw(false);
-
         }, 2000);
-        
 
         const removeLargeCanvas = () => {
             this.largeCanvasWrapper.remove();
@@ -371,12 +398,13 @@ export class LayerPreview {
                         this.largeCanvasWrapper.style.opacity = '1';
                     }, 20);
                 }, 250);
-
             } else {
                 this.largeCanvasWrapper.style.opacity = '0';
-                largeCanvasAnimationTimeout = setTimeout(removeLargeCanvas, largeCanvasAnimationDurationMs + 20);
+                largeCanvasAnimationTimeout = setTimeout(
+                    removeLargeCanvas,
+                    largeCanvasAnimationDurationMs + 20,
+                );
             }
-
         };
 
         const pointerListener = new BB.PointerListener({
@@ -389,11 +417,11 @@ export class LayerPreview {
 
     // ---- interface ----
 
-    getElement (): HTMLElement {
+    getElement(): HTMLElement {
         return this.rootEl;
     }
 
-    setIsVisible (b: boolean): void {
+    setIsVisible(b: boolean): void {
         if (this.isVisible === b) {
             return;
         }
@@ -401,19 +429,19 @@ export class LayerPreview {
         this.contentWrapperEl.style.display = this.isVisible ? 'flex' : 'none';
         this.rootEl.style.marginBottom = this.isVisible ? '' : '10px';
 
-        const currentState = klHistory.getState();
+        const currentState = this.history.getChangeCount();
         if (b && this.lastDrawnState !== currentState) {
             this.draw(true);
         }
     }
 
     //when the layer might have changed
-    setLayer (klCanvasLayerObj: TKlCanvasLayer): void {
+    setLayer(klCanvasLayerObj: TKlCanvasLayer): void {
         this.layerObj = klCanvasLayerObj;
         this.draw(true);
     }
 
-    setUiState (stateStr: TUiLayout): void {
+    setUiState(stateStr: TUiLayout): void {
         this.uiState = stateStr;
 
         if (this.uiState === 'left') {
@@ -428,5 +456,4 @@ export class LayerPreview {
             });
         }
     }
-
 }

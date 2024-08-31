@@ -22,7 +22,6 @@ const SEQUENCE_TIMEOUT_MS = 200;
  * - also trackpads are painful to draw with. So supporting a trackpad-based workflow makes not much sense.
  */
 export class WheelCleaner {
-
     private readonly knownUnitArr: number[] = [100];
     private sequenceLength: number = 0;
     private sequenceUnit: null | number = null;
@@ -35,8 +34,7 @@ export class WheelCleaner {
         clientY: number;
     } = null;
 
-
-    private emit (delta: number): void {
+    private emit(delta: number): void {
         if (this.position === null || this.sequenceUnit === null) {
             return;
         }
@@ -49,24 +47,23 @@ export class WheelCleaner {
         });
     }
 
-    private endSequence (): void {
+    private endSequence(): void {
         if (this.toEmitDelta !== null) {
             this.emit(this.toEmitDelta);
             this.toEmitDelta = null;
         }
-        if (this.sequenceUnit !== null && !(this.knownUnitArr.includes(this.sequenceUnit))) {
+        if (this.sequenceUnit !== null && !this.knownUnitArr.includes(this.sequenceUnit)) {
             this.knownUnitArr.push(this.sequenceUnit);
         }
         this.sequenceLength = 0;
         this.sequenceUnit = null;
     }
 
+    // ----------------------------------- public -----------------------------------
 
-    // ---- public ----
+    constructor(private callback: (p: IWheelCleanerEvent) => void) {}
 
-    constructor (private callback: (p: IWheelCleanerEvent) => void) {}
-
-    process (event: WheelEvent): void {
+    process(event: WheelEvent): void {
         this.position = {
             pageX: event.pageX,
             pageY: event.pageY,
@@ -118,13 +115,12 @@ export class WheelCleaner {
         }
         if (
             absDelta === this.sequenceUnit ||
-            (absDelta / this.sequenceUnit) % 1 < 0.0001// a multiple
+            (absDelta / this.sequenceUnit) % 1 < 0.0001 // a multiple
         ) {
             //fine
         } else if ((this.sequenceUnit / absDelta) % 1 < 0.0001) {
             //unit was actually a multiple - update it
             this.sequenceUnit = absDelta;
-
         } else if (absDelta !== this.sequenceUnit) {
             //not clean - delta is varying - probably a swipe scroll or pinch scroll on trackpad
             this.sequenceUnit = null;
@@ -132,12 +128,10 @@ export class WheelCleaner {
             return;
         }
 
-
         if (this.toEmitDelta !== null) {
             this.emit(this.toEmitDelta);
             this.toEmitDelta = null;
         }
         this.emit(delta);
     }
-
 }

@@ -1,6 +1,6 @@
-import {BB} from '../../../bb/bb';
-import {LANG} from '../../../language/language';
-import {dialogCounter} from '../modals/modal-count';
+import { BB } from '../../../bb/bb';
+import { LANG } from '../../../language/language';
+import { dialogCounter } from '../modals/modal-count';
 
 /**
  * Scroll buttons at the top and bottom of toolspace
@@ -8,25 +8,26 @@ import {dialogCounter} from '../modals/modal-count';
  * Allow user to scroll up and down toolspace.
  */
 export class ToolspaceScroller {
-
     private readonly toolspace: HTMLElement;
     private readonly upBtn: HTMLElement;
     private readonly downBtn: HTMLElement;
     private downInterval: any;
     private upInterval: any;
 
-    private update (): void {
+    private update(): void {
         let newUpDisplay = this.upBtn.style.display;
         let newDownDisplay = this.downBtn.style.display;
-        if (this.toolspace.scrollHeight > this.toolspace.offsetHeight + 3) { // small buffer where it's not worth it
+        if (this.toolspace.scrollHeight > this.toolspace.offsetHeight + 3) {
+            // small buffer where it's not worth it
             if (!this.upInterval) {
                 newUpDisplay = this.toolspace.scrollTop === 0 ? 'none' : 'block';
             }
             if (!this.downInterval) {
-                newDownDisplay = (
-                    this.toolspace.scrollTop + this.toolspace.offsetHeight + 1 >= this.toolspace.scrollHeight ?
-                        'none' : 'block'
-                );
+                newDownDisplay =
+                    this.toolspace.scrollTop + this.toolspace.offsetHeight + 1 >=
+                    this.toolspace.scrollHeight
+                        ? 'none'
+                        : 'block';
             }
         } else {
             newUpDisplay = 'none';
@@ -41,8 +42,8 @@ export class ToolspaceScroller {
         }
     }
 
-    // --- public ---
-    constructor (p: {toolspace: HTMLElement; uiState: 'left' | 'right'}) {
+    // ----------------------------------- public -----------------------------------
+    constructor(p: { toolspace: HTMLElement; uiState: 'left' | 'right' }) {
         this.toolspace = p.toolspace;
         this.upBtn = BB.el({
             parent: this.toolspace,
@@ -74,7 +75,8 @@ export class ToolspaceScroller {
                 }
                 if (e.type === 'pointerup') {
                     clearInterval(this.upInterval);
-                    setTimeout(() => { // prevent ff pressing anything underneath
+                    setTimeout(() => {
+                        // prevent ff pressing anything underneath
                         this.upInterval = null;
                         this.update();
                     }, 50);
@@ -92,7 +94,8 @@ export class ToolspaceScroller {
                 }
                 if (e.type === 'pointerup') {
                     clearInterval(this.downInterval);
-                    setTimeout(() => { // prevent ff pressing anything underneath
+                    setTimeout(() => {
+                        // prevent ff pressing anything underneath
                         this.downInterval = null;
                         this.update();
                     }, 50);
@@ -104,20 +107,17 @@ export class ToolspaceScroller {
             this.toolspace.scrollBy(0, Math.round(0.7 * e.deltaY));
             this.update();
         };
-        this.upBtn.addEventListener('wheel', wheelListener);
-        this.downBtn.addEventListener('wheel', wheelListener);
+        this.upBtn.addEventListener('wheel', wheelListener, { passive: false });
+        this.downBtn.addEventListener('wheel', wheelListener, { passive: false });
 
         this.update();
 
         const observer = new MutationObserver(() => this.update());
-        observer.observe(
-            this.toolspace,
-            {
-                attributes: true,
-                childList: true,
-                subtree: true,
-            }
-        );
+        observer.observe(this.toolspace, {
+            attributes: true,
+            childList: true,
+            subtree: true,
+        });
         window.addEventListener('resize', () => this.update());
 
         // hide if in dialog because that can have its own scrollbar
@@ -128,7 +128,7 @@ export class ToolspaceScroller {
         });
     }
 
-    updateUiState (uiState: 'left' | 'right'): void {
+    updateUiState(uiState: 'left' | 'right'): void {
         BB.css(this.upBtn, {
             left: uiState === 'left' ? '0' : '',
             right: uiState === 'right' ? '0' : '',

@@ -1,39 +1,42 @@
-import {BB} from '../../../bb/bb';
-import {CropCopy} from '../components/crop-copy';
-import {Checkbox} from '../components/checkbox';
-import {showModal} from './base/showModal';
-import {LANG} from '../../../language/language';
-import {IKeyString, IRect} from '../../../bb/bb-types';
-import {IKlPsd, TKlPsdError} from '../../kl-types';
+import { BB } from '../../../bb/bb';
+import { CropCopy } from '../components/crop-copy';
+import { Checkbox } from '../components/checkbox';
+import { showModal } from './base/showModal';
+import { LANG } from '../../../language/language';
+import { IKeyString, IRect } from '../../../bb/bb-types';
+import { IKlPsd, TKlPsdError } from '../../kl-types';
 
 /**
  * Shows first dialog when importing an image.
  * Where you can crop, and select import as layer or as image.
  */
-export function showImportImageDialog (
-    p: {
-        image: IKlPsd | {
-            type: 'image';
-            width: number;
-            height: number;
-            canvas: HTMLImageElement | HTMLCanvasElement;
-        };
-        maxSize: number;
-        target: HTMLElement;
-        callback: (
-            val: {
-                type: 'as-image' | 'as-layer';
-                image: HTMLImageElement | HTMLCanvasElement;
-            } | {
-                type: 'as-image-psd';
-                image: IKlPsd;
-                cropObj: IRect;
-            } | {
-                type: 'cancel';
-            }
-        ) => void;
-    }
-): void {
+export function showImportImageDialog(p: {
+    image:
+        | IKlPsd
+        | {
+              type: 'image';
+              width: number;
+              height: number;
+              canvas: HTMLImageElement | HTMLCanvasElement;
+          };
+    maxSize: number;
+    target: HTMLElement;
+    callback: (
+        val:
+            | {
+                  type: 'as-image' | 'as-layer';
+                  image: HTMLImageElement | HTMLCanvasElement;
+              }
+            | {
+                  type: 'as-image-psd';
+                  image: IKlPsd;
+                  cropObj: IRect;
+              }
+            | {
+                  type: 'cancel';
+              },
+    ) => void;
+}): void {
     const rootEl = BB.el();
     const isSmall = window.innerWidth < 550 || window.innerHeight < 550;
     const style: IKeyString = isSmall ? {} : { width: '540px' };
@@ -66,7 +69,7 @@ export function showImportImageDialog (
 
     rootEl.append(cropCopy.getEl(), resolutionEl);
 
-    function updateResolution (w: number, h: number): void {
+    function updateResolution(w: number, h: number): void {
         const fit = BB.fitInto(w, h, p.maxSize, p.maxSize);
 
         if (fit.width < w) {
@@ -79,15 +82,14 @@ export function showImportImageDialog (
     }
     updateResolution(p.image.width, p.image.height);
 
-
     let doFlatten = false;
-    function showWarnings (psdWarningArr: TKlPsdError[]): void {
+    function showWarnings(psdWarningArr: TKlPsdError[]): void {
         const contentArr = [];
         const warningMap = {
-            'mask': 'Masks not supported. Mask was applied.',
-            'clipping': 'Clipping not supported. Clipping layers were merged.',
-            'group': 'Groups not supported. Layers were ungrouped.',
-            'adjustment': 'Adjustment layers not supported.',
+            mask: 'Masks not supported. Mask was applied.',
+            clipping: 'Clipping not supported. Clipping layers were merged.',
+            group: 'Groups not supported. Layers were ungrouped.',
+            adjustment: 'Adjustment layers not supported.',
             'layer-effect': 'Layer effects not supported.',
             'smart-object': 'Smart objects not supported.',
             'blend-mode': 'Unsupported layer blend mode.',
@@ -122,7 +124,7 @@ export function showImportImageDialog (
                     parent: noteEl,
                     tagName: 'a',
                     content: 'Details',
-                    css: { marginLeft: '5px'},
+                    css: { marginLeft: '5px' },
                     onClick: () => showWarnings(warnings),
                 });
                 rootEl.append(noteEl);
@@ -136,7 +138,7 @@ export function showImportImageDialog (
         }
     }
 
-    function callback (result: string): void {
+    function callback(result: string): void {
         const croppedImage = cropCopy.getCroppedCanvas();
         const cropRect = cropCopy.getRect();
         const isCropped = p.image.width !== cropRect.width && p.image.height !== cropRect.height;

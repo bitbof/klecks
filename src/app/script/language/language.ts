@@ -1,4 +1,4 @@
-import {english, languages, loadLanguage, TTranslationCode} from '../../languages/languages';
+import { english, languages, loadLanguage, TTranslationCode } from '../../languages/languages';
 
 export const LS_LANGUAGE_KEY = 'klecks-language';
 
@@ -7,59 +7,59 @@ class LanguageStrings {
     private listeners: (() => void)[] = [];
     private code: string;
 
-    // --- public ----
-    constructor () {
+    // ----------------------------------- public -----------------------------------
+    constructor() {
         // need to use setLanguage for a different language
-        this.data = {...english};
+        this.data = { ...english };
         this.code = 'en';
     }
 
-    async setLanguage (langCode: string): Promise<void> {
+    async setLanguage(langCode: string): Promise<void> {
         if (langCode === 'en') {
-            this.data = {...english};
+            this.data = { ...english };
         } else {
-            this.data = {...english, ...(await loadLanguage(langCode))};
+            this.data = { ...english, ...(await loadLanguage(langCode)) };
         }
         this.code = langCode;
         document.documentElement.setAttribute('lang', langCode);
-        this.listeners.forEach(item => {
+        this.listeners.forEach((item) => {
             item();
         });
     }
 
-    get (code: TTranslationCode): string {
+    get(code: TTranslationCode): string {
         if (!(code in this.data)) {
             throw new Error("translation code doesn't exist: " + code);
         }
         return this.data[code];
     }
 
-    getLanguage (): {code: string; name: string} {
-        return languages.find(item => {
+    getLanguage(): { code: string; name: string } {
+        return languages.find((item) => {
             return item.code === this.code;
         })!;
     }
 
-    getAutoLanguage (): {code: string; name: string} {
+    getAutoLanguage(): { code: string; name: string } {
         const autoCode = getLanguage(false);
-        return languages.find(item => {
+        return languages.find((item) => {
             return item.code === autoCode;
         })!;
     }
 
-    getCode (): string {
+    getCode(): string {
         return this.code;
     }
 
     // get notified on language change
-    subscribe (subscriber: () => void) {
+    subscribe(subscriber: () => void) {
         if (this.listeners.includes(subscriber)) {
             return;
         }
         this.listeners.push(subscriber);
     }
 
-    unsubscribe (subscriber: () => void) {
+    unsubscribe(subscriber: () => void) {
         for (let i = 0; i < this.listeners.length; i++) {
             if (subscriber === this.listeners[i]) {
                 this.listeners.splice(i, 1);
@@ -69,13 +69,12 @@ class LanguageStrings {
     }
 }
 
-export function getLanguage (useLocalStorage?: boolean): string {
-
+export function getLanguage(useLocalStorage?: boolean): string {
     let result: string = 'en';
 
     const langs: string[] = []; // from highest to lowest priority
     const navLangs = navigator.languages ? navigator.languages : [navigator.language];
-    navLangs.forEach(item => {
+    navLangs.forEach((item) => {
         const split = item.split('-');
         langs.push(item);
         if (split.length === 2) {
@@ -96,7 +95,7 @@ export function getLanguage (useLocalStorage?: boolean): string {
 
     for (let i = 0; i < langs.length; i++) {
         const lang = langs[i];
-        const found = languages.find(item => {
+        const found = languages.find((item) => {
             return item.code.toLowerCase() === lang.toLowerCase();
         });
         if (found) {
@@ -110,11 +109,11 @@ export function getLanguage (useLocalStorage?: boolean): string {
 const activeLanguageCode = getLanguage(true);
 export const languageStrings = new LanguageStrings();
 
-export const LANG = (code: TTranslationCode, replace?: {[key: string]: string}): string => {
+export const LANG = (code: TTranslationCode, replace?: { [key: string]: string }): string => {
     if (replace) {
         let result = languageStrings.get(code);
         const keyArr = Object.keys(replace);
-        keyArr.forEach(key => {
+        keyArr.forEach((key) => {
             result = result.replace(`{${key}}`, replace[key]);
         });
         return result;

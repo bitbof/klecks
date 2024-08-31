@@ -1,26 +1,25 @@
-import {BB} from '../../../bb/bb';
-import {input} from './input';
+import { BB } from '../../../bb/bb';
+import { input } from './input';
 
 /**
  * Used by KlSlider. Allows user to type in value in input (type=number) field, instead of dragging with mouse.
  * Input goes away when losing focus, or when pressing Enter/Escape.
  */
 export class KlSliderManualInput {
-
     private readonly input: HTMLInputElement;
     private isEnabled: boolean = true;
     private scrollBefore: { x: number; y: number } | undefined; // window scroll position on creation
     private lastValue: number; // last emitted value
     private isClosed: boolean = false;
 
-    private emit (): void {
+    private emit(): void {
         if (this.lastValue !== Number(this.input.value)) {
             this.onChange(Number(this.input.value));
             this.lastValue = Number(this.input.value);
         }
     }
 
-    private privateOnClose (): void {
+    private privateOnClose(): void {
         if (this.isClosed) {
             return;
         }
@@ -35,9 +34,9 @@ export class KlSliderManualInput {
         });
     }
 
-    // --- public ---
+    // ----------------------------------- public -----------------------------------
 
-    constructor (
+    constructor(
         value: number, // initial value (displayValue)
         min: number,
         max: number,
@@ -46,7 +45,6 @@ export class KlSliderManualInput {
         private onClose: () => void,
         roundDigits?: number,
     ) {
-
         this.input = input({
             type: 'number',
             init: value,
@@ -62,14 +60,18 @@ export class KlSliderManualInput {
         this.input.onblur = () => {
             this.privateOnClose();
         };
-        this.input.addEventListener('keyup', (e) => {
-            if (['Enter', 'Escape'].includes(e.key)) {
-                this.privateOnClose();
-            } else {
-                this.emit();
-            }
-        });
-        this.input.addEventListener('wheel', () => this.emit());
+        this.input.addEventListener(
+            'keyup',
+            (e) => {
+                if (['Enter', 'Escape'].includes(e.key)) {
+                    this.privateOnClose();
+                } else {
+                    this.emit();
+                }
+            },
+            { passive: false },
+        );
+        this.input.addEventListener('wheel', () => this.emit(), { passive: false });
 
         this.scrollBefore = {
             x: window.scrollX,
@@ -91,20 +93,20 @@ export class KlSliderManualInput {
         });
     }
 
-    getElement () {
+    getElement() {
         return this.input;
     }
 
-    setIsEnabled (b: boolean): void {
+    setIsEnabled(b: boolean): void {
         this.isEnabled = !!b;
     }
 
-    focus (): void {
+    focus(): void {
         this.input.focus();
         this.input.select();
     }
 
-    destroy (): void {
+    destroy(): void {
         BB.destroyEl(this.input);
     }
 }

@@ -1,25 +1,22 @@
-import {BB} from '../../../bb/bb';
-import {PointerListener} from '../../../bb/input/pointer-listener';
+import { BB } from '../../../bb/bb';
+import { PointerListener } from '../../../bb/input/pointer-listener';
 
 /**
  * A slider that looks like this
  * ------O----
  */
 export class PointSlider {
-
     private readonly rootEl: HTMLElement;
     private readonly sliderPoint: HTMLElement;
     private readonly pointerListener: PointerListener;
 
-    // ---- public ----
-    constructor (
-        p: {
-            init: number;
-            width: number;
-            pointSize: number;
-            callback: (value: number, isFirst: boolean, isLast: boolean) => void;
-        }
-    ) {
+    // ----------------------------------- public -----------------------------------
+    constructor(p: {
+        init: number;
+        width: number;
+        pointSize: number;
+        callback: (value: number, isFirst: boolean, isLast: boolean) => void;
+    }) {
         this.rootEl = BB.el({
             css: {
                 position: 'relative',
@@ -41,7 +38,8 @@ export class PointSlider {
         let isDragging = false;
 
         //sliderPoint
-        const touchAreaEl = BB.el({ // expand clickable area
+        const touchAreaEl = BB.el({
+            // expand clickable area
             parent: this.sliderPoint,
             css: {
                 // background: 'rgba(255,0,0,0.4)',
@@ -57,7 +55,7 @@ export class PointSlider {
             });
         };
         const getValue = () => {
-            return sliderPos /  (p.width - p.pointSize);
+            return sliderPos / (p.width - p.pointSize);
         };
 
         {
@@ -101,15 +99,15 @@ export class PointSlider {
 
     // ---- interface ----
 
-    getEl (): HTMLElement {
+    getEl(): HTMLElement {
         return this.rootEl;
     }
 
-    setActive (isActive: boolean): void {
+    setActive(isActive: boolean): void {
         this.sliderPoint.style.backgroundColor = isActive ? '#fff' : '#eaeaea';
     }
 
-    destroy (): void {
+    destroy(): void {
         this.pointerListener.destroy();
     }
 }

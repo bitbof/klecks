@@ -1,24 +1,21 @@
-import {BB} from '../../../bb/bb';
-import {LANG} from '../../../language/language';
-import {KlColorSlider} from '../components/kl-color-slider';
+import { BB } from '../../../bb/bb';
+import { LANG } from '../../../language/language';
+import { KlColorSlider } from '../components/kl-color-slider';
 
 /**
  * Text Tool tab contents (color slider)
  */
 export class TextUi {
-
     private readonly rootEl: HTMLElement;
     private readonly colorDiv: HTMLElement;
     private isVisible: boolean = true;
     private readonly colorSlider: KlColorSlider;
 
-    // ---- public ----
+    // ----------------------------------- public -----------------------------------
 
-    constructor (
-        p: {
-            colorSlider: KlColorSlider; // when opening tab, inserts it (snatches it from where else it was)
-        }
-    ) {
+    constructor(p: {
+        colorSlider: KlColorSlider; // when opening tab, inserts it (snatches it from where else it was)
+    }) {
         this.rootEl = BB.el({
             css: {
                 margin: '10px',
@@ -39,15 +36,18 @@ export class TextUi {
         });
     }
 
-    getElement (): HTMLElement {
+    getElement(): HTMLElement {
         return this.rootEl;
     }
 
-    setIsVisible (pIsVisible: boolean): void {
+    setIsVisible(pIsVisible: boolean): void {
         this.isVisible = !!pIsVisible;
         this.rootEl.style.display = this.isVisible ? 'block' : 'none';
         if (this.isVisible) {
-            this.colorDiv.append(this.colorSlider.getElement(), this.colorSlider.getOutputElement());
+            this.colorDiv.append(
+                this.colorSlider.getElement(),
+                this.colorSlider.getOutputElement(),
+            );
         }
     }
 }

@@ -11,8 +11,10 @@ import {
     getDate,
     handleClick,
     imageBlobToUrl,
-    insertAfter, isDark,
-    loadImage, nullToUndefined,
+    insertAfter,
+    isDark,
+    loadImage,
+    nullToUndefined,
     reduce,
     setAttributes,
     shareCanvas,
@@ -22,10 +24,11 @@ import {
     canShareFiles,
     eventUsesHighResTimeStamp,
     hasPointerEvents,
-    isCssMinMaxSupported, unsetEventHandler,
+    isCssMinMaxSupported,
+    unsetEventHandler,
 } from './base/browser';
-import {KeyListener, sameKeys} from './input/key-listener';
-import {PointerListener} from './input/pointer-listener';
+import { KeyListener, sameKeys } from './input/key-listener';
+import { PointerListener } from './input/pointer-listener';
 import {
     canvasBounds,
     convertToAlphaChannelCanvas,
@@ -39,10 +42,16 @@ import {
     resizeCanvas,
     testShouldPixelate,
 } from './base/canvas';
-import {Matrix} from './math/matrix';
-import {Vec2} from './math/vec2';
-import {BezierLine, PointLine, projectPointOnLine, quadraticSplineInput, SplineInterpolator} from './math/line';
-import {CMYK, ColorConverter, HSV, RGB, testIsWhiteBestContrast} from './color/color';
+import { Matrix } from './math/matrix';
+import { Vec2 } from './math/vec2';
+import {
+    BezierLine,
+    PointLine,
+    projectPointOnLine,
+    quadraticSplineInput,
+    SplineInterpolator,
+} from './math/line';
+import { CMYK, ColorConverter, HSV, RGB, testIsWhiteBestContrast } from './color/color';
 import {
     appendTextDiv,
     clearSelection,
@@ -70,18 +79,17 @@ import {
     roundUneven,
     updateBounds,
 } from './math/math';
-import {createCanvas} from './base/create-canvas';
-import {BbLog} from './base/bb-log';
-import {LocalStorage} from './base/local-storage';
-import {CoalescedExploder} from './input/event-chain/coalesced-exploder';
-import {NFingerTapper} from './input/event-chain/n-finger-tapper';
-import {PinchZoomer} from './input/event-chain/pinch-zoomer';
-import {DoubleTapper} from './input/event-chain/double-tapper';
-import {OnePointerLimiter} from './input/event-chain/one-pointer-limiter';
-import {EventChain} from './input/event-chain/event-chain';
+import { createCanvas } from './base/create-canvas';
+import { BbLog } from './base/bb-log';
+import { LocalStorage } from './base/local-storage';
+import { CoalescedExploder } from './input/event-chain/coalesced-exploder';
+import { NFingerTapper } from './input/event-chain/n-finger-tapper';
+import { PinchZoomer } from './input/event-chain/pinch-zoomer';
+import { DoubleTapper } from './input/event-chain/double-tapper';
+import { OnePointerLimiter } from './input/event-chain/one-pointer-limiter';
+import { EventChain } from './input/event-chain/event-chain';
 
 export const BB = {
-
     // ---- browser ----
     eventUsesHighResTimeStamp,
     hasPointerEvents,
@@ -169,7 +177,6 @@ export const BB = {
     destroyEl,
     isInputFocused,
     unfocusAnyInput,
-
 
     // ---- events / input ----
 

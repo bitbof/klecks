@@ -1,21 +1,19 @@
-import {BB} from '../../bb/bb';
-import {IHistoryEntry, KlHistoryInterface, THistoryInnerActions} from '../history/kl-history';
-import {KL} from '../kl';
-import {IRGB, TPressureInput} from '../kl-types';
-import {IVector2D} from '../../bb/bb-types';
-import {BezierLine} from '../../bb/math/line';
-import {ERASE_COLOR} from './erase-color';
-import {throwIfNull} from '../../bb/base/base';
+import { BB } from '../../bb/bb';
+import { IHistoryEntry, KlHistory, THistoryInnerActions } from '../history/kl-history';
+import { KL } from '../kl';
+import { IRGB, TPressureInput } from '../kl-types';
+import { IVector2D } from '../../bb/bb-types';
+import { BezierLine } from '../../bb/math/line';
+import { ERASE_COLOR } from './erase-color';
+import { throwIfNull } from '../../bb/base/base';
 
 export interface IPixelBrushHistoryEntry extends IHistoryEntry {
     tool: ['brush', 'PixelBrush'];
     actions: THistoryInnerActions<PixelBrush>[];
 }
 
-
 export class PixelBrush {
-
-    private history: KlHistoryInterface = new KL.DecoyKlHistory();
+    private history: KlHistory | undefined;
     private historyEntry: IPixelBrushHistoryEntry | undefined;
     private context: CanvasRenderingContext2D = {} as CanvasRenderingContext2D;
     private settingHasSizePressure: boolean = true;
@@ -30,8 +28,8 @@ export class PixelBrush {
     private settingUseDither: boolean = true;
     private inputIsDrawing: boolean = false;
     private lineToolLastDot: number = 0;
-    private lastInput: TPressureInput = {x: 0, y: 0, pressure: 0};
-    private lastInput2: TPressureInput = {x: 0, y: 0, pressure: 0};
+    private lastInput: TPressureInput = { x: 0, y: 0, pressure: 0 };
+    private lastInput2: TPressureInput = { x: 0, y: 0, pressure: 0 };
     private bezierLine: BezierLine | null = null;
     private readonly ditherArr: [number, number][] = [
         [3, 2],
@@ -56,11 +54,16 @@ export class PixelBrush {
     private readonly ditherCtx: CanvasRenderingContext2D;
     private ditherPattern: CanvasPattern = {} as CanvasPattern;
 
-
-    private updateDither (): void {
+    private updateDither(): void {
         this.ditherCtx.clearRect(0, 0, 4, 4);
-        this.ditherCtx.fillStyle = this.settingIsEraser ? `rgb(${ERASE_COLOR},${ERASE_COLOR},${ERASE_COLOR})` : this.settingColorStr;
-        for (let i = 0; i < Math.max(1, Math.round(this.settingOpacity * this.ditherArr.length)); i++) {
+        this.ditherCtx.fillStyle = this.settingIsEraser
+            ? `rgb(${ERASE_COLOR},${ERASE_COLOR},${ERASE_COLOR})`
+            : this.settingColorStr;
+        for (
+            let i = 0;
+            i < Math.max(1, Math.round(this.settingOpacity * this.ditherArr.length));
+            i++
+        ) {
             this.ditherCtx.fillRect(this.ditherArr[i][0], this.ditherArr[i][1], 1, 1);
         }
         this.ditherPattern = throwIfNull(this.context.createPattern(this.ditherCanvas, 'repeat'));
@@ -69,7 +72,13 @@ export class PixelBrush {
     /**
      * Tests p1->p2 or p3->p4 deviate in their direction more than max, compared to p1->p4
      */
-    private cubicCurveOverThreshold (p1: IVector2D, p2: IVector2D, p3: IVector2D, p4: IVector2D, maxAngleRad: number): boolean {
+    private cubicCurveOverThreshold(
+        p1: IVector2D,
+        p2: IVector2D,
+        p3: IVector2D,
+        p4: IVector2D,
+        maxAngleRad: number,
+    ): boolean {
         const d = BB.Vec2.nor({
             x: p4.x - p1.x,
             y: p4.y - p1.y,
@@ -88,8 +97,7 @@ export class PixelBrush {
         return Math.max(BB.Vec2.dist(d, d2), BB.Vec2.dist(d, d3)) > maxAngleRad;
     }
 
-    private plotCubicBezierLine (p1: IVector2D, p2: IVector2D, p3: IVector2D, p4: IVector2D): void {
-
+    private plotCubicBezierLine(p1: IVector2D, p2: IVector2D, p3: IVector2D, p4: IVector2D): void {
         const isOverThreshold = this.cubicCurveOverThreshold(p1, p2, p3, p4, 0.1);
 
         p1.x = Math.floor(p1.x);
@@ -123,12 +131,12 @@ export class PixelBrush {
                 Math.round(pointArr[i].y),
                 Math.round(pointArr[i + 1].x),
                 Math.round(pointArr[i + 1].y),
-                true
+                true,
             );
         }
     }
 
-    private drawDot (x: number, y: number, size: number, opacity: number): void {
+    private drawDot(x: number, y: number, size: number, opacity: number): void {
         this.context.save();
         if (this.settingIsEraser) {
             this.context.fillStyle = this.settingUseDither ? this.ditherPattern : '#fff';
@@ -138,7 +146,9 @@ export class PixelBrush {
                 this.context.globalCompositeOperation = 'destination-out';
             }
         } else {
-            this.context.fillStyle = this.settingUseDither ? this.ditherPattern : this.settingColorStr;
+            this.context.fillStyle = this.settingUseDither
+                ? this.ditherPattern
+                : this.settingColorStr;
             if (this.settingLockLayerAlpha) {
                 this.context.globalCompositeOperation = 'source-atop';
             }
@@ -148,17 +158,12 @@ export class PixelBrush {
             Math.round(x + -size),
             Math.round(y + -size),
             Math.round(size * 2),
-            Math.round(size * 2)
+            Math.round(size * 2),
         );
         this.context.restore();
     }
 
-    private continueLine (
-        x: number | null,
-        y: number | null,
-        size: number,
-        pressure: number
-    ): void {
+    private continueLine(x: number | null, y: number | null, size: number, pressure: number): void {
         if (this.bezierLine === null) {
             this.bezierLine = new BB.BezierLine();
             this.bezierLine.add(this.lastInput.x, this.lastInput.y, 0, () => {});
@@ -166,29 +171,30 @@ export class PixelBrush {
 
         this.context.save();
 
-        const dotCallback = (
-            val: {
-                x: number;
-                y: number;
-                t: number;
-                angle?: number;
-                dAngle: number;
-            }
-        ): void => {
+        const dotCallback = (val: {
+            x: number;
+            y: number;
+            t: number;
+            angle?: number;
+            dAngle: number;
+        }): void => {
             const localPressure = BB.mix(this.lastInput2.pressure, pressure, val.t);
-            const localOpacity = this.settingOpacity * (this.settingHasOpacityPressure ? (localPressure * localPressure) : 1);
-            const localSize = Math.max(0.5, this.settingSize * (this.settingHasSizePressure ? localPressure : 1));
+            const localOpacity =
+                this.settingOpacity *
+                (this.settingHasOpacityPressure ? localPressure * localPressure : 1);
+            const localSize = Math.max(
+                0.5,
+                this.settingSize * (this.settingHasSizePressure ? localPressure : 1),
+            );
             this.drawDot(val.x, val.y, localSize, localOpacity);
         };
 
-        const controlCallback = (
-            controlObj: {
-                p1: IVector2D;
-                p2: IVector2D;
-                p3: IVector2D;
-                p4: IVector2D;
-            }
-        ): void => {
+        const controlCallback = (controlObj: {
+            p1: IVector2D;
+            p2: IVector2D;
+            p3: IVector2D;
+            p4: IVector2D;
+        }): void => {
             this.plotCubicBezierLine(controlObj.p1, controlObj.p2, controlObj.p3, controlObj.p4);
         };
 
@@ -198,7 +204,6 @@ export class PixelBrush {
             } else {
                 this.bezierLine.add(x, y, 4, undefined, controlCallback);
             }
-
         } else {
             const localSpacing = size * this.settingSpacing;
 
@@ -212,11 +217,10 @@ export class PixelBrush {
         this.context.restore();
     }
 
-
     /**
      * bresenheim line drawing
      */
-    private plotLine (x0: number, y0: number, x1: number, y1: number, skipFirst: boolean): void {
+    private plotLine(x0: number, y0: number, x1: number, y1: number, skipFirst: boolean): void {
         this.context.save();
 
         if (this.settingIsEraser) {
@@ -227,7 +231,9 @@ export class PixelBrush {
                 this.context.globalCompositeOperation = 'destination-out';
             }
         } else {
-            this.context.fillStyle = this.settingUseDither ? this.ditherPattern : this.settingColorStr;
+            this.context.fillStyle = this.settingUseDither
+                ? this.ditherPattern
+                : this.settingColorStr;
             if (this.settingLockLayerAlpha) {
                 this.context.globalCompositeOperation = 'source-atop';
             }
@@ -268,17 +274,15 @@ export class PixelBrush {
         this.context.restore();
     }
 
-
-
-    // ---- public ----
-    constructor () {
+    // ----------------------------------- public -----------------------------------
+    constructor() {
         this.ditherCanvas = BB.canvas(4, 4);
         this.ditherCtx = BB.ctx(this.ditherCanvas);
     }
 
     // ---- interface ----
 
-    startLine (x: number, y: number, p: number): void {
+    startLine(x: number, y: number, p: number): void {
         this.historyEntry = {
             tool: ['brush', 'PixelBrush'],
             actions: [
@@ -326,8 +330,12 @@ export class PixelBrush {
         }
 
         p = Math.max(0, Math.min(1, p));
-        const localOpacity = this.settingHasOpacityPressure ? (this.settingOpacity * p * p) : this.settingOpacity;
-        const localSize = this.settingHasSizePressure ? Math.max(0.5, p * this.settingSize) : Math.max(0.5, this.settingSize);
+        const localOpacity = this.settingHasOpacityPressure
+            ? this.settingOpacity * p * p
+            : this.settingOpacity;
+        const localSize = this.settingHasSizePressure
+            ? Math.max(0.5, p * this.settingSize)
+            : Math.max(0.5, this.settingSize);
 
         this.inputIsDrawing = true;
         this.drawDot(x, y, localSize, localOpacity);
@@ -343,7 +351,7 @@ export class PixelBrush {
         });
     }
 
-    goLine (x: number, y: number, p: number): void {
+    goLine(x: number, y: number, p: number): void {
         if (!this.inputIsDrawing) {
             return;
         }
@@ -356,7 +364,9 @@ export class PixelBrush {
         //drawDot(x, y, 1, 0.5);
 
         const pressure = BB.clamp(p, 0, 1);
-        const localSize = this.settingHasSizePressure ? Math.max(0.1, this.lastInput.pressure * this.settingSize) : Math.max(0.1, this.settingSize);
+        const localSize = this.settingHasSizePressure
+            ? Math.max(0.1, this.lastInput.pressure * this.settingSize)
+            : Math.max(0.1, this.settingSize);
 
         this.continueLine(x, y, localSize, this.lastInput.pressure);
 
@@ -366,9 +376,10 @@ export class PixelBrush {
         this.lastInput.pressure = pressure;
     }
 
-    endLine (x: number, y: number): void {
-
-        const localSize = this.settingHasSizePressure ? Math.max(0.1, this.lastInput.pressure * this.settingSize) : Math.max(0.1, this.settingSize);
+    endLine(x: number, y: number): void {
+        const localSize = this.settingHasSizePressure
+            ? Math.max(0.1, this.lastInput.pressure * this.settingSize)
+            : Math.max(0.1, this.settingSize);
         this.continueLine(null, null, localSize, this.lastInput.pressure);
 
         //debug
@@ -384,13 +395,13 @@ export class PixelBrush {
                 action: 'endLine',
                 params: [x, y],
             });
-            this.history.push(this.historyEntry);
+            this.history?.push(this.historyEntry);
             this.historyEntry = undefined;
         }
     }
 
     //cheap n' ugly
-    drawLineSegment (x1: number, y1: number, x2: number, y2: number): void {
+    drawLineSegment(x1: number, y1: number, x2: number, y2: number): void {
         this.lastInput.x = x2;
         this.lastInput.y = y2;
         this.lastInput.pressure = 1;
@@ -414,7 +425,12 @@ export class PixelBrush {
             const bdist = this.settingSize * this.settingSpacing;
             this.lineToolLastDot = this.settingSize * this.settingSpacing;
             for (loopDist = this.lineToolLastDot; loopDist <= mouseDist; loopDist += bdist) {
-                this.drawDot(x1 + eX * loopDist, y1 + eY * loopDist, this.settingSize, this.settingOpacity);
+                this.drawDot(
+                    x1 + eX * loopDist,
+                    y1 + eY * loopDist,
+                    this.settingSize,
+                    this.settingOpacity,
+                );
             }
         }
 
@@ -463,85 +479,92 @@ export class PixelBrush {
                 },
             ],
         };
-        this.history.push(historyEntry);
+        this.history?.push(historyEntry);
     }
 
     //IS
-    isDrawing (): boolean {
+    isDrawing(): boolean {
         return this.inputIsDrawing;
     }
 
     //SET
-    setColor (c: IRGB): void {
+    setColor(c: IRGB): void {
         if (this.settingColor === c) {
             return;
         }
         this.settingColor = c;
-        this.settingColorStr = 'rgb(' + this.settingColor.r + ',' + this.settingColor.g + ',' + this.settingColor.b + ')';
+        this.settingColorStr =
+            'rgb(' +
+            this.settingColor.r +
+            ',' +
+            this.settingColor.g +
+            ',' +
+            this.settingColor.b +
+            ')';
     }
 
-    setContext (c: CanvasRenderingContext2D): void {
+    setContext(c: CanvasRenderingContext2D): void {
         this.context = c;
     }
 
-    setHistory (l: KlHistoryInterface): void {
+    setHistory(l: KlHistory): void {
         this.history = l;
     }
 
-    setSize (s: number): void {
+    setSize(s: number): void {
         this.settingSize = Math.round(s * 2) / 2;
     }
 
-    setOpacity (o: number): void {
+    setOpacity(o: number): void {
         this.settingOpacity = o;
     }
 
-    setSpacing (s: number): void {
+    setSpacing(s: number): void {
         this.settingSpacing = s;
     }
 
-    sizePressure (b: boolean): void {
+    sizePressure(b: boolean): void {
         this.settingHasSizePressure = b;
     }
 
-    opacityPressure (b: boolean): void {
+    opacityPressure(b: boolean): void {
         this.settingHasOpacityPressure = b;
     }
 
-    setLockAlpha (b: boolean): void {
+    setLockAlpha(b: boolean): void {
         this.settingLockLayerAlpha = b;
     }
 
-    setIsEraser (b: boolean): void {
+    setIsEraser(b: boolean): void {
         this.settingIsEraser = b;
     }
 
-    setUseDither (b: boolean): void {
+    setUseDither(b: boolean): void {
         this.settingUseDither = b;
     }
 
     //GET
-    getSpacing (): number {
+    getSpacing(): number {
         return this.settingSpacing;
     }
 
-    getSize (): number {
+    getSize(): number {
         return this.settingSize;
     }
 
-    getOpacity (): number {
+    getOpacity(): number {
         return this.settingOpacity;
     }
 
-    getLockAlpha (): boolean {
+    getLockAlpha(): boolean {
         return this.settingLockLayerAlpha;
     }
 
-    getIsEraser (): boolean {
+    getIsEraser(): boolean {
         return this.settingIsEraser;
     }
 
-    getUseDither (): boolean {
+    getUseDither(): boolean {
         return this.settingUseDither;
     }
 }

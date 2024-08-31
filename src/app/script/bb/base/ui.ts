@@ -1,9 +1,8 @@
-import {css} from './base';
-import {BB} from '../bb';
-import {IKeyStringOptional} from '../bb-types';
+import { css } from './base';
+import { BB } from '../bb';
+import { IKeyStringOptional } from '../bb-types';
 
-
-export function appendTextDiv (target: HTMLElement, text: string): HTMLDivElement {
+export function appendTextDiv(target: HTMLElement, text: string): HTMLDivElement {
     const div = document.createElement('div');
     div.innerHTML = text;
     target.append(div);
@@ -16,8 +15,10 @@ export function appendTextDiv (target: HTMLElement, text: string): HTMLDivElemen
  *
  * @param getAll - check all, even those with "data-ignore-focus" = "true"
  */
-export function isInputFocused (getAll: boolean = false): boolean {
-    const result: boolean = !!document.activeElement && ['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement.tagName);
+export function isInputFocused(getAll: boolean = false): boolean {
+    const result: boolean =
+        !!document.activeElement &&
+        ['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement.tagName);
     if (getAll) {
         return result;
     } else {
@@ -25,7 +26,7 @@ export function isInputFocused (getAll: boolean = false): boolean {
     }
 }
 
-export function unfocusAnyInput (): void {
+export function unfocusAnyInput(): void {
     if (isInputFocused(true)) {
         /*
             Unfocus anything that is focused.
@@ -56,7 +57,7 @@ export function unfocusAnyInput (): void {
 /**
  * clears text selection in window
  */
-export function clearSelection (): void {
+export function clearSelection(): void {
     if (window.getSelection) {
         const sel = window.getSelection();
         if (sel) {
@@ -75,16 +76,15 @@ export function clearSelection (): void {
  *
  * @param el - dom element
  */
-export const makeUnfocusable = (function (): ((el: HTMLElement) => void) {
-
-    function preventFocus (event: FocusEvent): void {
+export const makeUnfocusable = (function (): (el: HTMLElement) => void {
+    function preventFocus(event: FocusEvent): void {
         event.preventDefault();
         let didFocusRelated = false;
         if (event.relatedTarget) {
             try {
                 (event.relatedTarget as HTMLElement).focus();
                 didFocusRelated = true;
-            } catch(e) {
+            } catch (e) {
                 console.error('failed to focus');
             }
         }
@@ -98,7 +98,6 @@ export const makeUnfocusable = (function (): ((el: HTMLElement) => void) {
         el.addEventListener('focus', preventFocus);
     };
 })();
-
 
 const els: {
     el: HTMLElement;
@@ -125,22 +124,20 @@ const els: {
  *
  * @param params
  */
-export function el <GTag extends keyof HTMLElementTagNameMap = 'div'> (
-    params?: {
-        parent?: HTMLElement;
-        css?: IKeyStringOptional;
-        custom?: { [key: string]: string };
-        content?: string | (HTMLElement | string | undefined)[] | Element;
-        textContent?: string;
-        className?: string;
-        title?: string;
-        id?: string;
-        tagName?: GTag;
-        onClick?: (e: Event) => void;
-        onChange?: (e: Event) => void;
-        noRef?: boolean; // don't keep references of listeners
-    }
-) {
+export function el<GTag extends keyof HTMLElementTagNameMap = 'div'>(params?: {
+    parent?: HTMLElement;
+    css?: IKeyStringOptional;
+    custom?: { [key: string]: string };
+    content?: string | (HTMLElement | string | undefined)[] | Element;
+    textContent?: string;
+    className?: string;
+    title?: string;
+    id?: string;
+    tagName?: GTag;
+    onClick?: (e: Event) => void;
+    onChange?: (e: Event) => void;
+    noRef?: boolean; // don't keep references of listeners
+}) {
     if (!params) {
         return document.createElement('div') as HTMLElementTagNameMap[GTag];
     }
@@ -150,13 +147,10 @@ export function el <GTag extends keyof HTMLElementTagNameMap = 'div'> (
     if (params.content) {
         if (typeof params.content === typeof 'aa') {
             result.innerHTML = params.content as string;
-
         } else if (Array.isArray(params.content)) {
             BB.append(result, params.content);
-
         } else {
             result.append(params.content as HTMLElement);
-
         }
     }
     if (params.textContent) {
@@ -204,14 +198,14 @@ export function el <GTag extends keyof HTMLElementTagNameMap = 'div'> (
  * removes event listeners for Elements created via el()
  * @param el
  */
-export function destroyEl (el?: HTMLElement): void {
+export function destroyEl(el?: HTMLElement): void {
     if (!el) {
         return;
     }
     for (let i = 0; i < els.length; i++) {
         const item = els[i];
         if (item.el === el) {
-            item.listeners.forEach(item => {
+            item.listeners.forEach((item) => {
                 el.removeEventListener(item[0], item[1]);
             });
             els.splice(i, 1);

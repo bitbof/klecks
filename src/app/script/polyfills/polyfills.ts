@@ -34,19 +34,25 @@ if (!('scrollBy' in Element.prototype)) {
 if (!Array.prototype.flat) {
     Object.defineProperty(Array.prototype, 'flat', {
         configurable: true,
-        value: function flat (...args: any[]) {
+        value: function flat(...args: any[]) {
             const depth = isNaN(args[0]) ? 1 : Number(args[0]);
 
-            return depth ? Array.prototype.reduce.call(this, function (acc: any, cur) {
-                if (Array.isArray(cur)) {
-                    // eslint-disable-next-line prefer-spread
-                    acc.push.apply(acc, flat.call(cur, depth - 1));
-                } else {
-                    acc.push(cur);
-                }
+            return depth
+                ? Array.prototype.reduce.call(
+                      this,
+                      function (acc: any, cur) {
+                          if (Array.isArray(cur)) {
+                              // eslint-disable-next-line prefer-spread
+                              acc.push.apply(acc, flat.call(cur, depth - 1));
+                          } else {
+                              acc.push(cur);
+                          }
 
-                return acc;
-            }, []) : Array.prototype.slice.call(this);
+                          return acc;
+                      },
+                      [],
+                  )
+                : Array.prototype.slice.call(this);
         },
         writable: true,
     });
@@ -61,6 +67,20 @@ if (!String.prototype.replaceAll) {
                 throw new Error('replaceAll polyfill does not support replaceValue: function');
             }
             return this.replace(new RegExp(searchValue, 'g'), replaceValue);
+        },
+    });
+}
+
+// Chrome 92, Firefox 90, Safari 15.4
+if (!('at' in Array.prototype)) {
+    Object.defineProperty(Array.prototype, 'at', {
+        value: function (index: number) {
+            if (index > 0) {
+                return this[index];
+            }
+            if (index < 0) {
+                return this[index + this.length];
+            }
         },
     });
 }
@@ -88,7 +108,7 @@ if (!String.prototype.replaceAll) {
 */
 if (!Object.fromEntries) {
     Object.defineProperty(Object, 'fromEntries', {
-        value (entries: any) {
+        value(entries: any) {
             if (!entries || !entries[Symbol.iterator]) {
                 throw new Error('Object.fromEntries() requires a single iterable argument');
             }

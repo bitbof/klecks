@@ -1,16 +1,17 @@
-import {TFxCanvas, TWrappedTexture} from '../../../fx-canvas/fx-canvas-types';
-import {TProjectViewportLayerFunc, TViewportTransformXY} from './project-viewport';
-import {BB} from '../../../bb/bb';
-import {getSharedFx} from '../../../fx-canvas/shared-fx';
-import {throwIfNull} from '../../../bb/base/base';
-import {IRect} from '../../../bb/bb-types';
-import {compose, translate, applyToPoint, inverse, scale} from 'transformation-matrix';
-import {createTransformMatrix} from './utils/create-transform-matrix';
+import { TFxCanvas, TWrappedTexture } from '../../../fx-canvas/fx-canvas-types';
+import { TProjectViewportLayerFunc, TViewportTransformXY } from './project-viewport';
+import { BB } from '../../../bb/bb';
+import { getSharedFx } from '../../../fx-canvas/shared-fx';
+import { throwIfNull } from '../../../bb/base/base';
+import { IRect } from '../../../bb/bb-types';
+import { compose, translate, applyToPoint, inverse, scale } from 'transformation-matrix';
+import { createMatrixFromTransform } from '../../../bb/transform/create-matrix-from-transform';
+import { matrixToTuple } from '../../../bb/math/matrix-to-tuple';
 
 type TPostMix = {
     opacity: number;
     operation: GlobalCompositeOperation;
-}
+};
 
 export type TFxPreviewRendererParams = {
     original: Exclude<CanvasImageSource, VideoFrame | HTMLOrSVGImageElement> | HTMLImageElement;
@@ -38,25 +39,27 @@ export class FxPreviewRenderer {
     private fxCanvas: TFxCanvas;
     private postMix: TPostMix | undefined;
 
-
-    // --- public ---
-    constructor (p: TFxPreviewRendererParams) {
+    // ----------------------------------- public -----------------------------------
+    constructor(p: TFxPreviewRendererParams) {
         this.original = p.original;
         this.onUpdate = p.onUpdate;
-        this.textureSource = BB.canvas(1,1);
+        this.textureSource = BB.canvas(1, 1);
         this.ctx = BB.ctx(this.textureSource);
         this.fxCanvas = throwIfNull(getSharedFx());
         this.postMix = p.postMix;
     }
 
     render: TProjectViewportLayerFunc = (viewportTransform, viewportWidth, viewportHeight) => {
-        const viewportMat = createTransformMatrix(viewportTransform);
+        const viewportMat = createMatrixFromTransform(viewportTransform);
         const padding = 0; // render more than visible with padding < 0
 
         let clippedViewportRect: IRect; // rect in viewport coordinates which contains the canvas
         {
-            const topLeft = applyToPoint(viewportMat, {x: 0, y: 0});
-            const bottomRight = applyToPoint(viewportMat, {x: this.original.width, y: this.original.height});
+            const topLeft = applyToPoint(viewportMat, { x: 0, y: 0 });
+            const bottomRight = applyToPoint(viewportMat, {
+                x: this.original.width,
+                y: this.original.height,
+            });
             bottomRight.x = Math.round(bottomRight.x);
             bottomRight.y = Math.round(bottomRight.y);
             const clippedTL = {
@@ -64,8 +67,8 @@ export class FxPreviewRenderer {
                 y: Math.max(padding, topLeft.y),
             };
             const clippedBR = {
-                x: Math.min(viewportWidth - padding, (bottomRight.x)),
-                y: Math.min(viewportHeight - padding, (bottomRight.y)),
+                x: Math.min(viewportWidth - padding, bottomRight.x),
+                y: Math.min(viewportHeight - padding, bottomRight.y),
             };
             clippedViewportRect = {
                 x: clippedTL.x,
@@ -102,10 +105,9 @@ export class FxPreviewRenderer {
         let tlOffsetX = 0;
         let tlOffsetY = 0;
 
-
         if (viewportTransform.scaleX > 1) {
             // what pixels of original canvas are actually visible
-            const canvasTopLeft = applyToPoint(resultTransform, {x: 0, y: 0});
+            const canvasTopLeft = applyToPoint(resultTransform, { x: 0, y: 0 });
             tlOffsetX = -canvasTopLeft.x;
             tlOffsetY = -canvasTopLeft.y;
             canvasTopLeft.x = Math.max(0, Math.floor(canvasTopLeft.x));
@@ -113,10 +115,12 @@ export class FxPreviewRenderer {
             tlOffsetX += canvasTopLeft.x;
             tlOffsetY += canvasTopLeft.y;
 
-            const canvasBottomRight = applyToPoint(resultTransform, {x: clippedViewportRect.width, y: clippedViewportRect.height});
+            const canvasBottomRight = applyToPoint(resultTransform, {
+                x: clippedViewportRect.width,
+                y: clippedViewportRect.height,
+            });
             canvasBottomRight.x = Math.min(this.original.width, Math.ceil(canvasBottomRight.x));
             canvasBottomRight.y = Math.min(this.original.height, Math.ceil(canvasBottomRight.y));
-
 
             const cw = canvasBottomRight.x - canvasTopLeft.x;
             const ch = canvasBottomRight.y - canvasTopLeft.y;
@@ -138,8 +142,11 @@ export class FxPreviewRenderer {
             );
         }
 
-
-        if (!this.texture || JSON.stringify(onUpdateProps) !== JSON.stringify(this.oldOnUpdateProps) || this.postMix) {
+        if (
+            !this.texture ||
+            JSON.stringify(onUpdateProps) !== JSON.stringify(this.oldOnUpdateProps) ||
+            this.postMix
+        ) {
             // update texture
             this.textureSource.width = onUpdateProps.textureWidth;
             this.textureSource.height = onUpdateProps.textureHeight;
@@ -148,9 +155,11 @@ export class FxPreviewRenderer {
             this.ctx.save();
             this.ctx.imageSmoothingEnabled = false;
             if (viewportTransform.scaleX > 1) {
-                this.ctx.setTransform(createTransformMatrix(onUpdateProps.transform));
+                this.ctx.setTransform(
+                    ...matrixToTuple(createMatrixFromTransform(onUpdateProps.transform)),
+                );
             } else {
-                this.ctx.setTransform(inverse(resultTransform));
+                this.ctx.setTransform(...matrixToTuple(inverse(resultTransform)));
             }
             this.ctx.drawImage(this.original, 0, 0);
             this.ctx.restore();
@@ -164,7 +173,10 @@ export class FxPreviewRenderer {
             });
             document.body.append(this.canvas);*/
 
-            if (!this.texture || JSON.stringify(onUpdateProps) !== JSON.stringify(this.oldOnUpdateProps)) {
+            if (
+                !this.texture ||
+                JSON.stringify(onUpdateProps) !== JSON.stringify(this.oldOnUpdateProps)
+            ) {
                 this.texture && this.texture.destroy();
                 this.texture = this.fxCanvas.texture(this.textureSource);
             }
@@ -178,7 +190,7 @@ export class FxPreviewRenderer {
 
         const resultFx = this.onUpdate(
             this.fxCanvas.draw(this.texture),
-            onUpdateProps.transform
+            onUpdateProps.transform,
         ).update();
 
         if (this.postMix) {
@@ -199,11 +211,11 @@ export class FxPreviewRenderer {
         };
     };
 
-    setPostMix (postMix: TPostMix): void {
+    setPostMix(postMix: TPostMix): void {
         this.postMix = postMix;
     }
 
-    destroy (): void {
+    destroy(): void {
         BB.freeCanvas(this.textureSource);
         if (this.texture) {
             this.texture = this.fxCanvas.texture(this.textureSource);
@@ -212,5 +224,3 @@ export class FxPreviewRenderer {
         }
     }
 }
-
-

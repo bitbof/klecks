@@ -1,16 +1,13 @@
-import {BB} from '../../../../bb/bb';
-import {TRenderTextParam} from '../../../image-operations/render-text';
-import {IRGB, IRGBA} from '../../../kl-types';
-import {ColorOptions} from '../../components/color-options';
-import {KlSlider} from '../../components/kl-slider';
-import {LANG} from '../../../../language/language';
-import {c} from '../../../../bb/base/c';
-import {createSvg} from '../../../../bb/base/base';
+import { BB } from '../../../../bb/bb';
+import { TRenderTextParam } from '../../../image-operations/render-text';
+import { IRGB, IRGBA } from '../../../kl-types';
+import { ColorOptions } from '../../components/color-options';
+import { KlSlider } from '../../components/kl-slider';
+import { LANG } from '../../../../language/language';
+import { c } from '../../../../bb/base/c';
+import { createSvg } from '../../../../bb/base/base';
 
-type TStrokeParams = Pick<
-    TRenderTextParam,
-    'stroke'
->;
+type TStrokeParams = Pick<TRenderTextParam, 'stroke'>;
 
 export type TStrokeUIParams = TStrokeParams & {
     primaryColor: IRGB;
@@ -25,13 +22,8 @@ export class TextToolStrokeUI {
     private readonly opacitySlider: KlSlider;
     private readonly lineWidthSlider: KlSlider;
 
-
-
-    // ---- public ----
-    constructor (p: TStrokeUIParams) {
-
-
-
+    // ----------------------------------- public -----------------------------------
+    constructor(p: TStrokeUIParams) {
         this.rootEl = BB.el({
             css: {
                 boxShadow: '0 0 0 1px #aaa',
@@ -44,10 +36,12 @@ export class TextToolStrokeUI {
 
         const colorOptionsArr: (IRGBA | null)[] = [
             null,
-            p.stroke ? {
-                ...p.stroke.color,
-                a: 1,
-            } : null,
+            p.stroke
+                ? {
+                      ...p.stroke.color,
+                      a: 1,
+                  }
+                : null,
             {
                 ...p.secondaryColor,
                 a: 1,
@@ -56,8 +50,8 @@ export class TextToolStrokeUI {
                 ...p.primaryColor,
                 a: 1,
             },
-            {r: 255, g: 255, b: 255, a: 1},
-            {r: 0, g: 0, b: 0, a: 1},
+            { r: 255, g: 255, b: 255, a: 1 },
+            { r: 0, g: 0, b: 0, a: 1 },
         ];
 
         this.colorOptions = new ColorOptions({
@@ -128,11 +122,11 @@ export class TextToolStrokeUI {
         ]);
     }
 
-    getElement (): HTMLElement {
+    getElement(): HTMLElement {
         return this.rootEl;
     }
 
-    getValues (): TStrokeParams {
+    getValues(): TStrokeParams {
         const c = this.colorOptions.getValue();
         if (c === null || c?.a === 0) {
             return {
@@ -151,7 +145,7 @@ export class TextToolStrokeUI {
         };
     }
 
-    destroy (): void {
+    destroy(): void {
         this.colorOptions.destroy();
         this.opacitySlider.destroy();
         this.lineWidthSlider.destroy();

@@ -1,26 +1,23 @@
-import {BB} from '../../../bb/bb';
-import {KlColorSliderSmall} from './kl-color-slider-small';
-import {KlSlider} from './kl-slider';
-import {BrushSettingService, TBrushSettingEmit} from '../../brushes-ui/brush-setting-service';
-import {LANG} from '../../../language/language';
-import {IRGB} from '../../kl-types';
-import {IVector2D} from '../../../bb/bb-types';
+import { BB } from '../../../bb/bb';
+import { KlColorSliderSmall } from './kl-color-slider-small';
+import { KlSlider } from './kl-slider';
+import { BrushSettingService, TBrushSettingEmit } from '../../brushes-ui/brush-setting-service';
+import { LANG } from '../../../language/language';
+import { IRGB } from '../../kl-types';
+import { IVector2D } from '../../../bb/bb-types';
 
 /**
  * Compressed HUD toolspace. When you hold ctrl+alt.
  * small color picker, brush settings
  */
 export class OverlayToolspace {
-
     private readonly rootEl: HTMLElement;
 
-    // ---- public ----
-    constructor (
-        p: {
-            brushSettingService: BrushSettingService; // to sync with outside
-            enabledTest: () => boolean; // calls to see if it's allowed to show
-        }
-    ) {
+    // ----------------------------------- public -----------------------------------
+    constructor(p: {
+        brushSettingService: BrushSettingService; // to sync with outside
+        enabledTest: () => boolean; // calls to see if it's allowed to show
+    }) {
         const sizeObj = {
             width: 150,
             svHeight: 90,
@@ -42,7 +39,6 @@ export class OverlayToolspace {
             opacity: null,
         };
 
-
         // --- inputs ---
 
         //color selection
@@ -56,7 +52,8 @@ export class OverlayToolspace {
             heightH: sizeObj.hHeight,
             color: p.brushSettingService.getColor(),
             callback: (rgbObj: IRGB) => {
-                selectedColorEl.style.backgroundColor = 'rgb(' + rgbObj.r + ',' + rgbObj.g + ',' + rgbObj.b + ')';
+                selectedColorEl.style.backgroundColor =
+                    'rgb(' + rgbObj.r + ',' + rgbObj.g + ',' + rgbObj.b + ')';
                 p.brushSettingService.setColor(rgbObj, subscriptionFunc);
             },
         });
@@ -69,18 +66,17 @@ export class OverlayToolspace {
         });
         {
             const initialColor = p.brushSettingService.getColor();
-            selectedColorEl.style.backgroundColor = 'rgb(' + initialColor.r + ',' + initialColor.g + ',' + initialColor.b + ')';
+            selectedColorEl.style.backgroundColor =
+                'rgb(' + initialColor.r + ',' + initialColor.g + ',' + initialColor.b + ')';
         }
 
         colorEl.append(selectedColorEl, colorSlider.getElement());
 
-
         const updateColor = (rgbObj: IRGB) => {
             colorSlider.setColor(rgbObj);
-            selectedColorEl.style.backgroundColor = 'rgb(' + rgbObj.r + ',' + rgbObj.g + ',' + rgbObj.b + ')';
+            selectedColorEl.style.backgroundColor =
+                'rgb(' + rgbObj.r + ',' + rgbObj.g + ',' + rgbObj.b + ')';
         };
-
-
 
         //brushsize slider
 
@@ -130,8 +126,6 @@ export class OverlayToolspace {
         });
         this.rootEl.append(sizeSlider.getElement(), opacitySlider.getElement());
 
-
-
         // --- general setup ---
 
         const subscriptionFunc = (event: TBrushSettingEmit) => {
@@ -171,26 +165,32 @@ export class OverlayToolspace {
         }
 
         const updateUI = () => {
-
             // unfocus manual slider input
             BB.unfocusAnyInput();
 
             this.rootEl.style.display = isVisible ? 'block' : 'none';
             if (isVisible && mousePos) {
                 BB.css(this.rootEl, {
-                    left: (mousePos.x - Math.round(sizeObj.width / 2)) + 'px',
-                    top: (mousePos.y - Math.round(sizeObj.svHeight + sizeObj.hHeight * 3 / 2)) + 'px',
+                    left: mousePos.x - Math.round(sizeObj.width / 2) + 'px',
+                    top:
+                        mousePos.y -
+                        Math.round(sizeObj.svHeight + (sizeObj.hHeight * 3) / 2) +
+                        'px',
                 });
             }
         };
 
         let mousePos: IVector2D | null = null;
-        document.addEventListener('pointermove', (event) => {
-            mousePos = {
-                x: event.pageX,
-                y: event.pageY,
-            };
-        });
+        document.addEventListener(
+            'pointermove',
+            (event) => {
+                mousePos = {
+                    x: event.pageX,
+                    y: event.pageY,
+                };
+            },
+            { passive: false },
+        );
 
         const keyListener = new BB.KeyListener({
             onDown: (keyStr, event, comboStr, isRepeat) => {
@@ -226,10 +226,12 @@ export class OverlayToolspace {
 
                     updateUI();
                 }
-
             },
             onUp: (keyStr, event, oldComboStr) => {
-                if (['ctrl+alt', 'cmd+alt', 'alt+ctrl', 'alt+cmd'].includes(oldComboStr) && isVisible) {
+                if (
+                    ['ctrl+alt', 'cmd+alt', 'alt+ctrl', 'alt+cmd'].includes(oldComboStr) &&
+                    isVisible
+                ) {
                     isVisible = false;
                     colorSlider.end();
                     updateUI();
@@ -246,7 +248,7 @@ export class OverlayToolspace {
     }
 
     // ---- interface ----
-    getElement (): HTMLElement {
+    getElement(): HTMLElement {
         return this.rootEl;
     }
 }

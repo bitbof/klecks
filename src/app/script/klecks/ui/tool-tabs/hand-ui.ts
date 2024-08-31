@@ -1,13 +1,12 @@
-import {BB} from '../../../bb/bb';
+import { BB } from '../../../bb/bb';
 import angleImg from '/src/app/img/ui/angle.svg';
 import rotateImg from '/src/app/img/ui/edit-rotate.svg';
-import {LANG} from '../../../language/language';
+import { LANG } from '../../../language/language';
 
 /**
  * Ui, when hand tool tab is open.
  */
 export class HandUi {
-
     private readonly rootEl: HTMLElement;
     private readonly onAngleChange: (angleDeg: number, isRelative?: boolean) => void;
     private isVisible: boolean = true;
@@ -17,31 +16,28 @@ export class HandUi {
     private readonly angleEl: HTMLElement;
     private readonly angleIm: HTMLImageElement;
 
-
-    private updateUi (): void {
+    private updateUi(): void {
         this.scaleEl.innerHTML = Math.round(this.scale * 100) + '%';
-        this.angleEl.innerHTML =  Math.round(this.angleDeg) + '°';
+        this.angleEl.innerHTML = Math.round(this.angleDeg) + '°';
 
         this.angleIm.style.transform = 'rotate(' + this.angleDeg + 'deg)';
         if (this.angleDeg % 90 === 0) {
-            this.angleIm.style.boxShadow = 'inset 0 0 0 1px rgba(255,255,255, 1), 0 0 0 1px rgba(0, 0, 0, 0.3)';
+            this.angleIm.style.boxShadow =
+                'inset 0 0 0 1px rgba(255,255,255, 1), 0 0 0 1px rgba(0, 0, 0, 0.3)';
         } else {
             this.angleIm.style.boxShadow = '';
         }
     }
 
+    // ----------------------------------- public -----------------------------------
 
-    // ---- public ----
-
-    constructor (
-        p: {
-            scale: number; // initial value
-            angleDeg: number; // initial value
-            onReset: () => void;
-            onFit: () => void;
-            onAngleChange: (angleDeg: number, isRelative?: boolean) => void;
-        }
-    ) {
+    constructor(p: {
+        scale: number; // initial value
+        angleDeg: number; // initial value
+        onReset: () => void;
+        onFit: () => void;
+        onAngleChange: (angleDeg: number, isRelative?: boolean) => void;
+    }) {
         this.rootEl = BB.el({
             css: {
                 margin: '10px',
@@ -69,7 +65,6 @@ export class HandUi {
             },
         });
         this.rootEl.append(row1, row2, row3);
-
 
         this.scaleEl = BB.el({
             css: {
@@ -101,7 +96,6 @@ export class HandUi {
 
         this.updateUi();
 
-
         const resetButton = BB.el({
             tagName: 'button',
             content: LANG('hand-reset'),
@@ -122,7 +116,10 @@ export class HandUi {
 
         const leftRotateButton = BB.el({
             tagName: 'button',
-            content: '<img height="20" src="' + rotateImg + '" alt="Rotate" style="transform: scale(-1, 1)"/>',
+            content:
+                '<img height="20" src="' +
+                rotateImg +
+                '" alt="Rotate" style="transform: scale(-1, 1)"/>',
             onClick: function () {
                 p.onAngleChange(-15, true);
             },
@@ -153,14 +150,13 @@ export class HandUi {
         });
         BB.makeUnfocusable(rightRotateButton);
         row3.append(leftRotateButton, resetAngleButton, rightRotateButton);
-
     }
 
-    getElement (): HTMLElement {
+    getElement(): HTMLElement {
         return this.rootEl;
     }
 
-    setIsVisible (pIsVisible: boolean): void {
+    setIsVisible(pIsVisible: boolean): void {
         this.isVisible = !!pIsVisible;
         this.rootEl.style.display = this.isVisible ? 'block' : 'none';
         if (this.isVisible) {
@@ -168,7 +164,7 @@ export class HandUi {
         }
     }
 
-    update (pScale: number, pAngleDeg: number): void {
+    update(pScale: number, pAngleDeg: number): void {
         this.scale = pScale;
         this.angleDeg = pAngleDeg;
         if (this.isVisible) {

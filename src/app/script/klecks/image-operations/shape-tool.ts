@@ -1,5 +1,5 @@
-import {BB} from '../../bb/bb';
-import {IRGB, IShapeToolObject} from '../kl-types';
+import { BB } from '../../bb/bb';
+import { IRGB, IShapeToolObject } from '../kl-types';
 
 /**
  * Input processor for shape tool.
@@ -7,32 +7,43 @@ import {IRGB, IShapeToolObject} from '../kl-types';
  * angleRad is the angle of the canvas.
  */
 export class ShapeTool {
-
-    private readonly onShape: (isDone: boolean, x1: number, y1: number, x2: number, y2: number, angleRad: number) => void;
+    private readonly onShape: (
+        isDone: boolean,
+        x1: number,
+        y1: number,
+        x2: number,
+        y2: number,
+        angleRad: number,
+    ) => void;
     private downX: number = 0;
     private downY: number = 0;
     private downAngleRad: number = 0;
 
-    // ---- public ----
-    constructor (
-        p: {
-            onShape: (isDone: boolean, x1: number, y1: number, x2: number, y2: number, angleRad: number) => void;
-        }
-    ) {
+    // ----------------------------------- public -----------------------------------
+    constructor(p: {
+        onShape: (
+            isDone: boolean,
+            x1: number,
+            y1: number,
+            x2: number,
+            y2: number,
+            angleRad: number,
+        ) => void;
+    }) {
         this.onShape = p.onShape;
     }
 
-    onDown (x: number, y: number, angleRad: number): void {
+    onDown(x: number, y: number, angleRad: number): void {
         this.downX = x;
         this.downY = y;
         this.downAngleRad = angleRad;
     }
 
-    onMove (x: number, y: number): void {
+    onMove(x: number, y: number): void {
         this.onShape(false, this.downX, this.downY, x, y, this.downAngleRad);
     }
 
-    onUp (x: number, y: number): void {
+    onUp(x: number, y: number): void {
         this.onShape(true, this.downX, this.downY, x, y, this.downAngleRad);
     }
 }
@@ -40,10 +51,7 @@ export class ShapeTool {
 /**
  * Draw a shape (rectangle, ellipse, line)
  */
-export function drawShape (
-    ctx: CanvasRenderingContext2D,
-    shapeObj: IShapeToolObject,
-): void {
+export function drawShape(ctx: CanvasRenderingContext2D, shapeObj: IShapeToolObject): void {
     shapeObj = {
         // defaults
         angleRad: 0,
@@ -61,14 +69,21 @@ export function drawShape (
         }
 
         const lineWidth = shapeObj.lineWidth === undefined ? -1 : Math.round(shapeObj.lineWidth);
-        const angleDeg = shapeObj.angleRad * 180 / Math.PI;
+        const angleDeg = (shapeObj.angleRad * 180) / Math.PI;
 
         // --- prep color ---
-        if (!shapeObj.isEraser && shapeObj.fillRgb === undefined && shapeObj.strokeRgb === undefined) {
+        if (
+            !shapeObj.isEraser &&
+            shapeObj.fillRgb === undefined &&
+            shapeObj.strokeRgb === undefined
+        ) {
             throw new Error('fillRgb and strokeRgb undefined');
         }
-        const colorRGB: IRGB = shapeObj.isEraser ? {r: 255, g: 255, b: 255} : (shapeObj.fillRgb ? shapeObj.fillRgb : shapeObj.strokeRgb!);
-
+        const colorRGB: IRGB = shapeObj.isEraser
+            ? { r: 255, g: 255, b: 255 }
+            : shapeObj.fillRgb
+              ? shapeObj.fillRgb
+              : shapeObj.strokeRgb!;
 
         // --- prep canvas ---
         ctx.save();
@@ -96,20 +111,26 @@ export function drawShape (
 
         // --- angle snapping ---
         if (shapeObj.isAngleSnap) {
-            const r1 = BB.rotate(x1, y1, shapeObj.angleRad / Math.PI * 180);
-            const r2 = BB.rotate(x2, y2, shapeObj.angleRad / Math.PI * 180);
+            const r1 = BB.rotate(x1, y1, (shapeObj.angleRad / Math.PI) * 180);
+            const r2 = BB.rotate(x2, y2, (shapeObj.angleRad / Math.PI) * 180);
 
             const pAngleDeg = BB.pointsToAngleDeg(r1, r2) + 90;
             const pAngleDegSnapped = Math.round(pAngleDeg / 45) * 45;
-            const rotated = BB.rotateAround({x: x1, y: y1}, {x: x2, y: y2}, pAngleDegSnapped - pAngleDeg);
+            const rotated = BB.rotateAround(
+                { x: x1, y: y1 },
+                { x: x2, y: y2 },
+                pAngleDegSnapped - pAngleDeg,
+            );
             x2 = rotated.x;
             y2 = rotated.y;
 
             // needs to be perfect if p1->p2 aligns with canvas x- or y-axis
             if ((angleDeg + pAngleDegSnapped) % 90 === 0) {
-                if (Math.round((angleDeg - pAngleDegSnapped) / 90) % 2 === 0) { // up or down
+                if (Math.round((angleDeg - pAngleDegSnapped) / 90) % 2 === 0) {
+                    // up or down
                     x2 = x1;
-                } else { // left or right
+                } else {
+                    // left or right
                     y2 = y1;
                 }
             }
@@ -122,8 +143,8 @@ export function drawShape (
 
         // --- 1:1 ratio ---
         if (shapeObj.type !== 'line' && shapeObj.isFixedRatio) {
-            let r1 = BB.rotate(shapeObj.x1, shapeObj.y1, shapeObj.angleRad / Math.PI * 180);
-            let r2 = BB.rotate(shapeObj.x2, shapeObj.y2, shapeObj.angleRad / Math.PI * 180);
+            let r1 = BB.rotate(shapeObj.x1, shapeObj.y1, (shapeObj.angleRad / Math.PI) * 180);
+            let r2 = BB.rotate(shapeObj.x2, shapeObj.y2, (shapeObj.angleRad / Math.PI) * 180);
 
             const rx = r1.x;
             const ry = r1.y;
@@ -138,8 +159,8 @@ export function drawShape (
             r2.x = rx + rdX;
             r2.y = ry + rdY;
 
-            r1 = BB.rotate(r1.x, r1.y, -shapeObj.angleRad / Math.PI * 180);
-            r2 = BB.rotate(r2.x, r2.y, -shapeObj.angleRad / Math.PI * 180);
+            r1 = BB.rotate(r1.x, r1.y, (-shapeObj.angleRad / Math.PI) * 180);
+            r2 = BB.rotate(r2.x, r2.y, (-shapeObj.angleRad / Math.PI) * 180);
 
             x1 = r1.x;
             y1 = r1.y;
@@ -167,7 +188,8 @@ export function drawShape (
 
         let p1;
         let p2;
-        if (shapeObj.type === 'line') { // --- line ---
+        if (shapeObj.type === 'line') {
+            // --- line ---
 
             // rounded
             const x1r = Math.round(x1);
@@ -182,7 +204,6 @@ export function drawShape (
             const y2f = Math.floor(y2);
 
             if (lineWidth % 2 === 0) {
-
                 if (y1r === y2r) {
                     p1 = {
                         x: x1f,
@@ -223,7 +244,6 @@ export function drawShape (
                         y: y2,
                     };
                 }
-
             } else {
                 p1 = {
                     x: x1f,
@@ -257,15 +277,15 @@ export function drawShape (
                 }
             }
 
-            p1 = BB.rotate(p1.x, p1.y, shapeObj.angleRad / Math.PI * 180);
-            p2 = BB.rotate(p2.x, p2.y, shapeObj.angleRad / Math.PI * 180);
+            p1 = BB.rotate(p1.x, p1.y, (shapeObj.angleRad / Math.PI) * 180);
+            p2 = BB.rotate(p2.x, p2.y, (shapeObj.angleRad / Math.PI) * 180);
 
             ctx.beginPath();
             ctx.moveTo(p1.x, p1.y);
             ctx.lineTo(p2.x, p2.y);
             ctx.stroke();
-
-        } else if (shapeObj.type === 'rect') { // --- rect ---
+        } else if (shapeObj.type === 'rect') {
+            // --- rect ---
 
             // floored
             const x1f = Math.floor(x1);
@@ -298,7 +318,6 @@ export function drawShape (
                     };
                     p2.x = p1.x + p2.x;
                     p2.y = p1.y + p2.y;
-
                 } else {
                     if (lineWidth % 2 === 0) {
                         p1 = {
@@ -331,8 +350,8 @@ export function drawShape (
                 };
             }
 
-            p1 = BB.rotate(p1.x, p1.y, shapeObj.angleRad / Math.PI * 180);
-            p2 = BB.rotate(p2.x, p2.y, shapeObj.angleRad / Math.PI * 180);
+            p1 = BB.rotate(p1.x, p1.y, (shapeObj.angleRad / Math.PI) * 180);
+            p2 = BB.rotate(p2.x, p2.y, (shapeObj.angleRad / Math.PI) * 180);
             p2.x = p2.x - p1.x;
             p2.y = p2.y - p1.y;
 
@@ -341,17 +360,25 @@ export function drawShape (
             } else {
                 ctx.strokeRect(p1.x, p1.y, p2.x, p2.y);
             }
-
-        } else {  // --- circle ---
-            p1 = BB.rotate(x1, y1, shapeObj.angleRad / Math.PI * 180);
-            p2 = BB.rotate(x2, y2, shapeObj.angleRad / Math.PI * 180);
+        } else {
+            // --- circle ---
+            p1 = BB.rotate(x1, y1, (shapeObj.angleRad / Math.PI) * 180);
+            p2 = BB.rotate(x2, y2, (shapeObj.angleRad / Math.PI) * 180);
             x = p1.x;
             y = p1.y;
             dX = p2.x - p1.x;
             dY = p2.y - p1.y;
 
             ctx.beginPath();
-            ctx.ellipse(x + dX / 2, y + dY / 2, Math.abs(dX / 2), Math.abs(dY / 2), 0, 0, Math.PI * 2);
+            ctx.ellipse(
+                x + dX / 2,
+                y + dY / 2,
+                Math.abs(dX / 2),
+                Math.abs(dY / 2),
+                0,
+                0,
+                Math.PI * 2,
+            );
             if (shapeObj.fillRgb) {
                 ctx.fill();
             } else {
@@ -359,9 +386,7 @@ export function drawShape (
             }
         }
 
-
         ctx.restore();
-
     } else {
         throw new Error('unknown shape');
     }

@@ -1,60 +1,59 @@
-import {createCanvas} from '../../bb/base/create-canvas';
-import {BlendMode, Layer, Psd} from 'ag-psd/dist/psd';
-import {IKlProject, IKlPsd, TKlPsdError, TKlPsdLayer, TMixMode} from '../kl-types';
-import {LANG} from '../../language/language';
-import {MAX_LAYERS} from '../canvas/kl-canvas';
-import {BB} from '../../bb/bb';
-import {throwIfUndefined} from '../../bb/base/base';
+import { createCanvas } from '../../bb/base/create-canvas';
+import { BlendMode, Layer, Psd } from 'ag-psd/dist/psd';
+import { IKlProject, IKlPsd, TKlPsdError, TKlPsdLayer, TMixMode } from '../kl-types';
+import { LANG } from '../../language/language';
+import { MAX_LAYERS } from '../canvas/kl-canvas';
+import { BB } from '../../bb/bb';
+import { throwIfUndefined } from '../../bb/base/base';
 
 let kl2PsdMap: Record<TMixMode, BlendMode>;
 let psd2KlMap: Record<BlendMode, TMixMode>;
 
-function init (): void {
+function init(): void {
     if (kl2PsdMap) {
         return;
     }
     kl2PsdMap = {
         'source-over': 'normal',
 
-        'darken': 'darken',
-        'multiply': 'multiply',
+        darken: 'darken',
+        multiply: 'multiply',
         'color-burn': 'color burn',
 
-        'lighten': 'lighten',
-        'screen': 'screen',
+        lighten: 'lighten',
+        screen: 'screen',
         'color-dodge': 'color dodge',
 
-        'overlay': 'overlay',
+        overlay: 'overlay',
         'soft-light': 'soft light',
         'hard-light': 'hard light',
 
-        'difference': 'difference',
-        'exclusion': 'exclusion',
+        difference: 'difference',
+        exclusion: 'exclusion',
 
-        'hue': 'hue',
-        'saturation': 'saturation',
-        'color': 'color',
-        'luminosity': 'luminosity',
+        hue: 'hue',
+        saturation: 'saturation',
+        color: 'color',
+        luminosity: 'luminosity',
     };
-    psd2KlMap = Object.fromEntries(Object.entries(kl2PsdMap).map(a => a.reverse()));
+    psd2KlMap = Object.fromEntries(Object.entries(kl2PsdMap).map((a) => a.reverse()));
 }
 
-export function blendPsdToKl (str: BlendMode): TMixMode {
+export function blendPsdToKl(str: BlendMode): TMixMode {
     init();
     return psd2KlMap[str];
 }
 
-export function blendKlToPsd (str: TMixMode): BlendMode {
+export function blendKlToPsd(str: TMixMode): BlendMode {
     init();
     return kl2PsdMap[str];
 }
-
 
 /**
  * Converts ag-psd object into something that KlCanvas can represent
  * @param psdObj
  */
-export function readPsd (psdObj: Psd): IKlPsd {
+export function readPsd(psdObj: Psd): IKlPsd {
     if (!psdObj.canvas) {
         throw new Error('psdObj.canvas undefined');
     }
@@ -65,7 +64,7 @@ export function readPsd (psdObj: Psd): IKlPsd {
         height: psdObj.height,
     };
 
-    function addWarning (warningStr: TKlPsdError): void {
+    function addWarning(warningStr: TKlPsdError): void {
         if (!result.warningArr) {
             result.warningArr = [];
         }
@@ -75,7 +74,7 @@ export function readPsd (psdObj: Psd): IKlPsd {
         result.warningArr.push(warningStr);
     }
 
-    function getMixModeStr (blendMode: BlendMode): TMixMode {
+    function getMixModeStr(blendMode: BlendMode): TMixMode {
         let mixModeStr: TMixMode = blendPsdToKl(blendMode);
         if (!mixModeStr) {
             addWarning('blend-mode');
@@ -96,7 +95,7 @@ export function readPsd (psdObj: Psd): IKlPsd {
     // count resulting layers
     const maxLayers = MAX_LAYERS;
     let layerCount = 0;
-    function countWithinGroup (groupObj: Layer): number {
+    function countWithinGroup(groupObj: Layer): number {
         let result = 0;
         if (groupObj.blendMode) {
             const mixModeStr = blendPsdToKl(groupObj.blendMode);
@@ -129,7 +128,7 @@ export function readPsd (psdObj: Psd): IKlPsd {
 
     result.layers = [];
 
-    function prepareMask (maskCanvas: HTMLCanvasElement, defaultColor: number): void {
+    function prepareMask(maskCanvas: HTMLCanvasElement, defaultColor: number): void {
         const groupMaskCtx = BB.ctx(maskCanvas);
         const imData = groupMaskCtx.getImageData(0, 0, maskCanvas.width, maskCanvas.height);
         if (defaultColor === 0) {
@@ -144,8 +143,7 @@ export function readPsd (psdObj: Psd): IKlPsd {
         groupMaskCtx.putImageData(imData, 0, 0);
     }
 
-    function convertGroup (psdGroupObj: Layer): TKlPsdLayer[] {
-
+    function convertGroup(psdGroupObj: Layer): TKlPsdLayer[] {
         let resultArr: TKlPsdLayer[] = [];
         const groupIsVisible = !psdGroupObj.hidden;
         const groupOpacity = throwIfUndefined(psdGroupObj.opacity, 'groupOpacity is undefined');
@@ -174,7 +172,10 @@ export function readPsd (psdObj: Psd): IKlPsd {
                     continue;
                 }
 
-                const hasClipping = (item.children || item.canvas) && psdGroupObj.children[i + 1] && psdGroupObj.children[i + 1].clipping;
+                const hasClipping =
+                    (item.children || item.canvas) &&
+                    psdGroupObj.children[i + 1] &&
+                    psdGroupObj.children[i + 1].clipping;
                 if (hasClipping) {
                     addWarning('clipping');
                 }
@@ -192,7 +193,11 @@ export function readPsd (psdObj: Psd): IKlPsd {
                             const clippingCtx = BB.ctx(clippingCanvas);
                             clippingCtx.drawImage(innerItem.image, 0, 0);
 
-                            for (let f = i + 1; f < psdGroupObj.children.length && psdGroupObj.children[f].clipping; f++) {
+                            for (
+                                let f = i + 1;
+                                f < psdGroupObj.children.length && psdGroupObj.children[f].clipping;
+                                f++
+                            ) {
                                 const clippingItem = psdGroupObj.children[f];
                                 if (clippingItem.opacity === 0 || clippingItem.hidden) {
                                     continue;
@@ -212,20 +217,27 @@ export function readPsd (psdObj: Psd): IKlPsd {
                                 if (clippingItem.top === undefined) {
                                     throw new Error('clippingItem.top undefined');
                                 }
-                                clippingCtx.globalCompositeOperation = getMixModeStr(clippingItem.blendMode);
+                                clippingCtx.globalCompositeOperation = getMixModeStr(
+                                    clippingItem.blendMode,
+                                );
                                 clippingCtx.globalAlpha = clippingItem.opacity;
-                                clippingCtx.drawImage(clippingItem.canvas, clippingItem.left, clippingItem.top);
+                                clippingCtx.drawImage(
+                                    clippingItem.canvas,
+                                    clippingItem.left,
+                                    clippingItem.top,
+                                );
                             }
 
                             innerCtx.globalCompositeOperation = 'source-atop';
                             innerCtx.drawImage(clippingCanvas, 0, 0);
                         }
 
-
-
                         // group mask
                         if (psdGroupObj.mask) {
-                            innerCtx.globalCompositeOperation = psdGroupObj.mask.defaultColor === 0 ? 'destination-in' : 'destination-out';
+                            innerCtx.globalCompositeOperation =
+                                psdGroupObj.mask.defaultColor === 0
+                                    ? 'destination-in'
+                                    : 'destination-out';
                             if (psdGroupObj.mask.canvas === undefined) {
                                 throw new Error('psdGroupObj.mask.canvas undefined');
                             }
@@ -235,7 +247,11 @@ export function readPsd (psdObj: Psd): IKlPsd {
                             if (psdGroupObj.mask.top === undefined) {
                                 throw new Error('psdGroupObj.mask.top undefined');
                             }
-                            innerCtx.drawImage(psdGroupObj.mask.canvas, psdGroupObj.mask.left, psdGroupObj.mask.top);
+                            innerCtx.drawImage(
+                                psdGroupObj.mask.canvas,
+                                psdGroupObj.mask.left,
+                                psdGroupObj.mask.top,
+                            );
                         }
 
                         if (groupCanvas) {
@@ -245,7 +261,6 @@ export function readPsd (psdObj: Psd): IKlPsd {
                             groupCtx.globalCompositeOperation = innerItem.mixModeStr;
                             groupCtx.globalAlpha = innerItem.opacity;
                             groupCtx.drawImage(innerItem.image, 0, 0);
-
                         } else {
                             innerItem.opacity = innerItem.opacity * groupOpacity;
                             resultArr.push(innerItem);
@@ -257,7 +272,8 @@ export function readPsd (psdObj: Psd): IKlPsd {
 
                 const canvas = createCanvas(result.width, result.height);
                 const ctx = BB.ctx(canvas);
-                if (item.canvas) { // if a layer is empty it has no canvas
+                if (item.canvas) {
+                    // if a layer is empty it has no canvas
                     if (item.top === undefined) {
                         throw new Error('item.top undefined');
                     }
@@ -289,7 +305,8 @@ export function readPsd (psdObj: Psd): IKlPsd {
                     }
                     prepareMask(item.mask.canvas, item.mask.defaultColor);
 
-                    ctx.globalCompositeOperation = item.mask.defaultColor === 0 ? 'destination-in' : 'destination-out';
+                    ctx.globalCompositeOperation =
+                        item.mask.defaultColor === 0 ? 'destination-in' : 'destination-out';
                     ctx.drawImage(item.mask.canvas, item.mask.left, item.mask.top);
                 }
 
@@ -310,11 +327,18 @@ export function readPsd (psdObj: Psd): IKlPsd {
                     if (item.canvas === undefined) {
                         throw new Error('item.canvas undefined');
                     }
-                    const clippingCanvas = createCanvas(item.right - item.left, item.bottom - item.top);
+                    const clippingCanvas = createCanvas(
+                        item.right - item.left,
+                        item.bottom - item.top,
+                    );
                     const clippingCtx = BB.ctx(clippingCanvas);
                     clippingCtx.drawImage(item.canvas, 0, 0);
 
-                    for (let e = i + 1; e < psdGroupObj.children.length && psdGroupObj.children[e].clipping; e++) {
+                    for (
+                        let e = i + 1;
+                        e < psdGroupObj.children.length && psdGroupObj.children[e].clipping;
+                        e++
+                    ) {
                         const clippingItem = psdGroupObj.children[e];
                         if (clippingItem.opacity === 0 || clippingItem.hidden) {
                             continue;
@@ -334,9 +358,15 @@ export function readPsd (psdObj: Psd): IKlPsd {
                         if (clippingItem.top === undefined) {
                             throw new Error('clippingItem.top undefined');
                         }
-                        clippingCtx.globalCompositeOperation = getMixModeStr(clippingItem.blendMode);
+                        clippingCtx.globalCompositeOperation = getMixModeStr(
+                            clippingItem.blendMode,
+                        );
                         clippingCtx.globalAlpha = clippingItem.opacity;
-                        clippingCtx.drawImage(clippingItem.canvas, clippingItem.left - item.left, clippingItem.top - item.top);
+                        clippingCtx.drawImage(
+                            clippingItem.canvas,
+                            clippingItem.left - item.left,
+                            clippingItem.top - item.top,
+                        );
                     }
 
                     ctx.globalCompositeOperation = 'source-atop';
@@ -345,7 +375,8 @@ export function readPsd (psdObj: Psd): IKlPsd {
 
                 // group mask
                 if (psdGroupObj.mask) {
-                    ctx.globalCompositeOperation = psdGroupObj.mask.defaultColor === 0 ? 'destination-in' : 'destination-out';
+                    ctx.globalCompositeOperation =
+                        psdGroupObj.mask.defaultColor === 0 ? 'destination-in' : 'destination-out';
                     if (psdGroupObj.mask.canvas === undefined) {
                         throw new Error('psdGroupObj.mask.canvas undefined');
                     }
@@ -355,13 +386,17 @@ export function readPsd (psdObj: Psd): IKlPsd {
                     if (psdGroupObj.mask.top === undefined) {
                         throw new Error('psdGroupObj.mask.top undefined');
                     }
-                    ctx.drawImage(psdGroupObj.mask.canvas, psdGroupObj.mask.left, psdGroupObj.mask.top);
+                    ctx.drawImage(
+                        psdGroupObj.mask.canvas,
+                        psdGroupObj.mask.left,
+                        psdGroupObj.mask.top,
+                    );
                 }
 
                 if (item.blendMode === undefined) {
                     throw new Error('item.blendMode undefined');
                 }
-                if (item.hidden  === undefined) {
+                if (item.hidden === undefined) {
                     throw new Error('item.hidden  undefined');
                 }
                 if (item.opacity === undefined) {
@@ -374,7 +409,6 @@ export function readPsd (psdObj: Psd): IKlPsd {
                         groupCtx.globalAlpha = item.hidden ? 0 : item.opacity;
                         groupCtx.drawImage(canvas, 0, 0);
                     }
-
                 } else {
                     if (item.name === undefined) {
                         throw new Error('item.name undefined');
@@ -418,7 +452,7 @@ export function readPsd (psdObj: Psd): IKlPsd {
     return result;
 }
 
-export function klPsdToKlProject (klPsd: IKlPsd): IKlProject {
+export function klPsdToKlProject(klPsd: IKlPsd): IKlProject {
     // only share references to Canvas elements
     const result: IKlProject = {
         width: klPsd.width,
@@ -426,7 +460,7 @@ export function klPsdToKlProject (klPsd: IKlPsd): IKlProject {
         layers: [],
     };
     if (klPsd.layers) {
-        result.layers = klPsd.layers.map(item => {
+        result.layers = klPsd.layers.map((item) => {
             return {
                 name: item.name,
                 isVisible: item.isVisible,
@@ -437,13 +471,15 @@ export function klPsdToKlProject (klPsd: IKlPsd): IKlProject {
         });
     } else {
         // flattened
-        result.layers = [{
-            name: LANG('background'),
-            isVisible: true,
-            opacity: 1,
-            mixModeStr: 'source-over',
-            image: klPsd.canvas,
-        }];
+        result.layers = [
+            {
+                name: LANG('background'),
+                isVisible: true,
+                opacity: 1,
+                mixModeStr: 'source-over',
+                image: klPsd.canvas,
+            },
+        ];
     }
     return result;
 }

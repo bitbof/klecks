@@ -1,36 +1,35 @@
-import {filterLib, filterLibStatus} from './filters';
-import {filterBrightnessContrast} from './filter-brightness-contrast';
-import {filterCropExtend} from './filter-crop-extend';
-import {filterCurves} from './filter-curves';
-import {filterFlip} from './filter-flip';
-import {filterHueSaturation} from './filter-hue-saturation';
-import {filterInvert} from './filter-invert';
-import {filterPerspective} from './filter-perspective';
-import {filterResize} from './filter-resize';
-import {filterRotate} from './filter-rotate';
-import {filterTiltShift} from './filter-tilt-shift';
-import {filterTransform} from './filter-transform';
-import {filterBlur} from './filter-blur';
-import {filterUnsharpMask} from './filter-unsharp-mask';
-import {filterToAlpha} from './filter-to-alpha';
-import {filterGrid} from './filter-grid';
-import {filterNoise} from './filter-noise';
-import {filterPattern} from './filter-pattern';
-import {filterDistort} from './filter-distort';
-import {filterVanishPoint} from './filter-vanish-point';
-import {IFilter} from '../kl-types';
+import { filterLib, filterLibStatus } from './filters';
+import { filterBrightnessContrast } from './filter-brightness-contrast';
+import { filterCropExtend } from './filter-crop-extend';
+import { filterCurves } from './filter-curves';
+import { filterFlip } from './filter-flip';
+import { filterHueSaturation } from './filter-hue-saturation';
+import { filterInvert } from './filter-invert';
+import { filterPerspective } from './filter-perspective';
+import { filterResize } from './filter-resize';
+import { filterRotate } from './filter-rotate';
+import { filterTiltShift } from './filter-tilt-shift';
+import { filterTransform } from './filter-transform';
+import { filterBlur } from './filter-blur';
+import { filterUnsharpMask } from './filter-unsharp-mask';
+import { filterToAlpha } from './filter-to-alpha';
+import { filterGrid } from './filter-grid';
+import { filterNoise } from './filter-noise';
+import { filterPattern } from './filter-pattern';
+import { filterDistort } from './filter-distort';
+import { filterVanishPoint } from './filter-vanish-point';
+import { IFilter } from '../kl-types';
 
 type TModuleFilter = Pick<IFilter, 'getDialog' | 'apply'>;
 
-function importFilter (libObj: IFilter, moduleObj: TModuleFilter): void {
+function importFilter(libObj: IFilter, moduleObj: TModuleFilter): void {
     if (moduleObj.getDialog) {
         libObj.getDialog = moduleObj.getDialog;
     }
     libObj.apply = moduleObj.apply;
 }
 
-
-export function importFilters (): void {
+export function importFilters(): void {
     if (filterLibStatus.isLoaded) {
         return;
     }

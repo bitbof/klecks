@@ -1,6 +1,6 @@
-import {gl} from './gl';
-import {BB} from '../../bb/bb';
-import {TFxGl, TFxSupportedElements} from '../fx-canvas-types';
+import { gl } from './gl';
+import { BB } from '../../bb/bb';
+import { TFxGl, TFxSupportedElements } from '../fx-canvas-types';
 
 /**
  * Format           Type                    Channels    Bytes per pixel
@@ -18,17 +18,14 @@ import {TFxGl, TFxSupportedElements} from '../fx-canvas-types';
 export type TTextureFormat = GLenum;
 export type TTextureType = GLenum;
 
-
 export class FxTexture {
-    
     // ---- static ----
-    static fromElement (element: TFxSupportedElements): FxTexture {
+    static fromElement(element: TFxSupportedElements): FxTexture {
         const texture = new FxTexture(0, 0, gl.RGBA, gl.UNSIGNED_BYTE);
         texture.loadContentsOf(element);
         return texture;
     }
-    
-    
+
     // ---- private ----
     private canvas: HTMLCanvasElement | null;
     private type: TTextureType;
@@ -46,14 +43,8 @@ export class FxTexture {
         return c;
     }*/
 
-    
-    // ---- public ----
-    constructor (
-        width: number,
-        height: number,
-        format: TTextureFormat,
-        type: TTextureType,
-    ) {
+    // ----------------------------------- public -----------------------------------
+    constructor(width: number, height: number, format: TTextureFormat, type: TTextureType) {
         this.gl = gl;
         this.id = BB.throwIfNull(gl.createTexture());
         this.width = width;
@@ -68,10 +59,20 @@ export class FxTexture {
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
         if (width && height) {
-            gl.texImage2D(gl.TEXTURE_2D, 0, this.format, width, height, 0, this.format, this.type, null);
+            gl.texImage2D(
+                gl.TEXTURE_2D,
+                0,
+                this.format,
+                width,
+                height,
+                0,
+                this.format,
+                this.type,
+                null,
+            );
         }
     }
-    
+
     // ---- interface ----
 
     gl: TFxGl;
@@ -79,55 +80,80 @@ export class FxTexture {
     height: number;
     id: WebGLTexture | null; // null -> destroyed
     format: TTextureFormat;
-    
-    loadContentsOf (element: TFxSupportedElements): void {
+
+    loadContentsOf(element: TFxSupportedElements): void {
         this.width = element.width || (element as HTMLVideoElement).videoWidth;
         this.height = element.height || (element as HTMLVideoElement).videoHeight!;
         gl.bindTexture(gl.TEXTURE_2D, this.id);
         gl.texImage2D(gl.TEXTURE_2D, 0, this.format, this.format, this.type, element);
     }
 
-    initFromBytes (width: number, height: number, data: number[]): void {
+    initFromBytes(width: number, height: number, data: number[]): void {
         this.width = width;
         this.height = height;
         this.format = gl.RGBA;
         this.type = gl.UNSIGNED_BYTE;
         gl.bindTexture(gl.TEXTURE_2D, this.id);
-        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, width, height, 0, gl.RGBA, this.type, new Uint8Array(data));
+        gl.texImage2D(
+            gl.TEXTURE_2D,
+            0,
+            gl.RGBA,
+            width,
+            height,
+            0,
+            gl.RGBA,
+            this.type,
+            new Uint8Array(data),
+        );
     }
 
-    destroy (): void {
+    destroy(): void {
         gl.deleteTexture(this.id);
         this.id = null;
     }
 
-    use (unit?: number): void {
+    use(unit?: number): void {
         gl.activeTexture(gl.TEXTURE0 + (unit || 0));
         gl.bindTexture(gl.TEXTURE_2D, this.id);
     }
 
-    unuse (unit: number): void {
+    unuse(unit: number): void {
         gl.activeTexture(gl.TEXTURE0 + (unit || 0));
         gl.bindTexture(gl.TEXTURE_2D, null);
     }
 
-    ensureFormat (width: number, height: number, format: TTextureFormat, type: TTextureType): void {
+    ensureFormat(width: number, height: number, format: TTextureFormat, type: TTextureType): void {
         // change the format only if required
-        if (width != this.width || height != this.height || format != this.format || type != this.type) {
+        if (
+            width != this.width ||
+            height != this.height ||
+            format != this.format ||
+            type != this.type
+        ) {
             this.width = width;
             this.height = height;
             this.format = format;
             this.type = type;
             gl.bindTexture(gl.TEXTURE_2D, this.id);
-            gl.texImage2D(gl.TEXTURE_2D, 0, this.format, width, height, 0, this.format, this.type, null);
+            gl.texImage2D(
+                gl.TEXTURE_2D,
+                0,
+                this.format,
+                width,
+                height,
+                0,
+                this.format,
+                this.type,
+                null,
+            );
         }
     }
 
-    ensureFormatViaTexture (texture: FxTexture): void {
+    ensureFormatViaTexture(texture: FxTexture): void {
         this.ensureFormat(texture.width, texture.height, texture.format, texture.type);
     }
 
-    drawTo (callback: () => void): void {
+    drawTo(callback: () => void): void {
         // start rendering to this texture
         gl.framebuffer = gl.framebuffer || gl.createFramebuffer();
         gl.bindFramebuffer(gl.FRAMEBUFFER, gl.framebuffer);
@@ -143,7 +169,6 @@ export class FxTexture {
         // stop rendering to this texture
         gl.bindFramebuffer(gl.FRAMEBUFFER, null);
     }
-
 
     /*
     // never seen this being used
@@ -173,7 +198,7 @@ export class FxTexture {
     }
      */
 
-    swapWith (other: FxTexture): void {
+    swapWith(other: FxTexture): void {
         let temp;
 
         temp = other.id;

@@ -1,16 +1,16 @@
-import {KL} from '../kl';
-import {KlCanvas} from '../canvas/kl-canvas';
-import {Psd} from 'ag-psd/dist/psd';
-import {loadAgPsd} from './load-ag-psd';
+import { KL } from '../kl';
+import { KlCanvas } from '../canvas/kl-canvas';
+import { Psd } from 'ag-psd/dist/psd';
+import { loadAgPsd } from './load-ag-psd';
 
-export async function klCanvasToPsdBlob (klCanvas: KlCanvas): Promise<Blob> {
+export async function klCanvasToPsdBlob(klCanvas: KlCanvas): Promise<Blob> {
     const layerArr = klCanvas.getLayersFast();
 
     const psdConfig: Psd = {
         width: klCanvas.getWidth(),
         height: klCanvas.getHeight(),
         //canvas: klCanvas.getCompleteCanvas(1), // preview, can be skipped
-        children: layerArr.map(item => {
+        children: layerArr.map((item) => {
             // todo - can be optimized if layer mostly empty
             return {
                 name: item.name,

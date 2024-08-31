@@ -1,22 +1,21 @@
-import {BB} from '../../../bb/bb';
+import { BB } from '../../../bb/bb';
 
 /**
  * Two buttons next to each other, each representing a tab. one at a time can be active.
  */
 export class TwoTabs {
-
     private readonly rootEl: HTMLElement;
     private readonly leftTab: HTMLElement;
     private readonly rightTab: HTMLElement;
     private value: number;
 
-    private update (): void {
+    private update(): void {
         this.leftTab.classList.toggle('kl-2-tabs--active', this.value === 0);
         this.rightTab.classList.toggle('kl-2-tabs--active', this.value === 1);
     }
 
-    // ---- public ----
-    constructor (params: {
+    // ----------------------------------- public -----------------------------------
+    constructor(params: {
         left: string;
         right: string;
         init: number; //0, 1
@@ -63,7 +62,7 @@ export class TwoTabs {
         };
     }
 
-    getElement (): HTMLElement {
+    getElement(): HTMLElement {
         return this.rootEl;
     }
 }

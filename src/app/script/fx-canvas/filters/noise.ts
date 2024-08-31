@@ -1,8 +1,8 @@
-import {gl} from '../core/gl';
-import {FxShader} from '../core/fx-shader';
-import {simpleShader} from '../core/simple-shader';
+import { gl } from '../core/gl';
+import { FxShader } from '../core/fx-shader';
+import { simpleShader } from '../core/simple-shader';
 import shaderNoise from '../shaders/shader-noise.glsl';
-import {TFxCanvas} from '../fx-canvas-types';
+import { TFxCanvas } from '../fx-canvas-types';
 
 /**
  * Noise
@@ -20,8 +20,8 @@ export type TFilterNoise = (
     brightness: number, // range [-1, 1]
     contrast: number, // range [-1, 1]
     isReversed: boolean, // reverse 0-1 range
-    colA: {r: number; g: number; b: number} | undefined, // which color at 0, if rgb - default black
-    colB: {r: number; g: number; b: number} | undefined, // which color at 1, if rgb - default white
+    colA: { r: number; g: number; b: number } | undefined, // which color at 0, if rgb - default black
+    colB: { r: number; g: number; b: number } | undefined, // which color at 1, if rgb - default white
     channels: 'rgb' | 'alpha', // which channel to target
 ) => TFxCanvas;
 

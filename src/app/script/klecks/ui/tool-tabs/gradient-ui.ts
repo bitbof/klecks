@@ -1,11 +1,10 @@
-import {BB} from '../../../bb/bb';
-import {KlSlider} from '../components/kl-slider';
-import {LANG} from '../../../language/language';
-import {Checkbox} from '../components/checkbox';
-import {Options} from '../components/options';
-import {TGradientType} from '../../kl-types';
-import {KlColorSlider} from '../components/kl-color-slider';
-
+import { BB } from '../../../bb/bb';
+import { KlSlider } from '../components/kl-slider';
+import { LANG } from '../../../language/language';
+import { Checkbox } from '../components/checkbox';
+import { Options } from '../components/options';
+import { TGradientType } from '../../kl-types';
+import { KlColorSlider } from '../components/kl-color-slider';
 
 interface IGradientUiSettings {
     opacity: number;
@@ -23,7 +22,6 @@ interface IGradientUiSettings {
  * @constructor
  */
 export class GradientUi {
-
     private readonly rootEl: HTMLElement;
     private colorDiv: HTMLElement;
     private colorSlider: KlColorSlider;
@@ -39,7 +37,7 @@ export class GradientUi {
         isEraser: false,
     };
 
-    private updateIcons (): void {
+    private updateIcons(): void {
         const col1 = this.settings.isReversed ? '#0000' : '#000';
         const col2 = this.settings.isReversed ? '#000' : '#0000';
         this.iconArr[0].style.background = `linear-gradient(${col1}, ${col2})`;
@@ -47,13 +45,11 @@ export class GradientUi {
         this.iconArr[2].style.background = `radial-gradient(${col1}, ${col2})`;
     }
 
-    // ----- public -------
+    // ----------------------------------- public -----------------------------------
 
-    constructor (
-        p: {
-            colorSlider: KlColorSlider; // when opening tab, inserts it (snatches it from where else it was)
-        }
-    ) {
+    constructor(p: {
+        colorSlider: KlColorSlider; // when opening tab, inserts it (snatches it from where else it was)
+    }) {
         this.colorSlider = p.colorSlider;
         this.rootEl = BB.el({
             css: {
@@ -130,8 +126,6 @@ export class GradientUi {
         });
         this.rootEl.append(opacitySlider.getElement());
 
-
-
         const row1 = BB.el({
             parent: this.rootEl,
             css: {
@@ -165,11 +159,7 @@ export class GradientUi {
             },
         });
 
-        row1.append(
-            reverseToggle.getElement(),
-            doSnapToggle.getElement(),
-        );
-
+        row1.append(reverseToggle.getElement(), doSnapToggle.getElement());
 
         const row2 = BB.el({
             parent: this.rootEl,
@@ -204,28 +194,25 @@ export class GradientUi {
             },
         });
 
-        row2.append(
-            eraserToggle.getElement(),
-            lockAlphaToggle.getElement(),
-        );
-
-
+        row2.append(eraserToggle.getElement(), lockAlphaToggle.getElement());
     }
 
-    getElement (): HTMLElement {
+    getElement(): HTMLElement {
         return this.rootEl;
     }
 
-    setIsVisible (isVisible: boolean): void {
+    setIsVisible(isVisible: boolean): void {
         this.isVisible = !!isVisible;
         this.rootEl.style.display = isVisible ? 'block' : 'none';
         if (isVisible) {
-            this.colorDiv.append(this.colorSlider.getElement(), this.colorSlider.getOutputElement());
+            this.colorDiv.append(
+                this.colorSlider.getElement(),
+                this.colorSlider.getOutputElement(),
+            );
         }
     }
 
-    getSettings (): IGradientUiSettings {
+    getSettings(): IGradientUiSettings {
         return BB.copyObj(this.settings);
     }
-
 }

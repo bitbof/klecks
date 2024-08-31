@@ -1,8 +1,8 @@
-import {gl} from '../core/gl';
-import {FxShader} from '../core/fx-shader';
-import {randomShaderFunc} from '../shaders/random-shader-func';
-import {simpleShader} from '../core/simple-shader';
-import {TFxCanvas} from '../fx-canvas-types';
+import { gl } from '../core/gl';
+import { FxShader } from '../core/fx-shader';
+import { randomShaderFunc } from '../shaders/random-shader-func';
+import { simpleShader } from '../core/simple-shader';
+import { TFxCanvas } from '../fx-canvas-types';
 
 /**
  * Triangle Blur
@@ -12,18 +12,20 @@ import {TFxCanvas} from '../fx-canvas-types';
  *               Note: Requires alpha to be premultiplied.
  * @param radius The radius of the pyramid convolved with the image.
  */
-export type TFilterTriangleBlur = (
-    this: TFxCanvas,
-    radius: number,
-) => TFxCanvas;
-
+export type TFilterTriangleBlur = (this: TFxCanvas, radius: number) => TFxCanvas;
 
 export const triangleBlur: TFilterTriangleBlur = function (radius) {
-    gl.triangleBlur = gl.triangleBlur || new FxShader(null, '\
+    gl.triangleBlur =
+        gl.triangleBlur ||
+        new FxShader(
+            null,
+            '\
         uniform sampler2D texture;\
         uniform vec2 delta;\
         varying vec2 texCoord;\
-        ' + randomShaderFunc + '\
+        ' +
+                randomShaderFunc +
+                '\
         void main() {\
             vec4 color = vec4(0.0);\
             float total = 0.0;\
@@ -42,7 +44,9 @@ export const triangleBlur: TFilterTriangleBlur = function (radius) {
             \
             gl_FragColor = color / total;\
         }\
-    ', 'triangleBlur');
+    ',
+            'triangleBlur',
+        );
 
     simpleShader.call(this, gl.triangleBlur, {
         delta: [radius / this.width, 0],

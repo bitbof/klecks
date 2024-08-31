@@ -1,6 +1,6 @@
-import {BB} from '../../bb/bb';
-import {IBounds, IRect} from '../../bb/bb-types';
-import {IRGBA} from '../kl-types';
+import { BB } from '../../bb/bb';
+import { IBounds, IRect } from '../../bb/bb-types';
+import { IRGBA } from '../kl-types';
 
 export type TTextFormat = 'left' | 'center' | 'right';
 export type TTextFont = 'serif' | 'monospace' | 'sans-serif' | 'cursive' | 'fantasy' | string;
@@ -25,9 +25,9 @@ export type TRenderTextParam = {
         color: IRGBA;
         lineWidth: number;
     };
-}
+};
 
-function textMetricToRect (metrics: TextMetrics, align: TTextFormat): IRect {
+function textMetricToRect(metrics: TextMetrics, align: TTextFormat): IRect {
     // fallback for older browsers
     const ascent = metrics.fontBoundingBoxAscent ?? metrics.actualBoundingBoxAscent;
     const descent = metrics.fontBoundingBoxDescent ?? metrics.actualBoundingBoxDescent;
@@ -64,12 +64,13 @@ function textMetricToRect (metrics: TextMetrics, align: TTextFormat): IRect {
  * @param canvas
  * @param p
  */
-export function renderText (canvas: HTMLCanvasElement, p: TRenderTextParam): IRect {
-
+export function renderText(canvas: HTMLCanvasElement, p: TRenderTextParam): IRect {
     p = BB.copyObj(p);
 
     // setup context
-    const ctx = BB.ctx(canvas) as CanvasRenderingContext2D & {letterSpacing: string};
+    const ctx = BB.ctx(canvas) as CanvasRenderingContext2D & {
+        letterSpacing: string;
+    };
     ctx.save();
     ctx.textAlign = p.align;
     ctx.letterSpacing = p.letterSpacing ? p.letterSpacing + 'px' : '0';
@@ -97,8 +98,7 @@ export function renderText (canvas: HTMLCanvasElement, p: TRenderTextParam): IRe
     ctx.translate(p.x, p.y);
     ctx.rotate(-p.angleRad);
 
-
-    const lines = p.text.split('\n').map(line => line.replaceAll('\t', '    '));
+    const lines = p.text.split('\n').map((line) => line.replaceAll('\t', '    '));
 
     // bounds
     const bounds: IBounds = {
@@ -112,7 +112,7 @@ export function renderText (canvas: HTMLCanvasElement, p: TRenderTextParam): IRe
         lines.forEach((line, lineIndex) => {
             const metrics = ctx.measureText(line);
             const x = 0;
-            const y =  p.size * (p.lineHeight ?? 1) * lineIndex;
+            const y = p.size * (p.lineHeight ?? 1) * lineIndex;
             const mRect = textMetricToRect(metrics, p.align);
             if (isFirst) {
                 isFirst = false;
@@ -132,14 +132,14 @@ export function renderText (canvas: HTMLCanvasElement, p: TRenderTextParam): IRe
     // draw stroke
     lines.forEach((line, lineIndex) => {
         const x = 0;
-        const y =  p.size * (p.lineHeight ?? 1) * lineIndex;
+        const y = p.size * (p.lineHeight ?? 1) * lineIndex;
         ctx.strokeText(line, x, y);
     });
 
     // draw fill
     lines.forEach((line, lineIndex) => {
         const x = 0;
-        const y =  p.size * (p.lineHeight ?? 1) * lineIndex;
+        const y = p.size * (p.lineHeight ?? 1) * lineIndex;
         ctx.fillText(line, x, y);
     });
 

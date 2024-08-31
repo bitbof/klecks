@@ -1,21 +1,20 @@
-import {BB} from '../../bb/bb';
-import {IFilterApply, IFilterGetDialogParam, TFilterGetDialogResult} from '../kl-types';
-import {KlSlider} from '../ui/components/kl-slider';
-import {LANG} from '../../language/language';
-import {eventResMs} from './filters-consts';
-import {getSharedFx} from '../../fx-canvas/shared-fx';
-import {Options} from '../ui/components/options';
-import {Checkbox} from '../ui/components/checkbox';
-import {TFilterHistoryEntry} from './filters';
-import {throwIfNull} from '../../bb/base/base';
-import {TFilterDistortSettings} from '../../fx-canvas/filters/distort';
-import {FxPreviewRenderer} from '../ui/project-viewport/fx-preview-renderer';
-import {TProjectViewportProject} from '../ui/project-viewport/project-viewport';
-import {Preview} from '../ui/project-viewport/preview';
-import {css} from '@emotion/css/dist/emotion-css.cjs';
-import {testIsSmall} from '../ui/utils/test-is-small';
-import {getPreviewHeight, getPreviewWidth, mediumPreview} from '../ui/utils/preview-size';
-
+import { BB } from '../../bb/bb';
+import { IFilterApply, IFilterGetDialogParam, TFilterGetDialogResult } from '../kl-types';
+import { KlSlider } from '../ui/components/kl-slider';
+import { LANG } from '../../language/language';
+import { eventResMs } from './filters-consts';
+import { getSharedFx } from '../../fx-canvas/shared-fx';
+import { Options } from '../ui/components/options';
+import { Checkbox } from '../ui/components/checkbox';
+import { TFilterHistoryEntry } from './filters';
+import { throwIfNull } from '../../bb/base/base';
+import { TFilterDistortSettings } from '../../fx-canvas/filters/distort';
+import { FxPreviewRenderer } from '../ui/project-viewport/fx-preview-renderer';
+import { TProjectViewportProject } from '../ui/project-viewport/project-viewport';
+import { Preview } from '../ui/project-viewport/preview';
+import { css } from '@emotion/css/dist/emotion-css.cjs';
+import { testIsSmall } from '../ui/utils/test-is-small';
+import { getPreviewHeight, getPreviewWidth, mediumPreview } from '../ui/utils/preview-size';
 
 // see fx-canvas distort
 export type TFilterDistortInput = {
@@ -27,14 +26,10 @@ export type TFilterDistortInput = {
     offset: { x: number; y: number };
 };
 
-export type TFilterDistortHistoryEntry = TFilterHistoryEntry<
-    'distort',
-    TFilterDistortInput>;
+export type TFilterDistortHistoryEntry = TFilterHistoryEntry<'distort', TFilterDistortInput>;
 
 export const filterDistort = {
-
-    getDialog (params: IFilterGetDialogParam) {
-
+    getDialog(params: IFilterGetDialogParam) {
         const isSmall = testIsSmall();
         const rootEl = BB.el();
         const context = params.context;
@@ -43,10 +38,10 @@ export const filterDistort = {
         const settings: TFilterDistortInput = {
             stepSize: 1,
             distortType: 0,
-            scale: {x: 100, y: 100},
-            strength: {x: 20, y: 20},
-            phase: {x: 0, y: 0},
-            offset: {x: 0, y: 0},
+            scale: { x: 100, y: 100 },
+            strength: { x: 20, y: 20 },
+            phase: { x: 0, y: 0 },
+            offset: { x: 0, y: 0 },
         };
         // let lastDrawnSettings = null;
 
@@ -82,7 +77,7 @@ export const filterDistort = {
 
             const scaleFactor = 20;
 
-            ([0, 1, 2] as const).forEach(item => {
+            ([0, 1, 2] as const).forEach((item) => {
                 const thumbImg = new Image();
                 const settingsCopy: TFilterDistortSettings = BB.copyObj(settings);
                 settingsCopy.distortType = item;
@@ -90,7 +85,12 @@ export const filterDistort = {
                 settingsCopy.scale.y /= scaleFactor;
                 settingsCopy.strength.x /= scaleFactor;
                 settingsCopy.strength.y /= scaleFactor;
-                fxCanvas.draw(texture).multiplyAlpha().distort(settingsCopy).unmultiplyAlpha().update();
+                fxCanvas
+                    .draw(texture)
+                    .multiplyAlpha()
+                    .distort(settingsCopy)
+                    .unmultiplyAlpha()
+                    .update();
                 ctx.clearRect(0, 0, thumbSize, thumbSize);
                 ctx.drawImage(fxCanvas, 0, 0);
                 thumbImg.src = canvas.toDataURL('image/png');
@@ -99,7 +99,6 @@ export const filterDistort = {
 
             texture.destroy();
         }
-
 
         // ---- controls ----
 
@@ -130,19 +129,19 @@ export const filterDistort = {
             },
         });
 
-        function sync (from: 'x' | 'y') {
+        function sync(from: 'x' | 'y') {
             if (from === 'x') {
-                settings.scale.y = (settings.scale.x);
-                settings.strength.y = (settings.strength.x);
-                settings.phase.y = (settings.phase.x);
+                settings.scale.y = settings.scale.x;
+                settings.strength.y = settings.strength.x;
+                settings.phase.y = settings.phase.x;
 
                 sliderArr[3].setValue(settings.scale.y);
                 sliderArr[4].setValue(settings.strength.y);
                 sliderArr[5].setValue(settings.phase.y);
             } else {
-                settings.scale.x = (settings.scale.y);
-                settings.strength.x = (settings.strength.y);
-                settings.phase.x = (settings.phase.y);
+                settings.scale.x = settings.scale.y;
+                settings.strength.x = settings.strength.y;
+                settings.phase.x = settings.phase.y;
 
                 sliderArr[0].setValue(settings.scale.x);
                 sliderArr[1].setValue(settings.strength.x);
@@ -164,7 +163,7 @@ export const filterDistort = {
 
         topRowEl.append(
             typeOptions.getElement(),
-            BB.el({css: {flexGrow: '1'}}),
+            BB.el({ css: { flexGrow: '1' } }),
             syncToggle.getElement(),
         );
 
@@ -181,7 +180,7 @@ export const filterDistort = {
                 marginRight: '10px',
             },
         });
-        const rightCol = BB.el({parent: xyRowEl});
+        const rightCol = BB.el({ parent: xyRowEl });
 
         const sliderWidth = isSmall ? 300 : 245;
         const sliderArr: KlSlider[] = [];
@@ -277,13 +276,11 @@ export const filterDistort = {
         stepSlider.getElement().style.marginBottom = '10px';
         rootEl.append(stepSlider.getElement());
 
-
         // ---- preview ----
 
         const klCanvas = params.klCanvas;
         const layers = klCanvas.getLayers();
         const selectedLayerIndex = throwIfNull(klCanvas.getLayerIndex(context.canvas));
-
 
         const fxPreviewRenderer = new FxPreviewRenderer({
             original: context.canvas,
@@ -322,15 +319,17 @@ export const filterDistort = {
             },
         });
         preview.render();
-        preview.getElement().classList.add(css({
-            marginLeft: '-20px',
-            marginRight: '-20px',
-        }));
+        preview.getElement().classList.add(
+            css({
+                marginLeft: '-20px',
+                marginRight: '-20px',
+            }),
+        );
         rootEl.append(preview.getElement());
 
         const destroy = () => {
             typeOptions.destroy();
-            sliderArr.forEach(item => item.destroy());
+            sliderArr.forEach((item) => item.destroy());
             stepSlider.destroy();
             syncToggle.destroy();
             fxPreviewRenderer.destroy();
@@ -352,14 +351,14 @@ export const filterDistort = {
         return result;
     },
 
-    apply (params: IFilterApply<TFilterDistortInput>): boolean {
+    apply(params: IFilterApply<TFilterDistortInput>): boolean {
         const klCanvas = params.klCanvas;
         const context = params.context;
         const history = params.history;
-        if (!klCanvas || !history) {
+        if (!klCanvas) {
             return false;
         }
-        history.pause(true);
+        history?.pause(true);
 
         const fxCanvas = getSharedFx();
         if (!fxCanvas) {
@@ -371,15 +370,16 @@ export const filterDistort = {
         context.drawImage(fxCanvas, 0, 0);
         texture.destroy();
 
-        history.pause(false);
-        history.push({
+        history?.pause(false);
+        history?.push({
             tool: ['filter', 'distort'],
             action: 'apply',
-            params: [{
-                input: params.input,
-            }],
+            params: [
+                {
+                    input: params.input,
+                },
+            ],
         } as TFilterDistortHistoryEntry);
         return true;
     },
-
 };

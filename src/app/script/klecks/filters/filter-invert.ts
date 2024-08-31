@@ -1,19 +1,16 @@
-import {getSharedFx} from '../../fx-canvas/shared-fx';
-import {IFilterApply} from '../kl-types';
-import {TFilterHistoryEntry} from './filters';
+import { getSharedFx } from '../../fx-canvas/shared-fx';
+import { IFilterApply } from '../kl-types';
+import { TFilterHistoryEntry } from './filters';
 
 export type TFilterInvertInput = null;
 
-export type TFilterInvertHistoryEntry = TFilterHistoryEntry<
-    'invert',
-    TFilterInvertInput>;
+export type TFilterInvertHistoryEntry = TFilterHistoryEntry<'invert', TFilterInvertInput>;
 
 export const filterInvert = {
-
-    apply (params: IFilterApply<TFilterInvertInput>): boolean {
+    apply(params: IFilterApply<TFilterInvertInput>): boolean {
         const context = params.context;
         const history = params.history;
-        if (!context || !history) {
+        if (!context) {
             return false;
         }
 
@@ -22,7 +19,7 @@ export const filterInvert = {
             return false;
         }
 
-        history.pause(true);
+        history?.pause(true);
 
         const texture = fxCanvas.texture(context.canvas);
         fxCanvas.draw(texture).invert().update();
@@ -30,15 +27,16 @@ export const filterInvert = {
         context.drawImage(fxCanvas, 0, 0);
         texture.destroy();
 
-        history.pause(false);
-        history.push({
+        history?.pause(false);
+        history?.push({
             tool: ['filter', 'invert'],
             action: 'apply',
-            params: [{
-                input: params.input,
-            }],
+            params: [
+                {
+                    input: params.input,
+                },
+            ],
         } as TFilterInvertHistoryEntry);
         return true;
     },
-
 };

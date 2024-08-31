@@ -1,17 +1,16 @@
-import {BB} from '../../../bb/bb';
-import {FreeTransform} from './free-transform';
-import {IKlBasicLayer} from '../../kl-types';
-import {IRect} from '../../../bb/bb-types';
-import {Preview} from '../project-viewport/preview';
-import {TProjectViewportProject} from '../project-viewport/project-viewport';
-import {css} from '@emotion/css/dist/emotion-css.cjs';
-import {IFreeTransform} from './free-transform-utils';
+import { BB } from '../../../bb/bb';
+import { FreeTransform } from './free-transform';
+import { IKlBasicLayer } from '../../kl-types';
+import { IRect } from '../../../bb/bb-types';
+import { Preview } from '../project-viewport/preview';
+import { TProjectViewportProject } from '../project-viewport/project-viewport';
+import { css } from '@emotion/css/dist/emotion-css.cjs';
+import { IFreeTransform } from './free-transform-utils';
 
 /**
  * a basic canvas where you can transform one layer(move around, rotate, scale)
  */
 export class FreeTransformCanvas {
-
     private readonly rootEl: HTMLElement;
     private readonly freeTransform: FreeTransform;
     private readonly layers: IKlBasicLayer[];
@@ -23,10 +22,10 @@ export class FreeTransformCanvas {
     private readonly preview: Preview;
     private readonly previewCanvas: HTMLCanvasElement;
 
-    private updatePreview (): void {
+    private updatePreview(): void {
         const transform = this.freeTransform.getValue();
 
-        const ctx = BB.ctx((this.previewCanvas));
+        const ctx = BB.ctx(this.previewCanvas);
         ctx.save();
         ctx.clearRect(0, 0, this.previewCanvas.width, this.previewCanvas.height);
         BB.drawTransformedImageWithBounds(
@@ -37,25 +36,22 @@ export class FreeTransformCanvas {
             BB.testShouldPixelate(
                 transform,
                 transform.width / this.initTransform.width,
-                transform.height / this.initTransform.height
+                transform.height / this.initTransform.height,
             ),
         );
         ctx.restore();
         this.preview.render();
     }
 
-
-    // ---- public ----
-    constructor (
-        p: {
-            elementWidth: number;
-            elementHeight: number;
-            imageWidth: number;
-            imageHeight: number;
-            layers: IKlBasicLayer[];
-            transformIndex: number;
-        }
-    ) {
+    // ----------------------------------- public -----------------------------------
+    constructor(p: {
+        elementWidth: number;
+        elementHeight: number;
+        imageWidth: number;
+        imageHeight: number;
+        layers: IKlBasicLayer[];
+        transformIndex: number;
+    }) {
         this.imageWidth = p.imageWidth;
         this.imageHeight = p.imageHeight;
 
@@ -72,7 +68,7 @@ export class FreeTransformCanvas {
         this.layers = p.layers;
         this.transformIndex = p.transformIndex;
 
-        this.previewLayerArr = this.layers.map(item => {
+        this.previewLayerArr = this.layers.map((item) => {
             return {
                 image: item.image,
                 isVisible: item.isVisible,
@@ -102,11 +98,13 @@ export class FreeTransformCanvas {
             },
             padding: 30,
         });
-        this.preview.getElement().classList.add(css({
-            overflow: 'hidden',
-            marginLeft: '-20px',
-            marginRight: '-20px',
-        }));
+        this.preview.getElement().classList.add(
+            css({
+                overflow: 'hidden',
+                marginLeft: '-20px',
+                marginRight: '-20px',
+            }),
+        );
         this.rootEl.append(this.preview.getElement());
 
         {
@@ -140,40 +138,41 @@ export class FreeTransformCanvas {
         setTimeout(() => this.updatePreview(), 0);
     }
 
-
     // ---- interface ----
-    move (dX: number, dY: number): void {
+    move(dX: number, dY: number): void {
         this.freeTransform.move(dX, dY);
     }
 
-    reset (): void {
+    reset(): void {
         const w = this.layers[this.transformIndex].image.width;
         const h = this.layers[this.transformIndex].image.height;
 
         this.freeTransform.setSize(w, h);
-        this.freeTransform.setPos({x: w / 2, y: h / 2});
+        this.freeTransform.setPos({ x: w / 2, y: h / 2 });
         this.freeTransform.setAngleDeg(0);
         this.updatePreview();
     }
 
-    setTransformFit (): void {
-
+    setTransformFit(): void {
         const fit = BB.fitInto(
             this.layers[this.transformIndex].image.width,
             this.layers[this.transformIndex].image.height,
             this.imageWidth,
             this.imageHeight,
-            1
+            1,
         );
 
         this.freeTransform.setSize(fit.width, fit.height);
-        this.freeTransform.setPos({x: fit.width / 2, y: fit.height / 2});
+        this.freeTransform.setPos({ x: fit.width / 2, y: fit.height / 2 });
         this.freeTransform.setAngleDeg(0);
         this.updatePreview();
     }
 
-    setTransformCenter (): void {
-        this.freeTransform.setPos({x: this.imageWidth / 2, y: this.imageHeight / 2});
+    setTransformCenter(): void {
+        this.freeTransform.setPos({
+            x: this.imageWidth / 2,
+            y: this.imageHeight / 2,
+        });
         this.freeTransform.setAngleDeg(0);
         this.updatePreview();
     }
@@ -181,24 +180,24 @@ export class FreeTransformCanvas {
     /**
      * gives you the transformation in the original scale
      */
-    getTransformation (): IFreeTransform {
+    getTransformation(): IFreeTransform {
         return this.freeTransform.getValue();
     }
 
-    getIsPixelated (): boolean {
+    getIsPixelated(): boolean {
         const transform = this.freeTransform.getValue();
         return BB.testShouldPixelate(
             transform,
             transform.width / this.initTransform.width,
-            transform.height / this.initTransform.height
+            transform.height / this.initTransform.height,
         );
     }
 
-    getElement (): HTMLElement {
+    getElement(): HTMLElement {
         return this.rootEl;
     }
 
-    destroy (): void {
+    destroy(): void {
         this.freeTransform.destroy();
         this.preview.destroy();
         BB.freeCanvas(this.previewCanvas);

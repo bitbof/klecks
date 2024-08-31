@@ -1,14 +1,13 @@
-import {BB} from '../../bb/bb';
-import {createPenPressureToggle} from '../ui/components/create-pen-pressure-toggle';
-import {eventResMs} from './brushes-consts';
-import {Checkbox} from '../ui/components/checkbox';
-import {brushes} from '../brushes/brushes';
-import {klHistory} from '../history/kl-history';
-import {KlSlider} from '../ui/components/kl-slider';
+import { BB } from '../../bb/bb';
+import { createPenPressureToggle } from '../ui/components/create-pen-pressure-toggle';
+import { eventResMs } from './brushes-consts';
+import { Checkbox } from '../ui/components/checkbox';
+import { brushes } from '../brushes/brushes';
+import { KlSlider } from '../ui/components/kl-slider';
 import brushIconImg from '/src/app/img/ui/brush-blend.svg';
-import {IBrushUi} from '../kl-types';
-import {LANG, languageStrings} from '../../language/language';
-import {BlendBrush} from '../brushes/blend-brush';
+import { IBrushUi } from '../kl-types';
+import { LANG, languageStrings } from '../../language/language';
+import { BlendBrush } from '../brushes/blend-brush';
 
 export const blendBrushUi = (function () {
     const brushInterface = {
@@ -32,17 +31,17 @@ export const blendBrushUi = (function () {
     brushInterface.Ui = function (p) {
         const div = document.createElement('div'); // the gui
         const brush = new brushes.BlendBrush();
-        brush.setHistory(klHistory);
+        brush.setHistory(p.history);
         p.onSizeChange(brush.getSize());
 
         let sizeSlider: KlSlider;
         let opacitySlider: KlSlider;
 
-        function setSize (size: number): void {
+        function setSize(size: number): void {
             brush.setSize(size);
         }
 
-        function init () {
+        function init() {
             sizeSlider = new KlSlider({
                 label: LANG('brush-size'),
                 width: 225,
@@ -112,13 +111,9 @@ export const blendBrushUi = (function () {
                 },
             });
 
-
             div.append(
                 BB.el({
-                    content: [
-                        sizeSlider.getElement(),
-                        pressureSizeToggle,
-                    ],
+                    content: [sizeSlider.getElement(), pressureSizeToggle],
                     css: {
                         display: 'flex',
                         justifyContent: 'space-between',
@@ -127,10 +122,7 @@ export const blendBrushUi = (function () {
                     },
                 }),
                 BB.el({
-                    content: [
-                        opacitySlider.getElement(),
-                        pressureOpacityToggle,
-                    ],
+                    content: [opacitySlider.getElement(), pressureOpacityToggle],
                     css: {
                         display: 'flex',
                         justifyContent: 'space-between',
@@ -138,7 +130,7 @@ export const blendBrushUi = (function () {
                     },
                 }),
                 blendingSlider.getElement(),
-                lockAlphaToggle.getElement()
+                lockAlphaToggle.getElement(),
             );
         }
 

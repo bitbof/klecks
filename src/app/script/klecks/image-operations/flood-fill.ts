@@ -1,4 +1,3 @@
-
 /**
  * Flood fill. Tried https://github.com/binarymax/floodfill.js/, but it implemented tolerance wrong, and had bugs.
  * So, my own implementation. can handle tolerance, grow, opacity.
@@ -15,7 +14,14 @@
  * @param x1 int >x0
  * @param y1 int >y0
  */
-function fillRect (data: Uint8Array, width: number, x0: number, y0: number, x1: number, y1: number): void {
+function fillRect(
+    data: Uint8Array,
+    width: number,
+    x0: number,
+    y0: number,
+    x1: number,
+    y1: number,
+): void {
     for (let x = x0; x <= x1; x++) {
         for (let y = y0; y <= y1; y++) {
             if (data[y * width + x] === 255) {
@@ -38,8 +44,14 @@ let mx, my;
  * @param dX int
  * @param dY int
  */
-function moveIndex (width: number, height: number, i: number, dX: number, dY: number): (undefined | number) {
-    mx = i % width + dX;
+function moveIndex(
+    width: number,
+    height: number,
+    i: number,
+    dX: number,
+    dY: number,
+): undefined | number {
+    mx = (i % width) + dX;
     my = Math.floor(i / width) + dY;
 
     if (mx < 0 || my < 0 || mx >= width || my >= height) {
@@ -62,7 +74,7 @@ function moveIndex (width: number, height: number, i: number, dX: number, dY: nu
  * @param i int - srcArr index
  * @returns {boolean}
  */
-function testAndFill (
+function testAndFill(
     srcArr: Uint8ClampedArray,
     targetArr: Uint8Array,
     width: number,
@@ -99,7 +111,6 @@ function testAndFill (
     return false;
 }
 
-
 /**
  *
  * @param srcArr Uint8ClampedArray rgba
@@ -112,7 +123,7 @@ function testAndFill (
  * @param grow int >= 0
  * @param isContiguous boolean
  */
-function floodFill (
+function floodFill(
     srcArr: Uint8ClampedArray,
     targetArr: Uint8Array,
     width: number,
@@ -123,7 +134,6 @@ function floodFill (
     grow: number,
     isContiguous: boolean,
 ): void {
-
     const initRgba: [number, number, number, number] = [
         srcArr[(py * width + px) * 4],
         srcArr[(py * width + px) * 4 + 1],
@@ -143,16 +153,20 @@ function floodFill (
             // queue up unfilled neighbors
             e = moveIndex(width, height, i, -1, 0); // left
             // test will return false if e is undefined -> only numbers will be pushed to q
-            testAndFill(srcArr, targetArr, width, height, initRgba, tolerance, e) && q.push(e as number);
+            testAndFill(srcArr, targetArr, width, height, initRgba, tolerance, e) &&
+                q.push(e as number);
 
             e = moveIndex(width, height, i, 1, 0); // right
-            testAndFill(srcArr, targetArr, width, height, initRgba, tolerance, e) && q.push(e as number);
+            testAndFill(srcArr, targetArr, width, height, initRgba, tolerance, e) &&
+                q.push(e as number);
 
             e = moveIndex(width, height, i, 0, -1); // up
-            testAndFill(srcArr, targetArr, width, height, initRgba, tolerance, e) && q.push(e as number);
+            testAndFill(srcArr, targetArr, width, height, initRgba, tolerance, e) &&
+                q.push(e as number);
 
             e = moveIndex(width, height, i, 0, 1); // bottom
-            testAndFill(srcArr, targetArr, width, height, initRgba, tolerance, e) && q.push(e as number);
+            testAndFill(srcArr, targetArr, width, height, initRgba, tolerance, e) &&
+                q.push(e as number);
         }
     } else {
         for (let i = 0; i < width * height; i++) {
@@ -183,40 +197,48 @@ function floodFill (
             y0 = y;
             y1 = y;
 
-            l = targetArr[(y) * width + x - 1] !== 255;
+            l = targetArr[y * width + x - 1] !== 255;
             tl = targetArr[(y - 1) * width + x - 1] !== 255;
             t = targetArr[(y - 1) * width + x] !== 255;
             tr = targetArr[(y - 1) * width + x + 1] !== 255;
-            r = targetArr[(y) * width + x + 1] !== 255;
+            r = targetArr[y * width + x + 1] !== 255;
             br = targetArr[(y + 1) * width + x + 1] !== 255;
             b = targetArr[(y + 1) * width + x] !== 255;
             bl = targetArr[(y + 1) * width + x - 1] !== 255;
 
-            if (l) { // left
+            if (l) {
+                // left
                 x0 = x - grow;
             }
-            if (l && tl && t) { // top left
+            if (l && tl && t) {
+                // top left
                 x0 = x - grow;
                 y0 = y - grow;
             }
-            if (t) { // top
+            if (t) {
+                // top
                 y0 = Math.min(y0, y - grow);
             }
-            if (t && tr && r) { // top right
+            if (t && tr && r) {
+                // top right
                 y0 = Math.min(y0, y - grow);
                 x1 = x + grow;
             }
-            if (r) { // right
+            if (r) {
+                // right
                 x1 = Math.max(x1, x + grow);
             }
-            if (r && br && b) { // bottom right
+            if (r && br && b) {
+                // bottom right
                 x1 = Math.max(x1, x + grow);
                 y1 = Math.max(y1, y + grow);
             }
-            if (b) { // bottom
+            if (b) {
+                // bottom
                 y1 = Math.max(y1, y + grow);
             }
-            if (b && bl && l) { // bottom left
+            if (b && bl && l) {
+                // bottom left
                 x0 = Math.min(x0, x - grow);
                 y1 = Math.max(y1, y + grow);
             }
@@ -231,7 +253,7 @@ function floodFill (
                 Math.max(0, x0),
                 Math.max(0, y0),
                 Math.min(width - 1, x1),
-                Math.min(height - 1, y1)
+                Math.min(height - 1, y1),
             );
         }
     }
@@ -240,9 +262,7 @@ function floodFill (
             targetArr[i] = 255;
         }
     }
-
 }
-
 
 /**
  * Does flood fill, and returns that. an array - 0 not filled. 255 filled
@@ -256,7 +276,7 @@ function floodFill (
  * @param grow int >= 0
  * @param isContiguous boolean
  */
-export function floodFillBits (
+export function floodFillBits(
     rgbaArr: Uint8ClampedArray,
     width: number,
     height: number,

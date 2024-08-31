@@ -64,7 +64,9 @@ renaming keys across language files:
     "hint": "Tool for navigating (or scrolling around) the canvas. Same name in Photoshop.",
     "value": "Hand Tool"
   },
+  "tool-select": "Select Tool",
   "tool-zoom": "Zoom",
+
 
   "undo": 'Undo',
   "redo": 'Redo',
@@ -387,10 +389,12 @@ renaming keys across language files:
     "hint": "the layer has been cleared. It is now empty",
     "value": "Cleared layer"
   },
+  "cleared-selected-area": 'Cleared selected area',
   "filled": {
     hint: 'layer got filled with a color',
     value: 'Filled',
   },
+  "filled-selected-area": 'Filled selection',
 
   "new-title": "New Image",
   "new-current": {
@@ -859,6 +863,25 @@ renaming keys across language files:
   "text-italic": "Italic",
   "text-bold": "Bold",
 
+  // select tool (and transform)
+  "select-select": "Select",
+  "select-transform": "Transform",
+  "select-lasso": "Lasso",
+  "select-polygon": "Polygon",
+  "select-boolean-replace": 'Replace',
+  "select-boolean-add": 'Add',
+  "select-boolean-subtract": 'Subtract',
+  "select-all": 'All',
+  "select-invert": 'Invert',
+  "select-reset": 'Reset',
+  "select-fill": 'Fill',
+  "select-erase": 'Erase',
+  "select-transform-clone": 'Clone',
+  "select-transform-clone-applied": 'Cloned',
+  "select-transform-move-to-layer": 'Move to layer:',
+  "select-transform-applied": 'Transformation applied',
+  "select-transform-empty": 'Selected area on active layer is empty.',
+
   "save-reminder-title": {
     hint: 'Save Reminder is a popup that shows up after 20 minutes of not saving. Allows user to save on the spot.',
     value: "Unsaved Work",
@@ -993,4 +1016,5 @@ renaming keys across language files:
   "loading": "Loading",
   "more": "More",
   "x-minutes": "{x}min",
+  "wip": 'Work in progress',
 }

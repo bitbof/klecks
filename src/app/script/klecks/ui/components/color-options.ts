@@ -1,8 +1,8 @@
-import {BB} from '../../../bb/bb';
-import {IRGBA} from '../../kl-types';
-import {theme} from '../../../theme/theme';
-import {ColorConverter} from '../../../bb/color/color';
-import {c} from '../../../bb/base/c';
+import { BB } from '../../../bb/bb';
+import { IRGBA } from '../../kl-types';
+import { theme } from '../../../theme/theme';
+import { ColorConverter } from '../../../bb/color/color';
+import { c } from '../../../bb/base/c';
 
 /**
  * UI to pick between colors in colorArr. can display full transparent (checkerboard).
@@ -10,7 +10,6 @@ import {c} from '../../../bb/base/c';
  * Rectangular buttons.
  */
 export class ColorOptions {
-
     private readonly rootEl: HTMLElement;
     private readonly buttonArr: {
         el: HTMLElement;
@@ -23,16 +22,14 @@ export class ColorOptions {
     private readonly updateCheckerboard: () => void;
     private readonly onColorInputChange: () => void;
 
-    // ---- public ----
-    constructor (
-        p: {
-            colorArr: (IRGBA | null)[]; // duplicates will be removed
-            onChange: (rgbaObj: IRGBA | null) => void;
-            label?: string;
-            initialIndex?: number; // index before duplicates were removed
-            title?: string;
-        }
-    ) {
+    // ----------------------------------- public -----------------------------------
+    constructor(p: {
+        colorArr: (IRGBA | null)[]; // duplicates will be removed
+        onChange: (rgbaObj: IRGBA | null) => void;
+        label?: string;
+        initialIndex?: number; // index before duplicates were removed
+        title?: string;
+    }) {
         this.rootEl = BB.el({
             content: p.label ? p.label : '',
             title: p.title ?? undefined,
@@ -87,7 +84,12 @@ export class ColorOptions {
                 if (sItem === null || item === null) {
                     continue;
                 }
-                if (sItem.r === item.r && sItem.g === item.g && sItem.b === item.b && sItem.a === item.a) {
+                if (
+                    sItem.r === item.r &&
+                    sItem.g === item.g &&
+                    sItem.b === item.b &&
+                    sItem.a === item.a
+                ) {
                     found = true;
                     break;
                 }
@@ -113,12 +115,14 @@ export class ColorOptions {
                         width: buttonSize + 'px',
                         height: buttonSize + 'px',
                         backgroundColor: color ? BB.ColorConverter.toRgbaStr(color) : 'transparent',
-                        lineHeight: (buttonSize + 1) + 'px',
+                        lineHeight: buttonSize + 1 + 'px',
                     },
                     onClick: (e) => {
                         if (this.selectedIndex === i) {
                             if (color && color.a === 1) {
-                                this.colorInput.showPicker ? this.colorInput.showPicker() : this.colorInput.click();
+                                this.colorInput.showPicker
+                                    ? this.colorInput.showPicker()
+                                    : this.colorInput.click();
                             }
                             return;
                         }
@@ -146,7 +150,6 @@ export class ColorOptions {
 
         this.rootEl.append(c(',w-0,h-0,overflow-hidden,abs-0-0', [this.colorInput]));
 
-
         const update = () => {
             for (let i = 0; i < this.buttonArr.length; i++) {
                 this.buttonArr[i].setIsSelected(i === this.selectedIndex);
@@ -167,17 +170,17 @@ export class ColorOptions {
     }
 
     // ---- interface ----
-    getElement (): HTMLElement {
+    getElement(): HTMLElement {
         return this.rootEl;
     }
 
-    getValue (): IRGBA | null {
+    getValue(): IRGBA | null {
         return this.colorArr[this.selectedIndex];
     }
 
-    destroy (): void {
+    destroy(): void {
         this.rootEl.remove();
-        this.buttonArr.forEach(item => {
+        this.buttonArr.forEach((item) => {
             BB.destroyEl(item.el);
         });
         this.buttonArr.splice(0, this.buttonArr.length);
@@ -185,6 +188,4 @@ export class ColorOptions {
         this.colorInput.onchange = null;
         this.colorInput.oninput = null;
     }
-
 }
-

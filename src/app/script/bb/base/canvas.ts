@@ -1,8 +1,8 @@
-import {IBounds, IKeyString, IRect} from '../bb-types';
-import {createCanvas} from './create-canvas';
-import {copyObj} from './base';
+import { IBounds, IKeyString, IRect } from '../bb-types';
+import { createCanvas } from './create-canvas';
+import { copyObj } from './base';
 
-export function copyCanvas (canvas: HTMLCanvasElement): HTMLCanvasElement {
+export function copyCanvas(canvas: HTMLCanvasElement): HTMLCanvasElement {
     const resultCanvas = createCanvas(canvas.width, canvas.height);
     const ctx = resultCanvas.getContext('2d');
     if (!ctx) {
@@ -12,7 +12,10 @@ export function copyCanvas (canvas: HTMLCanvasElement): HTMLCanvasElement {
     return resultCanvas;
 }
 
-export function ctx (canvas: HTMLCanvasElement, options?: CanvasRenderingContext2DSettings): CanvasRenderingContext2D {
+export function ctx(
+    canvas: HTMLCanvasElement,
+    options?: CanvasRenderingContext2DSettings,
+): CanvasRenderingContext2D {
     const ctx = canvas.getContext('2d', options);
     if (!ctx) {
         throw new Error("couldn't get 2d context");
@@ -24,14 +27,22 @@ export function ctx (canvas: HTMLCanvasElement, options?: CanvasRenderingContext
  * Determine if we should disable imageSmoothing for transformation.
  * ImageSmoothing can make images blurry even when they're in the original scale and aligned with the pixelgrid.
  */
-export function testShouldPixelate (
-    transform: {x: number; y: number; width:number; height: number; angleDeg: number},
+export function testShouldPixelate(
+    transform: {
+        x: number;
+        y: number;
+        width: number;
+        height: number;
+        angleDeg: number;
+    },
     scaleX: number,
     scaleY: number,
 ): boolean {
     if (
-        ![1, -1].includes(scaleX) || ![1, -1].includes(scaleY) ||
-        transform.width % 1 !== 0 || transform.height % 1 !== 0 ||
+        ![1, -1].includes(scaleX) ||
+        ![1, -1].includes(scaleY) ||
+        transform.width % 1 !== 0 ||
+        transform.height % 1 !== 0 ||
         Math.abs(transform.angleDeg) % 90 !== 0
     ) {
         return false;
@@ -40,15 +51,12 @@ export function testShouldPixelate (
     const width = whSwapped ? transform.height : transform.width;
     const height = whSwapped ? transform.width : transform.height;
     return (
-            (Math.abs(width) % 2 === 0 && transform.x % 1 === 0) ||
-            (Math.abs(width) % 2 === 1 && transform.x % 1 === 0.5)
-        ) &&
-        (
-            (Math.abs(height) % 2 === 0 && transform.y % 1 === 0) ||
-            (Math.abs(height) % 2 === 1 && transform.y % 1 === 0.5)
-        );
+        ((Math.abs(width) % 2 === 0 && transform.x % 1 === 0) ||
+            (Math.abs(width) % 2 === 1 && transform.x % 1 === 0.5)) &&
+        ((Math.abs(height) % 2 === 0 && transform.y % 1 === 0) ||
+            (Math.abs(height) % 2 === 1 && transform.y % 1 === 0.5))
+    );
 }
-
 
 /**
  * @param destCtx - the canvas that will be drawn on
@@ -57,11 +65,17 @@ export function testShouldPixelate (
  * @param bounds object - optional {x, y, width, height} - crop of transformImage in transformImage image space
  * @param pixelated
  */
-export function drawTransformedImageWithBounds (
+export function drawTransformedImageWithBounds(
     destCtx: CanvasRenderingContext2D,
     transformImage: HTMLImageElement | HTMLCanvasElement,
-    transform: {x: number; y: number; width:number; height: number; angleDeg: number},
-    bounds?: {x: number; y: number; width: number; height: number},
+    transform: {
+        x: number;
+        y: number;
+        width: number;
+        height: number;
+        angleDeg: number;
+    },
+    bounds?: { x: number; y: number; width: number; height: number },
     pixelated?: boolean,
 ): void {
     if (!bounds) {
@@ -82,12 +96,19 @@ export function drawTransformedImageWithBounds (
     }
 
     destCtx.translate(transform.x, transform.y);
-    destCtx.rotate(transform.angleDeg / 180 * Math.PI);
+    destCtx.rotate((transform.angleDeg / 180) * Math.PI);
     destCtx.scale(transform.width > 0 ? 1 : -1, transform.height > 0 ? 1 : -1);
     destCtx.drawImage(
         transformImage,
-        bounds.x, bounds.y, bounds.width, bounds.height,
-        -Math.abs(transform.width) / 2, -Math.abs(transform.height) / 2, Math.abs(transform.width), Math.abs(transform.height));
+        bounds.x,
+        bounds.y,
+        bounds.width,
+        bounds.height,
+        -Math.abs(transform.width) / 2,
+        -Math.abs(transform.height) / 2,
+        Math.abs(transform.width),
+        Math.abs(transform.height),
+    );
 
     destCtx.restore();
 }
@@ -100,13 +121,13 @@ export function drawTransformedImageWithBounds (
  * @param transformImage image|canvas - image that will be drawn on canvas
  * @param transformObj {center: {x, y}, scale: {x, y}, translate: {x, y}, angleDegree}
  */
-export function drawTransformedImageOnCanvas (
+export function drawTransformedImageOnCanvas(
     baseCanvas: HTMLCanvasElement,
     transformImage: HTMLImageElement | HTMLCanvasElement,
     transformObj: {
-        center: {x: number; y: number};
-        scale: {x: number; y: number};
-        translate: {x: number; y: number};
+        center: { x: number; y: number };
+        scale: { x: number; y: number };
+        translate: { x: number; y: number };
         angleDegree: number;
     },
 ): void {
@@ -139,7 +160,7 @@ export function drawTransformedImageOnCanvas (
     }
     ctx.save();
     if (
-        Math.abs(transformObj.scale.x - 1) >  0.000001 ||
+        Math.abs(transformObj.scale.x - 1) > 0.000001 ||
         Math.abs(transformObj.scale.y - 1) > 0.000001 ||
         Math.abs(transformObj.angleDegree % 90) > 0.000001
     ) {
@@ -151,7 +172,7 @@ export function drawTransformedImageOnCanvas (
 
     ctx.translate(transformObj.translate.x, transformObj.translate.y);
     ctx.translate(transformObj.center.x, transformObj.center.y);
-    ctx.rotate(transformObj.angleDegree / 180 * Math.PI);
+    ctx.rotate((transformObj.angleDegree / 180) * Math.PI);
     ctx.scale(transformObj.scale.x, transformObj.scale.y);
     ctx.translate(-transformObj.center.x, -transformObj.center.y);
     ctx.drawImage(transformImage, 0, 0, transformImage.width, transformImage.height);
@@ -183,7 +204,7 @@ export const createCheckerCanvas = function (size: number, isDark?: boolean): HT
         }
         ctx.fillStyle = isDark ? 'rgb(90, 90, 90)' : 'rgb(255, 255, 255)';
         ctx.fillRect(0, 0, size * 2, size * 2);
-        ctx.fillStyle = isDark ? 'rgb(63, 63, 63)': 'rgb(200, 200, 200)';
+        ctx.fillStyle = isDark ? 'rgb(63, 63, 63)' : 'rgb(200, 200, 200)';
         ctx.fillRect(0, 0, size, size);
         ctx.fillRect(size, size, size * 2, size * 2);
     }
@@ -191,15 +212,20 @@ export const createCheckerCanvas = function (size: number, isDark?: boolean): HT
 };
 
 export const createCheckerDataUrl = (function () {
-    const cache: IKeyString = { // previously created dataUrls
+    const cache: IKeyString = {
+        // previously created dataUrls
         '8l': 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAMElEQVQ4T2M8ceLEfwY8wNzcHJ80A+OoAcMiDP7//483HZw8eRJ/Ohg1gIFx6IcBAIhJUqnarXQ1AAAAAElFTkSuQmCC',
         '4l': 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAYAAADED76LAAAAJ0lEQVQoU2M8ceLEfwYkYG5ujsxlYKSDgv///6O44eTJk6huoL0CAGsOKVVu8UYvAAAAAElFTkSuQmCC',
     };
 
-    return function (size: number, callback?: (s: string) => void, isDark?: boolean): string | void {
+    return function (
+        size: number,
+        callback?: (s: string) => void,
+        isDark?: boolean,
+    ): string | void {
         const modeStr = isDark ? 'd' : 'l';
 
-        function create (size: number): string {
+        function create(size: number): string {
             size = parseInt('' + size);
             if (cache['' + size + modeStr]) {
                 return cache['' + size + modeStr];
@@ -210,11 +236,13 @@ export const createCheckerDataUrl = (function () {
             return result;
         }
 
-        if (callback) { //async
+        if (callback) {
+            //async
             setTimeout(function () {
                 callback(create(size));
             }, 1);
-        } else { //sync
+        } else {
+            //sync
             return create(size);
         }
     };
@@ -228,16 +256,15 @@ export const createCheckerDataUrl = (function () {
  * @param tmp1 canvas - optional, provide to save resources
  * @param tmp2 canvas - optional, provide to save resources
  */
-export function resizeCanvas (
+export function resizeCanvas(
     canvas: HTMLCanvasElement,
     w: number,
     h: number,
     tmp1?: HTMLCanvasElement,
     tmp2?: HTMLCanvasElement,
 ): void {
-
     //determine base 2 exponents of old and new size
-    function getBase2Obj (oldW: number, oldH: number, newW: number, newH: number) {
+    function getBase2Obj(oldW: number, oldH: number, newW: number, newH: number) {
         const result = {
             oldWidthEx: Math.round(Math.log2(oldW)),
             oldHeightEx: Math.round(Math.log2(oldH)),
@@ -255,7 +282,6 @@ export function resizeCanvas (
     w = Math.max(w, 1);
     h = Math.max(h, 1);
     if (w <= canvas.width && h <= canvas.height) {
-
         tmp1 = !tmp1 ? createCanvas() : tmp1;
         tmp2 = !tmp2 ? createCanvas() : tmp2;
 
@@ -268,15 +294,16 @@ export function resizeCanvas (
         tmp2.getContext('2d')!.save();
 
         let ew, eh;
-        let buffer1 = tmp1, buffer2 = tmp2;
+        let buffer1 = tmp1,
+            buffer2 = tmp2;
 
         ew = base2.oldWidthEx;
         eh = base2.oldHeightEx;
 
         let bufferCtx = buffer2.getContext('2d')!;
         bufferCtx.imageSmoothingEnabled = true;
-        bufferCtx.imageSmoothingQuality  = 'high';
-        bufferCtx.globalCompositeOperation  = 'copy';
+        bufferCtx.imageSmoothingQuality = 'high';
+        bufferCtx.globalCompositeOperation = 'copy';
         bufferCtx.drawImage(canvas, 0, 0, buffer2.width, buffer2.height);
 
         let currentWidth = buffer2.width;
@@ -286,11 +313,11 @@ export function resizeCanvas (
         for (; ew > base2.newWidthEx || eh > base2.newHeightEx; ew--, eh--) {
             bufferCtx = buffer1.getContext('2d')!;
             bufferCtx.imageSmoothingEnabled = true;
-            bufferCtx.imageSmoothingQuality  = 'high';
-            bufferCtx.globalCompositeOperation  = 'copy';
+            bufferCtx.imageSmoothingQuality = 'high';
+            bufferCtx.globalCompositeOperation = 'copy';
 
-            const newWidth = (ew > base2.newWidthEx) ? currentWidth / 2 : currentWidth;
-            const newHeight = (eh > base2.newHeightEx) ? currentHeight / 2 : currentHeight;
+            const newWidth = ew > base2.newWidthEx ? currentWidth / 2 : currentWidth;
+            const newHeight = eh > base2.newHeightEx ? currentHeight / 2 : currentHeight;
 
             //buffer also needs to be properly sized, unfortunately
             buffer1.width = newWidth;
@@ -298,10 +325,14 @@ export function resizeCanvas (
 
             bufferCtx.drawImage(
                 buffer2,
-                0, 0,
-                currentWidth, currentHeight,
-                0, 0,
-                newWidth, newHeight
+                0,
+                0,
+                currentWidth,
+                currentHeight,
+                0,
+                0,
+                newWidth,
+                newHeight,
             );
             currentWidth = newWidth;
             currentHeight = newHeight;
@@ -318,34 +349,25 @@ export function resizeCanvas (
         const canvasCtx = canvas.getContext('2d')!;
         canvasCtx.save();
         canvasCtx.imageSmoothingEnabled = true;
-        canvasCtx.imageSmoothingQuality  = 'high';
-        canvasCtx.drawImage(
-            buffer2,
-            0, 0,
-            currentWidth, currentHeight,
-            0, 0,
-            w, h
-        );
+        canvasCtx.imageSmoothingQuality = 'high';
+        canvasCtx.drawImage(buffer2, 0, 0, currentWidth, currentHeight, 0, 0, w, h);
         canvasCtx.restore();
         tmp1.getContext('2d')!.restore();
         tmp2.getContext('2d')!.restore();
-
     } else if (w >= canvas.width && h >= canvas.height) {
-
         tmp1 = !tmp1 ? createCanvas() : tmp1;
         tmp1.width = w;
         tmp1.height = h;
         const tmp1Ctx = tmp1.getContext('2d')!;
         tmp1Ctx.save();
         tmp1Ctx.imageSmoothingEnabled = true;
-        tmp1Ctx.imageSmoothingQuality  = 'high';
+        tmp1Ctx.imageSmoothingQuality = 'high';
         tmp1Ctx.drawImage(canvas, 0, 0, w, h);
         tmp1Ctx.restore();
 
         canvas.width = w;
         canvas.height = h;
         canvas.getContext('2d')!.drawImage(tmp1, 0, 0);
-
     } else {
         resizeCanvas(canvas, w, canvas.height, tmp1, tmp2);
         resizeCanvas(canvas, w, h, tmp1, tmp2);
@@ -357,13 +379,15 @@ export function resizeCanvas (
  * only writes a, doesn't write rgb
  * @param canvas
  */
-export function convertToAlphaChannelCanvas (canvas: HTMLCanvasElement): void {
+export function convertToAlphaChannelCanvas(canvas: HTMLCanvasElement): void {
     const imdat = canvas.getContext('2d')!.getImageData(0, 0, canvas.width, canvas.height);
     for (let i = 0; i < imdat.data.length; i += 4) {
         if (imdat.data[i + 3] === 0) {
             continue;
         }
-        imdat.data[i + 3] = (imdat.data[i] + imdat.data[i + 1] + imdat.data[i + 2]) / 3 * (imdat.data[i + 3] / 255);
+        imdat.data[i + 3] =
+            ((imdat.data[i] + imdat.data[i + 1] + imdat.data[i + 2]) / 3) *
+            (imdat.data[i + 3] / 255);
     }
     canvas.getContext('2d')!.putImageData(imdat, 0, 0);
 }
@@ -373,7 +397,7 @@ export function convertToAlphaChannelCanvas (canvas: HTMLCanvasElement): void {
  * or in the worst case there is a hard to fix memory leak.
  * This function manually makes the canvas use as little memory as possible.
  */
-export function freeCanvas (canvas: HTMLCanvasElement): void {
+export function freeCanvas(canvas: HTMLCanvasElement): void {
     canvas.width = 1;
     canvas.height = 1;
     canvas.remove();
@@ -381,58 +405,71 @@ export function freeCanvas (canvas: HTMLCanvasElement): void {
 
 /**
  * Determine bounding box that describes all pixels which are not fully transparent.
- * Returns null if empty.
+ * Returns undefined if empty.
  *
  * @param context
+ * @param integerBounds optional - restricts the search to this area. bounds have to be integers
  */
-export function canvasBounds (context: CanvasRenderingContext2D): IRect | undefined {
-    const boundsObj: {
-        x: number;
-        y: number;
-        width: number;
-        height: number;
-    } = { x: 0, y: 0, width: 0, height: 0 };
-    {
-        const tempBounds: Partial<IBounds> = {
-            x1: undefined,
-            y1: undefined,
-            x2: undefined,
-            y2: undefined,
-        };
-        const imdat = context.getImageData(0, 0, context.canvas.width, context.canvas.height);
+export function canvasBounds(
+    context: CanvasRenderingContext2D,
+    integerBounds?: IBounds,
+): IRect | undefined {
+    const searchBounds = integerBounds ?? {
+        x1: 0,
+        y1: 0,
+        x2: context.canvas.width - 1,
+        y2: context.canvas.height - 1,
+    };
+    const searchWidth = searchBounds.x2 - searchBounds.x1 + 1;
+    const searchHeight = searchBounds.y2 - searchBounds.y1 + 1;
 
-        if (imdat.data[3] > 0 && imdat.data[imdat.data.length - 1] > 0) {
-            tempBounds.x1 = 0;
-            tempBounds.y1 = 0;
-            tempBounds.x2 = context.canvas.width - 1;
-            tempBounds.y2 = context.canvas.height - 1;
-        } else {
-            for (let i = 3; i < imdat.data.length; i += 4) {
-                if (imdat.data[i] > 0 ) {
-                    const x = ((i - 3) / 4) %  context.canvas.width;
-                    const y = Math.floor((i - 3) / 4 / context.canvas.width);
-                    if (tempBounds.x1 === undefined || tempBounds.x1 > x) {
-                        tempBounds.x1 = x;
-                    }
-                    if (tempBounds.y1 === undefined) {
-                        tempBounds.y1 = y;
-                    }
-                    if (tempBounds.x2 === undefined || tempBounds.x2 < x) {
-                        tempBounds.x2 = x;
-                    }
-                    if (tempBounds.y2 === undefined || tempBounds.y2 < y) {
-                        tempBounds.y2 = y;
-                    }
-                }
+    const imdat = context.getImageData(searchBounds.x1, searchBounds.y1, searchWidth, searchHeight);
+
+    if (imdat.data[3] > 0 && imdat.data[imdat.data.length - 1] > 0) {
+        return {
+            x: searchBounds.x1,
+            y: searchBounds.y1,
+            width: searchBounds.x2 - searchBounds.x1 + 1,
+            height: searchBounds.y2 - searchBounds.y1 + 1,
+        };
+    }
+    const tempBounds: Partial<IBounds> = {
+        x1: undefined,
+        y1: undefined,
+        x2: undefined,
+        y2: undefined,
+    };
+    for (let i = 3; i < imdat.data.length; i += 4) {
+        if (imdat.data[i] > 0) {
+            const x = ((i - 3) / 4) % searchWidth;
+            const y = Math.floor((i - 3) / 4 / searchWidth);
+            if (tempBounds.x1 === undefined || tempBounds.x1 > x) {
+                tempBounds.x1 = x;
+            }
+            if (tempBounds.y1 === undefined) {
+                tempBounds.y1 = y;
+            }
+            if (tempBounds.x2 === undefined || tempBounds.x2 < x) {
+                tempBounds.x2 = x;
+            }
+            if (tempBounds.y2 === undefined || tempBounds.y2 < y) {
+                tempBounds.y2 = y;
             }
         }
-        if (tempBounds.x1 === undefined || tempBounds.y1 === undefined || tempBounds.x2 === undefined || tempBounds.y2 === undefined) {
-            return undefined;
-        }
-        boundsObj.x = tempBounds.x1;
-        boundsObj.y = tempBounds.y1;
-        boundsObj.width = tempBounds.x2! - tempBounds.x1 + 1;
-        boundsObj.height = tempBounds.y2! - tempBounds.y1 + 1;
     }
-    return boundsObj;
+    if (
+        tempBounds.x1 === undefined ||
+        tempBounds.y1 === undefined ||
+        tempBounds.x2 === undefined ||
+        tempBounds.y2 === undefined
+    ) {
+        return undefined;
+    }
+
+    return {
+        x: tempBounds.x1 + searchBounds.x1,
+        y: tempBounds.y1 + searchBounds.y1,
+        width: tempBounds.x2! - tempBounds.x1 + 1,
+        height: tempBounds.y2! - tempBounds.y1 + 1,
+    };
 }

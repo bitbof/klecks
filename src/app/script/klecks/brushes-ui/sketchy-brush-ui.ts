@@ -1,12 +1,11 @@
-import {brushes} from '../brushes/brushes';
-import {eventResMs} from './brushes-consts';
-import {klHistory} from '../history/kl-history';
-import {KlSlider} from '../ui/components/kl-slider';
+import { brushes } from '../brushes/brushes';
+import { eventResMs } from './brushes-consts';
+import { KlSlider } from '../ui/components/kl-slider';
 import brushIconImg from '/src/app/img/ui/brush-sketchy.png';
-import {IBrushUi} from '../kl-types';
-import {LANG, languageStrings} from '../../language/language';
-import {BB} from '../../bb/bb';
-import {SketchyBrush} from '../brushes/sketchy-brush';
+import { IBrushUi } from '../kl-types';
+import { LANG, languageStrings } from '../../language/language';
+import { BB } from '../../bb/bb';
+import { SketchyBrush } from '../brushes/sketchy-brush';
 
 export const sketchyBrushUi = (function () {
     const brushInterface = {
@@ -29,16 +28,16 @@ export const sketchyBrushUi = (function () {
     brushInterface.Ui = function (p) {
         const div = document.createElement('div'); // the gui
         const brush = new brushes.SketchyBrush();
-        brush.setHistory(klHistory);
+        brush.setHistory(p.history);
         p.onSizeChange(brush.getSize());
         let sizeSlider: KlSlider;
         let opacitySlider: KlSlider;
 
-        function setSize (size: number) {
+        function setSize(size: number) {
             brush.setSize(size);
         }
 
-        function init () {
+        function init() {
             sizeSlider = new KlSlider({
                 label: LANG('brush-size'),
                 width: 250,

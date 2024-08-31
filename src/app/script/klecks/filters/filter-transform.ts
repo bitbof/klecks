@@ -1,31 +1,28 @@
-import {BB} from '../../bb/bb';
-import {Checkbox} from '../ui/components/checkbox';
-import {FreeTransform} from '../ui/components/free-transform';
-import {IFreeTransform} from '../ui/components/free-transform-utils';
-import {Select} from '../ui/components/select';
-import {IFilterApply, IFilterGetDialogParam, TFilterGetDialogResult} from '../kl-types';
-import {LANG} from '../../language/language';
-import {TFilterHistoryEntry} from './filters';
-import {throwIfNull} from '../../bb/base/base';
-import {Preview} from '../ui/project-viewport/preview';
-import {TProjectViewportProject} from '../ui/project-viewport/project-viewport';
-import {css} from '@emotion/css/dist/emotion-css.cjs';
-import {testIsSmall} from '../ui/utils/test-is-small';
-import {getPreviewHeight, getPreviewWidth, mediumPreview} from '../ui/utils/preview-size';
+import { BB } from '../../bb/bb';
+import { Checkbox } from '../ui/components/checkbox';
+import { FreeTransform } from '../ui/components/free-transform';
+import { IFreeTransform } from '../ui/components/free-transform-utils';
+import { Select } from '../ui/components/select';
+import { IFilterApply, IFilterGetDialogParam, TFilterGetDialogResult } from '../kl-types';
+import { LANG } from '../../language/language';
+import { TFilterHistoryEntry } from './filters';
+import { throwIfNull } from '../../bb/base/base';
+import { Preview } from '../ui/project-viewport/preview';
+import { TProjectViewportProject } from '../ui/project-viewport/project-viewport';
+import { css } from '@emotion/css/dist/emotion-css.cjs';
+import { testIsSmall } from '../ui/utils/test-is-small';
+import { getPreviewHeight, getPreviewWidth, mediumPreview } from '../ui/utils/preview-size';
 
 export type TFilterTransformInput = {
-    bounds: {x: number; y: number; width: number; height: number};
+    bounds: { x: number; y: number; width: number; height: number };
     transform: IFreeTransform;
     isPixelated: boolean;
 };
 
-export type TFilterTransformHistoryEntry = TFilterHistoryEntry<
-    'transform',
-    TFilterTransformInput>;
+export type TFilterTransformHistoryEntry = TFilterHistoryEntry<'transform', TFilterTransformInput>;
 
 export const filterTransform = {
-
-    getDialog (params: IFilterGetDialogParam) {
+    getDialog(params: IFilterGetDialogParam) {
         const context = params.context;
         const klCanvas = params.klCanvas;
         if (!context || !klCanvas) {
@@ -48,7 +45,6 @@ export const filterTransform = {
             height: boundsObj.height,
             angleDeg: 0,
         };
-
 
         const rootEl = BB.el();
         const result: TFilterGetDialogResult<TFilterTransformInput> = {
@@ -81,15 +77,14 @@ export const filterTransform = {
                     onInputsChanged();
                 }
             },
-
         });
 
         const leftWrapper = BB.el();
         const rightWrapper = BB.el();
         const rotWrapper = BB.el();
-        const inputY = BB.el({tagName: 'input'});
-        const inputX = BB.el({tagName: 'input'});
-        const inputR = BB.el({tagName: 'input'});
+        const inputY = BB.el({ tagName: 'input' });
+        const inputX = BB.el({ tagName: 'input' });
+        const inputR = BB.el({ tagName: 'input' });
         leftWrapper.style.width = '100px';
         leftWrapper.style.height = '30px';
         rightWrapper.style.width = '100px';
@@ -156,7 +151,7 @@ export const filterTransform = {
             marginLeft: '10px',
             marginTop: '10px',
         };
-        const buttonRow = BB.el ({
+        const buttonRow = BB.el({
             parent: rootEl,
             css: {
                 display: 'flex',
@@ -164,7 +159,7 @@ export const filterTransform = {
                 marginLeft: '-10px',
             },
         });
-        const flipXBtn = BB.el ({
+        const flipXBtn = BB.el({
             parent: buttonRow,
             tagName: 'button',
             content: LANG('filter-transform-flip') + ' X',
@@ -174,7 +169,7 @@ export const filterTransform = {
             },
             css: actionBtnCss,
         });
-        const flipYBtn = BB.el ({
+        const flipYBtn = BB.el({
             parent: buttonRow,
             tagName: 'button',
             content: LANG('filter-transform-flip') + ' Y',
@@ -184,7 +179,7 @@ export const filterTransform = {
             },
             css: actionBtnCss,
         });
-        const scaleRotLeftBtn = BB.el ({
+        const scaleRotLeftBtn = BB.el({
             parent: buttonRow,
             tagName: 'button',
             content: '-90°',
@@ -198,7 +193,7 @@ export const filterTransform = {
             },
             css: actionBtnCss,
         });
-        const scaleRotRightBtn = BB.el ({
+        const scaleRotRightBtn = BB.el({
             parent: buttonRow,
             tagName: 'button',
             content: '+90°',
@@ -212,7 +207,7 @@ export const filterTransform = {
             },
             css: actionBtnCss,
         });
-        const scaleDoubleBtn = BB.el ({
+        const scaleDoubleBtn = BB.el({
             parent: buttonRow,
             tagName: 'button',
             content: '2x',
@@ -226,7 +221,7 @@ export const filterTransform = {
             },
             css: actionBtnCss,
         });
-        const scaleHalfBtn = BB.el ({
+        const scaleHalfBtn = BB.el({
             parent: buttonRow,
             tagName: 'button',
             content: '1/2x',
@@ -236,22 +231,21 @@ export const filterTransform = {
             },
             css: actionBtnCss,
         });
-        const centerBtn = BB.el ({
+        const centerBtn = BB.el({
             parent: buttonRow,
             tagName: 'button',
             content: LANG('center'),
             onClick: () => {
                 const t = freeTransform.getValue();
-                freeTransform.setPos({ x: context.canvas.width / 2, y: context.canvas.height / 2 });
+                freeTransform.setPos({
+                    x: context.canvas.width / 2,
+                    y: context.canvas.height / 2,
+                });
                 freeTransform.setAngleDeg(t.angleDeg);
                 updatePreview();
             },
             css: actionBtnCss,
         });
-
-
-
-
 
         let isConstrained = true;
         const constrainCheckbox = new Checkbox({
@@ -285,12 +279,14 @@ export const filterTransform = {
         const checkboxWrapper = BB.el();
         checkboxWrapper.append(constrainCheckbox.getElement(), snappingCheckbox.getElement());
 
-        rootEl.append(BB.el({
-            css: {
-                clear: 'both',
-                height: '10px',
-            },
-        }));
+        rootEl.append(
+            BB.el({
+                css: {
+                    clear: 'both',
+                    height: '10px',
+                },
+            }),
+        );
 
         const bottomRow = BB.el({
             parent: rootEl,
@@ -349,16 +345,17 @@ export const filterTransform = {
             padding: 30,
         });
         preview.render();
-        preview.getElement().classList.add(css({
-            overflow: 'hidden',
-            marginLeft: '-20px',
-            marginRight: '-20px',
-        }));
+        preview.getElement().classList.add(
+            css({
+                overflow: 'hidden',
+                marginLeft: '-20px',
+                marginRight: '-20px',
+            }),
+        );
         rootEl.append(preview.getElement());
 
-
         let lastDrawnTransformStr = '';
-        function updatePreview (doForce: boolean = false) {
+        function updatePreview(doForce: boolean = false) {
             if (!freeTransform) {
                 return;
             }
@@ -377,7 +374,11 @@ export const filterTransform = {
                 transform,
                 boundsObj,
                 algorithmSelect.getValue() === 'pixelated' ||
-                BB.testShouldPixelate(transform, transform.width / initTransform.width, transform.height / initTransform.height),
+                    BB.testShouldPixelate(
+                        transform,
+                        transform.width / initTransform.width,
+                        transform.height / initTransform.height,
+                    ),
             );
             ctx.restore();
             preview.render();
@@ -407,11 +408,11 @@ export const filterTransform = {
         });
         preview.getElement().append(freeTransform.getElement());
 
-        function onInputsChanged () {
+        function onInputsChanged() {
             freeTransform.setPos({
                 x: parseInt(inputX.value) + initTransform.x,
-                y: parseInt(inputY.value) + initTransform.y}
-            );
+                y: parseInt(inputY.value) + initTransform.y,
+            });
             freeTransform.setAngleDeg(parseInt(inputR.value));
             updatePreview();
         }
@@ -438,8 +439,13 @@ export const filterTransform = {
             const input: TFilterTransformInput = {
                 transform,
                 bounds: boundsObj,
-                isPixelated: algorithmSelect.getValue() === 'pixelated' ||
-                    BB.testShouldPixelate(transform, transform.width / initTransform.width, transform.height / initTransform.height),
+                isPixelated:
+                    algorithmSelect.getValue() === 'pixelated' ||
+                    BB.testShouldPixelate(
+                        transform,
+                        transform.width / initTransform.width,
+                        transform.height / initTransform.height,
+                    ),
             };
             result.destroy!();
             return BB.copyObj(input);
@@ -447,13 +453,13 @@ export const filterTransform = {
         return result;
     },
 
-    apply (params: IFilterApply<TFilterTransformInput>): boolean {
+    apply(params: IFilterApply<TFilterTransformInput>): boolean {
         const context = params.context;
         const history = params.history;
-        if (!context || !history) {
+        if (!context) {
             return false;
         }
-        history.pause(true);
+        history?.pause(true);
 
         const input = params.input;
 
@@ -467,13 +473,12 @@ export const filterTransform = {
             input.isPixelated,
         );
 
-        history.pause(false);
-        history.push({
+        history?.pause(false);
+        history?.push({
             tool: ['filter', 'transform'],
             action: 'apply',
-            params: [{input}],
+            params: [{ input }],
         } as TFilterTransformHistoryEntry);
         return true;
     },
-
 };
