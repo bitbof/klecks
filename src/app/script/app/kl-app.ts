@@ -158,10 +158,16 @@ export class KlApp {
                         left: '0',
                         right: '',
                     });
+                    BB.css(this.easel.getElement(), {
+                        left: '0',
+                    });
                 } else {
                     BB.css(this.toolspaceCollapser.getElement(), {
                         left: '',
                         right: '0',
+                    });
+                    BB.css(this.easel.getElement(), {
+                        left: '0',
                     });
                 }
                 this.toolspace.style.display = 'none';
@@ -441,8 +447,7 @@ export class KlApp {
             if (!tempHistory.canDecreaseIndex()) {
                 discardUncommitted();
             }
-            klHistoryExecutor.undo();
-            if (showMessage) {
+            if (klHistoryExecutor.undo() && showMessage) {
                 this.statusOverlay.out(LANG('undo'), true);
             }
         };
@@ -451,8 +456,7 @@ export class KlApp {
             /*if (!tempHistory.canIncreaseIndex()) {
                 discardUncommitted();
             }*/
-            klHistoryExecutor.redo();
-            if (showMessage) {
+            if (klHistoryExecutor.redo() && showMessage) {
                 this.statusOverlay.out(LANG('redo'), true);
             }
         };
@@ -543,6 +547,7 @@ export class KlApp {
             },
         });
 
+        let isFirstTransform = true;
         this.easel = new Easel({
             width: Math.max(0, this.uiWidth - this.toolWidth),
             height: this.uiHeight,
@@ -670,12 +675,15 @@ export class KlApp {
                 this.toolspaceToolRow.setEnableZoomIn(transform.scale !== EASEL_MAX_SCALE);
                 this.toolspaceToolRow.setEnableZoomOut(transform.scale !== EASEL_MIN_SCALE);
 
-                if (isScaleOrAngleChanged) {
+                if (isScaleOrAngleChanged && !isFirstTransform) {
                     this.statusOverlay.out({
                         type: 'transform',
                         scale: transform.scale,
                         angleDeg: transform.angleDeg,
                     });
+                }
+                if (isFirstTransform) {
+                    isFirstTransform = false;
                 }
             },
             onUndo: () => {
@@ -1404,7 +1412,7 @@ export class KlApp {
             statusOverlay: this.statusOverlay,
             onCanvasChanged: () => {
                 this.easelProjectUpdater.update();
-                this.easel.resetOrFitTransform();
+                this.easel.resetOrFitTransform(true);
             },
             applyUncommitted: () => applyUncommitted(),
             history: klHistory,
@@ -1426,14 +1434,15 @@ export class KlApp {
                 const currentLayerIndex = throwIfNull(
                     this.klCanvas.getLayerIndex(currentLayerCtx.canvas),
                 );
+                this.easelProjectUpdater.update(); // triggers render
+                if (dimensionChanged) {
+                    this.easel.resetOrFitTransform(true);
+                }
+
                 currentBrushUi.setContext(currentLayerCtx);
                 this.easelBrush.setLastDrawEvent();
                 this.layersUi.update(currentLayerIndex);
                 this.layerPreview.setLayer(this.klCanvas.getLayer(currentLayerIndex)!);
-                if (dimensionChanged) {
-                    this.easelProjectUpdater.update();
-                    this.easel.resetOrFitTransform();
-                }
                 klAppSelect.onHistory(type);
             },
             onCanUndoRedoChange: (canUndo, canRedo) => {
@@ -1465,7 +1474,7 @@ export class KlApp {
                     this.layersUi.update(0);
                     setCurrentLayer(throwIfNull(this.klCanvas.getLayer(0)));
                     this.easelProjectUpdater.update();
-                    this.easel.resetOrFitTransform();
+                    this.easel.resetOrFitTransform(true);
                 },
                 onCancel: () => {},
             });
@@ -1509,7 +1518,7 @@ export class KlApp {
                     });
                     this.layersUi.update();
                     this.easelProjectUpdater.update();
-                    this.easel.resetOrFitTransform();
+                    this.easel.resetOrFitTransform(true);
                 },
                 this.statusOverlay,
                 showCrop || false,
@@ -1834,7 +1843,7 @@ export class KlApp {
                 klCanvas: this.klCanvas,
                 onImportConfirm: () => {
                     this.easelProjectUpdater.update();
-                    this.easel.resetOrFitTransform();
+                    this.easel.resetOrFitTransform(true);
                 },
             },
             {

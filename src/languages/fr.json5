@@ -1642,5 +1642,13 @@
   wip: {
     original: 'Work in progress',
     value: ''
+  },
+  'browser-zoom-help': {
+    original: 'Double-tap or pinch-out to reset browser zoom.',
+    value: ''
+  },
+  dismiss: {
+    original: 'Dismiss',
+    value: ''
   }
 }

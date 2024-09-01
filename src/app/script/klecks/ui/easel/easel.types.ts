@@ -13,7 +13,8 @@ import { TEMP_TRIGGERS } from './easel.config';
 export type TEaselInterface = {
     setCursor: (cursor: string) => void; // css cursor of easel
     getTransform: () => TViewportTransform;
-    setTransform: (transform: TViewportTransform) => void;
+    getTargetTransform: () => TViewportTransform;
+    setTransform: (transform: TViewportTransform, isImmediate?: boolean) => void;
     setAngleDeg: (angleDeg: number, isRelative: undefined | boolean) => void;
     minScale: number;
     maxScale: number;

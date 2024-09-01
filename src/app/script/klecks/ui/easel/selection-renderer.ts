@@ -1,5 +1,5 @@
 import { TViewportTransform } from '../project-viewport/project-viewport';
-import { MultiPolygon } from 'polygon-clipping';
+import { MultiPolygon, Pair } from 'polygon-clipping';
 import { BB } from '../../../bb/bb';
 import * as classes from './selection-renderer.module.scss';
 import { Matrix } from 'transformation-matrix';
@@ -14,6 +14,17 @@ export type TSelectionRendererParams = {
     width: number; // size of viewport
     height: number; // size of viewport
 };
+
+// makes right angle rects look more crisp
+export function roundPoly(multiPolygon: MultiPolygon): MultiPolygon {
+    return multiPolygon.map((poly) => {
+        return poly.map((ring) => {
+            return ring.map((point) => {
+                return [Math.round(point[0] + 0.5) - 0.5, Math.round(point[1] + 0.5) - 0.5] as Pair; // on .5
+            });
+        });
+    });
+}
 
 export class SelectionRenderer {
     private readonly rootEl: SVGElement;
@@ -53,7 +64,7 @@ export class SelectionRenderer {
             ],
         ]);
 
-        const d = getSvgPathD(clippedSelection);
+        const d = getSvgPathD(roundPoly(clippedSelection));
         this.svgPath1.setAttribute('d', d);
         this.svgPath2.setAttribute('d', d);
     }

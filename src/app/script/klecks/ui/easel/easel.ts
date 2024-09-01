@@ -28,6 +28,8 @@ import {
     TEMP_TRIGGERS,
     TEMP_TRIGGERS_KEYS,
 } from './easel.config';
+import { isTransformEqual } from '../project-viewport/utils/is-transform-equal';
+import { blendTransform } from '../project-viewport/utils/blend-transform';
 
 function getToolEntries<GToolId extends string>(
     tools: Record<GToolId, TEaselTool>,
@@ -81,16 +83,18 @@ export class Easel<GToolId extends string> {
     private doRender = false; // true -> will render on next renderLoop
     private cursorPos: IVector2D | undefined; // so brush cursor not top left corner after reload
     private isFrozen: boolean = false; // disable interaction with the easel whatsoever
-    private lastTransform: TViewportTransform = {} as TViewportTransform; // previously rendered viewport transformation
+    private lastRenderedTransform: TViewportTransform = {} as TViewportTransform; // previously rendered viewport transformation
     private pinchInitialTransform: TViewportTransform | undefined; // when starting a pinch-to-zoom gesture
+    private targetTransform: TViewportTransform = {} as TViewportTransform;
 
     // custom interface passed to tools
     private readonly easelInterface: TEaselInterface = {
         setCursor: (cursor) => (this.rootEl.style.cursor = cursor),
         getTransform: () => this.viewport.getTransform(),
+        getTargetTransform: () => this.targetTransform,
         getSize: () => ({ width: this.width, height: this.height }),
         getProjectSize: () => ({ width: this.project.width, height: this.project.height }),
-        setTransform: (transform) => this.setTransform(transform),
+        setTransform: (transform, isImmediate) => this.setTargetTransform(transform, isImmediate),
         requestRender: () => this.requestRender(),
         isKeyPressed: (keyStr) => this.keyListener.isPressed(keyStr),
         minScale: EASEL_MIN_SCALE,
@@ -102,6 +106,14 @@ export class Easel<GToolId extends string> {
         clearRenderedSelection: (isImmediate) =>
             this.selectionRenderer.clearRenderedSelection(isImmediate),
     };
+
+    private setTargetTransform(transform: TViewportTransform, isImmediate?: boolean): void {
+        if (isImmediate) {
+            this.viewport.setTransform(transform);
+        }
+        this.targetTransform = transform;
+        this.doRender = true;
+    }
 
     private updateToolSvgs(): void {
         const tool = this.tempTool ?? this.tool;
@@ -119,30 +131,59 @@ export class Easel<GToolId extends string> {
         this.pointerPreprocessor.setDoubleTapPointerTypes(pointerTypes);
     }
 
+    private lastFrameTimestamp: number = 0;
     /**
      * Only call once from outside. Will perpetuate itself and render when doRender = true
      */
     private renderLoop(): void {
+        const now = performance.now();
+        const deltaMs = now - this.lastFrameTimestamp;
+        this.lastFrameTimestamp = now;
         this.animationFrameId = requestAnimationFrame(() => this.renderLoop());
         if (!this.doRender) {
             return;
         }
-        this.doRender = false;
         const tool = this.getActiveTool();
-        const transform = this.viewport.getTransform();
+        const oldTransform = this.viewport.getTransform();
+        let newTransform = oldTransform;
+        if (isTransformEqual(oldTransform, this.targetTransform)) {
+            this.doRender = false;
+        } else {
+            const defaultDeltaMs = 1000 / 60;
+            const timeFactor = deltaMs / defaultDeltaMs;
+            const easeFactor = 1 - 0.7 ** timeFactor;
+
+            newTransform = blendTransform(
+                oldTransform,
+                this.targetTransform,
+                {
+                    width: this.project.width,
+                    height: this.project.height,
+                },
+                {
+                    x: this.width / 2,
+                    y: this.height / 2,
+                },
+                easeFactor,
+            );
+            this.viewport.setTransform(newTransform);
+        }
+
+        // todo: is last renderedTransform needed?
 
         const isPositionChanged =
-            transform.x !== this.lastTransform.x || transform.y !== this.lastTransform.y;
+            newTransform.x !== this.lastRenderedTransform.x ||
+            newTransform.y !== this.lastRenderedTransform.y;
         const isScaleOrAngleChanged =
-            transform.scale !== this.lastTransform.scale ||
-            transform.angleDeg !== this.lastTransform.angleDeg;
+            newTransform.scale !== this.lastRenderedTransform.scale ||
+            newTransform.angleDeg !== this.lastRenderedTransform.angleDeg;
 
-        this.viewport.render();
+        this.viewport.render(!isTransformEqual(oldTransform, newTransform));
         if (isPositionChanged || isScaleOrAngleChanged) {
-            tool.onUpdateTransform?.(transform);
-            this.selectionRenderer.setTransform(transform);
-            this.onTransformChange(transform, isScaleOrAngleChanged);
-            this.lastTransform = transform;
+            tool.onUpdateTransform?.(newTransform);
+            this.selectionRenderer.setTransform(newTransform);
+            this.onTransformChange(this.targetTransform, isScaleOrAngleChanged);
+            this.lastRenderedTransform = newTransform;
         }
     }
 
@@ -196,7 +237,12 @@ export class Easel<GToolId extends string> {
     private getFitTransform(): TViewportTransform {
         const oldTransform = this.viewport.getTransform();
         // rotate
-        const newAngleDeg = snapAngleDeg(oldTransform.angleDeg, 90, 90);
+        let newAngleDeg = oldTransform.angleDeg;
+        if (newAngleDeg === 45) {
+            // would otherwise get rounded to 90
+            newAngleDeg = 0;
+        }
+        newAngleDeg = snapAngleDeg(newAngleDeg, 90, 90);
 
         //calc width and height of bounds
         const projectWidth = this.project.width;
@@ -349,13 +395,14 @@ export class Easel<GToolId extends string> {
                     metaTransform.viewportP.y += event.relY - event.downRelY;
                     metaTransform.angleDeg = newAngleDeg;
 
-                    this.viewport.setTransform(
+                    this.setTargetTransform(
                         createTransform(
                             metaTransform.viewportP,
                             metaTransform.canvasP,
                             metaTransform.scale,
                             metaTransform.angleDeg,
                         ),
+                        true,
                     );
                     this.requestRender();
                 } else if (event.type === 'end') {
@@ -442,7 +489,12 @@ export class Easel<GToolId extends string> {
             },
             onWheel: (e) => {
                 e.event?.preventDefault();
+                let isImmediate = false;
+                if (Math.abs(e.deltaY) < 0.8) {
+                    isImmediate = true;
+                }
                 if (e.event && e.event.ctrlKey && !this.keyListener.isPressed('ctrl')) {
+                    isImmediate = true;
                     let factor = 1;
                     if (e.event.deltaMode === 0) {
                         factor = 6;
@@ -452,8 +504,9 @@ export class Easel<GToolId extends string> {
                 if (this.keyListener.isPressed('shift')) {
                     e.deltaY /= 4;
                 }
+
                 // zoom
-                const transform = this.viewport.getTransform();
+                const transform = this.targetTransform;
                 const viewportPoint = {
                     x: e.relX,
                     y: e.relY,
@@ -465,10 +518,10 @@ export class Easel<GToolId extends string> {
                     EASEL_MIN_SCALE,
                     EASEL_MAX_SCALE,
                 );
-                this.setTransform(
+                this.setTargetTransform(
                     createTransform(viewportPoint, canvasPoint, newScale, transform.angleDeg),
+                    isImmediate,
                 );
-                this.requestRender();
             },
             onEnterLeave: (isOver) => {
                 const tool = this.getActiveTool();
@@ -657,7 +710,7 @@ export class Easel<GToolId extends string> {
         this.getActiveTool().onResize?.(width, height);
         this.viewport.setSize(width, height);
         const transform = this.viewport.getTransform();
-        this.viewport.setTransform(
+        this.setTargetTransform(
             createTransform(
                 {
                     x: this.width / 2,
@@ -667,6 +720,7 @@ export class Easel<GToolId extends string> {
                 transform.scale,
                 transform.angleDeg,
             ),
+            true,
         );
 
         this.requestRender();
@@ -681,8 +735,7 @@ export class Easel<GToolId extends string> {
     }
 
     setTransform(transform: TViewportTransform): void {
-        this.viewport.setTransform(transform);
-        this.requestRender();
+        this.setTargetTransform(transform, true);
     }
 
     setTool(toolId: GToolId): void {
@@ -701,17 +754,16 @@ export class Easel<GToolId extends string> {
     }
 
     translate(dX: number, dY: number): void {
-        const transform = this.viewport.getTransform();
-        this.viewport.setTransform({
+        const transform = this.targetTransform;
+        this.setTargetTransform({
             ...transform,
             x: transform.x + dX,
             y: transform.y + dY,
         });
-        this.requestRender();
     }
 
     scale(factor: number, viewportX?: number, viewportY?: number): void {
-        const before = this.viewport.getTransform();
+        const before = this.targetTransform;
         const viewportRect = { width: this.width, height: this.height };
         viewportX = viewportX ?? viewportRect.width / 2;
         viewportY = viewportY ?? viewportRect.height / 2;
@@ -723,7 +775,7 @@ export class Easel<GToolId extends string> {
             EASEL_MAX_SCALE,
         );
 
-        this.viewport.setTransform(
+        this.setTargetTransform(
             createTransform(
                 metaTransform.viewportP,
                 metaTransform.canvasP,
@@ -731,16 +783,15 @@ export class Easel<GToolId extends string> {
                 metaTransform.angleDeg,
             ),
         );
-        this.requestRender();
     }
 
-    resetTransform(): void {
+    resetTransform(isImmediate?: boolean): void {
         const transform = this.getResetTransform();
-        this.viewport.setTransform(transform);
+        this.setTargetTransform(transform, isImmediate);
         this.requestRender();
     }
 
-    fitTransform(): boolean {
+    fitTransform(isImmediate?: boolean): boolean {
         const oldTransform = this.viewport.getTransform();
         const transform = this.getFitTransform();
 
@@ -752,36 +803,37 @@ export class Easel<GToolId extends string> {
             return false;
         }
 
-        this.viewport.setTransform(transform);
-        this.requestRender();
+        this.setTargetTransform(transform, isImmediate);
         return true;
     }
 
     /**
      * Automatically decide what is best. E.g. if it's pixel art, Fit might be better.
      */
-    resetOrFitTransform(): void {
+    resetOrFitTransform(isImmediate?: boolean): void {
         const threshold = 4; // >= 400% zoom. pixelated, not blurry
         if (
             !klConfig.disableAutoFit &&
             this.project.width <= this.width / threshold &&
             this.project.height <= this.height / threshold
         ) {
-            this.fitTransform();
+            this.fitTransform(isImmediate);
         } else {
-            this.resetTransform();
+            this.resetTransform(isImmediate);
         }
     }
 
     setAngleDeg(angleDeg: number, isRelative: undefined | boolean) {
-        const viewportTransform = this.viewport.getTransform();
+        const viewportTransform = this.targetTransform;
         const viewportMat = createMatrixFromTransform(viewportTransform);
         const viewportRect = { width: this.width, height: this.height };
         const viewportCenterP = {
             x: viewportRect.width / 2,
             y: viewportRect.height / 2,
         };
-        const newAngleDeg = isRelative ? viewportTransform.angleDeg + angleDeg : angleDeg;
+        const newAngleDeg = minimizeAngleDeg(
+            isRelative ? viewportTransform.angleDeg + angleDeg : angleDeg,
+        );
 
         const newViewportTransform = createTransform(
             viewportCenterP,
@@ -789,8 +841,7 @@ export class Easel<GToolId extends string> {
             viewportTransform.scale,
             newAngleDeg,
         );
-        this.viewport.setTransform(newViewportTransform);
-        this.requestRender();
+        this.setTargetTransform(newViewportTransform);
     }
 
     getIsLocked(): boolean {
