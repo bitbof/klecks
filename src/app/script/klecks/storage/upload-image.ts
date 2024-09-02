@@ -8,6 +8,7 @@ export class UploadImage {
     private imageId: string;
     private generating: boolean;
     private queueNew: boolean;
+    private style: GenerateStyle;
     private getImage(canvas: HTMLCanvasElement, filename: string, mimeType: string): Blob {
         const parts = canvas.toDataURL(mimeType).match(/data:([^;]*)(;base64)?,([0-9A-Za-z+/]+)/);
 
@@ -34,6 +35,8 @@ export class UploadImage {
         this.generating = false;
         this.queueNew = false;
         this.backendUrl = backendUrl;
+        this.style = new GenerateStyle('(van gogh style:1.1) (Post-Impressionism:1.3) (Expressive:1.1), (bold brushstrokes:1.2), (vibrant colors:1.2), painting style, intense emotions, distorted forms, dynamic compositions, raw authenticity,',
+             'photo, photorealistic, painting of Van Gogh, logo, cartoon, naked, tits, nude, porn');
      }
 
     Send(): void {
@@ -72,8 +75,8 @@ export class UploadImage {
 
         const formData = new FormData();
         formData.append('file', data);
-        formData.append('negativePrompt', 'ugly');
-        formData.append('positivePrompt', 'picasso style, painting, vibrant strokes');
+        formData.append('negativePrompt', this.style.negativePrompt);
+        formData.append('positivePrompt', this.style.postivePrompt);
 
         var response = await fetch(this.backendUrl + '/generate', {
             method: 'POST',
@@ -96,4 +99,29 @@ export class UploadImage {
         return this.imageId;
     }
 
+    public setStyle(style: string){
+        var styles = new Map<string, GenerateStyle>();
+        styles.set('Van Gogh', new GenerateStyle('(van gogh style:1.1) (Post-Impressionism:1.3) (Expressive:1.1), (bold brushstrokes:1.2), (vibrant colors:1.2), painting style, intense emotions, distorted forms, dynamic compositions, raw authenticity,',
+             'photo, photorealistic, painting of Van Gogh, logo, cartoon, naked, tits, nude, porn'));
+        styles.set('Rembrandt', new GenerateStyle('Rembrandt van Rijn style painting, oil painting, Baroque, chiaroscuro, dramatic lighting, realistic portraits, deep shadows, warm color palette, emotional depth, 17th-century Dutch art', 
+            'photo, photorealistic, logo, cartoon, naked, tits, nude, porn'));
+        styles.set('Picasso', new GenerateStyle('painted by Picasso, Cubism, abstract, fragmented forms, bold colors, geometric shapes, surrealism, expressive, multiple perspectives, deconstructed figures, avant-garde', 
+            'photo, photorealistic, logo, cartoon, naked, tits, nude, porn'));
+        styles.set('Photo', new GenerateStyle('a photo realistic painting, High detail, realistic textures, precise rendering, lifelike, sharp focus, true-to-life colors, fine brushwork, hyperrealism, clarity, exact replication',
+             'logo, cartoon, naked, tits, nude, porn'));
+
+        var selectedStyle =  styles.get(style);
+        this.style = selectedStyle ?? new GenerateStyle('Select failed', '');
+    }
+
+}
+
+class GenerateStyle{
+    postivePrompt: string;
+    negativePrompt: string
+
+    constructor(negativePrompt:string, positivePrompt:string) {
+        this.negativePrompt = negativePrompt;
+        this.postivePrompt = positivePrompt;
+    }
 }

@@ -1,4 +1,4 @@
-FROM node
+FROM node:20
 
 COPY . /var/www
 WORKDIR /var/www

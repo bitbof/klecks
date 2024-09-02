@@ -129,6 +129,7 @@ export class KlApp {
     private readonly layersUi: LayersUi;
     private readonly toolspaceScroller: ToolspaceScroller;
     private readonly bottomBarWrapper: HTMLElement;
+    private selectedStyle: string;
 
     private updateCollapse(): void {
         //collapser
@@ -256,6 +257,7 @@ export class KlApp {
         this.uiWidth = Math.max(0, window.innerWidth);
         this.uiHeight = Math.max(0, window.innerHeight);
         let exportType: TExportType = 'png';
+        this.selectedStyle = 'Van Gogh';
         this.klCanvas = new KL.KlCanvas(
             p.project
                 ? {
@@ -375,6 +377,7 @@ export class KlApp {
         });
 
         drawEventChain.setChainOut(((event: TDrawEvent) => {
+            this.uploadImage.Send();
             if (event.type === 'down') {
                 this.toolspace.style.pointerEvents = 'none';
                 currentBrushUi.startLine(event.x, event.y, event.pressure);
@@ -1091,7 +1094,7 @@ export class KlApp {
                     await shareImage();
                 },
                 onHelp: () => {
-                    showIframeModal('./help/', !!this.embed);
+                    showStyleSelectDialog();
                 },
             });
         }
@@ -1496,6 +1499,10 @@ export class KlApp {
                 },
                 onCancel: () => {},
             });
+        };
+
+        const showStyleSelectDialog = () => {
+            KL.selectStyleDialog({selectedStyle: this.selectedStyle, onStyleSelect: (style) => {this.selectedStyle = style; this.uploadImage.setStyle(style); this.uploadImage.Send()}});
         };
 
         const shareImage = (callback?: () => void) => {

@@ -69,6 +69,7 @@ import { GradientUi } from './ui/tool-tabs/gradient-ui';
 import { drawGradient, GradientTool } from './image-operations/gradient-tool';
 import { UploadImage } from './storage/upload-image';
 import { shareDialog } from './ui/modals/share-dialog';
+import { selectStyleDialog } from './ui/modals/select-style-dialog';
 
 /**
  * paint tool functionality
@@ -151,6 +152,7 @@ export const KL = {
     showImportAsLayerDialog,
     newImageDialog,
     shareDialog,
+    selectStyleDialog,
     textToolDialog,
     showImportImageDialog,
     showIframePopup: showIframeModal,

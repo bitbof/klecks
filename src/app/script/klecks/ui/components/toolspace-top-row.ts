@@ -114,16 +114,14 @@ export class ToolspaceTopRow {
             contain: true,
         });
 
-        let shareButton = null;
-        if (BB.canShareFiles()) {
-            shareButton = createButton({
-                onClick: p.onShare,
-                title: LANG('file-share'),
-                image: shareImg,
-                contain: true,
-                darkInvert: true,
-            });
-        }
+        let shareButton = createButton({
+            onClick: p.onShare,
+            title: LANG('file-share'),
+            image: shareImg,
+            contain: true,
+            darkInvert: true,
+        });
+
         const helpButton = createButton({
             onClick: p.onHelp,
             title: LANG('help'),
