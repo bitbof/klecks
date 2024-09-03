@@ -9,6 +9,7 @@ import toolSelectImg from '/src/app/img/ui/tool-select.svg';
 import caretDownImg from '/src/app/img/ui/caret-down.svg';
 import { LANG } from '../../../language/language';
 import { TToolType } from '../../kl-types';
+import { PointerListener } from '../../../bb/input/pointer-listener';
 
 type TDropdownButton = {
     wrapper: HTMLElement;
@@ -151,6 +152,15 @@ export class ToolDropdown {
                 pointerEvents: 'auto',
                 height: '100%',
                 boxSizing: 'border-box',
+                zIndex: '1',
+            },
+        });
+
+        // hover via JS, so hover-state not stuck on mobile
+        const activeButtonPointerListener = new PointerListener({
+            target: this.activeButton,
+            onEnterLeave: (isOver) => {
+                this.activeButton.classList.toggle('kl-tool-button--hover', isOver);
             },
         });
 
@@ -170,21 +180,17 @@ export class ToolDropdown {
 
         this.arrowButton = BB.el({
             parent: this.activeButton,
-            className: 'dark-invert',
+            className: 'kl-tooldropdown-caret dark-invert',
             css: {
                 position: 'absolute',
                 right: '1px',
-                bottom: '1px',
                 width: '18px',
                 height: '18px',
-                //background: '#aaa',
-                //borderRadius: '2px',
                 cursor: 'pointer',
 
                 backgroundImage: "url('" + caretDownImg + "')",
                 backgroundRepeat: 'no-repeat',
                 backgroundPosition: 'center',
-                backgroundSize: '60%',
             },
             title: 'More Tools',
             onClick: (e) => {
@@ -222,7 +228,7 @@ export class ToolDropdown {
                 height: 100 * (this.optionArr.length - 1) + '%',
                 top: '100%',
                 left: '0',
-                zIndex: '1',
+                zIndex: '-1',
                 boxSizing: 'border-box',
                 cursor: 'pointer',
                 transition: 'height 0.1s ease-in-out, opacity 0.1s ease-in-out',
@@ -318,7 +324,8 @@ export class ToolDropdown {
                 this.dropdownBtnArr[i].show(this.currentActiveIndex !== i);
             }
 
-            this.arrowButton.style.display = 'none';
+            this.arrowButton.style.opacity = '0';
+            this.arrowButton.style.setProperty('opacity', '0');
             this.rootEl.style.zIndex = '1';
             document.body.append(overlay);
             this.rootEl.append(dropdownWrapper);
@@ -327,7 +334,7 @@ export class ToolDropdown {
         const closeDropdown = () => {
             dialogCounter.decrease(0.5);
             isOpen = false;
-            this.arrowButton.style.removeProperty('display');
+            this.arrowButton.style.removeProperty('opacity');
             this.rootEl.style.removeProperty('z-index');
             overlay.remove();
             dropdownWrapper.remove();

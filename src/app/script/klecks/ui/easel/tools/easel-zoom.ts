@@ -56,6 +56,7 @@ export class EaselZoom implements TEaselTool {
             );
             this.easel.setTransform(
                 createTransform(viewportPoint, canvasPoint, newScale, this.downTransform.angleDeg),
+                true,
             );
             this.easel.requestRender();
         }

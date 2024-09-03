@@ -224,6 +224,7 @@ export class SelectUi {
             css: {
                 display: 'flex',
                 gap: '5px',
+                flexWrap: 'wrap',
             },
         });
 
