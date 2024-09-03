@@ -88,14 +88,15 @@ export class EaselSelect implements TEaselTool {
         this.selectionPath = getSelectionPath2d(this.canvasSelection);
     }
 
-    private resetPolyShape(): void {
+    private resetPolyShape(): boolean {
         if (this.polyShape.length === 0) {
-            return;
+            return false;
         }
         this.polyShape = [];
         this.doubleTapPointerTypes = ['touch'];
         this.easel.updateDoubleTapPointerTypes();
         this.easel.requestRender(); // because polyShape might have changed
+        return true;
     }
 
     /** boolean operation if you also consider keys */
@@ -418,9 +419,11 @@ export class EaselSelect implements TEaselTool {
         ctx.restore();
     }
 
-    onKeyDown(keyStr: string): void {
+    onKeyDown(keyStr: string, e: KeyboardEvent): void {
         if (keyStr === 'esc') {
-            this.resetPolyShape();
+            if (this.resetPolyShape()) {
+                e.preventDefault();
+            }
         }
     }
 

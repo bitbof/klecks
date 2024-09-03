@@ -141,6 +141,7 @@ export class DynamicModal {
             onDown: (keyStr, e) => {
                 if (keyStr === 'esc') {
                     e.stopPropagation();
+                    e.preventDefault(); // stay in fullscreen on Mac
                     this.close();
                 }
             },

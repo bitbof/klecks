@@ -93,9 +93,14 @@ export class SelectTransformTool {
     private transform: Matrix = {} as Matrix;
     private doClone: boolean = false; // true -> draw selected area twice (original position, and transformed position)
     private selectionSample: TSelectionSample | undefined;
+    private backgroundIsTransparent: boolean = false;
 
     // ----------------------------------- public -----------------------------------
     constructor() {}
+
+    setBackgroundIsTransparent(isTransparent: boolean): void {
+        this.backgroundIsTransparent = isTransparent;
+    }
 
     setSelection(selection: MultiPolygon): void {
         this.selection = selection;
@@ -216,7 +221,13 @@ export class SelectTransformTool {
                     if (!this.doClone) {
                         ctx.save();
                         ctx.clip(selectionPath);
-                        ctx.clearRect(0, 0, originalSrcCanvas.width, originalSrcCanvas.height);
+                        if (this.backgroundIsTransparent) {
+                            ctx.clearRect(0, 0, originalSrcCanvas.width, originalSrcCanvas.height);
+                        } else {
+                            ctx.globalCompositeOperation = 'source-in';
+                            ctx.fillStyle = '#fff';
+                            ctx.fillRect(0, 0, originalSrcCanvas.width, originalSrcCanvas.height);
+                        }
                         ctx.restore();
                     }
 
@@ -246,7 +257,13 @@ export class SelectTransformTool {
                 //draw original with inverted selection before transformation
                 ctx.save();
                 ctx.clip(selectionPath);
-                ctx.clearRect(0, 0, originalSrcCanvas.width, originalSrcCanvas.height);
+                if (this.backgroundIsTransparent) {
+                    ctx.clearRect(0, 0, originalSrcCanvas.width, originalSrcCanvas.height);
+                } else {
+                    ctx.globalCompositeOperation = 'source-in';
+                    ctx.fillStyle = '#fff';
+                    ctx.fillRect(0, 0, originalSrcCanvas.width, originalSrcCanvas.height);
+                }
                 ctx.restore();
             },
         } as any;

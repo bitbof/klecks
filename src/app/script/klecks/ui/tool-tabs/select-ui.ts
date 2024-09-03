@@ -14,6 +14,7 @@ import polySvg from '/src/app/img/ui/select-shape-poly.svg';
 import removeLayerImg from '/src/app/img/ui/remove-layer.svg';
 import { Select } from '../components/select';
 import { LANG } from '../../../language/language';
+import { Checkbox } from '../components/checkbox';
 
 export type TSelectUiParams = {
     onChangeMode: (mode: TSelectToolMode) => void;
@@ -32,6 +33,7 @@ export type TSelectUiParams = {
         onRotateDeg: (deg: number) => void;
         onClone: () => void;
         onMoveToLayer: (index: number) => void;
+        onChangeTransparentBackground: (b: boolean) => void;
     };
     onErase: () => void;
     onFill: () => void;
@@ -51,6 +53,7 @@ export class SelectUi {
     private selectResetBtn: HTMLButtonElement;
     private transformDuplicateBtn: HTMLButtonElement;
     private moveToLayerSelect: Select<string>;
+    private transparentBackgroundToggle: Checkbox;
     private operationOptions: Options<TBooleanOperation>;
 
     private update(): void {
@@ -404,6 +407,19 @@ export class SelectUi {
             ]),
         );
 
+        this.transparentBackgroundToggle = new Checkbox({
+            label: LANG('brush-eraser-transparent-bg'),
+            callback: (b) => {
+                p.transform.onChangeTransparentBackground(b);
+            },
+        });
+        BB.css(this.transparentBackgroundToggle.getElement(), {
+            marginTop: '10px',
+            display: 'inline-block',
+        });
+
+        transformModeEl.append(this.transparentBackgroundToggle.getElement());
+
         const updateMode = () => {
             if (this.modeOptions.getValue() === 'select') {
                 this.rootEl.append(selectModeEl);
@@ -460,6 +476,10 @@ export class SelectUi {
     setHasSelection(b: boolean): void {
         this.hasSelection = b;
         this.update();
+    }
+
+    setBackgroundIsTransparent(b: boolean): void {
+        this.transparentBackgroundToggle.setValue(b);
     }
 
     getElement(): HTMLElement {

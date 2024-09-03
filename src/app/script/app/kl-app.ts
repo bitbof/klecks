@@ -437,10 +437,11 @@ export class KlApp {
         };
 
         /** see applyUncommitted **/
-        const discardUncommitted = () => {
+        const discardUncommitted = (): boolean => {
             if (this.easel.getTool() === 'select') {
-                klAppSelect.discardTransform();
+                return klAppSelect.discardTransform();
             }
+            return false;
         };
 
         const undo = (showMessage?: boolean) => {
@@ -835,7 +836,9 @@ export class KlApp {
                     }
                 }
                 if (comboStr === 'esc') {
-                    discardUncommitted();
+                    if (discardUncommitted()) {
+                        event.preventDefault();
+                    }
                 }
                 if (['delete', 'backspace'].includes(comboStr)) {
                     applyUncommitted();

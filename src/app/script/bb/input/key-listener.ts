@@ -5,6 +5,7 @@ type TGlobalKey = {
     remove: (keyListenerRef: TKeyListenerRef) => void;
     getIsDown: () => TIsDown;
     getCombo: () => string[];
+    blur: () => void;
 };
 
 type TIsDown = {
@@ -169,6 +170,12 @@ const globalKey = ((): TGlobalKey => {
                 } else {
                     clearTimeout(metaClearTimeout);
                 }
+                if (keyStr === 'esc') {
+                    // Workaround for a macOS behavior
+                    // When in fullscreen, pressing escape exits the fullscreen mode.
+                    // When that happens, no keyup for escape is fired.
+                    setTimeout(() => blur());
+                }
             }
             isDownObj[keyStr] = true;
             codeIsDownObj[code] = keyStr;
@@ -279,6 +286,7 @@ const globalKey = ((): TGlobalKey => {
         },
         getIsDown: (): TIsDown => isDownObj,
         getCombo: (): string[] => comboArr,
+        blur,
     };
 })();
 
@@ -332,6 +340,7 @@ export class KeyListener {
 
     destroy(): void {
         globalKey.remove(this.ref);
+        globalKey.blur();
     }
 }
 

@@ -4,6 +4,7 @@ import { IPointerEvent } from '../../../../bb/input/event.types';
 import { createMatrixFromTransform } from '../../../../bb/transform/create-matrix-from-transform';
 import { applyToPoint, inverse } from 'transformation-matrix';
 import { TEaselInterface, TEaselTool } from '../easel.types';
+import { CornerPanning } from '../corner-panning';
 
 export type tEaselShapeParams = {
     onDown: (p: IVector2D, angleRad: number) => void;
@@ -18,6 +19,7 @@ export class EaselShape implements TEaselTool {
     private readonly onUp: tEaselShapeParams['onUp'];
     private easel: TEaselInterface = {} as TEaselInterface;
     private isDragging: boolean = false;
+    private cornerPanning: CornerPanning;
 
     // ----------------------------------- public -----------------------------------
     constructor(p: tEaselShapeParams) {
@@ -27,13 +29,29 @@ export class EaselShape implements TEaselTool {
         this.onDown = p.onDown;
         this.onMove = p.onMove;
         this.onUp = p.onUp;
+
+        this.cornerPanning = new CornerPanning({
+            getEaselSize: () => this.easel.getSize(),
+            getTransform: () => this.easel.getTargetTransform(),
+            setTransform: (transform) => this.easel.setTransform(transform, true),
+            testCanPan: (buttonIsPressed) => {
+                return buttonIsPressed;
+            },
+            onRepeatEvent: (e) => {
+                this.onPointer(e, true);
+            },
+        });
     }
 
     getSvgElement(): SVGElement {
         return this.svgEl;
     }
 
-    onPointer(e: IPointerEvent): void {
+    onPointer(e: IPointerEvent, isRepeat?: boolean): void {
+        if (!isRepeat) {
+            this.cornerPanning.onPointer(e);
+        }
+
         this.easel.setCursor('crosshair');
         const vTransform = this.easel.getTransform();
         const m = createMatrixFromTransform(vTransform);

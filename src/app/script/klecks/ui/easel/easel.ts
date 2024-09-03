@@ -536,6 +536,9 @@ export class Easel<GToolId extends string> {
         });
 
         this.windowPointerListener = (e: PointerEvent) => {
+            if (this.isFrozen) {
+                return;
+            }
             if (!this.rootEl.contains(e.target as Node)) {
                 this.getActiveTool().onClickOutside?.();
             }
