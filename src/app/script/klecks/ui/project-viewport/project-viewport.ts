@@ -135,7 +135,7 @@ export class ProjectViewport {
         // this.render();
     }
 
-    render(): void {
+    render(optimizeForAnimation?: boolean): void {
         const isDark = theme.isDark();
         const transform = {
             ...this.transform,
@@ -151,13 +151,21 @@ export class ProjectViewport {
             this.canvas.height = Math.round(this.height * this.resFactor);
         }
 
-        const renderedTransform: TViewportTransformXY = {
-            x: Math.round(transform.x),
-            y: Math.round(transform.y),
-            scaleX: fixScale(transform.scale, this.project.width),
-            scaleY: fixScale(transform.scale, this.project.height),
-            angleDeg: transform.angleDeg,
-        };
+        const renderedTransform: TViewportTransformXY = optimizeForAnimation
+            ? {
+                  x: transform.x,
+                  y: transform.y,
+                  angleDeg: transform.angleDeg,
+                  scaleX: transform.scale,
+                  scaleY: transform.scale,
+              }
+            : {
+                  x: Math.round(transform.x),
+                  y: Math.round(transform.y),
+                  scaleX: fixScale(transform.scale, this.project.width),
+                  scaleY: fixScale(transform.scale, this.project.height),
+                  angleDeg: transform.angleDeg,
+              };
         const renderedMat = createMatrixFromTransform(renderedTransform);
 
         this.ctx.save();

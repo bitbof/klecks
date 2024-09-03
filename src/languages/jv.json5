@@ -1322,71 +1322,71 @@
   },
   'select-select': {
     original: 'Select',
-    value: ''
+    value: 'Pilih'
   },
   'select-transform': {
     original: 'Transform',
-    value: ''
+    value: 'Ngowahi'
   },
   'select-lasso': {
     original: 'Lasso',
-    value: ''
+    value: 'Lasso'
   },
   'select-polygon': {
     original: 'Polygon',
-    value: ''
+    value: 'Poligon'
   },
   'select-boolean-replace': {
     original: 'Replace',
-    value: ''
+    value: 'Ngganti'
   },
   'select-boolean-add': {
     original: 'Add',
-    value: ''
+    value: 'Tambah'
   },
   'select-boolean-subtract': {
     original: 'Subtract',
-    value: ''
+    value: 'Ngurangi'
   },
   'select-all': {
     original: 'All',
-    value: ''
+    value: 'Kabeh'
   },
   'select-invert': {
     original: 'Invert',
-    value: ''
+    value: 'Walik'
   },
   'select-reset': {
     original: 'Reset',
-    value: ''
+    value: 'Reset'
   },
   'select-fill': {
     original: 'Fill',
-    value: ''
+    value: 'Isi'
   },
   'select-erase': {
     original: 'Erase',
-    value: ''
+    value: 'Mbusak'
   },
   'select-transform-clone': {
     original: 'Clone',
-    value: ''
+    value: 'Klone'
   },
   'select-transform-clone-applied': {
     original: 'Cloned',
-    value: ''
+    value: 'Kloning'
   },
   'select-transform-move-to-layer': {
     original: 'Move to layer:',
-    value: ''
+    value: 'Pindhah menyang lapisan:'
   },
   'select-transform-applied': {
     original: 'Transformation applied',
-    value: ''
+    value: 'Transformasi ditrapake'
   },
   'select-transform-empty': {
     original: 'Selected area on active layer is empty.',
-    value: ''
+    value: 'Wilayah sing dipilih ing lapisan aktif kosong.'
   },
   'save-reminder-title': {
     hint: 'Save Reminder is a popup that shows up after 20 minutes of not saving. Allows user to save on the spot.',
@@ -1641,6 +1641,14 @@
   },
   wip: {
     original: 'Work in progress',
+    value: 'Kerja ing Kemajuan'
+  },
+  'browser-zoom-help': {
+    original: 'Double-tap or pinch-out to reset browser zoom.',
+    value: ''
+  },
+  dismiss: {
+    original: 'Dismiss',
     value: ''
   }
 }

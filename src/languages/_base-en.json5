@@ -1017,4 +1017,6 @@ renaming keys across language files:
   "more": "More",
   "x-minutes": "{x}min",
   "wip": 'Work in progress',
+  "browser-zoom-help": "Double-tap or pinch-out to reset browser zoom.",
+  "dismiss": "Dismiss",
 }

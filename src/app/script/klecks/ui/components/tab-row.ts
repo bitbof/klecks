@@ -1,5 +1,4 @@
 import { BB } from '../../../bb/bb';
-import invertedBorderImg from '/src/app/img/ui/inverted-border.svg';
 import { IKeyStringOptional } from '../../../bb/bb-types';
 import { PointerListener } from '../../../bb/input/pointer-listener';
 
@@ -62,29 +61,10 @@ export class TabRow {
 
         const roundSize = 10;
         this.roundRight = BB.el({
-            css: {
-                width: roundSize + 'px',
-                height: roundSize + 'px',
-                backgroundImage: `url('${invertedBorderImg}')`,
-                backgroundSize: 'cover',
-                position: 'absolute',
-                right: -roundSize + 'px',
-                bottom: '0',
-                pointerEvents: 'none',
-            },
+            className: 'tabrow__tab__rounding-left',
         });
         this.roundLeft = BB.el({
-            css: {
-                width: roundSize + 'px',
-                height: roundSize + 'px',
-                backgroundImage: `url('${invertedBorderImg}')`,
-                backgroundSize: 'cover',
-                position: 'absolute',
-                left: -roundSize + 'px',
-                bottom: '0',
-                transform: 'scale(-1,1)',
-                pointerEvents: 'none',
-            },
+            className: 'tabrow__tab__rounding-right',
         });
 
         const createTab = (pTabObj: TTabInit, initialId: string, useAccent: boolean): TTab => {
@@ -119,7 +99,6 @@ export class TabRow {
                     css: {
                         lineHeight: height + 'px',
                         display: isVisible ? 'block' : 'none',
-                        zIndex: '0',
                     },
                     onClick: () => {
                         if (this.activeTab === result) {
