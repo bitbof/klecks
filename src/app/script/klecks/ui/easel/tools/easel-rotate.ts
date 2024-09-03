@@ -6,6 +6,7 @@ import { createMatrixFromTransform } from '../../../../bb/transform/create-matri
 import { applyToPoint, inverse } from 'transformation-matrix';
 import { createTransform } from '../../../../bb/transform/create-transform';
 import { TEaselInterface, TEaselTool, TEaselToolTrigger } from '../easel.types';
+import { minimizeAngleDeg } from '../../../../bb/math/math';
 
 export type TEaselRotateParams = {
     /* */
@@ -44,7 +45,6 @@ export class EaselRotate implements TEaselTool {
         });
         this.compassInner = BB.createSvg({
             elementType: 'g',
-            transform: 'rotate(0)',
         });
         this.compassBaseCircle = BB.createSvg({
             elementType: 'circle',
@@ -63,8 +63,12 @@ export class EaselRotate implements TEaselTool {
             cy: '0',
             r: '' + this.compassSize * 0.9,
         });
+        BB.css(this.compassLineCircle, {
+            transition: 'opacity 0.1s ease-in-out',
+        });
         this.needleWrapper = BB.createSvg({
             elementType: 'g',
+            'transform-origin': '0 0',
         });
         this.compassUpperTriangle = BB.createSvg({
             elementType: 'path',
@@ -115,7 +119,7 @@ export class EaselRotate implements TEaselTool {
                 x: e.relX,
                 y: e.relY,
             };
-            this.downTransform = BB.copyObj(this.easel.getTransform());
+            this.downTransform = BB.copyObj(this.easel.getTargetTransform());
         } else if (e.button === 'left' && this.downPos && this.downTransform) {
             const { width, height } = this.easel.getSize();
 
@@ -134,12 +138,14 @@ export class EaselRotate implements TEaselTool {
             if (this.easel.isKeyPressed('shift')) {
                 newAngleDeg = Math.round(newAngleDeg / 45) * 45;
             }
+            newAngleDeg = minimizeAngleDeg(newAngleDeg);
 
             //rotate transform
             const mat = createMatrixFromTransform(this.downTransform);
             const canvasPoint = applyToPoint(inverse(mat), centerObj);
             this.easel.setTransform(
                 createTransform(centerObj, canvasPoint, this.downTransform.scale, newAngleDeg),
+                !this.easel.isKeyPressed('shift'),
             );
             this.easel.requestRender();
         } else if (e.type === 'pointerup' && this.downPos) {
@@ -149,8 +155,9 @@ export class EaselRotate implements TEaselTool {
     }
 
     onUpdateTransform(transform: TViewportTransform): void {
+        const targetTransform = this.easel.getTargetTransform();
         this.needleWrapper.setAttribute('transform', 'rotate(' + transform.angleDeg + ')');
-        this.compassLineCircle.style.opacity = transform.angleDeg % 90 === 0 ? '1' : '0';
+        this.compassLineCircle.style.opacity = targetTransform.angleDeg % 90 === 0 ? '1' : '0';
     }
 
     setEaselInterface(easelInterface: TEaselInterface): void {

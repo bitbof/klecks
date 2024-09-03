@@ -24,6 +24,7 @@ import { getMultiPolyBounds } from '../../bb/multi-polygon/get-multi-polygon-bou
 import { intBoundsWithinArea } from '../../bb/math/math';
 import { canvasBounds } from '../../bb/base/canvas';
 import { matrixToTuple } from '../../bb/math/matrix-to-tuple';
+import { getEraseColor } from '../brushes/erase-color';
 
 // TODO remove in 2026
 // workaround for chrome bug https://bugs.chromium.org/p/chromium/issues/detail?id=1281185
@@ -1116,7 +1117,7 @@ export class KlCanvas {
         } else {
             ctx.globalCompositeOperation = 'destination-out';
         }
-        ctx.fillStyle = '#fff';
+        ctx.fillStyle = BB.ColorConverter.toRgbStr(getEraseColor());
         ctx.fillRect(0, 0, this.width, this.height);
         ctx.restore();
 
@@ -1354,12 +1355,14 @@ export class KlCanvas {
         targetLayer?: number;
         transformation: Matrix; // relative to (0,0) of canvas
         isPixelated?: boolean; // default false
+        backgroundIsTransparent?: boolean;
     }): void {
         this.history?.pause(true);
         this.createSelectionSample(p.sourceLayer);
         this.eraseLayer({
             layerIndex: p.sourceLayer,
             useSelection: true,
+            useAlphaLock: p.sourceLayer === 0 && !p.backgroundIsTransparent,
         });
         this.transformSelectionAndSample(p.transformation);
         this.drawSelectionSample(p.targetLayer ?? p.sourceLayer, p.isPixelated ?? false);

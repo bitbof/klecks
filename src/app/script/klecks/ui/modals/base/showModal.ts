@@ -154,6 +154,7 @@ export function showModal(p: {
             }
             if (comboStr === 'esc') {
                 e.stopPropagation();
+                e.preventDefault(); // stay in fullscreen on Mac
                 close('Cancel');
             }
         },

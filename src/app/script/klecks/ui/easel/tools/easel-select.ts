@@ -13,6 +13,7 @@ import { getSelectionPath2d } from '../../../../bb/multi-polygon/get-selection-p
 import { EventChain } from '../../../../bb/input/event-chain/event-chain';
 import { DoubleTapper } from '../../../../bb/input/event-chain/double-tapper';
 import { IChainElement } from '../../../../bb/input/event-chain/event-chain.types';
+import { CornerPanning } from '../corner-panning';
 
 const modeToCursor: Record<TSelectToolMode, string> = {
     select: 'default',
@@ -58,6 +59,7 @@ export class EaselSelect implements TEaselTool {
     private viewportTransform: TViewportTransform = {} as TViewportTransform;
     private tempCtx: CanvasRenderingContext2D = BB.ctx(BB.canvas(1, 1)); // used for isPointInPath()
     private pointerChain: EventChain;
+    private cornerPanning: CornerPanning;
 
     // state
     private canvasSelection: MultiPolygon = [];
@@ -74,8 +76,8 @@ export class EaselSelect implements TEaselTool {
     private polyShape: (IVector2D & { temp?: true })[] = [];
 
     // transform-mode state
-    private movement: IVector2D | undefined = undefined;
-    private lastCanvasMovement: IVector2D | undefined = undefined;
+    private transformPointerStart: IVector2D = { x: 0, y: 0 }; // initial position, canvas coordinate
+    private transformPreviousPointer: IVector2D = { x: 0, y: 0 };
 
     private viewportToCanvas(p: IVector2D): IVector2D {
         const matrix = inverse(createMatrixFromTransform(this.easel.getTransform()));
@@ -86,11 +88,15 @@ export class EaselSelect implements TEaselTool {
         this.selectionPath = getSelectionPath2d(this.canvasSelection);
     }
 
-    private resetPolyShape(): void {
+    private resetPolyShape(): boolean {
+        if (this.polyShape.length === 0) {
+            return false;
+        }
         this.polyShape = [];
         this.doubleTapPointerTypes = ['touch'];
         this.easel.updateDoubleTapPointerTypes();
         this.easel.requestRender(); // because polyShape might have changed
+        return true;
     }
 
     /** boolean operation if you also consider keys */
@@ -124,6 +130,7 @@ export class EaselSelect implements TEaselTool {
         return effectiveOperation === 'new' && isOverSelection;
     }
 
+    // can be repeatedly called with the same event
     private selectOnPointer(event: IPointerEvent): void {
         const effectiveOperation = this.getEffectiveBooleanOperation();
         const wasDragging = this.isDragging;
@@ -231,52 +238,41 @@ export class EaselSelect implements TEaselTool {
         }
     }
 
+    // can be repeatedly called with the same event
     private transformOnPointer(event: IPointerEvent): void {
         this.easel.setCursor('move');
+        const transform = this.easel.getTransform();
+        const matrix = inverse(createMatrixFromTransform(transform));
+
         if (event.type === 'pointerdown' && event.button === 'left') {
-            this.movement = { x: 0, y: 0 };
-            this.lastCanvasMovement = { x: 0, y: 0 };
+            this.transformPointerStart = applyToPoint(matrix, { x: event.relX, y: event.relY });
+            this.transformPreviousPointer = { ...this.transformPointerStart };
             this.updateSelectionPath();
             this.isDragging = true;
         }
         if (event.type === 'pointermove' && event.button === 'left') {
-            this.movement!.x += event.dX;
-            this.movement!.y += event.dY;
+            const canvasPointer = applyToPoint(matrix, { x: event.relX, y: event.relY });
             this.updateSelectionPath();
 
-            const viewportMovement = this.movement!;
-
-            const viewportTransform = this.easel.getTransform();
-            let canvasMovement = BB.Vec2.mul(viewportMovement, 1 / viewportTransform.scale);
-            canvasMovement = rotate(
-                canvasMovement.x,
-                canvasMovement.y,
-                -this.viewportTransform.angleDeg,
-            );
-            canvasMovement.x = Math.round(canvasMovement.x);
-            canvasMovement.y = Math.round(canvasMovement.y);
-
-            const d = {
-                x: Math.round(canvasMovement.x - this.lastCanvasMovement!.x),
-                y: Math.round(canvasMovement.y - this.lastCanvasMovement!.y),
+            const delta = {
+                x: Math.round(canvasPointer.x - this.transformPreviousPointer.x),
+                y: Math.round(canvasPointer.y - this.transformPreviousPointer.y),
             };
-
-            if (d.x !== 0 || d.y !== 0) {
-                this.onTranslateTransform(d);
-                this.lastCanvasMovement = {
-                    x: this.lastCanvasMovement!.x + d.x,
-                    y: this.lastCanvasMovement!.y + d.y,
-                };
+            if (delta.x === 0 && delta.y === 0) {
+                return;
             }
+            this.onTranslateTransform(delta);
+            this.transformPreviousPointer = BB.Vec2.add(this.transformPreviousPointer, delta);
         }
         if (event.type === 'pointerup' && event.button === undefined && this.isDragging) {
-            this.movement = undefined;
             this.updateSelectionPath();
             this.isDragging = false;
         }
     }
 
     private onPointerChainOut(event: IPointerEvent): void {
+        this.cornerPanning.onPointer(event);
+
         if (this.mode === 'select') {
             this.selectOnPointer(event);
         } else {
@@ -299,6 +295,25 @@ export class EaselSelect implements TEaselTool {
         this.onEndMoveSelect = p.onEndMoveSelect;
         this.onSelectAddPoly = p.onSelectAddPoly;
         this.onResetSelection = p.onResetSelection;
+
+        this.cornerPanning = new CornerPanning({
+            getEaselSize: () => this.easel.getSize(),
+            getTransform: () => this.easel.getTargetTransform(),
+            setTransform: (transform) => this.easel.setTransform(transform, true),
+            testCanPan: (buttonIsPressed) => {
+                return (
+                    (buttonIsPressed || this.polyShape.length > 1) &&
+                    !(this.selectShape === 'lasso' && this.selectSelectMode === 'select')
+                );
+            },
+            onRepeatEvent: (e) => {
+                if (this.mode === 'select') {
+                    this.selectOnPointer(e);
+                } else {
+                    this.transformOnPointer(e);
+                }
+            },
+        });
 
         this.pointerChain = new EventChain({
             chainArr: [
@@ -404,9 +419,11 @@ export class EaselSelect implements TEaselTool {
         ctx.restore();
     }
 
-    onKeyDown(keyStr: string): void {
+    onKeyDown(keyStr: string, e: KeyboardEvent): void {
         if (keyStr === 'esc') {
-            this.resetPolyShape();
+            if (this.resetPolyShape()) {
+                e.preventDefault();
+            }
         }
     }
 

@@ -1,5 +1,11 @@
 import { BB } from '../../../bb/bb';
+import { LANG } from '../../../language/language';
 
+/**
+ * Users can get stuck when pinch-zooming in (via double tapping or pinching).
+ * This overlay helps users zoom out again. It automatically shows up and hides
+ * itself.
+ */
 export class PinchZoomWatcher {
     // -------------------- public ----------------------
     constructor() {
@@ -10,7 +16,7 @@ export class PinchZoomWatcher {
 
         let isHidden = false;
         const rootEl = BB.el({
-            content: 'Double-tap or pinch-out to reset browser zoom.',
+            content: LANG('browser-zoom-help'),
             className: 'kl-pinch-overlay',
             css: {
                 position: 'fixed',
@@ -22,12 +28,13 @@ export class PinchZoomWatcher {
                 flexDirection: 'column',
                 gap: '10px',
                 padding: '10px',
+                backdropFilter: 'blur(3px)',
             },
         });
         BB.el({
             parent: rootEl,
             tagName: 'button',
-            content: 'Ignore',
+            content: LANG('dismiss'),
             onClick: () => {
                 isHidden = true;
                 iframe.remove();
@@ -38,6 +45,7 @@ export class PinchZoomWatcher {
             },
         });
 
+        // iframe allows pinch-zooming the page even if viewport meta tag set to user-scalable=no
         const iframe = BB.el({
             tagName: 'iframe',
             css: {
@@ -45,7 +53,7 @@ export class PinchZoomWatcher {
                 width: '100vw',
                 height: '100vh',
                 zIndex: '99',
-                opacity: '0',
+                opacity: '0', // can't change iframe background color in some browsers
             },
         });
 
@@ -63,18 +71,13 @@ export class PinchZoomWatcher {
                 },
             });
 
-            /*console.log('---check---');
-            console.log(testEl);*/
             const rect = testEl.getBoundingClientRect();
-            //console.log(rect);
             testEl.remove();
 
             const isZoomed =
                 (viewport.width !== Math.round(rect.width) ||
                     viewport.height !== Math.round(rect.height)) &&
                 viewport.scale > 1;
-            //console.log('rect', BB.copyObj(rect));
-            //console.log('viewport', { width: viewport.width, height: viewport.height });
 
             if (isZoomed) {
                 BB.css(rootEl, {
@@ -82,7 +85,6 @@ export class PinchZoomWatcher {
                     top: viewport.offsetTop + 'px',
                     width: viewport.width + 'px',
                     height: viewport.height + 'px',
-                    //fontSize: 1 / viewport.scale + 'rem',
                 });
                 if (!isInDom) {
                     document.body.append(iframe);

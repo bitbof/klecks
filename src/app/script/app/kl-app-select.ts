@@ -13,7 +13,12 @@ import { LANG } from '../language/language';
 
 export type TSelectTransformTempEntry = {
     type: 'select-transform';
-    data: { transform: Matrix; doClone: boolean; targetLayerIndex: number };
+    data: {
+        transform: Matrix;
+        doClone: boolean;
+        targetLayerIndex: number;
+        backgroundIsTransparent: boolean;
+    };
 };
 
 function isSelectTransformTempEntry(entry: TTempHistoryEntry): entry is TSelectTransformTempEntry {
@@ -61,7 +66,19 @@ export class KlAppSelect {
         transform: identity(),
         doClone: false,
         targetLayerIndex: 0,
+        backgroundIsTransparent: false,
     };
+    private backgroundIsTransparent: boolean = false;
+
+    private isSourceLayerBackgroundTransparent(): boolean {
+        const srcLayerCtx = this.getCurrentLayerCtx();
+        const srcLayerIndex = throwIfNull(this.klCanvas.getLayerIndex(srcLayerCtx.canvas));
+        if (srcLayerIndex > 0) {
+            // not background layer
+            return true;
+        }
+        return this.backgroundIsTransparent;
+    }
 
     /** reset KlCanvas layer composites **/
     private resetComposites(): void {
@@ -109,6 +126,18 @@ export class KlAppSelect {
         this.selectUi.setHasSelection(!!selection);
     }
 
+    private tempHistoryReplaceTop(): void {
+        this.tempHistory.replaceTop({
+            type: 'select-transform',
+            data: {
+                transform: this.transformTool.getTransform(),
+                doClone: this.transformTool.getDoClone(),
+                targetLayerIndex: this.targetLayerIndex,
+                backgroundIsTransparent: this.backgroundIsTransparent,
+            },
+        } satisfies TSelectTransformTempEntry);
+    }
+
     // propagate from transformTool to everything else
     private propagateTransformationChange(): void {
         const selection = this.transformTool.getTransformedSelection();
@@ -116,14 +145,7 @@ export class KlAppSelect {
         this.updateComposites();
         this.onUpdateProject();
 
-        this.tempHistory.replaceTop({
-            type: 'select-transform',
-            data: {
-                transform: this.transformTool.getTransform(),
-                doClone: this.transformTool.getDoClone(),
-                targetLayerIndex: this.targetLayerIndex,
-            },
-        } as TSelectTransformTempEntry);
+        this.tempHistoryReplaceTop();
     }
 
     // ----------------------------------- public -----------------------------------
@@ -237,6 +259,7 @@ export class KlAppSelect {
                                 sourceLayer: layerIndex,
                                 targetLayer: this.targetLayerIndex,
                                 transformation: this.transformTool.getTransform(),
+                                backgroundIsTransparent: this.backgroundIsTransparent,
                             });
                         }
                         p.statusOverlay.out(LANG('select-transform-applied'), true);
@@ -267,6 +290,7 @@ export class KlAppSelect {
                             ],
                         ];
                     }
+
                     this.transformTool.setSelection(selection);
                     this.transformTool.setDoClone(false);
                     this.transformTool.setSelectionSample(this.klCanvas.getSelectionSample());
@@ -274,6 +298,9 @@ export class KlAppSelect {
                     const layerIndex = throwIfNull(this.klCanvas.getLayerIndex(currentLayerCanvas));
                     this.initialTransform.targetLayerIndex = layerIndex;
                     this.targetLayerIndex = layerIndex;
+                    this.transformTool.setBackgroundIsTransparent(
+                        this.isSourceLayerBackgroundTransparent(),
+                    );
                     this.updateComposites();
                     const transformedSelection = this.transformTool.getTransformedSelection();
                     this.easelSelect.setRenderedSelection(transformedSelection);
@@ -380,14 +407,17 @@ export class KlAppSelect {
                     this.updateComposites();
                     this.onUpdateProject();
 
-                    this.tempHistory.replaceTop({
-                        type: 'select-transform',
-                        data: {
-                            transform: this.transformTool.getTransform(),
-                            doClone: this.transformTool.getDoClone(),
-                            targetLayerIndex: this.targetLayerIndex,
-                        },
-                    } as TSelectTransformTempEntry);
+                    this.tempHistoryReplaceTop();
+                },
+                onChangeTransparentBackground: (isTransparent) => {
+                    this.backgroundIsTransparent = isTransparent;
+                    this.transformTool.setBackgroundIsTransparent(
+                        this.isSourceLayerBackgroundTransparent(),
+                    );
+                    this.updateComposites();
+                    this.onUpdateProject();
+
+                    this.tempHistoryReplaceTop();
                 },
             },
             onErase: () => {
@@ -428,14 +458,16 @@ export class KlAppSelect {
     }
 
     /** if transforming, changes are discarded */
-    discardTransform(): void {
+    discardTransform(): boolean {
         if (this.selectMode === 'transform') {
             this.transformTool.reset();
             this.transformTool.setDoClone(false);
             const currentCanvas = this.getCurrentLayerCtx().canvas;
             this.targetLayerIndex = throwIfNull(this.klCanvas.getLayerIndex(currentCanvas));
             this.selectUi.setMode('select'); // this triggers selectUi.onMode
+            return true;
         }
+        return false;
     }
 
     setSelectMode(mode: TSelectToolMode): void {}
@@ -467,6 +499,11 @@ export class KlAppSelect {
             this.transformTool.setTransform(state.transform);
             this.transformTool.setDoClone(state.doClone);
             this.targetLayerIndex = state.targetLayerIndex;
+            this.backgroundIsTransparent = state.backgroundIsTransparent;
+            this.selectUi.setBackgroundIsTransparent(state.backgroundIsTransparent);
+            this.transformTool.setBackgroundIsTransparent(
+                this.isSourceLayerBackgroundTransparent(),
+            );
 
             const selection = this.transformTool.getTransformedSelection();
             this.easelSelect.setRenderedSelection(selection);

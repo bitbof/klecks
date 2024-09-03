@@ -2,6 +2,7 @@ import { BB } from '../../../../bb/bb';
 import { IVector2D } from '../../../../bb/bb-types';
 import { IPointerEvent, TPointerType } from '../../../../bb/input/event.types';
 import { TEaselInterface, TEaselTool, TEaselToolTrigger } from '../easel.types';
+import { MomentumPanning } from '../momentum-panning';
 
 export type TEaselHandParams = {
     /* */
@@ -10,6 +11,7 @@ export type TEaselHandParams = {
 export class EaselHand implements TEaselTool {
     private readonly svgEl: SVGElement;
     private easel: TEaselInterface = {} as TEaselInterface;
+    private momentumPanning: MomentumPanning;
 
     // ----------------------------------- public -----------------------------------
     doubleTapPointerTypes: TPointerType[] = ['touch', 'mouse', 'pen'];
@@ -18,6 +20,10 @@ export class EaselHand implements TEaselTool {
     constructor(p: TEaselHandParams) {
         this.svgEl = BB.createSvg({
             elementType: 'g',
+        });
+        this.momentumPanning = new MomentumPanning({
+            getTransform: () => this.easel.getTransform(),
+            setTransform: (transform) => this.easel.setTransform(transform, true),
         });
     }
 
@@ -29,18 +35,20 @@ export class EaselHand implements TEaselTool {
         this.easel.setCursor('grab');
 
         if (e.type === 'pointerdown' && ['left', 'middle'].includes(e.button!)) {
-            /* */
+            this.momentumPanning.dragStart();
+            this.easel.setCursor('grabbing');
         }
         if (e.type === 'pointermove' && ['left', 'middle'].includes(e.button!)) {
             const vTransform = { ...this.easel.getTransform() };
             vTransform.x += e.dX;
             vTransform.y += e.dY;
-            this.easel.setTransform(vTransform);
+            this.easel.setTransform(vTransform, true);
             this.easel.requestRender();
             this.easel.setCursor('grabbing');
+            this.momentumPanning.dragMove(e.dX, e.dY);
         }
         if (e.type === 'pointerup' && e.button === undefined) {
-            /* */
+            this.momentumPanning.dragEnd();
         }
     }
 

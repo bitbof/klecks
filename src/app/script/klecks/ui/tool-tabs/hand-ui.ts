@@ -68,8 +68,9 @@ export class HandUi {
 
         this.scaleEl = BB.el({
             css: {
-                width: '55px',
+                width: '65px',
                 userSelect: 'none',
+                fontFamily: 'monospace',
             },
         });
         row1.append(this.scaleEl);

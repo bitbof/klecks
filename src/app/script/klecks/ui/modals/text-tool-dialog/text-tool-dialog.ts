@@ -132,6 +132,7 @@ export function textToolDialog(p: {
 
     const viewportInputsCss = css({
         position: 'relative',
+        zIndex: '1',
         '>*': {
             position: 'absolute',
             right: 0,
