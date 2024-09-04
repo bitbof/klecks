@@ -317,6 +317,9 @@ export class ToolDropdown {
         }
 
         const showDropdown = () => {
+            if (dialogCounter.get() > 0) {
+                return;
+            }
             dialogCounter.increase(0.5);
             isOpen = true;
 
@@ -326,6 +329,7 @@ export class ToolDropdown {
 
             this.arrowButton.style.opacity = '0';
             this.arrowButton.style.setProperty('opacity', '0');
+            this.arrowButton.style.pointerEvents = 'none';
             this.rootEl.style.zIndex = '1';
             document.body.append(overlay);
             this.rootEl.append(dropdownWrapper);
@@ -335,6 +339,7 @@ export class ToolDropdown {
             dialogCounter.decrease(0.5);
             isOpen = false;
             this.arrowButton.style.removeProperty('opacity');
+            this.arrowButton.style.removeProperty('pointerEvents');
             this.rootEl.style.removeProperty('z-index');
             overlay.remove();
             dropdownWrapper.remove();
