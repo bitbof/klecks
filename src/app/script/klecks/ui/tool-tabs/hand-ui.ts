@@ -2,6 +2,9 @@ import { BB } from '../../../bb/bb';
 import angleImg from '/src/app/img/ui/angle.svg';
 import rotateImg from '/src/app/img/ui/edit-rotate.svg';
 import { LANG } from '../../../language/language';
+import { Checkbox } from '../components/checkbox';
+
+const LS_INERTIA_KEY = 'kl-inertia-scroll';
 
 /**
  * Ui, when hand tool tab is open.
@@ -37,6 +40,7 @@ export class HandUi {
         onReset: () => void;
         onFit: () => void;
         onAngleChange: (angleDeg: number, isRelative?: boolean) => void;
+        onChangeUseInertiaScrolling: (b: boolean) => void;
     }) {
         this.rootEl = BB.el({
             css: {
@@ -151,6 +155,23 @@ export class HandUi {
         });
         BB.makeUnfocusable(rightRotateButton);
         row3.append(leftRotateButton, resetAngleButton, rightRotateButton);
+
+        const inertiaToggle = new Checkbox({
+            label: LANG('hand-inertia-scrolling'),
+            init: localStorage.getItem(LS_INERTIA_KEY) === 'true',
+            callback: (b) => {
+                localStorage.setItem(LS_INERTIA_KEY, '' + b);
+                p.onChangeUseInertiaScrolling(b);
+            },
+        });
+        setTimeout(() => {
+            p.onChangeUseInertiaScrolling(inertiaToggle.getValue());
+        }, 500);
+        BB.css(inertiaToggle.getElement(), {
+            marginTop: '10px',
+            display: 'inline-block',
+        });
+        this.rootEl.append(inertiaToggle.getElement());
     }
 
     getElement(): HTMLElement {

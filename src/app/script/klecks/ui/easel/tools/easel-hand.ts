@@ -2,7 +2,7 @@ import { BB } from '../../../../bb/bb';
 import { IVector2D } from '../../../../bb/bb-types';
 import { IPointerEvent, TPointerType } from '../../../../bb/input/event.types';
 import { TEaselInterface, TEaselTool, TEaselToolTrigger } from '../easel.types';
-import { MomentumPanning } from '../momentum-panning';
+import { InertiaScrolling } from '../inertia-scrolling';
 
 export type TEaselHandParams = {
     /* */
@@ -11,7 +11,7 @@ export type TEaselHandParams = {
 export class EaselHand implements TEaselTool {
     private readonly svgEl: SVGElement;
     private easel: TEaselInterface = {} as TEaselInterface;
-    private momentumPanning: MomentumPanning;
+    private inertiaScrolling: InertiaScrolling;
 
     // ----------------------------------- public -----------------------------------
     doubleTapPointerTypes: TPointerType[] = ['touch', 'mouse', 'pen'];
@@ -21,7 +21,7 @@ export class EaselHand implements TEaselTool {
         this.svgEl = BB.createSvg({
             elementType: 'g',
         });
-        this.momentumPanning = new MomentumPanning({
+        this.inertiaScrolling = new InertiaScrolling({
             getTransform: () => this.easel.getTransform(),
             setTransform: (transform) => this.easel.setTransform(transform, true),
         });
@@ -35,7 +35,7 @@ export class EaselHand implements TEaselTool {
         this.easel.setCursor('grab');
 
         if (e.type === 'pointerdown' && ['left', 'middle'].includes(e.button!)) {
-            this.momentumPanning.dragStart();
+            this.inertiaScrolling.dragStart();
             this.easel.setCursor('grabbing');
         }
         if (e.type === 'pointermove' && ['left', 'middle'].includes(e.button!)) {
@@ -45,10 +45,10 @@ export class EaselHand implements TEaselTool {
             this.easel.setTransform(vTransform, true);
             this.easel.requestRender();
             this.easel.setCursor('grabbing');
-            this.momentumPanning.dragMove(e.dX, e.dY);
+            this.inertiaScrolling.dragMove(e.dX, e.dY);
         }
         if (e.type === 'pointerup' && e.button === undefined) {
-            this.momentumPanning.dragEnd();
+            this.inertiaScrolling.dragEnd();
         }
     }
 
@@ -58,5 +58,9 @@ export class EaselHand implements TEaselTool {
 
     activate(cursorPos?: IVector2D): void {
         this.easel.setCursor('grab');
+    }
+
+    setUseInertiaScrolling(b: boolean): void {
+        this.inertiaScrolling.setIsEnabled(b);
     }
 }
