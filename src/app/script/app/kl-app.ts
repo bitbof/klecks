@@ -684,6 +684,9 @@ export class KlApp {
             },
         });
 
+        this.easel.fitTransform();
+
+
         BB.css(this.easel.getElement(), {
             position: 'absolute',
             left: '0',
@@ -1495,7 +1498,7 @@ export class KlApp {
                     this.layersUi.update(0);
                     setCurrentLayer(throwIfNull(this.klCanvas.getLayer(0)));
                     this.easelProjectUpdater.update();
-                    this.easel.resetOrFitTransform();
+                    this.easel.fitTransform();
                 },
                 onCancel: () => {},
             });

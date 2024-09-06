@@ -120,7 +120,7 @@ class GenerateStyle{
     postivePrompt: string;
     negativePrompt: string
 
-    constructor(negativePrompt:string, positivePrompt:string) {
+    constructor(positivePrompt:string, negativePrompt:string) {
         this.negativePrompt = negativePrompt;
         this.postivePrompt = positivePrompt;
     }
