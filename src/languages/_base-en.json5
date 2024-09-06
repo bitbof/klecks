@@ -777,6 +777,10 @@ renaming keys across language files:
     hint: 'makes canvas cover whole working area',
     value: 'Fit',
   },
+  "hand-inertia-scrolling": {
+    hint: 'Canvas will continue to move even after releasing pointer.',
+    value: 'Inertia Scrolling',
+  },
 
   // paint bucket tool
   "bucket-tolerance": {

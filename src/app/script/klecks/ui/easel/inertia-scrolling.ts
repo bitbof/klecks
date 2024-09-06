@@ -2,7 +2,7 @@ import { IVector2D } from '../../../bb/bb-types';
 import { TViewportTransform } from '../project-viewport/project-viewport';
 import { BB } from '../../../bb/bb';
 
-export type TMomentumPanningParams = {
+export type TInertiaScrollingParams = {
     getTransform: () => TViewportTransform;
     setTransform: (transform: TViewportTransform) => void;
 };
@@ -10,7 +10,7 @@ export type TMomentumPanningParams = {
 /**
  * flings the viewport into the direction the pointer was dragging
  */
-export class MomentumPanning {
+export class InertiaScrolling {
     // from params
     private getTransform: () => TViewportTransform;
     private setTransform: (transform: TViewportTransform) => void;
@@ -22,6 +22,7 @@ export class MomentumPanning {
     private lastTransform: TViewportTransform | undefined;
     private animationFrameHandle: ReturnType<typeof requestAnimationFrame> | undefined;
     private lastTimestamp: number = 0;
+    private isEnabled: boolean = false;
 
     private stop(): void {
         if (this.animationFrameHandle === undefined) {
@@ -52,7 +53,6 @@ export class MomentumPanning {
         this.animationFrameHandle = requestAnimationFrame(() => this.physicsLoop());
         const nowMs = performance.now();
         const deltaMs = nowMs - this.lastTimestamp;
-        const defaultDeltaMs = 1000 / 60;
         const timeFactor = deltaMs / this.defaultDeltaMs;
         this.lastTimestamp = nowMs;
         if ((this.momentum.x === 0 && this.momentum.y === 0) || this.isDragging) {
@@ -88,12 +88,15 @@ export class MomentumPanning {
 
     // -------------------- public --------------------------
 
-    constructor(p: TMomentumPanningParams) {
+    constructor(p: TInertiaScrollingParams) {
         this.getTransform = p.getTransform;
         this.setTransform = p.setTransform;
     }
 
     dragStart(): void {
+        if (!this.isEnabled) {
+            return;
+        }
         this.isDragging = true;
         this.momentum.x = 0;
         this.momentum.y = 0;
@@ -101,6 +104,9 @@ export class MomentumPanning {
     }
 
     dragMove(dX: number, dY: number): void {
+        if (!this.isEnabled) {
+            return;
+        }
         this.momentum = {
             x: BB.mix(this.momentum.x, dX, 0.6),
             y: BB.mix(this.momentum.y, dY, 0.6),
@@ -109,6 +115,9 @@ export class MomentumPanning {
     }
 
     dragEnd(): void {
+        if (!this.isEnabled) {
+            return;
+        }
         if (new Date().getTime() - this.lastDragTimestamp > 80) {
             this.momentum.x = 0;
             this.momentum.y = 0;
@@ -119,5 +128,9 @@ export class MomentumPanning {
         this.lastTransform = undefined;
         this.lastDragTimestamp = 0;
         this.isDragging = false;
+    }
+
+    setIsEnabled(b: boolean): void {
+        this.isEnabled = b;
     }
 }

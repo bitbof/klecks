@@ -548,6 +548,8 @@ export class KlApp {
             },
         });
 
+        const easelHand = new EaselHand({});
+
         let isFirstTransform = true;
         this.easel = new Easel({
             width: Math.max(0, this.uiWidth - this.toolWidth),
@@ -559,7 +561,7 @@ export class KlApp {
             }, // temp
             tools: {
                 brush: this.easelBrush,
-                hand: new EaselHand({}),
+                hand: easelHand,
                 select: klAppSelect.getEaselSelect(),
                 eyedropper: new EaselEyedropper({
                     onPick: (p) => {
@@ -1276,6 +1278,9 @@ export class KlApp {
             },
             onAngleChange: (angleDeg, isRelative) => {
                 this.easel.setAngleDeg(angleDeg, isRelative);
+            },
+            onChangeUseInertiaScrolling: (b) => {
+                easelHand.setUseInertiaScrolling(b);
             },
         });
 
