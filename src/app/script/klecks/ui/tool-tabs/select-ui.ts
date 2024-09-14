@@ -388,6 +388,9 @@ export class SelectUi {
                 marginTop: '10px',
                 display: 'block',
             },
+            custom: {
+                tabindex: '-1',
+            },
         });
 
         this.moveToLayerSelect = new Select({

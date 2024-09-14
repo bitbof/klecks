@@ -68,7 +68,7 @@
   },
   'tool-select': {
     original: 'Select Tool',
-    value: ''
+    value: 'Milih Alat'
   },
   'tool-zoom': {
     original: 'Zoom',
@@ -180,7 +180,7 @@
   'brush-eraser-transparent-bg': {
     hint: 'as in transparent background/bottom layer',
     original: 'Transparent Background',
-    value: 'Latar mburi transparan'
+    value: 'Latar mburi Transparan'
   },
   stabilizer: {
     hint: 'Common feature in drawing software to make lines smoother',
@@ -552,7 +552,7 @@
   },
   'cleared-selected-area': {
     original: 'Cleared selected area',
-    value: ''
+    value: 'Mbusak area sing dipilih'
   },
   filled: {
     hint: 'layer got filled with a color',
@@ -561,7 +561,7 @@
   },
   'filled-selected-area': {
     original: 'Filled selection',
-    value: ''
+    value: 'Pilihan sing diisi'
   },
   'new-title': {
     original: 'New Image',
@@ -899,7 +899,7 @@
   'filter-bright-contrast-title': {
     hint: 'same as the button, but can be longer',
     original: 'Brightness / Contrast',
-    value: 'Padhang/Kontras'
+    value: 'Padhang / Kontras'
   },
   'filter-bright-contrast-description': {
     original: 'Change brightness and contrast for the selected layer.',
@@ -1166,6 +1166,11 @@
     original: 'Fit',
     value: 'Fit'
   },
+  'hand-inertia-scrolling': {
+    hint: 'Canvas will continue to move even after releasing pointer.',
+    original: 'Inertia Scrolling',
+    value: 'Gulung Inertia'
+  },
   'bucket-tolerance': {
     hint: 'a common feature for paint bucket',
     original: 'Tolerance',
@@ -1423,7 +1428,7 @@
   'submit-prompt': {
     hint: 'Dialog asking for confirmation',
     original: 'Submit drawing?',
-    value: 'Kirim Gambar?'
+    value: 'Kirim gambar?'
   },
   'submit-submitting': {
     hint: 'in the process of uploading',
@@ -1641,14 +1646,14 @@
   },
   wip: {
     original: 'Work in progress',
-    value: 'Kerja ing Kemajuan'
+    value: 'Kerja ing kemajuan'
   },
   'browser-zoom-help': {
     original: 'Double-tap or pinch-out to reset browser zoom.',
-    value: ''
+    value: 'Tutul kaping pindho utawa jiwitake kanggo ngreset zoom browser.'
   },
   dismiss: {
     original: 'Dismiss',
-    value: ''
+    value: 'Ngilangi'
   }
 }

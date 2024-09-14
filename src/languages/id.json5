@@ -36,7 +36,7 @@
   'tab-file': {
     hint: 'label for a tab that lets user save the image, import, upload, etc.',
     original: 'File',
-    value: 'File'
+    value: 'Berkas'
   },
   'tool-brush': {
     hint: 'tool that lets user paint (like in ms paint or photoshop)',
@@ -68,7 +68,7 @@
   },
   'tool-select': {
     original: 'Select Tool',
-    value: ''
+    value: 'Pilih Alat'
   },
   'tool-zoom': {
     original: 'Zoom',
@@ -204,7 +204,7 @@
   'manual-color-input': {
     hint: 'A dialog where users can manually type the color, each channel a number. "mci" keys all related to this dialog.',
     original: 'Manual Color Input',
-    value: 'Input Warna Secara Manual'
+    value: 'Input Warna Manual'
   },
   'mci-hex': {
     hint: 'as in hex code. Hex representation of color. „#f00“ → red',
@@ -357,7 +357,7 @@
   'layers-rename-title': {
     hint: '-title in code usually means it shows up in a tooltip, or it’s the header of a dialog box, so it can be a little bit longer.',
     original: 'Rename Layer',
-    value: 'Ganti nama lapisan'
+    value: 'Ganti Nama Lapisan'
   },
   'layers-rename-name': {
     hint: 'noun',
@@ -449,7 +449,7 @@
   'file-storage': {
     hint: 'Made up term. Allows users to store drawing in the browser. (not synced across devices)',
     original: 'Browser Storage',
-    value: 'Penyimpanan Peramban '
+    value: 'Penyimpanan Peramban'
   },
   'file-storage-thumb-title': {
     hint: 'when reopening or reloading',
@@ -493,19 +493,19 @@
   'file-storage-min-ago': {
     hint: "{x} <- needs to stay, it's a placeholder.",
     original: '{x}min ago',
-    value: '{x} menit yang lalu'
+    value: '{x}menit yang lalu'
   },
   'file-storage-hours-ago': {
     original: '{x}h ago',
-    value: '{x} jam yang lalu'
+    value: '{x}jam yang lalu'
   },
   'file-storage-days-ago': {
     original: '{x}d ago',
-    value: '{x} hari yang lalu'
+    value: '{x}hari yang lalu'
   },
   'file-storage-month-ago': {
     original: '> 1month ago',
-    value: '> 1 bulan yang lalu'
+    value: '> 1bulan yang lalu'
   },
   'file-storage-restored': {
     original: 'Restored from Browser Storage',
@@ -548,11 +548,11 @@
   'cleared-layer': {
     hint: 'the layer has been cleared. It is now empty',
     original: 'Cleared layer',
-    value: 'Lapisan yang dihapus'
+    value: 'Lapisan yang dibersihkan'
   },
   'cleared-selected-area': {
     original: 'Cleared selected area',
-    value: ''
+    value: 'Membersihkan area yang dipilih'
   },
   filled: {
     hint: 'layer got filled with a color',
@@ -561,7 +561,7 @@
   },
   'filled-selected-area': {
     original: 'Filled selection',
-    value: ''
+    value: 'Pilihan yang terisi'
   },
   'new-title': {
     original: 'New Image',
@@ -653,7 +653,7 @@
   'upload-uploading': {
     hint: 'in the process of uploading',
     original: 'Uploading...',
-    value: 'Sedang mengunggah'
+    value: 'Sedang mengunggah...'
   },
   'upload-success': {
     original: 'Upload Successful',
@@ -772,7 +772,7 @@
   'filter-crop-description': {
     hint: 'descriptions explain the "filter" a tiny bit. Most importantly it says if it’s applied to a single layer, or the entire image (all layer)',
     original: 'Crop or extend the image.',
-    value: 'Pangkas atau perpanjangan gambar'
+    value: 'Pangkas atau perpanjangan gambar.'
   },
   'filter-crop-left': {
     original: 'Left',
@@ -894,7 +894,7 @@
   'filter-transform-snap-title': {
     hint: 'same as above, but as a tooltip',
     original: 'Snap Rotation And Position',
-    value: 'Rotasi dan Posisi Jepret'
+    value: 'Rotasi Dan Posisi Jepret'
   },
   'filter-bright-contrast-title': {
     hint: 'same as the button, but can be longer',
@@ -1166,6 +1166,11 @@
     original: 'Fit',
     value: 'Sesuai'
   },
+  'hand-inertia-scrolling': {
+    hint: 'Canvas will continue to move even after releasing pointer.',
+    original: 'Inertia Scrolling',
+    value: 'Pengguliran Inersia'
+  },
   'bucket-tolerance': {
     hint: 'a common feature for paint bucket',
     original: 'Tolerance',
@@ -1423,7 +1428,7 @@
   'submit-prompt': {
     hint: 'Dialog asking for confirmation',
     original: 'Submit drawing?',
-    value: 'Kirim Gambar?'
+    value: 'Kirim gambar?'
   },
   'submit-submitting': {
     hint: 'in the process of uploading',
@@ -1433,7 +1438,7 @@
   'embed-init-loading': {
     hint: 'when opening the app',
     original: 'Loading app',
-    value: 'Memuat Aplikasi'
+    value: 'Memuat aplikasi'
   },
   'embed-init-waiting': {
     hint: 'The app is loaded, but it’s still waiting for image',
@@ -1645,10 +1650,10 @@
   },
   'browser-zoom-help': {
     original: 'Double-tap or pinch-out to reset browser zoom.',
-    value: ''
+    value: 'Ketuk dua kali atau jepit untuk mengatur ulang zoom browser.'
   },
   dismiss: {
     original: 'Dismiss',
-    value: ''
+    value: 'Bubarkan'
   }
 }

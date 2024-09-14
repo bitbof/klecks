@@ -1166,6 +1166,11 @@
     original: 'Fit',
     value: 'Passen'
   },
+  'hand-inertia-scrolling': {
+    hint: 'Canvas will continue to move even after releasing pointer.',
+    original: 'Inertia Scrolling',
+    value: 'Trägheits-Scrollen'
+  },
   'bucket-tolerance': {
     hint: 'a common feature for paint bucket',
     original: 'Tolerance',

@@ -68,7 +68,7 @@
   },
   'tool-select': {
     original: 'Select Tool',
-    value: ''
+    value: 'Pilih Alat'
   },
   'tool-zoom': {
     original: 'Zoom',
@@ -552,7 +552,7 @@
   },
   'cleared-selected-area': {
     original: 'Cleared selected area',
-    value: ''
+    value: 'Ngabersihan daérah anu dipilih'
   },
   filled: {
     hint: 'layer got filled with a color',
@@ -561,7 +561,7 @@
   },
   'filled-selected-area': {
     original: 'Filled selection',
-    value: ''
+    value: 'Seleksi dieusian'
   },
   'new-title': {
     original: 'New Image',
@@ -1166,6 +1166,11 @@
     original: 'Fit',
     value: 'Pas'
   },
+  'hand-inertia-scrolling': {
+    hint: 'Canvas will continue to move even after releasing pointer.',
+    original: 'Inertia Scrolling',
+    value: 'Inersia Ngagulung'
+  },
   'bucket-tolerance': {
     hint: 'a common feature for paint bucket',
     original: 'Tolerance',
@@ -1423,7 +1428,7 @@
   'submit-prompt': {
     hint: 'Dialog asking for confirmation',
     original: 'Submit drawing?',
-    value: 'Kirimkeun Gambar?'
+    value: 'Kirimkeun gambar?'
   },
   'submit-submitting': {
     hint: 'in the process of uploading',
@@ -1645,10 +1650,10 @@
   },
   'browser-zoom-help': {
     original: 'Double-tap or pinch-out to reset browser zoom.',
-    value: ''
+    value: 'Ketok dua kali atawa ciwit kaluar pikeun ngareset zum browser.'
   },
   dismiss: {
     original: 'Dismiss',
-    value: ''
+    value: 'Ngaleungitkeun'
   }
 }
