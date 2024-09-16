@@ -9,11 +9,13 @@ import {table} from '../components/table';
 import {theme} from '../../../theme/theme';
 
 import QRCode from 'qrcode';
+import { KlCanvas } from '../../canvas/kl-canvas';
 export async function shareDialog (
     p: {
         backendUrl: string;
         image: string,
-        imageId: string
+        imageId: string,
+        getKlCanvas: () => KlCanvas,
     }
 ):  Promise<void> {
     const mainDiv = BB.el();
@@ -22,7 +24,9 @@ export async function shareDialog (
 
     const formData = new FormData();
     formData.append('image', p.image);
-    await fetch(p.backendUrl + "/share/" + p.imageId, {
+    const inputImage = getImage(p.getKlCanvas().getCompleteCanvas(1));
+    formData.append('input-image', inputImage)
+    await fetch(p.backendUrl + "/sharing/" + p.imageId, {
         method: 'POST',
         body: formData,
     })
@@ -34,7 +38,7 @@ export async function shareDialog (
     
     var image = new Image()
     image.src = "data:image/png;base64," + p.image;
-    image.style.width = "100%"
+    image.style.width = "80%"
     image.style.marginLeft = 'auto';
     image.style.marginRight = 'auto';
     image.style.paddingLeft = '0';
@@ -63,5 +67,24 @@ export async function shareDialog (
         clickOnEnter: 'Ok',
     });
 
+    function getImage(canvas: HTMLCanvasElement): Blob {
+        const extension = 'png';
+        const mimeType = 'image/png';
+        const filename = BB.getDate() + 'input-image' + '.' + extension;
+        const parts = canvas.toDataURL(mimeType).match(/data:([^;]*)(;base64)?,([0-9A-Za-z+/]+)/);
+
+        if (!parts) {
+            throw new Error('saveImage: empty parts');
+        }
+
+        const binStr = atob(parts[3]);
+        //convert to binary in ArrayBuffer
+        const buf = new ArrayBuffer(binStr.length);
+        const view = new Uint8Array(buf);
+        for (let i = 0; i < view.length; i++) {
+            view[i] = binStr.charCodeAt(i);
+        }
+        return new Blob([view], { 'type': parts[1] });
+    }
 }
 

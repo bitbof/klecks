@@ -1509,7 +1509,7 @@ export class KlApp {
         };
 
         const shareImage = (callback?: () => void) => {
-            KL.shareDialog({image: this.uploadImage.getLatestGeneration(), imageId: this.uploadImage.getimageId(), backendUrl: this.backendUrl});
+            KL.shareDialog({image: this.uploadImage.getLatestGeneration(), imageId: this.uploadImage.getimageId(), backendUrl: this.backendUrl, getKlCanvas: () => this.klCanvas});
         };
 
         this.saveToComputer = new KL.SaveToComputer(
