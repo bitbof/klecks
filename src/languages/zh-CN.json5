@@ -68,7 +68,7 @@
   },
   'tool-select': {
     original: 'Select Tool',
-    value: ''
+    value: '选择工具'
   },
   'tool-zoom': {
     original: 'Zoom',
@@ -271,7 +271,7 @@
   },
   'layers-merge-all': {
     original: 'Merge all',
-    value: ''
+    value: '合并全部'
   },
   'layers-rename': {
     hint: 'action',
@@ -552,7 +552,7 @@
   },
   'cleared-selected-area': {
     original: 'Cleared selected area',
-    value: ''
+    value: '清除选中区域'
   },
   filled: {
     hint: 'layer got filled with a color',
@@ -561,7 +561,7 @@
   },
   'filled-selected-area': {
     original: 'Filled selection',
-    value: ''
+    value: '填充选中区域'
   },
   'new-title': {
     original: 'New Image',
@@ -1169,7 +1169,7 @@
   'hand-inertia-scrolling': {
     hint: 'Canvas will continue to move even after releasing pointer.',
     original: 'Inertia Scrolling',
-    value: ''
+    value: '惯性滚动'
   },
   'bucket-tolerance': {
     hint: 'a common feature for paint bucket',
@@ -1327,71 +1327,71 @@
   },
   'select-select': {
     original: 'Select',
-    value: ''
+    value: '选择'
   },
   'select-transform': {
     original: 'Transform',
-    value: ''
+    value: '变换'
   },
   'select-lasso': {
     original: 'Lasso',
-    value: ''
+    value: '套索'
   },
   'select-polygon': {
     original: 'Polygon',
-    value: ''
+    value: '多边形'
   },
   'select-boolean-replace': {
     original: 'Replace',
-    value: ''
+    value: '替换'
   },
   'select-boolean-add': {
     original: 'Add',
-    value: ''
+    value: '添加'
   },
   'select-boolean-subtract': {
     original: 'Subtract',
-    value: ''
+    value: '减去'
   },
   'select-all': {
     original: 'All',
-    value: ''
+    value: '全部'
   },
   'select-invert': {
     original: 'Invert',
-    value: ''
+    value: '翻转'
   },
   'select-reset': {
     original: 'Reset',
-    value: ''
+    value: '重置'
   },
   'select-fill': {
     original: 'Fill',
-    value: ''
+    value: '填充'
   },
   'select-erase': {
     original: 'Erase',
-    value: ''
+    value: '擦除'
   },
   'select-transform-clone': {
     original: 'Clone',
-    value: ''
+    value: '复制'
   },
   'select-transform-clone-applied': {
     original: 'Cloned',
-    value: ''
+    value: '已复制'
   },
   'select-transform-move-to-layer': {
     original: 'Move to layer:',
-    value: ''
+    value: '移到图层'
   },
   'select-transform-applied': {
     original: 'Transformation applied',
-    value: ''
+    value: '已应用变换'
   },
   'select-transform-empty': {
     original: 'Selected area on active layer is empty.',
-    value: ''
+    value: '当前图层所选区域为空'
   },
   'save-reminder-title': {
     hint: 'Save Reminder is a popup that shows up after 20 minutes of not saving. Allows user to save on the spot.',
@@ -1473,27 +1473,27 @@
   },
   'settings-save-reminder-label': {
     original: 'Save Reminder',
-    value: ''
+    value: '保存提醒'
   },
   'settings-save-reminder-disabled': {
     original: 'disabled',
-    value: ''
+    value: '已禁用'
   },
   'settings-save-reminder-confirm-title': {
     original: 'Turn off Save Reminder?',
-    value: ''
+    value: '关闭保存提醒?'
   },
   'settings-save-reminder-confirm-a': {
     original: "There is no autosave and browser tabs don't last forever. If you don't periodically save you will likely lose work.",
-    value: ''
+    value: '没有自动保存功能，浏览器标签页也不会永久存在。如果不定期进行保存，你的工作可能会丢失。'
   },
   'settings-save-reminder-confirm-b': {
     original: 'Disable at your own risk?',
-    value: ''
+    value: '禁用风险自负？'
   },
   'settings-save-reminder-confirm-disable': {
     original: 'Disable',
-    value: ''
+    value: '禁用'
   },
   'theme-dark': {
     original: 'Dark',
@@ -1638,7 +1638,7 @@
   },
   more: {
     original: 'More',
-    value: ''
+    value: '更多'
   },
   'x-minutes': {
     original: '{x}min',
@@ -1646,14 +1646,14 @@
   },
   wip: {
     original: 'Work in progress',
-    value: ''
+    value: '此处正在施工'
   },
   'browser-zoom-help': {
     original: 'Double-tap or pinch-out to reset browser zoom.',
-    value: ''
+    value: '双击或捏合以重置浏览器缩放。'
   },
   dismiss: {
     original: 'Dismiss',
-    value: ''
+    value: '关闭'
   }
 }
