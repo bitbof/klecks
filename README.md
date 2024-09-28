@@ -1,3 +1,5 @@
+🖌️ [Demo](https://kleki.com/) | ❓ [About](https://kleki.com/about/) | 📝 [Dev Blog](https://blog.kleki.com/)
+
 <p style="text-align:center">
 <img src="https://bitbof.com/stuff/2022-01-klecks/2022-03-klecks-github.png" alt="Klecks"><br>
 </p>
@@ -11,7 +13,7 @@ Klecks can run in standalone mode (e.g. on [kleki.com](https://kleki.com)), or e
 - Pen-support with pressure and stabilizer
 - Touch gestures
 - Brushes: pen, blend, sketchy, pixel, chemy, smudge, eraser
-- Tools: paint bucket, text, shapes, gradient
+- Tools: selection, paint bucket, text, shapes, gradient
 - WebGL-powered filters: blur, tilt-shift, curves, distort, noise.
 - Lineart extraction
 - Editing tools: transform, crop/expand, resize, perspective
@@ -19,12 +21,6 @@ Klecks can run in standalone mode (e.g. on [kleki.com](https://kleki.com)), or e
 - Multi-language (10+ languages)
 
 ---
-
-🖌️ [Demo](https://kleki.com/)
-
-❓ [About](https://kleki.com/about/)
-
-📝 [Dev Blog](https://blog.kleki.com/)
 
 Created by developer/artist [bitbof](https://bitbof.com)
 
