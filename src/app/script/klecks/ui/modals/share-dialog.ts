@@ -20,13 +20,13 @@ export async function shareDialog (
 ):  Promise<void> {
     const mainDiv = BB.el();
     const canvas = BB.canvas(800, 800)
-    QRCode.toCanvas(canvas, p.backendUrl + "/share/" + p.imageId, { width: 200})
+    QRCode.toCanvas(canvas, p.backendUrl + "/sharing/" + p.imageId, { width: 200})
 
     const formData = new FormData();
     formData.append('image', p.image);
     const inputImage = getImage(p.getKlCanvas().getCompleteCanvas(1));
     formData.append('input-image', inputImage)
-    await fetch(p.backendUrl + "/sharing/" + p.imageId, {
+    fetch(p.backendUrl + "/share/" + p.imageId, {
         method: 'POST',
         body: formData,
     })

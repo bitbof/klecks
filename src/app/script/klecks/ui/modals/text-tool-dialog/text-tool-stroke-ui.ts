@@ -83,7 +83,7 @@ export class TextToolStrokeUI {
             label: LANG('shape-line-width'),
             width: 150,
             height: 30,
-            min: 0.5,
+            min: 20,
             max: 100,
             value: p.stroke ? p.stroke.lineWidth : 2,
             eventResMs: 1000 / 30,

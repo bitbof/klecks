@@ -937,7 +937,7 @@ export class KlApp {
             [key: string]: any;
         } = {};
         // create brush UIs
-        Object.entries(this.simpleUi ? KL.simpleBrushesUI : KL.brushesUI).forEach(([b, brushUi]) => {
+        Object.entries(KL.brushesUI).forEach(([b, brushUi]) => {
             const ui = new (brushUi.Ui as any)({
                 history: klHistory,
                 onSizeChange: sizeWatcher,
@@ -1282,7 +1282,7 @@ export class KlApp {
             ]);
         }
         BB.append(brushDiv, [
-                ...Object.entries(this.simpleUi ? KL.simpleBrushesUI : KL.brushesUI).map(([b]) => brushUiMap[b].getElement()),
+                ...Object.entries(KL.brushesUI).map(([b]) => brushUiMap[b].getElement()),
             ]);
 
         

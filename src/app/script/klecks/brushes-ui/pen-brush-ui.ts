@@ -16,9 +16,9 @@ export const penBrushUi = (function() {
         image: brushIconImg,
         tooltip: LANG('brush-pen'),
         sizeSlider: {
-            min: 0.5,
-            max: 100,
-            curve: BB.quadraticSplineInput(0.5, 100, 0.1),
+            min: 20,
+            max: 200,
+            curve: BB.quadraticSplineInput(20, 200, 0.1),
         },
         opacitySlider: {
             min: 1 / 100,
