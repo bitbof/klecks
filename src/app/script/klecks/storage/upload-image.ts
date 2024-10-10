@@ -101,14 +101,16 @@ export class UploadImage {
 
     public setStyle(style: string){
         var styles = new Map<string, GenerateStyle>();
-        styles.set('Van Gogh', new GenerateStyle('(van gogh style:1.1) (Post-Impressionism:1.3) (Expressive:1.1), (bold brushstrokes:1.2), (vibrant colors:1.2), painting style, intense emotions, distorted forms, dynamic compositions, raw authenticity,',
+        styles.set('Van Gogh', new GenerateStyle('(van gogh style:1.1) (Post-Impressionism:1.3) (Expressive:1.1), (bold brushstrokes:1.2), (vibrant colors:1.2), painting style, intense emotions, distorted forms, dynamic compositions, raw authenticity, vg, painting, <lora:vincent_van_gogh_xl.safetensors:0.5>',
              'photo, photorealistic, painting of Van Gogh, logo, cartoon, naked, tits, nude, porn'));
-        styles.set('Rembrandt', new GenerateStyle('Rembrandt van Rijn style painting, oil painting, Baroque, chiaroscuro, dramatic lighting, realistic portraits, deep shadows, warm color palette, emotional depth, 17th-century Dutch art', 
+        styles.set('Rembrandt', new GenerateStyle('Rembrandt van Rijn style painting, oil painting, Baroque, chiaroscuro, dramatic lighting, realistic portraits, deep shadows, warm color palette, emotional depth, 17th-century Dutch art, RembrandtXL, <lora:RembrandtXL_v1.safetensors:1.0>', 
             'photo, photorealistic, logo, cartoon, naked, tits, nude, porn'));
-        styles.set('Picasso', new GenerateStyle('painted by Picasso, Cubism, abstract, fragmented forms, bold colors, geometric shapes, surrealism, expressive, multiple perspectives, deconstructed figures, avant-garde', 
+        styles.set('Picasso', new GenerateStyle('painted by Picasso, Cubism, abstract, fragmented forms, bold colors, geometric shapes, surrealism, expressive, multiple perspectives, deconstructed figures, avant-garde, <lora:p1c4ss0_003-step00028000.safetensors:0.4>', 
             'photo, photorealistic, logo, cartoon, naked, tits, nude, porn'));
         styles.set('Photo', new GenerateStyle('a photo realistic painting, High detail, realistic textures, precise rendering, lifelike, sharp focus, true-to-life colors, fine brushwork, hyperrealism, clarity, exact replication',
              'logo, cartoon, naked, tits, nude, porn'));
+        styles.set('Fantasy', new GenerateStyle('Imagine a scene rendered in the Global Fantasy Style, where vibrant hues merge seamlessly with deep shadows, creating a tapestry of color that is both rich and enchanting. The artwork features a harmonious blend of cultural patterns and motifs, resulting in a universal aesthetic that feels both familiar and otherworldly. Ethereal lighting casts a soft glow over intricate details, highlighting elaborate textures and fine embellishments. The composition is dynamic and fluid, guiding the eye through a landscape of wonder without focusing on specific objects. Overall, the style evokes a sense of magic and immersion, inviting viewers to lose themselves in a world of endless  possibilities. drkfntasy,<lora:darkfantasystyle.safetensors:1.0>',
+             'photo, photorealistic, logo, cartoon, naked, tits, nude, porn'));
 
         var selectedStyle =  styles.get(style);
         this.style = selectedStyle ?? new GenerateStyle('Select failed', '');

@@ -21,6 +21,7 @@ export async function selectStyleDialog (
             ['Van Gogh', 'Van Gogh'],
             ['Rembrandt', 'Rembrandt van Rijn'],
             ['Picasso', 'Picasso'],
+            ['Fantasy', 'Fantasy'],
             ['Photo', 'Photo']
         ],
         initValue: p.selectedStyle,
