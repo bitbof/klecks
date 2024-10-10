@@ -133,13 +133,13 @@ export class ToolspaceTopRow {
         if(!p.simpleUi){
             BB.append(this.rootEl, [
                 importButton.el,
+                saveButton.el
             ]);    
         }
 
         BB.append(this.rootEl, [
             logoButton.el,
             newButton.el,
-            saveButton.el,
             shareButton ? shareButton.el : undefined,
             helpButton.el,
         ]);
