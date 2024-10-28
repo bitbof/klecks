@@ -111,6 +111,8 @@ export class UploadImage {
              'logo, cartoon, naked, tits, nude, porn'));
         styles.set('Fantasy', new GenerateStyle('Imagine a scene rendered in the Global Fantasy Style, where vibrant hues merge seamlessly with deep shadows, creating a tapestry of color that is both rich and enchanting. The artwork features a harmonious blend of cultural patterns and motifs, resulting in a universal aesthetic that feels both familiar and otherworldly. Ethereal lighting casts a soft glow over intricate details, highlighting elaborate textures and fine embellishments. The composition is dynamic and fluid, guiding the eye through a landscape of wonder without focusing on specific objects. Overall, the style evokes a sense of magic and immersion, inviting viewers to lose themselves in a world of endless  possibilities. drkfntasy,<lora:darkfantasystyle.safetensors:1.0>',
              'photo, photorealistic, logo, cartoon, naked, tits, nude, porn'));
+        styles.set('Halloween', new GenerateStyle('a spooky, gothic atmosphere with an eerie and mysterious mood. Utilize dark and moody colors, dramatic shadows, and subtle contrasts to evoke a chilling vibe. The style should suggest vintage horror with a macabre and haunting feel, incorporating autumnal tones and hints of the supernatural. Focus on conveying the overall ambience and emotional impact without depicting specific objects or scenes. halloween <lora:halloweenXL.safetensors:0.8>',
+                'photo, photorealistic, logo, cartoon, naked, tits, nude, porn'));     
 
         var selectedStyle =  styles.get(style);
         this.style = selectedStyle ?? new GenerateStyle('Select failed', '');

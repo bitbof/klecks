@@ -22,7 +22,8 @@ export async function selectStyleDialog (
             ['Rembrandt', 'Rembrandt van Rijn'],
             ['Picasso', 'Picasso'],
             ['Fantasy', 'Fantasy'],
-            ['Photo', 'Photo']
+            ['Photo', 'Photo'],
+            ['Halloween', 'Halloween']
         ],
         initValue: p.selectedStyle,
         onChange: (val : string) => {
