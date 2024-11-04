@@ -39,9 +39,9 @@ export async function selectStyleDialog (
         buttons: ['Ok',],
         style: {
             width: 'calc(100% - 50px)',
-            maxWidth: '800px',
+            maxWidth: '300px',
             minWidth: '300px',
-            boxSizing: 'border-box',
+            boxSizing: 'border-box',    
         },
         callback: function (result) {
             if (result === 'Cancel') {

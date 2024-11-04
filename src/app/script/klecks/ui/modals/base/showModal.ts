@@ -183,7 +183,6 @@ export function showModal(p: {
                   css: {
                       display: 'flex',
                       flexWrap: 'wrap',
-                      justifyContent: 'flex-end',
                       marginTop: '12px', // 8px already via buttons
                       marginLeft: '-8px',
                   },
