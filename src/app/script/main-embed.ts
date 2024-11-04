@@ -59,7 +59,8 @@ export class Embed {
                     url: this.p.embedUrl,
                     onSubmit: this.p.onSubmit,
                 },
-                simpleUi: false
+                simpleUi: false,
+                session: "default"
             });
             saveReminder.init();
 

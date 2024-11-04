@@ -56,19 +56,22 @@ function initError(e: Error): void {
             null,
             null,
         );
-        const params = new Proxy(new URLSearchParams(window.location.search), {
+        const simpleUiParam = new Proxy(new URLSearchParams(window.location.search), {
             get: (searchParams, prop) => searchParams.get("simpleUi") ?? searchParams.get("simpleui") ?? searchParams.get("simple"),
           });
+
+        const sessionParam = new Proxy(new URLSearchParams(window.location.search), {
+          get: (searchParams, prop) => searchParams.get("session") ?? searchParams.get("sessionId") ?? searchParams.get("Session") ?? 'Default',
+        });
           
-        let simpleUi = params.get;
-        console.log(params.get)
-        console.log(simpleUi)
+        let simpleUi = simpleUiParam.get;
         klApp = new KlApp(
             {
                 project: nullToUndefined(project),
                 saveReminder,
                 projectStore,
-                simpleUi: simpleUi ? simpleUi.toString() === 'true' : false
+                simpleUi: simpleUi ? simpleUi.toString() === 'true' : false,
+                session: sessionParam.get.toString()
             }
         );
         saveReminder.init();

@@ -83,6 +83,7 @@ export type TKlAppParams = {
     bottomBar?: HTMLElement; // row at bottom of toolspace
     embed?: KlAppOptionsEmbed;
     simpleUi: boolean;
+    session: string;
     app?: {
         imgurKey?: string; // for imgur uploads
     };
@@ -107,6 +108,7 @@ export class KlApp {
     private uiHeight: number;
     private simpleUi: boolean;
     private backendUrl: string;
+    private session: string;
     private readonly layerPreview: LayerPreview;
     private readonly klColorSlider: KlColorSlider;
     private readonly toolspaceToolRow: ToolspaceToolRow;
@@ -275,6 +277,7 @@ export class KlApp {
         let oldestProjectState: TOldestProjectState;
         let mainTabRow: TabRow | undefined = undefined;
         this.simpleUi = p.simpleUi;
+        this.session = p.session;
         this.backendUrl = process.env.BACKEND_URL ?? "";
 
         if (!p.saveReminder) {
@@ -1520,7 +1523,8 @@ export class KlApp {
 
         this.uploadImage = new KL.UploadImage(
             () => this.klCanvas,
-            this.backendUrl
+            this.backendUrl,
+            this.session
         );
 
         const copyToClipboard = (showCrop?: boolean) => {

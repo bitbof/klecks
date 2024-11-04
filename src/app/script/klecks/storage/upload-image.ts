@@ -28,13 +28,15 @@ export class UploadImage {
 
     constructor(
         private getKlCanvas: () => KlCanvas,
-        private backendUrl: string
+        private backendUrl: string,
+        private session: string
     ) {
         this.latestGeneration = "";
         this.imageId = "";
         this.generating = false;
         this.queueNew = false;
         this.backendUrl = backendUrl;
+        this.session = session;
         this.style = new GenerateStyle('(van gogh style:1.1) (Post-Impressionism:1.3) (Expressive:1.1), (bold brushstrokes:1.2), (vibrant colors:1.2), painting style, intense emotions, distorted forms, dynamic compositions, raw authenticity,',
              'photo, photorealistic, painting of Van Gogh, logo, cartoon, naked, tits, nude, porn');
      }
@@ -78,7 +80,7 @@ export class UploadImage {
         formData.append('negativePrompt', this.style.negativePrompt);
         formData.append('positivePrompt', this.style.postivePrompt);
 
-        var response = await fetch(this.backendUrl + '/generate', {
+        var response = await fetch(this.backendUrl + '/generate/' + this.session, {
             method: 'POST',
             body: formData,
         });
