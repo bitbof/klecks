@@ -26,7 +26,7 @@ export async function selectStyleDialog (
 //            ['Halloween', 'Halloween'],
             ['Édouard Manet', 'Édouard Manet'],
             ['Caravaggio', 'Caravaggio'],
-            ['Leonardo da Vinci', 'Leonardo da Vinci'],
+//            ['Leonardo da Vinci', 'Leonardo da Vinci'],
             ['Vermeer', 'Vermeer'],
             ['Renaissance', 'Renaissance'],
             ['Alphonso Mucha', 'Alphonso Mucha'],
