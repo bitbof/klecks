@@ -127,6 +127,9 @@ export class UploadImage {
                 'photo, photorealistic, logo, cartoon, naked, tits, nude, porn')); 
         styles.set('Édouard Manet', new GenerateStyle('A painting in the style of Édouard Manet, characterized by bold, loose brushstrokes and a modern, impressionistic approach. The scene focuses on contemporary life, capturing candid, everyday moments with a sense of immediacy. The composition features a balance of light and dark tones, often with a dramatic use of contrast to draw attention to the central subject. The background is subtly suggested rather than detailed, leaving an air of spontaneity. The palette includes rich blacks, muted blues, and soft whites, often punctuated by warm, vibrant accents. The figures and objects are rendered with a blend of realism and painterly abstraction, evoking the transitional spirit between realism and impressionism. <lora:m4n3t:0.5> m4n3t',
                 'photo, photorealistic, logo, cartoon, naked, tits, nude, porn')); 
+        styles.set('Kerst', new GenerateStyle('A warm, glowing Christmas image styled with a soft, dreamy focus, blending vibrant yet slightly muted tones of red, green, and gold. The composition feels layered and immersive, with textures like smooth, glossy highlights on ornaments, the soft flicker of fairy lights, and the cozy glow of ambient lighting. Shadows are gentle, creating depth without harsh contrast, while edges have a painterly or slightly blurred quality, evoking a sense of nostalgia and magic. The overall style emphasizes a rich, inviting atmosphere, with a harmonious balance between sharp details in focal points and a soft bokeh effect in the background, enhancing the cozy and festive feel. ChristmasWintery <lora:ChristmasWinteryXL.safetensors:0.5>',
+                'logo, cartoon, naked, tits, nude, porn')); 
+
         var selectedStyle =  styles.get(style);
         this.style = selectedStyle ?? new GenerateStyle('Select failed', '');
     }

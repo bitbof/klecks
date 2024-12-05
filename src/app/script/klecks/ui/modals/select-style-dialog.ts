@@ -20,9 +20,9 @@ export async function selectStyleDialog (
         optionArr: [
             ['Van Gogh', 'Van Gogh'],
             ['Rembrandt', 'Rembrandt van Rijn'],
-//            ['Picasso', 'Picasso'],
-//            ['Fantasy', 'Fantasy'],
-//            ['Photo', 'Photo'],
+            ['Picasso', 'Picasso'],
+            ['Fantasy', 'Fantasy'],
+            ['Photo', 'Photo'],
 //            ['Halloween', 'Halloween'],
             ['Édouard Manet', 'Édouard Manet'],
             ['Caravaggio', 'Caravaggio'],
@@ -30,6 +30,7 @@ export async function selectStyleDialog (
             ['Vermeer', 'Vermeer'],
             ['Renaissance', 'Renaissance'],
             ['Alphonso Mucha', 'Alphonso Mucha'],
+            ['Kerst', 'Kerst'],
 
         ],
         initValue: p.selectedStyle,
