@@ -268,12 +268,13 @@ export class PenBrush {
         const localSize = this.settingHasSizePressure
             ? Math.max(0.1, p * this.settingSize)
             : Math.max(0.1, this.settingSize);
+        const localScatter = this.settingScatter;
 
         this.hasDrawnDot = false;
 
         this.inputIsDrawing = true;
         this.context.save();
-        this.drawDot(x, y, localSize, localOpacity, this.settingScatter);
+        this.drawDot(x, y, localSize, localOpacity, localScatter);
         this.context.restore();
 
         this.lineToolLastDot = localSize * this.settingSpacing;
