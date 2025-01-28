@@ -63,6 +63,7 @@ export const penBrushUi = (function () {
         p.onSizeChange(brush.getSize());
         let sizeSlider: KlSlider;
         let opacitySlider: KlSlider;
+        let scatterSlider: KlSlider;
 
         const alphaOptions = new Options({
             optionArr: [0, 1, 2, 3].map((id) => {
@@ -174,7 +175,7 @@ export const penBrushUi = (function () {
                 },
             });
             scatterSlider = new KlSlider({
-                label: LANG('scatter'),
+                label: LANG('opacity'),
                 width: 225,
                 height: 30,
                 min: brushInterface.scatterSlider.min,

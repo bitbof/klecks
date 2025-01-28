@@ -148,6 +148,16 @@ export class BrushSettingService {
     }
 
     /**
+     * set current scatter
+     * @param scatter
+     * @param skipSubscriber
+     */
+    setScatter(scatter: number, skipSubscriber?: TBrushSettingSubscriber) {
+        this.onSetScatter(scatter);
+        // why not emitting?
+    }
+
+    /**
      * get current brush color
      */
     getColor(): IRGB {
@@ -160,6 +170,10 @@ export class BrushSettingService {
 
     getOpacity(): number {
         return this.onGetOpacity();
+    }
+
+    getScatter(): number {
+        return this.onGetScatter();
     }
 
     getSliderConfig(): ISliderConfig {
