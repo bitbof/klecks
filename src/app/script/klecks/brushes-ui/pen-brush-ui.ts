@@ -33,8 +33,8 @@ export const penBrushUi = (function () {
             min: 0,
             max: 100,
             curve: [
-                [0, 1 / 100],
-                [0.5, 30 / 100],
+                [0, 0],
+                [0.5, 0.5],
                 [1, 1],
             ],
         },
