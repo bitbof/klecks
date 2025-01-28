@@ -217,8 +217,10 @@ export const penBrushUi = (function () {
                         display: 'flex',
                         justifyContent: 'space-between',
                         alignItems: 'center',
+                        marginBottom: '10px',
                     },
-                }),BB.el({
+                }),
+                BB.el({
                     content: [scatterSlider.getElement(), pressureScatterToggle],
                     css: {
                         display: 'flex',
