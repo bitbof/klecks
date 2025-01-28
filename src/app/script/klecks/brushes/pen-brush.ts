@@ -230,6 +230,10 @@ export class PenBrush {
                     params: [this.settingHasSizePressure],
                 },
                 {
+                    action: 'scatterPressure',
+                    params: [this.settingHasScatterPressure],
+                },
+                {
                     action: 'setSize',
                     params: [this.settingSize],
                 },
@@ -403,6 +407,10 @@ export class PenBrush {
                 {
                     action: 'sizePressure',
                     params: [this.settingHasSizePressure],
+                },
+                {
+                    action: 'scatterPressure',
+                    params: [this.settingHasScatterPressure],
                 },
                 {
                     action: 'setSize',
