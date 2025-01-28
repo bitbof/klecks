@@ -26,6 +26,7 @@ export class PenBrush {
     private settingSize: number = 2;
     private settingSpacing: number = 0.8489;
     private settingOpacity: number = 1;
+    private settingScatter: number = 0;
     private settingColor: IRGB = {} as IRGB;
     private settingColorStr: string = '';
     private settingAlphaId: number = ALPHA_CIRCLE;
@@ -187,7 +188,9 @@ export class PenBrush {
                 0.1,
                 this.settingSize * (this.settingHasSizePressure ? localPressure : 1),
             );
-            drawArr.push([val.x, val.y, localSize, localOpacity, val.angle]);
+            const scatteredX = val.x + ((Math.random() * this.settingScatter) - (this.settingScatter / 2));
+            const scatteredY = val.y + ((Math.random() * this.settingScatter) - (this.settingScatter / 2));
+            drawArr.push([scatteredX, scatteredY, localSize, localOpacity, val.angle]);
         };
 
         const localSpacing = size * this.settingSpacing;
@@ -413,6 +416,10 @@ export class PenBrush {
                     params: [this.settingOpacity],
                 },
                 {
+                    action: 'setScatter',
+                    params: [this.settingScatter],
+                },
+                {
                     action: 'setColor',
                     params: [this.settingColor],
                 },
@@ -477,6 +484,10 @@ export class PenBrush {
 
     setOpacity(o: number): void {
         this.settingOpacity = o;
+    }
+
+    setScatter(o: number): void {
+        this.settingScatter = o;
     }
 
     setSpacing(s: number): void {
