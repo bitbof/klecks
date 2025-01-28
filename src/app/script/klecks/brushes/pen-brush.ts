@@ -109,6 +109,7 @@ export class PenBrush {
         y: number,
         size: number,
         opacity: number,
+        scatter: number,
         angle?: number,
         before?: [number, number, number, number, number | undefined],
     ): void {
@@ -130,17 +131,19 @@ export class PenBrush {
         ) {
             this.context.fillStyle = this.settingColorStr;
         }
-
+        
+        const scatteredX = x + ((Math.random() * this.settingScatter) - (this.settingScatter / 2));
+        const scatteredY = y + ((Math.random() * this.settingScatter) - (this.settingScatter / 2));
         if (this.settingAlphaId === ALPHA_CIRCLE) {
             this.context.beginPath();
-            this.context.arc(x, y, size, 0, TWO_PI);
+            this.context.arc(scatteredX, scatteredY, size, 0, TWO_PI);
             this.context.closePath();
             this.context.fill();
             this.hasDrawnDot = true;
         } else if (this.settingAlphaId === ALPHA_SQUARE) {
             if (angle !== undefined) {
                 this.context.save();
-                this.context.translate(x, y);
+                this.context.translate(scatteredX, scatteredY);
                 this.context.rotate((angle / 180) * Math.PI);
                 this.context.fillRect(-size, -size, size * 2, size * 2);
                 this.context.restore();
@@ -149,7 +152,7 @@ export class PenBrush {
         } else {
             // other brush alphas
             this.context.save();
-            this.context.translate(x, y);
+            this.context.translate(scatteredX, scatteredY);
             let targetMipmap = this.alphaCanvas128;
             if (size <= 32 && size > 16) {
                 targetMipmap = this.alphaCanvas64;
@@ -174,7 +177,7 @@ export class PenBrush {
             this.bezierLine.add(this.lastInput.x, this.lastInput.y, 0, () => {});
         }
 
-        const drawArr: [number, number, number, number, number | undefined][] = []; //draw instructions. will be all drawn at once
+        const drawArr: [number, number, number, number, number, number | undefined][] = []; //draw instructions. will be all drawn at once
 
         const dotCallback = (val: {
             x: number;
@@ -189,9 +192,7 @@ export class PenBrush {
                 0.1,
                 this.settingSize * (this.settingHasSizePressure ? localPressure : 1),
             );
-            const scatteredX = val.x + ((Math.random() * this.settingScatter) - (this.settingScatter / 2));
-            const scatteredY = val.y + ((Math.random() * this.settingScatter) - (this.settingScatter / 2));
-            drawArr.push([scatteredX, scatteredY, localSize, localOpacity, val.angle]);
+            drawArr.push([val.x, val.y, localSize, localOpacity, this.settingScatter, val.angle]);
         };
 
         const localSpacing = size * this.settingSpacing;
@@ -206,7 +207,7 @@ export class PenBrush {
         let before: (typeof drawArr)[number] | undefined = undefined;
         for (let i = 0; i < drawArr.length; i++) {
             const item = drawArr[i];
-            this.drawDot(item[0], item[1], item[2], item[3], item[4], before);
+            this.drawDot(item[0], item[1], item[2], item[3], item[4], item[5], before);
             before = item;
         }
         this.context.restore();
@@ -270,7 +271,7 @@ export class PenBrush {
 
         this.inputIsDrawing = true;
         this.context.save();
-        this.drawDot(x, y, localSize, localOpacity);
+        this.drawDot(x, y, localSize, localOpacity, this.settingScatter);
         this.context.restore();
 
         this.lineToolLastDot = localSize * this.settingSpacing;
@@ -350,7 +351,7 @@ export class PenBrush {
             this.context.save();
             const p = BB.clamp(maxInput.pressure, 0, 1);
             const localOpacity = this.calcOpacity(p);
-            this.drawDot(maxInput.x, maxInput.y, localSize, localOpacity, 0);
+            this.drawDot(maxInput.x, maxInput.y, localSize, localOpacity, 0, 0);
             this.context.restore();
         }
 
