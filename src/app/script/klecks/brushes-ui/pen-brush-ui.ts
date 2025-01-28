@@ -175,12 +175,12 @@ export const penBrushUi = (function () {
                 },
             });
             scatterSlider = new KlSlider({
-                label: LANG('opacity'),
+                label: LANG('scatter'),
                 width: 225,
                 height: 30,
                 min: brushInterface.scatterSlider.min,
                 max: brushInterface.scatterSlider.max,
-                value: brushInterface.scatterSlider.max,
+                value: brushInterface.scatterSlider.min,
                 curve: brushInterface.scatterSlider.curve,
                 eventResMs: eventResMs,
                 toDisplayValue: (val) => val * 100,
