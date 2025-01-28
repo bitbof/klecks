@@ -371,9 +371,13 @@ export class KlApp {
             onSetOpacity: (opacity) => {
                 currentBrushUi.setOpacity(opacity);
             },
+            onSetScatter: (scatter) => {
+                currentBrushUi.setScatter(scatter);
+            },
             onGetColor: () => this.klColorSlider.getColor(),
             onGetSize: () => brushUiMap[currentBrushId].getSize(),
             onGetOpacity: () => brushUiMap[currentBrushId].getOpacity(),
+            onGetScatter: () => brushUiMap[currentBrushId].getScatter(),
             onGetSliderConfig: () => {
                 return {
                     sizeSlider: KL.brushesUI[currentBrushId].sizeSlider,
