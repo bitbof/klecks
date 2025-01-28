@@ -183,6 +183,7 @@ export interface IKlSliderConfig {
 export interface ISliderConfig {
     sizeSlider: IKlSliderConfig;
     opacitySlider: IKlSliderConfig;
+    scatterSlider: IKlSliderConfig;
 }
 
 export type TBrushUiInstance<GBrush> = {
@@ -192,6 +193,8 @@ export type TBrushUiInstance<GBrush> = {
     setSize: (size: number) => void;
     getOpacity: () => number;
     setOpacity: (opacity: number) => void;
+    getScatter: () => number;
+    setScatter: (opacity: number) => void;
     setColor: (c: IRGB) => void;
     setContext: (ctx: CanvasRenderingContext2D) => void;
     startLine: (x: number, y: number, p: number) => void;
@@ -215,6 +218,7 @@ export interface IBrushUi<GBrush> extends ISliderConfig {
             history: KlHistory;
             onSizeChange: (size: number) => void;
             onOpacityChange: (size: number) => void;
+            onScatterChange: (size: number) => void;
             onConfigChange: () => void;
         },
     ) => TBrushUiInstance<GBrush>;

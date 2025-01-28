@@ -22,6 +22,7 @@ export class PenBrush {
     private historyEntry: IPenBrushHistoryEntry | undefined;
 
     private settingHasOpacityPressure: boolean = false;
+    private settingHasScatterPressure: boolean = false;
     private settingHasSizePressure: boolean = true;
     private settingSize: number = 2;
     private settingSpacing: number = 0.8489;
@@ -502,6 +503,10 @@ export class PenBrush {
         this.settingHasOpacityPressure = b;
     }
 
+    scatterPressure(b: boolean): void {
+        this.settingHasScatterPressure = b;
+    }
+
     setLockAlpha(b: boolean): void {
         this.settingLockLayerAlpha = b;
     }
@@ -517,6 +522,10 @@ export class PenBrush {
 
     getOpacity(): number {
         return this.settingOpacity;
+    }
+
+    getScatter(): number {
+        return this.settingScatter;
     }
 
     getLockAlpha(): boolean {

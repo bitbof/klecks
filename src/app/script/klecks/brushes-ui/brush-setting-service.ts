@@ -4,6 +4,7 @@ export type TBrushSettingEmit =
     | { type: 'color'; value: IRGB }
     | { type: 'opacity'; value: number }
     | { type: 'size'; value: number }
+    | { type: 'scatter'; value: number }
     | { type: 'sliderConfig'; value: ISliderConfig };
 
 export type TBrushSettingSubscriber = (p: TBrushSettingEmit) => void;
@@ -12,9 +13,11 @@ export type TBrushSettingServiceParams = {
     onSetColor: (rgb: IRGB) => void;
     onSetSize: (size: number) => void;
     onSetOpacity: (opacity: number) => void;
+    onSetScatter: (scatter: number) => void;
     onGetColor: () => IRGB;
     onGetSize: () => number;
     onGetOpacity: () => number;
+    onGetScatter: () => number;
     onGetSliderConfig: () => ISliderConfig;
 };
 
@@ -29,9 +32,11 @@ export class BrushSettingService {
     private readonly onSetColor: (rgb: IRGB) => void;
     private readonly onSetSize: (size: number) => void;
     private readonly onSetOpacity: (opacity: number) => void;
+    private readonly onSetScatter: (scatter: number) => void;
     private readonly onGetColor: () => IRGB;
     private readonly onGetSize: () => number;
     private readonly onGetOpacity: () => number;
+    private readonly onGetScatter: () => number;
     private readonly onGetSliderConfig: () => ISliderConfig;
 
     private emit(obj: TBrushSettingEmit, skipSubscriber?: TBrushSettingSubscriber): void {
@@ -49,9 +54,11 @@ export class BrushSettingService {
         this.onSetColor = p.onSetColor;
         this.onSetSize = p.onSetSize;
         this.onSetOpacity = p.onSetOpacity;
+        this.onSetScatter = p.onSetScatter;
         this.onGetColor = p.onGetColor;
         this.onGetSize = p.onGetSize;
         this.onGetOpacity = p.onGetOpacity;
+        this.onGetScatter = p.onGetScatter;
         this.onGetSliderConfig = p.onGetSliderConfig;
 
         if (BrushSettingService.instance) {
@@ -85,6 +92,16 @@ export class BrushSettingService {
             {
                 type: 'opacity',
                 value: opacity,
+            },
+            skipSubscriber,
+        );
+    }
+
+    emitScatter(scatter: number, skipSubscriber?: TBrushSettingSubscriber): void {
+        this.emit(
+            {
+                type: 'scatter',
+                value: scatter,
             },
             skipSubscriber,
         );

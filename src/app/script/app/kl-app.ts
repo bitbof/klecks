@@ -351,6 +351,12 @@ export class KlApp {
                 this.easelBrush.setBrush({ radius: val });
             }
         };
+        const scatterWatcher = (val: number) => {
+            brushSettingService.emitSize(val);
+            if (this.easelBrush) {
+                this.easelBrush.setBrush({ radius: val });
+            }
+        };
 
         const brushSettingService = new KL.BrushSettingService({
             onSetColor: (color) => {
@@ -372,6 +378,7 @@ export class KlApp {
                 return {
                     sizeSlider: KL.brushesUI[currentBrushId].sizeSlider,
                     opacitySlider: KL.brushesUI[currentBrushId].opacitySlider,
+                    scatterSlider: KL.brushesUI[currentBrushId].scatterSlider,
                 };
             },
         });
@@ -932,6 +939,7 @@ export class KlApp {
             const ui = new (brushUi.Ui as any)({
                 history: klHistory,
                 onSizeChange: sizeWatcher,
+                onScatterChange: scatterWatcher,
                 onOpacityChange: (opacity: number) => {
                     brushSettingService.emitOpacity(opacity);
                 },
@@ -939,6 +947,7 @@ export class KlApp {
                     brushSettingService.emitSliderConfig({
                         sizeSlider: KL.brushesUI[currentBrushId].sizeSlider,
                         opacitySlider: KL.brushesUI[currentBrushId].opacitySlider,
+                        scatterSlider: KL.brushesUI[currentBrushId].scatterSlider,
                     });
                 },
             });
@@ -1245,6 +1254,7 @@ export class KlApp {
                             brushSettingService.emitSliderConfig({
                                 sizeSlider: KL.brushesUI[keyStr].sizeSlider,
                                 opacitySlider: KL.brushesUI[keyStr].opacitySlider,
+                                scatterSlider: KL.brushesUI[keyStr].scatterSlider,
                             });
                             sizeWatcher(brushUiMap[keyStr].getSize());
                             brushSettingService.emitOpacity(brushUiMap[keyStr].getOpacity());
