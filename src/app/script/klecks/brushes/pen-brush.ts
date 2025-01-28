@@ -101,6 +101,7 @@ export class PenBrush {
      * @param y
      * @param size
      * @param opacity
+     * @param scatter
      * @param angle
      * @param before - [x, y, size, opacity, angle] the drawDot call before
      */
@@ -111,7 +112,7 @@ export class PenBrush {
         opacity: number,
         scatter: number,
         angle?: number,
-        before?: [number, number, number, number, number | undefined],
+        before?: [number, number, number, number, number, number | undefined],
     ): void {
         if (size <= 0) {
             return;
@@ -132,8 +133,8 @@ export class PenBrush {
             this.context.fillStyle = this.settingColorStr;
         }
         
-        const scatteredX = x + ((Math.random() * this.settingScatter) - (this.settingScatter / 2));
-        const scatteredY = y + ((Math.random() * this.settingScatter) - (this.settingScatter / 2));
+        const scatteredX = x + ((Math.random() * scatter) - (scatter / 2));
+        const scatteredY = y + ((Math.random() * scatter) - (scatter / 2));
         if (this.settingAlphaId === ALPHA_CIRCLE) {
             this.context.beginPath();
             this.context.arc(scatteredX, scatteredY, size, 0, TWO_PI);
@@ -192,7 +193,8 @@ export class PenBrush {
                 0.1,
                 this.settingSize * (this.settingHasSizePressure ? localPressure : 1),
             );
-            drawArr.push([val.x, val.y, localSize, localOpacity, this.settingScatter, val.angle]);
+            const localScatter = this.settingScatter;
+            drawArr.push([val.x, val.y, localSize, localOpacity, localScatter, val.angle]);
         };
 
         const localSpacing = size * this.settingSpacing;
