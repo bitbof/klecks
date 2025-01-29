@@ -351,12 +351,6 @@ export class KlApp {
                 this.easelBrush.setBrush({ radius: val });
             }
         };
-        const scatterWatcher = (val: number) => {
-            brushSettingService.emitSize(val);
-            if (this.easelBrush) {
-                this.easelBrush.setBrush({ radius: val });
-            }
-        };
 
         const brushSettingService = new KL.BrushSettingService({
             onSetColor: (color) => {
@@ -943,7 +937,9 @@ export class KlApp {
             const ui = new (brushUi.Ui as any)({
                 history: klHistory,
                 onSizeChange: sizeWatcher,
-                onScatterChange: scatterWatcher,
+                onScatterChange: (scatter: number) => {
+                    brushSettingService.emitScatter(scatter);
+                },
                 onOpacityChange: (opacity: number) => {
                     brushSettingService.emitOpacity(opacity);
                 },
