@@ -32,11 +32,7 @@ export const penBrushUi = (function () {
         scatterSlider: {
             min: 0,
             max: 100,
-            curve: [
-                [0, 0],
-                [0.5, 0.5],
-                [1, 1],
-            ],
+            curve: BB.quadraticSplineInput(0, 100, 0.1),
         },
     } as IBrushUi<PenBrush>;
 
@@ -183,7 +179,7 @@ export const penBrushUi = (function () {
                 value: brushInterface.scatterSlider.min,
                 curve: brushInterface.scatterSlider.curve,
                 eventResMs: eventResMs,
-                toDisplayValue: (val) => val * 100,
+                toDisplayValue: (val) => val,
                 toValue: (displayValue) => displayValue / 100,
                 onChange: (val) => {
                     brush.setScatter(val);
