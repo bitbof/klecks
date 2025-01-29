@@ -1550,6 +1550,11 @@
     original: 'Opacity',
     value: 'Deckkraft'
   },
+  scatter: {
+    hint: 'for brush scatter',
+    original: 'Scatter',
+    value: 'Streuen'
+  },
   red: {
     original: 'Red',
     value: 'Rot'
