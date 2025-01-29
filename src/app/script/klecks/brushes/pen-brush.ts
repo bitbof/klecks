@@ -193,7 +193,10 @@ export class PenBrush {
                 0.1,
                 this.settingSize * (this.settingHasSizePressure ? localPressure : 1),
             );
-            const localScatter = this.settingScatter;
+            const localScatter = Math.max(
+                0.1,
+                this.settingScatter * (this.settingHasScatterPressure ? localPressure : 1),
+            );
             drawArr.push([val.x, val.y, localSize, localOpacity, localScatter, val.angle]);
         };
 
@@ -268,7 +271,9 @@ export class PenBrush {
         const localSize = this.settingHasSizePressure
             ? Math.max(0.1, p * this.settingSize)
             : Math.max(0.1, this.settingSize);
-        const localScatter = this.settingScatter;
+        const localScatter = this.settingHasScatterPressure
+                ? Math.max(0.1, p * this.settingScatter)
+                : Math.max(0.1, this.settingScatter);
 
         this.hasDrawnDot = false;
 
