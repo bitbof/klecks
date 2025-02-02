@@ -1,4 +1,5 @@
 import { BB } from '../../../bb/bb';
+import { LANG } from '../../../language/language';
 
 type TDropOption = 'default' | 'layer' | 'image';
 
@@ -17,7 +18,7 @@ export class KlImageDropper {
     }) {
         //set up DOM
         this.rootEl = BB.el({
-            content: 'Drop to import',
+            content: LANG('dropper-drop'),
             css: {
                 paddingTop: '100px',
                 position: 'fixed',
@@ -50,11 +51,11 @@ export class KlImageDropper {
             fontWeight: 'bold',
         };
         const optionLayerEl = BB.el({
-            content: 'As Layer',
+            content: LANG('dropper-as-layer'),
             css: optionStyle,
         });
         const optionImageEl = BB.el({
-            content: 'As New Image',
+            content: LANG('dropper-as-image'),
             css: optionStyle,
         });
 

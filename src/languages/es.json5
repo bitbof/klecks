@@ -74,6 +74,11 @@
     original: 'Zoom',
     value: 'Zoom'
   },
+  'tool-more-tools': {
+    hint: 'when hovering the caret on the tool button',
+    original: 'More Tools',
+    value: ''
+  },
   undo: {
     original: 'Undo',
     value: 'Deshacer'
@@ -268,6 +273,11 @@
     hint: 'action',
     original: 'Merge with layer below',
     value: 'Combinar hacia abajo'
+  },
+  'layers-clear': {
+    hint: 'to make a layer empty',
+    original: 'Clear layer',
+    value: ''
   },
   'layers-merge-all': {
     original: 'Merge all',
@@ -479,6 +489,10 @@
   'file-storage-clear': {
     original: 'Clear',
     value: 'Borrar'
+  },
+  'file-storage-clear-prompt': {
+    original: 'Clear Browser Storage?',
+    value: ''
   },
   'file-storage-storing': {
     hint: 'while it is in the process of storing',
@@ -1081,6 +1095,19 @@
     hint: 'As in: the number of lines',
     original: 'Lines',
     value: 'Líneas'
+  },
+  'dropper-drop': {
+    hint: 'as in, drag and drop a file',
+    original: 'Drop to import',
+    value: ''
+  },
+  'dropper-as-image': {
+    original: 'As New Image',
+    value: ''
+  },
+  'dropper-as-layer': {
+    original: 'As Layer',
+    value: ''
   },
   'import-opening': {
     hint: 'in the process of opening a large file',

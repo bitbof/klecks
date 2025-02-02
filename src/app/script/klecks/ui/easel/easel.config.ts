@@ -1,6 +1,6 @@
 import { TPointerType } from '../../../bb/input/event.types';
 
-export const defaultDoubleTapPointerTypes: TPointerType[] = ['touch'];
+export const DEFAULT_DOUBLE_TAP_POINTER_TYPES: TPointerType[] = ['touch'];
 
 // triggers for switching into temp tool
 export const TEMP_TRIGGERS_KEYS = ['space', 'alt', 'r', 'z'] as const;

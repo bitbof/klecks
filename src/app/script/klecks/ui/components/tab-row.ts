@@ -1,5 +1,4 @@
 import { BB } from '../../../bb/bb';
-import { IKeyStringOptional } from '../../../bb/bb-types';
 import { PointerListener } from '../../../bb/input/pointer-listener';
 
 // type all functions
@@ -12,7 +11,7 @@ type TTabInit = {
     isVisible?: boolean; // default is true
     onOpen: () => void;
     onClose: () => void;
-    css?: IKeyStringOptional;
+    css?: Partial<CSSStyleDeclaration>;
 };
 
 type TTab = {

@@ -349,6 +349,7 @@ export class Preview {
                 className: elCss,
                 css: {
                     position: 'relative',
+                    zIndex: '0', // prevent buttons from sitting on top of other modals
                 },
             },
             [

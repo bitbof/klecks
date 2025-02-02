@@ -18,13 +18,6 @@ import noiseImg from '/src/app/img/ui/edit-noise.svg';
 import patternImg from '/src/app/img/ui/edit-pattern.svg';
 import vanishPointImg from '/src/app/img/ui/edit-vanish-point.svg';
 import distortImg from '/src/app/img/ui/edit-distort.svg';
-import { THistoryEntryG } from '../history/kl-history';
-
-export type TFilterHistoryEntry<Filter extends string, Input> = THistoryEntryG<
-    ['filter', Filter],
-    'apply',
-    [{ input: Input }]
->;
 
 export const filterLibStatus = {
     isLoaded: false,

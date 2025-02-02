@@ -1,8 +1,8 @@
 import { BB } from '../../bb/bb';
 import { createPenPressureToggle } from '../ui/components/create-pen-pressure-toggle';
-import { eventResMs } from './brushes-consts';
+import { EVENT_RES_MS } from './brushes-consts';
 import { Checkbox } from '../ui/components/checkbox';
-import { brushes } from '../brushes/brushes';
+import { BRUSHES } from '../brushes/brushes';
 import { KlSlider } from '../ui/components/kl-slider';
 import brushIconImg from '/src/app/img/ui/brush-blend.svg';
 import { IBrushUi } from '../kl-types';
@@ -30,8 +30,8 @@ export const blendBrushUi = (function () {
 
     brushInterface.Ui = function (p) {
         const div = document.createElement('div'); // the gui
-        const brush = new brushes.BlendBrush();
-        brush.setHistory(p.history);
+        const brush = new BRUSHES.BlendBrush();
+        brush.setHistory(p.klHistory);
         p.onSizeChange(brush.getSize());
 
         let sizeSlider: KlSlider;
@@ -50,7 +50,7 @@ export const blendBrushUi = (function () {
                 max: brushInterface.sizeSlider.max,
                 value: 58,
                 curve: brushInterface.sizeSlider.curve,
-                eventResMs: eventResMs,
+                eventResMs: EVENT_RES_MS,
                 toDisplayValue: (val) => val * 2,
                 toValue: (displayValue) => displayValue / 2,
                 onChange: (val) => {
@@ -66,7 +66,7 @@ export const blendBrushUi = (function () {
                 max: brushInterface.opacitySlider.max,
                 value: brush.getOpacity(),
                 curve: brushInterface.opacitySlider.curve,
-                eventResMs: eventResMs,
+                eventResMs: EVENT_RES_MS,
                 toDisplayValue: (val) => val * 100,
                 toValue: (displayValue) => displayValue / 100,
                 onChange: (val) => {
@@ -81,7 +81,7 @@ export const blendBrushUi = (function () {
                 min: 0,
                 max: 1,
                 value: brush.getBlending(),
-                eventResMs: eventResMs,
+                eventResMs: EVENT_RES_MS,
                 toDisplayValue: (val) => val * 100,
                 toValue: (displayValue) => displayValue / 100,
                 onChange: function (val) {
@@ -165,14 +165,14 @@ export const blendBrushUi = (function () {
         this.setColor = function (c) {
             brush.setColor(c);
         };
-        this.setContext = function (c) {
-            brush.setContext(c);
+        this.setLayer = function (layer) {
+            brush.setContext(layer.context);
         };
         this.startLine = function (x, y, p) {
             brush.startLine(x, y, p);
         };
         this.goLine = function (x, y, p, isCoalesced) {
-            brush.goLine(x, y, p, isCoalesced);
+            brush.goLine(x, y, p, false); // looks weird with isCoalesced
         };
         this.endLine = function () {
             brush.endLine();

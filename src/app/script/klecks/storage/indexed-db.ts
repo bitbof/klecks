@@ -107,6 +107,11 @@ function execIndexedDBTransaction(
         };
         transactionObj.onerror = function (): void {
             onError('transaction error, ' + transactionObj.error);
+            databaseObj.close();
+        };
+        transactionObj.onabort = function (ev: Event): void {
+            onError('transaction aborted, ' + transactionObj.error);
+            databaseObj.close();
         };
     };
 }

@@ -1,14 +1,13 @@
 import { BB } from '../../bb/bb';
-import { IHistoryEntry, KlHistory, THistoryInnerActions } from '../history/kl-history';
 import { TPressureInput } from '../kl-types';
 import { BezierLine } from '../../bb/math/line';
 import { ERASE_COLOR } from './erase-color';
-import { KlCanvasContext } from '../canvas/kl-canvas';
-
-export interface IEraserBrushHistoryEntry extends IHistoryEntry {
-    tool: ['brush', 'EraserBrush'];
-    actions: THistoryInnerActions<EraserBrush>[];
-}
+import { TKlCanvasLayer } from '../canvas/kl-canvas';
+import { KlHistory } from '../history/kl-history';
+import { getPushableLayerChange } from '../history/push-helpers/get-pushable-layer-change';
+import { IBounds } from '../../bb/bb-types';
+import { canvasAndChangedTilesToLayerTiles } from '../history/push-helpers/canvas-to-layer-tiles';
+import { getChangedTiles, updateChangedTiles } from '../history/push-helpers/changed-tiles';
 
 export class EraserBrush {
     private size: number = 30;
@@ -18,16 +17,25 @@ export class EraserBrush {
     private useOpacityPressure: boolean = false;
     private isTransparentBG: boolean = false;
 
-    private history: KlHistory | undefined;
-    private historyEntry: IEraserBrushHistoryEntry | undefined;
+    private klHistory: KlHistory = {} as KlHistory;
     private isBaseLayer: boolean = false;
-    private context: KlCanvasContext = {} as KlCanvasContext;
+    private layer: TKlCanvasLayer = {} as TKlCanvasLayer;
+    private context: CanvasRenderingContext2D = {} as CanvasRenderingContext2D;
 
     private started: boolean = false;
     private lastDot: number | undefined;
     private lastInput: TPressureInput = { x: 0, y: 0, pressure: 0 };
     private lastInput2: TPressureInput = { x: 0, y: 0, pressure: 0 };
     private bezierLine: BezierLine | undefined;
+
+    private changedTiles: boolean[] = [];
+
+    private updateChangedTiles(bounds: IBounds) {
+        this.changedTiles = updateChangedTiles(
+            this.changedTiles,
+            getChangedTiles(bounds, this.context.canvas.width, this.context.canvas.height),
+        );
+    }
 
     private drawDot(x: number, y: number, size: number, opacity: number): void {
         this.context.save();
@@ -54,6 +62,13 @@ export class EraserBrush {
         this.context.translate(x - size, y - size);
         this.context.fillRect(0, 0, size * 2, size * 2);
         this.context.restore();
+
+        this.updateChangedTiles({
+            x1: Math.floor(x - size),
+            y1: Math.floor(y - size),
+            x2: Math.ceil(x + size),
+            y2: Math.ceil(y + size),
+        });
     }
 
     private continueLine(x: number | undefined, y: number | undefined, p: number): void {
@@ -97,37 +112,8 @@ export class EraserBrush {
 
     // ---- interface ----
     startLine(x: number, y: number, p: number): void {
-        this.historyEntry = {
-            tool: ['brush', 'EraserBrush'],
-            actions: [
-                {
-                    action: 'opacityPressure',
-                    params: [this.useOpacityPressure],
-                },
-                {
-                    action: 'sizePressure',
-                    params: [this.useSizePressure],
-                },
-                {
-                    action: 'setSize',
-                    params: [this.size],
-                },
-                {
-                    action: 'setOpacity',
-                    params: [this.opacity],
-                },
-                {
-                    action: 'setTransparentBG',
-                    params: [this.isTransparentBG],
-                },
-                {
-                    action: 'startLine',
-                    params: [x, y, p],
-                },
-            ],
-        };
-
-        this.isBaseLayer = 0 === this.context.canvas.index;
+        this.changedTiles = [];
+        this.isBaseLayer = 0 === this.layer.index;
 
         p = Math.max(0, Math.min(1, p));
         const localOpacity = this.useOpacityPressure ? this.opacity * p * p : this.opacity;
@@ -150,13 +136,9 @@ export class EraserBrush {
     }
 
     goLine(x: number, y: number, p: number): void {
-        if (!this.started || !this.historyEntry) {
+        if (!this.started) {
             return;
         }
-        this.historyEntry.actions?.push({
-            action: 'goLine',
-            params: [x, y, p],
-        });
 
         this.continueLine(x, y, this.lastInput.pressure);
 
@@ -174,18 +156,17 @@ export class EraserBrush {
         this.started = false;
         this.bezierLine = undefined;
 
-        if (this.historyEntry) {
-            this.historyEntry.actions?.push({
-                action: 'endLine',
-                params: [],
-            });
-            this.history?.push(this.historyEntry);
-            this.historyEntry = undefined;
-        }
+        this.klHistory.push(
+            getPushableLayerChange(
+                this.klHistory.getComposed(),
+                canvasAndChangedTilesToLayerTiles(this.context.canvas, this.changedTiles),
+            ),
+        );
     }
 
     drawLineSegment(x1: number, y1: number, x2: number, y2: number): void {
-        this.isBaseLayer = 0 === this.context.canvas.index;
+        this.changedTiles = [];
+        this.isBaseLayer = 0 === this.layer.index;
 
         this.lastInput.x = x2;
         this.lastInput.y = y2;
@@ -204,36 +185,12 @@ export class EraserBrush {
             this.drawDot(x1 + eX * loopDist, y1 + eY * loopDist, this.size, this.opacity);
         }
 
-        const historyEntry: IEraserBrushHistoryEntry = {
-            tool: ['brush', 'EraserBrush'],
-            actions: [
-                {
-                    action: 'opacityPressure',
-                    params: [this.useOpacityPressure],
-                },
-                {
-                    action: 'sizePressure',
-                    params: [this.useSizePressure],
-                },
-                {
-                    action: 'setSize',
-                    params: [this.size],
-                },
-                {
-                    action: 'setOpacity',
-                    params: [this.opacity],
-                },
-                {
-                    action: 'setTransparentBG',
-                    params: [this.isTransparentBG],
-                },
-                {
-                    action: 'drawLineSegment',
-                    params: [x1, y1, x2, y2],
-                },
-            ],
-        };
-        this.history?.push(historyEntry);
+        this.klHistory.push(
+            getPushableLayerChange(
+                this.klHistory.getComposed(),
+                canvasAndChangedTilesToLayerTiles(this.context.canvas, this.changedTiles),
+            ),
+        );
     }
 
     //IS
@@ -242,12 +199,13 @@ export class EraserBrush {
     }
 
     //SET
-    setContext(c: KlCanvasContext): void {
-        this.context = c;
+    setLayer(layer: TKlCanvasLayer): void {
+        this.layer = layer;
+        this.context = layer.context;
     }
 
-    setHistory(l: KlHistory): void {
-        this.history = l;
+    setHistory(klHistory: KlHistory): void {
+        this.klHistory = klHistory;
     }
 
     setSize(s: number): void {

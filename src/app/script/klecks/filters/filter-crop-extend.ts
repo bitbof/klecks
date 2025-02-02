@@ -5,10 +5,9 @@ import { ColorOptions } from '../ui/components/color-options';
 import { Cropper } from '../ui/components/cropper';
 import { IFilterApply, IFilterGetDialogParam, TFilterGetDialogResult, IRGBA } from '../kl-types';
 import { LANG } from '../../language/language';
-import { TFilterHistoryEntry } from './filters';
 import { theme } from '../../theme/theme';
 import { IRect } from '../../bb/bb-types';
-import { smallPreview } from '../ui/utils/preview-size';
+import { SMALL_PREVIEW } from '../ui/utils/preview-size';
 
 export type TFilterCropExtendInput = {
     left: number;
@@ -17,11 +16,6 @@ export type TFilterCropExtendInput = {
     bottom: number;
     fillColor?: IRGBA;
 };
-
-export type TFilterCropExtendHistoryEntry = TFilterHistoryEntry<
-    'cropExtend',
-    TFilterCropExtendInput
->;
 
 export const filterCropExtend = {
     getDialog(params: IFilterGetDialogParam) {
@@ -58,21 +52,12 @@ export const filterCropExtend = {
         let scale: number = 1;
 
         // --- input elements ---
-
-        const lrWrapper = BB.el({
-            css: { display: 'flex', alignItems: 'center' },
-        });
-        const tbWrapper = BB.el({
-            css: { display: 'flex', alignItems: 'center', marginTop: '5px' },
-        });
-        rootEl.append(lrWrapper, tbWrapper);
-
         const leftInput = input({
             init: 0,
             type: 'number',
             min: -klCanvas.getWidth(),
             max: maxWidth,
-            css: { width: '75px', marginRight: '20px' },
+            css: { width: '75px' },
             callback: function () {
                 leftChanged = true;
                 updateInput();
@@ -94,7 +79,7 @@ export const filterCropExtend = {
             type: 'number',
             min: -klCanvas.getHeight(),
             max: maxHeight,
-            css: { width: '75px', marginRight: '20px' },
+            css: { width: '75px' },
             callback: function () {
                 topChanged = true;
                 updateInput();
@@ -112,29 +97,37 @@ export const filterCropExtend = {
             },
         });
 
-        const labelStyle = {
-            display: 'inline-block',
-            width: '65px',
-            wordBreak: 'break-word',
+        const sharedCss = {
+            display: 'flex',
+            flexDirection: 'column',
+            width: 'calc(50% - 5px)',
+            gap: '3px',
         };
-        lrWrapper.append(
-            BB.el({ content: LANG('filter-crop-left') + ':', css: labelStyle }),
-            leftInput,
-            BB.el({
-                content: LANG('filter-crop-right') + ':',
-                css: labelStyle,
-            }),
-            rightInput,
-        );
-        tbWrapper.append(
-            BB.el({ content: LANG('filter-crop-top') + ':', css: labelStyle }),
-            topInput,
-            BB.el({
-                content: LANG('filter-crop-bottom') + ':',
-                css: labelStyle,
-            }),
-            bottomInput,
-        );
+        const leftWrapper = BB.el({
+            content: [LANG('filter-crop-left') + ':', leftInput],
+            css: sharedCss,
+        });
+        const rightWrapper = BB.el({
+            content: [LANG('filter-crop-right') + ':', rightInput],
+            css: sharedCss,
+        });
+        const topWrapper = BB.el({
+            content: [LANG('filter-crop-top') + ':', topInput],
+            css: sharedCss,
+        });
+        const bottomWrapper = BB.el({
+            content: [LANG('filter-crop-bottom') + ':', bottomInput],
+            css: sharedCss,
+        });
+        const wrapWrapper = BB.el({
+            css: {
+                display: 'flex',
+                flexWrap: 'wrap',
+                gap: '10px',
+            },
+        });
+        wrapWrapper.append(leftWrapper, rightWrapper, topWrapper, bottomWrapper);
+        rootEl.append(wrapWrapper);
 
         function updateInput(): void {
             left = parseInt(leftInput.value);
@@ -265,7 +258,7 @@ export const filterCropExtend = {
             scale = fit.width / transform.width;
 
             const offset = BB.centerWithin(
-                smallPreview.width,
+                SMALL_PREVIEW.width,
                 previewHeight,
                 fit.width,
                 fit.height,
@@ -301,11 +294,11 @@ export const filterCropExtend = {
             cropper.setScale(scale);
         }
 
-        const previewHeight = smallPreview.height - 2; // two less because of border
+        const previewHeight = SMALL_PREVIEW.height - 2; // two less because of border
         const previewWrapper = BB.el({
             className: 'kl-edit-crop-preview',
             css: {
-                width: smallPreview.width + 'px',
+                width: SMALL_PREVIEW.width + 'px',
                 marginTop: '10px',
                 marginLeft: '-20px',
                 height: previewHeight + 'px',
@@ -409,7 +402,6 @@ export const filterCropExtend = {
 
     apply(params: IFilterApply<TFilterCropExtendInput>): boolean {
         const klCanvas = params.klCanvas;
-        const history = params.history;
         if (
             !klCanvas ||
             isNaN(params.input.left) ||
@@ -419,18 +411,8 @@ export const filterCropExtend = {
         ) {
             return false;
         }
-        history?.pause(true);
         klCanvas.resizeCanvas(params.input);
-        history?.pause(false);
-        history?.push({
-            tool: ['filter', 'cropExtend'],
-            action: 'apply',
-            params: [
-                {
-                    input: BB.copyObj(params.input),
-                },
-            ],
-        } as TFilterCropExtendHistoryEntry);
+
         return true;
     },
 };

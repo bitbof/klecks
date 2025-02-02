@@ -107,11 +107,11 @@ export class Embed {
         }
     }
 
-    getPNG(): Blob {
+    async getPNG(): Promise<Blob> {
         if (!this.klApp) {
             throw new Error('App not initialized');
         }
-        return this.klApp.getPNG();
+        return await this.klApp.getPNG();
     }
 
     async getPSD(): Promise<Blob> {

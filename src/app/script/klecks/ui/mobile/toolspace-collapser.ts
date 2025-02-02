@@ -8,12 +8,12 @@ import { TUiLayout } from '../../kl-types';
  */
 export class ToolspaceCollapser {
     private readonly rootEl: HTMLElement;
-    private directionStr: TUiLayout;
+    private orientation: TUiLayout;
     private readonly icon: HTMLElement;
     private stateIsOpen: boolean;
 
     private update(): void {
-        if (this.directionStr === 'left') {
+        if (this.orientation === 'left') {
             this.icon.style.transform = this.stateIsOpen ? 'rotate(180deg)' : '';
         } else {
             this.icon.style.transform = this.stateIsOpen ? '' : 'rotate(180deg)';
@@ -23,7 +23,7 @@ export class ToolspaceCollapser {
     // ----------------------------------- public -----------------------------------
     constructor(p: { onChange: () => void }) {
         this.stateIsOpen = true;
-        this.directionStr = 'right';
+        this.orientation = 'right';
 
         this.rootEl = BB.el({
             className: 'kl-toolspace-toggle',
@@ -32,8 +32,6 @@ export class ToolspaceCollapser {
                 height: '36px',
                 background: 'rgba(100, 100, 100, 0.9)',
                 color: '#fff',
-                position: 'absolute',
-                top: '0',
                 textAlign: 'center',
                 lineHeight: '36px',
                 cursor: 'pointer',
@@ -62,6 +60,7 @@ export class ToolspaceCollapser {
                 userSelect: 'none',
             },
         });
+        this.update();
         this.rootEl.oncontextmenu = () => {
             return false;
         };
@@ -73,8 +72,8 @@ export class ToolspaceCollapser {
         return this.stateIsOpen;
     }
 
-    setDirection(dirStr: TUiLayout): void {
-        this.directionStr = dirStr;
+    setOrientation(dirStr: TUiLayout): void {
+        this.orientation = dirStr;
         this.update();
     }
 

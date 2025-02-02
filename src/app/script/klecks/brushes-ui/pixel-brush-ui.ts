@@ -1,6 +1,6 @@
 import { BB } from '../../bb/bb';
-import { brushes } from '../brushes/brushes';
-import { eventResMs } from './brushes-consts';
+import { BRUSHES } from '../brushes/brushes';
+import { EVENT_RES_MS } from './brushes-consts';
 import { Checkbox } from '../ui/components/checkbox';
 import { KlSlider } from '../ui/components/kl-slider';
 import { createPenPressureToggle } from '../ui/components/create-pen-pressure-toggle';
@@ -35,8 +35,8 @@ export const pixelBrushUi = (function () {
 
     brushInterface.Ui = function (p) {
         const div = document.createElement('div'); // the gui
-        const brush = new brushes.PixelBrush();
-        brush.setHistory(p.history);
+        const brush = new BRUSHES.PixelBrush();
+        brush.setHistory(p.klHistory);
         p.onSizeChange(brush.getSize());
         let sizeSlider: KlSlider;
         let opacitySlider: KlSlider;
@@ -49,9 +49,6 @@ export const pixelBrushUi = (function () {
             },
             doHighlight: true,
             title: LANG('lock-alpha-title'),
-            css: {
-                marginRight: '10px',
-            },
         });
 
         const eraserToggle = new Checkbox({
@@ -59,9 +56,6 @@ export const pixelBrushUi = (function () {
             label: LANG('eraser'),
             callback: function (b) {
                 brush.setIsEraser(b);
-            },
-            css: {
-                marginRight: '10px',
             },
         });
 
@@ -92,7 +86,7 @@ export const pixelBrushUi = (function () {
                 max: brushInterface.sizeSlider.max,
                 value: brush.getSize(),
                 curve: brushInterface.sizeSlider.curve,
-                eventResMs: eventResMs,
+                eventResMs: EVENT_RES_MS,
                 toDisplayValue: (val) => val * 2,
                 toValue: (displayValue) => displayValue / 2,
                 onChange: (val) => {
@@ -107,7 +101,7 @@ export const pixelBrushUi = (function () {
                 min: brushInterface.opacitySlider.min,
                 max: brushInterface.opacitySlider.max,
                 value: brushInterface.opacitySlider.max,
-                eventResMs: eventResMs,
+                eventResMs: EVENT_RES_MS,
                 toDisplayValue: (val) => val * 100,
                 toValue: (displayValue) => displayValue / 100,
                 onChange: (val) => {
@@ -138,6 +132,8 @@ export const pixelBrushUi = (function () {
                 css: {
                     display: 'flex',
                     marginTop: '10px',
+                    gap: '10px',
+                    flexWrap: 'wrap',
                 },
             });
 
@@ -179,8 +175,8 @@ export const pixelBrushUi = (function () {
         this.setColor = function (c) {
             brush.setColor(c);
         };
-        this.setContext = function (c) {
-            brush.setContext(c);
+        this.setLayer = function (layer) {
+            brush.setContext(layer.context);
         };
         this.startLine = function (x, y, p) {
             brush.startLine(x, y, p);
@@ -188,8 +184,8 @@ export const pixelBrushUi = (function () {
         this.goLine = function (x, y, p) {
             brush.goLine(x, y, p);
         };
-        this.endLine = function (x, y) {
-            brush.endLine(x, y);
+        this.endLine = function () {
+            brush.endLine();
         };
         this.getBrush = function () {
             return brush;

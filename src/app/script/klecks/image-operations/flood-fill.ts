@@ -1,8 +1,4 @@
-/**
- * Flood fill. Tried https://github.com/binarymax/floodfill.js/, but it implemented tolerance wrong, and had bugs.
- * So, my own implementation. can handle tolerance, grow, opacity.
- * Needs to be optimized.
- */
+import { IBounds } from '../../bb/bb-types';
 
 /**
  * Set values in data within rect to 254, unless they're 255
@@ -32,83 +28,21 @@ function fillRect(
     }
 }
 
-let mx, my;
-
-/**
- * Get index i moved by dX, dY. in array with dimensions width height.
- * Returns null if outside bounds.
- *
- * @param width int
- * @param height int
- * @param i int
- * @param dX int
- * @param dY int
- */
-function moveIndex(
-    width: number,
-    height: number,
-    i: number,
-    dX: number,
-    dY: number,
-): undefined | number {
-    mx = (i % width) + dX;
-    my = Math.floor(i / width) + dY;
-
-    if (mx < 0 || my < 0 || mx >= width || my >= height) {
-        return undefined;
-    }
-
-    return my * width + mx;
-}
-
-/**
- * If pixel can be filled (within tolerance) will be set 255 and returns true.
- * returns false if already filled, or i is null
- *
- * @param srcArr Uint8ClampedArray rgba
- * @param targetArr Uint8Array
- * @param width int
- * @param height int
- * @param initRgba rgba
- * @param tolerance int 0 - 255
- * @param i int - srcArr index
- * @returns {boolean}
- */
-function testAndFill(
+// test, should fill, if there is a tolerance < 255
+function toleranceTest(
     srcArr: Uint8ClampedArray,
-    targetArr: Uint8Array,
-    width: number,
-    height: number,
-    initRgba: [number, number, number, number],
-    tolerance: number,
-    i: number | undefined,
+    initR: number,
+    initG: number,
+    initB: number,
+    toleranceSquared: number, // already squared for performance
+    i: number,
 ): boolean {
-    if (i === undefined || targetArr[i] === 255) {
-        return false;
-    }
-
-    if (
-        srcArr[i * 4] === initRgba[0] &&
-        srcArr[i * 4 + 1] === initRgba[1] &&
-        srcArr[i * 4 + 2] === initRgba[2] &&
-        srcArr[i * 4 + 3] === initRgba[3]
-    ) {
-        targetArr[i] = 255;
-        return true;
-    }
-
-    if (
-        tolerance > 0 &&
-        Math.abs(srcArr[i * 4] - initRgba[0]) <= tolerance &&
-        Math.abs(srcArr[i * 4 + 1] - initRgba[1]) <= tolerance &&
-        Math.abs(srcArr[i * 4 + 2] - initRgba[2]) <= tolerance &&
-        Math.abs(srcArr[i * 4 + 3] - initRgba[3]) <= tolerance
-    ) {
-        targetArr[i] = 255;
-        return true;
-    }
-
-    return false;
+    // other software also ignores the alpha channel
+    return (
+        (srcArr[i * 4] - initR) ** 2 <= toleranceSquared &&
+        (srcArr[i * 4 + 1] - initG) ** 2 <= toleranceSquared &&
+        (srcArr[i * 4 + 2] - initB) ** 2 <= toleranceSquared
+    );
 }
 
 /**
@@ -133,60 +67,129 @@ function floodFill(
     tolerance: number,
     grow: number,
     isContiguous: boolean,
-): void {
-    const initRgba: [number, number, number, number] = [
-        srcArr[(py * width + px) * 4],
-        srcArr[(py * width + px) * 4 + 1],
-        srcArr[(py * width + px) * 4 + 2],
-        srcArr[(py * width + px) * 4 + 3],
-    ];
+): IBounds {
+    const initR = srcArr[(py * width + px) * 4];
+    const initG = srcArr[(py * width + px) * 4 + 1];
+    const initB = srcArr[(py * width + px) * 4 + 2];
+    const view = new DataView(srcArr.buffer);
+    const init = view.getUint32((py * width + px) * 4, true);
+    const toleranceSquared = tolerance ** 2;
+    const bounds: IBounds = { x1: px, y1: py, x2: px, y2: py };
 
     if (isContiguous) {
-        const q: number[] = [];
-        q.push(py * width + px);
+        const q: number[] = []; // queue of pixel indices. they are already filled.
+        q.push(py * width + px); // starting pixel, where the user clicked to fill
         targetArr[py * width + px] = 255;
 
-        let i: number, e: number | undefined;
+        let i: number, e: number;
+        let x: number, y: number;
         while (q.length) {
-            i = q.pop() as number; // a test would slow down the code
+            // checks neighbors of queued pixels, fills, and queues them.
+            // Adds to queue after filling it. Skip if was already filled.
 
-            // queue up unfilled neighbors
-            e = moveIndex(width, height, i, -1, 0); // left
-            // test will return false if e is undefined -> only numbers will be pushed to q
-            testAndFill(srcArr, targetArr, width, height, initRgba, tolerance, e) &&
-                q.push(e as number);
+            i = q.pop()!;
 
-            e = moveIndex(width, height, i, 1, 0); // right
-            testAndFill(srcArr, targetArr, width, height, initRgba, tolerance, e) &&
-                q.push(e as number);
+            y = Math.floor(i / width);
+            x = i % width;
 
-            e = moveIndex(width, height, i, 0, -1); // up
-            testAndFill(srcArr, targetArr, width, height, initRgba, tolerance, e) &&
-                q.push(e as number);
-
-            e = moveIndex(width, height, i, 0, 1); // bottom
-            testAndFill(srcArr, targetArr, width, height, initRgba, tolerance, e) &&
-                q.push(e as number);
+            if (x > 0) {
+                // can go left
+                e = i - 1;
+                if (
+                    targetArr[e] !== 255 &&
+                    (view.getUint32(e * 4, true) === init ||
+                        (tolerance > 0 &&
+                            toleranceTest(srcArr, initR, initG, initB, toleranceSquared, e)))
+                ) {
+                    bounds.x1 = Math.min(bounds.x1, x - 1);
+                    targetArr[e] = 255;
+                    q.push(e);
+                }
+            }
+            if (x < width - 1) {
+                // can go right
+                e = i + 1;
+                if (
+                    targetArr[e] !== 255 &&
+                    (view.getUint32(e * 4, true) === init ||
+                        (tolerance > 0 &&
+                            toleranceTest(srcArr, initR, initG, initB, toleranceSquared, e)))
+                ) {
+                    bounds.x2 = Math.max(bounds.x2, x + 1);
+                    targetArr[e] = 255;
+                    q.push(e);
+                }
+            }
+            if (y > 0) {
+                // can go up
+                e = i - width;
+                if (
+                    targetArr[e] !== 255 &&
+                    (view.getUint32(e * 4, true) === init ||
+                        (tolerance > 0 &&
+                            toleranceTest(srcArr, initR, initG, initB, toleranceSquared, e)))
+                ) {
+                    bounds.y1 = Math.min(bounds.y1, y - 1);
+                    targetArr[e] = 255;
+                    q.push(e);
+                }
+            }
+            if (y < height - 1) {
+                // can go down
+                e = i + width;
+                if (
+                    targetArr[e] !== 255 &&
+                    (view.getUint32(e * 4, true) === init ||
+                        (tolerance > 0 &&
+                            toleranceTest(srcArr, initR, initG, initB, toleranceSquared, e)))
+                ) {
+                    bounds.y2 = Math.max(bounds.y2, y + 1);
+                    targetArr[e] = 255;
+                    q.push(e);
+                }
+            }
         }
     } else {
-        for (let i = 0; i < width * height; i++) {
-            testAndFill(srcArr, targetArr, width, height, initRgba, tolerance, i);
+        // not contiguous
+        for (let y = 0, i = 0; y < height; y++) {
+            for (let x = 0; x < width; x++, i++) {
+                if (
+                    view.getUint32(i * 4, true) === init ||
+                    (tolerance > 0 &&
+                        toleranceTest(srcArr, initR, initG, initB, toleranceSquared, i))
+                ) {
+                    targetArr[i] = 255;
+                    if (x < bounds.x1) {
+                        bounds.x1 = x;
+                    }
+                    if (y < bounds.y1) {
+                        bounds.y1 = y;
+                    }
+                    if (x > bounds.x2) {
+                        bounds.x2 = x;
+                    }
+                    if (y > bounds.y2) {
+                        bounds.y2 = y;
+                    }
+                }
+            }
         }
     }
 
-    // grow
     if (grow === 0) {
-        return;
+        return bounds;
     }
+
+    // --- grow ---
 
     // how does it grow? it finds all pixel at the edge.
     // then depending on what kind of edge it is, it draws a rectangle into target
-    // the rectangle has the value 254, or else it will mess it all up.
+    // In the rectangle each pixel has the value 254, or else it will mess it all up.
     // after it's all done, replaces it with 255
     let x0, x1, y0, y1;
     let l, tl, t, tr, r, br, b, bl; // left, top left, top, top right, etc.
-    for (let x = 0; x < width; x++) {
-        for (let y = 0; y < height; y++) {
+    for (let x = bounds.x1; x <= bounds.x2; x++) {
+        for (let y = bounds.y1; y <= bounds.y2; y++) {
             if (targetArr[y * width + x] !== 255) {
                 continue;
             }
@@ -262,40 +265,50 @@ function floodFill(
             targetArr[i] = 255;
         }
     }
+    // expand bounds by grow
+    bounds.x1 -= grow;
+    bounds.y1 -= grow;
+    bounds.x2 += grow;
+    bounds.y2 += grow;
+
+    return bounds;
 }
 
 /**
- * Does flood fill, and returns that. an array - 0 not filled. 255 filled
-
- * @param rgbaArr Uint8ClampedArray rgba
- * @param width int
- * @param height int
- * @param x int
- * @param y int
- * @param tolerance int 0 - 255
- * @param grow int >= 0
- * @param isContiguous boolean
+ * Does flood fill, and returns that. an array - 0 not filled, 255 filled.
  */
 export function floodFillBits(
     rgbaArr: Uint8ClampedArray,
-    width: number,
-    height: number,
-    x: number,
-    y: number,
-    tolerance: number,
-    grow: number,
+    width: number, // int
+    height: number, // int
+    x: number, // int
+    y: number, // int
+    tolerance: number, // 0 - 255
+    grow: number, // int >= 0
     isContiguous: boolean,
 ): {
     data: Uint8Array;
+    bounds: IBounds; // what area changed
 } {
-    x = Math.round(x);
+    x = Math.round(x); // just in case
     y = Math.round(y);
 
     const resultArr = new Uint8Array(new ArrayBuffer(width * height));
 
-    floodFill(rgbaArr, resultArr, width, height, x, y, tolerance, grow, isContiguous);
+    const bounds = floodFill(
+        rgbaArr,
+        resultArr,
+        width,
+        height,
+        x,
+        y,
+        tolerance,
+        grow,
+        isContiguous,
+    );
 
     return {
         data: resultArr,
+        bounds,
     };
 }

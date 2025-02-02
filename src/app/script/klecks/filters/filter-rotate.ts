@@ -1,14 +1,11 @@
 import { BB } from '../../bb/bb';
 import { IFilterApply, IFilterGetDialogParam, TFilterGetDialogResult } from '../kl-types';
-import { TFilterHistoryEntry } from './filters';
 import { theme } from '../../theme/theme';
-import { smallPreview } from '../ui/utils/preview-size';
+import { SMALL_PREVIEW } from '../ui/utils/preview-size';
 
 export type TFilterRotateInput = {
     deg: number;
 };
-
-export type TFilterRotateHistoryEntry = TFilterHistoryEntry<'rotate', TFilterRotateInput>;
 
 export const filterRotate = {
     getDialog(params: IFilterGetDialogParam) {
@@ -62,8 +59,8 @@ export const filterRotate = {
         const previewWrapper = BB.el({
             className: 'kl-preview-wrapper',
             css: {
-                width: smallPreview.width + 'px',
-                height: smallPreview.height + 'px',
+                width: SMALL_PREVIEW.width + 'px',
+                height: SMALL_PREVIEW.height + 'px',
                 display: 'table',
             },
         });
@@ -119,22 +116,10 @@ export const filterRotate = {
 
     apply(params: IFilterApply<TFilterRotateInput>): boolean {
         const klCanvas = params.klCanvas;
-        const history = params.history;
         if (!klCanvas) {
             return false;
         }
-        history?.pause(true);
         klCanvas.rotate(params.input.deg);
-        history?.pause(false);
-        history?.push({
-            tool: ['filter', 'rotate'],
-            action: 'apply',
-            params: [
-                {
-                    input: params.input,
-                },
-            ],
-        } as TFilterRotateHistoryEntry);
         return true;
     },
 };

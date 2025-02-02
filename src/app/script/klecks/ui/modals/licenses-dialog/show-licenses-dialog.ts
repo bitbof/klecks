@@ -56,7 +56,7 @@ export function showLicensesDialog() {
 
     import('./licenses').then((result) => {
         libraries.innerHTML = '';
-        result.licenses.forEach((item) => {
+        result.LICENSES.forEach((item) => {
             libraries.append(
                 c('details', [c('summary', item.title), c('', item.full.replace(/\n/g, '<br>'))]),
             );
@@ -65,7 +65,7 @@ export function showLicensesDialog() {
 
     import('../../../../../fonts/font-licenses').then((result) => {
         fonts.innerHTML = '';
-        result.fontLicenses.forEach((item) => {
+        result.FONT_LICENSES.forEach((item) => {
             fonts.append(
                 c('details', [
                     c('summary', 'Font: ' + item.title),

@@ -80,7 +80,7 @@ export class KlTempHistory {
     }
 
     /**
-     * emit when push, decrease, increase, clear, or toggle active
+     * emits on push, decrease, increase, clear, or toggle active
      */
     addListener(listener: TTempHistoryListener): void {
         if (this.listeners.includes(listener)) {

@@ -8,6 +8,7 @@ import { IProjectStoreListener, ProjectStore } from '../../storage/project-store
 import { KL } from '../../kl';
 import { LANG } from '../../../language/language';
 import { theme } from '../../../theme/theme';
+import { showModal } from '../modals/base/showModal';
 
 export class BrowserStorageUi {
     private previewEl: HTMLDivElement = {} as HTMLDivElement;
@@ -63,8 +64,10 @@ export class BrowserStorageUi {
             this.previewEl.innerHTML = '';
             this.updateAge();
             this.previewEl.append(thumbnail, this.ageEl);
+            this.previewEl.style.pointerEvents = '';
         } else {
             this.previewEl.innerHTML = LANG('file-storage-empty');
+            this.previewEl.style.pointerEvents = 'none'; // prevent title
         }
         this.resetButtons();
     }
@@ -101,22 +104,33 @@ export class BrowserStorageUi {
     }
 
     private async clear() {
-        this.storeButtonEl.disabled = true;
-        this.clearButtonEl.disabled = true;
-        try {
-            await this.projectStore.clear();
-        } catch (e) {
-            this.resetButtons();
-            KL.popup({
-                target: this.klRootEl,
-                type: 'error',
-                message: LANG('file-storage-failed-clear'),
-                buttons: ['Ok'],
-            });
-            setTimeout(() => {
-                throw new Error('storage-ui: failed to clear browser storage, ' + e);
-            }, 0);
-        }
+        showModal({
+            target: document.body,
+            message: LANG('file-storage-clear-prompt'),
+            buttons: [LANG('file-storage-clear'), 'Cancel'],
+            callback: async (result) => {
+                if (result === 'Cancel') {
+                    return;
+                }
+
+                this.storeButtonEl.disabled = true;
+                this.clearButtonEl.disabled = true;
+                try {
+                    await this.projectStore.clear();
+                } catch (e) {
+                    this.resetButtons();
+                    KL.popup({
+                        target: this.klRootEl,
+                        type: 'error',
+                        message: LANG('file-storage-failed-clear'),
+                        buttons: ['Ok'],
+                    });
+                    setTimeout(() => {
+                        throw new Error('storage-ui: failed to clear browser storage, ' + e);
+                    }, 0);
+                }
+            },
+        });
     }
 
     element: HTMLDivElement;
@@ -186,7 +200,7 @@ export class BrowserStorageUi {
                 textAlign: 'center',
                 background: 'rgba(0,0,0,0.7)',
                 color: '#fff',
-                textSize: '13px',
+                fontSize: '13px',
             },
         });
         const btnCustom: { [key: string]: string } = options?.isFocusable

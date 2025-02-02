@@ -1,12 +1,12 @@
-import { KlHistory } from './history/kl-history';
-import { KlCanvas } from './canvas/kl-canvas';
+import { KlCanvas, TKlCanvasLayer } from './canvas/kl-canvas';
 import { TTranslationCode } from '../../languages/languages';
+import { KlHistory } from './history/kl-history';
 
 export interface IFilterApply<T = unknown> {
-    context: CanvasRenderingContext2D; // context of selected layer
+    layer: TKlCanvasLayer; // active layer
     klCanvas: KlCanvas;
     input: T; // parameters chosen in modal
-    history?: KlHistory;
+    klHistory: KlHistory;
 }
 
 export interface IFilterGetDialogParam {
@@ -44,19 +44,12 @@ export interface IFilter {
     webGL?: boolean; // does the filter require webgl
 }
 
-export interface ITransform {
-    x: number;
-    y: number;
-    scale: number;
-    angle: number; // rad
-}
-
-export type TKlCanvasLayer = {
+export type TLayerFromKlCanvas = {
     context: CanvasRenderingContext2D;
     isVisible: boolean;
     opacity: number;
     name: string;
-    id: number;
+    id: number; // actually the index
 };
 
 // a subset of CanvasRenderingContext2D.globalCompositeOperation
@@ -85,16 +78,18 @@ export type IKlBasicLayer = {
     image: HTMLImageElement | HTMLCanvasElement; // already loaded
 };
 
+export type IKlProjectLayer = {
+    name: string;
+    isVisible: boolean;
+    opacity: number; // 0 - 1
+    mixModeStr?: TMixMode; // default "source-over"
+    image: HTMLImageElement | HTMLCanvasElement; // already loaded
+};
+
 export type IKlProject = {
     width: number; // int
     height: number; // int
-    layers: {
-        name: string;
-        isVisible: boolean;
-        opacity: number; // 0 - 1
-        mixModeStr?: TMixMode; // default "source-over"
-        image: HTMLImageElement | HTMLCanvasElement; // already loaded
-    }[];
+    layers: IKlProjectLayer[];
 };
 
 // stored in indexedDB
@@ -126,12 +121,6 @@ export interface IRGBA {
     g: number;
     b: number;
     a: number; // [0, 1]
-}
-
-export interface TOldestProjectState {
-    canvas: KlCanvas;
-    focus: number; // index of selected layer
-    brushes: any; // todo type
 }
 
 export type TGradientType = 'linear' | 'linear-mirror' | 'radial';
@@ -193,10 +182,10 @@ export type TBrushUiInstance<GBrush> = {
     getOpacity: () => number;
     setOpacity: (opacity: number) => void;
     setColor: (c: IRGB) => void;
-    setContext: (ctx: CanvasRenderingContext2D) => void;
+    setLayer: (layer: TKlCanvasLayer) => void;
     startLine: (x: number, y: number, p: number) => void;
-    goLine: (x: number, y: number, p: number, isCoalesced: boolean) => void;
-    endLine: (x: number, y: number) => void;
+    goLine: (x: number, y: number, p: number, isCoalesced?: boolean) => void;
+    endLine: () => void;
     getBrush: () => GBrush;
     isDrawing: () => boolean;
     getElement: () => HTMLElement;
@@ -212,7 +201,7 @@ export interface IBrushUi<GBrush> extends ISliderConfig {
     Ui: (
         this: TBrushUiInstance<GBrush>,
         p: {
-            history: KlHistory;
+            klHistory: KlHistory;
             onSizeChange: (size: number) => void;
             onOpacityChange: (size: number) => void;
             onConfigChange: () => void;

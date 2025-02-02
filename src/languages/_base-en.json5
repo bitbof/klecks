@@ -66,6 +66,10 @@ renaming keys across language files:
   },
   "tool-select": "Select Tool",
   "tool-zoom": "Zoom",
+  "tool-more-tools": {
+    "hint": "when hovering the caret on the tool button",
+    "value": "More Tools",
+  },
 
 
   "undo": 'Undo',
@@ -219,6 +223,10 @@ renaming keys across language files:
     "hint": "action",
     "value": "Merge with layer below"
   },
+  "layers-clear": {
+    "hint": "to make a layer empty",
+    "value": "Clear layer",
+  },
   "layers-merge-all": 'Merge all',
   "layers-rename": {
     "hint": "action",
@@ -354,6 +362,7 @@ renaming keys across language files:
     value: 'Store',
   },
   "file-storage-clear": "Clear",
+  "file-storage-clear-prompt": "Clear Browser Storage?",
   "file-storage-storing": {
     "hint": "while it is in the process of storing",
     "value": "Storing"
@@ -720,7 +729,12 @@ renaming keys across language files:
     hint: 'As in: the number of lines',
     value: 'Lines',
   },
-
+  "dropper-drop": {
+    "hint": "as in, drag and drop a file",
+    "value": "Drop to import",
+  },
+  "dropper-as-image": "As New Image",
+  "dropper-as-layer": "As Layer",
   "import-opening": {
     "hint": "in the process of opening a large file",
     "value": "Opening file..."

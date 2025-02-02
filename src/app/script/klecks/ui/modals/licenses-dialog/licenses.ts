@@ -1,4 +1,4 @@
-export const licenses: {
+export const LICENSES: {
     title: string;
     full: string;
 }[] = [

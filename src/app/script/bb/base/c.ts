@@ -1,4 +1,3 @@
-import { IKeyStringOptional } from '../bb-types';
 import { BB } from '../bb';
 import { el } from './ui';
 
@@ -50,7 +49,7 @@ function decomposeElString(el: string) {
 }
 
 function applyStyleNames(el: HTMLElement, styleNames: string[]) {
-    const style: IKeyStringOptional = {};
+    const style: Partial<CSSStyleDeclaration> = {};
 
     const operations: {
         [key: string]: (params: string[]) => void;

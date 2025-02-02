@@ -1,5 +1,4 @@
 import { BB } from '../../../../bb/bb';
-import { KlHistory } from '../../../history/kl-history';
 import { Select } from '../../components/select';
 import { PointSlider } from '../../components/point-slider';
 import { KlCanvas, MAX_LAYERS } from '../../../canvas/kl-canvas';
@@ -12,7 +11,7 @@ import { renameLayerDialog } from './rename-layer-dialog';
 import { mergeLayerDialog } from './merge-layer-dialog';
 import { theme } from '../../../../theme/theme';
 import { throwIfNull } from '../../../../bb/base/base';
-import { hasPointerEvents } from '../../../../bb/base/browser';
+import { HAS_POINTER_EVENTS } from '../../../../bb/base/browser';
 import { c } from '../../../../bb/base/c';
 import { DropdownMenu } from '../../components/dropdown-menu';
 import addLayerImg from '/src/app/img/ui/add-layer.svg';
@@ -21,6 +20,7 @@ import mergeLayerImg from '/src/app/img/ui/merge-layers.svg';
 import removeLayerImg from '/src/app/img/ui/remove-layer.svg';
 import renameLayerImg from '/src/app/img/ui/rename-layer.svg';
 import caretDownImg from '/src/app/img/ui/caret-down.svg';
+import { KlHistory } from '../../../history/kl-history';
 
 const paddingLeft = 25;
 
@@ -44,8 +44,9 @@ export type TLayersUiParams = {
     parentEl: HTMLElement;
     uiState: TUiLayout;
     applyUncommitted: () => void;
-    history: KlHistory;
+    klHistory: KlHistory;
     onUpdateProject: () => void; // triggers update of easel
+    onClearLayer: () => void;
 };
 
 export class LayersUi {
@@ -55,8 +56,9 @@ export class LayersUi {
     private parentEl: HTMLElement;
     private uiState: TUiLayout;
     private applyUncommitted: () => void;
-    private history: KlHistory;
+    private klHistory: KlHistory;
     private onUpdateProject: () => void;
+    private onClearLayer: () => void;
 
     private readonly rootEl: HTMLElement;
     private klCanvasLayerArr: {
@@ -72,7 +74,7 @@ export class LayersUi {
     private readonly addBtn: HTMLButtonElement;
     private readonly duplicateBtn: HTMLButtonElement;
     private readonly mergeBtn: HTMLButtonElement;
-    private readonly moreDropdown: DropdownMenu;
+    private readonly moreDropdown: DropdownMenu<'clear-layer' | 'merge-all'>;
     private readonly modeSelect: Select<TMixMode>;
     private readonly largeThumbDiv: HTMLElement;
     private oldHistoryState: number | undefined;
@@ -154,15 +156,15 @@ export class LayersUi {
     }
 
     private renameLayer(layerSpot: number): void {
-        renameLayerDialog(this.parentEl, this.klCanvas.getLayer(layerSpot)!.name, (newName) => {
-            if (newName === undefined || newName === this.klCanvas.getLayer(layerSpot)!.name) {
+        renameLayerDialog(this.parentEl, this.klCanvas.getLayerOld(layerSpot)!.name, (newName) => {
+            if (newName === undefined || newName === this.klCanvas.getLayerOld(layerSpot)!.name) {
                 return;
             }
             this.klCanvas.renameLayer(layerSpot, newName);
-            this.createLayerList();
-            this.history.pause(true);
+            //this.createLayerList();
+            this.klHistory.pause(true);
             this.onSelect(layerSpot);
-            this.history.pause(false);
+            this.klHistory.pause(false);
         });
     }
 
@@ -170,13 +172,16 @@ export class LayersUi {
         this.layerListEl.style.height = this.layerElArr.length * 35 + 'px';
     }
 
-    private createLayerList(): void {
-        this.oldHistoryState = this.history.getChangeCount();
+    private createLayerList(force?: boolean): void {
+        if (this.klHistory.getChangeCount() === this.oldHistoryState && !force) {
+            return;
+        }
+        this.oldHistoryState = this.klHistory.getChangeCount();
         this.klCanvasLayerArr = this.klCanvas.getLayers();
         const checkerImUrl = BB.createCheckerDataUrl(4, undefined, theme.isDark());
 
         const createLayerEntry = (index: number): void => {
-            const klLayer = throwIfNull(this.klCanvas.getLayer(index));
+            const klLayer = throwIfNull(this.klCanvas.getLayerOld(index));
             const layerName = klLayer.name;
             const opacity = this.klCanvasLayerArr[index].opacity;
             const isVisible = klLayer.isVisible;
@@ -238,11 +243,11 @@ export class LayersUi {
                 check.checked = isVisible;
                 check.onchange = () => {
                     this.klCanvas.setLayerIsVisible(layer.spot, check.checked);
-                    this.createLayerList();
+                    //this.createLayerList();
                     if (layer.spot === this.selectedSpotIndex) {
-                        this.history.pause(true);
+                        this.klHistory.pause(true);
                         this.onSelect(this.selectedSpotIndex);
-                        this.history.pause(false);
+                        this.klHistory.pause(false);
                     }
                 };
                 // prevent layer getting dragged
@@ -250,7 +255,7 @@ export class LayersUi {
                     e.preventDefault();
                     e.stopPropagation();
                 };
-                if (hasPointerEvents) {
+                if (HAS_POINTER_EVENTS) {
                     checkWrapper.onpointerdown = preventFunc;
                 } else {
                     checkWrapper.onmousedown = preventFunc;
@@ -334,19 +339,19 @@ export class LayersUi {
                 pointSize: 14,
                 callback: (sliderValue, isFirst, isLast) => {
                     if (isFirst) {
-                        oldOpacity = this.klCanvas.getLayer(layer.spot)!.opacity;
-                        this.history.pause(true);
+                        oldOpacity = this.klCanvas.getLayerOld(layer.spot)!.opacity;
+                        this.klHistory.pause(true);
                         return;
                     }
                     if (isLast) {
-                        this.history.pause(false);
+                        this.klHistory.pause(false);
                         if (oldOpacity !== sliderValue) {
-                            this.klCanvas.layerOpacity(layer.spot, sliderValue);
+                            this.klCanvas.setOpacity(layer.spot, sliderValue);
                         }
                         return;
                     }
                     layer.opacityLabel.innerHTML = Math.round(sliderValue * 100) + '%';
-                    this.klCanvas.layerOpacity(layer.spot, sliderValue);
+                    this.klCanvas.setOpacity(layer.spot, sliderValue);
                     this.onUpdateProject();
                 },
             });
@@ -477,9 +482,9 @@ export class LayersUi {
                     const oldSpot = layer.spot;
                     this.move(layer.spot, newSpot);
                     if (oldSpot != newSpot) {
-                        this.history.pause(true);
+                        this.klHistory.pause(true);
                         this.onSelect(this.selectedSpotIndex);
-                        this.history.pause(false);
+                        this.klHistory.pause(false);
                     }
                     if (oldSpot === newSpot && freshSelection) {
                         this.onSelect(this.selectedSpotIndex);
@@ -527,8 +532,9 @@ export class LayersUi {
         this.parentEl = p.parentEl;
         this.uiState = p.uiState;
         this.applyUncommitted = p.applyUncommitted;
-        this.history = p.history;
+        this.klHistory = p.klHistory;
         this.onUpdateProject = p.onUpdateProject;
+        this.onClearLayer = p.onClearLayer;
 
         this.layerElArr = [];
         this.layerHeight = 35;
@@ -571,6 +577,8 @@ export class LayersUi {
                 marginLeft: '10px',
                 marginTop: '10px',
                 cursor: 'default',
+                position: 'relative',
+                zIndex: '0',
             },
         });
 
@@ -602,8 +610,15 @@ export class LayersUi {
                 },
             }),
             buttonTitle: LANG('more'),
-            items: [['merge-all', LANG('layers-merge-all')]],
+            items: [
+                ['clear-layer', LANG('layers-clear')],
+                ['merge-all', LANG('layers-merge-all')],
+            ],
             onItemClick: (id) => {
+                if (id === 'clear-layer') {
+                    this.applyUncommitted();
+                    this.onClearLayer();
+                }
                 if (id === 'merge-all') {
                     this.applyUncommitted();
                     const newIndex = this.klCanvas.mergeAll();
@@ -613,10 +628,10 @@ export class LayersUi {
                     this.klCanvasLayerArr = this.klCanvas.getLayers();
                     this.selectedSpotIndex = newIndex;
 
-                    this.createLayerList();
-                    this.history.pause(true);
+                    //this.createLayerList();
+                    this.klHistory.pause(true);
                     this.onSelect(this.selectedSpotIndex);
-                    this.history.pause(false);
+                    this.klHistory.pause(false);
 
                     this.updateButtons();
                 }
@@ -686,10 +701,10 @@ export class LayersUi {
                     this.klCanvasLayerArr = this.klCanvas.getLayers();
 
                     this.selectedSpotIndex = this.selectedSpotIndex + 1;
-                    this.createLayerList();
-                    this.history.pause(true);
+                    //this.createLayerList();
+                    this.klHistory.pause(true);
                     this.onSelect(this.selectedSpotIndex);
-                    this.history.pause(false);
+                    this.klHistory.pause(false);
 
                     this.updateButtons();
                 };
@@ -701,10 +716,10 @@ export class LayersUi {
                     this.klCanvasLayerArr = this.klCanvas.getLayers();
 
                     this.selectedSpotIndex++;
-                    this.createLayerList();
-                    this.history.pause(true);
+                    //this.createLayerList();
+                    this.klHistory.pause(true);
                     this.onSelect(this.selectedSpotIndex);
-                    this.history.pause(false);
+                    this.klHistory.pause(false);
 
                     this.updateButtons();
                 };
@@ -719,10 +734,10 @@ export class LayersUi {
                         this.selectedSpotIndex--;
                     }
                     this.klCanvasLayerArr = this.klCanvas.getLayers();
-                    this.createLayerList();
-                    this.history.pause(true);
+                    //this.createLayerList();
+                    this.klHistory.pause(true);
                     this.onSelect(this.selectedSpotIndex);
-                    this.history.pause(false);
+                    this.klHistory.pause(false);
 
                     this.updateButtons();
                 };
@@ -735,7 +750,7 @@ export class LayersUi {
                         topCanvas: this.klCanvasLayerArr[this.selectedSpotIndex].context.canvas,
                         bottomCanvas:
                             this.klCanvasLayerArr[this.selectedSpotIndex - 1].context.canvas,
-                        topOpacity: this.klCanvas.getLayer(this.selectedSpotIndex)!.opacity,
+                        topOpacity: this.klCanvas.getLayerOld(this.selectedSpotIndex)!.opacity,
                         mixModeStr: this.klCanvasLayerArr[this.selectedSpotIndex].mixModeStr,
                         callback: (mode) => {
                             this.klCanvas.mergeLayers(
@@ -746,10 +761,10 @@ export class LayersUi {
                             this.klCanvasLayerArr = this.klCanvas.getLayers();
                             this.selectedSpotIndex--;
 
-                            this.createLayerList();
-                            this.history.pause(true);
+                            //this.createLayerList();
+                            this.klHistory.pause(true);
                             this.onSelect(this.selectedSpotIndex);
-                            this.history.pause(false);
+                            this.klHistory.pause(false);
 
                             this.updateButtons();
                         },
@@ -816,48 +831,15 @@ export class LayersUi {
 
         this.rootEl.append(listDiv);
 
-        //updating the thumbs in interval
-        //don't update when: manager not visible || layer didn't change || is drawing
-        setInterval(() => {
+        this.klHistory.addListener(() => {
             if (this.rootEl.style.display !== 'block') {
                 return;
             }
-
-            const historyState = this.history.getChangeCount();
-            if (historyState === this.oldHistoryState) {
-                return;
-            }
-            this.oldHistoryState = historyState;
-
-            for (let i = 0; i < this.layerElArr.length; i++) {
-                if (
-                    this.selectedSpotIndex === this.layerElArr[i].spot &&
-                    this.klCanvasLayerArr[this.layerElArr[i].spot]
-                ) {
-                    // second check, because might be out of date
-                    const ctx = BB.ctx(this.layerElArr[i].thumb);
-                    ctx.save();
-                    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-                    if (
-                        this.klCanvasLayerArr[this.layerElArr[i].spot].context.canvas.width <
-                        this.layerElArr[i].thumb.width
-                    ) {
-                        ctx.imageSmoothingEnabled = false;
-                    }
-                    ctx.drawImage(
-                        this.klCanvasLayerArr[this.layerElArr[i].spot].context.canvas,
-                        0,
-                        0,
-                        this.layerElArr[i].thumb.width,
-                        this.layerElArr[i].thumb.height,
-                    );
-                    ctx.restore();
-                }
-            }
-        }, 1);
+            this.createLayerList();
+        });
 
         theme.addIsDarkListener(() => {
-            this.createLayerList();
+            this.createLayerList(true); // force, because history did not change
         });
 
         this.createLayerList();

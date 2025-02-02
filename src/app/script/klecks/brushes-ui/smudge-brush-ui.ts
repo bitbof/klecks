@@ -1,6 +1,6 @@
 import { BB } from '../../bb/bb';
-import { brushes } from '../brushes/brushes';
-import { eventResMs } from './brushes-consts';
+import { BRUSHES } from '../brushes/brushes';
+import { EVENT_RES_MS } from './brushes-consts';
 import { Checkbox } from '../ui/components/checkbox';
 import { KlSlider } from '../ui/components/kl-slider';
 import { createPenPressureToggle } from '../ui/components/create-pen-pressure-toggle';
@@ -35,8 +35,8 @@ export const smudgeBrushUi = (function () {
 
     brushInterface.Ui = function (p) {
         const div = document.createElement('div'); // the gui
-        const brush = new brushes.SmudgeBrush();
-        brush.setHistory(p.history);
+        const brush = new BRUSHES.SmudgeBrush();
+        brush.setHistory(p.klHistory);
         p.onSizeChange(brush.getSize());
         let sizeSlider: KlSlider;
         let opacitySlider: KlSlider;
@@ -74,7 +74,7 @@ export const smudgeBrushUi = (function () {
                 max: brushInterface.sizeSlider.max,
                 value: brush.getSize(),
                 curve: brushInterface.sizeSlider.curve,
-                eventResMs: eventResMs,
+                eventResMs: EVENT_RES_MS,
                 toDisplayValue: (val) => val * 2,
                 toValue: (displayValue) => displayValue / 2,
                 onChange: (val) => {
@@ -98,7 +98,7 @@ export const smudgeBrushUi = (function () {
                 max: brushInterface.opacitySlider.max,
                 value: brush.getOpacity(),
                 curve: brushInterface.opacitySlider.curve,
-                eventResMs: eventResMs,
+                eventResMs: EVENT_RES_MS,
                 toDisplayValue: (val) => val * 100,
                 toValue: (displayValue) => displayValue / 100,
                 onChange: (val) => {
@@ -174,8 +174,8 @@ export const smudgeBrushUi = (function () {
         this.setColor = function (c) {
             brush.setColor(c);
         };
-        this.setContext = function (c) {
-            brush.setContext(c);
+        this.setLayer = function (layer) {
+            brush.setContext(layer.context);
         };
         this.startLine = function (x, y, p) {
             brush.startLine(x, y, p);

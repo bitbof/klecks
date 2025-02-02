@@ -6,16 +6,7 @@ import { EraserBrush } from './eraser-brush';
 import { SmudgeBrush } from './smudge-brush';
 import { ChemyBrush } from './chemy-brush';
 
-export type TBrush =
-    | PenBrush
-    | BlendBrush
-    | SketchyBrush
-    | PixelBrush
-    | ChemyBrush
-    | SmudgeBrush
-    | EraserBrush;
-
-export const brushes = {
+export const BRUSHES = {
     PenBrush,
     BlendBrush,
     SketchyBrush,

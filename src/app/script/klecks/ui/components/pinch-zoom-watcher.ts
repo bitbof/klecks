@@ -14,7 +14,7 @@ export class PinchZoomWatcher {
         }
         const viewport = visualViewport;
 
-        let isHidden = false;
+        let isDismissed = false;
         const rootEl = BB.el({
             content: LANG('browser-zoom-help'),
             className: 'kl-pinch-overlay',
@@ -36,7 +36,7 @@ export class PinchZoomWatcher {
             tagName: 'button',
             content: LANG('dismiss'),
             onClick: () => {
-                isHidden = true;
+                isDismissed = true;
                 iframe.remove();
                 rootEl.remove();
             },
@@ -59,7 +59,7 @@ export class PinchZoomWatcher {
 
         let isInDom = false;
         function check() {
-            if (isHidden) {
+            if (isDismissed) {
                 return;
             }
             const testEl = BB.el({

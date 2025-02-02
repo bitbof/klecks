@@ -1,4 +1,4 @@
-import { eventUsesHighResTimeStamp, hasPointerEvents, isFirefox } from '../base/browser';
+import { EVENT_USES_HIGH_RES_TIMESTAMP, HAS_POINTER_EVENTS, IS_FIREFOX } from '../base/browser';
 import { IWheelCleanerEvent, WheelCleaner } from './wheel-cleaner';
 import {
     IPointerEvent,
@@ -111,14 +111,14 @@ function getButtonStr(buttons: number): TPointerButton | undefined {
 }
 
 const pressureNormalizer = new PressureNormalizer();
-const timeStampOffset = eventUsesHighResTimeStamp() ? 0 : -performance.timing.navigationStart;
+const timeStampOffset = EVENT_USES_HIGH_RES_TIMESTAMP() ? 0 : -performance.timing.navigationStart;
 
-const pointerDownEvt = (hasPointerEvents ? 'pointerdown' : 'mousedown') as 'pointerdown';
-const pointerMoveEvt = (hasPointerEvents ? 'pointermove' : 'mousemove') as 'pointermove';
-const pointerUpEvt = (hasPointerEvents ? 'pointerup' : 'mouseup') as 'pointerup';
-const pointerCancelEvt = (hasPointerEvents ? 'pointercancel' : 'mousecancel') as 'pointercancel';
-const pointerLeaveEvt = (hasPointerEvents ? 'pointerleave' : 'mouseleave') as 'pointerleave';
-const pointerEnterEvt = (hasPointerEvents ? 'pointerenter' : 'mouseenter') as 'pointerenter';
+const pointerDownEvt = (HAS_POINTER_EVENTS ? 'pointerdown' : 'mousedown') as 'pointerdown';
+const pointerMoveEvt = (HAS_POINTER_EVENTS ? 'pointermove' : 'mousemove') as 'pointermove';
+const pointerUpEvt = (HAS_POINTER_EVENTS ? 'pointerup' : 'mouseup') as 'pointerup';
+const pointerCancelEvt = (HAS_POINTER_EVENTS ? 'pointercancel' : 'mousecancel') as 'pointercancel';
+const pointerLeaveEvt = (HAS_POINTER_EVENTS ? 'pointerleave' : 'mouseleave') as 'pointerleave';
+const pointerEnterEvt = (HAS_POINTER_EVENTS ? 'pointerenter' : 'mouseenter') as 'pointerenter';
 
 /**
  * More trustworthy pointer attributes. that behave the same across browsers.
@@ -192,7 +192,7 @@ function correctPointerEvent(
     }
 
     if (
-        isFirefox &&
+        IS_FIREFOX &&
         event.pointerType != 'mouse' &&
         event.type === 'pointermove' &&
         event.buttons === 0
@@ -609,7 +609,7 @@ export class PointerListener {
                 OPTIONS_PASSIVE,
             );
 
-            if (!hasPointerEvents) {
+            if (!HAS_POINTER_EVENTS) {
                 const touchToFakePointer = (
                     touch: Touch,
                     touchEvent: TouchEvent,

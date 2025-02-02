@@ -1,7 +1,7 @@
 import { IKlProject, IKlStorageProject } from '../kl-types';
 import { BB } from '../../bb/bb';
 import { drawProject } from '../canvas/draw-project';
-import { base64ToBlob } from './base-64-to-blob';
+import { canvasToBlob } from '../../bb/base/canvas';
 
 export type TReadStorageProjectResult = {
     project: IKlProject;
@@ -45,31 +45,32 @@ export class ProjectConverter {
         return drawProject(project, factor);
     }
 
-    static createStorageProject(project: IKlProject): IKlStorageProject {
+    static async createStorageProject(project: IKlProject): Promise<IKlStorageProject> {
+        const layers: IKlStorageProject['layers'] = [];
+        for (const item of project.layers) {
+            let blob;
+            if (item.image instanceof HTMLCanvasElement) {
+                blob = await canvasToBlob(item.image as HTMLCanvasElement, 'image/png');
+            } else {
+                // todo image
+                throw new Error('Not implemented');
+            }
+            layers.push({
+                name: item.name,
+                isVisible: item.isVisible,
+                opacity: item.opacity,
+                mixModeStr: item.mixModeStr,
+                blob,
+            });
+        }
+
         return {
             id: 1,
             timestamp: new Date().getTime(),
-            thumbnail: base64ToBlob(
-                ProjectConverter.createThumbnail(project).toDataURL('image/png'),
-            ),
+            thumbnail: await canvasToBlob(ProjectConverter.createThumbnail(project), 'image/png'),
             width: project.width,
             height: project.height,
-            layers: project.layers.map((item) => {
-                let blob;
-                if (item.image instanceof HTMLCanvasElement) {
-                    blob = base64ToBlob((item.image as HTMLCanvasElement).toDataURL('image/png'));
-                } else {
-                    // todo image
-                    throw new Error('Not implemented');
-                }
-                return {
-                    name: item.name,
-                    isVisible: item.isVisible,
-                    opacity: item.opacity,
-                    mixModeStr: item.mixModeStr,
-                    blob,
-                };
-            }),
+            layers,
         };
     }
 

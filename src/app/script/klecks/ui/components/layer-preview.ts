@@ -1,15 +1,15 @@
 import { BB } from '../../../bb/bb';
-import { KlHistory } from '../../history/kl-history';
 import { LANG } from '../../../language/language';
-import { TKlCanvasLayer, TUiLayout } from '../../kl-types';
+import { TUiLayout } from '../../kl-types';
 import { ISize2D } from '../../../bb/bb-types';
 import { theme } from '../../../theme/theme';
-import { KlCanvasLayer } from '../../canvas/kl-canvas';
 import { throwIfNull } from '../../../bb/base/base';
+import { TKlCanvasLayer } from '../../canvas/kl-canvas';
+import { KlHistory } from '../../history/kl-history';
 
 /**
  * Previews currently active layer
- * thumbnail (hover shows bigger preview), layername, opacity
+ * thumbnail (hover shows bigger preview), layer name, opacity
  *
  * internally listens to kl history. updates when there's a change.
  * but you need to update it when the active layer changed. (different canvas object)
@@ -20,9 +20,9 @@ export class LayerPreview {
     private readonly rootEl: HTMLElement;
     private readonly contentWrapperEl: HTMLElement;
     private readonly height: number;
-    private readonly history: KlHistory;
-    private layerObj: TKlCanvasLayer | undefined;
-    private isVisible: boolean;
+    private readonly klHistory: KlHistory;
+    private layer: TKlCanvasLayer | undefined;
+    private isPreviewVisible: boolean;
     private uiState: TUiLayout;
 
     private readonly checkEl: HTMLInputElement;
@@ -84,11 +84,11 @@ export class LayerPreview {
      * is always instant
      */
     private drawLargeCanvas(): void {
-        if (!this.largeCanvasIsVisible || !this.layerObj) {
+        if (!this.largeCanvasIsVisible || !this.layer) {
             return;
         }
 
-        const layerCanvas = this.layerObj.context.canvas;
+        const layerCanvas = this.layer.canvas;
 
         const canvasDimensions = BB.fitInto(
             layerCanvas.width,
@@ -123,28 +123,35 @@ export class LayerPreview {
         });
     }
 
-    private draw(isInstant: boolean): void {
-        if (!this.isVisible || !this.layerObj) {
+    private updateLabel(): void {
+        if (!this.isPreviewVisible || !this.layer) {
             return;
         }
 
-        const layerIsVisible = this.layerObj.isVisible;
+        const layerIsVisible = this.layer.isVisible;
         this.checkEl.parentElement!.title = layerIsVisible
             ? LANG('layers-active-layer-visible')
             : LANG('layers-active-layer-hidden');
         this.checkEl.checked = layerIsVisible;
         this.checkEl.style.boxShadow = layerIsVisible ? '' : '0 0 0 1px red';
 
-        this.nameLabelEl.textContent = this.layerObj.name;
-        if (this.layerObj.isVisible) {
+        this.nameLabelEl.textContent = this.layer.name;
+        if (this.layer.isVisible) {
             this.opacityEl.innerHTML =
-                LANG('opacity') + '<br>' + Math.round(this.layerObj.opacity * 100) + '%';
+                LANG('opacity') + '<br>' + Math.round(this.layer.opacity * 100) + '%';
         } else {
             this.opacityEl.innerHTML =
-                LANG('opacity') + '<br><s>' + Math.round(this.layerObj.opacity * 100) + '%</s>';
+                LANG('opacity') + '<br><s>' + Math.round(this.layer.opacity * 100) + '%</s>';
         }
+    }
 
-        const layerCanvas = this.layerObj.context.canvas;
+    private draw(isInstant: boolean): void {
+        if (!this.isPreviewVisible || !this.layer) {
+            return;
+        }
+        this.updateLabel();
+
+        const layerCanvas = this.layer.canvas;
 
         if (
             layerCanvas.width !== this.lastDrawnSize.width ||
@@ -160,7 +167,7 @@ export class LayerPreview {
             this.canvas.width = Math.round(canvasDimensions.width);
             this.canvas.height = Math.round(canvasDimensions.height);
 
-            isInstant = true;
+            isInstant = true; // can't animate when size changed
         }
 
         this.animationCanvas.width = this.canvas.width;
@@ -196,7 +203,7 @@ export class LayerPreview {
 
         this.drawLargeCanvas();
 
-        this.lastDrawnState = this.history.getChangeCount();
+        this.lastDrawnState = this.klHistory.getChangeCount();
         this.lastDrawnSize.width = layerCanvas.width;
         this.lastDrawnSize.height = layerCanvas.height;
     }
@@ -206,7 +213,7 @@ export class LayerPreview {
         onClick: () => void; // when clicking on layer name
         klRootEl: HTMLElement;
         uiState: TUiLayout;
-        history: KlHistory;
+        klHistory: KlHistory;
     }) {
         // internally redraws with in an interval. checks history is something changed
         // this update will be animated
@@ -218,8 +225,8 @@ export class LayerPreview {
         this.rootEl = BB.el({
             className: 'kl-layer-preview',
         });
-        this.history = p.history;
-        this.isVisible = true;
+        this.klHistory = p.klHistory;
+        this.isPreviewVisible = true;
         this.height = 40;
         this.canvasSize = this.height - 10;
         this.largeCanvasSize = 300;
@@ -334,7 +341,7 @@ export class LayerPreview {
                 transition: 'opacity ' + largeCanvasAnimationDurationMs + 'ms ease-in-out',
                 userSelect: 'none',
                 display: 'block',
-                webkitTouchCallout: 'none',
+                ['webkitTouchCallout' as any]: 'none',
             },
         });
         this.largeCanvas = BB.canvas(this.largeCanvasSize, this.largeCanvasSize);
@@ -356,23 +363,24 @@ export class LayerPreview {
         });
 
         // --- update logic ---
-
         // cross-fade done via 2 canvases (old and new state)
         // both have checkerboard background drawn on them, both fully opaque
         // -> no "lighter" is needed for accurate cross-fading
 
+        // label should update instantly
+        this.klHistory.addListener(() => {
+            this.updateLabel();
+        });
+
         setInterval(() => {
-            if (!this.layerObj) {
+            if (!this.layer) {
                 return;
             }
 
-            const currentState = this.history.getChangeCount();
+            const currentState = this.klHistory.getChangeCount();
             if (currentState === this.lastDrawnState) {
                 return;
             }
-
-            //update opacity w hack
-            this.layerObj.opacity = (this.layerObj.context.canvas as KlCanvasLayer).opacity;
 
             this.draw(false);
         }, 2000);
@@ -422,22 +430,22 @@ export class LayerPreview {
     }
 
     setIsVisible(b: boolean): void {
-        if (this.isVisible === b) {
+        if (this.isPreviewVisible === b) {
             return;
         }
-        this.isVisible = b;
-        this.contentWrapperEl.style.display = this.isVisible ? 'flex' : 'none';
-        this.rootEl.style.marginBottom = this.isVisible ? '' : '10px';
+        this.isPreviewVisible = b;
+        this.contentWrapperEl.style.display = this.isPreviewVisible ? 'flex' : 'none';
+        this.rootEl.style.marginBottom = this.isPreviewVisible ? '' : '10px';
 
-        const currentState = this.history.getChangeCount();
+        const currentState = this.klHistory.getChangeCount();
         if (b && this.lastDrawnState !== currentState) {
             this.draw(true);
         }
     }
 
     //when the layer might have changed
-    setLayer(klCanvasLayerObj: TKlCanvasLayer): void {
-        this.layerObj = klCanvasLayerObj;
+    setLayer(layer: TKlCanvasLayer): void {
+        this.layer = layer;
         this.draw(true);
     }
 

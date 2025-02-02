@@ -17,7 +17,7 @@ const LS_REMINDER_KEY = 'kl-save-reminder';
 export class SaveReminder {
     private setting: TSaveReminderSetting;
 
-    private history: KlHistory = {} as KlHistory;
+    private klHistory: KlHistory = {} as KlHistory;
     private lastSavedHistoryIndex: number | undefined;
     private lastSavedAt: number = 0;
 
@@ -130,7 +130,7 @@ export class SaveReminder {
             // already initialized
             return;
         }
-        this.lastSavedHistoryIndex = this.history.getCurrentIndex();
+        this.lastSavedHistoryIndex = this.klHistory.getTotalIndex();
         this.lastReminderShownAt = performance.now();
         this.lastSavedAt = performance.now();
 
@@ -141,7 +141,7 @@ export class SaveReminder {
                 }
 
                 const unsavedActions = Math.abs(
-                    this.history.getCurrentIndex() - this.lastSavedHistoryIndex!,
+                    this.klHistory.getTotalIndex() - this.lastSavedHistoryIndex!,
                 );
 
                 const timeLimitMs =
@@ -171,8 +171,8 @@ export class SaveReminder {
             e.returnValue = '';
         }
 
-        this.history.addListener(() => {
-            const historyIndex = this.history.getCurrentIndex();
+        this.klHistory.addListener(() => {
+            const historyIndex = this.klHistory.getTotalIndex();
             if (this.lastSavedHistoryIndex !== historyIndex) {
                 window.onbeforeunload = onBeforeUnload;
             } else {
@@ -186,7 +186,7 @@ export class SaveReminder {
                     document.title = this.title;
                     clearInterval(this.unsavedInterval);
                 } else {
-                    const historyIndex = this.history.getCurrentIndex();
+                    const historyIndex = this.klHistory.getTotalIndex();
                     if (this.lastSavedHistoryIndex !== historyIndex) {
                         document.title = LANG('unsaved') + ' - ' + this.title;
                         let state = 0;
@@ -213,7 +213,7 @@ export class SaveReminder {
             return;
         }
 
-        this.lastSavedHistoryIndex = this.history.getCurrentIndex();
+        this.lastSavedHistoryIndex = this.klHistory.getTotalIndex();
         this.lastReminderShownAt = performance.now();
         this.lastSavedAt = performance.now();
         window.onbeforeunload = null;
@@ -233,6 +233,6 @@ export class SaveReminder {
     }
 
     setHistory(history: KlHistory): void {
-        this.history = history;
+        this.klHistory = history;
     }
 }

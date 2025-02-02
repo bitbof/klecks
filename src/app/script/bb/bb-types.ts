@@ -14,14 +14,8 @@ export interface ISize2D {
     height: number;
 }
 
-export type TCSS = Partial<CSSStyleDeclaration>;
-
 export interface IKeyString {
     [key: string]: string;
-}
-
-export interface IKeyStringOptional {
-    [key: string]: string | undefined;
 }
 
 export interface ISVG {
@@ -71,6 +65,7 @@ export interface ISVG {
     // add more when needed
 }
 
+// x1 <= x2, y1 <= y2
 export interface IBounds {
     x1: number;
     y1: number;

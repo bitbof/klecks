@@ -10,17 +10,14 @@ import {
 } from '../kl-types';
 import { LANG } from '../../language/language';
 import { throwIfNull } from '../../bb/base/base';
-import { TFilterHistoryEntry } from './filters';
 import { Options } from '../ui/components/options';
-import { smallPreview } from '../ui/utils/preview-size';
+import { SMALL_PREVIEW } from '../ui/utils/preview-size';
 
 export type TFilterFlipInput = {
     horizontal: boolean;
     vertical: boolean;
     flipCanvas: boolean;
 };
-
-export type TFilterFlipHistoryEntry = TFilterHistoryEntry<'flip', TFilterFlipInput>;
 
 export const filterFlip = {
     getDialog(params: IFilterGetDialogParam) {
@@ -94,8 +91,8 @@ export const filterFlip = {
         const previewWrapper = BB.el({
             className: 'kl-preview-wrapper',
             css: {
-                width: smallPreview.width + 'px',
-                height: smallPreview.height + 'px',
+                width: SMALL_PREVIEW.width + 'px',
+                height: SMALL_PREVIEW.height + 'px',
             },
         });
 
@@ -191,9 +188,8 @@ export const filterFlip = {
     },
 
     apply(params: IFilterApply<TFilterFlipInput>): boolean {
-        const context = params.context;
+        const context = params.layer.context;
         const klCanvas = params.klCanvas;
-        const history = params.history;
         const horizontal = params.input.horizontal;
         const vertical = params.input.vertical;
         const flipCanvas = params.input.flipCanvas;
@@ -201,23 +197,11 @@ export const filterFlip = {
             return false;
         }
 
-        history?.pause(true);
         klCanvas.flip(
             horizontal,
             vertical,
             flipCanvas ? undefined : throwIfNull(klCanvas.getLayerIndex(context.canvas)),
         );
-        history?.pause(false);
-
-        history?.push({
-            tool: ['filter', 'flip'],
-            action: 'apply',
-            params: [
-                {
-                    input: params.input,
-                },
-            ],
-        } as TFilterFlipHistoryEntry);
         return true;
     },
 };

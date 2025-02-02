@@ -74,6 +74,11 @@
     original: 'Zoom',
     value: 'Zoom-Werkzeug'
   },
+  'tool-more-tools': {
+    hint: 'when hovering the caret on the tool button',
+    original: 'More Tools',
+    value: 'Mehr Werkzeuge'
+  },
   undo: {
     original: 'Undo',
     value: 'Rückgängig'
@@ -268,6 +273,11 @@
     hint: 'action',
     original: 'Merge with layer below',
     value: 'Auf untere Ebene reduzieren'
+  },
+  'layers-clear': {
+    hint: 'to make a layer empty',
+    original: 'Clear layer',
+    value: 'Ebene leeren'
   },
   'layers-merge-all': {
     original: 'Merge all',
@@ -479,6 +489,10 @@
   'file-storage-clear': {
     original: 'Clear',
     value: 'Leeren'
+  },
+  'file-storage-clear-prompt': {
+    original: 'Clear Browser Storage?',
+    value: 'Browser-Speicher leeren?'
   },
   'file-storage-storing': {
     hint: 'while it is in the process of storing',
@@ -1081,6 +1095,19 @@
     hint: 'As in: the number of lines',
     original: 'Lines',
     value: 'Linien'
+  },
+  'dropper-drop': {
+    hint: 'as in, drag and drop a file',
+    original: 'Drop to import',
+    value: 'Datei öffnen'
+  },
+  'dropper-as-image': {
+    original: 'As New Image',
+    value: 'als neues Bild'
+  },
+  'dropper-as-layer': {
+    original: 'As Layer',
+    value: 'als Ebene'
   },
   'import-opening': {
     hint: 'in the process of opening a large file',

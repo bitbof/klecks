@@ -1,13 +1,10 @@
 import { BB } from '../../bb/bb';
 import { IRGB } from '../kl-types';
 import { IBounds } from '../../bb/bb-types';
-import { IHistoryEntry, KlHistory, THistoryInnerActions } from '../history/kl-history';
 import { ERASE_COLOR } from './erase-color';
-
-export interface IChemyBrushHistoryEntry extends IHistoryEntry {
-    tool: ['brush', 'ChemyBrush'];
-    actions: THistoryInnerActions<ChemyBrush>[];
-}
+import { KlHistory } from '../history/kl-history';
+import { getPushableLayerChange } from '../history/push-helpers/get-pushable-layer-change';
+import { canvasToLayerTiles } from '../history/push-helpers/canvas-to-layer-tiles';
 
 type TChemyMode = 'fill' | 'stroke';
 
@@ -26,7 +23,7 @@ export class ChemyBrush {
 
     private isDrawing: boolean = false;
 
-    private history: KlHistory | undefined;
+    private klHistory: KlHistory = {} as KlHistory;
 
     private copyCanvas: HTMLCanvasElement = {} as HTMLCanvasElement;
     private path: { x: number; y: number }[] = [];
@@ -185,8 +182,8 @@ export class ChemyBrush {
     // ----------------------------------- public -----------------------------------
     constructor() {}
 
-    setHistory(h: KlHistory): void {
-        this.history = h;
+    setHistory(klHistory: KlHistory): void {
+        this.klHistory = klHistory;
     }
 
     getSize(): number {
@@ -310,30 +307,8 @@ export class ChemyBrush {
             this.copyCanvas.height,
         );
         if (this.path.length > 1 && this.completeRedrawBounds) {
-            const historyCanvas = BB.canvas(
-                this.completeRedrawBounds.x2 - this.completeRedrawBounds.x1 + 1,
-                this.completeRedrawBounds.y2 - this.completeRedrawBounds.y1 + 1,
-            );
-            const historyCtx = BB.ctx(historyCanvas);
-            historyCtx.drawImage(
-                this.context.canvas,
-                -this.completeRedrawBounds.x1,
-                -this.completeRedrawBounds.y1,
-            );
-
-            this.history?.push({
-                tool: ['brush', 'ChemyBrush'],
-                actions: [
-                    {
-                        action: 'drawImage',
-                        params: [
-                            historyCanvas, // faster than getting image data (measured on 2018 lenovo chromebook)
-                            this.completeRedrawBounds.x1,
-                            this.completeRedrawBounds.y1,
-                        ],
-                    },
-                ],
-            } as IChemyBrushHistoryEntry);
+            const layerData = canvasToLayerTiles(this.context.canvas, this.completeRedrawBounds);
+            this.klHistory.push(getPushableLayerChange(this.klHistory.getComposed(), layerData));
         }
         this.path = [];
         this.copyCanvas = {} as HTMLCanvasElement;

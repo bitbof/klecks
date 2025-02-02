@@ -1,14 +1,11 @@
 import { BB } from '../../bb/bb';
 import { IBounds, IPressureInput, IVector2D } from '../../bb/bb-types';
-import { IHistoryEntry, KlHistory, THistoryInnerActions } from '../history/kl-history';
 import { IRGB } from '../kl-types';
 import { clamp } from '../../bb/math/math';
 import { BezierLine, TBezierLineCallback } from '../../bb/math/line';
-
-export interface ISmudgeBrushHistoryEntry extends IHistoryEntry {
-    tool: ['brush', 'SmudgeBrush'];
-    actions: THistoryInnerActions<SmudgeBrush>[];
-}
+import { KlHistory } from '../history/kl-history';
+import { getPushableLayerChange } from '../history/push-helpers/get-pushable-layer-change';
+import { canvasToLayerTiles } from '../history/push-helpers/canvas-to-layer-tiles';
 
 // let statCount = 1;
 // let statAcc = 0;
@@ -269,8 +266,7 @@ function smudge(imageData: ImageData, p: ISmudgeParams): void {
 
 export class SmudgeBrush {
     private context: CanvasRenderingContext2D = {} as CanvasRenderingContext2D;
-    private history: KlHistory | undefined;
-    private historyEntry: ISmudgeBrushHistoryEntry | undefined;
+    private klHistory: KlHistory = {} as KlHistory;
 
     private settingColor: IRGB = { r: 0, g: 0, b: 0 };
     private settingSize: number = 35;
@@ -498,11 +494,6 @@ export class SmudgeBrush {
     constructor() {}
 
     startLine(x: number, y: number, p: number): void {
-        this.historyEntry = {
-            tool: ['brush', 'SmudgeBrush'],
-            actions: [],
-        };
-
         p = BB.clamp(p, 0, 1);
         const localOpacity = this.settingHasOpacityPressure
             ? this.settingOpacity * p * p
@@ -601,36 +592,13 @@ export class SmudgeBrush {
             );
         }
 
-        if (this.historyEntry && this.completeRedrawBounds) {
-            let historyIm: ImageData | HTMLCanvasElement = this.copyImageData;
-            if (
-                !(
-                    this.completeRedrawBounds.x1 === 0 &&
-                    this.completeRedrawBounds.y1 === 0 &&
-                    this.completeRedrawBounds.x2 >= this.context.canvas.width - 1 &&
-                    this.completeRedrawBounds.y2 >= this.context.canvas.height - 1
-                )
-            ) {
-                // temp canvas to prevent main canvas from getting slowed down in chrome
-                const tmpCanvas = BB.canvas(
-                    this.completeRedrawBounds.x2 - this.completeRedrawBounds.x1 + 1,
-                    this.completeRedrawBounds.y2 - this.completeRedrawBounds.y1 + 1,
-                );
-                const tmpCtx = BB.ctx(tmpCanvas);
-                tmpCtx.drawImage(
-                    this.context.canvas,
-                    -this.completeRedrawBounds.x1,
-                    -this.completeRedrawBounds.y1,
-                );
-
-                historyIm = tmpCanvas; // faster than getting image data (measured on 2018 lenovo chromebook)
-            }
-            this.historyEntry.actions.push({
-                action: 'drawImage',
-                params: [historyIm, this.completeRedrawBounds.x1, this.completeRedrawBounds.y1],
-            });
-            this.history?.push(this.historyEntry);
-            this.historyEntry = undefined;
+        if (this.completeRedrawBounds) {
+            this.klHistory.push(
+                getPushableLayerChange(
+                    this.klHistory.getComposed(),
+                    canvasToLayerTiles(this.context.canvas, this.completeRedrawBounds),
+                ),
+            );
         }
         this.copyImageData = {} as ImageData;
     }
@@ -695,8 +663,8 @@ export class SmudgeBrush {
         this.context = c;
     }
 
-    setHistory(h: KlHistory): void {
-        this.history = h;
+    setHistory(klHistory: KlHistory): void {
+        this.klHistory = klHistory;
     }
 
     setSize(s: number): void {

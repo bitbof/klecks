@@ -1,20 +1,14 @@
 import { BB } from '../../bb/bb';
-import { IHistoryEntry, KlHistory, THistoryInnerActions } from '../history/kl-history';
-import { KL } from '../kl';
 import { IRGB, TPressureInput } from '../kl-types';
 import { IVector2D } from '../../bb/bb-types';
 import { BezierLine } from '../../bb/math/line';
 import { ERASE_COLOR } from './erase-color';
 import { throwIfNull } from '../../bb/base/base';
-
-export interface IPixelBrushHistoryEntry extends IHistoryEntry {
-    tool: ['brush', 'PixelBrush'];
-    actions: THistoryInnerActions<PixelBrush>[];
-}
+import { KlHistory } from '../history/kl-history';
+import { getPushableLayerChange } from '../history/push-helpers/get-pushable-layer-change';
 
 export class PixelBrush {
-    private history: KlHistory | undefined;
-    private historyEntry: IPixelBrushHistoryEntry | undefined;
+    private klHistory: KlHistory = {} as KlHistory;
     private context: CanvasRenderingContext2D = {} as CanvasRenderingContext2D;
     private settingHasSizePressure: boolean = true;
     private settingHasOpacityPressure: boolean = false;
@@ -283,48 +277,6 @@ export class PixelBrush {
     // ---- interface ----
 
     startLine(x: number, y: number, p: number): void {
-        this.historyEntry = {
-            tool: ['brush', 'PixelBrush'],
-            actions: [
-                {
-                    action: 'sizePressure',
-                    params: [this.settingHasSizePressure],
-                },
-                {
-                    action: 'opacityPressure',
-                    params: [this.settingHasOpacityPressure],
-                },
-                {
-                    action: 'setSize',
-                    params: [this.settingSize],
-                },
-                {
-                    action: 'setSpacing',
-                    params: [this.settingSpacing],
-                },
-                {
-                    action: 'setOpacity',
-                    params: [this.settingOpacity],
-                },
-                {
-                    action: 'setColor',
-                    params: [this.settingColor],
-                },
-                {
-                    action: 'setLockAlpha',
-                    params: [this.settingLockLayerAlpha],
-                },
-                {
-                    action: 'setIsEraser',
-                    params: [this.settingIsEraser],
-                },
-                {
-                    action: 'setUseDither',
-                    params: [this.settingUseDither],
-                },
-            ],
-        };
-
         if (this.settingUseDither) {
             this.updateDither();
         }
@@ -344,21 +296,12 @@ export class PixelBrush {
         this.lastInput.y = y;
         this.lastInput.pressure = p;
         this.lastInput2 = BB.copyObj(this.lastInput);
-
-        this.historyEntry.actions!.push({
-            action: 'startLine',
-            params: [x, y, p],
-        });
     }
 
     goLine(x: number, y: number, p: number): void {
         if (!this.inputIsDrawing) {
             return;
         }
-        this.historyEntry!.actions!.push({
-            action: 'goLine',
-            params: [x, y, p],
-        });
 
         //debug
         //drawDot(x, y, 1, 0.5);
@@ -376,7 +319,7 @@ export class PixelBrush {
         this.lastInput.pressure = pressure;
     }
 
-    endLine(x: number, y: number): void {
+    endLine(): void {
         const localSize = this.settingHasSizePressure
             ? Math.max(0.1, this.lastInput.pressure * this.settingSize)
             : Math.max(0.1, this.settingSize);
@@ -390,14 +333,9 @@ export class PixelBrush {
 
         this.bezierLine = null;
 
-        if (this.historyEntry) {
-            this.historyEntry.actions!.push({
-                action: 'endLine',
-                params: [x, y],
-            });
-            this.history?.push(this.historyEntry);
-            this.historyEntry = undefined;
-        }
+        this.klHistory.push(
+            getPushableLayerChange(this.klHistory.getComposed(), this.context.canvas),
+        );
     }
 
     //cheap n' ugly
@@ -434,52 +372,9 @@ export class PixelBrush {
             }
         }
 
-        const historyEntry: IPixelBrushHistoryEntry = {
-            tool: ['brush', 'PixelBrush'],
-            actions: [
-                {
-                    action: 'sizePressure',
-                    params: [this.settingHasSizePressure],
-                },
-                {
-                    action: 'opacityPressure',
-                    params: [this.settingHasOpacityPressure],
-                },
-                {
-                    action: 'setSize',
-                    params: [this.settingSize],
-                },
-                {
-                    action: 'setSpacing',
-                    params: [this.settingSpacing],
-                },
-                {
-                    action: 'setOpacity',
-                    params: [this.settingOpacity],
-                },
-                {
-                    action: 'setColor',
-                    params: [this.settingColor],
-                },
-                {
-                    action: 'setLockAlpha',
-                    params: [this.settingLockLayerAlpha],
-                },
-                {
-                    action: 'setIsEraser',
-                    params: [this.settingIsEraser],
-                },
-                {
-                    action: 'setUseDither',
-                    params: [this.settingUseDither],
-                },
-                {
-                    action: 'drawLineSegment',
-                    params: [x1, y1, x2, y2],
-                },
-            ],
-        };
-        this.history?.push(historyEntry);
+        this.klHistory.push(
+            getPushableLayerChange(this.klHistory.getComposed(), this.context.canvas),
+        );
     }
 
     //IS
@@ -507,8 +402,8 @@ export class PixelBrush {
         this.context = c;
     }
 
-    setHistory(l: KlHistory): void {
-        this.history = l;
+    setHistory(klHistory: KlHistory): void {
+        this.klHistory = klHistory;
     }
 
     setSize(s: number): void {

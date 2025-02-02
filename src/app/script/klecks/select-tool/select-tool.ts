@@ -1,5 +1,5 @@
 import { IVector2D } from '../../bb/bb-types';
-import { Geom, MultiPolygon, Polygon } from 'polygon-clipping';
+import { MultiPolygon, Polygon } from 'polygon-clipping';
 import { translateMultiPolygon } from '../../bb/multi-polygon/translate-multi-polygon';
 import { getEllipsePath } from '../../bb/multi-polygon/get-ellipse-path';
 import { KlCanvas } from '../canvas/kl-canvas';

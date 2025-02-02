@@ -1,6 +1,5 @@
 import { css } from './base';
 import { BB } from '../bb';
-import { IKeyStringOptional } from '../bb-types';
 
 export function appendTextDiv(target: HTMLElement, text: string): HTMLDivElement {
     const div = document.createElement('div');
@@ -126,7 +125,7 @@ const els: {
  */
 export function el<GTag extends keyof HTMLElementTagNameMap = 'div'>(params?: {
     parent?: HTMLElement;
-    css?: IKeyStringOptional;
+    css?: Partial<CSSStyleDeclaration>;
     custom?: { [key: string]: string };
     content?: string | (HTMLElement | string | undefined)[] | Element;
     textContent?: string;

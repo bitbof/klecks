@@ -1,5 +1,4 @@
 import { BB } from '../../../bb/bb';
-import { IKeyStringOptional } from '../../../bb/bb-types';
 
 /**
  * selectable options
@@ -44,7 +43,8 @@ export class Options<IdType> {
         onBeforeChange?: (id: IdType) => boolean;
         changeOnInit?: boolean; // trigger change on creation
         isSmall?: boolean;
-        optionCss?: IKeyStringOptional;
+        optionCss?: Partial<CSSStyleDeclaration>;
+        isColumn?: boolean; // displayed as column. default row
     }) {
         this.rootEl = BB.el();
 
@@ -53,6 +53,7 @@ export class Options<IdType> {
             className: 'kl-option-wrapper',
             css: {
                 display: 'flex',
+                flexDirection: p.isColumn ? 'column' : 'row',
             },
         });
 
@@ -134,13 +135,13 @@ export class Options<IdType> {
         this.onChange && this.onChange(this.selectedId);
     }
 
-    setValue(val: IdType): void {
+    setValue(val: IdType, skipEmit?: boolean): void {
         if (this.selectedId === val) {
             return;
         }
         this.selectedId = val;
         this.update();
-        this.onChange && this.onChange(this.selectedId);
+        !skipEmit && this.onChange && this.onChange(this.selectedId);
     }
 
     previous(): void {

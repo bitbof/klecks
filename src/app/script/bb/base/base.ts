@@ -1,4 +1,4 @@
-import { IKeyString, IKeyStringOptional, ISize2D, ISVG, IVector2D } from '../bb-types';
+import { IKeyString, ISize2D, ISVG, IVector2D } from '../bb-types';
 
 export function insertAfter(referenceNode: Element, newNode: Element): void {
     if (referenceNode.parentNode) {
@@ -34,17 +34,15 @@ export function asyncLoadImage(src: string): Promise<HTMLImageElement> {
     });
 }
 
-export function css(el: HTMLElement | SVGElement, styleObj: IKeyStringOptional): void {
-    const keyArr = Object.keys(styleObj);
-    let keyStr: string;
-    const style = el.style as unknown as IKeyStringOptional;
-    for (let i = 0; i < keyArr.length; i++) {
-        keyStr = keyArr[i];
-        style[keyStr] = styleObj[keyStr];
-        if (keyStr === 'userSelect') {
-            style.webkitUserSelect = styleObj[keyStr]; // safari
+export function css(el: HTMLElement | SVGElement, styleObj: Partial<CSSStyleDeclaration>): void {
+    const elStyle: any = el.style;
+    Object.keys(styleObj).forEach((key) => {
+        const property = key as keyof CSSStyleDeclaration;
+        elStyle[property] = styleObj[property];
+        if (property === 'userSelect') {
+            elStyle.webkitUserSelect = styleObj[property]; // Safari support
         }
-    }
+    });
 }
 
 export function setAttributes(el: Element, attrObj: IKeyString): void {
@@ -275,4 +273,20 @@ export function removeIsDarkListener(func: () => void): void {
     matchMediaDark &&
         'removeEventListener' in matchMediaDark &&
         matchMediaDark.removeEventListener('change', func);
+}
+
+export function base64ToBlob(base64Str: string): Blob {
+    const parts = base64Str.match(/data:([^;]*)(;base64)?,([0-9A-Za-z+/]+)/) as [
+        string,
+        string,
+        string,
+        string,
+    ];
+    const binStr = atob(parts[3]);
+    const buf = new ArrayBuffer(binStr.length);
+    const view = new Uint8Array(buf);
+    for (let i = 0; i < view.length; i++) {
+        view[i] = binStr.charCodeAt(i);
+    }
+    return new Blob([view], { type: parts[1] });
 }
