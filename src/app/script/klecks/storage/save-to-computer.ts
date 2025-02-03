@@ -88,7 +88,7 @@ export class SaveToComputer {
                 .then((agPsdLazy) => {
                     const buffer = agPsdLazy.writePsdBuffer(psdConfig);
                     const blob = new Blob([buffer], {
-                        type: 'application/octet-stream',
+                        type: 'image/vnd.adobe.photoshop',
                     });
                     saveAs(blob, BB.getDate() + klConfig.filenameBase + '.psd', true, 'psd');
                 })
