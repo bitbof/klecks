@@ -34,14 +34,15 @@ function toleranceTest(
     initR: number,
     initG: number,
     initB: number,
+    initA: number,
     toleranceSquared: number, // already squared for performance
     i: number,
 ): boolean {
-    // other software also ignores the alpha channel
     return (
         (srcArr[i * 4] - initR) ** 2 <= toleranceSquared &&
         (srcArr[i * 4 + 1] - initG) ** 2 <= toleranceSquared &&
-        (srcArr[i * 4 + 2] - initB) ** 2 <= toleranceSquared
+        (srcArr[i * 4 + 2] - initB) ** 2 <= toleranceSquared &&
+        (srcArr[i * 4 + 3] - initA) ** 2 <= toleranceSquared
     );
 }
 
@@ -71,6 +72,7 @@ function floodFill(
     const initR = srcArr[(py * width + px) * 4];
     const initG = srcArr[(py * width + px) * 4 + 1];
     const initB = srcArr[(py * width + px) * 4 + 2];
+    const initA = srcArr[(py * width + px) * 4 + 3];
     const view = new DataView(srcArr.buffer);
     const init = view.getUint32((py * width + px) * 4, true);
     const toleranceSquared = tolerance ** 2;
@@ -99,7 +101,7 @@ function floodFill(
                     targetArr[e] !== 255 &&
                     (view.getUint32(e * 4, true) === init ||
                         (tolerance > 0 &&
-                            toleranceTest(srcArr, initR, initG, initB, toleranceSquared, e)))
+                            toleranceTest(srcArr, initR, initG, initB, initA, toleranceSquared, e)))
                 ) {
                     bounds.x1 = Math.min(bounds.x1, x - 1);
                     targetArr[e] = 255;
@@ -113,7 +115,7 @@ function floodFill(
                     targetArr[e] !== 255 &&
                     (view.getUint32(e * 4, true) === init ||
                         (tolerance > 0 &&
-                            toleranceTest(srcArr, initR, initG, initB, toleranceSquared, e)))
+                            toleranceTest(srcArr, initR, initG, initB, initA, toleranceSquared, e)))
                 ) {
                     bounds.x2 = Math.max(bounds.x2, x + 1);
                     targetArr[e] = 255;
@@ -127,7 +129,7 @@ function floodFill(
                     targetArr[e] !== 255 &&
                     (view.getUint32(e * 4, true) === init ||
                         (tolerance > 0 &&
-                            toleranceTest(srcArr, initR, initG, initB, toleranceSquared, e)))
+                            toleranceTest(srcArr, initR, initG, initB, initA, toleranceSquared, e)))
                 ) {
                     bounds.y1 = Math.min(bounds.y1, y - 1);
                     targetArr[e] = 255;
@@ -141,7 +143,7 @@ function floodFill(
                     targetArr[e] !== 255 &&
                     (view.getUint32(e * 4, true) === init ||
                         (tolerance > 0 &&
-                            toleranceTest(srcArr, initR, initG, initB, toleranceSquared, e)))
+                            toleranceTest(srcArr, initR, initG, initB, initA, toleranceSquared, e)))
                 ) {
                     bounds.y2 = Math.max(bounds.y2, y + 1);
                     targetArr[e] = 255;
@@ -156,7 +158,7 @@ function floodFill(
                 if (
                     view.getUint32(i * 4, true) === init ||
                     (tolerance > 0 &&
-                        toleranceTest(srcArr, initR, initG, initB, toleranceSquared, i))
+                        toleranceTest(srcArr, initR, initG, initB, initA, toleranceSquared, i))
                 ) {
                     targetArr[i] = 255;
                     if (x < bounds.x1) {
