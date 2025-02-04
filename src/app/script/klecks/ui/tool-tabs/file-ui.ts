@@ -11,6 +11,10 @@ import shareImg from '/src/app/img/ui/share.svg';
 import uploadImg from '/src/app/img/ui/upload.svg';
 import importImg from '/src/app/img/ui/import.svg';
 import copyImg from '/src/app/img/ui/copy.svg';
+import { Checkbox } from '../components/checkbox';
+import { LocalStorage } from '../../../bb/base/local-storage';
+
+const LS_SHOW_SAVE_DIALOG = 'kl-save-dialog';
 
 export type TFileUiParams = {
     klRootEl: HTMLElement;
@@ -24,8 +28,10 @@ export type TFileUiParams = {
     onShareImage: (callback: () => void) => void;
     onUpload: () => void;
     onCopyToClipboard: () => void;
+    onPaste: () => void;
     saveReminder: SaveReminder;
     applyUncommitted: () => void;
+    onChangeShowSaveDialog: (b: boolean) => void;
 };
 
 export class FileUi {
@@ -50,6 +56,7 @@ export class FileUi {
             const shareButton = document.createElement('button');
             const uploadImgurButton = document.createElement('button');
             const clipboardButton = document.createElement('button');
+            const pasteButton = document.createElement('button');
 
             newButton.style.cssFloat = 'left';
             BB.css(saveButton, {
@@ -67,6 +74,7 @@ export class FileUi {
             shareButton.tabIndex = -1;
             uploadImgurButton.tabIndex = -1;
             clipboardButton.tabIndex = -1;
+            pasteButton.tabIndex = -1;
 
             newButton.innerHTML = `<img class="dark-no-invert" src='${newImageImg}' alt='icon' height='20'/>${LANG('file-new')}`;
             saveButton.innerHTML = `<img src='${exportImg}' alt='icon' height='20'/>${LANG('file-save')}`;
@@ -74,11 +82,35 @@ export class FileUi {
             uploadImgurButton.innerHTML = `<img style='float:left' src='${uploadImg}' height='20' alt='icon'/>${LANG('file-upload')}`;
             clipboardButton.innerHTML = `<img src='${copyImg}' alt='icon' height='20'/>${LANG('file-copy')}`;
             clipboardButton.title = LANG('file-copy-title');
+            pasteButton.innerHTML = LANG('file-paste');
             newButton.className = 'grid-button';
             saveButton.className = 'grid-button grid-button--filter';
             shareButton.className = 'grid-button';
             uploadImgurButton.className = 'grid-button';
             clipboardButton.className = 'grid-button';
+            pasteButton.className = 'grid-button';
+
+            const canShowSaveDialog = 'showSaveFilePicker' in window;
+            const showSaveDialogRaw = LocalStorage.getItem(LS_SHOW_SAVE_DIALOG);
+            const initialShowSaveDialog =
+                showSaveDialogRaw === null ? false : showSaveDialogRaw === 'true';
+            const showSaveDialogCheck = new Checkbox({
+                init: initialShowSaveDialog,
+                label: LANG('file-show-save-dialog'),
+                callback: (value) => {
+                    if (value) {
+                        LocalStorage.setItem(LS_SHOW_SAVE_DIALOG, 'true');
+                    } else {
+                        LocalStorage.removeItem(LS_SHOW_SAVE_DIALOG); // default is false
+                    }
+                    p.onChangeShowSaveDialog(value);
+                },
+                css: {
+                    marginLeft: '10px',
+                    maxWidth: 'fit-content',
+                },
+            });
+            p.onChangeShowSaveDialog(initialShowSaveDialog);
 
             const importWrapper = BB.el({
                 className: 'grid-button',
@@ -178,6 +210,11 @@ export class FileUi {
                 p.onCopyToClipboard();
             };
 
+            pasteButton.onclick = () => {
+                pasteButton.blur();
+                p.onPaste();
+            };
+
             const saveNote = BB.el({
                 className: 'kl-toolspace-note',
                 textContent: LANG('file-no-autosave'),
@@ -212,8 +249,16 @@ export class FileUi {
             });
 
             const saveRow = BB.el({
-                content: [saveButton, exportTypeSelect.getElement()],
-                className: 'kl-file-save-row',
+                content: [
+                    BB.el({
+                        content: [saveButton, exportTypeSelect.getElement()],
+                        css: {
+                            display: 'flex',
+                        },
+                    }),
+                    ...(canShowSaveDialog ? [showSaveDialogCheck.getElement()] : []),
+                ],
+                className: 'kl-file-save-wrapper',
             });
 
             //actual structure
@@ -226,6 +271,7 @@ export class FileUi {
                 saveRow,
 
                 clipboardButton,
+                pasteButton,
                 BB.canShareFiles() ? shareButton : undefined,
                 BB.el({ css: { clear: 'both' } }),
 

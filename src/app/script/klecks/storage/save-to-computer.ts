@@ -9,6 +9,8 @@ import { klConfig } from '../kl-config';
 import { canvasToBlob } from '../../bb/base/canvas';
 
 export class SaveToComputer {
+    private showSaveDialog: boolean = true;
+
     private async saveImage(
         canvas: HTMLCanvasElement,
         filename: string,
@@ -38,7 +40,7 @@ export class SaveToComputer {
             const filename = BB.getDate() + klConfig.filenameBase + '.' + extension;
             const fullCanvas = this.klCanvas.getCompleteCanvas(1);
             try {
-                await this.saveImage(fullCanvas, filename, mimeType, true);
+                await this.saveImage(fullCanvas, filename, mimeType, this.showSaveDialog);
             } catch (error) {
                 //fallback for old browsers
                 alert('could not save');
@@ -90,11 +92,20 @@ export class SaveToComputer {
                     const blob = new Blob([buffer], {
                         type: 'image/vnd.adobe.photoshop',
                     });
-                    saveAs(blob, BB.getDate() + klConfig.filenameBase + '.psd', true, 'psd');
+                    saveAs(
+                        blob,
+                        BB.getDate() + klConfig.filenameBase + '.psd',
+                        this.showSaveDialog,
+                        'psd',
+                    );
                 })
                 .catch(() => {
                     alert('Error: failed to load PSD library');
                 });
         }
+    }
+
+    setShowSaveDialog(b: boolean) {
+        this.showSaveDialog = b;
     }
 }

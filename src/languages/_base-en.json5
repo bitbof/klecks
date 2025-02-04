@@ -325,11 +325,16 @@ renaming keys across language files:
   "file-format": {
     "value": "File Format",
   },
+  "file-show-save-dialog": {
+    "hint": 'setting for showing/not showing a dialog where user picks folder and filename',
+    "value": 'Show save dialog',
+  },
   "file-copy": {
     "hint": "verb",
     "value": "Copy"
   },
   "file-copy-title": "Copy To Clipboard",
+  "file-paste": 'Paste',
   "file-share": {
     hint: 'Common feature on phones. Pressing share button allows to send data to a different app, e.g. as a text message to someone.',
     value: 'Share',
@@ -781,6 +786,8 @@ renaming keys across language files:
   },
   "import-psd-too-large": "Image exceeds maximum dimensions of {x} x {x} pixels. Unable to import.",
   "import-psd-size": "Image size",
+  "clipboard-read-fail": "Failed to read from clipboard.",
+  "clipboard-no-image": "No image found in clipboard.",
 
   // hand tool
   "hand-reset": {

@@ -273,6 +273,59 @@ export class KlAppImportHandler {
 
     // ---- interface ----
 
+    async readClipboard(): Promise<void> {
+        try {
+            /*if (Math.random() > 0.001) {
+                throw new Error('haha');
+            }*/
+            // May freeze the app until it read the clipboard
+            // But if you show a loading indicator on this line, it will show up too early.
+            const clipboardItems = await navigator.clipboard.read();
+            // On this line it's already done freezing.
+
+            let hasImage = false;
+            for (const item of clipboardItems) {
+                for (const type of item.types) {
+                    if (type.startsWith('image')) {
+                        hasImage = true;
+                        const blob = await item.getType(type);
+                        const img = new Image();
+                        img.onload = () => {
+                            URL.revokeObjectURL(img.src);
+                            this.importFinishedLoading(
+                                {
+                                    type: 'image',
+                                    width: img.width,
+                                    height: img.height,
+                                    canvas: img,
+                                },
+                                undefined,
+                                'default',
+                            );
+                        };
+                        img.src = URL.createObjectURL(blob);
+                        return;
+                    }
+                }
+            }
+            if (!hasImage) {
+                KL.popup({
+                    target: this.klRootEl,
+                    type: 'error',
+                    message: LANG('clipboard-no-image'),
+                    buttons: ['Ok'],
+                });
+            }
+        } catch (error) {
+            KL.popup({
+                target: this.klRootEl,
+                type: 'error',
+                message: LANG('clipboard-read-fail'),
+                buttons: ['Ok'],
+            });
+        }
+    }
+
     onPaste(e: ClipboardEvent): void {
         if (KL.dialogCounter.get() > 0) {
             return;

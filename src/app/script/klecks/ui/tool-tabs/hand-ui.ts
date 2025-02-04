@@ -3,6 +3,7 @@ import angleImg from '/src/app/img/ui/angle.svg';
 import rotateImg from '/src/app/img/ui/edit-rotate.svg';
 import { LANG } from '../../../language/language';
 import { Checkbox } from '../components/checkbox';
+import { LocalStorage } from '../../../bb/base/local-storage';
 
 const LS_INERTIA_KEY = 'kl-inertia-scroll';
 
@@ -158,9 +159,9 @@ export class HandUi {
 
         const inertiaToggle = new Checkbox({
             label: LANG('hand-inertia-scrolling'),
-            init: localStorage.getItem(LS_INERTIA_KEY) === 'true',
+            init: LocalStorage.getItem(LS_INERTIA_KEY) === 'true',
             callback: (b) => {
-                localStorage.setItem(LS_INERTIA_KEY, '' + b);
+                LocalStorage.setItem(LS_INERTIA_KEY, '' + b);
                 p.onChangeUseInertiaScrolling(b);
             },
         });

@@ -1594,8 +1594,12 @@ export class KlApp {
                       applyUncommitted();
                       copyToClipboard();
                   },
+                  onPaste: () => importHandler.readClipboard(),
                   saveReminder: p.saveReminder,
                   applyUncommitted: () => applyUncommitted(),
+                  onChangeShowSaveDialog: (b) => {
+                      this.saveToComputer.setShowSaveDialog(b);
+                  },
               });
 
         const settingsUi = new KL.SettingsUi({

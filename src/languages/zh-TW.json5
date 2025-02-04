@@ -442,6 +442,11 @@
     original: 'File Format',
     value: '檔案格式'
   },
+  'file-show-save-dialog': {
+    hint: 'setting for showing/not showing a dialog where user picks folder and filename',
+    original: 'Show save dialog',
+    value: ''
+  },
   'file-copy': {
     hint: 'verb',
     original: 'Copy',
@@ -450,6 +455,10 @@
   'file-copy-title': {
     original: 'Copy To Clipboard',
     value: '複製到剪貼板'
+  },
+  'file-paste': {
+    original: 'Paste',
+    value: ''
   },
   'file-share': {
     hint: 'Common feature on phones. Pressing share button allows to send data to a different app, e.g. as a text message to someone.',
@@ -1182,6 +1191,14 @@
   'import-psd-size': {
     original: 'Image size',
     value: '圖像大小'
+  },
+  'clipboard-read-fail': {
+    original: 'Failed to read from clipboard.',
+    value: ''
+  },
+  'clipboard-no-image': {
+    original: 'No image found in clipboard.',
+    value: ''
   },
   'hand-reset': {
     hint: 'resets zoom (to 100%) and rotation (to 0°)',

@@ -5,6 +5,7 @@ import { BrowserStorageUi } from './browser-storage-ui';
 import { ProjectStore } from '../../storage/project-store';
 import { IKlProject } from '../../kl-types';
 import { KlHistory } from '../../history/kl-history';
+import { LocalStorage } from '../../../bb/base/local-storage';
 
 export type TSaveReminderSetting = '20min' | '40min' | 'disabled';
 
@@ -122,7 +123,7 @@ export class SaveReminder {
         private title: string = 'Klecks',
     ) {
         this.setting =
-            (localStorage.getItem(LS_REMINDER_KEY) as TSaveReminderSetting | null) ?? '20min';
+            (LocalStorage.getItem(LS_REMINDER_KEY) as TSaveReminderSetting | null) ?? '20min';
     }
 
     init(): void {
@@ -229,7 +230,7 @@ export class SaveReminder {
 
     setSetting(setting: TSaveReminderSetting): void {
         this.setting = setting;
-        localStorage.setItem(LS_REMINDER_KEY, this.setting);
+        LocalStorage.setItem(LS_REMINDER_KEY, this.setting);
     }
 
     setHistory(history: KlHistory): void {
