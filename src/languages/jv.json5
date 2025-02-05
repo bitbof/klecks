@@ -445,7 +445,7 @@
   'file-show-save-dialog': {
     hint: 'setting for showing/not showing a dialog where user picks folder and filename',
     original: 'Show save dialog',
-    value: 'Tampilake dialog simpen
+    value: 'Tampilake dialog simpen'
   },
   'file-copy': {
     hint: 'verb',
