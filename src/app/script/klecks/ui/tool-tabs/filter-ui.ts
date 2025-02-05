@@ -1,9 +1,8 @@
 import { BB } from '../../../bb/bb';
 import { KL } from '../../kl';
-import { KlHistory } from '../../history/kl-history';
 import { IKeyString } from '../../../bb/bb-types';
 import { StatusOverlay } from '../components/status-overlay';
-import { KlCanvas } from '../../canvas/kl-canvas';
+import { KlCanvas, TKlCanvasLayer } from '../../canvas/kl-canvas';
 import { LANG } from '../../../language/language';
 import { IFilterApply, IFilterGetDialogParam, TFilterGetDialogResult } from '../../kl-types';
 import { KlColorSlider } from '../components/kl-color-slider';
@@ -11,6 +10,7 @@ import { LayersUi } from './layers-ui/layers-ui';
 import { RGB } from '../../../bb/color/color';
 import { getSharedFx } from '../../../fx-canvas/shared-fx';
 import { c } from '../../../bb/base/c';
+import { KlHistory } from '../../history/kl-history';
 
 export type TFilterUiParams = {
     klRootEl: HTMLElement;
@@ -19,12 +19,12 @@ export type TFilterUiParams = {
     getCurrentColor: () => RGB;
     getKlMaxCanvasSize: () => number;
     klCanvas: KlCanvas;
-    getCurrentLayerCtx: () => CanvasRenderingContext2D | null;
+    getCurrentLayer: () => TKlCanvasLayer;
     isEmbed: boolean;
     statusOverlay: StatusOverlay;
     onCanvasChanged: () => void; // dimensions/orientation changed
     applyUncommitted: () => void;
-    history: KlHistory;
+    klHistory: KlHistory;
 };
 
 export class FilterUi {
@@ -35,12 +35,12 @@ export class FilterUi {
     private readonly getCurrentColor: () => RGB;
     private readonly getKlMaxCanvasSize: () => number;
     private readonly klCanvas: KlCanvas;
-    private readonly getCurrentLayerCtx: () => CanvasRenderingContext2D | null;
+    private readonly getCurrentLayer: () => TKlCanvasLayer;
     private readonly isEmbed: boolean;
     private readonly statusOverlay: StatusOverlay;
     private readonly onCanvasChanged: () => void; // dimensions/orientation changed
     private readonly applyUncommitted: () => void;
-    private readonly history: KlHistory;
+    private readonly klHistory: KlHistory;
 
     private readonly rootEl: HTMLDivElement;
     private isInit = false;
@@ -56,12 +56,12 @@ export class FilterUi {
         this.getCurrentColor = p.getCurrentColor;
         this.getKlMaxCanvasSize = p.getKlMaxCanvasSize;
         this.klCanvas = p.klCanvas;
-        this.getCurrentLayerCtx = p.getCurrentLayerCtx;
+        this.getCurrentLayer = p.getCurrentLayer;
         this.isEmbed = p.isEmbed;
         this.statusOverlay = p.statusOverlay;
         this.onCanvasChanged = p.onCanvasChanged;
         this.applyUncommitted = p.applyUncommitted;
-        this.history = p.history;
+        this.klHistory = p.klHistory;
 
         this.rootEl = document.createElement('div');
     }
@@ -186,9 +186,9 @@ This has been reported to Google.
 
                     const applyFilter = (input: any) => {
                         const filterResult = filters[filterKey].apply!({
-                            context: this.getCurrentLayerCtx(),
+                            layer: this.getCurrentLayer(),
                             klCanvas: this.klCanvas,
-                            history: this.history,
+                            klHistory: this.klHistory,
                             input: input,
                         } as IFilterApply);
                         if (filterResult === false) {
@@ -215,7 +215,7 @@ This has been reported to Google.
 
                         try {
                             filterDialog = filters[filterKey].getDialog!({
-                                context: this.getCurrentLayerCtx(),
+                                context: this.getCurrentLayer().context,
                                 klCanvas: this.klCanvas,
                                 maxWidth: this.getKlMaxCanvasSize(),
                                 maxHeight: this.getKlMaxCanvasSize(),

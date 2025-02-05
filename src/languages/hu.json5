@@ -74,6 +74,11 @@
     original: 'Zoom',
     value: 'Zoomolás'
   },
+  'tool-more-tools': {
+    hint: 'when hovering the caret on the tool button',
+    original: 'More Tools',
+    value: ''
+  },
   undo: {
     original: 'Undo',
     value: 'Visszavonás'
@@ -269,6 +274,11 @@
     original: 'Merge with layer below',
     value: 'Egyesítse az alábbi réteggel'
   },
+  'layers-clear': {
+    hint: 'to make a layer empty',
+    original: 'Clear layer',
+    value: ''
+  },
   'layers-merge-all': {
     original: 'Merge all',
     value: 'Egyesítse az összeset'
@@ -432,6 +442,11 @@
     original: 'File Format',
     value: 'Fájlformátum'
   },
+  'file-show-save-dialog': {
+    hint: 'setting for showing/not showing a dialog where user picks folder and filename',
+    original: 'Show save dialog',
+    value: ''
+  },
   'file-copy': {
     hint: 'verb',
     original: 'Copy',
@@ -440,6 +455,10 @@
   'file-copy-title': {
     original: 'Copy To Clipboard',
     value: 'Másolja a vágólapra'
+  },
+  'file-paste': {
+    original: 'Paste',
+    value: ''
   },
   'file-share': {
     hint: 'Common feature on phones. Pressing share button allows to send data to a different app, e.g. as a text message to someone.',
@@ -479,6 +498,10 @@
   'file-storage-clear': {
     original: 'Clear',
     value: 'Egyértelmű'
+  },
+  'file-storage-clear-prompt': {
+    original: 'Clear Browser Storage?',
+    value: ''
   },
   'file-storage-storing': {
     hint: 'while it is in the process of storing',
@@ -1082,6 +1105,19 @@
     original: 'Lines',
     value: 'Vonalak'
   },
+  'dropper-drop': {
+    hint: 'as in, drag and drop a file',
+    original: 'Drop to import',
+    value: ''
+  },
+  'dropper-as-image': {
+    original: 'As New Image',
+    value: ''
+  },
+  'dropper-as-layer': {
+    original: 'As Layer',
+    value: ''
+  },
   'import-opening': {
     hint: 'in the process of opening a large file',
     original: 'Opening file...',
@@ -1155,6 +1191,14 @@
   'import-psd-size': {
     original: 'Image size',
     value: 'Képméret'
+  },
+  'clipboard-read-fail': {
+    original: 'Failed to read from clipboard.',
+    value: ''
+  },
+  'clipboard-no-image': {
+    original: 'No image found in clipboard.',
+    value: ''
   },
   'hand-reset': {
     hint: 'resets zoom (to 100%) and rotation (to 0°)',

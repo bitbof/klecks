@@ -66,6 +66,10 @@ renaming keys across language files:
   },
   "tool-select": "Select Tool",
   "tool-zoom": "Zoom",
+  "tool-more-tools": {
+    "hint": "when hovering the caret on the tool button",
+    "value": "More Tools",
+  },
 
 
   "undo": 'Undo',
@@ -219,6 +223,10 @@ renaming keys across language files:
     "hint": "action",
     "value": "Merge with layer below"
   },
+  "layers-clear": {
+    "hint": "to make a layer empty",
+    "value": "Clear layer",
+  },
   "layers-merge-all": 'Merge all',
   "layers-rename": {
     "hint": "action",
@@ -317,11 +325,16 @@ renaming keys across language files:
   "file-format": {
     "value": "File Format",
   },
+  "file-show-save-dialog": {
+    "hint": 'setting for showing/not showing a dialog where user picks folder and filename',
+    "value": 'Show save dialog',
+  },
   "file-copy": {
     "hint": "verb",
     "value": "Copy"
   },
   "file-copy-title": "Copy To Clipboard",
+  "file-paste": 'Paste',
   "file-share": {
     hint: 'Common feature on phones. Pressing share button allows to send data to a different app, e.g. as a text message to someone.',
     value: 'Share',
@@ -354,6 +367,7 @@ renaming keys across language files:
     value: 'Store',
   },
   "file-storage-clear": "Clear",
+  "file-storage-clear-prompt": "Clear Browser Storage?",
   "file-storage-storing": {
     "hint": "while it is in the process of storing",
     "value": "Storing"
@@ -720,7 +734,12 @@ renaming keys across language files:
     hint: 'As in: the number of lines',
     value: 'Lines',
   },
-
+  "dropper-drop": {
+    "hint": "as in, drag and drop a file",
+    "value": "Drop to import",
+  },
+  "dropper-as-image": "As New Image",
+  "dropper-as-layer": "As Layer",
   "import-opening": {
     "hint": "in the process of opening a large file",
     "value": "Opening file..."
@@ -767,6 +786,8 @@ renaming keys across language files:
   },
   "import-psd-too-large": "Image exceeds maximum dimensions of {x} x {x} pixels. Unable to import.",
   "import-psd-size": "Image size",
+  "clipboard-read-fail": "Failed to read from clipboard.",
+  "clipboard-no-image": "No image found in clipboard.",
 
   // hand tool
   "hand-reset": {

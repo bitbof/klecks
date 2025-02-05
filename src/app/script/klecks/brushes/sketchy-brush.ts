@@ -1,11 +1,9 @@
 import { BB } from '../../bb/bb';
-import { IHistoryEntry, KlHistory, THistoryInnerActions } from '../history/kl-history';
 import { IRGB, TPressureInput } from '../kl-types';
-
-export interface ISketchyBrushHistoryEntry extends IHistoryEntry {
-    tool: ['brush', 'SketchyBrush'];
-    actions: THistoryInnerActions<SketchyBrush>[];
-}
+import { KlHistory } from '../history/kl-history';
+import { getPushableLayerChange } from '../history/push-helpers/get-pushable-layer-change';
+import { IBounds } from '../../bb/bb-types';
+import { canvasToLayerTiles } from '../history/push-helpers/canvas-to-layer-tiles';
 
 const sampleCanvas = BB.canvas(32, 32);
 const sampleCtx = BB.ctx(sampleCanvas);
@@ -21,8 +19,7 @@ export class SketchyBrush {
     private lastY: number = 0;
     private inputIsDrawing: boolean = false;
     private lastInput: TPressureInput = { x: 0, y: 0, pressure: 0 };
-    private history: KlHistory | undefined;
-    private historyEntry: ISketchyBrushHistoryEntry | undefined;
+    private klHistory: KlHistory = {} as KlHistory;
     private sketchySeed: number = 0;
     private points: [number, number][] = []; // x y
     private count: number = 0;
@@ -40,6 +37,8 @@ export class SketchyBrush {
         },
     ];
 
+    private changedBounds: IBounds | undefined;
+
     private rand(): number {
         this.sketchySeed++;
         return Math.sin(6324634.2345 * Math.cos(this.sketchySeed * 5342.3423)) * 0.5 + 0.5;
@@ -50,8 +49,8 @@ export class SketchyBrush {
 
     // ---- interface ----
 
-    setHistory(l: KlHistory): void {
-        this.history = l;
+    setHistory(klHistory: KlHistory): void {
+        this.klHistory = klHistory;
     }
 
     setSeed(s: number): void {
@@ -103,6 +102,7 @@ export class SketchyBrush {
     }
 
     startLine(x: number, y: number, pressure: number, shift?: boolean): void {
+        this.changedBounds = undefined;
         if (shift && this.lastInput.x) {
             this.inputIsDrawing = true;
             this.endLine();
@@ -112,35 +112,6 @@ export class SketchyBrush {
             this.lastY = y;
             this.lastInput.x = x;
             this.lastInput.y = y;
-            this.historyEntry = {
-                tool: ['brush', 'SketchyBrush'],
-                actions: [
-                    {
-                        action: 'setScale',
-                        params: [this.settingScale],
-                    },
-                    {
-                        action: 'setSize',
-                        params: [this.settingSize / 2],
-                    },
-                    {
-                        action: 'setOpacity',
-                        params: [this.settingOpacity],
-                    },
-                    {
-                        action: 'setColor',
-                        params: [this.settingColor],
-                    },
-                    {
-                        action: 'setBlending',
-                        params: [this.settingBlending],
-                    },
-                    {
-                        action: 'startLine',
-                        params: [x, y, pressure],
-                    },
-                ],
-            };
         }
     }
 
@@ -241,9 +212,12 @@ export class SketchyBrush {
         this.lastY = y;
         this.lastInput.x = x;
         this.lastInput.y = y;
-        this.historyEntry!.actions!.push({
-            action: 'goLine',
-            params: [p_x, p_y, pressure, { r: mixr, g: mixg, b: mixb }],
+
+        this.changedBounds = BB.updateBounds(this.changedBounds, {
+            x1: Math.floor(x - this.settingSize / 2),
+            y1: Math.floor(y - this.settingSize / 2),
+            x2: Math.ceil(x + this.settingSize / 2),
+            y2: Math.ceil(y + this.settingSize / 2),
         });
     }
 
@@ -251,18 +225,16 @@ export class SketchyBrush {
         this.inputIsDrawing = false;
         this.count = 0;
         this.points = [];
-        if (this.historyEntry) {
-            this.historyEntry.actions!.push({
-                action: 'endLine',
-                params: [],
-            });
-            this.history?.push(this.historyEntry);
-            this.historyEntry = undefined;
+
+        if (this.changedBounds) {
+            const layerData = canvasToLayerTiles(this.context.canvas, this.changedBounds);
+            this.klHistory.push(getPushableLayerChange(this.klHistory.getComposed(), layerData));
         }
     }
     //cheap 'n' ugly
 
     drawLineSegment(x1: number, y1: number, x2: number, y2: number): void {
+        this.changedBounds = undefined;
         this.lastInput.x = x2;
         this.lastInput.y = y2;
 
@@ -353,36 +325,27 @@ export class SketchyBrush {
             ')';
         this.context.restore();
 
-        const historyEntry: ISketchyBrushHistoryEntry = {
-            tool: ['brush', 'SketchyBrush'],
-            actions: [
-                {
-                    action: 'setScale',
-                    params: [this.settingScale],
-                },
-                {
-                    action: 'setSize',
-                    params: [this.settingSize / 2],
-                },
-                {
-                    action: 'setOpacity',
-                    params: [this.settingOpacity],
-                },
-                {
-                    action: 'setColor',
-                    params: [this.settingColor],
-                },
-                {
-                    action: 'setBlending',
-                    params: [this.settingBlending],
-                },
-                {
-                    action: 'drawLineSegment',
-                    params: [x1, y1, x2, y2],
-                },
-            ],
-        };
-        this.history?.push(historyEntry);
+        this.changedBounds = BB.updateBounds(this.changedBounds, {
+            x1: Math.floor(x1 - this.settingSize / 2),
+            y1: Math.floor(y1 - this.settingSize / 2),
+            x2: Math.ceil(x1 + this.settingSize / 2),
+            y2: Math.ceil(y1 + this.settingSize / 2),
+        });
+        this.changedBounds = BB.updateBounds(this.changedBounds, {
+            x1: Math.floor(x2 - this.settingSize / 2),
+            y1: Math.floor(y2 - this.settingSize / 2),
+            x2: Math.ceil(x2 + this.settingSize / 2),
+            y2: Math.ceil(y2 + this.settingSize / 2),
+        });
+
+        if (this.changedBounds) {
+            this.klHistory.push(
+                getPushableLayerChange(
+                    this.klHistory.getComposed(),
+                    canvasToLayerTiles(this.context.canvas, this.changedBounds),
+                ),
+            );
+        }
     }
 
     isDrawing(): boolean {

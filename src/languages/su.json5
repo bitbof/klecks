@@ -7,7 +7,7 @@
   'toggle-show-tools': {
     hint: 'Button that hides/shows the toolbar.',
     original: 'Show/Hide Tools',
-    value: 'Témbongkeun / Sumputkeun Alat'
+    value: 'Témbongkeun/Sumputkeun Alat'
   },
   scroll: {
     hint: 'Verb. As in scrolling a page.',
@@ -73,6 +73,11 @@
   'tool-zoom': {
     original: 'Zoom',
     value: 'Zum'
+  },
+  'tool-more-tools': {
+    hint: 'when hovering the caret on the tool button',
+    original: 'More Tools',
+    value: 'Langkung Alat'
   },
   undo: {
     original: 'Undo',
@@ -199,7 +204,7 @@
   'secondary-color': {
     hint: 'or sometimes called "background" color. Photoshop, MS Paint, etc. allow user to switch between two colors.',
     original: 'Secondary Color',
-    value: 'Warna sekundér'
+    value: 'Warna Sekundér'
   },
   'manual-color-input': {
     hint: 'A dialog where users can manually type the color, each channel a number. "mci" keys all related to this dialog.',
@@ -268,6 +273,11 @@
     hint: 'action',
     original: 'Merge with layer below',
     value: 'Ngagabung jeung lapisan handap'
+  },
+  'layers-clear': {
+    hint: 'to make a layer empty',
+    original: 'Clear layer',
+    value: 'Lapisan jelas'
   },
   'layers-merge-all': {
     original: 'Merge all',
@@ -397,11 +407,11 @@
   'layers-rename-foreground': {
     hint: 'noun. Name suggestion for a layer',
     original: 'Foreground',
-    value: 'latar hareup'
+    value: 'Latar hareup'
   },
   'layers-merge-modal-title': {
     original: 'Merge/Mix Layers',
-    value: 'Ngagabung / Campur Lapisan'
+    value: 'Ngagabung/Campur Lapisan'
   },
   'layers-merge-description': {
     hint: 'After ":" a list of mix/blend modes is shown.',
@@ -432,6 +442,11 @@
     original: 'File Format',
     value: 'Format File'
   },
+  'file-show-save-dialog': {
+    hint: 'setting for showing/not showing a dialog where user picks folder and filename',
+    original: 'Show save dialog',
+    value: 'Témbongkeun dialog simpen'
+  },
   'file-copy': {
     hint: 'verb',
     original: 'Copy',
@@ -440,6 +455,10 @@
   'file-copy-title': {
     original: 'Copy To Clipboard',
     value: 'Nyalin Kana Clipboard'
+  },
+  'file-paste': {
+    original: 'Paste',
+    value: 'Témpél'
   },
   'file-share': {
     hint: 'Common feature on phones. Pressing share button allows to send data to a different app, e.g. as a text message to someone.',
@@ -479,6 +498,10 @@
   'file-storage-clear': {
     original: 'Clear',
     value: 'Jelas'
+  },
+  'file-storage-clear-prompt': {
+    original: 'Clear Browser Storage?',
+    value: 'Hapus Panyimpenan Browser?'
   },
   'file-storage-storing': {
     hint: 'while it is in the process of storing',
@@ -701,7 +724,7 @@
   },
   'filter-crop-extend': {
     original: 'Crop/Extend',
-    value: 'Pamotongan / Ngalegaan'
+    value: 'Pamotongan/Ngalegaan'
   },
   'filter-flip': {
     original: 'Flip',
@@ -710,7 +733,7 @@
   'filter-perspective': {
     hint: 'perspective transformation',
     original: 'Perspective',
-    value: 'Sudut pandang'
+    value: 'Sudut Pandang'
   },
   'filter-resize': {
     original: 'Resize',
@@ -728,7 +751,7 @@
   'filter-bright-contrast': {
     hint: 'brightness contrast',
     original: 'Bright/Contrast',
-    value: 'Caang / Kontras'
+    value: 'Caang/Kontras'
   },
   'filter-curves': {
     hint: 'color curves',
@@ -737,7 +760,7 @@
   },
   'filter-hue-sat': {
     original: 'Hue/Saturation',
-    value: 'Hue / Saturasi'
+    value: 'Hue/Saturasi'
   },
   'filter-invert': {
     hint: 'invert the colors',
@@ -1082,6 +1105,19 @@
     original: 'Lines',
     value: 'Garis-garis'
   },
+  'dropper-drop': {
+    hint: 'as in, drag and drop a file',
+    original: 'Drop to import',
+    value: 'Leupaskeun pikeun ngimpor'
+  },
+  'dropper-as-image': {
+    original: 'As New Image',
+    value: 'Salaku Gambar Anyar'
+  },
+  'dropper-as-layer': {
+    original: 'As Layer',
+    value: 'Salaku Lapisan'
+  },
   'import-opening': {
     hint: 'in the process of opening a large file',
     original: 'Opening file...',
@@ -1155,6 +1191,14 @@
   'import-psd-size': {
     original: 'Image size',
     value: 'Ukuran gambar'
+  },
+  'clipboard-read-fail': {
+    original: 'Failed to read from clipboard.',
+    value: 'Gagal maca tina clipboard.'
+  },
+  'clipboard-no-image': {
+    original: 'No image found in clipboard.',
+    value: 'Taya gambar kapanggih dina clipboard.'
   },
   'hand-reset': {
     hint: 'resets zoom (to 100%) and rotation (to 0°)',
@@ -1612,7 +1656,7 @@
   'lock-alpha': {
     hint: 'Short. Freezes the alpha channel of image. Images consist of 4 channels (red, green, blue, alpha). Alpha lock also found in Procreate and photoshop',
     original: 'Lock Alpha',
-    value: 'Konci Alpha'
+    value: 'Konci Alfa'
   },
   'lock-alpha-title': {
     hint: "same as 'lock-alpha' but longer version. Shows up as a tooltip when hovering",

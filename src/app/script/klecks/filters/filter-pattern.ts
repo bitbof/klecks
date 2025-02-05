@@ -8,14 +8,14 @@ import {
 import { input } from '../ui/components/input';
 import { KlSlider } from '../ui/components/kl-slider';
 import { LANG } from '../../language/language';
-import { eventResMs } from './filters-consts';
+import { EVENT_RES_MS } from './filters-consts';
 import { KlCanvasPreview } from '../ui/project-viewport/kl-canvas-preview';
 import { TwoTabs } from '../ui/components/two-tabs';
 import { IVector2D } from '../../bb/bb-types';
-import { TFilterHistoryEntry } from './filters';
 import { throwIfNull } from '../../bb/base/base';
 import { testIsSmall } from '../ui/utils/test-is-small';
-import { getPreviewHeight, getPreviewWidth, mediumPreview } from '../ui/utils/preview-size';
+import { getPreviewHeight, getPreviewWidth, MEDIUM_PREVIEW } from '../ui/utils/preview-size';
+import { canvasToLayerTiles } from '../history/push-helpers/canvas-to-layer-tiles';
 
 export type TFilterPatternInput = {
     x: number;
@@ -26,8 +26,6 @@ export type TFilterPatternInput = {
     offsetX: number;
     offsetY: number;
 };
-
-export type TFilterPatternHistoryEntry = TFilterHistoryEntry<'pattern', TFilterPatternInput>;
 
 /**
  * Draws pattern onto context. Pattern generated from context.
@@ -271,7 +269,7 @@ export const filterPattern = {
             min: 0,
             max: 1,
             value: settings.blend,
-            eventResMs: eventResMs,
+            eventResMs: EVENT_RES_MS,
             onChange: function (val) {
                 settings.blend = val;
                 updatePreview();
@@ -613,32 +611,38 @@ export const filterPattern = {
             },
         };
         if (!isSmall) {
-            result.width = mediumPreview.width;
+            result.width = MEDIUM_PREVIEW.width;
         }
         return result;
     },
 
     apply(params: IFilterApply<TFilterPatternInput>): boolean {
         const klCanvas = params.klCanvas;
-        const ctx = params.context;
-        const history = params.history;
+        const ctx = params.layer.context;
+        const klHistory = params.klHistory;
         if (!klCanvas) {
             return false;
         }
-        history?.pause(true);
-
         drawPattern(ctx, params.input);
+        {
+            const layerMap = Object.fromEntries(
+                params.klCanvas.getLayers().map((layerItem) => {
+                    if (layerItem.id === params.layer.id) {
+                        return [
+                            layerItem.id,
+                            {
+                                tiles: canvasToLayerTiles(params.layer.canvas),
+                            },
+                        ];
+                    }
 
-        history?.pause(false);
-        history?.push({
-            tool: ['filter', 'pattern'],
-            action: 'apply',
-            params: [
-                {
-                    input: params.input,
-                },
-            ],
-        } as TFilterPatternHistoryEntry);
+                    return [layerItem.id, {}];
+                }),
+            );
+            klHistory.push({
+                layerMap,
+            });
+        }
         return true;
     },
 };

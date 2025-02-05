@@ -27,33 +27,38 @@ export type TRenderTextParam = {
     };
 };
 
+// accurately represents the bounds of the text, even it's fancy Zalgo text that tries to break layout
 function textMetricToRect(metrics: TextMetrics, align: TTextFormat): IRect {
-    // fallback for older browsers
-    const ascent = metrics.fontBoundingBoxAscent ?? metrics.actualBoundingBoxAscent;
-    const descent = metrics.fontBoundingBoxDescent ?? metrics.actualBoundingBoxDescent;
+    const ascent = metrics.actualBoundingBoxAscent;
+    const descent = metrics.actualBoundingBoxDescent;
+    const left = metrics.actualBoundingBoxLeft;
+    const right = metrics.actualBoundingBoxRight;
+
+    const width = right + left; // More accurate width calculation considering left/right bounds
+    const height = ascent + descent;
 
     if (align === 'left') {
         return {
-            x: 0,
+            x: -left,
             y: -ascent,
-            width: metrics.width,
-            height: ascent + descent,
+            width: width,
+            height,
         };
     }
     if (align === 'right') {
         return {
-            x: -metrics.width,
+            x: -width,
             y: -ascent,
-            width: metrics.width,
-            height: ascent + descent,
+            width: width,
+            height,
         };
     }
     // center
     return {
-        x: -metrics.width / 2,
+        x: -left,
         y: -ascent,
-        width: metrics.width,
-        height: ascent + descent,
+        width: width,
+        height,
     };
 }
 

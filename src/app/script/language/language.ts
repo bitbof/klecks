@@ -1,4 +1,5 @@
 import { english, languages, loadLanguage, TTranslationCode } from '../../languages/languages';
+import { LocalStorage } from '../bb/base/local-storage';
 
 export const LS_LANGUAGE_KEY = 'klecks-language';
 
@@ -84,7 +85,7 @@ export function getLanguage(useLocalStorage?: boolean): string {
 
     if (useLocalStorage) {
         try {
-            const item = localStorage.getItem(LS_LANGUAGE_KEY);
+            const item = LocalStorage.getItem(LS_LANGUAGE_KEY);
             if (item) {
                 langs.unshift(item);
             }

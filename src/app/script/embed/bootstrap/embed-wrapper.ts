@@ -149,6 +149,6 @@ export class EmbedWrapper {
         });
     }
 
-    getPNG: (() => Blob) | undefined = undefined;
+    getPNG: (() => Promise<Blob>) | undefined = undefined;
     getPSD: (() => Promise<Blob>) | undefined = undefined;
 }

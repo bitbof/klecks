@@ -15,7 +15,7 @@ import fontSilkscreen from 'url:./Silkscreen-Regular.woff2';
 import fontTehroc from 'url:./Tehroc-Regular.woff2';
 import fontYunga from 'url:./YUNGA-Display.woff2';
 
-export const fonts: {
+export const FONTS: {
     name: string;
     url: string;
 }[] = [

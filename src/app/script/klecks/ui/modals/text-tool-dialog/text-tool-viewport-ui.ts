@@ -326,8 +326,10 @@ export class TextToolViewportUI {
 
         // --- determine transformation of viewport ---
         // text should always be visible
-        bounds.width = Math.max(bounds.width, 1);
-        bounds.height = Math.max(bounds.height, 1);
+        bounds.x -= 3;
+        bounds.y -= 3;
+        bounds.width += 6;
+        bounds.height += 6;
         const rotatedXY = BB.rotate(bounds.x, bounds.y, (-angleRad / Math.PI) * 180);
         const rotatedWH = BB.rotate(bounds.width, bounds.height, (-angleRad / Math.PI) * 180);
         const centerX = this.text.x + rotatedXY.x + rotatedWH.x / 2 + transformedOffset.x;

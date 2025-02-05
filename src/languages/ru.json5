@@ -68,11 +68,16 @@
   },
   'tool-select': {
     original: 'Select Tool',
-    value: ''
+    value: 'Инструмент «Выделение»'
   },
   'tool-zoom': {
     original: 'Zoom',
     value: 'Приблизить/отдалить'
+  },
+  'tool-more-tools': {
+    hint: 'when hovering the caret on the tool button',
+    original: 'More Tools',
+    value: 'Другие инструменты'
   },
   undo: {
     original: 'Undo',
@@ -269,6 +274,11 @@
     original: 'Merge with layer below',
     value: 'Объединить со слоём ниже'
   },
+  'layers-clear': {
+    hint: 'to make a layer empty',
+    original: 'Clear layer',
+    value: 'Очистить слой'
+  },
   'layers-merge-all': {
     original: 'Merge all',
     value: 'Объединить все'
@@ -362,12 +372,12 @@
   'layers-rename-name': {
     hint: 'noun',
     original: 'Name',
-    value: 'Имя'
+    value: 'Название'
   },
   'layers-rename-clear': {
     hint: 'aka action of deleting entered name',
     original: 'Clear Name',
-    value: 'Очистить имя'
+    value: 'Сбросить название'
   },
   'layers-rename-sketch': {
     hint: 'noun. Name suggestion for a layer',
@@ -406,7 +416,7 @@
   'layers-merge-description': {
     hint: 'After ":" a list of mix/blend modes is shown.',
     original: 'Merges the selected layer with the one underneath. Select the mix mode:',
-    value: 'Объединяет выбранный слой с тем, который находится под ним. Выберите режим смешивания:'
+    value: 'Объединяет выделенный слой с тем, который находится под ним. Выберите режим смешивания:'
   },
   'file-no-autosave': {
     hint: "let user know they can't autosave, and there's no cloud storage. Keep short so fits on one line",
@@ -432,6 +442,11 @@
     original: 'File Format',
     value: 'Формат файла'
   },
+  'file-show-save-dialog': {
+    hint: 'setting for showing/not showing a dialog where user picks folder and filename',
+    original: 'Show save dialog',
+    value: ''
+  },
   'file-copy': {
     hint: 'verb',
     original: 'Copy',
@@ -440,6 +455,10 @@
   'file-copy-title': {
     original: 'Copy To Clipboard',
     value: 'Скопировать в буфер обмена'
+  },
+  'file-paste': {
+    original: 'Paste',
+    value: ''
   },
   'file-share': {
     hint: 'Common feature on phones. Pressing share button allows to send data to a different app, e.g. as a text message to someone.',
@@ -479,6 +498,10 @@
   'file-storage-clear': {
     original: 'Clear',
     value: 'Очистить'
+  },
+  'file-storage-clear-prompt': {
+    original: 'Clear Browser Storage?',
+    value: 'Очистить хранилище браузера?'
   },
   'file-storage-storing': {
     hint: 'while it is in the process of storing',
@@ -548,20 +571,20 @@
   'cleared-layer': {
     hint: 'the layer has been cleared. It is now empty',
     original: 'Cleared layer',
-    value: 'Очищенный слой'
+    value: 'Слой очищен'
   },
   'cleared-selected-area': {
     original: 'Cleared selected area',
-    value: ''
+    value: 'Очищена выделенная область'
   },
   filled: {
     hint: 'layer got filled with a color',
     original: 'Filled',
-    value: 'Заполненный'
+    value: 'Залито'
   },
   'filled-selected-area': {
     original: 'Filled selection',
-    value: ''
+    value: 'Залито выделенное'
   },
   'new-title': {
     original: 'New Image',
@@ -665,7 +688,7 @@
   },
   'upload-delete': {
     original: 'To delete your image from Imgur visit:',
-    value: 'Чтобы удалить своё изображение с Imgur, посетите сайт:'
+    value: 'Чтобы удалить своё изображение с Imgur, зайдите на:'
   },
   'cropcopy-title-copy': {
     original: 'Copy To Clipboard',
@@ -762,7 +785,7 @@
   'filter-unsharp-mask': {
     hint: 'or just sharpen, https://en.wikipedia.org/wiki/Unsharp_masking',
     original: 'Unsharp Mask',
-    value: 'Нерезкая маска'
+    value: 'Контурная резкость'
   },
   'filter-crop-title': {
     hint: 'same as the button, but can be longer',
@@ -798,7 +821,7 @@
   'filter-crop-fill': {
     hint: 'If image gets extended, what color to fill that new area with',
     original: 'Fill',
-    value: 'Заполнение'
+    value: 'Заливка'
   },
   'filter-flip-title': {
     hint: 'same as the button, but can be longer',
@@ -832,7 +855,7 @@
   },
   'filter-perspective-description': {
     original: 'Transforms the selected layer.',
-    value: 'Трансформирование выбранного слоя.'
+    value: 'Трансформирование выделенного слоя.'
   },
   'filter-resize-title': {
     hint: 'same as the button, but can be longer',
@@ -865,7 +888,7 @@
   'filter-transform-description': {
     hint: 'as in the Shift key.',
     original: 'Transforms selected layer. Hold Shift for additional behavior.',
-    value: 'Трансформация выбранного слоя. Удерживайте Shift для дополнительного поведения.'
+    value: 'Трансформация выделенного слоя. Удерживайте Shift для дополнительного поведения.'
   },
   'filter-transform-rotation': {
     hint: 'or Angle',
@@ -903,7 +926,7 @@
   },
   'filter-bright-contrast-description': {
     original: 'Change brightness and contrast for the selected layer.',
-    value: 'Изменение яркости и контрастности для выбранного слоя.'
+    value: 'Изменение яркости и контрастности для выделенного слоя.'
   },
   'filter-bright-contrast-brightness': {
     original: 'Brightness',
@@ -920,7 +943,7 @@
   },
   'filter-curves-description': {
     original: 'Apply curves on the selected layer.',
-    value: 'Применение кривые к выбранному слою.'
+    value: 'Применение кривых к выделенному слою.'
   },
   'filter-curves-all': {
     original: 'All',
@@ -933,7 +956,7 @@
   },
   'filter-hue-sat-description': {
     original: 'Change hue and saturation for the selected layer.',
-    value: 'Изменение оттенка и насыщенность для выбранного слоя.'
+    value: 'Изменение оттенка и насыщенности для выделенного слоя.'
   },
   'filter-hue-sat-hue': {
     original: 'Hue',
@@ -946,7 +969,7 @@
   'filter-applied': {
     hint: 'used like this: „Invert“ applied. Informs that a filter was applied',
     original: 'applied',
-    value: '- применено'
+    value: ': применено'
   },
   'filter-tilt-shift-title': {
     hint: 'same as the button, but can be longer',
@@ -955,7 +978,7 @@
   },
   'filter-tilt-shift-description': {
     original: 'Applies tilt shift on the selected layer.',
-    value: 'Применение глубины резкости к выбранному слою.'
+    value: 'Применение глубины резкости к выделенному слою.'
   },
   'filter-tilt-shift-blur': {
     hint: 'words can be individually translated',
@@ -975,7 +998,7 @@
   'filter-to-alpha-description': {
     hint: 'after ":" follow two options',
     original: 'Generates alpha channel for selected layer from:',
-    value: 'Создание альфа-канала для выбранного слоя:'
+    value: 'Создание альфа-канала для выделенного слоя:'
   },
   'filter-to-alpha-inverted-lum': {
     hint: 'luminance is same as the layer blend mode "luminosity"',
@@ -998,16 +1021,16 @@
   },
   'filter-triangle-blur-description': {
     original: 'Applies triangle blur on the selected layer.',
-    value: 'Применение треугольного размытия к выбранному слою.'
+    value: 'Применение треугольного размытия к выделенному слою.'
   },
   'filter-unsharp-mask-title': {
     hint: 'same as the button, but can be longer',
     original: 'Unsharp Mask',
-    value: 'Нерезкая маска'
+    value: 'Контурная резкость'
   },
   'filter-unsharp-mask-description': {
     original: 'Sharpens the selected layer by scaling pixels away from the average of their neighbors.',
-    value: 'Повышение резкости выбранного слоя, масштабируя пиксели от среднего значения их соседей.'
+    value: 'Повышение резкости выделенного слоя, масштабируя пиксели от среднего значения их соседей.'
   },
   'filter-unsharp-mask-strength': {
     original: 'Strength',
@@ -1019,7 +1042,7 @@
   },
   'filter-grid-description': {
     original: 'Draws grid on selected layer.',
-    value: 'Отображение сетки на выбранном слое.'
+    value: 'Отображение сетки на выделенном слое.'
   },
   'filter-noise': {
     original: 'Noise',
@@ -1027,7 +1050,7 @@
   },
   'filter-noise-description': {
     original: 'Adds noise to selected layer.',
-    value: 'Добавление шума к выбранному слою.'
+    value: 'Добавление шума к выделенному слою.'
   },
   'filter-noise-scale': {
     original: 'Scale',
@@ -1043,7 +1066,7 @@
   },
   'filter-pattern-description': {
     original: 'Generates pattern on selected layer. Drag the preview for further controls.',
-    value: 'Создание шаблона на выбранном слое. Перетащите предпросмотр для дополнительных элементов управления.'
+    value: 'Создание шаблона на выделенном слое. Перетащите предпросмотр для дополнительных элементов управления.'
   },
   'filter-distort': {
     original: 'Distort',
@@ -1051,7 +1074,7 @@
   },
   'filter-distort-description': {
     original: 'Distorts the selected layer.',
-    value: 'Искажение выбранного слоя.'
+    value: 'Искажение выделенного слоя.'
   },
   'filter-distort-phase': {
     original: 'Phase',
@@ -1075,12 +1098,25 @@
   },
   'filter-vanish-point-description': {
     original: 'Adds vanishing point to selected layer. Drag preview to move.',
-    value: 'Добавление исправления перспективы к выбранному слою. Перетащите предпросмотр, чтобы переместить.'
+    value: 'Добавление исправления перспективы к выделенному слою. Перетащите предпросмотр, чтобы переместить.'
   },
   'filter-vanish-point-lines': {
     hint: 'As in: the number of lines',
     original: 'Lines',
     value: 'Линии'
+  },
+  'dropper-drop': {
+    hint: 'as in, drag and drop a file',
+    original: 'Drop to import',
+    value: 'Отпустите для добавления'
+  },
+  'dropper-as-image': {
+    original: 'As New Image',
+    value: 'Нового изображения'
+  },
+  'dropper-as-layer': {
+    original: 'As Layer',
+    value: 'Слоя'
   },
   'import-opening': {
     hint: 'in the process of opening a large file',
@@ -1131,7 +1167,7 @@
   'import-unsupported-file': {
     hint: 'e.g. user tried to open a WAV',
     original: 'Unsupported file type. See Help for supported types.',
-    value: 'Неподдерживаемый тип файла. Поддерживаемые типы см. во вкладке «Помощь».'
+    value: 'Неподдерживаемый тип файла. Поддерживаемые типы см. во вкладке «Справка».'
   },
   'import-broken-file': {
     hint: 'if an image file is broken',
@@ -1156,6 +1192,14 @@
     original: 'Image size',
     value: 'Размер изображения'
   },
+  'clipboard-read-fail': {
+    original: 'Failed to read from clipboard.',
+    value: ''
+  },
+  'clipboard-no-image': {
+    original: 'No image found in clipboard.',
+    value: ''
+  },
   'hand-reset': {
     hint: 'resets zoom (to 100%) and rotation (to 0°)',
     original: 'Reset',
@@ -1169,7 +1213,7 @@
   'hand-inertia-scrolling': {
     hint: 'Canvas will continue to move even after releasing pointer.',
     original: 'Inertia Scrolling',
-    value: ''
+    value: 'Перемещение по холсту с инерцией'
   },
   'bucket-tolerance': {
     hint: 'a common feature for paint bucket',
@@ -1207,7 +1251,7 @@
   },
   'bucket-grow-title': {
     original: 'Grow filled area (in pixels)',
-    value: 'Расширить заполненную область (в пикселях)'
+    value: 'Расширить залитую область (в пикселях)'
   },
   'bucket-contiguous': {
     hint: 'common setting for paint bucket in image editing software',
@@ -1217,7 +1261,7 @@
   'bucket-contiguous-title': {
     hint: 'tooltip explaining Contiguous',
     original: 'Only fill connected areas',
-    value: 'Заполнить только соединённые области'
+    value: 'Залить только соединённые области'
   },
   'gradient-linear': {
     original: 'Linear',
@@ -1237,7 +1281,7 @@
   },
   'shape-fill': {
     original: 'Fill',
-    value: 'Заполнение'
+    value: 'Заливка'
   },
   'shape-rect': {
     hint: 'rectangle shape',
@@ -1327,71 +1371,71 @@
   },
   'select-select': {
     original: 'Select',
-    value: ''
+    value: 'Выделение'
   },
   'select-transform': {
     original: 'Transform',
-    value: ''
+    value: 'Трансформация'
   },
   'select-lasso': {
     original: 'Lasso',
-    value: ''
+    value: 'Лассо'
   },
   'select-polygon': {
     original: 'Polygon',
-    value: ''
+    value: 'Многоугольник'
   },
   'select-boolean-replace': {
     original: 'Replace',
-    value: ''
+    value: 'Замена'
   },
   'select-boolean-add': {
     original: 'Add',
-    value: ''
+    value: 'Добавление'
   },
   'select-boolean-subtract': {
     original: 'Subtract',
-    value: ''
+    value: 'Вычитание'
   },
   'select-all': {
     original: 'All',
-    value: ''
+    value: 'Всё'
   },
   'select-invert': {
     original: 'Invert',
-    value: ''
+    value: 'Инвертировать'
   },
   'select-reset': {
     original: 'Reset',
-    value: ''
+    value: 'Сброс'
   },
   'select-fill': {
     original: 'Fill',
-    value: ''
+    value: 'Залить'
   },
   'select-erase': {
     original: 'Erase',
-    value: ''
+    value: 'Стереть'
   },
   'select-transform-clone': {
     original: 'Clone',
-    value: ''
+    value: 'Клонировать'
   },
   'select-transform-clone-applied': {
     original: 'Cloned',
-    value: ''
+    value: 'Клонировано'
   },
   'select-transform-move-to-layer': {
     original: 'Move to layer:',
-    value: ''
+    value: 'Переместить в слой:'
   },
   'select-transform-applied': {
     original: 'Transformation applied',
-    value: ''
+    value: 'Трансформация применена'
   },
   'select-transform-empty': {
     original: 'Selected area on active layer is empty.',
-    value: ''
+    value: 'Выделенная область на активном слое пуста.'
   },
   'save-reminder-title': {
     hint: 'Save Reminder is a popup that shows up after 20 minutes of not saving. Allows user to save on the spot.',
@@ -1452,7 +1496,7 @@
   help: {
     hint: 'or user manual',
     original: 'Help',
-    value: 'Помощь'
+    value: 'Справка'
   },
   'tab-settings': {
     original: 'Settings',
@@ -1646,14 +1690,14 @@
   },
   wip: {
     original: 'Work in progress',
-    value: ''
+    value: 'В разработке'
   },
   'browser-zoom-help': {
     original: 'Double-tap or pinch-out to reset browser zoom.',
-    value: ''
+    value: 'Двойное нажатие или уменьшение масштаба позволяет сбросить масштаб браузера.'
   },
   dismiss: {
     original: 'Dismiss',
-    value: ''
+    value: 'Убрать'
   }
 }

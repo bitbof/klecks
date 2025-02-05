@@ -52,7 +52,7 @@ export class CornerPanning {
     }
 
     getSpeed(thresholdDelta: number): number {
-        return Math.min(thresholdDelta, this.thresholdPx) * (3 / 5);
+        return Math.min(thresholdDelta, this.thresholdPx) * (2 / 5);
     }
 
     // ----------------- public ------------------

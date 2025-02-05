@@ -22,7 +22,7 @@ import { TVec4 } from '../../../bb/math/matrix';
 import { klConfig } from '../../kl-config';
 import { minimizeAngleDeg, snapAngleDeg } from '../../../bb/math/math';
 import {
-    defaultDoubleTapPointerTypes,
+    DEFAULT_DOUBLE_TAP_POINTER_TYPES,
     EASEL_MAX_SCALE,
     EASEL_MIN_SCALE,
     TEMP_TRIGGERS,
@@ -43,6 +43,7 @@ export type TEaselParams<GToolId extends string> = {
     project: TEaselProject;
     tools: Record<GToolId, TEaselTool>;
     tool: NoInfer<GToolId>;
+    onChangeTool: (toolId: NoInfer<GToolId>) => void;
     onTransformChange: (transform: TViewportTransform, scaleOrAngleChanged: boolean) => void; // whenever Viewport changes
     onUndo?: () => void; // gesture triggers undo
     onRedo?: () => void; // gesture triggers redo
@@ -66,6 +67,7 @@ export class Easel<GToolId extends string> {
     private readonly toolsMap: TEaselParams<GToolId>['tools'];
     // temp tool is tool that is active during holding a key or mouse button (e.g. hold space -> hand tool)
     private readonly tempTools: Record<TEaselToolTrigger, GToolId | undefined>;
+    private readonly onChangeTool: TEaselParams<GToolId>['onChangeTool'];
     private readonly onTransformChange: (
         transform: TViewportTransform,
         scaleOrAngleChanged: boolean,
@@ -127,7 +129,7 @@ export class Easel<GToolId extends string> {
     private updateDoubleTapPointerTypes(): void {
         const pointerTypes =
             this.toolsMap[this.tempTool ?? this.tool].doubleTapPointerTypes ??
-            defaultDoubleTapPointerTypes;
+            DEFAULT_DOUBLE_TAP_POINTER_TYPES;
         this.pointerPreprocessor.setDoubleTapPointerTypes(pointerTypes);
     }
 
@@ -321,6 +323,7 @@ export class Easel<GToolId extends string> {
         this.height = p.height;
         this.tool = p.tool;
         this.toolsMap = { ...p.tools };
+        this.onChangeTool = p.onChangeTool;
         this.onTransformChange = p.onTransformChange;
         this.onUndo = p.onUndo;
         this.onRedo = p.onRedo;
@@ -747,6 +750,7 @@ export class Easel<GToolId extends string> {
         }
         this.tool = toolId;
         this.toolsMap[this.tool].activate?.(this.cursorPos);
+        this.onChangeTool(toolId);
         this.updateToolSvgs();
         this.updateDoubleTapPointerTypes();
         this.requestRender();

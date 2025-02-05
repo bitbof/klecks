@@ -1,6 +1,6 @@
 import { IBounds, IKeyString, IRect } from '../bb-types';
 import { createCanvas } from './create-canvas';
-import { copyObj } from './base';
+import { asyncLoadImage, base64ToBlob, copyObj } from './base';
 
 export function copyCanvas(canvas: HTMLCanvasElement): HTMLCanvasElement {
     const resultCanvas = createCanvas(canvas.width, canvas.height);
@@ -21,6 +21,14 @@ export function ctx(
         throw new Error("couldn't get 2d context");
     }
     return ctx;
+}
+
+export async function loadToCanvas(path: string): Promise<HTMLCanvasElement> {
+    const im = await asyncLoadImage(path);
+    const canvas = createCanvas(im.width, im.height);
+    const ctx = canvas.getContext('2d')!;
+    ctx.drawImage(im, 0, 0);
+    return canvas;
 }
 
 /**
@@ -192,9 +200,6 @@ export const createCheckerCanvas = function (size: number, isDark?: boolean): HT
         }
         ctx.fillStyle = 'rgb(128, 128, 128)';
         ctx.fillRect(0, 0, 1, 1);
-    } else if (size > 200) {
-        canvas.width = 401;
-        canvas.height = 401;
     } else {
         canvas.width = size * 2;
         canvas.height = size * 2;
@@ -472,4 +477,25 @@ export function canvasBounds(
         width: tempBounds.x2! - tempBounds.x1 + 1,
         height: tempBounds.y2! - tempBounds.y1 + 1,
     };
+}
+
+export function htmlCanvasToBlobAsync(canvas: HTMLCanvasElement, mimeType: string): Promise<Blob> {
+    return new Promise<Blob>((resolve, reject) => {
+        canvas.toBlob((blob) => {
+            if (blob) {
+                resolve(blob);
+            } else {
+                reject(new Error('Failed to create blob from canvas.'));
+            }
+        }, mimeType);
+    });
+}
+
+export async function canvasToBlob(canvas: HTMLCanvasElement, mimeType: string): Promise<Blob> {
+    if ('toBlob' in HTMLCanvasElement.prototype) {
+        return await htmlCanvasToBlobAsync(canvas, mimeType);
+    } else {
+        // assume base64
+        return base64ToBlob(canvas.toDataURL(mimeType));
+    }
 }

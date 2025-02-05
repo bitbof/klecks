@@ -32,7 +32,7 @@ export class EaselProjectUpdater<T extends string> {
             height,
             layers: this.klCanvas.getLayersFast().map((layer) => {
                 return {
-                    image: layer.canvas.compositeObj
+                    image: layer.compositeObj
                         ? () => {
                               if (
                                   this.compositeCanvas.width != width ||
@@ -44,7 +44,7 @@ export class EaselProjectUpdater<T extends string> {
                               const ctx = this.compositeCanvas.getContext('2d')!;
                               ctx.clearRect(0, 0, width, height);
                               ctx.drawImage(layer.canvas, 0, 0);
-                              layer.canvas.compositeObj?.draw(
+                              layer.compositeObj?.draw(
                                   throwIfNull(this.compositeCanvas.getContext('2d')),
                               );
                               return this.compositeCanvas;

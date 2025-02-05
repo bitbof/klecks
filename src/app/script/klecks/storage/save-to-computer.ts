@@ -6,29 +6,19 @@ import { SaveReminder } from '../ui/components/save-reminder';
 import { saveAs } from '../../bb/base/save-as';
 import { Psd } from 'ag-psd/dist/psd';
 import { klConfig } from '../kl-config';
+import { canvasToBlob } from '../../bb/base/canvas';
 
 export class SaveToComputer {
-    /**
-     * Using old code, because saving somehow doesn't work for ipad before ios 13,
-     * and it doesn't even throw an exception.
-     */
-    private saveImage(canvas: HTMLCanvasElement, filename: string, mimeType: string): void {
-        const parts = canvas.toDataURL(mimeType).match(/data:([^;]*)(;base64)?,([0-9A-Za-z+/]+)/);
+    private showSaveDialog: boolean = true;
 
-        if (!parts) {
-            throw new Error('saveImage: empty parts');
-        }
-
-        //assume base64 encoding
-        const binStr = atob(parts[3]);
-        //convert to binary in ArrayBuffer
-        const buf = new ArrayBuffer(binStr.length);
-        const view = new Uint8Array(buf);
-        for (let i = 0; i < view.length; i++) {
-            view[i] = binStr.charCodeAt(i);
-        }
-        const blob = new Blob([view], { type: parts[1] });
-        saveAs(blob, filename);
+    private async saveImage(
+        canvas: HTMLCanvasElement,
+        filename: string,
+        mimeType: string,
+        showDialog: boolean = false,
+    ): Promise<void> {
+        const blob = await canvasToBlob(canvas, mimeType);
+        saveAs(blob, filename, showDialog);
     }
 
     constructor(
@@ -37,7 +27,7 @@ export class SaveToComputer {
         private klCanvas: KlCanvas,
     ) {}
 
-    save(format?: 'psd' | 'layers' | 'png'): void {
+    async save(format?: 'psd' | 'layers' | 'png'): Promise<void> {
         this.saveReminder.reset();
 
         if (!format) {
@@ -50,7 +40,7 @@ export class SaveToComputer {
             const filename = BB.getDate() + klConfig.filenameBase + '.' + extension;
             const fullCanvas = this.klCanvas.getCompleteCanvas(1);
             try {
-                this.saveImage(fullCanvas, filename, mimeType);
+                await this.saveImage(fullCanvas, filename, mimeType, this.showSaveDialog);
             } catch (error) {
                 //fallback for old browsers
                 alert('could not save');
@@ -72,7 +62,7 @@ export class SaveToComputer {
                     '.',
                     extension,
                 ];
-                this.saveImage(item.canvas, fnameArr.join(''), mimeType);
+                await this.saveImage(item.canvas, fnameArr.join(''), mimeType);
             }
         } else if (format === 'psd') {
             const layerArr = this.klCanvas.getLayersFast();
@@ -100,13 +90,22 @@ export class SaveToComputer {
                 .then((agPsdLazy) => {
                     const buffer = agPsdLazy.writePsdBuffer(psdConfig);
                     const blob = new Blob([buffer], {
-                        type: 'application/octet-stream',
+                        type: 'image/vnd.adobe.photoshop',
                     });
-                    saveAs(blob, BB.getDate() + klConfig.filenameBase + '.psd');
+                    saveAs(
+                        blob,
+                        BB.getDate() + klConfig.filenameBase + '.psd',
+                        this.showSaveDialog,
+                        'psd',
+                    );
                 })
                 .catch(() => {
                     alert('Error: failed to load PSD library');
                 });
         }
+    }
+
+    setShowSaveDialog(b: boolean) {
+        this.showSaveDialog = b;
     }
 }

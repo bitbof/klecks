@@ -655,6 +655,11 @@
     "iso-639-1": "pt"
   },
   {
+    "name-english": "Portuguese (Brazil)",
+    "name": "Português Brasil",
+    "iso-639-1": "pt-BR"
+  },
+  {
     "name-english": "Quechua",
     "name": "Runa Simi, Kichwa",
     "iso-639-1": "qu"

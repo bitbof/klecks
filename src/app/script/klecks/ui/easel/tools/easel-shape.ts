@@ -48,9 +48,9 @@ export class EaselShape implements TEaselTool {
     }
 
     onPointer(e: IPointerEvent, isRepeat?: boolean): void {
-        if (!isRepeat) {
+        /*if (!isRepeat) {
             this.cornerPanning.onPointer(e);
-        }
+        }*/
 
         this.easel.setCursor('crosshair');
         const vTransform = this.easel.getTransform();

@@ -12,7 +12,7 @@ import { ImageToggle } from '../../components/image-toggle';
 import { Select } from '../../components/select';
 import { c } from '../../../../bb/base/c';
 import { PointerListener } from '../../../../bb/input/pointer-listener';
-import { fonts } from '../../../../../fonts/fonts';
+import { FONTS } from '../../../../../fonts/fonts';
 
 type TFontParams = Pick<
     TRenderTextParam,
@@ -32,7 +32,7 @@ const importedFonts: {
     { fontFamily: 'monospace', fontName: 'Monospace' },
     { fontFamily: 'cursive', fontName: 'Cursive' },
     { fontFamily: 'fantasy', fontName: 'Fantasy' },
-    ...fonts.map((item) => {
+    ...FONTS.map((item) => {
         return {
             fontFamily: item.name,
             fontName: item.name,
@@ -46,18 +46,14 @@ async function loadBundledFonts(): Promise<void> {
         return;
     }
     didLoadBundledFonts = true;
-    const promises: Promise<void>[] = [];
-    for (let i = 0; i < fonts.length; i++) {
-        promises.push(
-            (async () => {
-                const item = fonts[i];
-                const response = await fetch(item.url);
-                const buffer = await response.arrayBuffer();
-                const font = new FontFace(item.name, buffer);
-                document.fonts.add(font);
-            })(),
-        );
-    }
+    const promises = FONTS.map(async (item) => {
+        const response = await fetch(item.url);
+        const buffer = await response.arrayBuffer();
+        const font = new FontFace(item.name, buffer);
+        // await font.load();
+        document.fonts.add(font);
+    });
+
     await Promise.all(promises);
 }
 

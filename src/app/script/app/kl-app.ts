@@ -1,24 +1,21 @@
 import { KL } from '../klecks/kl';
-import { KlHistory, TMiscFocusLayerHistoryEntry } from '../klecks/history/kl-history';
 import { BB } from '../bb/bb';
 import { showIframeModal } from '../klecks/ui/modals/show-iframe-modal';
 import { EmbedToolspaceTopRow } from '../embed/embed-toolspace-top-row';
 import {
     IGradient,
-    TOldestProjectState,
     IKlProject,
     IRGB,
     TDrawEvent,
     TExportType,
-    TKlCanvasLayer,
     TUiLayout,
+    TBrushUiInstance,
 } from '../klecks/kl-types';
 import { importFilters } from '../klecks/filters/filters-lazy';
-import { base64ToBlob } from '../klecks/storage/base-64-to-blob';
 import { klCanvasToPsdBlob } from '../klecks/storage/kl-canvas-to-psd-blob';
 import { ProjectStore } from '../klecks/storage/project-store';
 import { SaveReminder } from '../klecks/ui/components/save-reminder';
-import { KlCanvas } from '../klecks/canvas/kl-canvas';
+import { KlCanvas, TKlCanvasLayer } from '../klecks/canvas/kl-canvas';
 import { LANG } from '../language/language';
 import { LocalStorage } from '../bb/base/local-storage';
 import { LineSmoothing } from '../klecks/events/line-smoothing';
@@ -29,7 +26,6 @@ import { KlColorSlider } from '../klecks/ui/components/kl-color-slider';
 import { ToolspaceToolRow } from '../klecks/ui/components/toolspace-tool-row';
 import { StatusOverlay } from '../klecks/ui/components/status-overlay';
 import { SaveToComputer } from '../klecks/storage/save-to-computer';
-import { ToolspaceCollapser } from '../klecks/ui/components/toolspace-collapser';
 import { ToolspaceScroller } from '../klecks/ui/components/toolspace-scroller';
 import { translateSmoothing } from '../klecks/utils/translate-smoothing';
 import { KlAppImportHandler } from './kl-app-import-handler';
@@ -46,7 +42,6 @@ import { LayersUi } from '../klecks/ui/tool-tabs/layers-ui/layers-ui';
 import { IVector2D } from '../bb/bb-types';
 import { createConsoleApi } from './console-api';
 import { ERASE_COLOR } from '../klecks/brushes/erase-color';
-import { throwIfNull } from '../bb/base/base';
 import { klConfig } from '../klecks/kl-config';
 import { TRenderTextParam } from '../klecks/image-operations/render-text';
 import { Easel } from '../klecks/ui/easel/easel';
@@ -63,9 +58,16 @@ import { EaselRotate } from '../klecks/ui/easel/tools/easel-rotate';
 import { EaselZoom } from '../klecks/ui/easel/tools/easel-zoom';
 import { KlAppSelect } from './kl-app-select';
 import { KlTempHistory } from '../klecks/history/kl-temp-history';
-import { KlHistoryExecutor } from '../klecks/history/kl-history-executor';
 import { PinchZoomWatcher } from '../klecks/ui/components/pinch-zoom-watcher';
 import { EASEL_MAX_SCALE, EASEL_MIN_SCALE } from '../klecks/ui/easel/easel.config';
+import { THistoryEntryDataComposed } from '../klecks/history/history.types';
+import { KlHistoryExecutor, THistoryExecutionType } from '../klecks/history/kl-history-executor';
+import { KlHistory } from '../klecks/history/kl-history';
+import { canvasToLayerTiles } from '../klecks/history/push-helpers/canvas-to-layer-tiles';
+import { isHistoryEntryActiveLayerChange } from '../klecks/history/push-helpers/is-history-entry-active-layer-change';
+import { MobileUi } from '../klecks/ui/mobile/mobile-ui';
+import { MobileBrushUi } from '../klecks/ui/mobile/mobile-brush-ui';
+import { canvasToBlob } from '../bb/base/canvas';
 
 importFilters();
 
@@ -116,7 +118,8 @@ export class KlApp {
     private readonly easelProjectUpdater: EaselProjectUpdater<TKlAppToolId>;
     private readonly easelBrush: EaselBrush;
     private readonly collapseThreshold: number = 820;
-    private readonly toolspaceCollapser: ToolspaceCollapser;
+    private readonly mobileUi: MobileUi;
+    private readonly mobileBrushUi: MobileBrushUi;
     private readonly toolspace: HTMLElement;
     private readonly toolspaceInner: HTMLElement;
     private readonly toolWidth: number = 271;
@@ -126,25 +129,15 @@ export class KlApp {
     private readonly bottomBarWrapper: HTMLElement;
 
     private updateCollapse(): void {
-        //collapser
+        this.mobileUi.setOrientation(this.uiState);
         if (this.uiWidth < this.collapseThreshold) {
-            this.toolspaceCollapser.getElement().style.display = 'block';
-
-            this.toolspaceCollapser.setDirection(this.uiState);
-            if (this.toolspaceCollapser.isOpen()) {
+            this.mobileUi.setIsVisible(true);
+            if (this.mobileUi.getToolspaceIsOpen()) {
                 if (this.uiState === 'left') {
-                    BB.css(this.toolspaceCollapser.getElement(), {
-                        left: '271px',
-                        right: '',
-                    });
                     BB.css(this.easel.getElement(), {
                         left: '271px',
                     });
                 } else {
-                    BB.css(this.toolspaceCollapser.getElement(), {
-                        left: '',
-                        right: '271px',
-                    });
                     BB.css(this.easel.getElement(), {
                         left: '0',
                     });
@@ -154,18 +147,10 @@ export class KlApp {
                 this.statusOverlay.setWide(false);
             } else {
                 if (this.uiState === 'left') {
-                    BB.css(this.toolspaceCollapser.getElement(), {
-                        left: '0',
-                        right: '',
-                    });
                     BB.css(this.easel.getElement(), {
                         left: '0',
                     });
                 } else {
-                    BB.css(this.toolspaceCollapser.getElement(), {
-                        left: '',
-                        right: '0',
-                    });
                     BB.css(this.easel.getElement(), {
                         left: '0',
                     });
@@ -175,7 +160,7 @@ export class KlApp {
                 this.statusOverlay.setWide(true);
             }
         } else {
-            this.toolspaceCollapser.getElement().style.display = 'none';
+            this.mobileUi.setIsVisible(false);
             if (this.uiState === 'left') {
                 BB.css(this.easel.getElement(), {
                     left: '271px',
@@ -185,6 +170,7 @@ export class KlApp {
             this.easel.setSize(Math.max(0, this.uiWidth - this.toolWidth), this.uiHeight);
             this.statusOverlay.setWide(false);
         }
+        this.mobileUi.update();
     }
 
     private updateBottomBar(): void {
@@ -276,10 +262,7 @@ export class KlApp {
                   },
             this.embed ? -1 : 0,
         );
-        const klHistory = new KlHistory();
-        this.klCanvas.setHistory(klHistory);
         const tempHistory = new KlTempHistory();
-        let oldestProjectState: TOldestProjectState;
         let mainTabRow: TabRow | undefined = undefined;
 
         if (!p.saveReminder) {
@@ -297,42 +280,72 @@ export class KlApp {
             p.project = undefined;
         } else {
             // init blank project
-            klHistory.pause(true);
             this.klCanvas.addLayer();
             this.klCanvas.layerFill(0, {
                 r: ERASE_COLOR,
                 g: ERASE_COLOR,
                 b: ERASE_COLOR,
             });
-            klHistory.pause(false);
         }
-        try {
-            oldestProjectState = {
-                canvas: new KL.KlCanvas({ copy: this.klCanvas }, this.embed ? -1 : 0),
-                focus: this.klCanvas.getLayerCount() - 1,
-                brushes: {},
-            };
-        } catch (e) {
-            if ((e as Error).message === 'kl-create-canvas-error') {
-                this.klCanvas.destroy();
-            }
-            throw e;
-        }
-        Object.entries(KL.brushes).forEach(([b, Brush]) => {
-            oldestProjectState.brushes[b] = new Brush();
-            if (oldestProjectState.canvas) {
-                oldestProjectState.brushes[b].setContext(
-                    oldestProjectState.canvas.getLayerContext(oldestProjectState.focus),
+
+        const klHistory = new KlHistory({
+            oldest: (() => {
+                let lastId: string = '';
+                const layerMap = Object.fromEntries(
+                    this.klCanvas.getLayers().map((layer, index) => {
+                        lastId = layer.id;
+                        return [
+                            layer.id,
+                            {
+                                name: layer.name,
+                                opacity: layer.opacity,
+                                isVisible: layer.isVisible,
+                                mixModeStr: layer.mixModeStr,
+                                index,
+                                tiles: canvasToLayerTiles(layer.context.canvas),
+                            },
+                        ];
+                    }),
                 );
-            }
+
+                const data: THistoryEntryDataComposed = {
+                    size: {
+                        width: this.klCanvas.getWidth(),
+                        height: this.klCanvas.getHeight(),
+                    },
+                    selection: {},
+                    activeLayerId: lastId,
+                    layerMap,
+                };
+
+                return data;
+            })(),
         });
+        this.klCanvas.setHistory(klHistory);
+
+        const clearLayer = (showStatus?: boolean) => {
+            applyUncommitted();
+            const layerIndex = currentLayer.index;
+            this.klCanvas.eraseLayer({
+                layerIndex,
+                useAlphaLock: layerIndex === 0 && !brushUiMap.eraserBrush.getIsTransparentBg(),
+                useSelection: true,
+            });
+            showStatus &&
+                this.statusOverlay.out(
+                    this.klCanvas.getSelection()
+                        ? LANG('cleared-selected-area')
+                        : LANG('cleared-layer'),
+                    true,
+                );
+        };
 
         let currentColor = new BB.RGB(0, 0, 0);
-        let currentBrushUi: any; // todo
+        let currentBrushUi: TBrushUiInstance<any>;
         let currentBrushId: string;
         let lastNonEraserBrushId: string;
-        let currentLayerCtx = throwIfNull(
-            this.klCanvas.getLayerContext(this.klCanvas.getLayerCount() - 1),
+        let currentLayer: TKlCanvasLayer = this.klCanvas.getLayer(
+            this.klCanvas.getLayerCount() - 1,
         );
 
         // when cycling through brushes you need to know the next non-eraser brush
@@ -398,7 +411,7 @@ export class KlApp {
                 this.easel.requestRender();
             }
             if (event.type === 'move') {
-                currentBrushUi.goLine(event.x, event.y, event.pressure, false, event.isCoalesced);
+                currentBrushUi.goLine(event.x, event.y, event.pressure, event.isCoalesced);
                 this.easelBrush.setLastDrawEvent({ x: event.x, y: event.y });
                 this.easel.requestRender();
             }
@@ -449,20 +462,60 @@ export class KlApp {
             return false;
         };
 
+        const propagateUndoRedoChanges = (
+            type: THistoryExecutionType,
+            composedBefore: THistoryEntryDataComposed,
+        ) => {
+            if (['undo', 'redo'].includes(type)) {
+                const composedAfter = klHistory.getComposed();
+
+                this.klCanvas.updateViaComposed(composedBefore!, composedAfter);
+
+                setCurrentLayer(
+                    this.klCanvas.getLayer(
+                        composedAfter.layerMap[composedAfter.activeLayerId].index,
+                    ),
+                );
+                this.easelProjectUpdater.update(); // triggers render
+
+                const dimensionChanged =
+                    composedBefore.size.width !== composedAfter.size.width ||
+                    composedBefore.size.height !== composedAfter.size.height;
+                if (dimensionChanged) {
+                    this.easel.resetOrFitTransform(true);
+                }
+                this.easelBrush.setLastDrawEvent();
+                this.layersUi.update(currentLayer.index);
+            }
+
+            klAppSelect.onHistory(type);
+        };
+
         const undo = (showMessage?: boolean) => {
             if (!tempHistory.canDecreaseIndex()) {
                 discardUncommitted();
             }
-            if (klHistoryExecutor.undo() && showMessage) {
+            const composedBefore = klHistory.getComposed();
+            const result = klHistoryExecutor.undo();
+            if (!result) {
+                // didn't do anything
+                return;
+            }
+            propagateUndoRedoChanges(result.type, composedBefore);
+            if (showMessage) {
                 this.statusOverlay.out(LANG('undo'), true);
             }
         };
 
         const redo = (showMessage?: boolean) => {
-            /*if (!tempHistory.canIncreaseIndex()) {
-                discardUncommitted();
-            }*/
-            if (klHistoryExecutor.redo() && showMessage) {
+            const composedBefore = klHistory.getComposed();
+            const result = klHistoryExecutor.redo();
+            if (!result) {
+                // didn't do anything
+                return;
+            }
+            propagateUndoRedoChanges(result.type, composedBefore);
+            if (showMessage) {
                 this.statusOverlay.out(LANG('redo'), true);
             }
         };
@@ -471,14 +524,14 @@ export class KlApp {
 
         const klAppSelect = new KlAppSelect({
             klCanvas: this.klCanvas,
-            getCurrentLayerCtx: () => currentLayerCtx,
+            getCurrentLayerCtx: () => currentLayer.context,
             onUpdateProject: () => this.easelProjectUpdater.update(),
-            klHistory,
+            klHistory: klHistory,
             tempHistory,
             statusOverlay: this.statusOverlay,
             onFill: () => {
                 this.klCanvas.layerFill(
-                    throwIfNull(this.klCanvas.getLayerIndex(currentLayerCtx.canvas)),
+                    currentLayer.index,
                     this.klColorSlider.getColor(),
                     undefined,
                     true,
@@ -489,7 +542,7 @@ export class KlApp {
                 );
             },
             onErase: () => {
-                const layerIndex = throwIfNull(this.klCanvas.getLayerIndex(currentLayerCtx.canvas));
+                const layerIndex = currentLayer.index;
                 this.klCanvas.eraseLayer({
                     layerIndex,
                     useAlphaLock: layerIndex === 0 && !brushUiMap.eraserBrush.getIsTransparentBg(),
@@ -583,11 +636,8 @@ export class KlApp {
                 }),
                 paintBucket: new EaselPaintBucket({
                     onFill: (p) => {
-                        const layerIndex = throwIfNull(
-                            this.klCanvas.getLayerIndex(currentLayerCtx.canvas),
-                        );
                         this.klCanvas.floodFill(
-                            layerIndex,
+                            currentLayer.index,
                             p.x,
                             p.y,
                             fillUi.getIsEraser() ? null : this.klColorSlider.getColor(),
@@ -619,9 +669,7 @@ export class KlApp {
 
                         KL.textToolDialog({
                             klCanvas: this.klCanvas,
-                            layerIndex: throwIfNull(
-                                this.klCanvas.getLayerIndex(currentLayerCtx.canvas),
-                            ),
+                            layerIndex: currentLayer.index,
                             primaryColor: this.klColorSlider.getColor(),
                             secondaryColor: this.klColorSlider.getSecondaryRGB(),
 
@@ -655,10 +703,7 @@ export class KlApp {
                                     ...val,
                                     text: '',
                                 };
-                                const layerIndex = throwIfNull(
-                                    this.klCanvas.getLayerIndex(currentLayerCtx.canvas),
-                                );
-                                this.klCanvas.text(layerIndex, val);
+                                this.klCanvas.text(currentLayer.index, val);
                             },
                         });
                     },
@@ -678,6 +723,9 @@ export class KlApp {
                 zoom: new EaselZoom({}),
             },
             tool: 'brush',
+            onChangeTool: (toolId) => {
+                this.mobileBrushUi.setIsVisible(toolId === 'brush');
+            },
             onTransformChange: (transform, isScaleOrAngleChanged) => {
                 handUi.update(transform.scale, transform.angleDeg);
                 this.toolspaceToolRow.setEnableZoomIn(transform.scale !== EASEL_MAX_SCALE);
@@ -829,7 +877,7 @@ export class KlApp {
                 if (comboStr === 'enter') {
                     if (!applyUncommitted()) {
                         this.klCanvas.layerFill(
-                            throwIfNull(this.klCanvas.getLayerIndex(currentLayerCtx.canvas)),
+                            currentLayer.index,
                             this.klColorSlider.getColor(),
                             undefined,
                             true,
@@ -837,7 +885,7 @@ export class KlApp {
                         this.statusOverlay.out(
                             this.klCanvas.getSelection()
                                 ? LANG('filled-selected-area')
-                                : LANG('filled'), // todo translation
+                                : LANG('filled'),
                             true,
                         );
                     }
@@ -848,22 +896,7 @@ export class KlApp {
                     }
                 }
                 if (['delete', 'backspace'].includes(comboStr)) {
-                    applyUncommitted();
-                    const layerIndex = throwIfNull(
-                        this.klCanvas.getLayerIndex(currentLayerCtx.canvas),
-                    );
-                    this.klCanvas.eraseLayer({
-                        layerIndex,
-                        useAlphaLock:
-                            layerIndex === 0 && !brushUiMap.eraserBrush.getIsTransparentBg(),
-                        useSelection: true,
-                    });
-                    this.statusOverlay.out(
-                        this.klCanvas.getSelection()
-                            ? LANG('cleared-selected-area')
-                            : LANG('cleared-layer'),
-                        true,
-                    );
+                    clearLayer(true);
                 }
                 if (comboStr === 'shift+e') {
                     event.preventDefault();
@@ -935,7 +968,7 @@ export class KlApp {
         // create brush UIs
         Object.entries(KL.brushesUI).forEach(([b, brushUi]) => {
             const ui = new (brushUi.Ui as any)({
-                history: klHistory,
+                klHistory: klHistory,
                 onSizeChange: sizeWatcher,
                 onScatterChange: (scatter: number) => {
                     brushSettingService.emitScatter(scatter);
@@ -976,10 +1009,20 @@ export class KlApp {
         };
         this.toolspace.onclick = BB.handleClick;
 
-        this.toolspaceCollapser = new KL.ToolspaceCollapser({
-            onChange: () => {
+        this.mobileBrushUi = new MobileBrushUi({
+            onBrush: () => {
+                brushTabRow.open(lastNonEraserBrushId);
+            },
+            onEraser: () => {
+                brushTabRow.open('eraserBrush');
+            },
+        });
+
+        this.mobileUi = new MobileUi({
+            onShowToolspace: (b) => {
                 this.updateCollapse();
             },
+            toolUis: [this.mobileBrushUi.getElement()],
         });
 
         this.updateCollapse();
@@ -999,7 +1042,7 @@ export class KlApp {
             this.easel.getElement(),
             // this.klCanvasWorkspace.getElement(),
             this.toolspace,
-            this.toolspaceCollapser.getElement(),
+            this.mobileUi.getElement(),
         ]);
 
         let toolspaceTopRow;
@@ -1197,7 +1240,7 @@ export class KlApp {
             currentBrushId = brushId;
             currentBrushUi = brushUiMap[brushId];
             currentBrushUi.setColor(currentColor);
-            currentBrushUi.setContext(currentLayerCtx);
+            currentBrushUi.setLayer(currentLayer);
             this.easelBrush.setBrush({
                 type: currentBrushId === 'pixelBrush' ? 'pixel-square' : 'round',
             });
@@ -1206,10 +1249,9 @@ export class KlApp {
         };
 
         const setCurrentLayer = (layer: TKlCanvasLayer) => {
-            //BrushContext(p_context) {
-            currentLayerCtx = layer.context;
-            currentBrushUi.setContext(layer.context);
-            this.layerPreview.setLayer(layer);
+            currentLayer = layer;
+            currentBrushUi.setLayer(currentLayer);
+            this.layerPreview.setLayer(currentLayer);
         };
 
         const brushDiv = BB.el();
@@ -1258,6 +1300,9 @@ export class KlApp {
                             });
                             sizeWatcher(brushUiMap[keyStr].getSize());
                             brushSettingService.emitOpacity(brushUiMap[keyStr].getOpacity());
+                            this.mobileBrushUi.setType(
+                                keyStr === 'eraserBrush' ? 'eraser' : 'brush',
+                            );
                         },
                         onClose: () => {
                             brushUiMap[keyStr].getElement().style.display = 'none';
@@ -1312,7 +1357,7 @@ export class KlApp {
 
         const gradientTool = new KL.GradientTool({
             onGradient: (isDone, x1, y1, x2, y2, angleRad) => {
-                const layerIndex = throwIfNull(this.klCanvas.getLayerIndex(currentLayerCtx.canvas));
+                const layerIndex = currentLayer.index;
                 const settings = gradientUi.getSettings();
                 const gradientObj: IGradient = {
                     type: settings.type,
@@ -1346,7 +1391,7 @@ export class KlApp {
 
         const shapeTool = new KL.ShapeTool({
             onShape: (isDone, x1, y1, x2, y2, angleRad) => {
-                const layerIndex = throwIfNull(this.klCanvas.getLayerIndex(currentLayerCtx.canvas));
+                const layerIndex = currentLayer.index;
 
                 const shapeObj: any = {
                     type: shapeUi.getShape(),
@@ -1391,19 +1436,26 @@ export class KlApp {
 
         this.layersUi = new KL.LayersUi({
             klCanvas: this.klCanvas,
-            onSelect: (val) => {
-                setCurrentLayer(throwIfNull(this.klCanvas.getLayer(val)));
-                klHistory.push({
-                    tool: ['misc'],
-                    action: 'focusLayer',
-                    params: [val],
-                } as TMiscFocusLayerHistoryEntry);
+            onSelect: (layerIndex) => {
+                const activeLayer = this.klCanvas.getLayer(layerIndex);
+                setCurrentLayer(activeLayer);
+
+                const topEntry = klHistory.getEntries().at(-1)!.data;
+                const replaceTop = isHistoryEntryActiveLayerChange(topEntry);
+
+                klHistory.push(
+                    {
+                        activeLayerId: activeLayer.id,
+                    },
+                    replaceTop,
+                );
             },
             parentEl: this.klRootEl,
             uiState: this.uiState,
             applyUncommitted: () => applyUncommitted(),
-            history: klHistory,
+            klHistory: klHistory,
             onUpdateProject: () => this.easelProjectUpdater.update(),
+            onClearLayer: () => clearLayer(),
         });
         this.layerPreview = new KL.LayerPreview({
             klRootEl: this.klRootEl,
@@ -1411,12 +1463,10 @@ export class KlApp {
                 mainTabRow && mainTabRow.open('layers');
             },
             uiState: this.uiState,
-            history: klHistory,
+            klHistory: klHistory,
         });
         this.layerPreview.setIsVisible(this.uiHeight >= 579);
-        this.layerPreview.setLayer(
-            this.klCanvas.getLayer(this.klCanvas.getLayerIndex(currentLayerCtx.canvas)!)!,
-        );
+        this.layerPreview.setLayer(currentLayer);
 
         const filterUi = new KL.FilterUi({
             klRootEl: this.klRootEl,
@@ -1425,7 +1475,7 @@ export class KlApp {
             getCurrentColor: () => currentColor,
             getKlMaxCanvasSize: () => klMaxCanvasSize,
             klCanvas: this.klCanvas,
-            getCurrentLayerCtx: () => currentLayerCtx,
+            getCurrentLayer: () => currentLayer,
             isEmbed: !!this.embed,
             statusOverlay: this.statusOverlay,
             onCanvasChanged: () => {
@@ -1433,36 +1483,12 @@ export class KlApp {
                 this.easel.resetOrFitTransform(true);
             },
             applyUncommitted: () => applyUncommitted(),
-            history: klHistory,
+            klHistory: klHistory,
         });
 
         const klHistoryExecutor = new KlHistoryExecutor({
-            history: klHistory,
+            klHistory: klHistory,
             tempHistory,
-            brushUiMap,
-            getOldestProjectState: () => {
-                return oldestProjectState;
-            },
-            klCanvas: this.klCanvas,
-            getCurrentLayerCtx: () => currentLayerCtx,
-            setCurrentLayerCtx: (ctx) => {
-                currentLayerCtx = ctx;
-            },
-            onExecuted: (dimensionChanged, type) => {
-                const currentLayerIndex = throwIfNull(
-                    this.klCanvas.getLayerIndex(currentLayerCtx.canvas),
-                );
-                this.easelProjectUpdater.update(); // triggers render
-                if (dimensionChanged) {
-                    this.easel.resetOrFitTransform(true);
-                }
-
-                currentBrushUi.setContext(currentLayerCtx);
-                this.easelBrush.setLastDrawEvent();
-                this.layersUi.update(currentLayerIndex);
-                this.layerPreview.setLayer(this.klCanvas.getLayer(currentLayerIndex)!);
-                klAppSelect.onHistory(type);
-            },
             onCanUndoRedoChange: (canUndo, canRedo) => {
                 this.toolspaceToolRow.setEnableUndo(canUndo);
                 this.toolspaceToolRow.setEnableRedo(canRedo);
@@ -1490,7 +1516,7 @@ export class KlApp {
                     });
 
                     this.layersUi.update(0);
-                    setCurrentLayer(throwIfNull(this.klCanvas.getLayer(0)));
+                    setCurrentLayer(this.klCanvas.getLayer(0));
                     this.easelProjectUpdater.update();
                     this.easel.resetOrFitTransform(true);
                 },
@@ -1529,10 +1555,10 @@ export class KlApp {
                     }
                     //do a crop
                     KL.filterLib.cropExtend.apply!({
-                        context: currentLayerCtx,
+                        layer: currentLayer,
                         klCanvas: this.klCanvas,
                         input: inputObj,
-                        history: klHistory,
+                        klHistory: klHistory,
                     });
                     this.layersUi.update();
                     this.easelProjectUpdater.update();
@@ -1578,8 +1604,12 @@ export class KlApp {
                       applyUncommitted();
                       copyToClipboard();
                   },
+                  onPaste: () => importHandler.readClipboard(),
                   saveReminder: p.saveReminder,
                   applyUncommitted: () => applyUncommitted(),
+                  onChangeShowSaveDialog: (b) => {
+                      this.saveToComputer.setShowSaveDialog(b);
+                  },
               });
 
         const settingsUi = new KL.SettingsUi({
@@ -1987,8 +2017,8 @@ export class KlApp {
         this.statusOverlay.out(msg);
     }
 
-    getPNG(): Blob {
-        return base64ToBlob(this.klCanvas.getCompleteCanvas(1).toDataURL('image/png'));
+    async getPNG(): Promise<Blob> {
+        return await canvasToBlob(this.klCanvas.getCompleteCanvas(1), 'image/png');
     }
 
     getPSD = async (): Promise<Blob> => {

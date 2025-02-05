@@ -8,7 +8,7 @@ import { createMatrixFromTransform } from '../../../../bb/transform/create-matri
 import { createTransform } from '../../../../bb/transform/create-transform';
 import { TEaselInterface, TEaselTool, TEaselToolTrigger } from '../easel.types';
 
-export type TEaselZoomParams = {};
+export type TEaselZoomParams = Record<string, never>;
 
 export class EaselZoom implements TEaselTool {
     private readonly svgEl: SVGElement;

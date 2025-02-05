@@ -1,5 +1,5 @@
-import { brushes } from '../brushes/brushes';
-import { eventResMs } from './brushes-consts';
+import { BRUSHES } from '../brushes/brushes';
+import { EVENT_RES_MS } from './brushes-consts';
 import { KlSlider } from '../ui/components/kl-slider';
 import brushIconImg from '/src/app/img/ui/brush-sketchy.png';
 import { IBrushUi } from '../kl-types';
@@ -27,8 +27,8 @@ export const sketchyBrushUi = (function () {
 
     brushInterface.Ui = function (p) {
         const div = document.createElement('div'); // the gui
-        const brush = new brushes.SketchyBrush();
-        brush.setHistory(p.history);
+        const brush = new BRUSHES.SketchyBrush();
+        brush.setHistory(p.klHistory);
         p.onSizeChange(brush.getSize());
         let sizeSlider: KlSlider;
         let opacitySlider: KlSlider;
@@ -45,7 +45,7 @@ export const sketchyBrushUi = (function () {
                 min: brushInterface.sizeSlider.min,
                 max: brushInterface.sizeSlider.max,
                 value: brush.getSize() * 2,
-                eventResMs: eventResMs,
+                eventResMs: EVENT_RES_MS,
                 toDisplayValue: (val) => val * 2,
                 toValue: (displayValue) => displayValue / 2,
                 onChange: function (val) {
@@ -68,7 +68,7 @@ export const sketchyBrushUi = (function () {
                 min: brushInterface.opacitySlider.min,
                 max: brushInterface.opacitySlider.max,
                 value: brush.getOpacity(),
-                eventResMs: eventResMs,
+                eventResMs: EVENT_RES_MS,
                 toDisplayValue: (val) => val * 100,
                 toValue: (displayValue) => displayValue / 100,
                 onChange: (val) => {
@@ -83,7 +83,7 @@ export const sketchyBrushUi = (function () {
                 min: 0,
                 max: 1,
                 value: brush.getBlending(),
-                eventResMs: eventResMs,
+                eventResMs: EVENT_RES_MS,
                 toDisplayValue: (val) => val * 100,
                 toValue: (displayValue) => displayValue / 100,
                 onChange: function (val) {
@@ -97,7 +97,7 @@ export const sketchyBrushUi = (function () {
                 min: 1,
                 max: 20,
                 value: brush.getScale(),
-                eventResMs: eventResMs,
+                eventResMs: EVENT_RES_MS,
                 onChange: function (val) {
                     brush.setScale(val);
                 },
@@ -142,8 +142,8 @@ export const sketchyBrushUi = (function () {
         this.setColor = function (c) {
             brush.setColor(c);
         };
-        this.setContext = function (c) {
-            brush.setContext(c);
+        this.setLayer = function (layer) {
+            brush.setContext(layer.context);
         };
         this.startLine = function (x, y, pressure) {
             brush.startLine(x, y, pressure);

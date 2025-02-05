@@ -37,7 +37,7 @@ import { FillUi } from './ui/tool-tabs/fill-ui';
 import { TextUi } from './ui/tool-tabs/text-ui';
 import { ShapeUi } from './ui/tool-tabs/shape-ui';
 import { newImageDialog } from './ui/modals/new-image-dialog';
-import { ToolspaceCollapser } from './ui/components/toolspace-collapser';
+import { ToolspaceCollapser } from './ui/mobile/toolspace-collapser';
 import { renderText } from './image-operations/render-text';
 import { textToolDialog } from './ui/modals/text-tool-dialog/text-tool-dialog';
 import { showImportImageDialog } from './ui/modals/show-import-image-dialog';
@@ -48,7 +48,7 @@ import { KlCanvas } from './canvas/kl-canvas';
 import * as indexedDb from './storage/indexed-db';
 import { setDbName } from './storage/indexed-db';
 import { filterLib, filterLibStatus } from './filters/filters';
-import { brushes } from './brushes/brushes';
+import { BRUSHES } from './brushes/brushes';
 import { brushesUI } from './brushes-ui/brushes-ui';
 import { showIframeModal } from './ui/modals/show-iframe-modal';
 import { RadioList } from './ui/components/radio-list';
@@ -73,7 +73,7 @@ import { drawGradient, GradientTool } from './image-operations/gradient-tool';
  */
 export const KL = {
     // --- brushes ---
-    brushes,
+    brushes: BRUSHES,
     brushesUI,
     BrushSettingService,
 

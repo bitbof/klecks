@@ -5,6 +5,7 @@ import { theme } from '../../../theme/theme';
 import { Matrix, inverse, compose } from 'transformation-matrix';
 import { createMatrixFromTransform } from '../../../bb/transform/create-matrix-from-transform';
 import { matrixToTuple } from '../../../bb/math/matrix-to-tuple';
+import { DEBUG_RENDERER_ENABLED, debugRender } from './debug-render';
 
 function fixScale(scale: number, pixels: number): number {
     return Math.round(pixels * scale) / pixels;
@@ -244,6 +245,14 @@ export class ProjectViewport {
         });
 
         this.renderAfter?.(this.ctx, renderedTransform);
+
+        DEBUG_RENDERER_ENABLED &&
+            debugRender.render(
+                this.ctx,
+                this.project.width,
+                this.project.height,
+                renderedTransform.scaleX,
+            );
 
         this.ctx.restore();
     }

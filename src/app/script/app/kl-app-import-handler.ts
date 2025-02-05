@@ -1,12 +1,12 @@
-import { IKlPsd, IRGB, TDropOption, TKlCanvasLayer } from '../klecks/kl-types';
+import { IKlPsd, IRGB, TDropOption } from '../klecks/kl-types';
 import { KL } from '../klecks/kl';
 import { LANG } from '../language/language';
 import { BB } from '../bb/bb';
-import { TMiscImportImageHistoryEntry } from '../klecks/history/kl-history';
-import { KlCanvas } from '../klecks/canvas/kl-canvas';
+import { KlCanvas, TKlCanvasLayer } from '../klecks/canvas/kl-canvas';
 import { LayersUi } from '../klecks/ui/tool-tabs/layers-ui/layers-ui';
 import { IRect, ISize2D } from '../bb/bb-types';
 import { throwIfNull, throwIfUndefined } from '../bb/base/base';
+import { getNextLayerId } from '../klecks/history/get-next-layer-id';
 
 // todo later:
 // onImage: (project: IKlProject) => void
@@ -93,7 +93,7 @@ export class KlAppImportHandler {
             });
 
             this.layersUi.update(0);
-            this.setCurrentLayer(this.klCanvas.getLayer(0)!);
+            this.setCurrentLayer(this.klCanvas.getLayer(0));
             this.onImportConfirm();
         };
 
@@ -162,7 +162,16 @@ export class KlAppImportHandler {
                 layerIndex = this.klCanvas.reset({
                     width: convertedPsdObj.width,
                     height: convertedPsdObj.height,
-                    layers: convertedPsdObj.layers,
+                    layers: convertedPsdObj.layers.map((layer) => {
+                        return {
+                            id: getNextLayerId(),
+                            name: layer.name,
+                            isVisible: layer.isVisible,
+                            opacity: layer.opacity,
+                            mixModeStr: layer.mixModeStr,
+                            image: layer.image,
+                        };
+                    }),
                 });
             } else {
                 layerIndex = this.klCanvas.reset({
@@ -172,7 +181,7 @@ export class KlAppImportHandler {
                 });
             }
             this.layersUi.update(layerIndex);
-            this.setCurrentLayer(throwIfNull(this.klCanvas.getLayer(layerIndex)));
+            this.setCurrentLayer(this.klCanvas.getLayer(layerIndex));
             this.onImportConfirm();
         };
 
@@ -185,34 +194,24 @@ export class KlAppImportHandler {
                     if (!transformObj) {
                         return;
                     }
-
-                    this.klCanvas.getHistory()?.pause(true);
-                    this.klCanvas.addLayer();
+                    this.klCanvas.addLayer(undefined, {
+                        name: filename,
+                        isVisible: true,
+                        opacity: 1,
+                        image: (ctx) => {
+                            BB.drawTransformedImageWithBounds(
+                                ctx,
+                                canvas,
+                                transformObj,
+                                undefined,
+                                isPixelated,
+                            );
+                        },
+                    });
                     const layers = this.klCanvas.getLayers();
                     const activeLayerIndex = layers.length - 1;
-                    if (filename) {
-                        this.klCanvas.renameLayer(activeLayerIndex, filename);
-                    }
-                    const activeLayerContext = throwIfNull(
-                        this.klCanvas.getLayerContext(activeLayerIndex),
-                    );
-                    BB.drawTransformedImageWithBounds(
-                        activeLayerContext,
-                        canvas,
-                        transformObj,
-                        undefined,
-                        isPixelated,
-                    );
-                    this.setCurrentLayer(throwIfNull(this.klCanvas.getLayer(activeLayerIndex)));
+                    this.setCurrentLayer(this.klCanvas.getLayer(activeLayerIndex));
                     this.layersUi.update(activeLayerIndex);
-
-                    this.klCanvas.getHistory()?.pause(false);
-
-                    this.klCanvas.getHistory()?.push({
-                        tool: ['misc'],
-                        action: 'importImage',
-                        params: [BB.copyCanvas(activeLayerContext.canvas), filename],
-                    } as TMiscImportImageHistoryEntry);
                 },
             });
         };
@@ -273,6 +272,59 @@ export class KlAppImportHandler {
     }
 
     // ---- interface ----
+
+    async readClipboard(): Promise<void> {
+        try {
+            /*if (Math.random() > 0.001) {
+                throw new Error('haha');
+            }*/
+            // May freeze the app until it read the clipboard
+            // But if you show a loading indicator on this line, it will show up too early.
+            const clipboardItems = await navigator.clipboard.read();
+            // On this line it's already done freezing.
+
+            let hasImage = false;
+            for (const item of clipboardItems) {
+                for (const type of item.types) {
+                    if (type.startsWith('image')) {
+                        hasImage = true;
+                        const blob = await item.getType(type);
+                        const img = new Image();
+                        img.onload = () => {
+                            URL.revokeObjectURL(img.src);
+                            this.importFinishedLoading(
+                                {
+                                    type: 'image',
+                                    width: img.width,
+                                    height: img.height,
+                                    canvas: img,
+                                },
+                                undefined,
+                                'default',
+                            );
+                        };
+                        img.src = URL.createObjectURL(blob);
+                        return;
+                    }
+                }
+            }
+            if (!hasImage) {
+                KL.popup({
+                    target: this.klRootEl,
+                    type: 'error',
+                    message: LANG('clipboard-no-image'),
+                    buttons: ['Ok'],
+                });
+            }
+        } catch (error) {
+            KL.popup({
+                target: this.klRootEl,
+                type: 'error',
+                message: LANG('clipboard-read-fail'),
+                buttons: ['Ok'],
+            });
+        }
+    }
 
     onPaste(e: ClipboardEvent): void {
         if (KL.dialogCounter.get() > 0) {

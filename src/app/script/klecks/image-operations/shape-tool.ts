@@ -1,5 +1,9 @@
 import { BB } from '../../bb/bb';
 import { IRGB, IShapeToolObject } from '../kl-types';
+import { IBounds, IRect, IVector2D } from '../../bb/bb-types';
+import { transformBounds } from '../../bb/transform/transform-bounds';
+import { compose, rotate } from 'transformation-matrix';
+import { matrixToTuple } from '../../bb/math/matrix-to-tuple';
 
 /**
  * Input processor for shape tool.
@@ -51,7 +55,7 @@ export class ShapeTool {
 /**
  * Draw a shape (rectangle, ellipse, line)
  */
-export function drawShape(ctx: CanvasRenderingContext2D, shapeObj: IShapeToolObject): void {
+export function drawShape(ctx: CanvasRenderingContext2D, shapeObj: IShapeToolObject): IBounds {
     shapeObj = {
         // defaults
         angleRad: 0,
@@ -62,6 +66,7 @@ export function drawShape(ctx: CanvasRenderingContext2D, shapeObj: IShapeToolObj
 
         ...BB.copyObj(shapeObj),
     };
+    let bounds: IBounds = { x1: 0, y1: 0, x2: 0, y2: 0 };
 
     if (['rect', 'ellipse', 'line'].includes(shapeObj.type)) {
         if (shapeObj.angleRad === undefined) {
@@ -96,7 +101,8 @@ export function drawShape(ctx: CanvasRenderingContext2D, shapeObj: IShapeToolObj
         if (shapeObj.doLockAlpha) {
             ctx.globalCompositeOperation = 'source-atop';
         }
-        ctx.rotate(-shapeObj.angleRad);
+        const transformation = compose(rotate(-shapeObj.angleRad));
+        ctx.setTransform(...matrixToTuple(transformation));
         if (shapeObj.fillRgb) {
             ctx.fillStyle = BB.ColorConverter.toRgbStr(colorRGB);
         } else if (shapeObj.strokeRgb) {
@@ -284,6 +290,13 @@ export function drawShape(ctx: CanvasRenderingContext2D, shapeObj: IShapeToolObj
             ctx.moveTo(p1.x, p1.y);
             ctx.lineTo(p2.x, p2.y);
             ctx.stroke();
+
+            bounds = {
+                x1: Math.min(p1.x, p2.x) - lineWidth / 2,
+                y1: Math.min(p1.y, p2.y) - lineWidth / 2,
+                x2: Math.max(p1.x, p2.x) + lineWidth / 2,
+                y2: Math.max(p1.y, p2.y) + lineWidth / 2,
+            };
         } else if (shapeObj.type === 'rect') {
             // --- rect ---
 
@@ -352,13 +365,28 @@ export function drawShape(ctx: CanvasRenderingContext2D, shapeObj: IShapeToolObj
 
             p1 = BB.rotate(p1.x, p1.y, (shapeObj.angleRad / Math.PI) * 180);
             p2 = BB.rotate(p2.x, p2.y, (shapeObj.angleRad / Math.PI) * 180);
-            p2.x = p2.x - p1.x;
-            p2.y = p2.y - p1.y;
+            const rect: IRect = {
+                x: p1.x,
+                y: p1.y,
+                width: p2.x - p1.x,
+                height: p2.y - p1.y,
+            };
+
+            const padding = shapeObj.fillRgb ? 0 : lineWidth / 2;
+            bounds = transformBounds(
+                {
+                    x1: Math.min(p1.x, p2.x) - padding,
+                    y1: Math.min(p1.y, p2.y) - padding,
+                    x2: Math.max(p1.x, p2.x) + padding,
+                    y2: Math.max(p1.y, p2.y) + padding,
+                },
+                transformation,
+            );
 
             if (shapeObj.fillRgb) {
-                ctx.fillRect(p1.x, p1.y, p2.x, p2.y);
+                ctx.fillRect(rect.x, rect.y, rect.width, rect.height);
             } else {
-                ctx.strokeRect(p1.x, p1.y, p2.x, p2.y);
+                ctx.strokeRect(rect.x, rect.y, rect.width, rect.height);
             }
         } else {
             // --- circle ---
@@ -368,26 +396,37 @@ export function drawShape(ctx: CanvasRenderingContext2D, shapeObj: IShapeToolObj
             y = p1.y;
             dX = p2.x - p1.x;
             dY = p2.y - p1.y;
+            const center: IVector2D = {
+                x: x + dX / 2,
+                y: y + dY / 2,
+            };
+            const rX = Math.abs(dX / 2);
+            const rY = Math.abs(dY / 2);
 
             ctx.beginPath();
-            ctx.ellipse(
-                x + dX / 2,
-                y + dY / 2,
-                Math.abs(dX / 2),
-                Math.abs(dY / 2),
-                0,
-                0,
-                Math.PI * 2,
-            );
+            ctx.ellipse(center.x, center.y, rX, rY, 0, 0, Math.PI * 2);
             if (shapeObj.fillRgb) {
                 ctx.fill();
             } else {
                 ctx.stroke();
             }
+            const padding = shapeObj.fillRgb ? 0 : lineWidth / 2;
+            // bounds are bigger than they need to be when it's rotated and rX ~ rY. should be good enough though.
+            bounds = transformBounds(
+                {
+                    x1: center.x - rX - padding,
+                    y1: center.y - rY - padding,
+                    x2: center.x + rX + padding,
+                    y2: center.y + rY + padding,
+                },
+                transformation,
+            );
         }
 
         ctx.restore();
     } else {
         throw new Error('unknown shape');
     }
+
+    return bounds;
 }

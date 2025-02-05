@@ -1,9 +1,9 @@
 import { BB } from '../../../bb/bb';
-import { IKeyString, IKeyStringOptional } from '../../../bb/bb-types';
+import { IKeyString } from '../../../bb/bb-types';
 
 type TSelectItem<ValueType> =
     | [ValueType, string]
-    | [ValueType, string, { css: IKeyStringOptional }]; // [value, label, properties]
+    | [ValueType, string, { css: Partial<CSSStyleDeclaration> }]; // [value, label, properties]
 
 /**
  * A select dropdown

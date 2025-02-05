@@ -1,5 +1,5 @@
 /* eslint max-lines: 0 */
-export const fontLicenses: {
+export const FONT_LICENSES: {
     title: string;
     full: string;
 }[] = [

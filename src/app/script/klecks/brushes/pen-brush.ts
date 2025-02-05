@@ -1,13 +1,12 @@
 import { BB } from '../../bb/bb';
-import { alphaImArr } from './brushes-common';
-import { IHistoryEntry, KlHistory, THistoryInnerActions } from '../history/kl-history';
+import { ALPHA_IM_ARR } from './brushes-common';
 import { IRGB, TPressureInput } from '../kl-types';
 import { BezierLine } from '../../bb/math/line';
-
-export interface IPenBrushHistoryEntry extends IHistoryEntry {
-    tool: ['brush', 'PenBrush'];
-    actions: THistoryInnerActions<PenBrush>[];
-}
+import { KlHistory } from '../history/kl-history';
+import { getPushableLayerChange } from '../history/push-helpers/get-pushable-layer-change';
+import { IBounds } from '../../bb/bb-types';
+import { canvasAndChangedTilesToLayerTiles } from '../history/push-helpers/canvas-to-layer-tiles';
+import { getChangedTiles, updateChangedTiles } from '../history/push-helpers/changed-tiles';
 
 const ALPHA_CIRCLE = 0;
 const ALPHA_CHALK = 1;
@@ -18,8 +17,7 @@ const TWO_PI = 2 * Math.PI;
 
 export class PenBrush {
     private context: CanvasRenderingContext2D = {} as CanvasRenderingContext2D;
-    private history: KlHistory | undefined;
-    private historyEntry: IPenBrushHistoryEntry | undefined;
+    private klHistory: KlHistory = {} as KlHistory;
 
     private settingHasOpacityPressure: boolean = false;
     private settingHasScatterPressure: boolean = false;
@@ -46,6 +44,15 @@ export class PenBrush {
     private readonly alphaCanvas64: HTMLCanvasElement = BB.canvas(64, 64);
     private readonly alphaCanvas32: HTMLCanvasElement = BB.canvas(32, 32);
     private readonly alphaOpacityArr: number[] = [1, 0.9, 1, 1];
+
+    private changedTiles: boolean[] = [];
+
+    private updateChangedTiles(bounds: IBounds) {
+        this.changedTiles = updateChangedTiles(
+            this.changedTiles,
+            getChangedTiles(bounds, this.context.canvas.width, this.context.canvas.height),
+        );
+    }
 
     private updateAlphaCanvas() {
         if (this.settingAlphaId === ALPHA_CIRCLE || this.settingAlphaId === ALPHA_SQUARE) {
@@ -81,7 +88,7 @@ export class PenBrush {
             ctx.globalCompositeOperation = 'destination-in';
             ctx.imageSmoothingQuality = 'high';
             ctx.drawImage(
-                alphaImArr[this.settingAlphaId],
+                ALPHA_IM_ARR[this.settingAlphaId],
                 0,
                 0,
                 instructionArr[i][1],
@@ -137,18 +144,30 @@ export class PenBrush {
             this.context.fillStyle = this.settingColorStr;
         }
         
-        const scatteredX = x + ((Math.random() * scatter) - (scatter / 2));
-        const scatteredY = y + ((Math.random() * scatter) - (scatter / 2));
+        x += (Math.random() - 0.5) * scatter;
+        y += (Math.random() - 0.5) * scatter;
+
+        const boundsSize =
+            this.settingAlphaId === ALPHA_CIRCLE || this.settingAlphaId === ALPHA_CAL
+                ? size
+                : size * Math.sqrt(2);
+        this.updateChangedTiles({
+            x1: Math.floor(x - boundsSize),
+            y1: Math.floor(y - boundsSize),
+            x2: Math.ceil(x + boundsSize),
+            y2: Math.ceil(y + boundsSize),
+        });
+
         if (this.settingAlphaId === ALPHA_CIRCLE) {
             this.context.beginPath();
-            this.context.arc(scatteredX, scatteredY, size, 0, TWO_PI);
+            this.context.arc(x, y, size, 0, TWO_PI);
             this.context.closePath();
             this.context.fill();
             this.hasDrawnDot = true;
         } else if (this.settingAlphaId === ALPHA_SQUARE) {
             if (angle !== undefined) {
                 this.context.save();
-                this.context.translate(scatteredX, scatteredY);
+                this.context.translate(x, y);
                 this.context.rotate((angle / 180) * Math.PI);
                 this.context.fillRect(-size, -size, size * 2, size * 2);
                 this.context.restore();
@@ -157,7 +176,7 @@ export class PenBrush {
         } else {
             // other brush alphas
             this.context.save();
-            this.context.translate(scatteredX, scatteredY);
+            this.context.translate(x, y);
             let targetMipmap = this.alphaCanvas128;
             if (size <= 32 && size > 16) {
                 targetMipmap = this.alphaCanvas64;
@@ -225,52 +244,7 @@ export class PenBrush {
     // ---- interface ----
 
     startLine(x: number, y: number, p: number): void {
-        this.historyEntry = {
-            tool: ['brush', 'PenBrush'],
-            actions: [
-                {
-                    action: 'opacityPressure',
-                    params: [this.settingHasOpacityPressure],
-                },
-                {
-                    action: 'sizePressure',
-                    params: [this.settingHasSizePressure],
-                },
-                {
-                    action: 'scatterPressure',
-                    params: [this.settingHasScatterPressure],
-                },
-                {
-                    action: 'setSize',
-                    params: [this.settingSize],
-                },
-                {
-                    action: 'setSpacing',
-                    params: [this.settingSpacing],
-                },
-                {
-                    action: 'setOpacity',
-                    params: [this.settingOpacity],
-                },
-                {
-                    action: 'setScatter',
-                    params: [this.settingScatter],
-                },
-                {
-                    action: 'setColor',
-                    params: [this.settingColor],
-                },
-                {
-                    action: 'setAlpha',
-                    params: [this.settingAlphaId],
-                },
-                {
-                    action: 'setLockAlpha',
-                    params: [this.settingLockLayerAlpha],
-                },
-            ],
-        };
-
+        this.changedTiles = [];
         p = BB.clamp(p, 0, 1);
         const localOpacity = this.calcOpacity(p);
         const localSize = this.settingHasSizePressure
@@ -298,21 +272,12 @@ export class PenBrush {
                 pressure: p,
             },
         ];
-
-        this.historyEntry.actions!.push({
-            action: 'startLine',
-            params: [x, y, p],
-        });
     }
 
     goLine(x: number, y: number, p: number): void {
         if (!this.inputIsDrawing) {
             return;
         }
-        this.historyEntry!.actions!.push({
-            action: 'goLine',
-            params: [x, y, p],
-        });
 
         const pressure = BB.clamp(p, 0, 1);
         const localSize = this.settingHasSizePressure
@@ -340,7 +305,7 @@ export class PenBrush {
         });
     }
 
-    endLine(x: number, y: number): void {
+    endLine(): void {
         const localSize = this.settingHasSizePressure
             ? Math.max(0.1, this.lastInput.pressure * this.settingSize)
             : Math.max(0.1, this.settingSize);
@@ -368,20 +333,19 @@ export class PenBrush {
 
         this.bezierLine = null;
 
-        if (this.historyEntry) {
-            this.historyEntry.actions!.push({
-                action: 'endLine',
-                params: [x, y],
-            });
-            this.history?.push(this.historyEntry);
-            this.historyEntry = undefined;
-        }
+        this.klHistory.push(
+            getPushableLayerChange(
+                this.klHistory.getComposed(),
+                canvasAndChangedTilesToLayerTiles(this.context.canvas, this.changedTiles),
+            ),
+        );
 
         this.hasDrawnDot = false;
         this.inputArr = [];
     }
 
     drawLineSegment(x1: number, y1: number, x2: number, y2: number): void {
+        this.changedTiles = [];
         this.lastInput.x = x2;
         this.lastInput.y = y2;
         this.lastInput.pressure = 1;
@@ -409,56 +373,12 @@ export class PenBrush {
         }
         this.context.restore();
 
-        const historyEntry: IPenBrushHistoryEntry = {
-            tool: ['brush', 'PenBrush'],
-            actions: [
-                {
-                    action: 'opacityPressure',
-                    params: [this.settingHasOpacityPressure],
-                },
-                {
-                    action: 'sizePressure',
-                    params: [this.settingHasSizePressure],
-                },
-                {
-                    action: 'scatterPressure',
-                    params: [this.settingHasScatterPressure],
-                },
-                {
-                    action: 'setSize',
-                    params: [this.settingSize],
-                },
-                {
-                    action: 'setSpacing',
-                    params: [this.settingSpacing],
-                },
-                {
-                    action: 'setOpacity',
-                    params: [this.settingOpacity],
-                },
-                {
-                    action: 'setScatter',
-                    params: [this.settingScatter],
-                },
-                {
-                    action: 'setColor',
-                    params: [this.settingColor],
-                },
-                {
-                    action: 'setAlpha',
-                    params: [this.settingAlphaId],
-                },
-                {
-                    action: 'setLockAlpha',
-                    params: [this.settingLockLayerAlpha],
-                },
-                {
-                    action: 'drawLineSegment',
-                    params: [x1, y1, x2, y2],
-                },
-            ],
-        };
-        this.history?.push(historyEntry);
+        this.klHistory.push(
+            getPushableLayerChange(
+                this.klHistory.getComposed(),
+                canvasAndChangedTilesToLayerTiles(this.context.canvas, this.changedTiles),
+            ),
+        );
     }
 
     //IS
@@ -495,8 +415,8 @@ export class PenBrush {
         this.context = c;
     }
 
-    setHistory(l: KlHistory): void {
-        this.history = l;
+    setHistory(klHistory: KlHistory): void {
+        this.klHistory = klHistory;
     }
 
     setSize(s: number): void {

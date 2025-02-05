@@ -10,14 +10,13 @@ import { LANG } from '../../language/language';
 import { KlSlider } from '../ui/components/kl-slider';
 import { getSharedFx } from '../../fx-canvas/shared-fx';
 import { Options } from '../ui/components/options';
-import { eventResMs } from './filters-consts';
+import { EVENT_RES_MS } from './filters-consts';
 import { Select } from '../ui/components/select';
 import { translateBlending } from '../canvas/translate-blending';
 import { KL } from '../kl';
 import { ColorConverter } from '../../bb/color/color';
 import { Checkbox } from '../ui/components/checkbox';
 import { TFxCanvas } from '../../fx-canvas/fx-canvas-types';
-import { TKlCanvasHistoryEntry } from '../canvas/kl-canvas';
 import { throwIfNull } from '../../bb/base/base';
 import { FxPreviewRenderer } from '../ui/project-viewport/fx-preview-renderer';
 import { Preview } from '../ui/project-viewport/preview';
@@ -25,6 +24,7 @@ import { css } from '@emotion/css/dist/emotion-css.cjs';
 import { TProjectViewportProject } from '../ui/project-viewport/project-viewport';
 import { getPreviewHeight, getPreviewWidth } from '../ui/utils/preview-size';
 import { testIsSmall } from '../ui/utils/test-is-small';
+import { canvasToLayerTiles } from '../history/push-helpers/canvas-to-layer-tiles';
 
 // see noise(...) in fx-canvas
 interface INoisePreset {
@@ -290,7 +290,7 @@ export const filterNoise = {
             min: 1,
             max: 1000,
             value: settingsObj.scale,
-            eventResMs: eventResMs,
+            eventResMs: EVENT_RES_MS,
             curve: BB.quadraticSplineInput(1, 1000, 0.1),
             onChange: (value) => {
                 settingsObj.scale = value;
@@ -306,7 +306,7 @@ export const filterNoise = {
             min: 1 / 100,
             max: 1,
             value: settingsObj.opacity,
-            eventResMs: eventResMs,
+            eventResMs: EVENT_RES_MS,
             toValue: (displayValue) => displayValue / 100,
             toDisplayValue: (value) => value * 100,
             onChange: (value) => {
@@ -548,14 +548,12 @@ export const filterNoise = {
     },
 
     apply(params: IFilterApply<TFilterNoiseInput>): boolean {
-        const context = params.context;
+        const context = params.layer.context;
         const klCanvas = params.klCanvas;
-        const history = params.history;
+        const klHistory = params.klHistory;
         if (!context || !klCanvas) {
             return false;
         }
-
-        history?.pause(true);
 
         const fxCanvas = getSharedFx();
         if (!fxCanvas) {
@@ -566,7 +564,6 @@ export const filterNoise = {
         texture.destroy();
 
         const input = params.input;
-
         const presetCopy: INoiseSettings = BB.copyObj(
             presetArr[input.presetIndex],
         ) as INoiseSettings;
@@ -589,16 +586,25 @@ export const filterNoise = {
         context.drawImage(fxCanvas, 0, 0);
         context.restore();
 
-        history?.pause(false);
+        {
+            const layerMap = Object.fromEntries(
+                params.klCanvas.getLayers().map((layerItem) => {
+                    if (layerItem.id === params.layer.id) {
+                        return [
+                            layerItem.id,
+                            {
+                                tiles: canvasToLayerTiles(params.layer.canvas),
+                            },
+                        ];
+                    }
 
-        history?.push({
-            tool: ['canvas'],
-            action: 'replaceLayer',
-            params: [
-                klCanvas.getLayerIndex(context.canvas),
-                context.getImageData(0, 0, context.canvas.width, context.canvas.height),
-            ],
-        } as TKlCanvasHistoryEntry);
+                    return [layerItem.id, {}];
+                }),
+            );
+            klHistory.push({
+                layerMap,
+            });
+        }
         return true;
     },
 };

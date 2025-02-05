@@ -192,7 +192,7 @@ export class ToolDropdown {
                 backgroundRepeat: 'no-repeat',
                 backgroundPosition: 'center',
             },
-            title: 'More Tools',
+            title: LANG('tool-more-tools'),
             onClick: (e) => {
                 e.preventDefault();
                 e.stopPropagation();
@@ -327,9 +327,8 @@ export class ToolDropdown {
                 this.dropdownBtnArr[i].show(this.currentActiveIndex !== i);
             }
 
-            this.arrowButton.style.opacity = '0';
             this.arrowButton.style.setProperty('opacity', '0');
-            this.arrowButton.style.pointerEvents = 'none';
+            this.arrowButton.style.setProperty('pointer-events', 'none');
             this.rootEl.style.zIndex = '1';
             document.body.append(overlay);
             this.rootEl.append(dropdownWrapper);
@@ -339,7 +338,7 @@ export class ToolDropdown {
             dialogCounter.decrease(0.5);
             isOpen = false;
             this.arrowButton.style.removeProperty('opacity');
-            this.arrowButton.style.removeProperty('pointerEvents');
+            this.arrowButton.style.removeProperty('pointer-events');
             this.rootEl.style.removeProperty('z-index');
             overlay.remove();
             dropdownWrapper.remove();

@@ -1,5 +1,4 @@
 import { BB } from '../../../bb/bb';
-import { IKeyStringOptional } from '../../../bb/bb-types';
 
 /**
  * Checkbox - with label
@@ -18,7 +17,7 @@ export class Checkbox {
         allowTab?: boolean; // default false
         title?: string;
         doHighlight?: boolean; // default false
-        css?: IKeyStringOptional;
+        css?: Partial<CSSStyleDeclaration>;
     }) {
         this.doHighlight = !!params.doHighlight;
 

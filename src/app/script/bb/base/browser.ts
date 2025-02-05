@@ -1,15 +1,15 @@
-export const isFirefox = navigator.userAgent.toLowerCase().indexOf('firefox') > -1;
+export const IS_FIREFOX = navigator.userAgent.toLowerCase().indexOf('firefox') > -1;
 
-export const eventUsesHighResTimeStamp = (function (): () => boolean {
+export const EVENT_USES_HIGH_RES_TIMESTAMP = (function (): () => boolean {
     const eventUsesHighResTimeStamp: boolean = new Event('').timeStamp < 1000 * 60 * 60;
     return function (): boolean {
         return eventUsesHighResTimeStamp;
     };
 })();
 
-export const hasPointerEvents = !!window.PointerEvent;
+export const HAS_POINTER_EVENTS = !!window.PointerEvent;
 
-export const isCssMinMaxSupported = (function (): () => boolean {
+export const IS_CSS_MIN_MAX_SUPPORTED = (function (): () => boolean {
     let result: boolean | undefined;
 
     function test(): void {

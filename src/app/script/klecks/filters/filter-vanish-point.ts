@@ -5,14 +5,14 @@ import { input } from '../ui/components/input';
 import { ColorOptions } from '../ui/components/color-options';
 import { drawVanishPoint } from '../image-operations/draw-vanish-point';
 import { KlSlider } from '../ui/components/kl-slider';
-import { eventResMs } from './filters-consts';
-import { TFilterHistoryEntry } from './filters';
+import { EVENT_RES_MS } from './filters-consts';
 import { throwIfNull } from '../../bb/base/base';
 import { Preview } from '../ui/project-viewport/preview';
 import { TProjectViewportProject } from '../ui/project-viewport/project-viewport';
 import { DraggableInput } from '../ui/components/draggable-input';
 import { testIsSmall } from '../ui/utils/test-is-small';
 import { getPreviewHeight, getPreviewWidth } from '../ui/utils/preview-size';
+import { canvasToLayerTiles } from '../history/push-helpers/canvas-to-layer-tiles';
 
 export type TFilterVanishPointInput = {
     x: number;
@@ -22,11 +22,6 @@ export type TFilterVanishPointInput = {
     color: IRGB;
     opacity: number;
 };
-
-export type TFilterVanishPointHistoryEntry = TFilterHistoryEntry<
-    'vanishPoint',
-    TFilterVanishPointInput
->;
 
 export const filterVanishPoint = {
     getDialog(params: IFilterGetDialogParam) {
@@ -68,7 +63,7 @@ export const filterVanishPoint = {
             max: 20,
             value: settingsObj.lines,
             curve: 'quadratic',
-            eventResMs: eventResMs,
+            eventResMs: EVENT_RES_MS,
             onChange: function (val) {
                 settingsObj.lines = Math.round(val);
                 update();
@@ -268,14 +263,13 @@ export const filterVanishPoint = {
     },
 
     apply(params: IFilterApply<TFilterVanishPointInput>): boolean {
-        const context = params.context;
+        const context = params.layer.context;
         const klCanvas = params.klCanvas;
-        const history = params.history;
+        const klHistory = params.klHistory;
         if (!context || !klCanvas) {
             return false;
         }
 
-        history?.pause(true);
         drawVanishPoint(
             context,
             params.input.x,
@@ -285,17 +279,25 @@ export const filterVanishPoint = {
             params.input.color,
             params.input.opacity,
         );
-        history?.pause(false);
+        {
+            const layerMap = Object.fromEntries(
+                params.klCanvas.getLayers().map((layerItem) => {
+                    if (layerItem.id === params.layer.id) {
+                        return [
+                            layerItem.id,
+                            {
+                                tiles: canvasToLayerTiles(params.layer.canvas),
+                            },
+                        ];
+                    }
 
-        history?.push({
-            tool: ['filter', 'vanishPoint'],
-            action: 'apply',
-            params: [
-                {
-                    input: params.input,
-                },
-            ],
-        } as TFilterVanishPointHistoryEntry);
+                    return [layerItem.id, {}];
+                }),
+            );
+            klHistory.push({
+                layerMap,
+            });
+        }
         return true;
     },
 };

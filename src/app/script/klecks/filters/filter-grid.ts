@@ -4,12 +4,12 @@ import { LANG } from '../../language/language';
 import { input } from '../ui/components/input';
 import { ColorOptions } from '../ui/components/color-options';
 import { drawGrid } from '../image-operations/draw-grid';
-import { TFilterHistoryEntry } from './filters';
 import { throwIfNull } from '../../bb/base/base';
 import { Preview } from '../ui/project-viewport/preview';
 import { css } from '@emotion/css/dist/emotion-css.cjs';
 import { testIsSmall } from '../ui/utils/test-is-small';
 import { getPreviewHeight, getPreviewWidth } from '../ui/utils/preview-size';
+import { canvasToLayerTiles } from '../history/push-helpers/canvas-to-layer-tiles';
 
 export type TFilterGridInput = {
     x: number;
@@ -18,8 +18,6 @@ export type TFilterGridInput = {
     color: string;
     opacity: number;
 };
-
-export type TFilterGridHistoryEntry = TFilterHistoryEntry<'grid', TFilterGridInput>;
 
 export const filterGrid = {
     getDialog(params: IFilterGetDialogParam) {
@@ -204,14 +202,13 @@ export const filterGrid = {
     },
 
     apply(params: IFilterApply<TFilterGridInput>): boolean {
-        const context = params.context;
+        const context = params.layer.context;
         const klCanvas = params.klCanvas;
-        const history = params.history;
+        const klHistory = params.klHistory;
         if (!context || !klCanvas) {
             return false;
         }
 
-        history?.pause(true);
         drawGrid(
             context,
             params.input.x,
@@ -220,17 +217,25 @@ export const filterGrid = {
             params.input.color,
             params.input.opacity,
         );
-        history?.pause(false);
+        {
+            const layerMap = Object.fromEntries(
+                params.klCanvas.getLayers().map((layerItem) => {
+                    if (layerItem.id === params.layer.id) {
+                        return [
+                            layerItem.id,
+                            {
+                                tiles: canvasToLayerTiles(params.layer.canvas),
+                            },
+                        ];
+                    }
 
-        history?.push({
-            tool: ['filter', 'grid'],
-            action: 'apply',
-            params: [
-                {
-                    input: params.input,
-                },
-            ],
-        } as TFilterGridHistoryEntry);
+                    return [layerItem.id, {}];
+                }),
+            );
+            klHistory.push({
+                layerMap,
+            });
+        }
         return true;
     },
 };

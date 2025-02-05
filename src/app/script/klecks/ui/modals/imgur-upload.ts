@@ -1,10 +1,10 @@
 import { BB } from '../../../bb/bb';
 import { KL } from '../../kl';
 import { SaveReminder } from '../components/save-reminder';
-import { base64ToBlob } from '../../storage/base-64-to-blob';
 import { KlCanvas } from '../../canvas/kl-canvas';
 import { LANG } from '../../../language/language';
 import loadingImg from '/src/app/img/ui/loading.gif';
+import { canvasToBlob } from '../../../bb/base/canvas';
 
 type TImgurUploadResponse = {
     // just a subset
@@ -28,33 +28,33 @@ async function upload(
     type: 'png' | 'jpeg',
     imgurKey: string,
 ): Promise<TImgurUploadResponse> {
-    const img = base64ToBlob(canvas.toDataURL('image/' + type));
+    const imageBlob = await canvasToBlob(canvas, 'image/' + type);
 
-    const w = window.open();
+    const newTab = window.open();
 
-    if (!w) {
+    if (!newTab) {
         throw new Error('could not create new tab');
     }
 
-    const label = w.document.createElement('div');
-    const gif = w.document.createElement('img');
+    const label = newTab.document.createElement('div');
+    const gif = newTab.document.createElement('img');
     gif.src = loadingImg;
     label.append(gif);
     BB.css(gif, {
         filter: 'invert(1)',
     });
-    BB.css(w.document.body, {
+    BB.css(newTab.document.body, {
         backgroundColor: '#121211',
         backgroundImage: 'linear-gradient(#2b2b2b 0%, #121211 50%)',
         backgroundRepeat: 'no-repeat',
     });
 
-    const labelText = w.document.createElement('div');
+    const labelText = newTab.document.createElement('div');
     labelText.style.marginTop = '10px';
     label.append(labelText);
     labelText.textContent = LANG('upload-uploading');
 
-    w.document.body.append(label);
+    newTab.document.body.append(label);
     BB.css(label, {
         marginLeft: 'auto',
         marginRight: 'auto',
@@ -75,7 +75,7 @@ async function upload(
         const formData = new FormData();
         formData.append('title', title);
         formData.append('description', description);
-        formData.append('image', img);
+        formData.append('image', imageBlob);
         response = await fetch('https://api.imgur.com/3/image', {
             method: 'POST',
             headers: {
@@ -84,16 +84,16 @@ async function upload(
             body: formData,
         });
     } catch (e) {
-        w.close();
+        newTab.close();
         throw e;
     }
     if (!response.ok) {
-        w.close();
+        newTab.close();
         throw new Error();
     }
     const data: TImgurUploadResponse = (await response.json()).data;
 
-    w.location.href = data.link.replace(/\.(jpg|png)/, '');
+    newTab.location.href = data.link.replace(/\.(jpg|png)/, '');
 
     return data;
 }

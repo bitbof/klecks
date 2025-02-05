@@ -1,14 +1,10 @@
 import { BB } from '../../bb/bb';
 import { IRGB, IRGBA } from '../kl-types';
 import { IBounds, IPressureInput } from '../../bb/bb-types';
-import { IHistoryEntry, KlHistory, THistoryInnerActions } from '../history/kl-history';
 import { clamp } from '../../bb/math/math';
 import { BezierLine, TBezierLineCallback } from '../../bb/math/line';
-
-export interface IBlendBrushHistoryEntry extends IHistoryEntry {
-    tool: ['brush', 'BlendBrush'];
-    actions: THistoryInnerActions<BlendBrush>[];
-}
+import { KlHistory } from '../history/kl-history';
+import { getPushableLayerChange } from '../history/push-helpers/get-pushable-layer-change';
 
 const cellSize = 256;
 
@@ -49,8 +45,7 @@ export class BlendBrush {
     private lastInput2: IPressureInput = { x: 0, y: 0, pressure: 0 }; // todo docs
     private bezierLine: undefined | BezierLine;
 
-    private history: KlHistory | undefined;
-    private historyEntry: IBlendBrushHistoryEntry | undefined;
+    private klHistory: KlHistory = {} as KlHistory;
     private redrawBounds: IBounds | undefined;
     private cells: (ImageData | undefined)[] = [];
     private drawBuffer: IDrawBufferItem[] = [];
@@ -521,8 +516,8 @@ export class BlendBrush {
     // ----------------------------------- public -----------------------------------
     constructor() {}
 
-    setHistory(h: KlHistory): void {
-        this.history = h;
+    setHistory(klHistory: KlHistory): void {
+        this.klHistory = klHistory;
     }
 
     getSize(): number {
@@ -582,11 +577,6 @@ export class BlendBrush {
     }
 
     startLine(x: number, y: number, p: number): void {
-        this.historyEntry = {
-            tool: ['brush', 'BlendBrush'],
-            actions: [],
-        };
-
         const totalCells =
             Math.ceil(this.context.canvas.width / cellSize) *
             Math.ceil(this.context.canvas.height / cellSize);
@@ -710,14 +700,7 @@ export class BlendBrush {
 
         this.drawChangedCells();
 
-        if (this.historyEntry && this.history && this.cells.find((item) => !!item)) {
-            this.historyEntry.actions.push({
-                action: 'drawCells',
-                params: [this.cells],
-            });
-            this.history.push(this.historyEntry);
-            this.historyEntry = undefined;
-        }
+        this.klHistory.push(getPushableLayerChange(this.klHistory.getComposed(), this.cells));
         this.cells = [];
     }
 
@@ -821,20 +804,9 @@ export class BlendBrush {
         });
         this.drawBuffer = [];
 
-        if (this.history && this.cells.find((item) => !!item)) {
-            this.drawCells(this.cells);
-            this.historyEntry = {
-                tool: ['brush', 'BlendBrush'],
-                actions: [
-                    {
-                        action: 'drawCells',
-                        params: [this.cells],
-                    },
-                ],
-            };
-            this.history.push(this.historyEntry);
-            this.historyEntry = undefined;
-        }
+        this.klHistory.push(
+            getPushableLayerChange(this.klHistory.getComposed(), this.context.canvas),
+        );
         this.cells = [];
     }
 }

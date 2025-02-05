@@ -22,9 +22,9 @@ import {
 } from './base/base';
 import {
     canShareFiles,
-    eventUsesHighResTimeStamp,
-    hasPointerEvents,
-    isCssMinMaxSupported,
+    EVENT_USES_HIGH_RES_TIMESTAMP,
+    HAS_POINTER_EVENTS,
+    IS_CSS_MIN_MAX_SUPPORTED,
     unsetEventHandler,
 } from './base/browser';
 import { KeyListener, sameKeys } from './input/key-listener';
@@ -91,10 +91,10 @@ import { EventChain } from './input/event-chain/event-chain';
 
 export const BB = {
     // ---- browser ----
-    eventUsesHighResTimeStamp,
-    hasPointerEvents,
-    isCssMinMaxSupported,
-    canShareFiles,
+    eventUsesHighResTimeStamp: EVENT_USES_HIGH_RES_TIMESTAMP,
+    hasPointerEvents: HAS_POINTER_EVENTS,
+    isCssMinMaxSupported: IS_CSS_MIN_MAX_SUPPORTED,
+    canShareFiles: canShareFiles,
     unsetEventHandler,
 
     // ---- base ----

@@ -1,15 +1,13 @@
 import { getSharedFx } from '../../fx-canvas/shared-fx';
 import { IFilterApply } from '../kl-types';
-import { TFilterHistoryEntry } from './filters';
+import { canvasToLayerTiles } from '../history/push-helpers/canvas-to-layer-tiles';
 
 export type TFilterInvertInput = null;
 
-export type TFilterInvertHistoryEntry = TFilterHistoryEntry<'invert', TFilterInvertInput>;
-
 export const filterInvert = {
     apply(params: IFilterApply<TFilterInvertInput>): boolean {
-        const context = params.context;
-        const history = params.history;
+        const context = params.layer.context;
+        const klHistory = params.klHistory;
         if (!context) {
             return false;
         }
@@ -19,24 +17,31 @@ export const filterInvert = {
             return false;
         }
 
-        history?.pause(true);
-
         const texture = fxCanvas.texture(context.canvas);
         fxCanvas.draw(texture).invert().update();
         context.clearRect(0, 0, context.canvas.width, context.canvas.height);
         context.drawImage(fxCanvas, 0, 0);
         texture.destroy();
 
-        history?.pause(false);
-        history?.push({
-            tool: ['filter', 'invert'],
-            action: 'apply',
-            params: [
-                {
-                    input: params.input,
-                },
-            ],
-        } as TFilterInvertHistoryEntry);
+        {
+            const layerMap = Object.fromEntries(
+                params.klCanvas.getLayers().map((layerItem) => {
+                    if (layerItem.id === params.layer.id) {
+                        return [
+                            layerItem.id,
+                            {
+                                tiles: canvasToLayerTiles(params.layer.canvas),
+                            },
+                        ];
+                    }
+
+                    return [layerItem.id, {}];
+                }),
+            );
+            klHistory.push({
+                layerMap,
+            });
+        }
         return true;
     },
 };

@@ -102,7 +102,7 @@ export class ProjectStore {
 
     async store(project: IKlProject): Promise<void> {
         try {
-            const storageProject = ProjectConverter.createStorageProject(project);
+            const storageProject = await ProjectConverter.createStorageProject(project);
             await this.lowLevelStore(storageProject);
         } catch (e) {
             this.accessHasFailed = true;

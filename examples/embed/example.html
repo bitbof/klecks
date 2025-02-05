@@ -39,9 +39,9 @@
 
     const klecks = new Klecks({
         // disableAutoFit: true,
-        onSubmit: (onSuccess, onError) => {
+        onSubmit: async (onSuccess, onError) => {
             // download png
-            saveData(klecks.getPNG(), 'drawing.png');
+            saveData(await klecks.getPNG(), 'drawing.png');
 
             /*// download psd
             klecks.getPSD().then((blob) => {

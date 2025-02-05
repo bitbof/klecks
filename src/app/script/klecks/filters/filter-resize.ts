@@ -4,18 +4,15 @@ import { Select } from '../ui/components/select';
 import constrainImg from '/src/app/img/ui/constrain.svg';
 import { IFilterApply, IFilterGetDialogParam, TFilterGetDialogResult } from '../kl-types';
 import { LANG } from '../../language/language';
-import { TFilterHistoryEntry } from './filters';
 import { table } from '../ui/components/table';
 import { theme } from '../../theme/theme';
-import { smallPreview } from '../ui/utils/preview-size';
+import { SMALL_PREVIEW } from '../ui/utils/preview-size';
 
 export type TFilterResizeInput = {
     width: number;
     height: number;
     algorithm: 'smooth' | 'pixelated';
 };
-
-export type TFilterResizeHistoryEntry = TFilterHistoryEntry<'resize', TFilterResizeInput>;
 
 export const filterResize = {
     getDialog(params: IFilterGetDialogParam) {
@@ -267,8 +264,8 @@ export const filterResize = {
             previewFactor = previewW / newWidth;
 
             const offset = BB.centerWithin(
-                smallPreview.width,
-                smallPreview.height,
+                SMALL_PREVIEW.width,
+                SMALL_PREVIEW.height,
                 previewW,
                 previewH,
             );
@@ -286,8 +283,8 @@ export const filterResize = {
         const previewWrapper = BB.el({
             className: 'kl-transparent-preview',
             css: {
-                width: smallPreview.width + 'px',
-                height: smallPreview.height + 'px',
+                width: SMALL_PREVIEW.width + 'px',
+                height: SMALL_PREVIEW.height + 'px',
                 marginLeft: '-20px',
                 display: 'table',
                 marginTop: '10px',
@@ -340,25 +337,13 @@ export const filterResize = {
 
     apply(params: IFilterApply<TFilterResizeInput>): boolean {
         const klCanvas = params.klCanvas;
-        const history = params.history;
         const width = params.input.width;
         const height = params.input.height;
         const algorithm = params.input.algorithm;
         if (!klCanvas) {
             return false;
         }
-        history?.pause(true);
         klCanvas.resize(width, height, algorithm);
-        history?.pause(false);
-        history?.push({
-            tool: ['filter', 'resize'],
-            action: 'apply',
-            params: [
-                {
-                    input: params.input,
-                },
-            ],
-        } as TFilterResizeHistoryEntry);
         return true;
     },
 };

@@ -1,4 +1,5 @@
 import { addIsDarkListener, isDark } from '../bb/base/base';
+import { LocalStorage } from '../bb/base/local-storage';
 
 const LS_THEME_KEY = 'klecks-theme';
 
@@ -24,10 +25,10 @@ class Theme {
     }
 
     private readLocalStorage(): TTheme | undefined {
-        let result = localStorage.getItem(LS_THEME_KEY) as unknown;
+        let result = LocalStorage.getItem(LS_THEME_KEY) as unknown;
         if (!result || (typeof result === 'string' && !['dark', 'light'].includes(result))) {
             result = undefined;
-            localStorage.removeItem(LS_THEME_KEY); // reset because invalid
+            LocalStorage.removeItem(LS_THEME_KEY); // reset because invalid
         }
         return result as TTheme | undefined;
     }
@@ -83,9 +84,9 @@ class Theme {
 
     setStoredTheme(theme: TTheme | undefined): void {
         if (theme) {
-            localStorage.setItem(LS_THEME_KEY, theme);
+            LocalStorage.setItem(LS_THEME_KEY, theme);
         } else {
-            localStorage.removeItem(LS_THEME_KEY);
+            LocalStorage.removeItem(LS_THEME_KEY);
         }
         this.storedTheme = theme;
         this.updateTheme();

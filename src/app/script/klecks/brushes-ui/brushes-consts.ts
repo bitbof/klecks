@@ -1,1 +1,1 @@
-export const eventResMs = 20;
+export const EVENT_RES_MS = 20;

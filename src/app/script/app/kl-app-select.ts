@@ -1,7 +1,6 @@
 import { SelectUi, TSelectToolMode } from '../klecks/ui/tool-tabs/select-ui';
 import { EaselSelect } from '../klecks/ui/easel/tools/easel-select';
-import { isKlCanvasHistoryEntry, KlCanvas } from '../klecks/canvas/kl-canvas';
-import { KlHistory } from '../klecks/history/kl-history';
+import { KlCanvas } from '../klecks/canvas/kl-canvas';
 import { throwIfNull } from '../bb/base/base';
 import { SelectTool } from '../klecks/select-tool/select-tool';
 import { SelectTransformTool } from '../klecks/select-tool/select-transform-tool';
@@ -10,6 +9,7 @@ import { identity, Matrix } from 'transformation-matrix';
 import { StatusOverlay } from '../klecks/ui/components/status-overlay';
 import { showModal } from '../klecks/ui/modals/base/showModal';
 import { LANG } from '../language/language';
+import { KlHistory } from '../klecks/history/kl-history';
 
 export type TSelectTransformTempEntry = {
     type: 'select-transform';
@@ -62,10 +62,11 @@ export class KlAppSelect {
     // transform state
     private targetLayerIndex: number = 0;
     private initialTransform: TSelectTransformTempEntry['data'] = {
-        // when you begin transforming (for undo, and comparing change)
+        // When you begin transforming (for undo, and comparing change).
         transform: identity(),
         doClone: false,
         targetLayerIndex: 0,
+        // Needs to be kept up to date.
         backgroundIsTransparent: false,
     };
     private backgroundIsTransparent: boolean = false;
@@ -169,7 +170,7 @@ export class KlAppSelect {
 
         // KlCanvas' selectionSample needs to be cleared manually.
         // Done by injecting it before any new undo step. It's an "invisible" undo step.
-        this.klHistory.addBeforePushListener((entry) => {
+        /*this.klHistory.addBeforePushListener((entry) => {
             if (this.tempHistory.getIsActive() || !this.klCanvas.getSelectionSample()) {
                 return;
             }
@@ -182,7 +183,7 @@ export class KlAppSelect {
                 return;
             }
             this.klCanvas.clearSelectionSample();
-        });
+        });*/
 
         this.selectTool = new SelectTool({
             klCanvas: this.klCanvas,
@@ -264,6 +265,7 @@ export class KlAppSelect {
                         }
                         p.statusOverlay.out(LANG('select-transform-applied'), true);
                     }
+                    this.klCanvas.clearSelectionSample();
                     this.klCanvas.setComposite(layerIndex, undefined);
                     this.klCanvas.setComposite(this.targetLayerIndex, undefined);
                     this.easelSelect.clearRenderedSelection(true);
@@ -297,6 +299,7 @@ export class KlAppSelect {
                     const currentLayerCanvas = this.getCurrentLayerCtx().canvas;
                     const layerIndex = throwIfNull(this.klCanvas.getLayerIndex(currentLayerCanvas));
                     this.initialTransform.targetLayerIndex = layerIndex;
+                    this.initialTransform.backgroundIsTransparent = this.backgroundIsTransparent;
                     this.targetLayerIndex = layerIndex;
                     this.transformTool.setBackgroundIsTransparent(
                         this.isSourceLayerBackgroundTransparent(),
@@ -382,12 +385,14 @@ export class KlAppSelect {
                             sourceLayer: layerIndex,
                             targetLayer: this.targetLayerIndex,
                             transformation: this.transformTool.getTransform(),
+                            backgroundIsTransparent: this.backgroundIsTransparent,
                         });
                     }
                     const oldSelection = this.transformTool.getTransformedSelection();
 
                     // start another transform
                     const selection = this.klCanvas.getSelection() || oldSelection;
+                    this.initialTransform.backgroundIsTransparent = this.backgroundIsTransparent;
                     this.transformTool.setSelection(selection);
                     this.transformTool.setDoClone(true);
                     this.transformTool.setSelectionSample(this.klCanvas.getSelectionSample());
@@ -428,7 +433,7 @@ export class KlAppSelect {
             },
         });
 
-        this.klHistory.addListener((update) => {
+        this.klHistory.addListener(() => {
             const selection = this.klCanvas.getSelection();
             if (this.selectMode === 'select') {
                 this.selectTool.setSelection(selection);

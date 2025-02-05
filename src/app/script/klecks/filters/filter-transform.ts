@@ -5,21 +5,19 @@ import { IFreeTransform } from '../ui/components/free-transform-utils';
 import { Select } from '../ui/components/select';
 import { IFilterApply, IFilterGetDialogParam, TFilterGetDialogResult } from '../kl-types';
 import { LANG } from '../../language/language';
-import { TFilterHistoryEntry } from './filters';
 import { throwIfNull } from '../../bb/base/base';
 import { Preview } from '../ui/project-viewport/preview';
 import { TProjectViewportProject } from '../ui/project-viewport/project-viewport';
 import { css } from '@emotion/css/dist/emotion-css.cjs';
 import { testIsSmall } from '../ui/utils/test-is-small';
-import { getPreviewHeight, getPreviewWidth, mediumPreview } from '../ui/utils/preview-size';
+import { getPreviewHeight, getPreviewWidth, MEDIUM_PREVIEW } from '../ui/utils/preview-size';
+import { canvasToLayerTiles } from '../history/push-helpers/canvas-to-layer-tiles';
 
 export type TFilterTransformInput = {
     bounds: { x: number; y: number; width: number; height: number };
     transform: IFreeTransform;
     isPixelated: boolean;
 };
-
-export type TFilterTransformHistoryEntry = TFilterHistoryEntry<'transform', TFilterTransformInput>;
 
 export const filterTransform = {
     getDialog(params: IFilterGetDialogParam) {
@@ -51,7 +49,7 @@ export const filterTransform = {
             element: rootEl,
         };
         if (!isSmall) {
-            result.width = mediumPreview.width;
+            result.width = MEDIUM_PREVIEW.width;
         }
 
         const keyListener = new BB.KeyListener({
@@ -454,13 +452,11 @@ export const filterTransform = {
     },
 
     apply(params: IFilterApply<TFilterTransformInput>): boolean {
-        const context = params.context;
-        const history = params.history;
+        const context = params.layer.context;
+        const klHistory = params.klHistory;
         if (!context) {
             return false;
         }
-        history?.pause(true);
-
         const input = params.input;
 
         const copyCanvas = BB.copyCanvas(context.canvas);
@@ -472,13 +468,25 @@ export const filterTransform = {
             input.bounds,
             input.isPixelated,
         );
+        {
+            const layerMap = Object.fromEntries(
+                params.klCanvas.getLayers().map((layerItem) => {
+                    if (layerItem.id === params.layer.id) {
+                        return [
+                            layerItem.id,
+                            {
+                                tiles: canvasToLayerTiles(params.layer.canvas),
+                            },
+                        ];
+                    }
 
-        history?.pause(false);
-        history?.push({
-            tool: ['filter', 'transform'],
-            action: 'apply',
-            params: [{ input }],
-        } as TFilterTransformHistoryEntry);
+                    return [layerItem.id, {}];
+                }),
+            );
+            klHistory.push({
+                layerMap,
+            });
+        }
         return true;
     },
 };

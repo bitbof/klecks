@@ -1,20 +1,20 @@
 import { c } from '../../../bb/base/c';
 import { makeUnfocusable } from '../../../bb/base/ui';
 
-export type TDropdownMenuParams = {
+export type TDropdownMenuParams<IdType extends string> = {
     button: string | HTMLElement;
     buttonTitle?: string;
-    items: [string, string][]; // id, label
-    onItemClick: (id: string) => void;
+    items: [IdType, string][]; // id, label
+    onItemClick: (id: IdType) => void;
 };
 
-export class DropdownMenu {
+export class DropdownMenu<IdType extends string> {
     private readonly rootElement: HTMLElement;
     private isExpanded: boolean = false;
-    private readonly onSetEnabled: (id: string, enabled: boolean) => void = () => 0;
+    private readonly onSetEnabled: (id: IdType, enabled: boolean) => void = () => 0;
 
     // ----------------------------------- public -----------------------------------
-    constructor(p: TDropdownMenuParams) {
+    constructor(p: TDropdownMenuParams<IdType>) {
         const button = c('button,w-full,h-full', [p.button]) as HTMLButtonElement;
         button.onclick = () => {
             toggle(!this.isExpanded);
@@ -25,7 +25,7 @@ export class DropdownMenu {
         makeUnfocusable(button);
 
         const items: HTMLButtonElement[] = [];
-        const itemMap: Record<string, HTMLButtonElement> = {};
+        const itemMap: Record<IdType, HTMLButtonElement> = {} as Record<IdType, HTMLButtonElement>;
         p.items.forEach((item) => {
             const itemButton = c('button', item[1]) as HTMLButtonElement;
             makeUnfocusable(itemButton);
@@ -47,7 +47,7 @@ export class DropdownMenu {
 
         const toggle = (force: boolean) => {
             this.isExpanded = force;
-            menu.style.display = this.isExpanded ? 'block' : 'none';
+            menu.style.display = this.isExpanded ? '' : 'none';
             if (this.isExpanded) {
                 document.addEventListener('pointerdown', onPointerDown, { passive: false });
                 window.addEventListener('blur', onBlur);
@@ -64,7 +64,6 @@ export class DropdownMenu {
             }
             toggle(false);
         };
-
         const onBlur = () => toggle(false);
     }
 
@@ -72,7 +71,7 @@ export class DropdownMenu {
         return this.rootElement;
     }
 
-    setEnabled(id: string, enabled: boolean): void {
+    setEnabled(id: IdType, enabled: boolean): void {
         this.onSetEnabled(id, enabled);
     }
 }

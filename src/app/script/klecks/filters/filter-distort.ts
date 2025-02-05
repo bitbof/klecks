@@ -2,11 +2,10 @@ import { BB } from '../../bb/bb';
 import { IFilterApply, IFilterGetDialogParam, TFilterGetDialogResult } from '../kl-types';
 import { KlSlider } from '../ui/components/kl-slider';
 import { LANG } from '../../language/language';
-import { eventResMs } from './filters-consts';
+import { EVENT_RES_MS } from './filters-consts';
 import { getSharedFx } from '../../fx-canvas/shared-fx';
 import { Options } from '../ui/components/options';
 import { Checkbox } from '../ui/components/checkbox';
-import { TFilterHistoryEntry } from './filters';
 import { throwIfNull } from '../../bb/base/base';
 import { TFilterDistortSettings } from '../../fx-canvas/filters/distort';
 import { FxPreviewRenderer } from '../ui/project-viewport/fx-preview-renderer';
@@ -14,7 +13,8 @@ import { TProjectViewportProject } from '../ui/project-viewport/project-viewport
 import { Preview } from '../ui/project-viewport/preview';
 import { css } from '@emotion/css/dist/emotion-css.cjs';
 import { testIsSmall } from '../ui/utils/test-is-small';
-import { getPreviewHeight, getPreviewWidth, mediumPreview } from '../ui/utils/preview-size';
+import { getPreviewHeight, getPreviewWidth, MEDIUM_PREVIEW } from '../ui/utils/preview-size';
+import { canvasToLayerTiles } from '../history/push-helpers/canvas-to-layer-tiles';
 
 // see fx-canvas distort
 export type TFilterDistortInput = {
@@ -25,8 +25,6 @@ export type TFilterDistortInput = {
     phase: { x: number; y: number };
     offset: { x: number; y: number };
 };
-
-export type TFilterDistortHistoryEntry = TFilterHistoryEntry<'distort', TFilterDistortInput>;
 
 export const filterDistort = {
     getDialog(params: IFilterGetDialogParam) {
@@ -196,7 +194,7 @@ export const filterDistort = {
                 max: 1000,
                 curve: 'quadratic',
                 value: settings.scale[item],
-                eventResMs: eventResMs,
+                eventResMs: EVENT_RES_MS,
                 onChange: (val) => {
                     settings.scale[item] = val;
                     if (isSynced) {
@@ -217,7 +215,7 @@ export const filterDistort = {
                 max: 200,
                 curve: 'quadratic',
                 value: settings.strength[item],
-                eventResMs: eventResMs,
+                eventResMs: EVENT_RES_MS,
                 onChange: (val) => {
                     settings.strength[item] = val;
                     if (isSynced) {
@@ -238,7 +236,7 @@ export const filterDistort = {
                 max: 1,
                 value: settings.phase[item],
                 manualInputRoundDigits: 2,
-                eventResMs: eventResMs,
+                eventResMs: EVENT_RES_MS,
                 formatFunc: (val) => BB.round(val, 2),
                 onChange: (val) => {
                     settings.phase[item] = val;
@@ -265,7 +263,7 @@ export const filterDistort = {
             max: 300,
             curve: 'quadratic',
             value: settings.stepSize,
-            eventResMs: eventResMs,
+            eventResMs: EVENT_RES_MS,
             onChange: (val) => {
                 settings.stepSize = Math.round(val);
                 preview.render();
@@ -346,20 +344,18 @@ export const filterDistort = {
             },
         };
         if (!isSmall) {
-            result.width = mediumPreview.width;
+            result.width = MEDIUM_PREVIEW.width;
         }
         return result;
     },
 
     apply(params: IFilterApply<TFilterDistortInput>): boolean {
         const klCanvas = params.klCanvas;
-        const context = params.context;
-        const history = params.history;
+        const context = params.layer.context;
+        const klHistory = params.klHistory;
         if (!klCanvas) {
             return false;
         }
-        history?.pause(true);
-
         const fxCanvas = getSharedFx();
         if (!fxCanvas) {
             return false; // todo more specific error?
@@ -370,16 +366,25 @@ export const filterDistort = {
         context.drawImage(fxCanvas, 0, 0);
         texture.destroy();
 
-        history?.pause(false);
-        history?.push({
-            tool: ['filter', 'distort'],
-            action: 'apply',
-            params: [
-                {
-                    input: params.input,
-                },
-            ],
-        } as TFilterDistortHistoryEntry);
+        {
+            const layerMap = Object.fromEntries(
+                params.klCanvas.getLayers().map((layerItem) => {
+                    if (layerItem.id === params.layer.id) {
+                        return [
+                            layerItem.id,
+                            {
+                                tiles: canvasToLayerTiles(params.layer.canvas),
+                            },
+                        ];
+                    }
+
+                    return [layerItem.id, {}];
+                }),
+            );
+            klHistory.push({
+                layerMap,
+            });
+        }
         return true;
     },
 };

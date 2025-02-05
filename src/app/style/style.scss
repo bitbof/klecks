@@ -366,6 +366,7 @@ button img {
     width: 120px;
     margin-left: 10px;
     margin-top: 10px;
+    min-height: 30px; // for consistency with buttons that have an icon
 }
 
 .grid-button--filter {
@@ -688,6 +689,8 @@ clip-path seems the cleanest.
     width: 11px;
     height: 10px;
     background: #f5f5f5;
+    // webstorm complains for no reason https://youtrack.jetbrains.com/issue/WEB-56824/Mismatched-property-value-error-for-clip-path-path...
+    // noinspection CssInvalidPropertyValue
     clip-path: path("M 11 10 11 0 10 0 A 10 10 0 0 1 0 10");
     filter: none !important;
 
@@ -705,6 +708,7 @@ clip-path seems the cleanest.
     width: 11px;
     height: 10px;
     background: #f5f5f5;
+    // noinspection CssInvalidPropertyValue
     clip-path: path("M 0 0 0 10 11 10 A 10 10 0 0 1 1 0");
     filter: none !important;
 
@@ -717,14 +721,12 @@ clip-path seems the cleanest.
 .kl-option-wrapper {
     display: flex;
     flex-wrap: wrap;
-    margin-top: -4px;
-    margin-left: -4px;
+    gap: 4px;
 }
 
 .kl-option {
     cursor: pointer;
     padding: 6px 10px;
-    margin: 4px 0 0 4px;
     font-size: 16px;
     border-radius: 4px;
     // transition: all 0.1s ease-in-out;
@@ -1133,13 +1135,15 @@ clip-path seems the cleanest.
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
 }
 
-.kl-file-save-row {
-    box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.2);
+.kl-file-save-wrapper {
+    box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.15);
     border-radius: 5px;
     margin: 10px 10px 0 10px;
     padding-bottom: 10px;
     padding-right: 10px;
     display: flex;
+    flex-direction: column;
+    gap: 10px;
 }
 
 .kl-dropdown-menu {
@@ -1150,6 +1154,10 @@ clip-path seems the cleanest.
     background: #ddd;
     box-shadow: 0 2px 5px #00000080;
     border-radius: 4px;
+
+    display: flex;
+    flex-direction: column;
+    z-index: 1;
 }
 
 .kl-pinch-overlay {
