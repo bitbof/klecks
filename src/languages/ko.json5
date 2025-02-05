@@ -1311,6 +1311,14 @@
     original: 'Fixed 1:1',
     value: '고정 1:1'
   },
+  'shape-auto-pan': {
+    original: 'Auto-pan',
+    value: ''
+  },
+  'shape-auto-pan-title': {
+    original: 'Automatically moves as you draw',
+    value: ''
+  },
   'text-instruction': {
     original: 'Click canvas to place text',
     value: '텍스트를 배치하려면 캔버스를 클릭하세요'
@@ -1593,6 +1601,11 @@
     hint: 'for layer opacity, brush opacity, text opacity, ...',
     original: 'Opacity',
     value: '투명도'
+  },
+  scatter: {
+    hint: 'for brush scatter',
+    original: 'Scatter',
+    value: ''
   },
   red: {
     original: 'Red',

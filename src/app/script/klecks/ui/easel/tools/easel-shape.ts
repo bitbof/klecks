@@ -19,6 +19,7 @@ export class EaselShape implements TEaselTool {
     private readonly onUp: tEaselShapeParams['onUp'];
     private easel: TEaselInterface = {} as TEaselInterface;
     private isDragging: boolean = false;
+    private doPan: boolean = false;
     private cornerPanning: CornerPanning;
 
     // ----------------------------------- public -----------------------------------
@@ -48,9 +49,9 @@ export class EaselShape implements TEaselTool {
     }
 
     onPointer(e: IPointerEvent, isRepeat?: boolean): void {
-        /*if (!isRepeat) {
+        if (this.doPan && !isRepeat) {
             this.cornerPanning.onPointer(e);
-        }*/
+        }
 
         this.easel.setCursor('crosshair');
         const vTransform = this.easel.getTransform();
@@ -80,5 +81,9 @@ export class EaselShape implements TEaselTool {
     activate(cursorPos?: IVector2D): void {
         this.easel.setCursor('crosshair');
         this.isDragging = false;
+    }
+
+    setPanning(doPan: boolean) {
+        this.doPan = doPan;
     }
 }

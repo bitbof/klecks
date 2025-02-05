@@ -1403,7 +1403,7 @@ export class KlCanvas {
     }
 
     getColorAt(x: number, y: number): IRGB {
-        return this.eyedropper.getColorAt(x, y, this.layers);
+        return this.eyedropper.getColorAt(x, y, this.klHistory.getComposed());
     }
 
     getCompleteCanvas(factor: number): HTMLCanvasElement {

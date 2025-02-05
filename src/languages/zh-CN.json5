@@ -1311,6 +1311,14 @@
     original: 'Fixed 1:1',
     value: '锁定 1:1'
   },
+  'shape-auto-pan': {
+    original: 'Auto-pan',
+    value: ''
+  },
+  'shape-auto-pan-title': {
+    original: 'Automatically moves as you draw',
+    value: ''
+  },
   'text-instruction': {
     original: 'Click canvas to place text',
     value: '点击画布添加文本'
@@ -1593,6 +1601,11 @@
     hint: 'for layer opacity, brush opacity, text opacity, ...',
     original: 'Opacity',
     value: '不透明度'
+  },
+  scatter: {
+    hint: 'for brush scatter',
+    original: 'Scatter',
+    value: ''
   },
   red: {
     original: 'Red',

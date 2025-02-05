@@ -1311,6 +1311,14 @@
     original: 'Fixed 1:1',
     value: 'Fest 1:1'
   },
+  'shape-auto-pan': {
+    original: 'Auto-pan',
+    value: 'Auto-scroll'
+  },
+  'shape-auto-pan-title': {
+    original: 'Automatically moves as you draw',
+    value: 'Bewegt die Ansicht automatisch'
+  },
   'text-instruction': {
     original: 'Click canvas to place text',
     value: 'Klicken um Text zu platzieren'

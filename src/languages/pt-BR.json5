@@ -1310,6 +1310,14 @@
     original: 'Fixed 1:1',
     value: 'Fixo 1:1'
   },
+  'shape-auto-pan': {
+    original: 'Auto-pan',
+    value: ''
+  },
+  'shape-auto-pan-title': {
+    original: 'Automatically moves as you draw',
+    value: ''
+  },
   'text-instruction': {
     original: 'Click canvas to place text',
     value: 'Clique na tela para inserir texto'
@@ -1592,6 +1600,11 @@
     hint: 'for layer opacity, brush opacity, text opacity, ...',
     original: 'Opacity',
     value: 'Opacidade'
+  },
+  scatter: {
+    hint: 'for brush scatter',
+    original: 'Scatter',
+    value: ''
   },
   red: {
     original: 'Red',

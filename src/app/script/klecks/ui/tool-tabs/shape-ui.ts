@@ -23,11 +23,13 @@ export class ShapeUi {
     private readonly fixedToggle: Checkbox;
     private readonly snapToggle: Checkbox;
     private readonly lockAlphaToggle: Checkbox;
+    private readonly panningToggle: Checkbox;
 
     // ----------------------------------- public -----------------------------------
 
     constructor(p: {
         colorSlider: KlColorSlider; // when opening tab, inserts it (snatches it from where else it was)
+        onChangePanning: (doPan: boolean) => void;
     }) {
         this.rootEl = BB.el({
             css: {
@@ -269,9 +271,21 @@ export class ShapeUi {
         });
         this.lockAlphaToggle.getElement().style.marginTop = '10px';
 
+        this.panningToggle = new Checkbox({
+            init: false,
+            label: LANG('shape-auto-pan'),
+            title: LANG('shape-auto-pan-title'),
+            callback: (b) => p.onChangePanning(b),
+        });
+        this.panningToggle.getElement().style.marginTop = '10px';
+
         row1.append(
             BB.el({
-                content: [this.eraserToggle.getElement(), this.lockAlphaToggle.getElement()],
+                content: [
+                    this.eraserToggle.getElement(),
+                    this.lockAlphaToggle.getElement(),
+                    this.panningToggle.getElement(),
+                ],
             }),
         );
 

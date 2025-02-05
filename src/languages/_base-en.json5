@@ -865,6 +865,8 @@ renaming keys across language files:
     "hint": "fixed ratio of 1:1",
     "value": "Fixed 1:1"
   },
+  "shape-auto-pan": "Auto-pan",
+  "shape-auto-pan-title": "Automatically moves as you draw",
 
   // text tool
   "text-instruction": "Click canvas to place text",

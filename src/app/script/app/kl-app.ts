@@ -607,6 +607,17 @@ export class KlApp {
         });
 
         const easelHand = new EaselHand({});
+        const easelShape = new EaselShape({
+            onDown: (p, angleRad) => {
+                shapeTool.onDown(p.x, p.y, angleRad);
+            },
+            onMove: (p) => {
+                shapeTool.onMove(p.x, p.y);
+            },
+            onUp: (p) => {
+                shapeTool.onUp(p.x, p.y);
+            },
+        });
 
         let isFirstTransform = true;
         this.easel = new Easel({
@@ -708,17 +719,7 @@ export class KlApp {
                         });
                     },
                 }),
-                shape: new EaselShape({
-                    onDown: (p, angleRad) => {
-                        shapeTool.onDown(p.x, p.y, angleRad);
-                    },
-                    onMove: (p) => {
-                        shapeTool.onMove(p.x, p.y);
-                    },
-                    onUp: (p) => {
-                        shapeTool.onUp(p.x, p.y);
-                    },
-                }),
+                shape: easelShape,
                 rotate: new EaselRotate({}),
                 zoom: new EaselZoom({}),
             },
@@ -1353,6 +1354,7 @@ export class KlApp {
 
         const shapeUi = new KL.ShapeUi({
             colorSlider: this.klColorSlider,
+            onChangePanning: (doPan) => easelShape.setPanning(doPan),
         });
 
         const gradientTool = new KL.GradientTool({
