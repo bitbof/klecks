@@ -7,7 +7,7 @@
   'toggle-show-tools': {
     hint: 'Button that hides/shows the toolbar.',
     original: 'Show/Hide Tools',
-    value: 'Tampilake / Singidaken Piranti'
+    value: 'Tampilake/Singidaken Piranti'
   },
   scroll: {
     hint: 'Verb. As in scrolling a page.',
@@ -77,7 +77,7 @@
   'tool-more-tools': {
     hint: 'when hovering the caret on the tool button',
     original: 'More Tools',
-    value: ''
+    value: 'Piranti Liyane'
   },
   undo: {
     original: 'Undo',
@@ -277,11 +277,11 @@
   'layers-clear': {
     hint: 'to make a layer empty',
     original: 'Clear layer',
-    value: ''
+    value: 'Lapisan sing cetha'
   },
   'layers-merge-all': {
     original: 'Merge all',
-    value: 'Gabung Kabeh'
+    value: 'Gabung kabeh'
   },
   'layers-rename': {
     hint: 'action',
@@ -367,7 +367,7 @@
   'layers-rename-title': {
     hint: '-title in code usually means it shows up in a tooltip, or it’s the header of a dialog box, so it can be a little bit longer.',
     original: 'Rename Layer',
-    value: 'Ganti jeneng Layer'
+    value: 'Ganti Jeneng Layer'
   },
   'layers-rename-name': {
     hint: 'noun',
@@ -411,7 +411,7 @@
   },
   'layers-merge-modal-title': {
     original: 'Merge/Mix Layers',
-    value: 'Gabung / Nyampur Lapisan'
+    value: 'Gabung/Nyampur Lapisan'
   },
   'layers-merge-description': {
     hint: 'After ":" a list of mix/blend modes is shown.',
@@ -445,7 +445,7 @@
   'file-show-save-dialog': {
     hint: 'setting for showing/not showing a dialog where user picks folder and filename',
     original: 'Show save dialog',
-    value: ''
+    value: 'Tampilake dialog simpen
   },
   'file-copy': {
     hint: 'verb',
@@ -458,7 +458,7 @@
   },
   'file-paste': {
     original: 'Paste',
-    value: ''
+    value: 'Tempel'
   },
   'file-share': {
     hint: 'Common feature on phones. Pressing share button allows to send data to a different app, e.g. as a text message to someone.',
@@ -493,7 +493,7 @@
   'file-storage-store': {
     hint: 'verb',
     original: 'Store',
-    value: 'nyimpen'
+    value: 'Nyimpen'
   },
   'file-storage-clear': {
     original: 'Clear',
@@ -501,7 +501,7 @@
   },
   'file-storage-clear-prompt': {
     original: 'Clear Browser Storage?',
-    value: ''
+    value: 'Mbusak Panyimpenan Browser?'
   },
   'file-storage-storing': {
     hint: 'while it is in the process of storing',
@@ -684,7 +684,7 @@
   },
   'upload-failed': {
     original: 'Upload failed.',
-    value: 'Unggahan gagal'
+    value: 'Unggahan gagal.'
   },
   'upload-delete': {
     original: 'To delete your image from Imgur visit:',
@@ -952,7 +952,7 @@
   'filter-hue-sat-title': {
     hint: 'same as the button, but can be longer',
     original: 'Hue / Saturation',
-    value: 'Hue/Saturasi'
+    value: 'Hue / Saturasi'
   },
   'filter-hue-sat-description': {
     original: 'Change hue and saturation for the selected layer.',
@@ -1108,15 +1108,15 @@
   'dropper-drop': {
     hint: 'as in, drag and drop a file',
     original: 'Drop to import',
-    value: ''
+    value: 'Gulung kanggo ngimpor
   },
   'dropper-as-image': {
     original: 'As New Image',
-    value: ''
+    value: 'Minangka Gambar Anyar'
   },
   'dropper-as-layer': {
     original: 'As Layer',
-    value: ''
+    value: 'Minangka Lapisan'
   },
   'import-opening': {
     hint: 'in the process of opening a large file',
@@ -1194,11 +1194,11 @@
   },
   'clipboard-read-fail': {
     original: 'Failed to read from clipboard.',
-    value: ''
+    value: 'Gagal maca saka clipboard.'
   },
   'clipboard-no-image': {
     original: 'No image found in clipboard.',
-    value: ''
+    value: 'Ora ana gambar sing ditemokake ing clipboard.'
   },
   'hand-reset': {
     hint: 'resets zoom (to 100%) and rotation (to 0°)',
