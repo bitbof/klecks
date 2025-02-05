@@ -375,6 +375,7 @@ export class PenBrush {
                 y1 + eY * loopDist,
                 this.settingSize,
                 this.settingOpacity,
+                this.settingScatter,
                 angle,
             );
         }
