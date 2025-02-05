@@ -29,6 +29,11 @@ export const penBrushUi = (function () {
                 [1, 1],
             ],
         },
+        scatterSlider: {
+            min: 0,
+            max: 100,
+            curve: BB.quadraticSplineInput(0, 100, 0.1),
+        },
     } as IBrushUi<PenBrush>;
 
     let alphaNames = [
@@ -54,6 +59,7 @@ export const penBrushUi = (function () {
         p.onSizeChange(brush.getSize());
         let sizeSlider: KlSlider;
         let opacitySlider: KlSlider;
+        let scatterSlider: KlSlider;
 
         const alphaOptions = new Options({
             optionArr: [0, 1, 2, 3].map((id) => {
@@ -164,12 +170,31 @@ export const penBrushUi = (function () {
                     p.onOpacityChange(val);
                 },
             });
+            scatterSlider = new KlSlider({
+                label: LANG('scatter'),
+                width: 225,
+                height: 30,
+                min: brushInterface.scatterSlider.min,
+                max: brushInterface.scatterSlider.max,
+                value: brushInterface.scatterSlider.min,
+                curve: brushInterface.scatterSlider.curve,
+                eventResMs: EVENT_RES_MS,
+                toDisplayValue: (val) => val,
+                toValue: (displayValue) => displayValue / 100,
+                onChange: (val) => {
+                    brush.setScatter(val);
+                    p.onScatterChange(val);
+                },
+            });
 
             const pressureSizeToggle = createPenPressureToggle(true, function (b) {
                 brush.sizePressure(b);
             });
             const pressureOpacityToggle = createPenPressureToggle(false, function (b) {
                 brush.opacityPressure(b);
+            });
+            const pressureScatterToggle = createPenPressureToggle(false, function (b) {
+                brush.scatterPressure(b);
             });
 
             div.append(
@@ -184,6 +209,15 @@ export const penBrushUi = (function () {
                 }),
                 BB.el({
                     content: [opacitySlider.getElement(), pressureOpacityToggle],
+                    css: {
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        marginBottom: '10px',
+                    },
+                }),
+                BB.el({
+                    content: [scatterSlider.getElement(), pressureScatterToggle],
                     css: {
                         display: 'flex',
                         justifyContent: 'space-between',
@@ -231,6 +265,13 @@ export const penBrushUi = (function () {
         this.setOpacity = function (opacity) {
             brush.setOpacity(opacity);
             opacitySlider.setValue(opacity);
+        };
+        this.getScatter = function () {
+            return brush.getScatter();
+        };
+        this.setScatter = function (scatter) {
+            brush.setScatter(scatter);
+            scatterSlider.setValue(scatter);
         };
 
         this.setColor = function (c) {

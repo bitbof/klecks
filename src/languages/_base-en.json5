@@ -990,6 +990,10 @@ renaming keys across language files:
     "hint": "for layer opacity, brush opacity, text opacity, ...",
     "value": "Opacity"
   },
+  "scatter": {
+    "hint": "for brush scatter",
+    "value": "Scatter"
+  },
   "red": 'Red',
   "green": 'Green',
   "blue": 'Blue',

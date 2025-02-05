@@ -1594,6 +1594,11 @@
     original: 'Opacity',
     value: 'Opacidad'
   },
+  scatter: {
+    hint: 'for brush scatter',
+    original: 'Scatter',
+    value: 'Dispersion'
+  },
   red: {
     original: 'Red',
     value: 'Rojo'

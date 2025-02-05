@@ -20,10 +20,12 @@ export class PenBrush {
     private klHistory: KlHistory = {} as KlHistory;
 
     private settingHasOpacityPressure: boolean = false;
+    private settingHasScatterPressure: boolean = false;
     private settingHasSizePressure: boolean = true;
     private settingSize: number = 2;
     private settingSpacing: number = 0.8489;
     private settingOpacity: number = 1;
+    private settingScatter: number = 0;
     private settingColor: IRGB = {} as IRGB;
     private settingColorStr: string = '';
     private settingAlphaId: number = ALPHA_CIRCLE;
@@ -101,11 +103,16 @@ export class PenBrush {
         return this.settingOpacity * (this.settingHasOpacityPressure ? pressure * pressure : 1);
     }
 
+    private calcScatter(pressure: number): number {
+        return this.settingScatter * this.settingSize * (this.settingHasOpacityPressure ? pressure : 1);
+    }
+
     /**
      * @param x
      * @param y
      * @param size
      * @param opacity
+     * @param scatter
      * @param angle
      * @param before - [x, y, size, opacity, angle] the drawDot call before
      */
@@ -114,8 +121,9 @@ export class PenBrush {
         y: number,
         size: number,
         opacity: number,
+        scatter: number,
         angle?: number,
-        before?: [number, number, number, number, number | undefined],
+        before?: [number, number, number, number, number, number | undefined],
     ): void {
         if (size <= 0) {
             return;
@@ -135,6 +143,12 @@ export class PenBrush {
         ) {
             this.context.fillStyle = this.settingColorStr;
         }
+        
+        // scatter equally distributed over area of a circle
+        const scatterAngleRad = Math.random() * 2 * Math.PI;
+        const distance = Math.sqrt(Math.random()) * scatter;
+        x += Math.cos(scatterAngleRad) * distance;
+        y += Math.sin(scatterAngleRad) * distance;
 
         const boundsSize =
             this.settingAlphaId === ALPHA_CIRCLE || this.settingAlphaId === ALPHA_CAL
@@ -190,7 +204,7 @@ export class PenBrush {
             this.bezierLine.add(this.lastInput.x, this.lastInput.y, 0, () => {});
         }
 
-        const drawArr: [number, number, number, number, number | undefined][] = []; //draw instructions. will be all drawn at once
+        const drawArr: [number, number, number, number, number, number | undefined][] = []; //draw instructions. will be all drawn at once
 
         const dotCallback = (val: {
             x: number;
@@ -205,7 +219,8 @@ export class PenBrush {
                 0.1,
                 this.settingSize * (this.settingHasSizePressure ? localPressure : 1),
             );
-            drawArr.push([val.x, val.y, localSize, localOpacity, val.angle]);
+            const localScatter = this.calcScatter(localPressure);
+            drawArr.push([val.x, val.y, localSize, localOpacity, localScatter, val.angle]);
         };
 
         const localSpacing = size * this.settingSpacing;
@@ -220,7 +235,7 @@ export class PenBrush {
         let before: (typeof drawArr)[number] | undefined = undefined;
         for (let i = 0; i < drawArr.length; i++) {
             const item = drawArr[i];
-            this.drawDot(item[0], item[1], item[2], item[3], item[4], before);
+            this.drawDot(item[0], item[1], item[2], item[3], item[4], item[5], before);
             before = item;
         }
         this.context.restore();
@@ -238,12 +253,13 @@ export class PenBrush {
         const localSize = this.settingHasSizePressure
             ? Math.max(0.1, p * this.settingSize)
             : Math.max(0.1, this.settingSize);
+        const localScatter = this.calcScatter(p);
 
         this.hasDrawnDot = false;
 
         this.inputIsDrawing = true;
         this.context.save();
-        this.drawDot(x, y, localSize, localOpacity);
+        this.drawDot(x, y, localSize, localOpacity, localScatter);
         this.context.restore();
 
         this.lineToolLastDot = localSize * this.settingSpacing;
@@ -314,7 +330,7 @@ export class PenBrush {
             this.context.save();
             const p = BB.clamp(maxInput.pressure, 0, 1);
             const localOpacity = this.calcOpacity(p);
-            this.drawDot(maxInput.x, maxInput.y, localSize, localOpacity, 0);
+            this.drawDot(maxInput.x, maxInput.y, localSize, localOpacity, 0, 0);
             this.context.restore();
         }
 
@@ -414,6 +430,10 @@ export class PenBrush {
         this.settingOpacity = o;
     }
 
+    setScatter(o: number): void {
+        this.settingScatter = o;
+    }
+
     setSpacing(s: number): void {
         this.settingSpacing = s;
     }
@@ -424,6 +444,10 @@ export class PenBrush {
 
     opacityPressure(b: boolean): void {
         this.settingHasOpacityPressure = b;
+    }
+
+    scatterPressure(b: boolean): void {
+        this.settingHasScatterPressure = b;
     }
 
     setLockAlpha(b: boolean): void {
@@ -441,6 +465,10 @@ export class PenBrush {
 
     getOpacity(): number {
         return this.settingOpacity;
+    }
+
+    getScatter(): number {
+        return this.settingScatter;
     }
 
     getLockAlpha(): boolean {

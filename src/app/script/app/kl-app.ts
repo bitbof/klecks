@@ -378,13 +378,18 @@ export class KlApp {
             onSetOpacity: (opacity) => {
                 currentBrushUi.setOpacity(opacity);
             },
+            onSetScatter: (scatter) => {
+                currentBrushUi.setScatter(scatter);
+            },
             onGetColor: () => this.klColorSlider.getColor(),
             onGetSize: () => brushUiMap[currentBrushId].getSize(),
             onGetOpacity: () => brushUiMap[currentBrushId].getOpacity(),
+            onGetScatter: () => brushUiMap[currentBrushId].getScatter(),
             onGetSliderConfig: () => {
                 return {
                     sizeSlider: KL.brushesUI[currentBrushId].sizeSlider,
                     opacitySlider: KL.brushesUI[currentBrushId].opacitySlider,
+                    scatterSlider: KL.brushesUI[currentBrushId].scatterSlider,
                 };
             },
         });
@@ -965,6 +970,9 @@ export class KlApp {
             const ui = new (brushUi.Ui as any)({
                 klHistory: klHistory,
                 onSizeChange: sizeWatcher,
+                onScatterChange: (scatter: number) => {
+                    brushSettingService.emitScatter(scatter);
+                },
                 onOpacityChange: (opacity: number) => {
                     brushSettingService.emitOpacity(opacity);
                 },
@@ -972,6 +980,7 @@ export class KlApp {
                     brushSettingService.emitSliderConfig({
                         sizeSlider: KL.brushesUI[currentBrushId].sizeSlider,
                         opacitySlider: KL.brushesUI[currentBrushId].opacitySlider,
+                        scatterSlider: KL.brushesUI[currentBrushId].scatterSlider,
                     });
                 },
             });
@@ -1287,6 +1296,7 @@ export class KlApp {
                             brushSettingService.emitSliderConfig({
                                 sizeSlider: KL.brushesUI[keyStr].sizeSlider,
                                 opacitySlider: KL.brushesUI[keyStr].opacitySlider,
+                                scatterSlider: KL.brushesUI[keyStr].scatterSlider,
                             });
                             sizeWatcher(brushUiMap[keyStr].getSize());
                             brushSettingService.emitOpacity(brushUiMap[keyStr].getOpacity());
