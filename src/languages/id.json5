@@ -1563,7 +1563,7 @@
   auto: {
     hint: 'automatically decided',
     original: 'auto',
-    value: 'Otomatis'
+    value: 'otomatis'
   },
   'zoom-in': {
     original: 'Zoom In',
