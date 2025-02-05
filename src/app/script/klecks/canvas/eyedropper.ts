@@ -3,14 +3,6 @@ import { BB } from '../../bb/bb';
 import { THistoryEntryDataComposed } from '../history/history.types';
 import { HISTORY_TILE_SIZE } from '../history/kl-history';
 
-// x and y must be within bounds
-function getTileIndex(x: number, y: number, width: number): number {
-    const tilesX = Math.ceil(width / HISTORY_TILE_SIZE);
-    const col = Math.floor(x / HISTORY_TILE_SIZE);
-    const row = Math.floor(y / HISTORY_TILE_SIZE);
-    return row * tilesX + col;
-}
-
 export class Eyedropper {
     // ----------------------------------- public -----------------------------------
     constructor() {}
@@ -32,8 +24,10 @@ export class Eyedropper {
         layerCtx.imageSmoothingEnabled = false;
         const imageData = new ImageData(1, 1);
 
-        const tileIndex = getTileIndex(x, y, composed.size.width);
-        const pixelIndex = (y % HISTORY_TILE_SIZE) * HISTORY_TILE_SIZE + (x % HISTORY_TILE_SIZE);
+        const tilesX = Math.ceil(composed.size.width / HISTORY_TILE_SIZE);
+        const tileCol = Math.floor(x / HISTORY_TILE_SIZE);
+        const tileRow = Math.floor(y / HISTORY_TILE_SIZE);
+        const tileIndex = tileRow * tilesX + tileCol;
 
         Object.values(composed.layerMap)
             .sort((a, b) => {
@@ -51,6 +45,13 @@ export class Eyedropper {
                 }
                 const tile = layer.tiles[tileIndex];
                 if (tile instanceof ImageData) {
+                    let tileWidth = HISTORY_TILE_SIZE;
+                    if (composed.size.width % HISTORY_TILE_SIZE !== 0 && tileCol === tilesX - 1) {
+                        tileWidth = composed.size.width % HISTORY_TILE_SIZE;
+                    }
+                    const pixelIndex =
+                        (y % HISTORY_TILE_SIZE) * tileWidth + (x % HISTORY_TILE_SIZE);
+
                     imageData.data[0] = tile.data[pixelIndex * 4];
                     imageData.data[1] = tile.data[pixelIndex * 4 + 1];
                     imageData.data[2] = tile.data[pixelIndex * 4 + 2];
