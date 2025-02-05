@@ -445,7 +445,7 @@
   'file-show-save-dialog': {
     hint: 'setting for showing/not showing a dialog where user picks folder and filename',
     original: 'Show save dialog',
-    value: ''
+    value: 'Tanpilkan simpan dialog'
   },
   'file-copy': {
     hint: 'verb',
@@ -458,7 +458,7 @@
   },
   'file-paste': {
     original: 'Paste',
-    value: ''
+    value: 'Tempel'
   },
   'file-share': {
     hint: 'Common feature on phones. Pressing share button allows to send data to a different app, e.g. as a text message to someone.',
@@ -483,7 +483,7 @@
   'file-storage-cant-access': {
     hint: 'an error. Can’t access the storage.',
     original: "Can't access",
-    value: 'Tak bisa akses'
+    value: 'Tidak bisa akses'
   },
   'file-storage-empty': {
     hint: 'nothing stored',
@@ -785,7 +785,7 @@
   'filter-unsharp-mask': {
     hint: 'or just sharpen, https://en.wikipedia.org/wiki/Unsharp_masking',
     original: 'Unsharp Mask',
-    value: 'Topeng Tak Tajam'
+    value: 'Topeng Tidak Tajam'
   },
   'filter-crop-title': {
     hint: 'same as the button, but can be longer',
@@ -1026,7 +1026,7 @@
   'filter-unsharp-mask-title': {
     hint: 'same as the button, but can be longer',
     original: 'Unsharp Mask',
-    value: 'Topeng Tak Tajam'
+    value: 'Topeng Tidak Tajam'
   },
   'filter-unsharp-mask-description': {
     original: 'Sharpens the selected layer by scaling pixels away from the average of their neighbors.',
@@ -1062,7 +1062,7 @@
   },
   'filter-pattern': {
     original: 'Pattern',
-    value: 'Pola'
+    value: 'Corak'
   },
   'filter-pattern-description': {
     original: 'Generates pattern on selected layer. Drag the preview for further controls.',
@@ -1194,11 +1194,11 @@
   },
   'clipboard-read-fail': {
     original: 'Failed to read from clipboard.',
-    value: ''
+    value: 'Gagal membaca dari papan klip.'
   },
   'clipboard-no-image': {
     original: 'No image found in clipboard.',
-    value: ''
+    value: 'Tidak ada gambar yang ditemukan di papan klip.'
   },
   'hand-reset': {
     hint: 'resets zoom (to 100%) and rotation (to 0°)',
@@ -1472,7 +1472,7 @@
   'submit-prompt': {
     hint: 'Dialog asking for confirmation',
     original: 'Submit drawing?',
-    value: 'Kirim Gambar?'
+    value: 'Kirim gambar?'
   },
   'submit-submitting': {
     hint: 'in the process of uploading',
@@ -1491,7 +1491,7 @@
   },
   unsaved: {
     original: 'Unsaved',
-    value: 'Tak disimpan'
+    value: 'Tidak disimpan'
   },
   help: {
     hint: 'or user manual',
