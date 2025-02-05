@@ -178,7 +178,7 @@ export const penBrushUi = (function () {
                 max: brushInterface.scatterSlider.max,
                 value: brushInterface.scatterSlider.min,
                 curve: brushInterface.scatterSlider.curve,
-                eventResMs: eventResMs,
+                eventResMs: EVENT_RES_MS,
                 toDisplayValue: (val) => val,
                 toValue: (displayValue) => displayValue / 100,
                 onChange: (val) => {
