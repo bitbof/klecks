@@ -1108,7 +1108,7 @@
   'dropper-drop': {
     hint: 'as in, drag and drop a file',
     original: 'Drop to import',
-    value: 'Gulung kanggo ngimpor
+    value: 'Gulung kanggo ngimpor'
   },
   'dropper-as-image': {
     original: 'As New Image',
