@@ -144,8 +144,11 @@ export class PenBrush {
             this.context.fillStyle = this.settingColorStr;
         }
         
-        x += (Math.random() - 0.5) * scatter;
-        y += (Math.random() - 0.5) * scatter;
+        // scatter equally distributed over area of a circle
+        const scatterAngleRad = Math.random() * 2 * Math.PI;
+        const distance = Math.sqrt(Math.random()) * scatter;
+        x += Math.cos(scatterAngleRad) * distance;
+        y += Math.sin(scatterAngleRad) * distance;
 
         const boundsSize =
             this.settingAlphaId === ALPHA_CIRCLE || this.settingAlphaId === ALPHA_CAL
