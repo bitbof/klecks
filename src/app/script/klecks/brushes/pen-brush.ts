@@ -104,7 +104,9 @@ export class PenBrush {
     }
 
     private calcScatter(pressure: number): number {
-        return this.settingScatter * this.settingSize * (this.settingHasOpacityPressure ? pressure : 1);
+        return (
+            this.settingScatter * this.settingSize * (this.settingHasOpacityPressure ? pressure : 1)
+        );
     }
 
     /**
@@ -143,12 +145,14 @@ export class PenBrush {
         ) {
             this.context.fillStyle = this.settingColorStr;
         }
-        
-        // scatter equally distributed over area of a circle
-        const scatterAngleRad = Math.random() * 2 * Math.PI;
-        const distance = Math.sqrt(Math.random()) * scatter;
-        x += Math.cos(scatterAngleRad) * distance;
-        y += Math.sin(scatterAngleRad) * distance;
+
+        if (scatter > 0) {
+            // scatter equally distributed over area of a circle
+            const scatterAngleRad = Math.random() * 2 * Math.PI;
+            const distance = Math.sqrt(Math.random()) * scatter;
+            x += Math.cos(scatterAngleRad) * distance;
+            y += Math.sin(scatterAngleRad) * distance;
+        }
 
         const boundsSize =
             this.settingAlphaId === ALPHA_CIRCLE || this.settingAlphaId === ALPHA_CAL
