@@ -179,12 +179,18 @@ export const penBrushUi = (function () {
                 value: brushInterface.scatterSlider.min,
                 curve: brushInterface.scatterSlider.curve,
                 eventResMs: EVENT_RES_MS,
-                toDisplayValue: (val) => val,
-                toValue: (displayValue) => displayValue / 100,
                 onChange: (val) => {
                     brush.setScatter(val);
                     p.onScatterChange(val);
                 },
+                formatFunc: (displayValue) => {
+                    if (displayValue < 10) {
+                        return BB.round(displayValue, 1);
+                    } else {
+                        return Math.round(displayValue);
+                    }
+                },
+                manualInputRoundDigits: 1,
             });
 
             const pressureSizeToggle = createPenPressureToggle(true, function (b) {
