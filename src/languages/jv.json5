@@ -402,7 +402,7 @@
   'layers-rename-effects': {
     hint: 'noun. Name suggestion for a layer',
     original: 'Effects',
-    value: 'Efek'
+    value: 'Efek-efek'
   },
   'layers-rename-foreground': {
     hint: 'noun. Name suggestion for a layer',
@@ -775,7 +775,7 @@
   'filter-to-alpha': {
     hint: 'feature that can isolate line drawings if it is a black and white image.',
     original: 'To Alpha',
-    value: 'Kanggo Alpha'
+    value: 'Kanggo Alfa'
   },
   'filter-triangle-blur': {
     hint: 'or just blur',
