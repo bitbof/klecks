@@ -334,7 +334,8 @@ export class PenBrush {
             this.context.save();
             const p = BB.clamp(maxInput.pressure, 0, 1);
             const localOpacity = this.calcOpacity(p);
-            this.drawDot(maxInput.x, maxInput.y, localSize, localOpacity, 0, 0);
+            const localScatter = this.calcScatter(p);
+            this.drawDot(maxInput.x, maxInput.y, localSize, localOpacity, localScatter, 0);
             this.context.restore();
         }
 
@@ -369,12 +370,14 @@ export class PenBrush {
         const bdist = this.settingSize * this.settingSpacing;
         this.lineToolLastDot = this.settingSize * this.settingSpacing;
         this.context.save();
+        const localScatter = this.calcScatter(1);
         for (loopDist = this.lineToolLastDot; loopDist <= mouseDist; loopDist += bdist) {
             this.drawDot(
                 x1 + eX * loopDist,
                 y1 + eY * loopDist,
                 this.settingSize,
                 this.settingOpacity,
+                localScatter,
                 angle,
             );
         }
