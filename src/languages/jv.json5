@@ -1313,11 +1313,11 @@
   },
   'shape-auto-pan': {
     original: 'Auto-pan',
-    value: ''
+    value: 'Pan-otomatis'
   },
   'shape-auto-pan-title': {
     original: 'Automatically moves as you draw',
-    value: ''
+    value: 'Obah kanthi otomatis nalika sampeyan nggambar'
   },
   'text-instruction': {
     original: 'Click canvas to place text',
@@ -1605,7 +1605,7 @@
   scatter: {
     hint: 'for brush scatter',
     original: 'Scatter',
-    value: ''
+    value: 'Buyar'
   },
   red: {
     original: 'Red',
