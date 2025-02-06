@@ -998,7 +998,7 @@
   'filter-to-alpha-description': {
     hint: 'after ":" follow two options',
     original: 'Generates alpha channel for selected layer from:',
-    value: 'Ngasilake saluran alpha kanggo lapisan sing dipilih saka:'
+    value: 'Ngasilake saluran alfa kanggo lapisan sing dipilih saka:'
   },
   'filter-to-alpha-inverted-lum': {
     hint: 'luminance is same as the layer blend mode "luminosity"',
