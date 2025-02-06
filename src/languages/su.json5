@@ -402,7 +402,7 @@
   'layers-rename-effects': {
     hint: 'noun. Name suggestion for a layer',
     original: 'Effects',
-    value: 'Balukar'
+    value: 'Balukar-balukar'
   },
   'layers-rename-foreground': {
     hint: 'noun. Name suggestion for a layer',
@@ -775,7 +775,7 @@
   'filter-to-alpha': {
     hint: 'feature that can isolate line drawings if it is a black and white image.',
     original: 'To Alpha',
-    value: 'Pikeun Alpha'
+    value: 'Pikeun Alfa'
   },
   'filter-triangle-blur': {
     hint: 'or just blur',
@@ -993,7 +993,7 @@
   'filter-to-alpha-title': {
     hint: 'same as the button, but can be longer',
     original: 'To Alpha',
-    value: 'Pikeun Alpha'
+    value: 'Pikeun Alfa'
   },
   'filter-to-alpha-description': {
     hint: 'after ":" follow two options',
