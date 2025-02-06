@@ -397,7 +397,7 @@
   'layers-rename-lines': {
     hint: 'noun. Name suggestion for a layer',
     original: 'Lines',
-    value: 'Garis'
+    value: 'Garis-garis'
   },
   'layers-rename-effects': {
     hint: 'noun. Name suggestion for a layer',
@@ -598,7 +598,7 @@
   'new-fit': {
     hint: 'make dimensions of image fit your window size',
     original: 'Fit',
-    value: 'Sesuai'
+    value: 'Cocok'
   },
   'new-oversize': {
     hint: 'like oversized clothes.',
@@ -1103,7 +1103,7 @@
   'filter-vanish-point-lines': {
     hint: 'As in: the number of lines',
     original: 'Lines',
-    value: 'Garis'
+    value: 'Garis-garis'
   },
   'dropper-drop': {
     hint: 'as in, drag and drop a file',
