@@ -790,7 +790,7 @@
   'filter-crop-title': {
     hint: 'same as the button, but can be longer',
     original: 'Crop / Extend',
-    value: 'Potong/Ngluwihi'
+    value: 'Potong / Ngluwihi'
   },
   'filter-crop-description': {
     hint: 'descriptions explain the "filter" a tiny bit. Most importantly it says if it’s applied to a single layer, or the entire image (all layer)',
@@ -993,7 +993,7 @@
   'filter-to-alpha-title': {
     hint: 'same as the button, but can be longer',
     original: 'To Alpha',
-    value: 'Kanggo Alpha'
+    value: 'Kanggo Alfa'
   },
   'filter-to-alpha-description': {
     hint: 'after ":" follow two options',
@@ -1058,7 +1058,7 @@
   },
   'filter-noise-alpha': {
     original: 'Alpha',
-    value: 'Alpha'
+    value: 'Alfa'
   },
   'filter-pattern': {
     original: 'Pattern',
@@ -1669,12 +1669,12 @@
   'lock-alpha': {
     hint: 'Short. Freezes the alpha channel of image. Images consist of 4 channels (red, green, blue, alpha). Alpha lock also found in Procreate and photoshop',
     original: 'Lock Alpha',
-    value: 'Kunci Alpha'
+    value: 'Kunci Alfa'
   },
   'lock-alpha-title': {
     hint: "same as 'lock-alpha' but longer version. Shows up as a tooltip when hovering",
     original: "Locks layer's alpha channel",
-    value: 'Ngunci saluran alpha lapisan'
+    value: 'Ngunci saluran alfa lapisan'
   },
   reverse: {
     hint: 'Reversing the direction of a color gradient',
