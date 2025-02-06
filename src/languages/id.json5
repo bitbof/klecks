@@ -2,7 +2,7 @@
   'switch-ui-left-right': {
     hint: 'Button that switches layout from left to right, to accommodate left handed & right handed visitors.',
     original: 'Switch left/right UI',
-    value: 'Beralih ke kiri/kanan'
+    value: 'Beralih ke kiri/kanan UI'
   },
   'toggle-show-tools': {
     hint: 'Button that hides/shows the toolbar.',
@@ -652,7 +652,7 @@
   'upload-link-notice': {
     hint: 'Explaining to user even though their upload is unlisted, they should be careful who they share the link with. No password protection.',
     original: 'Anyone with the link to your uploaded image will be able to view it.',
-    value: 'Siapa pun yang memiliki tautan ke gambar yang Anda unggah akan dapat melihatnya.'
+    value: 'Siapa pun yang memiliki tautan ke gambar yang anda unggah akan dapat melihatnya.'
   },
   'upload-name': {
     hint: 'noun',
@@ -688,7 +688,7 @@
   },
   'upload-delete': {
     original: 'To delete your image from Imgur visit:',
-    value: 'Untuk menghapus gambar Anda dari Imgur, kunjungi:'
+    value: 'Untuk menghapus gambar anda dari Imgur, kunjungi:'
   },
   'cropcopy-title-copy': {
     original: 'Copy To Clipboard',
@@ -1157,7 +1157,7 @@
   'import-as-layer-fit': {
     hint: 'verb. imported image made to fit inside canvas.',
     original: 'Fit',
-    value: 'Sesuai'
+    value: 'Cocok'
   },
   'import-flatten': {
     hint: 'Turn image that has multiple layers into an image that has only one layer.',
@@ -1313,11 +1313,11 @@
   },
   'shape-auto-pan': {
     original: 'Auto-pan',
-    value: ''
+    value: 'Pena-otomatis'
   },
   'shape-auto-pan-title': {
     original: 'Automatically moves as you draw',
-    value: ''
+    value: 'Secara otomatis bergerak saat anda menggambar'
   },
   'text-instruction': {
     original: 'Click canvas to place text',
@@ -1605,7 +1605,7 @@
   scatter: {
     hint: 'for brush scatter',
     original: 'Scatter',
-    value: ''
+    value: 'Menyebar'
   },
   red: {
     original: 'Red',
