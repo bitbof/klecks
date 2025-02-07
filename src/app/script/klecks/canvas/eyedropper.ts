@@ -16,13 +16,8 @@ export class Eyedropper {
         }
 
         const canvas = BB.canvas(1, 1);
-        const ctx = BB.ctx(canvas, { willReadFrequently: true });
+        const ctx = BB.ctx(canvas);
         ctx.imageSmoothingEnabled = false;
-
-        const layerCanvas = BB.canvas(1, 1);
-        const layerCtx = BB.ctx(layerCanvas);
-        layerCtx.imageSmoothingEnabled = false;
-        const imageData = new ImageData(1, 1);
 
         const tilesX = Math.ceil(composed.size.width / HISTORY_TILE_SIZE);
         const tileCol = Math.floor(x / HISTORY_TILE_SIZE);
@@ -44,6 +39,7 @@ export class Eyedropper {
                     return;
                 }
                 const tile = layer.tiles[tileIndex];
+                let fillStyle = '';
                 if (tile instanceof ImageData) {
                     let tileWidth = HISTORY_TILE_SIZE;
                     if (composed.size.width % HISTORY_TILE_SIZE !== 0 && tileCol === tilesX - 1) {
@@ -52,20 +48,24 @@ export class Eyedropper {
                     const pixelIndex =
                         (y % HISTORY_TILE_SIZE) * tileWidth + (x % HISTORY_TILE_SIZE);
 
-                    imageData.data[0] = tile.data[pixelIndex * 4];
-                    imageData.data[1] = tile.data[pixelIndex * 4 + 1];
-                    imageData.data[2] = tile.data[pixelIndex * 4 + 2];
-                    imageData.data[3] = tile.data[pixelIndex * 4 + 3];
-                    layerCtx.putImageData(imageData, 0, 0);
+                    if (tile.data[pixelIndex * 4 + 3] === 0) {
+                        return;
+                    }
+
+                    fillStyle = BB.ColorConverter.toRgbaStr({
+                        r: tile.data[pixelIndex * 4],
+                        g: tile.data[pixelIndex * 4 + 1],
+                        b: tile.data[pixelIndex * 4 + 2],
+                        a: tile.data[pixelIndex * 4 + 3],
+                    });
                 } else {
-                    layerCtx.clearRect(0, 0, 1, 1);
-                    layerCtx.fillStyle = tile.fill;
-                    layerCtx.fillRect(0, 0, 1, 1);
+                    fillStyle = tile.fill;
                 }
 
+                ctx.fillStyle = fillStyle;
                 ctx.globalAlpha = layer.opacity;
                 ctx.globalCompositeOperation = layer.mixModeStr;
-                ctx.drawImage(layerCanvas, 0, 0);
+                ctx.fillRect(0, 0, 1, 1);
             });
 
         const imData = ctx.getImageData(0, 0, 1, 1);

@@ -179,7 +179,8 @@ function correctPointerEvent(
             }
             // Spec: If there's no pressure support, pressure is 0.5.
             // https://w3c.github.io/pointerevents/#dom-pointerevent-pressure
-            if (event.pointerType === 'mouse' && event.pressure === 0.5) {
+            // & in older Safari (<=16) it seems to be "mouse" and 0.
+            if (event.pointerType === 'mouse' && (event.pressure === 0.5 || event.pressure === 0)) {
                 correctedObj.pressure = 1;
                 customPressure = 1;
             }
