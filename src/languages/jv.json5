@@ -402,7 +402,7 @@
   'layers-rename-effects': {
     hint: 'noun. Name suggestion for a layer',
     original: 'Effects',
-    value: 'Efek'
+    value: 'Efek-efek'
   },
   'layers-rename-foreground': {
     hint: 'noun. Name suggestion for a layer',
@@ -775,7 +775,7 @@
   'filter-to-alpha': {
     hint: 'feature that can isolate line drawings if it is a black and white image.',
     original: 'To Alpha',
-    value: 'Kanggo Alpha'
+    value: 'Kanggo Alfa'
   },
   'filter-triangle-blur': {
     hint: 'or just blur',
@@ -790,7 +790,7 @@
   'filter-crop-title': {
     hint: 'same as the button, but can be longer',
     original: 'Crop / Extend',
-    value: 'Potong/Ngluwihi'
+    value: 'Potong / Ngluwihi'
   },
   'filter-crop-description': {
     hint: 'descriptions explain the "filter" a tiny bit. Most importantly it says if it’s applied to a single layer, or the entire image (all layer)',
@@ -993,12 +993,12 @@
   'filter-to-alpha-title': {
     hint: 'same as the button, but can be longer',
     original: 'To Alpha',
-    value: 'Kanggo Alpha'
+    value: 'Kanggo Alfa'
   },
   'filter-to-alpha-description': {
     hint: 'after ":" follow two options',
     original: 'Generates alpha channel for selected layer from:',
-    value: 'Ngasilake saluran alpha kanggo lapisan sing dipilih saka:'
+    value: 'Ngasilake saluran alfa kanggo lapisan sing dipilih saka:'
   },
   'filter-to-alpha-inverted-lum': {
     hint: 'luminance is same as the layer blend mode "luminosity"',
@@ -1058,7 +1058,7 @@
   },
   'filter-noise-alpha': {
     original: 'Alpha',
-    value: 'Alpha'
+    value: 'Alfa'
   },
   'filter-pattern': {
     original: 'Pattern',
@@ -1313,11 +1313,11 @@
   },
   'shape-auto-pan': {
     original: 'Auto-pan',
-    value: ''
+    value: 'Pan-otomatis'
   },
   'shape-auto-pan-title': {
     original: 'Automatically moves as you draw',
-    value: ''
+    value: 'Obah kanthi otomatis nalika sampeyan nggambar'
   },
   'text-instruction': {
     original: 'Click canvas to place text',
@@ -1605,7 +1605,7 @@
   scatter: {
     hint: 'for brush scatter',
     original: 'Scatter',
-    value: ''
+    value: 'Buyar'
   },
   red: {
     original: 'Red',
@@ -1669,12 +1669,12 @@
   'lock-alpha': {
     hint: 'Short. Freezes the alpha channel of image. Images consist of 4 channels (red, green, blue, alpha). Alpha lock also found in Procreate and photoshop',
     original: 'Lock Alpha',
-    value: 'Kunci Alpha'
+    value: 'Kunci Alfa'
   },
   'lock-alpha-title': {
     hint: "same as 'lock-alpha' but longer version. Shows up as a tooltip when hovering",
     original: "Locks layer's alpha channel",
-    value: 'Ngunci saluran alpha lapisan'
+    value: 'Ngunci saluran alfa lapisan'
   },
   reverse: {
     hint: 'Reversing the direction of a color gradient',
