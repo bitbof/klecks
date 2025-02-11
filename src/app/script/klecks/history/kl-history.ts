@@ -18,6 +18,8 @@ export type TKlHistoryParams = {
     oldest: THistoryEntryDataComposed;
 };
 
+const HISTORY_DEBUGGING = false;
+
 export class KlHistory {
     // total number of non-free undo steps
     private readonly maxUndoSteps: number = 20;
@@ -79,6 +81,9 @@ export class KlHistory {
             },
         ];
         this.composed = p.oldest;
+        if (HISTORY_DEBUGGING) {
+            (window as any).getHistoryEntries = () => this.entries;
+        }
     }
 
     /**

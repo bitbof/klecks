@@ -168,23 +168,6 @@ export class KlAppSelect {
             }
         });
 
-        // KlCanvas' selectionSample needs to be cleared manually.
-        // Done by injecting it before any new undo step. It's an "invisible" undo step.
-        /*this.klHistory.addBeforePushListener((entry) => {
-            if (this.tempHistory.getIsActive() || !this.klCanvas.getSelectionSample()) {
-                return;
-            }
-            if (
-                isKlCanvasHistoryEntry(entry) &&
-                (entry.action === 'transformCloneViaSelection' ||
-                    entry.action === 'transformViaSelection' ||
-                    entry.action === 'clearSelectionSample')
-            ) {
-                return;
-            }
-            this.klCanvas.clearSelectionSample();
-        });*/
-
         this.selectTool = new SelectTool({
             klCanvas: this.klCanvas,
         });
@@ -474,8 +457,6 @@ export class KlAppSelect {
         }
         return false;
     }
-
-    setSelectMode(mode: TSelectToolMode): void {}
 
     /**
      * feed type from KlHistoryExecutor.onExecuted.

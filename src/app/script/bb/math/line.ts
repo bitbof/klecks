@@ -293,6 +293,8 @@ export class BezierLine {
     }
 }
 
+export type TSplineInputPoints = [number, number][]; // [x, y]
+
 /**
  * from SplineInterpolator.cs in the Paint.NET source code
  */
@@ -305,7 +307,7 @@ export class SplineInterpolator {
     private readonly last: number;
 
     // ----------------------------------- public -----------------------------------
-    constructor(points: [number, number][]) {
+    constructor(points: TSplineInputPoints) {
         const n = points.length;
         this.xa = [];
         this.ya = [];
@@ -424,24 +426,25 @@ export class SplineInterpolator {
 }
 
 /**
- * input for a spline, following curve of quadratic function x^2 [0 - 1]
+ * input for a spline, following curve of a power function x^n [0 - 1]
  * returns [[0, startVal], ..., [1, endVal]]
- * @param startVal
- * @param endVal
- * @param stepSize
  */
-export function quadraticSplineInput(
+export function powerSplineInput(
     startVal: number,
     endVal: number,
     stepSize: number,
-): [number, number][] {
+    exponent: number = 2,
+): TSplineInputPoints {
     function round(v: number, dec: number): number {
         return Math.round(v * Math.pow(10, dec)) / Math.pow(10, dec);
     }
 
-    const resultArr: [number, number][] = [];
+    const resultArr: TSplineInputPoints = [];
     for (let i = 0; i <= 1; i += stepSize) {
-        resultArr.push([round(i, 4), round(startVal + Math.pow(i, 2) * (endVal - startVal), 4)]);
+        resultArr.push([
+            round(i, 4),
+            round(startVal + Math.pow(i, exponent) * (endVal - startVal), 4),
+        ]);
     }
     return resultArr;
 }

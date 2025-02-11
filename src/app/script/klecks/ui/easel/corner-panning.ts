@@ -13,10 +13,10 @@ export type TCornerPanningParams = {
 export class CornerPanning {
     // from params
     private getEaselSize: () => ISize2D;
-    private getTransform: () => TViewportTransform;
-    private setTransform: (transform: TViewportTransform) => void;
-    private testCanPan: (buttonIsPressed: boolean) => boolean;
-    private onRepeatEvent: (e: IPointerEvent) => void;
+    private readonly getTransform: () => TViewportTransform;
+    private readonly setTransform: (transform: TViewportTransform) => void;
+    private readonly testCanPan: (buttonIsPressed: boolean) => boolean;
+    private readonly onRepeatEvent: (e: IPointerEvent) => void;
 
     private readonly thresholdPx = 25;
 

@@ -7,6 +7,7 @@ import {
     IKlProject,
     IRGB,
     IShapeToolObject,
+    isLayerFill,
     TFillSampling,
     TLayerFromKlCanvas,
     TMixMode,
@@ -16,7 +17,7 @@ import { LANG } from '../../language/language';
 import { drawGradient } from '../image-operations/gradient-tool';
 import { IBounds, IRect } from '../../bb/bb-types';
 import { MultiPolygon } from 'polygon-clipping';
-import { compose, identity, Matrix, translate, fromObject, rotate } from 'transformation-matrix';
+import { compose, identity, Matrix, translate, rotate } from 'transformation-matrix';
 import { getSelectionPath2d } from '../../bb/multi-polygon/get-selection-path-2d';
 import { transformMultiPolygon } from '../../bb/multi-polygon/transform-multi-polygon';
 import { getMultiPolyBounds } from '../../bb/multi-polygon/get-multi-polygon-bounds';
@@ -24,7 +25,7 @@ import { intBoundsWithinArea, integerBounds } from '../../bb/math/math';
 import { canvasBounds } from '../../bb/base/canvas';
 import { matrixToTuple } from '../../bb/math/matrix-to-tuple';
 import { getEraseColor } from '../brushes/erase-color';
-import { KlHistory } from '../history/kl-history';
+import { HISTORY_TILE_SIZE, KlHistory } from '../history/kl-history';
 import { getNextLayerId } from '../history/get-next-layer-id';
 import {
     THistoryEntryDataComposed,
@@ -39,6 +40,7 @@ import { transformBounds } from '../../bb/transform/transform-bounds';
 import { getSelectionSampleBounds } from './get-selection-sample-bounds';
 import { createLayerMap } from '../history/push-helpers/create-layer-map';
 import { Eyedropper } from './eyedropper';
+import { copyImageData } from '../utils/copy-image-data';
 
 // TODO remove in 2026
 // workaround for chrome bug https://bugs.chromium.org/p/chromium/issues/detail?id=1281185
@@ -93,6 +95,8 @@ export type TLayerComposite = {
     draw: (ctx: CanvasRenderingContext2D) => void;
 };
 
+const KL_CANVAS_DEBUGGING = false;
+
 /**
  * The image/canvas that the user paints on
  * Has layers. layers have names and opacity.
@@ -106,24 +110,13 @@ export class KlCanvas {
     private layers: TKlCanvasLayer[];
     private eyedropper: Eyedropper;
     private selection: undefined | MultiPolygon = undefined;
-    private klHistory: KlHistory = {
-        pause: (b: boolean) => {},
-        isPaused: () => true,
-    } as KlHistory;
+    private klHistory: KlHistory;
     /**
      * Transforming via selection creates a selection sample, which is the area of a layer which got selected.
      * This way consecutive transformations don't resample each time.
      * The selection is not yet applied in the sample, so it can be sharp when drawing it. (e.g. when upscaling)
      */
     private selectionSample: undefined | TSelectionSample = undefined;
-
-    private init(w: number, h: number): void {
-        if (!w || !h || isNaN(w) || isNaN(h) || w < 1 || h < 1) {
-            throw new Error('init - invalid canvas size: ' + w + ', ' + h);
-        }
-        this.width = w;
-        this.height = h;
-    }
 
     private updateIndices(): void {
         this.layers.forEach((item, index) => {
@@ -221,70 +214,26 @@ export class KlCanvas {
     // ----------------------------------- public -----------------------------------
 
     constructor(
-        params:
-            | {
-                  projectObj: IKlProject;
-              }
-            | {
-                  // creates blank KlCanvas, 0 layers
-                  width: number;
-                  height: number;
-              }
-            | {
-                  copy: KlCanvas;
-              },
+        history: KlHistory,
         private layerNrOffset: number = 0,
     ) {
+        this.klHistory = history;
         this.layers = [];
+        if (KL_CANVAS_DEBUGGING) {
+            (window as any).getCanvasLayers = () => this.layers;
+        }
         this.eyedropper = new Eyedropper();
-        if ('copy' in params) {
-            this.width = 1;
-            this.height = 1;
-        } else {
-            if ('width' in params && 'height' in params) {
-                this.width = params.width;
-                this.height = params.height;
-            } else {
-                this.width = 1;
-                this.height = 1;
-            }
-        }
-        this.init(this.width, this.height);
-
-        if ('copy' in params) {
-            try {
-                this.copy(params.copy);
-            } catch (e) {
-                this.destroy();
-                throw e;
-            }
-        } else if ('projectObj' in params) {
-            const inLayers = [...params.projectObj.layers];
-            this.init(params.projectObj.width, params.projectObj.height);
-
-            if (!inLayers.length) {
-                throw new Error('project.layers needs at least 1 layer');
-            }
-
-            for (let i = 0; i < inLayers.length; i++) {
-                const mixModeStr = inLayers[i].mixModeStr;
-                if (mixModeStr && !allowedMixModes.includes(mixModeStr)) {
-                    throw new Error('unknown mixModeStr ' + inLayers[i].mixModeStr);
-                }
-
-                this.addLayer();
-                this.setOpacity(i, inLayers[i].opacity);
-                this.layers[i].name = inLayers[i].name;
-                this.layers[i].isVisible = inLayers[i].isVisible;
-                this.layers[i].mixModeStr = mixModeStr || 'source-over';
-                BB.ctx(this.layers[i].canvas).drawImage(inLayers[i].image, 0, 0);
-            }
-        }
-        this.updateIndices();
-    }
-
-    setHistory(h: KlHistory): void {
-        this.klHistory = h;
+        this.width = 0;
+        this.height = 0;
+        this.updateViaComposed(
+            {
+                size: { width: 0, height: 0 },
+                activeLayerId: '',
+                selection: { value: [] },
+                layerMap: {},
+            },
+            this.klHistory.getComposed(),
+        );
     }
 
     /*
@@ -397,57 +346,6 @@ export class KlCanvas {
     setSize(width: number, height: number) {
         this.width = width;
         this.height = height;
-    }
-
-    copy(toCopyCanvas: KlCanvas): void {
-        if (
-            toCopyCanvas.getWidth() < 1 ||
-            toCopyCanvas.getHeight() < 1 ||
-            isNaN(toCopyCanvas.getWidth()) ||
-            isNaN(toCopyCanvas.getHeight())
-        ) {
-            throw new Error('invalid canvas size');
-        }
-
-        this.klHistory.pause(true);
-
-        this.selection = toCopyCanvas.getSelection();
-        this.clearSelectionSample();
-        if (toCopyCanvas.selectionSample) {
-            this.selectionSample = {
-                image: toCopyCanvas.selectionSample.image
-                    ? BB.copyCanvas(toCopyCanvas.selectionSample.image)
-                    : undefined,
-                transformation: fromObject(toCopyCanvas.selectionSample.transformation),
-            };
-        }
-
-        // keep existing canvases
-        const origLayers = toCopyCanvas.getLayers();
-
-        while (this.layers.length > origLayers.length) {
-            this.removeLayer(this.layers.length - 1);
-        }
-
-        if (toCopyCanvas.getWidth() != this.width || toCopyCanvas.getHeight() != this.height) {
-            this.init(toCopyCanvas.getWidth(), toCopyCanvas.getHeight());
-        }
-        for (let i = 0; i < origLayers.length; i++) {
-            if (i >= this.layers.length) {
-                this.addLayer();
-            } else {
-                this.layers[i].canvas.width = this.width;
-                this.layers[i].canvas.height = this.height;
-            }
-            this.setOpacity(i, origLayers[i].opacity);
-            this.layers[i].name = origLayers[i].name;
-            this.layers[i].isVisible = origLayers[i].isVisible;
-            this.layers[i].mixModeStr = origLayers[i].mixModeStr;
-            this.layers[i].context.drawImage(origLayers[i].context.canvas, 0, 0);
-        }
-        this.updateIndices();
-
-        this.klHistory.pause(false);
     }
 
     getLayerCount(): number {
@@ -633,30 +531,49 @@ export class KlCanvas {
             return false;
         }
         const srcLayer = this.layers[srcIndex];
-        const index = srcIndex + 1;
+        const newIndex = srcIndex + 1;
+
+        const composed = this.klHistory.getComposed();
+        const srcComposed = composed.layerMap[srcLayer.id];
 
         const canvas = BB.canvas(this.width, this.height);
+        const ctx = BB.ctx(canvas);
         const layerId = getNextLayerId();
         const newLayer: TKlCanvasLayer = {
             id: layerId,
-            index,
+            index: newIndex,
             name: srcLayer.name + ' ' + LANG('layers-copy'),
             mixModeStr: srcLayer.mixModeStr,
             isVisible: srcLayer.isVisible,
             opacity: srcLayer.opacity,
             canvas,
-            context: BB.ctx(canvas),
+            context: ctx,
         };
 
-        this.layers.splice(index, 0, newLayer);
+        this.layers.splice(newIndex, 0, newLayer);
 
-        // 2023-04-30 workaround for https://bugs.webkit.org/show_bug.cgi?id=256151
-        // todo replace with simple drawImage eventually when fixed
-        newLayer.context.putImageData(
-            this.layers[srcIndex].context.getImageData(0, 0, this.width, this.height),
-            0,
-            0,
-        );
+        {
+            // draw into new layer from old
+            const tilesPerX = Math.ceil(this.width / HISTORY_TILE_SIZE);
+            srcComposed.tiles.forEach((tile, index) => {
+                const x = index % tilesPerX;
+                const y = Math.floor(index / tilesPerX);
+                ctx.save();
+                if (isLayerFill(tile)) {
+                    ctx.fillStyle = tile.fill;
+                    ctx.fillRect(
+                        x * HISTORY_TILE_SIZE,
+                        y * HISTORY_TILE_SIZE,
+                        HISTORY_TILE_SIZE,
+                        HISTORY_TILE_SIZE,
+                    );
+                } else {
+                    ctx.putImageData(tile, x * HISTORY_TILE_SIZE, y * HISTORY_TILE_SIZE);
+                }
+                ctx.restore();
+            });
+        }
+
         this.updateIndices();
 
         if (!this.klHistory.isPaused()) {
@@ -665,7 +582,16 @@ export class KlCanvas {
                 layerMap: createLayerMap(
                     this.layers,
                     { attributes: ['index'] },
-                    { layerId, attributes: 'all' },
+                    {
+                        layerId,
+                        attributes: 'all',
+                        tiles: srcComposed.tiles.map((tile) => {
+                            if (isLayerFill(tile)) {
+                                return { ...tile };
+                            }
+                            return copyImageData(tile);
+                        }),
+                    },
                 ),
             });
         }
@@ -1219,11 +1145,12 @@ export class KlCanvas {
         const targetLayer = this.layers[layerIndex];
         const bounds = integerBounds(drawShape(targetLayer.context, shapeObj));
 
-        // const ctx = this.layers[layerIndex].context;
-        // ctx.save();
-        // ctx.fillStyle = 'rgba(255,0,0,0.2)';
-        // ctx.fillRect(bounds.x1, bounds.y1, bounds.x2 - bounds.x1, bounds.y2 - bounds.y1);
-        // ctx.restore();
+        // debug
+        /*const ctx = this.layers[layerIndex].context;
+        ctx.save();
+        ctx.fillStyle = 'rgba(255,0,0,0.2)';
+        ctx.fillRect(bounds.x1, bounds.y1, bounds.x2 - bounds.x1, bounds.y2 - bounds.y1);
+        ctx.restore();*/
 
         if (!this.klHistory.isPaused()) {
             this.klHistory.push({

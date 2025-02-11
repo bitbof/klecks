@@ -16,7 +16,7 @@ export const eraserBrushUi = (function () {
         sizeSlider: {
             min: 0.5,
             max: 200,
-            curve: BB.quadraticSplineInput(0.5, 200, 0.1),
+            curve: BB.powerSplineInput(0.5, 200, 0.1),
         },
         opacitySlider: {
             min: 1 / 100,

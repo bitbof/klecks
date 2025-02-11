@@ -6,6 +6,7 @@ import { BezierLine, TBezierLineCallback } from '../../bb/math/line';
 import { KlHistory } from '../history/kl-history';
 import { getPushableLayerChange } from '../history/push-helpers/get-pushable-layer-change';
 import { canvasToLayerTiles } from '../history/push-helpers/canvas-to-layer-tiles';
+import { createArray } from '../../bb/base/base';
 
 // let statCount = 1;
 // let statAcc = 0;
@@ -509,10 +510,7 @@ export class SmudgeBrush {
         const totalCells =
             Math.ceil(this.context.canvas.width / CELL_SIZE) *
             Math.ceil(this.context.canvas.height / CELL_SIZE);
-        this.copiedCells = '0'
-            .repeat(totalCells)
-            .split('')
-            .map(() => false);
+        this.copiedCells = createArray(totalCells, false);
 
         this.prepDot(x, y, localSize, localOpacity);
 

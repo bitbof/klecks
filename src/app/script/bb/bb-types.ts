@@ -86,5 +86,3 @@ export interface ICropRect {
     top: number;
     bottom: number;
 }
-
-export type TNullable<T> = { [K in keyof T]: T[K] | null };

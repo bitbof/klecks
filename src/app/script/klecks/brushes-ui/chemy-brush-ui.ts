@@ -17,7 +17,7 @@ export const chemyBrushUi = (function () {
         sizeSlider: {
             min: 0.25,
             max: 25,
-            curve: BB.quadraticSplineInput(0.25, 25, 0.1),
+            curve: BB.powerSplineInput(0.25, 25, 0.1),
             isDisabled: true,
         },
         opacitySlider: {

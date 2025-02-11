@@ -1,12 +1,12 @@
 import { BB } from '../../bb/bb';
-import { IRGB, IRGBA } from '../kl-types';
+import { IRGB, IRGBA, isLayerFill } from '../kl-types';
 import { IBounds, IPressureInput } from '../../bb/bb-types';
 import { clamp } from '../../bb/math/math';
 import { BezierLine, TBezierLineCallback } from '../../bb/math/line';
-import { KlHistory } from '../history/kl-history';
+import { HISTORY_TILE_SIZE, KlHistory } from '../history/kl-history';
 import { getPushableLayerChange } from '../history/push-helpers/get-pushable-layer-change';
-
-const cellSize = 256;
+import { copyImageData } from '../utils/copy-image-data';
+import { createArray } from '../../bb/base/base';
 
 interface IDrawBufferItem {
     x: number;
@@ -23,9 +23,11 @@ interface IDrawBufferItem {
 }
 
 export class BlendBrush {
-    private isTesting: boolean = false; // testing mode - context only gets updated when line is finished
+    // testing mode - context only gets updated when line is finished
+    private isTesting: boolean = false;
 
     private context: CanvasRenderingContext2D = {} as CanvasRenderingContext2D;
+    private layerId: string = 'NOT_SET';
     private color: IRGB = {} as IRGB;
     private size: number = 29; // radius - 0.5 - 99999
     private opacity: number = 0.6; // 0-1
@@ -55,7 +57,23 @@ export class BlendBrush {
     }
 
     private getCellsWidth(): number {
-        return Math.ceil(this.context.canvas.width / cellSize);
+        return Math.ceil(this.context.canvas.width / HISTORY_TILE_SIZE);
+    }
+
+    /**
+     * draw cells onto context
+     * @param cells
+     */
+    private drawCells(cells: (ImageData | undefined)[]): void {
+        const cellsW = this.getCellsWidth();
+        cells.forEach((imageData, index) => {
+            if (!imageData) {
+                return;
+            }
+            const cellOffsetX = (index % cellsW) * HISTORY_TILE_SIZE;
+            const cellOffsetY = Math.floor(index / cellsW) * HISTORY_TILE_SIZE;
+            this.context.putImageData(imageData, cellOffsetX, cellOffsetY);
+        });
     }
 
     /**
@@ -82,10 +100,10 @@ export class BlendBrush {
         const touchedCells = this.cells.map(() => false);
         const cellsW = this.getCellsWidth();
         bounds = {
-            x1: Math.floor(bounds.x1 / cellSize),
-            y1: Math.floor(bounds.y1 / cellSize),
-            x2: Math.floor(bounds.x2 / cellSize),
-            y2: Math.floor(bounds.y2 / cellSize),
+            x1: Math.floor(bounds.x1 / HISTORY_TILE_SIZE),
+            y1: Math.floor(bounds.y1 / HISTORY_TILE_SIZE),
+            x2: Math.floor(bounds.x2 / HISTORY_TILE_SIZE),
+            y2: Math.floor(bounds.y2 / HISTORY_TILE_SIZE),
         };
         for (let i = bounds.x1; i <= bounds.x2; i++) {
             for (let e = bounds.y1; e <= bounds.y2; e++) {
@@ -110,8 +128,8 @@ export class BlendBrush {
                 return;
             }
 
-            const cellOffsetX = (i % cellsW) * cellSize;
-            const cellOffsetY = Math.floor(i / cellsW) * cellSize;
+            const cellOffsetX = (i % cellsW) * HISTORY_TILE_SIZE;
+            const cellOffsetY = Math.floor(i / cellsW) * HISTORY_TILE_SIZE;
             const cellWidth = this.cells[i]!.width;
             const cellHeight = this.cells[i]!.height;
 
@@ -142,27 +160,23 @@ export class BlendBrush {
         }
 
         const touchedCells = this.getTouchedCells(bounds);
-        const cellsW = this.getCellsWidth();
+        const composedLayer = this.klHistory.getComposed().layerMap[this.layerId];
 
         touchedCells.forEach((item, i) => {
             if (!item || this.cells[i]) {
                 // not touched, or already copied
                 return;
             }
-            const x = i % cellsW;
-            const y = Math.floor(i / cellsW);
-            const w =
-                ((Math.min(x * cellSize + cellSize, this.context.canvas.width) - 1) % cellSize) + 1;
-            const h =
-                ((Math.min(y * cellSize + cellSize, this.context.canvas.height) - 1) % cellSize) +
-                1;
-
-            // temp canvas to prevent main canvas from getting slowed down in chrome
-            const tmpCanvas = BB.canvas(w, h);
-            const tmpCtx = BB.ctx(tmpCanvas);
-            tmpCtx.drawImage(this.context.canvas, -x * cellSize, -y * cellSize);
-
-            this.cells[i] = tmpCtx.getImageData(0, 0, w, h);
+            const composedTile = composedLayer.tiles[i];
+            if (isLayerFill(composedTile)) {
+                const canvas = BB.canvas(HISTORY_TILE_SIZE, HISTORY_TILE_SIZE);
+                const ctx = BB.ctx(canvas);
+                ctx.fillStyle = composedTile.fill;
+                ctx.fillRect(0, 0, HISTORY_TILE_SIZE, HISTORY_TILE_SIZE);
+                this.cells[i] = ctx.getImageData(0, 0, HISTORY_TILE_SIZE, HISTORY_TILE_SIZE);
+            } else {
+                this.cells[i] = copyImageData(composedTile);
+            }
         });
     }
 
@@ -275,8 +289,8 @@ export class BlendBrush {
 
         const cellsW = this.getCellsWidth();
         slicedBounds.forEach((slice) => {
-            const cellOffsetX = (slice.index % cellsW) * cellSize;
-            const cellOffsetY = Math.floor(slice.index / cellsW) * cellSize;
+            const cellOffsetX = (slice.index % cellsW) * HISTORY_TILE_SIZE;
+            const cellOffsetY = Math.floor(slice.index / cellsW) * HISTORY_TILE_SIZE;
             const cellWidth = this.cells[slice.index]!.width;
             const data = this.cells[slice.index]!.data;
 
@@ -548,8 +562,9 @@ export class BlendBrush {
         this.color = BB.copyObj(c);
     }
 
-    setContext(c: CanvasRenderingContext2D): void {
+    setContext(c: CanvasRenderingContext2D, id: string): void {
         this.context = c;
+        this.layerId = id;
     }
 
     setSizePressure(b: boolean): void {
@@ -578,12 +593,9 @@ export class BlendBrush {
 
     startLine(x: number, y: number, p: number): void {
         const totalCells =
-            Math.ceil(this.context.canvas.width / cellSize) *
-            Math.ceil(this.context.canvas.height / cellSize);
-        this.cells = '0'
-            .repeat(totalCells)
-            .split('')
-            .map(() => undefined);
+            Math.ceil(this.context.canvas.width / HISTORY_TILE_SIZE) *
+            Math.ceil(this.context.canvas.height / HISTORY_TILE_SIZE);
+        this.cells = createArray(totalCells, undefined);
 
         this.isDrawing = true;
 
@@ -704,23 +716,8 @@ export class BlendBrush {
         this.cells = [];
     }
 
-    /**
-     * draw cells onto context
-     * @param cells
-     */
-    drawCells(cells: (ImageData | undefined)[]): void {
-        const cellsW = this.getCellsWidth();
-        cells.forEach((imageData, index) => {
-            if (!imageData) {
-                return;
-            }
-            const cellOffsetX = (index % cellsW) * cellSize;
-            const cellOffsetY = Math.floor(index / cellsW) * cellSize;
-            this.context.putImageData(imageData, cellOffsetX, cellOffsetY);
-        });
-    }
-
     drawLineSegment(x1: number, y1: number, x2: number, y2: number): void {
+        // todo - should sample more often for blending
         this.lastInput.x = x2;
         this.lastInput.y = y2;
 
@@ -729,12 +726,9 @@ export class BlendBrush {
         }
 
         const totalCells =
-            Math.ceil(this.context.canvas.width / cellSize) *
-            Math.ceil(this.context.canvas.height / cellSize);
-        this.cells = '0'
-            .repeat(totalCells)
-            .split('')
-            .map(() => undefined);
+            Math.ceil(this.context.canvas.width / HISTORY_TILE_SIZE) *
+            Math.ceil(this.context.canvas.height / HISTORY_TILE_SIZE);
+        this.cells = createArray(totalCells, undefined);
         this.redrawBounds = undefined;
         this.drawBuffer = [];
 
@@ -803,10 +797,20 @@ export class BlendBrush {
             this.drawDot(item);
         });
         this.drawBuffer = [];
-
-        this.klHistory.push(
-            getPushableLayerChange(this.klHistory.getComposed(), this.context.canvas),
-        );
+        this.updateRedrawBounds({
+            x1: x1 - localSize,
+            y1: y1 - localSize,
+            x2: x1 + localSize,
+            y2: y1 + localSize,
+        });
+        this.updateRedrawBounds({
+            x1: x2 - localSize,
+            y1: y2 - localSize,
+            x2: x2 + localSize,
+            y2: y2 + localSize,
+        });
+        this.drawChangedCells();
+        this.klHistory.push(getPushableLayerChange(this.klHistory.getComposed(), this.cells));
         this.cells = [];
     }
 }

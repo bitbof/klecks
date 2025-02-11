@@ -22,13 +22,13 @@ export class DoubleTapper {
     private chainOut: TChainOutFunc | undefined;
     private allowedPointerTypeArr: TPointerType[] = ['touch', 'mouse', 'pen'];
     private allowedButtonArr: TPointerButton[] = ['left'];
-    private minSilenceBeforeDurationMs: number = 400;
+    private readonly minSilenceBeforeDurationMs: number = 400;
     private maxPressedDurationMs: number = 300;
     private maxPressedDistancePx: number = 10;
     private maxInbetweenDistancePx: number = 19;
     private maxUpToUpDurationMs: number = 500;
     private maxUntilSecondDownDurationMs: number = 300;
-    private minSilenceAfterMs: number = 250;
+    private readonly minSilenceAfterMs: number = 250;
     private sequenceArr: (
         | {
               isDown: boolean;

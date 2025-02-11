@@ -52,13 +52,13 @@ export type TLayersUiParams = {
 export class LayersUi {
     // from params
     private klCanvas: KlCanvas;
-    private onSelect: (layerIndex: number) => void;
-    private parentEl: HTMLElement;
+    private readonly onSelect: (layerIndex: number) => void;
+    private readonly parentEl: HTMLElement;
     private uiState: TUiLayout;
-    private applyUncommitted: () => void;
+    private readonly applyUncommitted: () => void;
     private klHistory: KlHistory;
-    private onUpdateProject: () => void;
-    private onClearLayer: () => void;
+    private readonly onUpdateProject: () => void;
+    private readonly onClearLayer: () => void;
 
     private readonly rootEl: HTMLElement;
     private klCanvasLayerArr: {

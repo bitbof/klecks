@@ -67,6 +67,25 @@
         });
 
     } else {
+        const useFill = true;
+        // fill is more efficient if layer is one color
+        const layerImage = useFill ? {fill: '#fff'} : (() => {
+            const canvas = document.createElement('canvas');
+            canvas.width = 100;
+            canvas.height = 100;
+            const ctx = canvas.getContext('2d');
+            ctx.save();
+            ctx.fillStyle = '#fff';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            ctx.fillStyle = '#000';
+            for(let i = 0; i < 10; i++) {
+                ctx.fillRect(Math.random() * canvas.width, Math.random() * canvas.height, 10, 10);
+            }
+            ctx.restore();
+            return canvas;
+        })();
+
         klecks.openProject({
             width: 100,
             height: 100,
@@ -75,17 +94,7 @@
                 isVisible: true,
                 opacity: 1,
                 mixModeStr: 'source-over',
-                image: (() => {
-                    const canvas = document.createElement('canvas');
-                    canvas.width = 100;
-                    canvas.height = 100;
-                    const ctx = canvas.getContext('2d');
-                    ctx.save();
-                    ctx.fillStyle = '#fff';
-                    ctx.fillRect(0, 0, canvas.width, canvas.height);
-                    ctx.restore();
-                    return canvas;
-                })(),
+                image: layerImage,
             }]
         });
     }

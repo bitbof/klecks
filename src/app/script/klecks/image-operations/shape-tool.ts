@@ -283,6 +283,13 @@ export function drawShape(ctx: CanvasRenderingContext2D, shapeObj: IShapeToolObj
                 }
             }
 
+            bounds = {
+                x1: Math.min(p1.x, p2.x) - lineWidth / 2,
+                y1: Math.min(p1.y, p2.y) - lineWidth / 2,
+                x2: Math.max(p1.x, p2.x) + lineWidth / 2,
+                y2: Math.max(p1.y, p2.y) + lineWidth / 2,
+            };
+
             p1 = BB.rotate(p1.x, p1.y, (shapeObj.angleRad / Math.PI) * 180);
             p2 = BB.rotate(p2.x, p2.y, (shapeObj.angleRad / Math.PI) * 180);
 
@@ -290,13 +297,6 @@ export function drawShape(ctx: CanvasRenderingContext2D, shapeObj: IShapeToolObj
             ctx.moveTo(p1.x, p1.y);
             ctx.lineTo(p2.x, p2.y);
             ctx.stroke();
-
-            bounds = {
-                x1: Math.min(p1.x, p2.x) - lineWidth / 2,
-                y1: Math.min(p1.y, p2.y) - lineWidth / 2,
-                x2: Math.max(p1.x, p2.x) + lineWidth / 2,
-                y2: Math.max(p1.y, p2.y) + lineWidth / 2,
-            };
         } else if (shapeObj.type === 'rect') {
             // --- rect ---
 

@@ -16,9 +16,9 @@ type TGenericListener = (e: Event) => void;
 
 export class GestureListener {
     private target: Element;
-    private onStart: TGestureListenerParams['onStart'];
-    private onChange: TGestureListenerParams['onChange'];
-    private onEnd: TGestureListenerParams['onEnd'];
+    private readonly onStart: TGestureListenerParams['onStart'];
+    private readonly onChange: TGestureListenerParams['onChange'];
+    private readonly onEnd: TGestureListenerParams['onEnd'];
 
     // ----------------------------------- public -----------------------------------
     constructor(p: TGestureListenerParams) {

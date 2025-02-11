@@ -16,7 +16,7 @@ export const pixelBrushUi = (function () {
         sizeSlider: {
             min: 0.5,
             max: 100,
-            curve: BB.quadraticSplineInput(0.5, 100, 0.1),
+            curve: BB.powerSplineInput(0.5, 100, 0.1),
         },
         opacitySlider: {
             min: 1 / 100,

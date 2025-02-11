@@ -7,9 +7,9 @@ import {
     TLayerId,
 } from './history.types';
 
-// finds the largest index (<=targetIndex) that is defined
-function getLatestDefined<GType>(array: (GType | undefined)[], targetIndex: number): GType {
-    for (let i = targetIndex; i >= 0; i--) {
+// finds the largest index that is defined
+function getLatestDefined<GType>(array: (GType | undefined)[]): GType {
+    for (let i = array.length - 1; i >= 0; i--) {
         const value = array[i];
         if (value !== undefined) {
             return value;
@@ -18,14 +18,14 @@ function getLatestDefined<GType>(array: (GType | undefined)[], targetIndex: numb
     throw new Error('no defined entry found');
 }
 
-// in an array of maps, finds array[i][prop] for the largest index (<=targetIndex)
+// in an array of maps, finds array[i][prop] for the largest index
 // where array[i][prop] is defined
-function getLatestDefinedForProp<
+function getLatestDefinedProp<
     GProp extends string,
     GValue,
     GArray extends { [K in GProp]?: GValue },
->(array: (GArray | undefined)[], prop: GProp, targetIndex: number): GValue {
-    for (let i = targetIndex; i >= 0; i--) {
+>(array: (GArray | undefined)[], prop: GProp): GValue {
+    for (let i = array.length - 1; i >= 0; i--) {
         if (!array[i]) {
             continue;
         }
@@ -37,48 +37,37 @@ function getLatestDefinedForProp<
     throw new Error('no defined entry found');
 }
 
-// For each tile gets the latest (<=targetIndex) which is defined.
+// For each tile gets the latest which is defined.
 // Each tile[] is from a history entry.
 function composeLayerTiles(
     tilesEntries: ((THistoryEntryLayerTile | undefined)[] | undefined)[],
-    targetIndex: number,
 ): THistoryEntryLayerTile[] {
-    const result = [...getLatestDefined(tilesEntries, targetIndex)];
+    const result = [...getLatestDefined(tilesEntries)];
     Object.entries(result).forEach(([id]) => {
-        result[+id] = getLatestDefinedForProp(tilesEntries as any, id, targetIndex);
+        result[+id] = getLatestDefinedProp(tilesEntries as any, id);
     });
     return result as THistoryEntryLayerTile[];
 }
 
-// combines layers from multiple history entries into the latest (<=targetIndex) representation
+// combines layers from multiple history entries into the latest representation
 function composeLayer(
     layerEntries: (THistoryEntryLayer | undefined)[],
-    targetIndex: number,
 ): THistoryEntryLayerComposed {
     return {
-        name: getLatestDefinedForProp(layerEntries, 'name', targetIndex),
-        opacity: getLatestDefinedForProp(layerEntries, 'opacity', targetIndex),
-        isVisible: getLatestDefinedForProp(layerEntries, 'isVisible', targetIndex),
-        mixModeStr: getLatestDefinedForProp(layerEntries, 'mixModeStr', targetIndex),
-        index: getLatestDefinedForProp(layerEntries, 'index', targetIndex),
-        tiles: composeLayerTiles(
-            layerEntries.map((item) => (item ? item.tiles : undefined)),
-            targetIndex,
-        ),
+        name: getLatestDefinedProp(layerEntries, 'name'),
+        opacity: getLatestDefinedProp(layerEntries, 'opacity'),
+        isVisible: getLatestDefinedProp(layerEntries, 'isVisible'),
+        mixModeStr: getLatestDefinedProp(layerEntries, 'mixModeStr'),
+        index: getLatestDefinedProp(layerEntries, 'index'),
+        tiles: composeLayerTiles(layerEntries.map((item) => (item ? item.tiles : undefined))),
     };
 }
 
-// combines layerMaps from multiple history entries into the latest (<=targetIndex) representation
-function composeLayerMap(
-    layerMaps: (Record<TLayerId, THistoryEntryLayer> | undefined)[],
-    targetIndex: number,
-) {
-    const result = { ...getLatestDefined(layerMaps, targetIndex) };
+// combines layerMaps from multiple history entries into the latest representation
+function composeLayerMap(layerMaps: (Record<TLayerId, THistoryEntryLayer> | undefined)[]) {
+    const result = { ...getLatestDefined(layerMaps) };
     Object.entries(result).forEach(([id]) => {
-        result[id] = composeLayer(
-            layerMaps.map((item) => (item ? item[id] : undefined)),
-            targetIndex,
-        );
+        result[id] = composeLayer(layerMaps.map((item) => (item ? item[id] : undefined)));
     });
     return result as Record<TLayerId, THistoryEntryLayerComposed>;
 }
@@ -99,13 +88,11 @@ export function composeHistoryStateData(
     if (targetIndex === undefined) {
         targetIndex = entries.length - 1;
     }
+    entries = entries.slice(0, targetIndex + 1);
     return {
-        size: getLatestDefinedForProp(entries, 'size', targetIndex),
-        activeLayerId: getLatestDefinedForProp(entries, 'activeLayerId', targetIndex),
-        selection: getLatestDefinedForProp(entries, 'selection', targetIndex),
-        layerMap: composeLayerMap(
-            entries.map((item) => item.layerMap),
-            targetIndex,
-        ),
+        size: getLatestDefinedProp(entries, 'size'),
+        activeLayerId: getLatestDefinedProp(entries, 'activeLayerId'),
+        selection: getLatestDefinedProp(entries, 'selection'),
+        layerMap: composeLayerMap(entries.map((item) => item.layerMap)),
     };
 }

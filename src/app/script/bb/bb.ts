@@ -48,7 +48,7 @@ import {
     BezierLine,
     PointLine,
     projectPointOnLine,
-    quadraticSplineInput,
+    powerSplineInput,
     SplineInterpolator,
 } from './math/line';
 import { CMYK, ColorConverter, HSV, RGB, testIsWhiteBestContrast } from './color/color';
@@ -146,7 +146,7 @@ export const BB = {
     PointLine,
     BezierLine,
     SplineInterpolator,
-    quadraticSplineInput,
+    powerSplineInput,
 
     // ---- canvas ----
     canvas: createCanvas,

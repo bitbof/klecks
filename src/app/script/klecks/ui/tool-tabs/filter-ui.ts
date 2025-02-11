@@ -17,7 +17,7 @@ export type TFilterUiParams = {
     klColorSlider: KlColorSlider;
     layersUi: LayersUi;
     getCurrentColor: () => RGB;
-    getKlMaxCanvasSize: () => number;
+    maxCanvasSize: number;
     klCanvas: KlCanvas;
     getCurrentLayer: () => TKlCanvasLayer;
     isEmbed: boolean;
@@ -33,7 +33,7 @@ export class FilterUi {
     private readonly klColorSlider: KlColorSlider;
     private readonly layersUi: LayersUi;
     private readonly getCurrentColor: () => RGB;
-    private readonly getKlMaxCanvasSize: () => number;
+    private readonly maxCanvasSize: number;
     private readonly klCanvas: KlCanvas;
     private readonly getCurrentLayer: () => TKlCanvasLayer;
     private readonly isEmbed: boolean;
@@ -54,7 +54,7 @@ export class FilterUi {
         this.klColorSlider = p.klColorSlider;
         this.layersUi = p.layersUi;
         this.getCurrentColor = p.getCurrentColor;
-        this.getKlMaxCanvasSize = p.getKlMaxCanvasSize;
+        this.maxCanvasSize = p.maxCanvasSize;
         this.klCanvas = p.klCanvas;
         this.getCurrentLayer = p.getCurrentLayer;
         this.isEmbed = p.isEmbed;
@@ -191,7 +191,7 @@ This has been reported to Google.
                             klHistory: this.klHistory,
                             input: input,
                         } as IFilterApply);
-                        if (filterResult === false) {
+                        if (!filterResult) {
                             KL.popup({
                                 target: this.klRootEl,
                                 message: "Couldn't apply the edit action",
@@ -217,8 +217,8 @@ This has been reported to Google.
                             filterDialog = filters[filterKey].getDialog!({
                                 context: this.getCurrentLayer().context,
                                 klCanvas: this.klCanvas,
-                                maxWidth: this.getKlMaxCanvasSize(),
-                                maxHeight: this.getKlMaxCanvasSize(),
+                                maxWidth: this.maxCanvasSize,
+                                maxHeight: this.maxCanvasSize,
                                 currentColorRgb: {
                                     r: this.getCurrentColor().r,
                                     g: this.getCurrentColor().g,

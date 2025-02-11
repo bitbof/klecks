@@ -41,7 +41,6 @@ import tabLayersImg from '/src/app/img/ui/tab-layers.svg';
 import { LayersUi } from '../klecks/ui/tool-tabs/layers-ui/layers-ui';
 import { IVector2D } from '../bb/bb-types';
 import { createConsoleApi } from './console-api';
-import { ERASE_COLOR } from '../klecks/brushes/erase-color';
 import { klConfig } from '../klecks/kl-config';
 import { TRenderTextParam } from '../klecks/image-operations/render-text';
 import { Easel } from '../klecks/ui/easel/easel';
@@ -63,11 +62,12 @@ import { EASEL_MAX_SCALE, EASEL_MIN_SCALE } from '../klecks/ui/easel/easel.confi
 import { THistoryEntryDataComposed } from '../klecks/history/history.types';
 import { KlHistoryExecutor, THistoryExecutionType } from '../klecks/history/kl-history-executor';
 import { KlHistory } from '../klecks/history/kl-history';
-import { canvasToLayerTiles } from '../klecks/history/push-helpers/canvas-to-layer-tiles';
 import { isHistoryEntryActiveLayerChange } from '../klecks/history/push-helpers/is-history-entry-active-layer-change';
 import { MobileUi } from '../klecks/ui/mobile/mobile-ui';
 import { MobileBrushUi } from '../klecks/ui/mobile/mobile-brush-ui';
 import { canvasToBlob } from '../bb/base/canvas';
+import { projectToComposed } from '../klecks/history/push-helpers/project-to-composed';
+import { ERASE_COLOR } from '../klecks/brushes/erase-color';
 
 importFilters();
 
@@ -218,7 +218,7 @@ export class KlApp {
         this.embed = p.embed;
         // default 2048, unless your screen is bigger than that (that computer then probably has the horsepower for that)
         // but not larger than 4096 - a fairly arbitrary decision
-        const klMaxCanvasSize = Math.min(
+        const maxCanvasSize = Math.min(
             4096,
             Math.max(2048, Math.max(window.screen.width, window.screen.height)),
         );
@@ -243,25 +243,51 @@ export class KlApp {
         this.uiWidth = Math.max(0, window.innerWidth);
         this.uiHeight = Math.max(0, window.innerHeight);
         let exportType: TExportType = 'png';
-        this.klCanvas = new KL.KlCanvas(
-            p.project
-                ? {
-                      projectObj: p.project,
-                  }
-                : {
-                      width: Math.max(
-                          10,
-                          Math.min(
-                              klMaxCanvasSize,
-                              window.innerWidth < this.collapseThreshold
-                                  ? this.uiWidth
-                                  : this.uiWidth - this.toolWidth,
-                          ),
-                      ),
-                      height: Math.max(10, Math.min(klMaxCanvasSize, this.uiHeight)),
-                  },
-            this.embed ? -1 : 0,
+
+        const initialWidth = Math.max(
+            10,
+            Math.min(
+                maxCanvasSize,
+                window.innerWidth < this.collapseThreshold
+                    ? this.uiWidth
+                    : this.uiWidth - this.toolWidth,
+            ),
         );
+        const initialHeight = Math.max(10, Math.min(maxCanvasSize, this.uiHeight));
+        const klHistory = new KlHistory({
+            oldest: projectToComposed(
+                p.project ?? {
+                    width: initialWidth,
+                    height: initialHeight,
+                    layers: [
+                        {
+                            name: LANG('layers-layer') + ' 1', // not ideal
+                            opacity: 1,
+                            isVisible: true,
+                            mixModeStr: 'source-over',
+                            image: {
+                                fill: BB.ColorConverter.toRgbStr({
+                                    r: ERASE_COLOR,
+                                    g: ERASE_COLOR,
+                                    b: ERASE_COLOR,
+                                }),
+                            },
+                        },
+                    ],
+                },
+            ),
+        });
+        if (p.project) {
+            // attempt at freeing memory
+            p.project.layers.forEach((layer) => {
+                if (layer.image instanceof HTMLCanvasElement) {
+                    BB.freeCanvas(layer.image);
+                }
+                layer.image = null as any;
+            });
+        }
+
+        this.klCanvas = new KL.KlCanvas(klHistory, this.embed ? -1 : 1);
         const tempHistory = new KlTempHistory();
         let mainTabRow: TabRow | undefined = undefined;
 
@@ -271,57 +297,6 @@ export class KlApp {
                 reset: () => {},
             } as SaveReminder;
         }
-
-        if (p.project) {
-            // attempt at freeing memory
-            p.project.layers.forEach((layer) => {
-                layer.image = null as any;
-            });
-            p.project = undefined;
-        } else {
-            // init blank project
-            this.klCanvas.addLayer();
-            this.klCanvas.layerFill(0, {
-                r: ERASE_COLOR,
-                g: ERASE_COLOR,
-                b: ERASE_COLOR,
-            });
-        }
-
-        const klHistory = new KlHistory({
-            oldest: (() => {
-                let lastId: string = '';
-                const layerMap = Object.fromEntries(
-                    this.klCanvas.getLayers().map((layer, index) => {
-                        lastId = layer.id;
-                        return [
-                            layer.id,
-                            {
-                                name: layer.name,
-                                opacity: layer.opacity,
-                                isVisible: layer.isVisible,
-                                mixModeStr: layer.mixModeStr,
-                                index,
-                                tiles: canvasToLayerTiles(layer.context.canvas),
-                            },
-                        ];
-                    }),
-                );
-
-                const data: THistoryEntryDataComposed = {
-                    size: {
-                        width: this.klCanvas.getWidth(),
-                        height: this.klCanvas.getHeight(),
-                    },
-                    selection: {},
-                    activeLayerId: lastId,
-                    layerMap,
-                };
-
-                return data;
-            })(),
-        });
-        this.klCanvas.setHistory(klHistory);
 
         const clearLayer = (showStatus?: boolean) => {
             applyUncommitted();
@@ -1475,7 +1450,7 @@ export class KlApp {
             klColorSlider: this.klColorSlider,
             layersUi: this.layersUi,
             getCurrentColor: () => currentColor,
-            getKlMaxCanvasSize: () => klMaxCanvasSize,
+            maxCanvasSize,
             klCanvas: this.klCanvas,
             getCurrentLayer: () => currentLayer,
             isEmbed: !!this.embed,
@@ -1502,7 +1477,7 @@ export class KlApp {
             KL.newImageDialog({
                 currentColor: currentColor,
                 secondaryColor: this.klColorSlider.getSecondaryRGB(),
-                maxCanvasSize: klMaxCanvasSize,
+                maxCanvasSize,
                 canvasWidth: this.klCanvas.getWidth(),
                 canvasHeight: this.klCanvas.getHeight(),
                 workspaceWidth:
@@ -1887,7 +1862,7 @@ export class KlApp {
         const importHandler = new KlAppImportHandler(
             {
                 klRootEl: this.klRootEl,
-                klMaxCanvasSize,
+                maxCanvasSize,
                 layersUi: this.layersUi,
                 setCurrentLayer,
                 klCanvas: this.klCanvas,

@@ -17,7 +17,7 @@ export class ColorOptions {
     }[];
     private readonly colorArr: (IRGBA | null)[] = [];
     private selectedIndex: number = 0;
-    private colorInput: HTMLInputElement;
+    private readonly colorInput: HTMLInputElement;
 
     private readonly updateCheckerboard: () => void;
     private readonly onColorInputChange: () => void;

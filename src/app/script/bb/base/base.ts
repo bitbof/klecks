@@ -290,3 +290,7 @@ export function base64ToBlob(base64Str: string): Blob {
     }
     return new Blob([view], { type: parts[1] });
 }
+
+export function createArray<T>(length: number, fillValue: T): T[] {
+    return new Array(length).fill(fillValue);
+}

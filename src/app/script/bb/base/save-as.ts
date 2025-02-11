@@ -3,32 +3,34 @@ type FilePickerAcceptType = {
     accept: Record<string, string[]>;
 };
 
-const types: Record<string, FilePickerAcceptType> = {
-    png: {
+type TMimeType = string;
+const types: Record<TMimeType, FilePickerAcceptType> = {
+    'image/png': {
         description: 'PNG Image',
         accept: { 'image/png': ['.png'] },
     },
-    psd: {
+    'image/vnd.adobe.photoshop': {
         description: 'Adobe Photoshop Document',
         accept: { 'image/vnd.adobe.photoshop': ['.psd'] },
     },
+    // jpg etc
 } as const;
 
-// https://github.com/eligrey/FileSaver.js/issues/774
-// stripped down & modified version of https://github.com/eligrey/FileSaver.js/blob/master/src/FileSaver.js#L81-L108
-// todo redesign when also support jpg, etc.
 export async function saveAs(
     blob: Blob,
-    name: string,
+    fileName: string,
     showDialog: boolean = false,
-    type?: 'png' | 'psd',
 ): Promise<void> {
+    const mimeType = blob.type;
     if (showDialog && 'showSaveFilePicker' in window) {
         let fileHandle: FileSystemFileHandle | undefined;
+        if (!types[mimeType]) {
+            console.error('unknown mime type:', mimeType);
+        }
         try {
             fileHandle = await (window.showSaveFilePicker as any)({
-                suggestedName: name,
-                types: [type ? types[type] : types['png']],
+                suggestedName: fileName,
+                types: types[mimeType],
             });
         } catch (e) {
             // cancelled dialog, probably.
@@ -45,7 +47,7 @@ export async function saveAs(
 
     // Namespace is used to prevent conflict w/ Chrome Poper Blocker extension (Issue https://github.com/eligrey/FileSaver.js/issues/561)
     const a = document.createElementNS('http://www.w3.org/1999/xhtml', 'a') as HTMLAnchorElement;
-    a.download = name;
+    a.download = fileName;
     a.rel = 'noopener';
     const objectUrl = URL.createObjectURL(blob);
     a.href = objectUrl;

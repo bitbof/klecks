@@ -202,7 +202,7 @@ export class GradientUi {
     }
 
     setIsVisible(isVisible: boolean): void {
-        this.isVisible = !!isVisible;
+        this.isVisible = isVisible;
         this.rootEl.style.display = isVisible ? 'block' : 'none';
         if (isVisible) {
             this.colorDiv.append(

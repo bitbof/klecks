@@ -228,7 +228,7 @@ export class ProjectViewport {
             this.ctx.globalCompositeOperation = layer.mixModeStr;
             this.ctx.globalAlpha = layer.opacity;
 
-            let image: CanvasImageSource = {} as CanvasImageSource;
+            let image: CanvasImageSource;
             if (typeof layer.image === 'function') {
                 const res = layer.image(renderedTransform, this.canvas.width, this.canvas.height);
                 if ('image' in res && 'transform' in res) {

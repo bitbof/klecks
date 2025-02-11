@@ -46,12 +46,31 @@ export function canvasToLayerTiles(
         );
         return canvasAndChangedTilesToLayerTiles(canvas, changedTiles);
     } else {
+        // only do a single read back
+        const ctx = canvas.getContext('2d')!;
+        const fullImageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
         const tilesX = Math.ceil(canvas.width / HISTORY_TILE_SIZE);
         const tilesY = Math.ceil(canvas.height / HISTORY_TILE_SIZE);
-        const result: (THistoryEntryLayerTile | undefined)[] = [];
+        const result: THistoryEntryLayerTile[] = [];
+
+        // manually transfer into tiles
         for (let row = 0; row < tilesY; row++) {
             for (let col = 0; col < tilesX; col++) {
-                result.push(getTileFromCanvas(canvas, col, row, HISTORY_TILE_SIZE));
+                const x = col * HISTORY_TILE_SIZE;
+                const y = row * HISTORY_TILE_SIZE;
+                const tileWidth = Math.min(HISTORY_TILE_SIZE, canvas.width - x);
+                const tileHeight = Math.min(HISTORY_TILE_SIZE, canvas.height - y);
+
+                const tileData = new ImageData(tileWidth, tileHeight);
+                for (let line = 0; line < tileHeight; line++) {
+                    const srcStart = ((y + line) * canvas.width + x) * 4;
+                    const destStart = line * tileWidth * 4;
+                    tileData.data.set(
+                        fullImageData.data.subarray(srcStart, srcStart + tileWidth * 4),
+                        destStart,
+                    );
+                }
+                result.push(tileData);
             }
         }
         return result;

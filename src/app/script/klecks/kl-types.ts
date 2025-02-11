@@ -71,6 +71,17 @@ export type TMixMode =
     | 'color'
     | 'luminosity';
 
+export type TLayerFill = { fill: string }; // css color string. hex, rgb, rgba, color name
+
+export function isLayerFill(obj: unknown): obj is TLayerFill {
+    return (
+        typeof obj === 'object' &&
+        obj !== null &&
+        'fill' in obj &&
+        typeof (obj as any).fill === 'string'
+    );
+}
+
 export type IKlBasicLayer = {
     opacity: number; // 0 - 1
     isVisible: boolean;
@@ -83,7 +94,7 @@ export type IKlProjectLayer = {
     isVisible: boolean;
     opacity: number; // 0 - 1
     mixModeStr?: TMixMode; // default "source-over"
-    image: HTMLImageElement | HTMLCanvasElement; // already loaded
+    image: HTMLImageElement | HTMLCanvasElement | TLayerFill; // image already loaded
 };
 
 export type IKlProject = {

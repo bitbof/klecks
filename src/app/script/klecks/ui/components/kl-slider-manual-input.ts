@@ -98,7 +98,7 @@ export class KlSliderManualInput {
     }
 
     setIsEnabled(b: boolean): void {
-        this.isEnabled = !!b;
+        this.isEnabled = b;
     }
 
     focus(): void {

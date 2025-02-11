@@ -18,7 +18,7 @@ export const penBrushUi = (function () {
         sizeSlider: {
             min: 0.5,
             max: 100,
-            curve: BB.quadraticSplineInput(0.5, 100, 0.1),
+            curve: BB.powerSplineInput(0.5, 100, 0.1),
         },
         opacitySlider: {
             min: 1 / 100,
@@ -32,7 +32,7 @@ export const penBrushUi = (function () {
         scatterSlider: {
             min: 0,
             max: 100,
-            curve: BB.quadraticSplineInput(0, 100, 0.1),
+            curve: BB.powerSplineInput(0, 100, 0.1, 2.5),
         },
     } as IBrushUi<PenBrush>;
 

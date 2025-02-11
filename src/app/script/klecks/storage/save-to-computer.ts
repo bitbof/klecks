@@ -18,7 +18,7 @@ export class SaveToComputer {
         showDialog: boolean = false,
     ): Promise<void> {
         const blob = await canvasToBlob(canvas, mimeType);
-        saveAs(blob, filename, showDialog);
+        await saveAs(blob, filename, showDialog);
     }
 
     constructor(
@@ -96,7 +96,6 @@ export class SaveToComputer {
                         blob,
                         BB.getDate() + klConfig.filenameBase + '.psd',
                         this.showSaveDialog,
-                        'psd',
                     );
                 })
                 .catch(() => {

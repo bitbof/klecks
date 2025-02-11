@@ -291,7 +291,7 @@ export const filterNoise = {
             max: 1000,
             value: settingsObj.scale,
             eventResMs: EVENT_RES_MS,
-            curve: BB.quadraticSplineInput(1, 1000, 0.1),
+            curve: BB.powerSplineInput(1, 1000, 0.1),
             onChange: (value) => {
                 settingsObj.scale = value;
                 update();

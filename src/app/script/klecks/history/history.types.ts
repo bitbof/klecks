@@ -1,10 +1,10 @@
 import { MultiPolygon } from 'polygon-clipping';
-import { TMixMode } from '../kl-types';
+import { TLayerFill, TMixMode } from '../kl-types';
 
 export type TLayerId = string;
 // image data, or a fill color
 // can be transparent: {fill: 'transparent'} -> useful if empty layer
-export type THistoryEntryLayerTile = ImageData | { fill: string };
+export type THistoryEntryLayerTile = ImageData | TLayerFill;
 export type THistoryEntryLayer = {
     // if layer exists but did not change, must be in the layerMap. object can be empty
 

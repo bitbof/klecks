@@ -20,7 +20,7 @@ export class ImageToggle {
         image: string;
         darkInvert?: boolean;
     }) {
-        this.isActive = !!p.initValue;
+        this.isActive = p.initValue;
         this.rootEl = BB.el({
             className: 'image-toggle',
             title: p.title,
@@ -46,7 +46,7 @@ export class ImageToggle {
 
     // --- interface ---
     setValue(b: boolean): void {
-        this.isActive = !!b;
+        this.isActive = b;
         this.update();
     }
 

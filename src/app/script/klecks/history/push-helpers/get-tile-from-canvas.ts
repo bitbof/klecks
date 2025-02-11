@@ -1,10 +1,12 @@
+import { BB } from '../../../bb/bb';
+
 export function getTileFromCanvas(
     canvas: HTMLCanvasElement,
     col: number,
     row: number,
     tileSize: number,
 ) {
-    const ctx = canvas.getContext('2d')!;
+    const ctx = BB.ctx(canvas);
 
     const width = Math.min(canvas.width, (col + 1) * tileSize) - col * tileSize;
     const height = Math.min(canvas.height, (row + 1) * tileSize) - row * tileSize;

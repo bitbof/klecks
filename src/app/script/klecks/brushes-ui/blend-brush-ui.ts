@@ -16,7 +16,7 @@ export const blendBrushUi = (function () {
         sizeSlider: {
             min: 0.5,
             max: 100,
-            curve: BB.quadraticSplineInput(0.5, 100, 0.1),
+            curve: BB.powerSplineInput(0.5, 100, 0.1),
         },
         opacitySlider: {
             min: 1 / 100,
@@ -166,7 +166,7 @@ export const blendBrushUi = (function () {
             brush.setColor(c);
         };
         this.setLayer = function (layer) {
-            brush.setContext(layer.context);
+            brush.setContext(layer.context, layer.id);
         };
         this.startLine = function (x, y, p) {
             brush.startLine(x, y, p);

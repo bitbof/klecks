@@ -1,6 +1,7 @@
 import { IBounds } from '../../../bb/bb-types';
 import { HISTORY_TILE_SIZE } from '../kl-history';
 import { clamp } from '../../../bb/math/math';
+import { createArray } from '../../../bb/base/base';
 
 // returns array, each entry represents a tile, as a boolean
 // true - intersected with bounds
@@ -12,7 +13,7 @@ export function getChangedTiles(
 ): boolean[] {
     const tilesX = Math.ceil(width / tileSize);
     const tilesY = Math.ceil(height / tileSize);
-    const result: boolean[] = Array(tilesX * tilesY).fill(false);
+    const result: boolean[] = createArray(tilesX * tilesY, false);
 
     const tileBounds = {
         x1: clamp(Math.floor(bounds.x1 / tileSize), 0, tilesX - 1),

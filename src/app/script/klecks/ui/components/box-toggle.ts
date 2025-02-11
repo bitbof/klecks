@@ -46,7 +46,7 @@ export class BoxToggle {
     }
 
     setValue(b: boolean): void {
-        this.value = !!b;
+        this.value = b;
         this.update();
     }
 

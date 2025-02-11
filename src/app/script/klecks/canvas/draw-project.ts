@@ -1,5 +1,5 @@
 import { BB } from '../../bb/bb';
-import { IKlProject } from '../kl-types';
+import { IKlProject, isLayerFill } from '../kl-types';
 
 export function drawProject(project: IKlProject, factor: number): HTMLCanvasElement {
     const resultCanvas = BB.canvas(
@@ -19,7 +19,12 @@ export function drawProject(project: IKlProject, factor: number): HTMLCanvasElem
         ctx.globalAlpha = layer.opacity;
         const mixModeStr = layer.mixModeStr;
         ctx.globalCompositeOperation = mixModeStr !== undefined ? mixModeStr : 'source-over';
-        ctx.drawImage(layer.image, 0, 0, resultCanvas.width, resultCanvas.height);
+        if (isLayerFill(layer.image)) {
+            ctx.fillStyle = layer.image.fill;
+            ctx.fillRect(0, 0, resultCanvas.width, resultCanvas.height);
+        } else {
+            ctx.drawImage(layer.image, 0, 0, resultCanvas.width, resultCanvas.height);
+        }
     }
     ctx.restore();
     return resultCanvas;

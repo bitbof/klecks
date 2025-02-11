@@ -48,14 +48,14 @@ export class Preview {
     private doRender = false;
     private readonly padding: number;
     private animationFrameId: ReturnType<typeof requestAnimationFrame> | undefined;
-    private onTransformChange: TPreviewParams['onTransformChange'] | undefined;
+    private readonly onTransformChange: TPreviewParams['onTransformChange'] | undefined;
     private lastEmittedTransform: TViewportTransform = {
         x: 0,
         y: 0,
         scale: 0,
         angleDeg: 0,
     };
-    private modeToggle: Options<TPreviewMode> | undefined;
+    private readonly modeToggle: Options<TPreviewMode> | undefined;
     private readonly pointerChain: EventChain;
 
     private renderLoop = (): void => {

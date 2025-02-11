@@ -12,8 +12,8 @@ export type TInertiaScrollingParams = {
  */
 export class InertiaScrolling {
     // from params
-    private getTransform: () => TViewportTransform;
-    private setTransform: (transform: TViewportTransform) => void;
+    private readonly getTransform: () => TViewportTransform;
+    private readonly setTransform: (transform: TViewportTransform) => void;
 
     private readonly defaultDeltaMs = 1000 / 60; // time factor is 1 for 60fps, 2 for 120fps
     private momentum: IVector2D = { x: 0, y: 0 };

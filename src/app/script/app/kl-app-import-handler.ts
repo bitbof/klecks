@@ -22,22 +22,16 @@ export class KlAppImportHandler {
 
     private readonly onColor: (rgb: IRGB) => void;
 
-    /**
-     *
-     * @param importedImage - convertedPsd | {type: 'image', width: number, height: number, canvas: image | canvas}
-     * @param filename - string e.g. 'drawing.psd'
-     * @param optionStr? - 'default' | 'layer' | 'image'
-     */
     private importFinishedLoading(
-        importedImage:
-            | IKlPsd
+        importedImage: // convertedPsd | {type: 'image', width: number, height: number, canvas: image | canvas}
+        | IKlPsd
             | {
                   type: 'image';
                   width: number;
                   height: number;
                   canvas: HTMLCanvasElement | HTMLImageElement;
               },
-        filename: string | undefined,
+        filename: string | undefined, // string e.g. 'drawing.psd'
         optionStr: 'default' | 'layer' | 'image',
     ): void {
         if (
@@ -98,9 +92,7 @@ export class KlAppImportHandler {
         };
 
         /**
-         *
-         * @param convertedPsdObj - if flattened then without layers
-         * @param cropObj? - {x: number, y: number, width: number, height: number}
+         * convertedPsdObj has no layers if flattened
          */
         const importAsImagePsd = (convertedPsdObj: IKlPsd, cropObj?: IRect) => {
             // crop
@@ -251,7 +243,7 @@ export class KlAppImportHandler {
     constructor(
         input: {
             klRootEl: HTMLElement;
-            klMaxCanvasSize: number;
+            maxCanvasSize: number;
             layersUi: LayersUi;
             setCurrentLayer: (layer: TKlCanvasLayer) => void;
             klCanvas: KlCanvas;
@@ -262,7 +254,7 @@ export class KlAppImportHandler {
         },
     ) {
         this.klRootEl = input.klRootEl;
-        this.klMaxCanvasSize = input.klMaxCanvasSize;
+        this.klMaxCanvasSize = input.maxCanvasSize;
         this.layersUi = input.layersUi;
         this.setCurrentLayer = input.setCurrentLayer;
         this.klCanvas = input.klCanvas;

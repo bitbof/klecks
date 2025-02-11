@@ -373,7 +373,7 @@ export class ShapeUi {
     }
 
     setIsVisible(pIsVisible: boolean): void {
-        this.isVisible = !!pIsVisible;
+        this.isVisible = pIsVisible;
         this.rootEl.style.display = this.isVisible ? 'block' : 'none';
         if (this.isVisible) {
             this.colorDiv.append(this.colorSlider.getElement());

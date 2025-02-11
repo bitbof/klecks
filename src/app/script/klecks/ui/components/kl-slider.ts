@@ -234,9 +234,7 @@ export class KlSlider {
                 throw new Error('curve needs to be set if useSpline true');
             }
             const curveArr: [number, number][] =
-                p.curve === 'quadratic'
-                    ? BB.quadraticSplineInput(this.min, this.max, 0.1)
-                    : p.curve;
+                p.curve === 'quadratic' ? BB.powerSplineInput(this.min, this.max, 0.1) : p.curve;
             this.splineInterpolator = new BB.SplineInterpolator(curveArr);
         }
 
@@ -399,7 +397,7 @@ export class KlSlider {
             }
             const curveArr =
                 config.curve === 'quadratic'
-                    ? BB.quadraticSplineInput(this.min, this.max, 0.1)
+                    ? BB.powerSplineInput(this.min, this.max, 0.1)
                     : config.curve;
             this.splineInterpolator = new BB.SplineInterpolator(curveArr);
         } else {
@@ -409,7 +407,7 @@ export class KlSlider {
     }
 
     setIsEnabled(e: boolean): void {
-        this.isEnabled = !!e;
+        this.isEnabled = e;
         this.updateEnable();
     }
 

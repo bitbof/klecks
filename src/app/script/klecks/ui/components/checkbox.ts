@@ -83,7 +83,7 @@ export class Checkbox {
     }
 
     setValue(b: boolean): void {
-        this.check.checked = !!b;
+        this.check.checked = b;
         if (this.doHighlight) {
             this.element.classList.toggle('kl-checkbox--highlight', this.check.checked);
         }

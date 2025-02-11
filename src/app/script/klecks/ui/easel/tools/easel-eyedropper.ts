@@ -18,8 +18,8 @@ export class EaselEyedropper implements TEaselTool {
     private readonly onPickEnd: TEaselEyedropperParams['onPickEnd'];
     private easel: TEaselInterface = {} as TEaselInterface;
     private isDragging: boolean = false;
-    private previewBorder: SVGElement;
-    private previewColor: SVGElement;
+    private readonly previewBorder: SVGElement;
+    private readonly previewColor: SVGElement;
 
     // ----------------------------------- public -----------------------------------
     tempTriggers: TEaselToolTrigger[] = ['mouse-right', 'alt'];
