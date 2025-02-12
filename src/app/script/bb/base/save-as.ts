@@ -16,32 +16,46 @@ const types: Record<TMimeType, FilePickerAcceptType> = {
     // jpg etc
 } as const;
 
+// resolves to true if it saves via file picker (or user aborted)
+async function saveViaFilePicker(blob: Blob, fileName: string): Promise<boolean> {
+    const mimeType = blob.type;
+    if ('showSaveFilePicker' in window) {
+        let fileHandle: FileSystemFileHandle | undefined;
+        if (!types[mimeType]) {
+            console.error('unknown mime type:', mimeType);
+            return false;
+        }
+        try {
+            fileHandle = await (window.showSaveFilePicker as any)({
+                suggestedName: fileName,
+                types: [types[mimeType]],
+            });
+        } catch (e) {
+            if (e instanceof Error && e.name === 'AbortError') {
+                // cancelled dialog
+                return true;
+            }
+            console.log('unpredicted error', e);
+            return false;
+        }
+        if (!fileHandle) {
+            return false;
+        }
+        const writableStream = await fileHandle.createWritable();
+        await writableStream.write(blob);
+        await writableStream.close();
+        return true;
+    } else {
+        return false;
+    }
+}
+
 export async function saveAs(
     blob: Blob,
     fileName: string,
     showDialog: boolean = false,
 ): Promise<void> {
-    const mimeType = blob.type;
-    if (showDialog && 'showSaveFilePicker' in window) {
-        let fileHandle: FileSystemFileHandle | undefined;
-        if (!types[mimeType]) {
-            console.error('unknown mime type:', mimeType);
-        }
-        try {
-            fileHandle = await (window.showSaveFilePicker as any)({
-                suggestedName: fileName,
-                types: types[mimeType],
-            });
-        } catch (e) {
-            // cancelled dialog, probably.
-            return;
-        }
-        if (!fileHandle) {
-            return;
-        }
-        const writableStream = await fileHandle.createWritable();
-        await writableStream.write(blob);
-        await writableStream.close();
+    if (showDialog && (await saveViaFilePicker(blob, fileName))) {
         return;
     }
 
