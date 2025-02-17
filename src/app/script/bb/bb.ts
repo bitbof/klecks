@@ -84,7 +84,7 @@ import { BbLog } from './base/bb-log';
 import { LocalStorage } from './base/local-storage';
 import { CoalescedExploder } from './input/event-chain/coalesced-exploder';
 import { NFingerTapper } from './input/event-chain/n-finger-tapper';
-import { PinchZoomer } from './input/event-chain/pinch-zoomer';
+// import { PinchZoomer } from './input/event-chain/pinch-zoomer';
 import { DoubleTapper } from './input/event-chain/double-tapper';
 import { OnePointerLimiter } from './input/event-chain/one-pointer-limiter';
 import { EventChain } from './input/event-chain/event-chain';
@@ -187,7 +187,7 @@ export const BB = {
     EventChain,
     DoubleTapper,
     NFingerTapper,
-    PinchZoomer,
+    // PinchZoomer,
     CoalescedExploder,
     OnePointerLimiter,
 };

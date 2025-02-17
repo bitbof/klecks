@@ -441,34 +441,34 @@ export class Easel<GToolId extends string> {
                 this.pointerPreprocessor.chainIn(e);
             },
             onWheel: (e) => {
-                e.event?.preventDefault();
-                if (e.event && e.event.ctrlKey && !this.keyListener.isPressed('ctrl')) {
-                    let factor = 1;
-                    if (e.event.deltaMode === 0) {
-                        factor = 6;
-                    }
-                    e.deltaY *= factor;
-                }
-                if (this.keyListener.isPressed('shift')) {
-                    e.deltaY /= 4;
-                }
-                // zoom
-                const transform = this.viewport.getTransform();
-                const viewportPoint = {
-                    x: e.relX,
-                    y: e.relY,
-                };
-                const mat = createMatrixFromTransform(transform);
-                const canvasPoint = applyToPoint(inverse(mat), viewportPoint);
-                const newScale = BB.clamp(
-                    transform.scale * Math.pow(1 + 4 / 10, -e.deltaY),
-                    EASEL_MIN_SCALE,
-                    EASEL_MAX_SCALE,
-                );
-                this.setTransform(
-                    createTransform(viewportPoint, canvasPoint, newScale, transform.angleDeg),
-                );
-                this.requestRender();
+                // e.event?.preventDefault();
+                // if (e.event && e.event.ctrlKey && !this.keyListener.isPressed('ctrl')) {
+                //     let factor = 1;
+                //     if (e.event.deltaMode === 0) {
+                //         factor = 6;
+                //     }
+                //     e.deltaY *= factor;
+                // }
+                // if (this.keyListener.isPressed('shift')) {
+                //     e.deltaY /= 4;
+                // }
+                // // zoom
+                // const transform = this.viewport.getTransform();
+                // const viewportPoint = {
+                //     x: e.relX,
+                //     y: e.relY,
+                // };
+                // const mat = createMatrixFromTransform(transform);
+                // const canvasPoint = applyToPoint(inverse(mat), viewportPoint);
+                // const newScale = BB.clamp(
+                //     transform.scale * Math.pow(1 + 4 / 10, -e.deltaY),
+                //     EASEL_MIN_SCALE,
+                //     EASEL_MAX_SCALE,
+                // );
+                // this.setTransform(
+                //     createTransform(viewportPoint, canvasPoint, newScale, transform.angleDeg),
+                // );
+                // this.requestRender();
             },
             onEnterLeave: (isOver) => {
                 const tool = this.getActiveTool();

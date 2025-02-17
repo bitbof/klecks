@@ -187,6 +187,8 @@ export class KlApp {
             this.easel.setSize(Math.max(0, this.uiWidth - this.toolWidth), this.uiHeight);
             this.statusOverlay.setWide(false);
         }
+        // this.resize(this.klCanvas.getWidth(), this.klCanvas.getHeight());
+        this.easel.fitTransform();
     }
 
     private updateBottomBar(): void {
@@ -1085,7 +1087,8 @@ export class KlApp {
                 simpleUi: p.simpleUi,
                 logoImg: p.logoImg!,
                 onLogo: () => {
-                    showIframeModal('./home/', !!this.embed);
+                    return;
+                    // showIframeModal('./home/', !!this.embed);
                 },
                 onNew: () => {
                     showNewImageDialog();
@@ -1138,20 +1141,20 @@ export class KlApp {
                 this.klColorSlider.pickingDone();
             },
             onZoomIn: () => {
-                const oldScale = this.easel.getTransform().scale;
-                const newScale = zoomByStep(
-                    oldScale,
-                    keyListener.isPressed('shift') ? 1 / 8 : 1 / 2,
-                );
-                this.easel.scale(newScale / oldScale);
+                // const oldScale = this.easel.getTransform().scale;
+                // const newScale = zoomByStep(
+                //     oldScale,
+                //     keyListener.isPressed('shift') ? 1 / 8 : 1 / 2,
+                // );
+                // this.easel.scale(newScale / oldScale);
             },
             onZoomOut: () => {
-                const oldScale = this.easel.getTransform().scale;
-                const newScale = zoomByStep(
-                    oldScale,
-                    keyListener.isPressed('shift') ? -1 / 8 : -1 / 2,
-                );
-                this.easel.scale(newScale / oldScale);
+                // const oldScale = this.easel.getTransform().scale;
+                // const newScale = zoomByStep(
+                //     oldScale,
+                //     keyListener.isPressed('shift') ? -1 / 8 : -1 / 2,
+                // );
+                // this.easel.scale(newScale / oldScale);
             },
             onUndo: () => {
                 undo();
@@ -1951,15 +1954,15 @@ export class KlApp {
             }
 
             // prevent ctrl scroll -> zooming page
-            this.klRootEl.addEventListener(
-                'wheel',
-                (event) => {
-                    if (keyListener.isPressed('ctrl')) {
-                        event.preventDefault();
-                    }
-                },
-                { passive: false },
-            );
+            // this.klRootEl.addEventListener(
+            //     'wheel',
+            //     (event) => {
+            //         if (keyListener.isPressed('ctrl')) {
+            //             event.preventDefault();
+            //         }
+            //     },
+            //     { passive: false },
+            // );
             //maybe prevent zooming on safari mac os - todo still needed?
             const prevent = (e: Event) => {
                 e.preventDefault();

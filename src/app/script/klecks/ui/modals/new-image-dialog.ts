@@ -114,119 +114,119 @@ export function newImageDialog (
             gap: '5px',
         },
     });
-    const presetFitBtn = BB.el({ tagName: 'button' });
+    // const presetFitBtn = BB.el({ tagName: 'button' });
     templateWrapper.style.marginBottom = '10px';
-    const presetCurrentBtn = BB.el({ tagName: 'button' });
-    const presetSquareBtn = BB.el({ tagName: 'button' });
-    const presetLandscapeBtn = BB.el({ tagName: 'button' });
-    const presetPortraitBtn = BB.el({ tagName: 'button' });
-    const presetOversizeBtn = BB.el({ tagName: 'button' });
+    // const presetCurrentBtn = BB.el({ tagName: 'button' });
+    // const presetSquareBtn = BB.el({ tagName: 'button' });
+    // const presetLandscapeBtn = BB.el({ tagName: 'button' });
+    // const presetPortraitBtn = BB.el({ tagName: 'button' });
+    // const presetOversizeBtn = BB.el({ tagName: 'button' });
 
-    presetCurrentBtn.textContent = LANG('new-current');
-    presetFitBtn.textContent = LANG('new-fit');
-    presetOversizeBtn.textContent = LANG('new-oversize');
-    presetLandscapeBtn.textContent = LANG('new-landscape');
-    presetPortraitBtn.textContent = LANG('new-portrait');
-    presetSquareBtn.textContent = LANG('new-square');
+    // presetCurrentBtn.textContent = LANG('new-current');
+    // presetFitBtn.textContent = LANG('new-fit');
+    // presetOversizeBtn.textContent = LANG('new-oversize');
+    // presetLandscapeBtn.textContent = LANG('new-landscape');
+    // presetPortraitBtn.textContent = LANG('new-portrait');
+    // presetSquareBtn.textContent = LANG('new-square');
 
-    templateWrapper.append(
-        presetCurrentBtn,
-        presetFitBtn,
-        presetOversizeBtn,
-        presetSquareBtn,
-        presetLandscapeBtn,
-        presetPortraitBtn,
-    );
+    // templateWrapper.append(
+    //     presetCurrentBtn,
+    //     presetFitBtn,
+    //     presetOversizeBtn,
+    //     presetSquareBtn,
+    //     presetLandscapeBtn,
+    //     presetPortraitBtn,
+    // );
 
-    const templatePadding = 0;
+    // const templatePadding = 0;
 
-    presetCurrentBtn.onclick = function (): void {
-        widthInput.value = '' + canvasWidth;
-        heightInput.value = '' + canvasHeight;
-        updateRatio();
-    };
-    presetFitBtn.onclick = function (): void {
-        widthInput.value = '' + workspaceWidth;
-        heightInput.value = '' + workspaceHeight;
-        updateRatio();
-    };
-    presetOversizeBtn.onclick = function (): void {
-        widthInput.value = '' + (workspaceWidth + 500);
-        heightInput.value = '' + (workspaceHeight + 500);
-        updateRatio();
-    };
-    presetSquareBtn.onclick = function (): void {
-        const sizeObj = createRatioSize(1, 1, workspaceWidth, workspaceHeight, templatePadding);
-        widthInput.value = '' + Math.round(sizeObj.width);
-        heightInput.value = '' + Math.round(sizeObj.height);
-        updateRatio();
-    };
-    presetLandscapeBtn.onclick = function (): void {
-        const sizeObj = createRatioSize(4, 3, workspaceWidth, workspaceHeight, templatePadding);
-        widthInput.value = '' + Math.round(sizeObj.width);
-        heightInput.value = '' + Math.round(sizeObj.height);
-        updateRatio();
-    };
-    presetPortraitBtn.onclick = function (): void {
-        const sizeObj = createRatioSize(3, 4, workspaceWidth, workspaceHeight, templatePadding);
-        widthInput.value = '' + Math.round(sizeObj.width);
-        heightInput.value = '' + Math.round(sizeObj.height);
-        updateRatio();
-    };
+    // presetCurrentBtn.onclick = function (): void {
+    //     widthInput.value = '' + canvasWidth;
+    //     heightInput.value = '' + canvasHeight;
+    //     updateRatio();
+    // };
+    // presetFitBtn.onclick = function (): void {
+    //     widthInput.value = '' + workspaceWidth;
+    //     heightInput.value = '' + workspaceHeight;
+    //     updateRatio();
+    // };
+    // presetOversizeBtn.onclick = function (): void {
+    //     widthInput.value = '' + (workspaceWidth + 500);
+    //     heightInput.value = '' + (workspaceHeight + 500);
+    //     updateRatio();
+    // };
+    // presetSquareBtn.onclick = function (): void {
+    //     const sizeObj = createRatioSize(1, 1, workspaceWidth, workspaceHeight, templatePadding);
+    //     widthInput.value = '' + Math.round(sizeObj.width);
+    //     heightInput.value = '' + Math.round(sizeObj.height);
+    //     updateRatio();
+    // };
+    // presetLandscapeBtn.onclick = function (): void {
+    //     const sizeObj = createRatioSize(4, 3, workspaceWidth, workspaceHeight, templatePadding);
+    //     widthInput.value = '' + Math.round(sizeObj.width);
+    //     heightInput.value = '' + Math.round(sizeObj.height);
+    //     updateRatio();
+    // };
+    // presetPortraitBtn.onclick = function (): void {
+    //     const sizeObj = createRatioSize(3, 4, workspaceWidth, workspaceHeight, templatePadding);
+    //     widthInput.value = '' + Math.round(sizeObj.width);
+    //     heightInput.value = '' + Math.round(sizeObj.height);
+    //     updateRatio();
+    // };
 
-    const select = new Select({
-        isFocusable: true,
-        optionArr: [
-            ['screen', LANG('new-screen')],
-            ['16 9', LANG('new-video') + ' 16:9'],
-            ['3 2', '3:2'],
-            ['5 3', '5:3'],
-            ['2 1', '2:1'],
-            ['paper', LANG('new-din-paper') + ' √2:1'],
-            ['9 16', '9:16'],
-            ['2 3', '2:3'],
-            ['3 5', '3:5'],
-            ['1 2', '1:2'],
-            ['1 1.4142135623730951', '1:√2'],
-        ],
-        onChange: function (val): void {
-            if (val === 'screen') {
-                widthInput.value = '' + window.screen.width;
-                heightInput.value = '' + window.screen.height;
-            } else if (val === 'paper') {
-                const sizeObj = createRatioSize(
-                    Math.sqrt(2),
-                    1,
-                    workspaceWidth,
-                    workspaceHeight,
-                    templatePadding,
-                );
-                widthInput.value = '' + Math.round(sizeObj.width);
-                heightInput.value = '' + Math.round(sizeObj.height);
-            } else {
-                const split = val.split(' ');
-                const sizeObj = createRatioSize(
-                    parseFloat(split[0]),
-                    parseFloat(split[1]),
-                    workspaceWidth,
-                    workspaceHeight,
-                    templatePadding,
-                );
-                widthInput.value = '' + Math.round(sizeObj.width);
-                heightInput.value = '' + Math.round(sizeObj.height);
-            }
-            updateRatio();
-            select.setValue(undefined);
-        },
-    });
-    setTimeout(() => {
-        // safari: not empty without also setting it to null via timeout
-        select.setValue(undefined);
-    }, 0);
-    BB.css(select.getElement(), {
-        width: '80px',
-    });
-    templateWrapper.append(select.getElement());
+    // const select = new Select({
+    //     isFocusable: true,
+    //     optionArr: [
+    //         ['screen', LANG('new-screen')],
+    //         ['16 9', LANG('new-video') + ' 16:9'],
+    //         ['3 2', '3:2'],
+    //         ['5 3', '5:3'],
+    //         ['2 1', '2:1'],
+    //         ['paper', LANG('new-din-paper') + ' √2:1'],
+    //         ['9 16', '9:16'],
+    //         ['2 3', '2:3'],
+    //         ['3 5', '3:5'],
+    //         ['1 2', '1:2'],
+    //         ['1 1.4142135623730951', '1:√2'],
+    //     ],
+    //     onChange: function (val): void {
+    //         if (val === 'screen') {
+    //             widthInput.value = '' + window.screen.width;
+    //             heightInput.value = '' + window.screen.height;
+    //         } else if (val === 'paper') {
+    //             const sizeObj = createRatioSize(
+    //                 Math.sqrt(2),
+    //                 1,
+    //                 workspaceWidth,
+    //                 workspaceHeight,
+    //                 templatePadding,
+    //             );
+    //             widthInput.value = '' + Math.round(sizeObj.width);
+    //             heightInput.value = '' + Math.round(sizeObj.height);
+    //         } else {
+    //             const split = val.split(' ');
+    //             const sizeObj = createRatioSize(
+    //                 parseFloat(split[0]),
+    //                 parseFloat(split[1]),
+    //                 workspaceWidth,
+    //                 workspaceHeight,
+    //                 templatePadding,
+    //             );
+    //             widthInput.value = '' + Math.round(sizeObj.width);
+    //             heightInput.value = '' + Math.round(sizeObj.height);
+    //         }
+    //         updateRatio();
+    //         select.setValue(undefined);
+    //     },
+    // });
+    // setTimeout(() => {
+    //     // safari: not empty without also setting it to null via timeout
+    //     select.setValue(undefined);
+    // }, 0);
+    // BB.css(select.getElement(), {
+    //     width: '80px',
+    // });
+    // templateWrapper.append(select.getElement());
 
 
     let backgroundRGBA = {r: 255, g: 208, b: 89, a: 1};
@@ -435,12 +435,15 @@ export function newImageDialog (
     widthInput.onkeyup = (): void => {
         updateRatio();
     };
+    widthInput.disabled = true;
     heightInput.onchange = (): void => {
         if (heightInput.value === '' || parseFloat(heightInput.value) < 0) {
             heightInput.value = '1';
         }
         updateRatio();
     };
+    heightInput.disabled = true;
+
     heightInput.onkeyup = (): void => {
         updateRatio();
     };
@@ -472,14 +475,14 @@ export function newImageDialog (
             BB.unsetEventHandler(widthInput, 'onclick', 'onchange', 'onkeyup');
             BB.unsetEventHandler(widthInput, 'onclick', 'onchange', 'onkeyup');
 
-            BB.unsetEventHandler(presetCurrentBtn, 'onclick');
-            BB.unsetEventHandler(presetFitBtn, 'onclick');
-            BB.unsetEventHandler(presetOversizeBtn, 'onclick');
-            BB.unsetEventHandler(presetSquareBtn, 'onclick');
-            BB.unsetEventHandler(presetLandscapeBtn, 'onclick');
-            BB.unsetEventHandler(presetPortraitBtn, 'onclick');
+            // BB.unsetEventHandler(presetCurrentBtn, 'onclick');
+            // BB.unsetEventHandler(presetFitBtn, 'onclick');
+            // BB.unsetEventHandler(presetOversizeBtn, 'onclick');
+            // BB.unsetEventHandler(presetSquareBtn, 'onclick');
+            // BB.unsetEventHandler(presetLandscapeBtn, 'onclick');
+            // BB.unsetEventHandler(presetPortraitBtn, 'onclick');
 
-            select.destroy();
+            // select.destroy();
             colorOptions.destroy();
             theme.removeIsDarkListener(updateRatio);
 

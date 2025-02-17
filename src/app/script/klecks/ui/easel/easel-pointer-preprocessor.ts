@@ -25,7 +25,7 @@ export class EaselPointerPreprocessor {
     private readonly threeFingerTap: NFingerTapper | undefined;
     private readonly mainDoubleTapper: DoubleTapper;
     private readonly middleDoubleTapper: DoubleTapper;
-    private readonly pinchZoomer: PinchZoomer;
+    // private readonly pinchZoomer: PinchZoomer;
 
     // ----------------------------------- public -----------------------------------
     constructor(p: TEaselPointerPreprocessor) {
@@ -48,16 +48,16 @@ export class EaselPointerPreprocessor {
         this.mainDoubleTapper.setAllowedPointerTypeArr(['touch']);
         this.middleDoubleTapper = new BB.DoubleTapper({ onDoubleTap: p.onDoubleTap });
         this.middleDoubleTapper.setAllowedButtonArr(['middle']);
-        this.pinchZoomer = new BB.PinchZoomer({
-            onPinch: p.onPinch,
-        });
+        // this.pinchZoomer = new BB.PinchZoomer({
+        //     onPinch: p.onPinch,
+        // });
 
         this.pointerEventChain = new EventChain({
             chainArr: [
                 ...nFingerSubChain,
                 this.mainDoubleTapper as IChainElement,
                 this.middleDoubleTapper as IChainElement,
-                this.pinchZoomer as IChainElement,
+                // this.pinchZoomer as IChainElement,
                 new BB.OnePointerLimiter() as IChainElement,
             ],
         });

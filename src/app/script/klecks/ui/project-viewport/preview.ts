@@ -221,49 +221,49 @@ export class Preview {
             },
             isInstant: true,
         });
-        let oldTransform: TViewportTransform | undefined = undefined;
-        const pinchZoomer = new PinchZoomer({
-            onPinch: (e) => {
-                if (e.type === 'move') {
-                    if (!oldTransform) {
-                        oldTransform = this.viewport.getTransform();
-                    }
-                    const metaTransform = toMetaTransform(oldTransform, {
-                        x: e.downRelX,
-                        y: e.downRelY,
-                    });
-                    metaTransform.scale *= e.scale;
-                    metaTransform.viewportP.x += e.relX - e.downRelX;
-                    metaTransform.viewportP.y += e.relY - e.downRelY;
-                    this.viewport.setTransform(
-                        createTransform(
-                            metaTransform.viewportP,
-                            metaTransform.canvasP,
-                            metaTransform.scale,
-                            metaTransform.angleDeg,
-                        ),
-                    );
-                    this.requestRerender();
-                    this.isReset = false;
-                } else if (e.type === 'end') {
-                    oldTransform = undefined;
-                }
-            },
-        });
+        // let oldTransform: TViewportTransform | undefined = undefined;
+        // const pinchZoomer = new PinchZoomer({
+        //     onPinch: (e) => {
+        //         if (e.type === 'move') {
+        //             if (!oldTransform) {
+        //                 oldTransform = this.viewport.getTransform();
+        //             }
+        //             const metaTransform = toMetaTransform(oldTransform, {
+        //                 x: e.downRelX,
+        //                 y: e.downRelY,
+        //             });
+        //             metaTransform.scale *= e.scale;
+        //             metaTransform.viewportP.x += e.relX - e.downRelX;
+        //             metaTransform.viewportP.y += e.relY - e.downRelY;
+        //             this.viewport.setTransform(
+        //                 createTransform(
+        //                     metaTransform.viewportP,
+        //                     metaTransform.canvasP,
+        //                     metaTransform.scale,
+        //                     metaTransform.angleDeg,
+        //                 ),
+        //             );
+        //             this.requestRerender();
+        //             this.isReset = false;
+        //         } else if (e.type === 'end') {
+        //             oldTransform = undefined;
+        //         }
+        //     },
+        // });
 
-        this.pointerChain = new EventChain({
-            chainArr: [pinchZoomer as IChainElement, doubleTapper as IChainElement],
-        });
-        this.pointerChain.setChainOut((e) => {
-            if (e.button && ['left', 'middle'].includes(e.button)) {
-                // debugOut(JSON.stringify(e));
-                this.transformCanvas({
-                    type: 'translate',
-                    x: e.dX,
-                    y: e.dY,
-                });
-            }
-        });
+        // this.pointerChain = new EventChain({
+        //     chainArr: [pinchZoomer as IChainElement, doubleTapper as IChainElement],
+        // });
+        // this.pointerChain.setChainOut((e) => {
+        //     if (e.button && ['left', 'middle'].includes(e.button)) {
+        //         // debugOut(JSON.stringify(e));
+        //         this.transformCanvas({
+        //             type: 'translate',
+        //             x: e.dX,
+        //             y: e.dY,
+        //         });
+        //     }
+        // });
 
         this.viewport.getElement().classList.add(
             css({
@@ -430,12 +430,12 @@ export class Preview {
         const oldScale = this.viewport.getTransform().scale;
         const newScale = zoomByStep(oldScale, -e.deltaY / 2);
 
-        this.transformCanvas({
-            type: 'zoom',
-            vX,
-            vY,
-            fac: newScale / oldScale,
-        });
+        // this.transformCanvas({
+        //     type: 'zoom',PinchZoomer
+        //     vX,
+        //     vY,
+        //     fac: newScale / oldScale,
+        // });
     };
 
     getElement(): HTMLElement {
