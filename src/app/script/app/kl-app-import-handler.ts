@@ -19,6 +19,7 @@ export class KlAppImportHandler {
     private readonly setCurrentLayer: (layer: TKlCanvasLayer) => void;
     private readonly klCanvas: KlCanvas;
     private readonly onImportConfirm: () => void;
+    private readonly applyUncommitted: () => void;
 
     private readonly onColor: (rgb: IRGB) => void;
 
@@ -70,6 +71,7 @@ export class KlAppImportHandler {
         };
 
         const importAsImage = (canvas: HTMLCanvasElement | HTMLImageElement) => {
+            this.applyUncommitted();
             const resizedDimensions = getResizedDimensions(canvas.width, canvas.height);
 
             //resize first
@@ -95,6 +97,7 @@ export class KlAppImportHandler {
          * convertedPsdObj has no layers if flattened
          */
         const importAsImagePsd = (convertedPsdObj: IKlPsd, cropObj?: IRect) => {
+            this.applyUncommitted();
             // crop
             const crop = (
                 targetCanvas: HTMLCanvasElement,
@@ -178,6 +181,7 @@ export class KlAppImportHandler {
         };
 
         const importAsLayer = (canvas: HTMLCanvasElement | HTMLImageElement) => {
+            this.applyUncommitted();
             KL.showImportAsLayerDialog({
                 target: this.klRootEl,
                 klCanvas: this.klCanvas,
@@ -248,6 +252,7 @@ export class KlAppImportHandler {
             setCurrentLayer: (layer: TKlCanvasLayer) => void;
             klCanvas: KlCanvas;
             onImportConfirm: () => void;
+            applyUncommitted: () => void;
         },
         callback: {
             onColor: (rgb: IRGB) => void;
@@ -259,6 +264,7 @@ export class KlAppImportHandler {
         this.setCurrentLayer = input.setCurrentLayer;
         this.klCanvas = input.klCanvas;
         this.onImportConfirm = input.onImportConfirm;
+        this.applyUncommitted = input.applyUncommitted;
 
         this.onColor = callback.onColor;
     }
