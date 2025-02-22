@@ -167,7 +167,7 @@ export class PixelBrush {
             this.context.arc(x, y, size, 0, TWO_PI);
             this.context.closePath();
             this.context.fill();*/ // Note: This produces a circle normally, but it's too anti-aliased! Below is a hack to get them to work properly:
-            for(let y1 = -size; y1 <= 0; y1++){
+            for(let y1 = -size; y1 <= size; y1++){
                 // Derived from x**2 + y**2 = 1, y = square root of the absolute (to avoid dealing with imaginaries) of 1 - x**2.
                 // This only gives us a semi-circle to work with instead of a full one as expected but does the job since it's drawn to the left and right with lines.
                 let spaceout = size * Math.sqrt(Math.abs(1-((y1/size)**2))); 
@@ -175,7 +175,7 @@ export class PixelBrush {
                     Math.round(x - spaceout),
                     Math.round(y + y1),
                     Math.round(2 * spaceout),
-                    Math.round(-(y1 * 2)),
+                    1,
                 );
             }
         } else {
