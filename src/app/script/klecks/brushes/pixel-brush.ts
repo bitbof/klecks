@@ -162,7 +162,7 @@ export class PixelBrush {
             y += Math.sin(scatterAngleRad) * distance;
         }
 
-        if (this.settingShapeId === SHAPE_CIRCLE && size > 1) {
+        if (this.settingShapeId === SHAPE_CIRCLE) {
             /*this.context.beginPath();
             this.context.arc(x, y, size, 0, TWO_PI);
             this.context.closePath();
