@@ -178,9 +178,9 @@ export class PixelBrush {
                 let spaceout = Math.sqrt(Math.abs(1-((y1/size)**2)));
                 this.context.fillRect(
                     Math.round(x - (size * spaceout)),
-                    Math.round((y - size) + y1),
+                    Math.round(y + y1),
                     Math.round(size * 2 * spaceout),
-                    Math.round(size * 2),
+                    1,
                 );
             }
         } else {
