@@ -7,6 +7,9 @@ import { throwIfNull } from '../../bb/base/base';
 import { KlHistory } from '../history/kl-history';
 import { getPushableLayerChange } from '../history/push-helpers/get-pushable-layer-change';
 
+const SHAPE_CIRCLE = 0;
+const SHAPE_SQUARE = 1;
+
 export class PixelBrush {
     private klHistory: KlHistory = {} as KlHistory;
     private context: CanvasRenderingContext2D = {} as CanvasRenderingContext2D;
@@ -19,6 +22,7 @@ export class PixelBrush {
     private settingScatter: number = 0;
     private settingColor: IRGB = {} as IRGB;
     private settingColorStr: string = '';
+    private settingShapeId: number = SHAPE_CIRCLE;
     private settingLockLayerAlpha: boolean = false;
     private settingIsEraser: boolean = false;
     private settingUseDither: boolean = true;
@@ -396,6 +400,14 @@ export class PixelBrush {
     //IS
     isDrawing(): boolean {
         return this.inputIsDrawing;
+    }
+
+    //SET
+    setShape(a: number): void {
+        if (this.settingShapeId === a) {
+            return;
+        }
+        this.settingShapeId = a;
     }
 
     //SET

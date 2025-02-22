@@ -7,6 +7,7 @@ import { createPenPressureToggle } from '../ui/components/create-pen-pressure-to
 import brushIconImg from '/src/app/img/ui/brush-pixel.svg';
 import { IBrushUi } from '../kl-types';
 import { LANG, languageStrings } from '../../language/language';
+import { Options } from '../ui/components/options';
 import { PixelBrush } from '../brushes/pixel-brush';
 
 export const pixelBrushUi = (function () {
@@ -41,6 +42,53 @@ export const pixelBrushUi = (function () {
         let sizeSlider: KlSlider;
         let opacitySlider: KlSlider;
         let scatterSlider: KlSlider;
+
+        let alphaNames = [
+            LANG('brush-pen-circle'),
+            LANG('brush-pen-square'),
+        ];
+        languageStrings.subscribe(() => {
+            brushInterface.tooltip = LANG('brush-pen');
+            alphaNames = [
+                LANG('brush-pen-circle'),
+                LANG('brush-pen-square'),
+            ];
+        });
+
+        const shapeOptions = new Options({
+            optionArr: [0, 1].map((id) => {
+                const shape = BB.el({
+                    className: 'dark-invert',
+                    css: {
+                        width: '31px',
+                        height: '31px',
+                        backgroundSize: 'contain',
+                        margin: '2px',
+                    },
+                });
+                const canvas = BB.canvas(70, 70);
+                const ctx = BB.ctx(canvas);
+                if (id === 0) {
+                    ctx.beginPath();
+                    ctx.arc(35, 35, 30, 0, 2 * Math.PI);
+                    ctx.closePath();
+                    ctx.fill();
+                } else {
+                    ctx.fillRect(5, 5, 60, 60);
+                }
+                shape.style.backgroundImage = 'url(' + canvas.toDataURL('image/png') + ')';
+
+                return {
+                    id: id,
+                    label: shape,
+                    title: alphaNames[id],
+                };
+            }),
+            initId: 0,
+            onChange: (id) => {
+                brush.setShape(id);
+            },
+        });
 
         const lockAlphaToggle = new Checkbox({
             init: brush.getLockAlpha(),
@@ -143,17 +191,38 @@ export const pixelBrushUi = (function () {
                 brush.scatterPressure(b);
             });
 
-            div.append(
-                BB.el({
-                    content: [sizeSlider.getElement(), pressureSizeToggle],
-                    css: {
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                        alignItems: 'center',
-                        marginBottom: '10px',
-                    },
-                }),
-                opacitySlider.getElement(),
+            div.append(BB.el({
+                content: [sizeSlider.getElement(), pressureSizeToggle],
+                css: {
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    marginBottom: '10px',
+                },
+            }),
+            BB.el({
+                content: [opacitySlider.getElement(), pressureOpacityToggle],
+                css: {
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    marginBottom: '10px',
+                },
+            }),
+            BB.el({
+                content: [scatterSlider.getElement(), pressureScatterToggle],
+                css: {
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                },
+            }),
+            BB.el({
+                content: shapeOptions.getElement(),
+                css: {
+                    marginTop: '10px',
+                },
+            }),
             );
 
             const toggleRow = BB.el({
