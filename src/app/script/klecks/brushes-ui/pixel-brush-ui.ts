@@ -43,13 +43,13 @@ export const pixelBrushUi = (function () {
         let opacitySlider: KlSlider;
         let scatterSlider: KlSlider;
 
-        let alphaNames = [
+        let shapeNames = [
             LANG('brush-pen-circle'),
             LANG('brush-pen-square'),
         ];
         languageStrings.subscribe(() => {
             brushInterface.tooltip = LANG('brush-pen');
-            alphaNames = [
+            shapeNames = [
                 LANG('brush-pen-circle'),
                 LANG('brush-pen-square'),
             ];
@@ -81,7 +81,7 @@ export const pixelBrushUi = (function () {
                 return {
                     id: id,
                     label: shape,
-                    title: alphaNames[id],
+                    title: shapeNames[id],
                 };
             }),
             initId: 0,

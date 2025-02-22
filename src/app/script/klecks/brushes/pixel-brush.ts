@@ -10,6 +10,8 @@ import { getPushableLayerChange } from '../history/push-helpers/get-pushable-lay
 const SHAPE_CIRCLE = 0;
 const SHAPE_SQUARE = 1;
 
+const TWO_PI = 2 * Math.PI;
+
 export class PixelBrush {
     private klHistory: KlHistory = {} as KlHistory;
     private context: CanvasRenderingContext2D = {} as CanvasRenderingContext2D;
@@ -165,12 +167,19 @@ export class PixelBrush {
         x += Math.cos(scatterAngleRad) * distance;
         y += Math.sin(scatterAngleRad) * distance;
 
-        this.context.fillRect(
-            Math.round(x + -size),
-            Math.round(y + -size),
-            Math.round(size * 2),
-            Math.round(size * 2),
-        );
+        if (this.settingShapeId === SHAPE_CIRCLE) {
+            this.context.beginPath();
+            this.context.arc(x, y, size, 0, TWO_PI);
+            this.context.closePath();
+            this.context.fill();
+        } else {
+            this.context.fillRect(
+                Math.round(x + -size),
+                Math.round(y + -size),
+                Math.round(size * 2),
+                Math.round(size * 2),
+            );
+        }
         this.context.restore();
     }
 
