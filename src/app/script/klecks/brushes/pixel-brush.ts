@@ -144,15 +144,7 @@ export class PixelBrush {
 
     private drawDot(x: number, y: number, size: number, opacity: number, scatter: number): void {
         this.context.save();
-        this.context.fillStyle = this.settingUseDither
-            ? this.ditherPattern
-            : this.settingIsEraser ? '#fff' : this.settingColorStr;
-        if (this.settingLockLayerAlpha) {
-            this.context.globalCompositeOperation = 'source-atop';
-        } else if (this.settingIsEraser) {
-            this.context.globalCompositeOperation = 'destination-out';
-        }
-        this.context.globalAlpha = this.settingUseDither ? 1 : opacity;
+        this.updateFillAndAlpha();
 
         if(scatter) {
             // scatter equally distributed over area of a circle
@@ -253,6 +245,18 @@ export class PixelBrush {
         }
 
         this.context.restore();
+    }
+
+    private updateFillAndAlpha(): void {
+        this.context.fillStyle = this.settingUseDither
+            ? this.ditherPattern
+            : this.settingIsEraser ? '#fff' : this.settingColorStr;
+        if (this.settingLockLayerAlpha) {
+            this.context.globalCompositeOperation = 'source-atop';
+        } else if (this.settingIsEraser) {
+            this.context.globalCompositeOperation = 'destination-out';
+        }
+        this.context.globalAlpha = this.settingUseDither ? 1 : this.settingOpacity;
     }
 
     /**
