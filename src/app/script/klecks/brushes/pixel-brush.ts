@@ -264,16 +264,7 @@ export class PixelBrush {
      */
     private plotLine(x0: number, y0: number, x1: number, y1: number, skipFirst: boolean): void {
         this.context.save();
-
-        this.context.fillStyle = this.settingUseDither
-            ? this.ditherPattern
-            : this.settingIsEraser ? '#fff' : this.settingColorStr;
-        if (this.settingLockLayerAlpha) {
-            this.context.globalCompositeOperation = 'source-atop';
-        } else if (this.settingIsEraser) {
-            this.context.globalCompositeOperation = 'destination-out';
-        }
-        this.context.globalAlpha = this.settingUseDither ? 1 : this.settingOpacity;
+        this.updateFillAndAlpha();
 
         x0 = Math.floor(x0);
         y0 = Math.floor(y0);
