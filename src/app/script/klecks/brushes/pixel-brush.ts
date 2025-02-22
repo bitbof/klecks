@@ -10,7 +10,7 @@ import { getPushableLayerChange } from '../history/push-helpers/get-pushable-lay
 const SHAPE_CIRCLE = 0;
 const SHAPE_SQUARE = 1;
 
-const TWO_PI = 2 * Math.PI;
+//const TWO_PI = 2 * Math.PI;
 
 export class PixelBrush {
     private klHistory: KlHistory = {} as KlHistory;
