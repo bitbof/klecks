@@ -161,17 +161,28 @@ export class PixelBrush {
         }
         this.context.globalAlpha = this.settingUseDither ? 1 : opacity;
 
-        // scatter equally distributed over area of a circle
-        const scatterAngleRad = Math.random() * 2 * Math.PI;
-        const distance = Math.sqrt(Math.random()) * scatter;
-        x += Math.cos(scatterAngleRad) * distance;
-        y += Math.sin(scatterAngleRad) * distance;
+        if(scatter) {
+            // scatter equally distributed over area of a circle
+            const scatterAngleRad = Math.random() * 2 * Math.PI;
+            const distance = Math.sqrt(Math.random()) * scatter;
+            x += Math.cos(scatterAngleRad) * distance;
+            y += Math.sin(scatterAngleRad) * distance;
+        }
 
         if (this.settingShapeId === SHAPE_CIRCLE) {
-            this.context.beginPath();
+            /*this.context.beginPath();
             this.context.arc(x, y, size, 0, TWO_PI);
             this.context.closePath();
-            this.context.fill();
+            this.context.fill();*/
+            for(let y1 = -size; y1 <= size; y1++){
+                let spaceout = Math.sqrt(Math.abs(1-((y1/size)**2)));
+                this.context.fillRect(
+                    Math.round(x - (size * spaceout)),
+                    Math.round((y - size) + y1),
+                    Math.round(size * 2 * spaceout),
+                    Math.round(size * 2),
+                );
+            }
         } else {
             this.context.fillRect(
                 Math.round(x + -size),
