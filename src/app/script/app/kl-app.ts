@@ -1870,6 +1870,7 @@ export class KlApp {
                     this.easelProjectUpdater.update();
                     this.easel.resetOrFitTransform(true);
                 },
+                applyUncommitted: () => applyUncommitted(),
             },
             {
                 onColor: (rgb) => brushSettingService.setColor(rgb),

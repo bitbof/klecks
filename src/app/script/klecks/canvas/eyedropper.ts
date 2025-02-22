@@ -56,7 +56,7 @@ export class Eyedropper {
                         r: tile.data[pixelIndex * 4],
                         g: tile.data[pixelIndex * 4 + 1],
                         b: tile.data[pixelIndex * 4 + 2],
-                        a: tile.data[pixelIndex * 4 + 3],
+                        a: tile.data[pixelIndex * 4 + 3] / 255,
                     });
                 } else {
                     fillStyle = tile.fill;
