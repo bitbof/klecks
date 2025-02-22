@@ -74,14 +74,10 @@ export const pixelBrushUi = (function () {
                 const canvas = BB.canvas(70, 70);
                 const ctx = BB.ctx(canvas);
                 if (id === 0) {
-                    /*ctx.beginPath();
+                    ctx.beginPath();
                     ctx.arc(35, 35, 30, 0, 2 * Math.PI);
                     ctx.closePath();
-                    ctx.fill();*/
-                    for(let y = -30; y <= 30; y++){
-                        let spaceout = Math.sqrt(Math.abs(1-((y/30)**2)));
-                        ctx.fillRect(Math.round(35-(30*spaceout)), 35+y, Math.round(60*spaceout), 1);
-                    }
+                    ctx.fill();
                 } else {
                     ctx.fillRect(5, 5, 60, 60);
                 }
