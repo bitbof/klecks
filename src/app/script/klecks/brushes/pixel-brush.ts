@@ -12,9 +12,11 @@ export class PixelBrush {
     private context: CanvasRenderingContext2D = {} as CanvasRenderingContext2D;
     private settingHasSizePressure: boolean = true;
     private settingHasOpacityPressure: boolean = false;
+    private settingHasScatterPressure: boolean = false;
     private settingSize: number = 0.5;
     private settingSpacing: number = 0.9;
     private settingOpacity: number = 1;
+    private settingScatter: number = 0;
     private settingColor: IRGB = {} as IRGB;
     private settingColorStr: string = '';
     private settingLockLayerAlpha: boolean = false;
@@ -130,7 +132,11 @@ export class PixelBrush {
         }
     }
 
-    private drawDot(x: number, y: number, size: number, opacity: number): void {
+    private calcScatter(pressure: number): number {
+        return this.settingScatter * this.settingSize * (this.settingHasOpacityPressure ? pressure : 1);
+    }
+
+    private drawDot(x: number, y: number, size: number, opacity: number, scatter: number): void {
         this.context.save();
         if (this.settingIsEraser) {
             this.context.fillStyle = this.settingUseDither ? this.ditherPattern : '#fff';
@@ -180,7 +186,8 @@ export class PixelBrush {
                 0.5,
                 this.settingSize * (this.settingHasSizePressure ? localPressure : 1),
             );
-            this.drawDot(val.x, val.y, localSize, localOpacity);
+            const localScatter = this.calcScatter(localPressure)
+            this.drawDot(val.x, val.y, localSize, localOpacity, localScatter);
         };
 
         const controlCallback = (controlObj: {
@@ -288,9 +295,10 @@ export class PixelBrush {
         const localSize = this.settingHasSizePressure
             ? Math.max(0.5, p * this.settingSize)
             : Math.max(0.5, this.settingSize);
+        const localScatter = this.calcScatter(localSize)
 
         this.inputIsDrawing = true;
-        this.drawDot(x, y, localSize, localOpacity);
+        this.drawDot(x, y, localSize, localOpacity, localScatter);
         this.lineToolLastDot = localSize * this.settingSpacing;
         this.lastInput.x = x;
         this.lastInput.y = y;
@@ -368,6 +376,7 @@ export class PixelBrush {
                     y1 + eY * loopDist,
                     this.settingSize,
                     this.settingOpacity,
+                    this.settingScatter,
                 );
             }
         }
@@ -413,6 +422,10 @@ export class PixelBrush {
     setOpacity(o: number): void {
         this.settingOpacity = o;
     }
+    
+    setScatter(o: number): void {
+        this.settingScatter = o;
+    }
 
     setSpacing(s: number): void {
         this.settingSpacing = s;
@@ -424,6 +437,10 @@ export class PixelBrush {
 
     opacityPressure(b: boolean): void {
         this.settingHasOpacityPressure = b;
+    }
+    
+    scatterPressure(b: boolean): void {
+        this.settingHasScatterPressure = b;
     }
 
     setLockAlpha(b: boolean): void {
@@ -449,6 +466,10 @@ export class PixelBrush {
 
     getOpacity(): number {
         return this.settingOpacity;
+    }
+
+    getScatter(): number {
+        return this.settingScatter;
     }
 
     getLockAlpha(): boolean {

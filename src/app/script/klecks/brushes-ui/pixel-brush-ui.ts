@@ -40,6 +40,7 @@ export const pixelBrushUi = (function () {
         p.onSizeChange(brush.getSize());
         let sizeSlider: KlSlider;
         let opacitySlider: KlSlider;
+        let scatterSlider: KlSlider;
 
         const lockAlphaToggle = new Checkbox({
             init: brush.getLockAlpha(),
@@ -109,9 +110,37 @@ export const pixelBrushUi = (function () {
                     p.onOpacityChange(val);
                 },
             });
+            scatterSlider = new KlSlider({
+                label: LANG('scatter'),
+                width: 225,
+                height: 30,
+                min: brushInterface.scatterSlider.min,
+                max: brushInterface.scatterSlider.max,
+                value: brushInterface.scatterSlider.min,
+                curve: brushInterface.scatterSlider.curve,
+                eventResMs: EVENT_RES_MS,
+                onChange: (val) => {
+                    brush.setScatter(val);
+                    p.onScatterChange(val);
+                },
+                formatFunc: (displayValue) => {
+                    if (displayValue < 10) {
+                        return BB.round(displayValue, 1);
+                    } else {
+                        return Math.round(displayValue);
+                    }
+                },
+                manualInputRoundDigits: 1,
+            });
 
             const pressureSizeToggle = createPenPressureToggle(true, function (b) {
                 brush.sizePressure(b);
+            });
+            const pressureOpacityToggle = createPenPressureToggle(false, function (b) {
+                brush.opacityPressure(b);
+            });
+            const pressureScatterToggle = createPenPressureToggle(false, function (b) {
+                brush.scatterPressure(b);
             });
 
             div.append(
