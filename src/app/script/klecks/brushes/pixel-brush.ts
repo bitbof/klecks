@@ -261,20 +261,13 @@ export class PixelBrush {
     private plotLine(x0: number, y0: number, x1: number, y1: number, skipFirst: boolean): void {
         this.context.save();
 
-        if (this.settingIsEraser) {
-            this.context.fillStyle = this.settingUseDither ? this.ditherPattern : '#fff';
-            if (this.settingLockLayerAlpha) {
-                this.context.globalCompositeOperation = 'source-atop';
-            } else {
-                this.context.globalCompositeOperation = 'destination-out';
-            }
-        } else {
-            this.context.fillStyle = this.settingUseDither
-                ? this.ditherPattern
-                : this.settingColorStr;
-            if (this.settingLockLayerAlpha) {
-                this.context.globalCompositeOperation = 'source-atop';
-            }
+        this.context.fillStyle = this.settingUseDither
+            ? this.ditherPattern
+            : this.settingIsEraser ? '#fff' : this.settingColorStr;
+        if (this.settingLockLayerAlpha) {
+            this.context.globalCompositeOperation = 'source-atop';
+        } else if (this.settingIsEraser) {
+            this.context.globalCompositeOperation = 'destination-out';
         }
         this.context.globalAlpha = this.settingUseDither ? 1 : this.settingOpacity;
 
