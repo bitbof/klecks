@@ -144,20 +144,13 @@ export class PixelBrush {
 
     private drawDot(x: number, y: number, size: number, opacity: number, scatter: number): void {
         this.context.save();
-        if (this.settingIsEraser) {
-            this.context.fillStyle = this.settingUseDither ? this.ditherPattern : '#fff';
-            if (this.settingLockLayerAlpha) {
-                this.context.globalCompositeOperation = 'source-atop';
-            } else {
-                this.context.globalCompositeOperation = 'destination-out';
-            }
-        } else {
-            this.context.fillStyle = this.settingUseDither
-                ? this.ditherPattern
-                : this.settingColorStr;
-            if (this.settingLockLayerAlpha) {
-                this.context.globalCompositeOperation = 'source-atop';
-            }
+        this.context.fillStyle = this.settingUseDither
+            ? this.ditherPattern
+            : this.settingIsEraser ? '#fff' : this.settingColorStr;
+        if (this.settingLockLayerAlpha) {
+            this.context.globalCompositeOperation = 'source-atop';
+        } else if (this.settingIsEraser) {
+            this.context.globalCompositeOperation = 'destination-out';
         }
         this.context.globalAlpha = this.settingUseDither ? 1 : opacity;
 
@@ -169,7 +162,7 @@ export class PixelBrush {
             y += Math.sin(scatterAngleRad) * distance;
         }
 
-        if (this.settingShapeId === SHAPE_CIRCLE) {
+        if (this.settingShapeId === SHAPE_CIRCLE && size > 1) {
             /*this.context.beginPath();
             this.context.arc(x, y, size, 0, TWO_PI);
             this.context.closePath();
