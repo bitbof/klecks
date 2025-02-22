@@ -154,6 +154,13 @@ export class PixelBrush {
             }
         }
         this.context.globalAlpha = this.settingUseDither ? 1 : opacity;
+
+        // scatter equally distributed over area of a circle
+        const scatterAngleRad = Math.random() * 2 * Math.PI;
+        const distance = Math.sqrt(Math.random()) * scatter;
+        x += Math.cos(scatterAngleRad) * distance;
+        y += Math.sin(scatterAngleRad) * distance;
+
         this.context.fillRect(
             Math.round(x + -size),
             Math.round(y + -size),
