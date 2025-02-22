@@ -176,7 +176,7 @@ export class PixelBrush {
                     Math.floor(y + y1),
                     Math.floor(2 * spaceout),
                     1,
-                );
+                ); // In practice, we only calculate for a quarter of a circle too, since this gets mirror drawn below to cut down calculating the space-out by half
                 this.context.fillRect(
                     Math.floor(x - spaceout),
                     Math.floor(y - y1),
