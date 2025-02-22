@@ -173,7 +173,7 @@ export class PixelBrush {
             /*this.context.beginPath();
             this.context.arc(x, y, size, 0, TWO_PI);
             this.context.closePath();
-            this.context.fill();*/
+            this.context.fill();*/ // Note: This produces a circle normally, but it's too anti-aliased! Below is a hack to get them to work properly:
             for(let y1 = -size; y1 <= size; y1++){
                 let spaceout = Math.sqrt(Math.abs(1-((y1/size)**2)));
                 this.context.fillRect(
