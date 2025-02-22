@@ -28,6 +28,11 @@ export const pixelBrushUi = (function () {
                 [1, 1],
             ],
         },
+        scatterSlider: {
+            min: 0,
+            max: 100,
+            curve: BB.powerSplineInput(0, 100, 0.1, 2.5),
+        },
     } as IBrushUi<PixelBrush>;
 
     languageStrings.subscribe(() => {
