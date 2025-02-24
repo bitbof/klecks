@@ -1563,9 +1563,9 @@ export class KlApp {
                       this.saveToComputer.save();
                   },
                   onNewImage: showNewImageDialog,
-                  onShareImage: () => {
+                  onShareImage: (callback) => {
                       applyUncommitted();
-                      shareImage();
+                      shareImage(callback);
                   },
                   onUpload: () => {
                       // on upload

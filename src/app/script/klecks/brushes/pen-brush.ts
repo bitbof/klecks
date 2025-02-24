@@ -105,7 +105,7 @@ export class PenBrush {
 
     private calcScatter(pressure: number): number {
         return (
-            this.settingScatter * this.settingSize * (this.settingHasOpacityPressure ? pressure : 1)
+            this.settingScatter * this.settingSize * (this.settingHasScatterPressure ? pressure : 1)
         );
     }
 
