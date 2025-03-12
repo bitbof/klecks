@@ -16,6 +16,7 @@ export interface IEmbedParams {
     bottomBar?: HTMLElement;
     aboutEl?: HTMLElement;
     disableAutoFit?: boolean; // disable automatic Fit to View for small canvases
+    enableImageImport?: boolean
 }
 
 export interface IReadPSD {
@@ -57,6 +58,7 @@ export class Embed {
                 aboutEl: this.p.aboutEl,
                 embed: {
                     url: this.p.embedUrl,
+                    enableImageImport: !!this.p.enableImageImport,
                     onSubmit: this.p.onSubmit,
                 },
             });
