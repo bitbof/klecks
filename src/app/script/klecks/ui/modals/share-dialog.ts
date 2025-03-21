@@ -16,6 +16,7 @@ export async function shareDialog (
         image: string,
         imageId: string,
         getKlCanvas: () => KlCanvas,
+        session: string
     }
 ):  Promise<void> {
     const mainDiv = BB.el();
@@ -26,6 +27,7 @@ export async function shareDialog (
     formData.append('image', p.image);
     const inputImage = getImage(p.getKlCanvas().getCompleteCanvas(1));
     formData.append('input-image', inputImage)
+    formData.append('session', p.session)
     fetch(p.backendUrl + "/share/" + p.imageId, {
         method: 'POST',
         body: formData,
