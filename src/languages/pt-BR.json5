@@ -1711,5 +1711,49 @@
   dismiss: {
     original: 'Dismiss',
     value: 'Dispensar'
+  },
+  'file-show-save-dialog': {
+    original: 'Show save dialog',
+    value: 'Perguntar onde salvar'
+  },
+  'file-paste': {
+    original: 'Paste',
+    value: 'Colar'
+  },
+  'file-storage-clear-prompt': {
+    original: 'Clear Browser Storage?',
+    value: 'Limpar Armazenamento do Navegador'
+  },
+  'clipboard-read-fail': {
+    original: 'Failed to read from clipboard.',
+    value: 'Falha ao ler da área de transferência.'
+  },
+  'clipboard-no-image': {
+    original: 'No image found in clipboard.',
+    value: 'Imagem não encontrada na área de transferência.'
+  },
+  'bucket-sample-title': {
+    original: 'Which layers to sample color from',
+    value: 'Retirar amostra de quais camadas'
+  },
+  'shape-auto-pan': {
+    original: 'Auto-pan',
+    value: 'Auto-mover'
+  },
+  'shape-auto-pan-title': {
+    original: 'Automatically moves as you draw',
+    value: 'Move automaticamente conforme desenha'
+  },
+  scatter: {
+    original: 'Scatter',
+    value: 'Espalhar'
+  },
+  blog: {
+    original: 'Blog',
+    value: 'Blog'
+  },
+  changelog: {
+    original: 'Changelog',
+    value: 'Registro de Alterações'
   }
 }
