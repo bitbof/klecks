@@ -445,7 +445,7 @@
   'file-show-save-dialog': {
     hint: 'setting for showing/not showing a dialog where user picks folder and filename',
     original: 'Show save dialog',
-    value: ''
+    value: 'Perguntar onde salvar'
   },
   'file-copy': {
     hint: 'verb',
@@ -458,7 +458,7 @@
   },
   'file-paste': {
     original: 'Paste',
-    value: ''
+    value: 'Colar'
   },
   'file-share': {
     hint: 'Common feature on phones. Pressing share button allows to send data to a different app, e.g. as a text message to someone.',
@@ -501,7 +501,7 @@
   },
   'file-storage-clear-prompt': {
     original: 'Clear Browser Storage?',
-    value: ''
+    value: 'Limpar'
   },
   'file-storage-storing': {
     hint: 'while it is in the process of storing',
@@ -1194,11 +1194,11 @@
   },
   'clipboard-read-fail': {
     original: 'Failed to read from clipboard.',
-    value: ''
+    value: 'Falha ao ler da área de transferência.'
   },
   'clipboard-no-image': {
     original: 'No image found in clipboard.',
-    value: ''
+    value: 'Imagem não encontrada na área de transferência.'
   },
   'hand-reset': {
     hint: 'resets zoom (to 100%) and rotation (to 0°)',
@@ -1226,7 +1226,8 @@
     value: 'Amostra'
   },
   'bucket-sample-title': {
-    original: 'Which layers to sample color from'
+    original: 'Which layers to sample color from',
+    value: 'Retirar amostra de quais camadas'
   },
   'bucket-sample-all': {
     hint: 'all layers',
@@ -1312,11 +1313,11 @@
   },
   'shape-auto-pan': {
     original: 'Auto-pan',
-    value: ''
+    value: 'Auto-mover'
   },
   'shape-auto-pan-title': {
     original: 'Automatically moves as you draw',
-    value: ''
+    value: 'Move automaticamente conforme desenha'
   },
   'text-instruction': {
     original: 'Click canvas to place text',
@@ -1604,7 +1605,7 @@
   scatter: {
     hint: 'for brush scatter',
     original: 'Scatter',
-    value: ''
+    value: 'Espalhar'
   },
   red: {
     original: 'Red',
@@ -1711,5 +1712,13 @@
   dismiss: {
     original: 'Dismiss',
     value: 'Dispensar'
+  },
+  blog: {
+    original: 'Blog',
+    value: 'Blog'
+  },
+  changelog: {
+    original: 'Changelog',
+    value: 'Registro de Alterações'
   }
 }
