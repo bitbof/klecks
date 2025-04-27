@@ -54,6 +54,7 @@ export class KlSlider {
     private readonly rootEl: HTMLElement;
     private readonly sliderWrapperEl: HTMLElement;
     private readonly textEl: HTMLElement; // displays label, displayValue
+    private readonly labelValueEl: HTMLElement;
     private readonly label: string;
     private readonly control: HTMLElement;
     private manualInput: undefined | KlSliderManualInput;
@@ -86,12 +87,7 @@ export class KlSlider {
         displayValue = this.formatFunc ? this.formatFunc(displayValue) : Math.round(displayValue);
         displayValue = displayValue.toLocaleString(languageStrings.getCode());
         const unit = this.unit !== undefined ? this.unit : '';
-        this.textEl.innerHTML =
-            this.label +
-            '&nbsp;&nbsp;<span style="font-weight:bold">' +
-            displayValue +
-            unit +
-            '</span>';
+        this.labelValueEl.textContent = displayValue + unit;
 
         const sliderValue = this.valueToSliderValue(this.value);
         this.control.style.width = sliderValue * this.elementWidth + 'px';
@@ -259,16 +255,30 @@ export class KlSlider {
         };
         this.label = p.label;
         const labelFontSize = this.elementHeight - 14;
+        this.labelValueEl = BB.el({
+            css: { fontWeight: 'bold' },
+        });
         this.textEl = BB.el({
-            content: this.label,
+            content: [
+                BB.el({
+                    content: this.label,
+                    css: {
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                    },
+                }),
+                this.labelValueEl,
+            ],
             css: {
                 position: 'absolute',
                 display: 'flex',
                 alignItems: 'center',
-                marginLeft: '7px',
+                padding: '0 7px',
                 height: '100%',
+                width: '100%',
                 fontSize: labelFontSize + 'px',
                 pointerEvents: 'none',
+                gap: '8px',
             },
         });
         this.control = BB.el({
