@@ -2,1059 +2,1059 @@
   'switch-ui-left-right': {
     hint: 'Button that switches layout from left to right, to accommodate left handed & right handed visitors.',
     original: 'Switch left/right UI',
-    value: 'Trocar IU para esquerda/direita'
+    value: 'Pārslēgt kreiso/labo UI'
   },
   'toggle-show-tools': {
     hint: 'Button that hides/shows the toolbar.',
     original: 'Show/Hide Tools',
-    value: 'Mostrar/Esconder ferramentas'
+    value: 'Rādīt/Slēpt rīkus'
   },
   scroll: {
     hint: 'Verb. As in scrolling a page.',
     original: 'Scroll',
-    value: 'Rolar'
+    value: 'Ritināt'
   },
   donate: {
     original: 'Donate',
-    value: 'Doar'
+    value: 'Ziedot'
   },
   home: {
     hint: 'button with logo, top left of tools',
     original: 'Home',
-    value: 'Início'
+    value: 'Sākums'
   },
   'modal-new-tab': {
     hint: 'as in browser tab',
     original: 'Open in new tab',
-    value: 'Abrir em uma nova aba'
+    value: 'Atvērt jaunā cilnē'
   },
   'tab-edit': {
     hint: 'label for a tab that offer filters for making color adjustments, cropping, transforming, etc.',
     original: 'Edit',
-    value: 'Editar'
+    value: 'Rediģēt'
   },
   'tab-file': {
     hint: 'label for a tab that lets user save the image, import, upload, etc.',
     original: 'File',
-    value: 'Arquivo'
+    value: 'Fails'
   },
   'tool-brush': {
     hint: 'tool that lets user paint (like in ms paint or photoshop)',
     original: 'Brush',
-    value: 'Pincel'
+    value: 'Ota'
   },
   'tool-paint-bucket': {
     original: 'Paint Bucket',
-    value: 'Balde de tinta'
+    value: 'Aizpildīšanas rīks'
   },
   'tool-gradient': {
     original: 'Gradient',
-    value: 'Gradiente'
+    value: 'Pārejas rīks'
   },
   'tool-shape': {
     hint: 'Tool for drawing rectangles, circles, lines',
     original: 'Shape',
-    value: 'Forma'
+    value: 'Figūru rīks'
   },
   'tool-text': {
     hint: 'Tool for placing text on canvas',
     original: 'Text',
-    value: 'Texto'
+    value: 'Teksta rīks'
   },
   'tool-hand': {
     hint: 'Tool for navigating (or scrolling around) the canvas. Same name in Photoshop.',
     original: 'Hand Tool',
-    value: 'Mão'
+    value: 'Rokas rīks'
   },
   'tool-select': {
     original: 'Select Tool',
-    value: 'Selecionar'
+    value: 'Atlases rīks'
   },
   'tool-zoom': {
     original: 'Zoom',
-    value: 'Zoom'
+    value: 'Tālummaiņas rīks'
   },
   'tool-more-tools': {
     hint: 'when hovering the caret on the tool button',
     original: 'More Tools',
-    value: 'Mais Ferramentas'
+    value: 'Vairāk rīku'
   },
   undo: {
     original: 'Undo',
-    value: 'Desfazer'
+    value: 'Atsaukt'
   },
   redo: {
     original: 'Redo',
-    value: 'Refazer'
+    value: 'Atcelt atsaukšanu'
   },
   'brush-pen': {
     hint: 'Generic "brush" that feels a bit like a pen or marker, as opposed to a paint brush.',
     original: 'Pen',
-    value: 'Caneta'
+    value: 'Pildspalva'
   },
   'brush-blend': {
     hint: 'brush with watercolor feel. Makes colors blend/bleed into each other. Different from smudging though.',
     original: 'Blend',
-    value: 'Misturar'
+    value: 'Sajaukšana'
   },
   'brush-sketchy': {
     hint: 'Made up brush name. Pictures drawn with this brush often look like sketches.',
     original: 'Sketchy',
-    value: 'Croqui'
+    value: 'Skicēts'
   },
   'brush-pixel': {
     original: 'Pixel',
-    value: 'Pixel'
+    value: 'Pikseļota'
   },
   'brush-chemy': {
     hint: 'Made up brush name, derived from drawing applications "Webchemy" and "Alchemy"',
     original: 'Chemy',
-    value: 'Chimia'
+    value: 'Kemija'
   },
   'brush-smudge': {
     hint: 'Common brush/tool in image editing software. Smudges colors around canvas.',
     original: 'Smudge',
-    value: 'Borrar'
+    value: 'Izsmērēšana'
   },
   'brush-size': {
     original: 'Size',
-    value: 'Tamanho'
+    value: 'Izmērs'
   },
   'brush-blending': {
     hint: 'Wetness. How much colors will bleed into each other.',
     original: 'Blending',
-    value: 'Mistura'
+    value: 'Sajaukšanas pakāpe'
   },
   'brush-toggle-pressure': {
     hint: 'google "pressure sensitivity". Feature of Wacom tablets, Apple Pencil, XP Pen, etc.',
     original: 'Toggle Pressure Sensitivity',
-    value: 'Ativar sensibilidade à pressão'
+    value: 'Pārslēgt spiediena jutību'
   },
   'brush-pen-circle': {
     hint: 'as in circle shape',
     original: 'Circle',
-    value: 'Círculo'
+    value: 'Aplis'
   },
   'brush-pen-chalk': {
     hint: 'as in chalk texture',
     original: 'Chalk',
-    value: 'Giz'
+    value: 'Krīts'
   },
   'brush-pen-calligraphy': {
     hint: 'like a "chisel tip marker"',
     original: 'Calligraphy',
-    value: 'Caligrafia'
+    value: 'Kaligrāfija'
   },
   'brush-pen-square': {
     hint: 'as in square shape',
     original: 'Square',
-    value: 'Quadrado'
+    value: 'Kvadrāts'
   },
   'brush-sketchy-scale': {
     hint: 'How far the connecting lines of sketchy brush can reach.',
     original: 'Scale',
-    value: 'Escala'
+    value: 'Mērogs'
   },
   'brush-pixel-dither': {
     hint: 'Dithering/halftone pattern',
     original: 'Dither',
-    value: 'Pontilhado'
+    value: 'Punktu raksts'
   },
   'brush-chemy-fill': {
     hint: 'Like in MS Paint. A shape can have be outlined, and filled.',
     original: 'Fill',
-    value: 'Preencher'
+    value: 'Aizpildīt'
   },
   'brush-chemy-stroke': {
     original: 'Stroke',
-    value: 'Traçado'
+    value: 'Stroke'
   },
   'brush-chemy-mirror-x': {
     original: 'Horizontal Symmetry',
-    value: 'Simetria horizontal'
+    value: 'Horizontālā simetrija'
   },
   'brush-chemy-mirror-y': {
     original: 'Vertical Symmetry',
-    value: 'Simetria vertical'
+    value: 'Vertikālā simetrija'
   },
   'brush-chemy-gradient': {
     hint: 'as in color gradient',
     original: 'Gradient',
-    value: 'Degradê'
+    value: 'Krāsu pāreja'
   },
   'brush-eraser-transparent-bg': {
     hint: 'as in transparent background/bottom layer',
     original: 'Transparent Background',
-    value: 'Fundo transparente'
+    value: 'Caurspīdīgs fons'
   },
   stabilizer: {
     hint: 'Common feature in drawing software to make lines smoother',
     original: 'Stabilizer',
-    value: 'Estabilizador'
+    value: 'Stabilizators'
   },
   'stabilizer-title': {
     hint: '-title keys are usually more verbose description. shown as a tooltip.',
     original: 'Stroke Stabilizer',
-    value: 'Estabilizador de traço'
+    value: 'Līniju stabilizators'
   },
   eyedropper: {
     original: 'Eyedropper',
-    value: 'Conta-gotas'
+    value: 'Pipete'
   },
   'secondary-color': {
     hint: 'or sometimes called "background" color. Photoshop, MS Paint, etc. allow user to switch between two colors.',
     original: 'Secondary Color',
-    value: 'Cor secundária'
+    value: 'Sekundārā krāsa'
   },
   'manual-color-input': {
     hint: 'A dialog where users can manually type the color, each channel a number. "mci" keys all related to this dialog.',
     original: 'Manual Color Input',
-    value: 'Inserir Cor Manualmente'
+    value: 'Manuāla krāsu ievade'
   },
   'mci-hex': {
     hint: 'as in hex code. Hex representation of color. „#f00“ → red',
     original: 'Hex',
-    value: 'Código Hex'
+    value: 'Heksadecimāls'
   },
   'mci-copy': {
     hint: 'verb',
     original: 'Copy',
-    value: 'Copiar'
+    value: 'Kopēt'
   },
   'modal-ok': {
     hint: 'main confirmation button in dialogs. Can be to confirm an action, not just acknowledge information.',
     original: 'Ok',
-    value: 'Ok'
+    value: 'Labi'
   },
   'modal-cancel': {
     original: 'Cancel',
-    value: 'Cancelar'
+    value: 'Atcelt'
   },
   'modal-close': {
     hint: 'as in close a dialog box',
     original: 'Close',
-    value: 'Fechar'
+    value: 'Aizvērt'
   },
   'layers-active-layer': {
     hint: 'currently selected layer that user is drawing on',
     original: 'Active Layer',
-    value: 'Camada Ativa'
+    value: 'Aktīvais slānis'
   },
   'layers-layer': {
     original: 'Layer',
-    value: 'Camada'
+    value: 'Slānis'
   },
   'layers-copy': {
     hint: 'noun',
     original: 'copy',
-    value: 'Copiar'
+    value: 'Kopija'
   },
   'layers-blending': {
     hint: 'Common feature in image editing & drawing software. All layers-blend- keys relate to this. https://en.wikipedia.org/wiki/Blend_modes',
     original: 'Blending',
-    value: 'Mistura'
+    value: 'Sajaukšana'
   },
   'layers-new': {
     hint: 'action',
     original: 'New Layer',
-    value: 'Nova Camada'
+    value: 'Jauns slānis'
   },
   'layers-remove': {
     hint: 'action',
     original: 'Remove Layer',
-    value: 'Excluir Camada'
+    value: 'Noņemt slāni'
   },
   'layers-duplicate': {
     hint: 'action',
     original: 'Duplicate Layer',
-    value: 'Duplicar Camada'
+    value: 'Dublēt slāni'
   },
   'layers-merge': {
     hint: 'action',
     original: 'Merge with layer below',
-    value: 'Mesclar com a camada abaixo'
+    value: 'Apvienot ar apakšējo slāni'
   },
   'layers-clear': {
     hint: 'to make a layer empty',
     original: 'Clear layer',
-    value: 'Limpar camada'
+    value: 'Notīrīt slāni'
   },
   'layers-merge-all': {
     original: 'Merge all',
-    value: 'Mesclar todas as camadas'
+    value: 'Apvienot visus'
   },
   'layers-rename': {
     hint: 'action',
     original: 'Rename',
-    value: 'Renomear'
+    value: 'Pārdēvēt'
   },
   'layers-active-layer-visible': {
     original: 'Active layer is visible',
-    value: 'Camada ativa visível'
+    value: 'Aktīvais slānis ir redzams'
   },
   'layers-active-layer-hidden': {
     original: 'Active layer is hidden',
-    value: 'Camada ativa oculta'
+    value: 'Aktīvais slānis ir paslēpts'
   },
   'layers-visibility-toggle': {
     original: 'Layer Visibility',
-    value: 'Visibilidade da Camada'
+    value: 'Slāņa redzamība'
   },
   'layers-blend-normal': {
     original: 'normal',
-    value: 'Normal'
+    value: 'Normāls'
   },
   'layers-blend-darken': {
     original: 'darken',
-    value: 'Escurecer'
+    value: 'Aptumšot'
   },
   'layers-blend-multiply': {
     original: 'multiply',
-    value: 'Multiplicar'
+    value: 'Reizināt'
   },
   'layers-blend-color-burn': {
     original: 'color burn',
-    value: 'Superexposição'
+    value: 'Krāsu dedzināšana'
   },
   'layers-blend-lighten': {
     original: 'lighten',
-    value: 'Clarear'
+    value: 'Gaišināt'
   },
   'layers-blend-screen': {
     original: 'screen',
-    value: 'Tela'
+    value: 'Ekrāns'
   },
   'layers-blend-color-dodge': {
     original: 'color dodge',
-    value: 'Subexposição'
+    value: 'Krāsu izvairīšanās'
   },
   'layers-blend-overlay': {
     original: 'overlay',
-    value: 'Sobrepor'
+    value: 'Pārklājums'
   },
   'layers-blend-soft-light': {
     original: 'soft light',
-    value: 'Luz indireta'
+    value: 'Mīkstā gaisma'
   },
   'layers-blend-hard-light': {
     original: 'hard light',
-    value: 'Luz direta'
+    value: 'Cietā gaisma'
   },
   'layers-blend-difference': {
     original: 'difference',
-    value: 'Diferença'
+    value: 'Atšķirība'
   },
   'layers-blend-exclusion': {
     original: 'exclusion',
-    value: 'Exclusão'
+    value: 'Izslēgšana'
   },
   'layers-blend-hue': {
     original: 'hue',
-    value: 'Matiz'
+    value: 'Tonis'
   },
   'layers-blend-saturation': {
     original: 'saturation',
-    value: 'Saturação'
+    value: 'Piesātinājums'
   },
   'layers-blend-color': {
     original: 'color',
-    value: 'Cor'
+    value: 'Krāsa'
   },
   'layers-blend-luminosity': {
     original: 'luminosity',
-    value: 'Luminosidade'
+    value: 'Spilgtums'
   },
   'layers-rename-title': {
     hint: '-title in code usually means it shows up in a tooltip, or it’s the header of a dialog box, so it can be a little bit longer.',
     original: 'Rename Layer',
-    value: 'Renomear Camada'
+    value: 'Pārdēvēt slāni'
   },
   'layers-rename-name': {
     hint: 'noun',
     original: 'Name',
-    value: 'Nome'
+    value: 'Nosaukums'
   },
   'layers-rename-clear': {
     hint: 'aka action of deleting entered name',
     original: 'Clear Name',
-    value: 'Apagar Nome'
+    value: 'Notīrīt nosaukumu'
   },
   'layers-rename-sketch': {
     hint: 'noun. Name suggestion for a layer',
     original: 'Sketch',
-    value: 'Rascunho'
+    value: 'Skice'
   },
   'layers-rename-colors': {
     hint: 'noun. Name suggestion for a layer',
     original: 'Colors',
-    value: 'Cores'
+    value: 'Krāsas'
   },
   'layers-rename-shading': {
     hint: 'noun. Name suggestion for a layer',
     original: 'Shading',
-    value: 'Sombreamento'
+    value: 'Ēnojums'
   },
   'layers-rename-lines': {
     hint: 'noun. Name suggestion for a layer',
     original: 'Lines',
-    value: 'Linhas'
+    value: 'Līnijas'
   },
   'layers-rename-effects': {
     hint: 'noun. Name suggestion for a layer',
     original: 'Effects',
-    value: 'Efeitos'
+    value: 'Efekti'
   },
   'layers-rename-foreground': {
     hint: 'noun. Name suggestion for a layer',
     original: 'Foreground',
-    value: 'Primeiro Plano'
+    value: 'Priekšplāns'
   },
   'layers-merge-modal-title': {
     original: 'Merge/Mix Layers',
-    value: 'Mesclar/Misturar Camadas'
+    value: 'Apvienot/Sajaukt slāņus'
   },
   'layers-merge-description': {
     hint: 'After ":" a list of mix/blend modes is shown.',
     original: 'Merges the selected layer with the one underneath. Select the mix mode:',
-    value: 'Mescla a camada selecionada com a abaixo. Escolha o modo de mistura:'
+    value: 'Apvieno izvēlēto slāni ar apakšējo. Izvēlieties sajaukšanas režīmu:'
   },
   'file-no-autosave': {
     hint: "let user know they can't autosave, and there's no cloud storage. Keep short so fits on one line",
     original: 'No autosave, no cloud storage',
-    value: 'Sem gravação automática, sem armazenamento na nuvem'
+    value: 'Nav automātiskās saglabāšanas'
   },
   'file-new': {
     hint: 'action',
     original: 'New',
-    value: 'Novo'
+    value: 'Jauns'
   },
   'file-import': {
     hint: 'action',
     original: 'Import',
-    value: 'Importar'
+    value: 'Importēt'
   },
   'file-save': {
     hint: 'action',
     original: 'Save',
-    value: 'Salvar'
+    value: 'Saglabāt'
   },
   'file-format': {
     original: 'File Format',
-    value: 'Formato do Arquivo'
+    value: 'Faila formāts'
   },
   'file-show-save-dialog': {
     hint: 'setting for showing/not showing a dialog where user picks folder and filename',
     original: 'Show save dialog',
-    value: 'Perguntar onde salvar'
+    value: 'Rādīt saglabāšanas dialogu'
   },
   'file-copy': {
     hint: 'verb',
     original: 'Copy',
-    value: 'Copiar'
+    value: 'Kopēt'
   },
   'file-copy-title': {
     original: 'Copy To Clipboard',
-    value: 'Copiar para Área de Transferência'
+    value: 'Kopēt uz starpliktuvi'
   },
   'file-paste': {
     original: 'Paste',
-    value: 'Colar'
+    value: 'Ielīmēt'
   },
   'file-share': {
     hint: 'Common feature on phones. Pressing share button allows to send data to a different app, e.g. as a text message to someone.',
     original: 'Share',
-    value: 'Compartilhar'
+    value: 'Kopīgot'
   },
   'file-storage': {
     hint: 'Made up term. Allows users to store drawing in the browser. (not synced across devices)',
     original: 'Browser Storage',
-    value: 'Armazenamento do Navegador'
+    value: 'Pārlūka krātuve'
   },
   'file-storage-thumb-title': {
     hint: 'when reopening or reloading',
     original: 'Restores when reopening page',
-    value: 'Restaura ao reabrir a página'
+    value: 'Atjauno'
   },
   'file-storage-about': {
     hint: 'link to Browser Storage help/user manual',
     original: 'About Browser Storage',
-    value: 'Sobre o Armazenamento do Navegador'
+    value: 'Par pārlūka krātuvi'
   },
   'file-storage-cant-access': {
     hint: 'an error. Can’t access the storage.',
     original: "Can't access",
-    value: 'Erro ao acessar'
+    value: 'Nevar piekļūt'
   },
   'file-storage-empty': {
     hint: 'nothing stored',
     original: 'Empty',
-    value: 'Vazio'
+    value: 'Tukšs'
   },
   'file-storage-store': {
     hint: 'verb',
     original: 'Store',
-    value: 'Armazenar'
+    value: 'Saglabāt'
   },
   'file-storage-clear': {
     original: 'Clear',
-    value: 'Limpar'
+    value: 'Notīrīt'
   },
   'file-storage-clear-prompt': {
     original: 'Clear Browser Storage?',
-    value: 'Limpar'
+    value: 'Notīrīt pārlūka krātuvi?'
   },
   'file-storage-storing': {
     hint: 'while it is in the process of storing',
     original: 'Storing',
-    value: 'Armazenando'
+    value: 'Saglabā'
   },
   'file-storage-overwrite': {
     hint: 'overwrite what is already stored',
     original: 'Overwrite',
-    value: 'Substituir'
+    value: 'Pārrakstīt'
   },
   'file-storage-min-ago': {
     hint: "{x} <- needs to stay, it's a placeholder.",
     original: '{x}min ago',
-    value: '{x}m atrás'
+    value: 'Pirms {x} min'
   },
   'file-storage-hours-ago': {
     original: '{x}h ago',
-    value: '{x}h atrás'
+    value: 'Pirms {x} stundām'
   },
   'file-storage-days-ago': {
     original: '{x}d ago',
-    value: '{x}d atrás'
+    value: 'Pirms {x} dienām'
   },
   'file-storage-month-ago': {
     original: '> 1month ago',
-    value: '> 1mês atrás'
+    value: 'Pirms > 1 mēneša'
   },
   'file-storage-restored': {
     original: 'Restored from Browser Storage',
-    value: 'Restaurado do Armazenamento do Navegador'
+    value: 'Atjaunots no pārlūka krātuves'
   },
   'file-storage-stored': {
     original: 'Stored to Browser Storage',
-    value: 'Salvo no Armazenamento do Navegador'
+    value: 'Saglabāts pārlūka krātuvē'
   },
   'file-storage-failed': {
     original: 'Failed to store to Browser Storage',
-    value: 'Erro ao salvar no Armazenamento do Navegador'
+    value: 'Neizdevās saglabāt pārlūka krātuvē'
   },
   'file-storage-failed-1': {
     original: 'Failed to store. Possible causes:',
-    value: 'Erro ao salvar. Possíveis causas:'
+    value: 'Neizdevās saglabāt. Iespējamie iemesli:'
   },
   'file-storage-failed-2': {
     original: 'Out of disk space',
-    value: 'Sem espaço no disco'
+    value: 'Nav vietas diskā'
   },
   'file-storage-failed-3': {
     original: 'Storage disabled in incognito tab',
-    value: 'Armazenamento desativado no modo anônimo'
+    value: 'Krātuve atspējota inkognito cilnē'
   },
   'file-storage-failed-4': {
     hint: 'as in: unsupported feature',
     original: "Browser doesn't support storage",
-    value: 'O navegador não oferece suporte para armazenamento'
+    value: 'Pārlūks neatbalsta krātuvi'
   },
   'file-storage-failed-clear': {
     original: 'Failed to clear.',
-    value: 'Erro ao limpar.'
+    value: 'Neizdevās notīrīt.'
   },
   'file-upload': {
     hint: 'verb',
     original: 'Upload',
-    value: 'Upload'
+    value: 'Augšupielādēt'
   },
   'cleared-layer': {
     hint: 'the layer has been cleared. It is now empty',
     original: 'Cleared layer',
-    value: 'Camada limpa'
+    value: 'Slānis notīrīts'
   },
   'cleared-selected-area': {
     original: 'Cleared selected area',
-    value: 'A área selecionada foi limpa'
+    value: 'Izvēlētā zona notīrīta'
   },
   filled: {
     hint: 'layer got filled with a color',
     original: 'Filled',
-    value: 'Preenchida'
+    value: 'Aizpildīts'
   },
   'filled-selected-area': {
     original: 'Filled selection',
-    value: 'Seleção preenchida'
+    value: 'Izvēle aizpildīta'
   },
   'new-title': {
     original: 'New Image',
-    value: 'Nova Imagem'
+    value: 'Jauns attēls'
   },
   'new-current': {
     hint: 'as in "reuse the current image resolution"',
     original: 'Current',
-    value: 'Atual'
+    value: 'Pašreizējais'
   },
   'new-fit': {
     hint: 'make dimensions of image fit your window size',
     original: 'Fit',
-    value: 'Encaixar'
+    value: 'Pielāgot'
   },
   'new-oversize': {
     hint: 'like oversized clothes.',
     original: 'Oversize',
-    value: 'Tamanho Grande'
+    value: 'Lielizmērs'
   },
   'new-square': {
     hint: 'square image format',
     original: 'Square',
-    value: 'Quadrado'
+    value: 'Kvadrāts'
   },
   'new-landscape': {
     hint: 'https://en.wikipedia.org/wiki/Page_orientation',
     original: 'Landscape',
-    value: 'Paisagem'
+    value: 'Ainava'
   },
   'new-portrait': {
     original: 'Portrait',
-    value: 'Retrato'
+    value: 'Portrets'
   },
   'new-screen': {
     hint: 'resolution of computer screen',
     original: 'Screen',
-    value: 'Tela'
+    value: 'Ekrāns'
   },
   'new-video': {
     hint: 'dimensions of a video (usually 16:9)',
     original: 'Video',
-    value: 'Vídeo'
+    value: 'Video'
   },
   'new-din-paper': {
     hint: 'https://en.wikipedia.org/wiki/Paper_size',
     original: 'DIN Paper',
-    value: 'Papel DIN'
+    value: 'DIN papīrs'
   },
   'new-px': {
     hint: 'abbreviation of pixel',
     original: 'px',
-    value: 'Px'
+    value: 'px'
   },
   'new-ratio': {
     hint: 'aspect ratio',
     original: 'Ratio',
-    value: 'Proporção'
+    value: 'Proporcija'
   },
   'upload-title': {
     hint: '"Imgur" is a website name.',
     original: 'Upload to Imgur',
-    value: 'Fazer upload no Imgur'
+    value: 'Augšupielādēt uz Imgur'
   },
   'upload-link-notice': {
     hint: 'Explaining to user even though their upload is unlisted, they should be careful who they share the link with. No password protection.',
     original: 'Anyone with the link to your uploaded image will be able to view it.',
-    value: 'Visível para qualquer pessoa com o link.'
+    value: 'Ikviens ar saiti uz jūsu augšupielādēto attēlu to varēs apskatīt.'
   },
   'upload-name': {
     hint: 'noun',
     original: 'Title',
-    value: 'Título'
+    value: 'Nosaukums'
   },
   'upload-title-untitled': {
     original: 'Untitled',
-    value: 'Sem título'
+    value: 'Bez nosaukuma'
   },
   'upload-caption': {
     hint: 'as in image caption / description',
     original: 'Caption',
-    value: 'Descrição'
+    value: 'Paraksts'
   },
   'upload-submit': {
     hint: 'verb',
     original: 'Upload',
-    value: 'Upload'
+    value: 'Augšupielādēt'
   },
   'upload-uploading': {
     hint: 'in the process of uploading',
     original: 'Uploading...',
-    value: 'Fazendo upload...'
+    value: 'Augšupielādē...'
   },
   'upload-success': {
     original: 'Upload Successful',
-    value: 'Upload Bem Sucedido'
+    value: 'Augšupielāde veiksmīga'
   },
   'upload-failed': {
     original: 'Upload failed.',
-    value: 'Erro no upload.'
+    value: 'Augšupielāde neizdevās.'
   },
   'upload-delete': {
     original: 'To delete your image from Imgur visit:',
-    value: 'Para apagar sua imagem do Imgur visite:'
+    value: 'Lai dzēstu attēlu no Imgur'
   },
   'cropcopy-title-copy': {
     original: 'Copy To Clipboard',
-    value: 'Copiar para a Área de Transferência'
+    value: 'Kopēt uz starpliktuvi'
   },
   'cropcopy-title-crop': {
     hint: 'Cropping is a common feature in image editing.',
     original: 'Crop',
-    value: 'Cortar'
+    value: 'Apgriezt'
   },
   'cropcopy-click-hold': {
     original: 'Right-click or press hold to copy.',
-    value: 'Botão direito ou segure para copiar'
+    value: 'Ar peles labo pogu vai turiet'
   },
   'cropcopy-btn-copy': {
     hint: 'confirmation button. Should be short.',
     original: 'To Clipboard',
-    value: 'Para a Área de Transferência'
+    value: 'Uz starpliktuvi'
   },
   'cropcopy-copied': {
     original: 'Copied.',
-    value: 'Copiado.'
+    value: 'Kopēts.'
   },
   'cropcopy-btn-crop': {
     hint: 'confirmation button. Should be short.',
     original: 'Apply Crop',
-    value: 'Aplicar corte'
+    value: 'Lietot apgriešanu'
   },
   'crop-drag-to-crop': {
     hint: 'drag the mouse to adjust cropping',
     original: 'Drag to crop',
-    value: 'Arraste para cortar'
+    value: 'Velciet'
   },
   'filter-crop-extend': {
     original: 'Crop/Extend',
-    value: 'Cortar/Esticar'
+    value: 'Apgriezt/Paplašināt'
   },
   'filter-flip': {
     original: 'Flip',
-    value: 'Virar'
+    value: 'Pārvērst'
   },
   'filter-perspective': {
     hint: 'perspective transformation',
     original: 'Perspective',
-    value: 'Perspectiva'
+    value: 'Perspektīva'
   },
   'filter-resize': {
     original: 'Resize',
-    value: 'Redimensionar'
+    value: 'Mainīt izmēru'
   },
   'filter-rotate': {
     original: 'Rotate',
-    value: 'Girar'
+    value: 'Pagriezt'
   },
   'filter-transform': {
     hint: 'more generic transformation. Commonly known as "free transform"',
     original: 'Transform',
-    value: 'Transformar'
+    value: 'Transformēt'
   },
   'filter-bright-contrast': {
     hint: 'brightness contrast',
     original: 'Bright/Contrast',
-    value: 'Brilho/Contraste'
+    value: 'Spilgtums/Kontrasts'
   },
   'filter-curves': {
     hint: 'color curves',
     original: 'Curves',
-    value: 'Curvas'
+    value: 'Līknes'
   },
   'filter-hue-sat': {
     original: 'Hue/Saturation',
-    value: 'Matiz/Saturação'
+    value: 'Tonis/Piesātinājums'
   },
   'filter-invert': {
     hint: 'invert the colors',
     original: 'Invert',
-    value: 'Inverter'
+    value: 'Invertēt'
   },
   'filter-tilt-shift': {
     hint: 'or just depth-of-field. https://en.wikipedia.org/wiki/Tilt%E2%80%93shift_photography',
     original: 'Tilt Shift',
-    value: 'Tilt Shift (Miniatura)'
+    value: 'Slaidu nobīde'
   },
   'filter-to-alpha': {
     hint: 'feature that can isolate line drawings if it is a black and white image.',
     original: 'To Alpha',
-    value: 'Ao Alfa'
+    value: 'Uz alfa'
   },
   'filter-triangle-blur': {
     hint: 'or just blur',
     original: 'Triangle Blur',
-    value: 'Desfoque Triangular'
+    value: 'Trijstūra izplūšana'
   },
   'filter-unsharp-mask': {
     hint: 'or just sharpen, https://en.wikipedia.org/wiki/Unsharp_masking',
     original: 'Unsharp Mask',
-    value: 'Máscara de Nitidez'
+    value: 'Neasuma maska'
   },
   'filter-crop-title': {
     hint: 'same as the button, but can be longer',
     original: 'Crop / Extend',
-    value: 'Cortar / Esticar'
+    value: 'Apgriešana / Paplašināšana'
   },
   'filter-crop-description': {
     hint: 'descriptions explain the "filter" a tiny bit. Most importantly it says if it’s applied to a single layer, or the entire image (all layer)',
     original: 'Crop or extend the image.',
-    value: 'Corta ou estica a imagem'
+    value: 'Apgriež vai paplašina attēlu.'
   },
   'filter-crop-left': {
     original: 'Left',
-    value: 'Esquerda'
+    value: 'Kreisais'
   },
   'filter-crop-right': {
     original: 'Right',
-    value: 'Direita'
+    value: 'Labais'
   },
   'filter-crop-top': {
     original: 'Top',
-    value: 'Topo'
+    value: 'Augša'
   },
   'filter-crop-bottom': {
     original: 'Bottom',
-    value: 'Base'
+    value: 'Apakša'
   },
   'filter-crop-rule-thirds': {
     hint: 'https://en.wikipedia.org/wiki/Rule_of_thirds',
     original: 'Rule of Thirds',
-    value: 'Regra dos Terços'
+    value: 'Trešdaļu likums'
   },
   'filter-crop-fill': {
     hint: 'If image gets extended, what color to fill that new area with',
     original: 'Fill',
-    value: 'Preencher'
+    value: 'Aizpildīt'
   },
   'filter-flip-title': {
     hint: 'same as the button, but can be longer',
     original: 'Flip',
-    value: 'Virar'
+    value: 'Pārvēršana'
   },
   'filter-flip-description': {
     original: 'Flips layer or whole image.',
-    value: 'Vira a camada ou a imagem'
+    value: 'Pārvērš slāni vai visu attēlu.'
   },
   'filter-flip-horizontal': {
     original: 'Horizontal',
-    value: 'Horizontal'
+    value: 'Horizontāli'
   },
   'filter-flip-vertical': {
     original: 'Vertical',
-    value: 'Vertical'
+    value: 'Vertikāli'
   },
   'filter-flip-image': {
     original: 'Flip Image',
-    value: 'Virar Imagem'
+    value: 'Pārvērst attēlu'
   },
   'filter-flip-layer': {
     original: 'Flip Layer',
-    value: 'Virar Camada'
+    value: 'Pārvērst slāni'
   },
   'filter-perspective-title': {
     hint: 'same as the button, but can be longer',
     original: 'Perspective',
-    value: 'Perspectiva'
+    value: 'Perspektīvas transformācija'
   },
   'filter-perspective-description': {
     original: 'Transforms the selected layer.',
-    value: 'Transforma a camada selecionada.'
+    value: 'Transformē izvēlēto slāni.'
   },
   'filter-resize-title': {
     hint: 'same as the button, but can be longer',
     original: 'Resize',
-    value: 'Redimensionar'
+    value: 'Izmēra maiņa'
   },
   'filter-resize-description': {
     original: 'Resizes the image.',
-    value: 'Redimensiona a imagem.'
+    value: 'Maina attēla izmēru.'
   },
   'filter-rotate-title': {
     hint: 'same as the button, but can be longer',
     original: 'Rotate',
-    value: 'Girar'
+    value: 'Rotācija'
   },
   'filter-rotate-description': {
     original: 'Rotates the image.',
-    value: 'Gira a Imagem'
+    value: 'Pagriež attēlu.'
   },
   'filter-transform-empty': {
     hint: 'nothing on the layer, just transparency',
     original: 'Layer is empty.',
-    value: 'Camada vazia.'
+    value: 'Slānis ir tukšs.'
   },
   'filter-transform-title': {
     hint: 'same as the button, but can be longer',
     original: 'Transform',
-    value: 'Transformar'
+    value: 'Transformācija'
   },
   'filter-transform-description': {
     hint: 'as in the Shift key.',
     original: 'Transforms selected layer. Hold Shift for additional behavior.',
-    value: 'Transforma a camada selecionada. Aperte Shift para mais opções.'
+    value: 'Transformē izvēlēto slāni. Turiet Shift papildu funkcionalitātei.'
   },
   'filter-transform-rotation': {
     hint: 'or Angle',
     original: 'Rotation',
-    value: 'Rotação'
+    value: 'Rotācija'
   },
   'filter-transform-flip': {
     original: 'Flip',
-    value: 'Virar'
+    value: 'Pārvērst'
   },
   'filter-transform-center': {
     hint: 'verb or noun',
     original: 'Center',
-    value: 'Centro'
+    value: 'Centrēt'
   },
   'filter-transform-constrain': {
     hint: 'short version of "constrain proportions" – feature that locks the aspect ratio',
     original: 'Constrain',
-    value: 'Restringir'
+    value: 'Saglabāt proporcijas'
   },
   'filter-transform-snap': {
     hint: 'or snapping. Common feature in graphics software. Makes stuff snap into place so it’s easier to align elements in an image',
     original: 'Snap',
-    value: 'Alinhar'
+    value: 'Piepūst'
   },
   'filter-transform-snap-title': {
     hint: 'same as above, but as a tooltip',
     original: 'Snap Rotation And Position',
-    value: 'Alinhar Rotação e Posição'
+    value: 'Piepūst rotāciju un pozīciju'
   },
   'filter-bright-contrast-title': {
     hint: 'same as the button, but can be longer',
     original: 'Brightness / Contrast',
-    value: 'Brilho / Contraste'
+    value: 'Spilgtums / Kontrasts'
   },
   'filter-bright-contrast-description': {
     original: 'Change brightness and contrast for the selected layer.',
-    value: 'Muda o brilho e contraste da camada'
+    value: 'Maina izvēlētā slāņa spilgtumu un kontrastu.'
   },
   'filter-bright-contrast-brightness': {
     original: 'Brightness',
-    value: 'Brilho'
+    value: 'Spilgtums'
   },
   'filter-bright-contrast-contrast': {
     original: 'Contrast',
-    value: 'Contraste'
+    value: 'Kontrasts'
   },
   'filter-curves-title': {
     hint: 'same as the button, but can be longer',
     original: 'Curves',
-    value: 'Curvas'
+    value: 'Līknes'
   },
   'filter-curves-description': {
     original: 'Apply curves on the selected layer.',
-    value: 'Aplicar curvas à camada selecionada'
+    value: 'Pielieto līknes izvēlētajam slānim.'
   },
   'filter-curves-all': {
     original: 'All',
-    value: 'Tudo'
+    value: 'Visi'
   },
   'filter-hue-sat-title': {
     hint: 'same as the button, but can be longer',
     original: 'Hue / Saturation',
-    value: 'Matiz / Saturação'
+    value: 'Tonis / Piesātinājums'
   },
   'filter-hue-sat-description': {
     original: 'Change hue and saturation for the selected layer.',
-    value: 'Muda a matiz e saturação da camada selecionada'
+    value: 'Maina izvēlētā slāņa toni un piesātinājumu.'
   },
   'filter-hue-sat-hue': {
     original: 'Hue',
-    value: 'Matiz'
+    value: 'Tonis'
   },
   'filter-hue-sat-saturation': {
     original: 'Saturation',
-    value: 'Saturação'
+    value: 'Piesātinājums'
   },
   'filter-applied': {
     hint: 'used like this: „Invert“ applied. Informs that a filter was applied',
     original: 'applied',
-    value: 'Aplicado'
+    value: 'Pielietots'
   },
   'filter-tilt-shift-title': {
     hint: 'same as the button, but can be longer',
     original: 'Tilt Shift',
-    value: 'Tilt Shift (Miniatura)'
+    value: 'Slaidu nobīdes efekts'
   },
   'filter-tilt-shift-description': {
     original: 'Applies tilt shift on the selected layer.',
-    value: 'Aplica Tilt Shift na camada selecionada.'
+    value: 'Pielieto slaidu nobīdi izvēlētajam slānim.'
   },
   'filter-tilt-shift-blur': {
     hint: 'words can be individually translated',
     original: 'Blur Radius',
-    value: 'Alcance de Desfoque'
+    value: 'Izplūšanas rādiuss'
   },
   'filter-tilt-shift-gradient': {
     hint: 'words can be individually translated',
     original: 'Gradient Radius',
-    value: 'Alcance de Degradê'
+    value: 'Pārejas rādiuss'
   },
   'filter-to-alpha-title': {
     hint: 'same as the button, but can be longer',
     original: 'To Alpha',
-    value: 'Ao Alfa'
+    value: 'Uz alfa kanālu'
   },
   'filter-to-alpha-description': {
     hint: 'after ":" follow two options',
     original: 'Generates alpha channel for selected layer from:',
-    value: 'Gera um canal alfa para a camada selecionada.'
+    value: 'Ģenerē alfa kanālu izvēlētajam slānim no:'
   },
   'filter-to-alpha-inverted-lum': {
     hint: 'luminance is same as the layer blend mode "luminosity"',
     original: 'Inverted Luminance',
-    value: 'Luminosidade Invertida'
+    value: 'Invertēts spilgtums'
   },
   'filter-to-alpha-lum': {
     original: 'Luminance',
-    value: 'Luminosidade'
+    value: 'Spilgtums'
   },
   'filter-to-alpha-replace': {
     hint: 'What color to replace the rgb channels with',
     original: 'Replace RGB',
-    value: 'Substituir RGB'
+    value: 'Aizvietot RGB'
   },
   'filter-triangle-blur-title': {
     hint: 'same as the button, but can be longer',
     original: 'Triangle Blur',
-    value: 'Desfoque Triangular'
+    value: 'Trijstūra izplūšana'
   },
   'filter-triangle-blur-description': {
     original: 'Applies triangle blur on the selected layer.',
-    value: 'Aplica desfoque triangular na camada selecionada.'
+    value: 'Pielieto trijstūra izplūšanu izvēlētajam slānim.'
   },
   'filter-unsharp-mask-title': {
     hint: 'same as the button, but can be longer',
     original: 'Unsharp Mask',
-    value: 'Máscara de Nitidez'
+    value: 'Neasuma maska'
   },
   'filter-unsharp-mask-description': {
     original: 'Sharpens the selected layer by scaling pixels away from the average of their neighbors.',
-    value: 'Aplica nitidez à camada selecionada compensando com a média dos pixels vizinhos.'
+    value: 'Asina izvēlēto slāni'
   },
   'filter-unsharp-mask-strength': {
     original: 'Strength',
-    value: 'Intensidade'
+    value: 'Stiprums'
   },
   'filter-grid': {
     original: 'Grid',
-    value: 'Grade'
+    value: 'Režģis'
   },
   'filter-grid-description': {
     original: 'Draws grid on selected layer.',
-    value: 'Adiciona grade à camada selecionada.'
+    value: 'Zīmē režģi uz izvēlētā slāņa.'
   },
   'filter-noise': {
     original: 'Noise',
-    value: 'Ruído'
+    value: 'Troksnis'
   },
   'filter-noise-description': {
     original: 'Adds noise to selected layer.',
-    value: 'Adiciona ruído à camada selecionada.'
+    value: 'Pievieno troksni izvēlētajam slānim.'
   },
   'filter-noise-scale': {
     original: 'Scale',
-    value: 'Escala'
+    value: 'Mērogs'
   },
   'filter-noise-alpha': {
     original: 'Alpha',
@@ -1062,214 +1062,214 @@
   },
   'filter-pattern': {
     original: 'Pattern',
-    value: 'Estampa'
+    value: 'Raksts'
   },
   'filter-pattern-description': {
     original: 'Generates pattern on selected layer. Drag the preview for further controls.',
-    value: 'Gera uma estampa na camada selecionada. Arraste a pré-visualização para mais opções.'
+    value: 'Ģenerē rakstu uz izvēlētā slāņa. Velciet priekšskatījumu papildu kontrolei.'
   },
   'filter-distort': {
     original: 'Distort',
-    value: 'Distorcer'
+    value: 'Sagrozīt'
   },
   'filter-distort-description': {
     original: 'Distorts the selected layer.',
-    value: 'Distorce a camada selecionada.'
+    value: 'Sagroza izvēlēto slāni.'
   },
   'filter-distort-phase': {
     original: 'Phase',
-    value: 'Fase'
+    value: 'Fāze'
   },
   'filter-distort-stepsize': {
     original: 'Step Size',
-    value: 'Tamanho da etapa'
+    value: 'Solļa izmērs'
   },
   'filter-distort-sync-xy': {
     original: 'Sync XY',
-    value: 'Sincronizar XY'
+    value: 'Sinhronizēt XY'
   },
   'filter-vanish-point': {
     original: 'Vanish Point',
-    value: 'Ponto de Fuga'
+    value: 'Pazūdošais punkts'
   },
   'filter-vanish-point-title': {
     original: 'Vanishing Point',
-    value: 'Ponto de Fuga'
+    value: 'Pazūdošā punkta efekts'
   },
   'filter-vanish-point-description': {
     original: 'Adds vanishing point to selected layer. Drag preview to move.',
-    value: 'Adiciona um ponto de fuga à camada selecionada. Arraste a pré-visualização para mover.'
+    value: 'Pievieno pazūdošo punktu izvēlētajam slānim. Velciet priekšskatījumu'
   },
   'filter-vanish-point-lines': {
     hint: 'As in: the number of lines',
     original: 'Lines',
-    value: 'Linhas'
+    value: 'Līnijas'
   },
   'dropper-drop': {
     hint: 'as in, drag and drop a file',
     original: 'Drop to import',
-    value: 'Arraste para importar'
+    value: 'Nometiet'
   },
   'dropper-as-image': {
     original: 'As New Image',
-    value: 'Como nova imagem'
+    value: 'Kā jauns attēls'
   },
   'dropper-as-layer': {
     original: 'As Layer',
-    value: 'Como camada'
+    value: 'Kā slānis'
   },
   'import-opening': {
     hint: 'in the process of opening a large file',
     original: 'Opening file...',
-    value: 'Abrindo arquivo...'
+    value: 'Atver failu...'
   },
   'import-title': {
     original: 'Import Image',
-    value: 'Importar imagem'
+    value: 'Importēt attēlu'
   },
   'import-too-large': {
     original: 'Image too large, will be downscaled.',
-    value: 'Imagem muito grande, será reduzida.'
+    value: 'Attēls pārāk liels'
   },
   'import-btn-as-layer': {
     hint: 'import as layer. Button label, should be short',
     original: 'As Layer',
-    value: 'Como camada'
+    value: 'Kā slānis'
   },
   'import-btn-as-image': {
     hint: 'import as image. Button label, should be short',
     original: 'As Image',
-    value: 'Como imagem'
+    value: 'Kā attēls'
   },
   'import-as-layer-title': {
     original: 'Import Image as New Layer',
-    value: 'Importar imagem como Nova Camada'
+    value: 'Importēt attēlu kā jaunu slāni'
   },
   'import-as-layer-description': {
     original: 'Adjust the position of the imported image.',
-    value: 'Ajustar a posição da imagem importada'
+    value: 'Pielāgojiet importētā attēla pozīciju.'
   },
   'import-as-layer-limit-reached': {
     hint: 'Kleki allows only a certain number of layers',
     original: 'Layer limit reached. Image will be placed on existing layer.',
-    value: 'Limite de camadas atingido. A imagem será colocada na camada atual.'
+    value: 'Slāņu limits sasniegts. Attēls tiks ievietots esošajā slānī.'
   },
   'import-as-layer-fit': {
     hint: 'verb. imported image made to fit inside canvas.',
     original: 'Fit',
-    value: 'Encaixar'
+    value: 'Pielāgot'
   },
   'import-flatten': {
     hint: 'Turn image that has multiple layers into an image that has only one layer.',
     original: 'Flatten image',
-    value: 'Achatar Imagem'
+    value: 'Saplacināt attēlu'
   },
   'import-unsupported-file': {
     hint: 'e.g. user tried to open a WAV',
     original: 'Unsupported file type. See Help for supported types.',
-    value: 'Formato de arquivo não suportado. Consulte o menu Ajuda para ver arquivos suportados.'
+    value: 'Neatbalstīts faila tips. Skatiet Palīdzību par atbalstītajiem tipiem.'
   },
   'import-broken-file': {
     hint: 'if an image file is broken',
     original: "Couldn't load image. File might be corrupted.",
-    value: 'Erro ao carregar imagem. O arquivo pode estar corrompido.'
+    value: 'Neizdevās ielādēt attēlu. Fails var būt bojāts.'
   },
   'import-psd-unsupported': {
     hint: 'PSD is photoshop file format. flatten as in „flatten image“ in photoshop. Merged all layers',
     original: 'Unsupported features. PSD had to be flattened.',
-    value: 'Recursos não suportados. O PSD foi achatado.'
+    value: 'Neatbalstītas funkcijas. PSD tika saplacināts.'
   },
   'import-psd-limited-support': {
     hint: 'PSD has lots of fancy features that Kleki doesn\'t have, so when importing a PSD it often has to simplify things. So it might look different compared to when opening in Photoshop. We’re informing the user if they "flatten" the image it will be accurate despite losing layers. The user has to weigh, do they care about having layers, or do they care about it looking right.',
     original: 'PSD support is limited. Flattened will more likely look correct.',
-    value: 'O suporte para PSD é limitado. O arquivo achatado provavelmente terá melhor visualização.'
+    value: 'PSD atbalsts ir ierobežots. Saplacināts attēls izskatīsies precīzāk.'
   },
   'import-psd-too-large': {
     original: 'Image exceeds maximum dimensions of {x} x {x} pixels. Unable to import.',
-    value: 'Imagem excede o tamanho máximo de {x} x {x} pixels. Não foi possível importar.'
+    value: 'Attēls pārsniedz maksimālos izmērus {x} x {x} pikseļi. Nevar importēt.'
   },
   'import-psd-size': {
     original: 'Image size',
-    value: 'Tamanho da imagem'
+    value: 'Attēla izmērs'
   },
   'clipboard-read-fail': {
     original: 'Failed to read from clipboard.',
-    value: 'Falha ao ler da área de transferência.'
+    value: 'Neizdevās nolasīt no starpliktuves.'
   },
   'clipboard-no-image': {
     original: 'No image found in clipboard.',
-    value: 'Imagem não encontrada na área de transferência.'
+    value: 'Starpliktuvē nav attēla.'
   },
   'hand-reset': {
     hint: 'resets zoom (to 100%) and rotation (to 0°)',
     original: 'Reset',
-    value: 'Restaurar'
+    value: 'Atiestatīt'
   },
   'hand-fit': {
     hint: 'makes canvas cover whole working area',
     original: 'Fit',
-    value: 'Encaixar'
+    value: 'Pielāgot'
   },
   'hand-inertia-scrolling': {
     hint: 'Canvas will continue to move even after releasing pointer.',
     original: 'Inertia Scrolling',
-    value: 'Inércia de rolagem'
+    value: 'Inerces ritināšana'
   },
   'bucket-tolerance': {
     hint: 'a common feature for paint bucket',
     original: 'Tolerance',
-    value: 'Tolerância'
+    value: 'Tolerance'
   },
   'bucket-sample': {
     hint: 'like "taking a sample"',
     original: 'Sample',
-    value: 'Amostra'
+    value: 'Paraugs'
   },
   'bucket-sample-title': {
     original: 'Which layers to sample color from',
-    value: 'Retirar amostra de quais camadas'
+    value: 'Kurus slāņus izmantot krāsu paraugam'
   },
   'bucket-sample-all': {
     hint: 'all layers',
     original: 'All',
-    value: 'Tudo'
+    value: 'Visi'
   },
   'bucket-sample-active': {
     hint: 'currently active layer',
     original: 'Active',
-    value: 'Ativa'
+    value: 'Aktīvais'
   },
   'bucket-sample-above': {
     hint: 'layer above active layer',
     original: 'Above',
-    value: 'Acima'
+    value: 'Virspusē'
   },
   'bucket-grow': {
     hint: 'verb. Or expand.',
     original: 'Grow',
-    value: 'Expandir'
+    value: 'Paplašināt'
   },
   'bucket-grow-title': {
     original: 'Grow filled area (in pixels)',
-    value: 'Expandir área preenchida (em pixels)'
+    value: 'Paplašināt aizpildīto zonu (pikseļos)'
   },
   'bucket-contiguous': {
     hint: 'common setting for paint bucket in image editing software',
     original: 'Contiguous',
-    value: 'Adjacente'
+    value: 'Savienots'
   },
   'bucket-contiguous-title': {
     hint: 'tooltip explaining Contiguous',
     original: 'Only fill connected areas',
-    value: 'Preenche somente áreas conectadas'
+    value: 'Aizpildīt tikai savienotās zonas'
   },
   'gradient-linear': {
     original: 'Linear',
-    value: 'Linear'
+    value: 'Lineārs'
   },
   'gradient-linear-mirror': {
     original: 'Linear-Mirror',
-    value: 'Espelho Linear'
+    value: 'Lineārs spogulis'
   },
   'gradient-radial': {
     original: 'Radial',
@@ -1277,16 +1277,16 @@
   },
   'shape-stroke': {
     original: 'Stroke',
-    value: 'Traçado'
+    value: 'Stroke'
   },
   'shape-fill': {
     original: 'Fill',
-    value: 'Preencher'
+    value: 'Aizpildīt'
   },
   'shape-rect': {
     hint: 'rectangle shape',
     original: 'Rectangle',
-    value: 'Retângulo'
+    value: 'Taisnstūris'
   },
   'shape-ellipse': {
     hint: 'ellipse shape',
@@ -1295,422 +1295,422 @@
   },
   'shape-line': {
     original: 'Line',
-    value: 'Linha'
+    value: 'Līnija'
   },
   'shape-line-width': {
     original: 'Line Width',
-    value: 'Largura da Linha'
+    value: 'Līnijas platums'
   },
   'shape-outwards': {
     hint: 'grows shape from the center outwards',
     original: 'Outwards',
-    value: 'Para fora'
+    value: 'No centra uz āru'
   },
   'shape-fixed': {
     hint: 'fixed ratio of 1:1',
     original: 'Fixed 1:1',
-    value: 'Fixo 1:1'
+    value: 'Fiksēts 1:1'
   },
   'shape-auto-pan': {
     original: 'Auto-pan',
-    value: 'Auto-mover'
+    value: 'Automātiskā panoramēšana'
   },
   'shape-auto-pan-title': {
     original: 'Automatically moves as you draw',
-    value: 'Move automaticamente conforme desenha'
+    value: 'Automātiski pārvietojas zīmējot'
   },
   'text-instruction': {
     original: 'Click canvas to place text',
-    value: 'Clique na tela para inserir texto'
+    value: 'Noklikšķiniet uz audekla'
   },
   'text-title': {
     original: 'Add Text',
-    value: 'Adicionar texto'
+    value: 'Pievienot tekstu'
   },
   'text-text': {
     original: 'Text',
-    value: 'Texto'
+    value: 'Teksts'
   },
   'text-font': {
     original: 'Font',
-    value: 'Fonte'
+    value: 'Fonts'
   },
   'text-placeholder': {
     hint: 'placeholder in text input.',
     original: 'Your text',
-    value: 'Seu texto'
+    value: 'Jūsu teksts'
   },
   'text-color': {
     original: 'Color',
-    value: 'Cor'
+    value: 'Krāsa'
   },
   'text-size': {
     original: 'Size',
-    value: 'Tamanho'
+    value: 'Izmērs'
   },
   'text-line-height': {
     original: 'Line Height',
-    value: 'Altura da linha'
+    value: 'Rindas augstums'
   },
   'text-letter-spacing': {
     original: 'Letter Spacing',
-    value: 'Espaçamento'
+    value: 'Burtu atstarpe'
   },
   'text-left': {
     hint: 'left, center, right text formatting like in Word',
     original: 'Left',
-    value: 'Esquerda'
+    value: 'Pa kreisi'
   },
   'text-center': {
     original: 'Center',
-    value: 'Centro'
+    value: 'Centrā'
   },
   'text-right': {
     original: 'Right',
-    value: 'Direita'
+    value: 'Pa labi'
   },
   'text-italic': {
     original: 'Italic',
-    value: 'Itálico'
+    value: 'Slīpraksts'
   },
   'text-bold': {
     original: 'Bold',
-    value: 'Negrito'
+    value: 'Treknraksts'
   },
   'select-select': {
     original: 'Select',
-    value: 'Selecionar'
+    value: 'Atlasīt'
   },
   'select-transform': {
     original: 'Transform',
-    value: 'Transformar'
+    value: 'Transformēt'
   },
   'select-lasso': {
     original: 'Lasso',
-    value: 'Laço'
+    value: 'Lasso'
   },
   'select-polygon': {
     original: 'Polygon',
-    value: 'Polígono'
+    value: 'Poligons'
   },
   'select-boolean-replace': {
     original: 'Replace',
-    value: 'Substituir'
+    value: 'Aizvietot'
   },
   'select-boolean-add': {
     original: 'Add',
-    value: 'Adicionar'
+    value: 'Pievienot'
   },
   'select-boolean-subtract': {
     original: 'Subtract',
-    value: 'Subtrair'
+    value: 'Atņemt'
   },
   'select-all': {
     original: 'All',
-    value: 'Tudo'
+    value: 'Visu'
   },
   'select-invert': {
     original: 'Invert',
-    value: 'Inverter'
+    value: 'Invertēt'
   },
   'select-reset': {
     original: 'Reset',
-    value: 'Restaurar'
+    value: 'Atiestatīt'
   },
   'select-fill': {
     original: 'Fill',
-    value: 'Preencher'
+    value: 'Aizpildīt'
   },
   'select-erase': {
     original: 'Erase',
-    value: 'Apagar'
+    value: 'Dzēst'
   },
   'select-transform-clone': {
     original: 'Clone',
-    value: 'Clonar'
+    value: 'Klonēt'
   },
   'select-transform-clone-applied': {
     original: 'Cloned',
-    value: 'Clonado'
+    value: 'Klonēts'
   },
   'select-transform-move-to-layer': {
     original: 'Move to layer:',
-    value: 'Mover para camada:'
+    value: 'Pārvietot uz slāni:'
   },
   'select-transform-applied': {
     original: 'Transformation applied',
-    value: 'Transformação feita'
+    value: 'Transformācija pielietota'
   },
   'select-transform-empty': {
     original: 'Selected area on active layer is empty.',
-    value: 'A área selecionada na camada ativa está vazia'
+    value: 'Izvēlētā zona uz aktīvā slāņa ir tukša.'
   },
   'save-reminder-title': {
     hint: 'Save Reminder is a popup that shows up after 20 minutes of not saving. Allows user to save on the spot.',
     original: 'Unsaved Work',
-    value: 'Trabalho Não Salvo'
+    value: 'Nesaglabāts darbs'
   },
   'save-reminder-text': {
     hint: 'turns into: "...saved in <strong>12 minutes</strong>. Save..."',
     original: 'Image was not saved in {a} minutes{b}. Save now to prevent eventual loss.',
-    value: 'A imagem não é salva há {a} minutos{b}. Salve agora para prevenir a perda.'
+    value: 'Attēls nav saglabāts {a} minūtes{b}. Saglabājiet tagad'
   },
   'save-reminder-save-psd': {
     original: 'Save As PSD',
-    value: 'Salvar como PSD'
+    value: 'Saglabāt kā PSD'
   },
   'save-reminder-psd-layers': {
     original: 'PSD will remember all layers.',
-    value: 'PSD grava todas as camadas.'
+    value: 'PSD saglabās visus slāņus.'
   },
   'backup-drawing': {
     hint: '(Embed) If the upload failed, the user can backup/download their drawing.',
     original: 'You can backup your drawing.',
-    value: 'Você pode fazer o backup do seu desenho.'
+    value: 'Jūs varat dublēt savu zīmējumu.'
   },
   submit: {
     original: 'Submit',
-    value: 'Enviar'
+    value: 'Iesniegt'
   },
   'submit-title': {
     hint: 'tooltip when hovering "Submit" button',
     original: 'Submit Drawing',
-    value: 'Enviar Desenho'
+    value: 'Iesniegt zīmējumu'
   },
   'submit-prompt': {
     hint: 'Dialog asking for confirmation',
     original: 'Submit drawing?',
-    value: 'Enviar Desenho?'
+    value: 'Iesniegt zīmējumu?'
   },
   'submit-submitting': {
     hint: 'in the process of uploading',
     original: 'Submitting',
-    value: 'Enviando'
+    value: 'Iesniedz...'
   },
   'embed-init-loading': {
     hint: 'when opening the app',
     original: 'Loading app',
-    value: 'Carregando aplicação'
+    value: 'Ielādē lietotni'
   },
   'embed-init-waiting': {
     hint: 'The app is loaded, but it’s still waiting for image',
     original: 'Waiting for image',
-    value: 'Esperando imagem'
+    value: 'Gaida attēlu'
   },
   unsaved: {
     original: 'Unsaved',
-    value: 'Não Salvo'
+    value: 'Nesaglabāts'
   },
   help: {
     hint: 'or user manual',
     original: 'Help',
-    value: 'Ajuda'
+    value: 'Palīdzība'
   },
   'tab-settings': {
     original: 'Settings',
-    value: 'Configurações'
+    value: 'Iestatījumi'
   },
   'settings-language': {
     original: 'Language',
-    value: 'Idioma'
+    value: 'Valoda'
   },
   'settings-language-reload': {
     hint: 'changes will be visible after reloading the page',
     original: 'Will update after reloading.',
-    value: 'A atualização será feita após recarregar a página'
+    value: 'Atjaunināsies pēc pārlādes.'
   },
   'settings-theme': {
     original: 'Theme',
-    value: 'Tema'
+    value: 'Tēma'
   },
   'settings-save-reminder-label': {
     original: 'Save Reminder',
-    value: 'Lembrete para Salvar'
+    value: 'Saglabāšanas atgādinājums'
   },
   'settings-save-reminder-disabled': {
     original: 'disabled',
-    value: 'Desativado'
+    value: 'Atspējots'
   },
   'settings-save-reminder-confirm-title': {
     original: 'Turn off Save Reminder?',
-    value: 'Desligar Lembrete para Salvar?'
+    value: 'Izslēgt saglabāšanas atgādinājumu?'
   },
   'settings-save-reminder-confirm-a': {
     original: "There is no autosave and browser tabs don't last forever. If you don't periodically save you will likely lose work.",
-    value: 'Não há gravação automática e abas não são eternas. Se você não salvar periodicamente, perderá seu progresso.'
+    value: 'Nav automātiskās saglabāšanas'
   },
   'settings-save-reminder-confirm-b': {
     original: 'Disable at your own risk?',
-    value: 'Desativar por sua conta e risco?'
+    value: 'Atspējot uz savu atbildību?'
   },
   'settings-save-reminder-confirm-disable': {
     original: 'Disable',
-    value: 'Desativar'
+    value: 'Atspējot'
   },
   'theme-dark': {
     original: 'Dark',
-    value: 'Escuro'
+    value: 'Tumšs'
   },
   'theme-light': {
     original: 'Light',
-    value: 'Claro'
+    value: 'Gaišs'
   },
   'terms-of-service': {
     original: 'Terms of Service',
-    value: 'Termos de Utilização'
+    value: 'Lietošanas noteikumi'
   },
   licenses: {
     hint: 'as in software licenses',
     original: 'Licenses',
-    value: 'Licenças'
+    value: 'Licences'
   },
   'source-code': {
     original: 'Source Code',
-    value: 'Código-Fonte'
+    value: 'Avota kods'
   },
   auto: {
     hint: 'automatically decided',
     original: 'auto',
-    value: 'Auto'
+    value: 'Automātiski'
   },
   'zoom-in': {
     original: 'Zoom In',
-    value: 'Ampliar'
+    value: 'Tuvināt'
   },
   'zoom-out': {
     original: 'Zoom Out',
-    value: 'Reduzir'
+    value: 'Attālināt'
   },
   radius: {
     original: 'Radius',
-    value: 'Alcance'
+    value: 'Rādiuss'
   },
   'constrain-proportions': {
     original: 'Constrain Proportions',
-    value: 'Limitar proporções'
+    value: 'Saglabāt proporcijas'
   },
   width: {
     original: 'Width',
-    value: 'Largura'
+    value: 'Platums'
   },
   height: {
     original: 'Height',
-    value: 'Altura'
+    value: 'Augstums'
   },
   opacity: {
     hint: 'for layer opacity, brush opacity, text opacity, ...',
     original: 'Opacity',
-    value: 'Opacidade'
+    value: 'Necaurredzamība'
   },
   scatter: {
     hint: 'for brush scatter',
     original: 'Scatter',
-    value: 'Espalhar'
+    value: 'Izkliede'
   },
   red: {
     original: 'Red',
-    value: 'Vermelho'
+    value: 'Sarkans'
   },
   green: {
     original: 'Green',
-    value: 'Verde'
+    value: 'Zaļš'
   },
   blue: {
     original: 'Blue',
-    value: 'Azul'
+    value: 'Zils'
   },
   eraser: {
     hint: 'noun. As short as possible',
     original: 'Eraser',
-    value: 'Borracha'
+    value: 'Dzēšgumija'
   },
   center: {
     hint: 'verb',
     original: 'Center',
-    value: 'Centro'
+    value: 'Centrēt'
   },
   layers: {
     hint: 'layers in the context of image editing software',
     original: 'Layers',
-    value: 'Camadas'
+    value: 'Slāņi'
   },
   background: {
     hint: 'as in background layer',
     original: 'Background',
-    value: 'Fundo'
+    value: 'Fons'
   },
   'scaling-algorithm': {
     hint: 'Label for dropdown where user chooses which computer graphics algorithm should be used to scale the image',
     original: 'Scaling Algorithm',
-    value: 'Algoritmo de dimensionamento'
+    value: 'Mērogošanas algoritms'
   },
   'algorithm-smooth': {
     original: 'Smooth',
-    value: 'Suave'
+    value: 'Gluds'
   },
   'algorithm-pixelated': {
     original: 'Pixelated',
-    value: 'Pixelado'
+    value: 'Pikseļots'
   },
   preview: {
     hint: 'subject. When applying a filter user sees a preview of what the result would look like.',
     original: 'Preview',
-    value: 'Pré-visualização'
+    value: 'Priekšskatījums'
   },
   'angle-snap': {
     hint: 'Snapping. Like when transforming an image and it snaps to the side of the frame.',
     original: 'Snap',
-    value: 'Alinhar'
+    value: 'Piepūst'
   },
   'angle-snap-title': {
     original: '45° Angle Snapping',
-    value: 'Alinhar em 45º'
+    value: '45° leņķa piepūšana'
   },
   'lock-alpha': {
     hint: 'Short. Freezes the alpha channel of image. Images consist of 4 channels (red, green, blue, alpha). Alpha lock also found in Procreate and photoshop',
     original: 'Lock Alpha',
-    value: 'Bloquear Alfa'
+    value: 'Bloķēt alfa'
   },
   'lock-alpha-title': {
     hint: "same as 'lock-alpha' but longer version. Shows up as a tooltip when hovering",
     original: "Locks layer's alpha channel",
-    value: 'Bloqueia o canal alfa da camada'
+    value: 'Bloķē slāņa alfa kanālu'
   },
   reverse: {
     hint: 'Reversing the direction of a color gradient',
     original: 'Reverse',
-    value: 'Inverter'
+    value: 'Apgriezt'
   },
   'compare-before': {
     original: 'Before',
-    value: 'Antes'
+    value: 'Pirms'
   },
   'compare-after': {
     original: 'After',
-    value: 'Depois'
+    value: 'Pēc'
   },
   loading: {
     original: 'Loading',
-    value: 'Carregando'
+    value: 'Ielādē'
   },
   more: {
     original: 'More',
-    value: 'Mais'
+    value: 'Vairāk'
   },
   'x-minutes': {
     original: '{x}min',
-    value: '{x}min'
+    value: '{x} min'
   },
   wip: {
     original: 'Work in progress',
-    value: 'Trabalho em andamento'
+    value: 'Darbs procesā'
   },
   'browser-zoom-help': {
     original: 'Double-tap or pinch-out to reset browser zoom.',
-    value: 'Toque duplo ou movimento de pinça para restaurar o zoom do navegador'
+    value: 'Veiciet dubultskārienu vai izvelciet'
   },
   dismiss: {
     original: 'Dismiss',
-    value: 'Dispensar'
+    value: 'Noraidīt'
   }
 }

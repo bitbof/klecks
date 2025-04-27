@@ -74,6 +74,11 @@ export class BrowserStorageUi {
 
     private async store() {
         this.applyUncommitted?.();
+        // https://developer.mozilla.org/en-US/docs/Web/API/StorageManager/persist
+        // Might reduce deletions of indexedDB data by browser.
+        if ('storage' in navigator && 'persist' in navigator.storage) {
+            await navigator.storage.persist();
+        }
         this.storeButtonEl.textContent = LANG('file-storage-storing');
         this.storeButtonEl.disabled = true;
         this.clearButtonEl.disabled = true;

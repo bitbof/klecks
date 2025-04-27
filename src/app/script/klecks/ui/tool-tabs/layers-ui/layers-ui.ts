@@ -115,6 +115,7 @@ export class LayersUi {
         if (oldSpotIndex === newSpotIndex) {
             return;
         }
+        this.applyUncommitted();
         this.klCanvas.moveLayer(this.selectedSpotIndex, newSpotIndex - oldSpotIndex);
         this.klCanvasLayerArr = this.klCanvas.getLayers();
         this.selectedSpotIndex = newSpotIndex;
@@ -437,7 +438,6 @@ export class LayersUi {
             //events for moving layers up and down
             const dragEventHandler = (event: IPointerEvent) => {
                 if (event.type === 'pointerdown' && event.button === 'left') {
-                    this.applyUncommitted();
                     BB.css(layer, {
                         transition: 'box-shadow 0.3s ease-in-out',
                     });
@@ -487,6 +487,7 @@ export class LayersUi {
                         this.klHistory.pause(false);
                     }
                     if (oldSpot === newSpot && freshSelection) {
+                        this.applyUncommitted();
                         this.onSelect(this.selectedSpotIndex);
                     }
                     freshSelection = false;
