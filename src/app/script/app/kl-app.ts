@@ -73,7 +73,7 @@ importFilters();
 
 type KlAppOptionsEmbed = {
     url: string;
-    enableImageImport: boolean;
+    enableImageDropperImport: boolean;
     onSubmit: (onSuccess: () => void, onError: () => void) => void;
 };
 
@@ -1878,7 +1878,7 @@ export class KlApp {
             },
         );
 
-        if (!this.embed || this.embed.enableImageImport) {
+        if (!this.embed || this.embed.enableImageDropperImport) {
             new KL.KlImageDropper({
                 target: document.body,
                 onDrop: (files, optionStr) => {
