@@ -6,10 +6,10 @@ import {
     IGradient,
     IKlProject,
     IRGB,
+    TBrushUiInstance,
     TDrawEvent,
     TExportType,
     TUiLayout,
-    TBrushUiInstance,
 } from '../klecks/kl-types';
 import { importFilters } from '../klecks/filters/filters-lazy';
 import { klCanvasToPsdBlob } from '../klecks/storage/kl-canvas-to-psd-blob';
@@ -74,7 +74,7 @@ importFilters();
 
 type KlAppOptionsEmbed = {
     url: string;
-    enableImageDropperImport: boolean;
+    enableImageDropperImport?: boolean; // default false
     onSubmit: (onSuccess: () => void, onError: () => void) => void;
 };
 

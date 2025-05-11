@@ -16,7 +16,7 @@ export interface IEmbedParams {
     bottomBar?: HTMLElement;
     aboutEl?: HTMLElement;
     disableAutoFit?: boolean; // disable automatic Fit to View for small canvases
-    enableImageDropperImport?: boolean
+    enableImageDropperImport?: boolean; // default false
 }
 
 export interface IReadPSD {
