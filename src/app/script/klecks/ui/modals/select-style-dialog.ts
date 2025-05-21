@@ -1,39 +1,21 @@
 import {BB} from '../../../bb/bb';
-import {Select} from '../components/select';
-import {ColorOptions} from '../components/color-options';
 import {showModal} from './base/showModal';
 import {LANG} from '../../../language/language';
-import {IRGB, IRGBA} from '../../kl-types';
-import {IKeyString, ISize2D} from '../../../bb/bb-types';
-import {table} from '../components/table';
-import {theme} from '../../../theme/theme';
 import { KL } from '../../kl';
 
 export async function selectStyleDialog (
     p: {
-        onStyleSelect(type: string): void;
-        selectedStyle : string;
+        onStyleSelect(style: Style): void;
+        selectedStyle : Style;
+        styleOptions : Style[]
     }
 ):  Promise<void> {
     const mainDiv = BB.el();
+    const selectStyles = p.styleOptions.map(x => [x.name, x.name]) as []; 
+    
     const selectStyle = new KL.Select({
-        optionArr: [
-            ['Van Gogh', 'Van Gogh'],
-            ['Rembrandt', 'Rembrandt van Rijn'],
-            ['Picasso', 'Picasso'],
-            ['Fantasy', 'Fantasy'],
-            ['Photo', 'Photo'],
-//            ['Halloween', 'Halloween'],
-            ['Édouard Manet', 'Édouard Manet'],
-            ['Caravaggio', 'Caravaggio'],
-//            ['Leonardo da Vinci', 'Leonardo da Vinci'],
-            ['Vermeer', 'Vermeer'],
-            ['Renaissance', 'Renaissance'],
-            ['Alphonso Mucha', 'Alphonso Mucha'],
-            ['Kerst', 'Kerst'],
-
-        ],
-        initValue: p.selectedStyle,
+        optionArr: selectStyles,
+        initValue: p.selectedStyle.name,
         onChange: (val : string) => {
         },
         title: LANG('file-format'),
@@ -56,10 +38,15 @@ export async function selectStyleDialog (
                 return;
             }
             if(result === 'Ok'){
-                p.onStyleSelect(selectStyle.getValue());
+                p.onStyleSelect(p.styleOptions.find(x => x.name == selectStyle.getValue()) as Style);
             }
         },
         clickOnEnter: 'Ok',
     });
 }
 
+export interface Style {
+    name: string;
+    positivePrompt: string;
+    negativePrompt: string;
+}

@@ -67,6 +67,7 @@ import { KlHistoryExecutor } from '../klecks/history/kl-history-executor';
 import { PinchZoomWatcher } from '../klecks/ui/components/pinch-zoom-watcher';
 import { EASEL_MAX_SCALE, EASEL_MIN_SCALE } from '../klecks/ui/easel/easel.config';
 import { UploadImage } from '../klecks/storage/upload-image';
+import { Style } from '../klecks/ui/modals/select-style-dialog';
 
 importFilters();
 
@@ -131,7 +132,8 @@ export class KlApp {
     private readonly layersUi: LayersUi;
     private readonly toolspaceScroller: ToolspaceScroller;
     private readonly bottomBarWrapper: HTMLElement;
-    private selectedStyle: string;
+    private selectedStyle: Style;
+    private styleOptions: Style[];
 
     private updateCollapse(): void {
         //collapser
@@ -261,7 +263,8 @@ export class KlApp {
         this.uiWidth = Math.max(0, window.innerWidth);
         this.uiHeight = Math.max(0, window.innerHeight);
         let exportType: TExportType = 'png';
-        this.selectedStyle = 'Van Gogh';
+        
+        
         this.klCanvas = new KL.KlCanvas(
             p.project
                 ? {
@@ -281,6 +284,13 @@ export class KlApp {
         this.simpleUi = p.simpleUi;
         this.session = p.session;
         this.backendUrl = process.env.BACKEND_URL ?? "";
+        this.styleOptions = [];
+        this.selectedStyle = {name: 'van gogh', negativePrompt:'(van gogh style:1.1) (Post-Impressionism:1.3) (Expressive:1.1), (bold brushstrokes:1.2), (vibrant colors:1.2), painting style, intense emotions, distorted forms, dynamic compositions, raw authenticity, vg, painting, <lora:vincent_van_gogh_xl.safetensors:0.5>',
+             positivePrompt: 'photo, photorealistic, painting of Van Gogh, logo, cartoon, naked, tits, nude, porn'};
+        fetch(`${this.backendUrl}/GenerateStyles/List/${p.session}?workflowType=PictureThis`).then(async response => {
+            this.styleOptions = await response.json() as [{name : string, positivePrompt : string, negativePrompt : string}]
+            this.selectedStyle = this.styleOptions[0];
+        })
 
         if (!p.saveReminder) {
             p.saveReminder = {
@@ -1510,8 +1520,8 @@ export class KlApp {
             });
         };
 
-        const showStyleSelectDialog = () => {
-            KL.selectStyleDialog({selectedStyle: this.selectedStyle, onStyleSelect: (style) => {this.selectedStyle = style; this.uploadImage.setStyle(style); this.uploadImage.Send()}});
+        const showStyleSelectDialog = () => {            
+            KL.selectStyleDialog({selectedStyle: this.selectedStyle, styleOptions: this.styleOptions, onStyleSelect: (style) => {this.selectedStyle = style; this.uploadImage.setStyle(style); this.uploadImage.Send()}});
         };
 
         const shareImage = (callback?: () => void) => {
@@ -1527,7 +1537,8 @@ export class KlApp {
         this.uploadImage = new KL.UploadImage(
             () => this.klCanvas,
             this.backendUrl,
-            this.session
+            this.session,
+            this.selectedStyle
         );
 
         const copyToClipboard = (showCrop?: boolean) => {
