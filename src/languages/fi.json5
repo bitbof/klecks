@@ -21,7 +21,7 @@
   home: {
     hint: 'button with logo, top left of tools',
     original: 'Home',
-    value: 'Valikko'
+    value: 'Kotisivu'
   },
   'modal-new-tab': {
     hint: 'as in browser tab',
@@ -281,7 +281,7 @@
   },
   'layers-merge-all': {
     original: 'Merge all',
-    value: ''
+    value: 'Yhdistä kaikki tasot'
   },
   'layers-rename': {
     hint: 'action',
@@ -570,8 +570,8 @@
   },
   'cleared-layer': {
     hint: 'the layer has been cleared. It is now empty',
-    original: 'Taso on tyhjennetty',
-    value: ''
+    original: 'Cleared layer',
+    value: 'Taso on tyhjennetty'
   },
   'cleared-selected-area': {
     original: 'Cleared selected area',
@@ -584,7 +584,7 @@
   },
   'filled-selected-area': {
     original: 'Filled selection',
-    value: 'Valittu alue on tyhjennetty'
+    value: 'Valittu alue on täytetty'
   },
   'new-title': {
     original: 'New Image',
@@ -830,7 +830,7 @@
   },
   'filter-flip-description': {
     original: 'Flips layer or whole image.',
-    value: 'Peilaa kuva'
+    value: 'Peilaa tason tai koko kuvan.'
   },
   'filter-flip-horizontal': {
     original: 'Horizontal',
@@ -1042,7 +1042,7 @@
   },
   'filter-grid-description': {
     original: 'Draws grid on selected layer.',
-    value: 'Piirtää kehyksen valitulle tasolle.'
+    value: 'Piirtää ruudukon valitulle tasolle.'
   },
   'filter-noise': {
     original: 'Noise',
@@ -1277,11 +1277,11 @@
   },
   'shape-stroke': {
     original: 'Stroke',
-    value: '(muoto)'
+    value: 'Viiva'
   },
   'shape-fill': {
     original: 'Fill',
-    value: '(täytetty)'
+    value: 'Täyttö'
   },
   'shape-rect': {
     hint: 'rectangle shape',
