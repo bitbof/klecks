@@ -1,0 +1,1716 @@
+{
+  'switch-ui-left-right': {
+    hint: 'Button that switches layout from left to right, to accommodate left handed & right handed visitors.',
+    original: 'Switch left/right UI',
+    value: 'Valikko vasen/oikea'
+  },
+  'toggle-show-tools': {
+    hint: 'Button that hides/shows the toolbar.',
+    original: 'Show/Hide Tools',
+    value: 'Näytä/piilota työkalut'
+  },
+  scroll: {
+    hint: 'Verb. As in scrolling a page.',
+    original: 'Scroll',
+    value: 'Rullaa'
+  },
+  donate: {
+    original: 'Donate',
+    value: 'Lahjoita'
+  },
+  home: {
+    hint: 'button with logo, top left of tools',
+    original: 'Home',
+    value: 'Kotisivu'
+  },
+  'modal-new-tab': {
+    hint: 'as in browser tab',
+    original: 'Open in new tab',
+    value: 'Avaa uusi välilehti'
+  },
+  'tab-edit': {
+    hint: 'label for a tab that offer filters for making color adjustments, cropping, transforming, etc.',
+    original: 'Edit',
+    value: 'Muokkaa'
+  },
+  'tab-file': {
+    hint: 'label for a tab that lets user save the image, import, upload, etc.',
+    original: 'File',
+    value: 'Tiedosto'
+  },
+  'tool-brush': {
+    hint: 'tool that lets user paint (like in ms paint or photoshop)',
+    original: 'Brush',
+    value: 'Sivellin'
+  },
+  'tool-paint-bucket': {
+    original: 'Paint Bucket',
+    value: 'Väritäyttö'
+  },
+  'tool-gradient': {
+    original: 'Gradient',
+    value: 'Liukuväri'
+  },
+  'tool-shape': {
+    hint: 'Tool for drawing rectangles, circles, lines',
+    original: 'Shape',
+    value: 'Muoto'
+  },
+  'tool-text': {
+    hint: 'Tool for placing text on canvas',
+    original: 'Text',
+    value: 'Teksti'
+  },
+  'tool-hand': {
+    hint: 'Tool for navigating (or scrolling around) the canvas. Same name in Photoshop.',
+    original: 'Hand Tool',
+    value: 'Käsi'
+  },
+  'tool-select': {
+    original: 'Select Tool',
+    value: 'Valinta'
+  },
+  'tool-zoom': {
+    original: 'Zoom',
+    value: 'Zoom'
+  },
+  'tool-more-tools': {
+    hint: 'when hovering the caret on the tool button',
+    original: 'More Tools',
+    value: 'Lisää työkaluja'
+  },
+  undo: {
+    original: 'Undo',
+    value: 'Peru'
+  },
+  redo: {
+    original: 'Redo',
+    value: 'Uudelleen'
+  },
+  'brush-pen': {
+    hint: 'Generic "brush" that feels a bit like a pen or marker, as opposed to a paint brush.',
+    original: 'Pen',
+    value: 'Kynä'
+  },
+  'brush-blend': {
+    hint: 'brush with watercolor feel. Makes colors blend/bleed into each other. Different from smudging though.',
+    original: 'Blend',
+    value: 'Vesiväri'
+  },
+  'brush-sketchy': {
+    hint: 'Made up brush name. Pictures drawn with this brush often look like sketches.',
+    original: 'Sketchy',
+    value: 'Luonnos'
+  },
+  'brush-pixel': {
+    original: 'Pixel',
+    value: 'Pikseli'
+  },
+  'brush-chemy': {
+    hint: 'Made up brush name, derived from drawing applications "Webchemy" and "Alchemy"',
+    original: 'Chemy',
+    value: 'Chemy'
+  },
+  'brush-smudge': {
+    hint: 'Common brush/tool in image editing software. Smudges colors around canvas.',
+    original: 'Smudge',
+    value: 'Tuhrinta'
+  },
+  'brush-size': {
+    original: 'Size',
+    value: 'Koko'
+  },
+  'brush-blending': {
+    hint: 'Wetness. How much colors will bleed into each other.',
+    original: 'Blending',
+    value: 'Sekoitus'
+  },
+  'brush-toggle-pressure': {
+    hint: 'google "pressure sensitivity". Feature of Wacom tablets, Apple Pencil, XP Pen, etc.',
+    original: 'Toggle Pressure Sensitivity',
+    value: 'Paineherkkyys päälle/pois'
+  },
+  'brush-pen-circle': {
+    hint: 'as in circle shape',
+    original: 'Circle',
+    value: 'Ympyrä'
+  },
+  'brush-pen-chalk': {
+    hint: 'as in chalk texture',
+    original: 'Chalk',
+    value: 'Liitu'
+  },
+  'brush-pen-calligraphy': {
+    hint: 'like a "chisel tip marker"',
+    original: 'Calligraphy',
+    value: 'Kalligrafia'
+  },
+  'brush-pen-square': {
+    hint: 'as in square shape',
+    original: 'Square',
+    value: 'Neliö'
+  },
+  'brush-sketchy-scale': {
+    hint: 'How far the connecting lines of sketchy brush can reach.',
+    original: 'Scale',
+    value: 'Skaala'
+  },
+  'brush-pixel-dither': {
+    hint: 'Dithering/halftone pattern',
+    original: 'Dither',
+    value: 'Rasterointi'
+  },
+  'brush-chemy-fill': {
+    hint: 'Like in MS Paint. A shape can have be outlined, and filled.',
+    original: 'Fill',
+    value: 'Täytä'
+  },
+  'brush-chemy-stroke': {
+    original: 'Stroke',
+    value: 'Viiva'
+  },
+  'brush-chemy-mirror-x': {
+    original: 'Horizontal Symmetry',
+    value: 'Vaakasymmetria'
+  },
+  'brush-chemy-mirror-y': {
+    original: 'Vertical Symmetry',
+    value: 'Pystysymmetria'
+  },
+  'brush-chemy-gradient': {
+    hint: 'as in color gradient',
+    original: 'Gradient',
+    value: 'Liukuväri'
+  },
+  'brush-eraser-transparent-bg': {
+    hint: 'as in transparent background/bottom layer',
+    original: 'Transparent Background',
+    value: 'Läpinäkyvä tausta'
+  },
+  stabilizer: {
+    hint: 'Common feature in drawing software to make lines smoother',
+    original: 'Stabilizer',
+    value: 'Vakautin'
+  },
+  'stabilizer-title': {
+    hint: '-title keys are usually more verbose description. shown as a tooltip.',
+    original: 'Stroke Stabilizer',
+    value: 'Viivan vakautin'
+  },
+  eyedropper: {
+    original: 'Eyedropper',
+    value: 'Pipetti'
+  },
+  'secondary-color': {
+    hint: 'or sometimes called "background" color. Photoshop, MS Paint, etc. allow user to switch between two colors.',
+    original: 'Secondary Color',
+    value: 'Taustaväri'
+  },
+  'manual-color-input': {
+    hint: 'A dialog where users can manually type the color, each channel a number. "mci" keys all related to this dialog.',
+    original: 'Manual Color Input',
+    value: 'Valitse väri'
+  },
+  'mci-hex': {
+    hint: 'as in hex code. Hex representation of color. „#f00“ → red',
+    original: 'Hex',
+    value: 'HTML-koodi'
+  },
+  'mci-copy': {
+    hint: 'verb',
+    original: 'Copy',
+    value: 'Kopioi'
+  },
+  'modal-ok': {
+    hint: 'main confirmation button in dialogs. Can be to confirm an action, not just acknowledge information.',
+    original: 'Ok',
+    value: 'Ok'
+  },
+  'modal-cancel': {
+    original: 'Cancel',
+    value: 'Peruuta'
+  },
+  'modal-close': {
+    hint: 'as in close a dialog box',
+    original: 'Close',
+    value: 'Sulje'
+  },
+  'layers-active-layer': {
+    hint: 'currently selected layer that user is drawing on',
+    original: 'Active Layer',
+    value: 'Aktiivinen taso'
+  },
+  'layers-layer': {
+    original: 'Layer',
+    value: 'Taso'
+  },
+  'layers-copy': {
+    hint: 'noun',
+    original: 'copy',
+    value: 'kopio'
+  },
+  'layers-blending': {
+    hint: 'Common feature in image editing & drawing software. All layers-blend- keys relate to this. https://en.wikipedia.org/wiki/Blend_modes',
+    original: 'Blending',
+    value: 'Sekoitus'
+  },
+  'layers-new': {
+    hint: 'action',
+    original: 'New Layer',
+    value: 'Uusi taso'
+  },
+  'layers-remove': {
+    hint: 'action',
+    original: 'Remove Layer',
+    value: 'Poista taso'
+  },
+  'layers-duplicate': {
+    hint: 'action',
+    original: 'Duplicate Layer',
+    value: 'Monista taso'
+  },
+  'layers-merge': {
+    hint: 'action',
+    original: 'Merge with layer below',
+    value: 'Yhdistä alemman tason kanssa'
+  },
+  'layers-clear': {
+    hint: 'to make a layer empty',
+    original: 'Clear layer',
+    value: 'Tyhjennä taso'
+  },
+  'layers-merge-all': {
+    original: 'Merge all',
+    value: 'Yhdistä kaikki tasot'
+  },
+  'layers-rename': {
+    hint: 'action',
+    original: 'Rename',
+    value: 'Nimeä uudelleen'
+  },
+  'layers-active-layer-visible': {
+    original: 'Active layer is visible',
+    value: 'Aktiivinen taso näkyy'
+  },
+  'layers-active-layer-hidden': {
+    original: 'Active layer is hidden',
+    value: 'Aktiivinen taso ei näy'
+  },
+  'layers-visibility-toggle': {
+    original: 'Layer Visibility',
+    value: 'Taso näkyvyys'
+  },
+  'layers-blend-normal': {
+    original: 'normal',
+    value: 'normaali'
+  },
+  'layers-blend-darken': {
+    original: 'darken',
+    value: 'tummentava'
+  },
+  'layers-blend-multiply': {
+    original: 'multiply',
+    value: 'kertova'
+  },
+  'layers-blend-color-burn': {
+    original: 'color burn',
+    value: 'värivarjostus'
+  },
+  'layers-blend-lighten': {
+    original: 'lighten',
+    value: 'vaalentava'
+  },
+  'layers-blend-screen': {
+    original: 'screen',
+    value: 'rasteri'
+  },
+  'layers-blend-color-dodge': {
+    original: 'color dodge',
+    value: 'värilisävalotus'
+  },
+  'layers-blend-overlay': {
+    original: 'overlay',
+    value: 'sulauttava'
+  },
+  'layers-blend-soft-light': {
+    original: 'soft light',
+    value: 'pehmeä valo'
+  },
+  'layers-blend-hard-light': {
+    original: 'hard light',
+    value: 'kova valo'
+  },
+  'layers-blend-difference': {
+    original: 'difference',
+    value: 'erottava'
+  },
+  'layers-blend-exclusion': {
+    original: 'exclusion',
+    value: 'poistava'
+  },
+  'layers-blend-hue': {
+    original: 'hue',
+    value: 'sävy'
+  },
+  'layers-blend-saturation': {
+    original: 'saturation',
+    value: 'kylläisyys'
+  },
+  'layers-blend-color': {
+    original: 'color',
+    value: 'väri'
+  },
+  'layers-blend-luminosity': {
+    original: 'luminosity',
+    value: 'kirkkaus'
+  },
+  'layers-rename-title': {
+    hint: '-title in code usually means it shows up in a tooltip, or it’s the header of a dialog box, so it can be a little bit longer.',
+    original: 'Rename Layer',
+    value: 'Nimeä taso uudelleen'
+  },
+  'layers-rename-name': {
+    hint: 'noun',
+    original: 'Name',
+    value: 'Nimi'
+  },
+  'layers-rename-clear': {
+    hint: 'aka action of deleting entered name',
+    original: 'Clear Name',
+    value: 'Poista nimi'
+  },
+  'layers-rename-sketch': {
+    hint: 'noun. Name suggestion for a layer',
+    original: 'Sketch',
+    value: 'Luonnos'
+  },
+  'layers-rename-colors': {
+    hint: 'noun. Name suggestion for a layer',
+    original: 'Colors',
+    value: 'Värit'
+  },
+  'layers-rename-shading': {
+    hint: 'noun. Name suggestion for a layer',
+    original: 'Shading',
+    value: 'Varjostus'
+  },
+  'layers-rename-lines': {
+    hint: 'noun. Name suggestion for a layer',
+    original: 'Lines',
+    value: 'Viivat'
+  },
+  'layers-rename-effects': {
+    hint: 'noun. Name suggestion for a layer',
+    original: 'Effects',
+    value: 'Efektit'
+  },
+  'layers-rename-foreground': {
+    hint: 'noun. Name suggestion for a layer',
+    original: 'Foreground',
+    value: 'Etuala'
+  },
+  'layers-merge-modal-title': {
+    original: 'Merge/Mix Layers',
+    value: 'Yhdistä/sekoita tasoja'
+  },
+  'layers-merge-description': {
+    hint: 'After ":" a list of mix/blend modes is shown.',
+    original: 'Merges the selected layer with the one underneath. Select the mix mode:',
+    value: 'Yhdistää valitun tason alempana olevan tason kanssa. Valitse yhdistämistapa:'
+  },
+  'file-no-autosave': {
+    hint: "let user know they can't autosave, and there's no cloud storage. Keep short so fits on one line",
+    original: 'No autosave, no cloud storage',
+    value: 'Ei automaattitallennusta, pilvitallennustila puuttuu'
+  },
+  'file-new': {
+    hint: 'action',
+    original: 'New',
+    value: 'Uusi'
+  },
+  'file-import': {
+    hint: 'action',
+    original: 'Import',
+    value: 'Avaa'
+  },
+  'file-save': {
+    hint: 'action',
+    original: 'Save',
+    value: 'Tallenna'
+  },
+  'file-format': {
+    original: 'File Format',
+    value: 'Tiedostomuoto'
+  },
+  'file-show-save-dialog': {
+    hint: 'setting for showing/not showing a dialog where user picks folder and filename',
+    original: 'Show save dialog',
+    value: 'Näytä tallennusvalinnat'
+  },
+  'file-copy': {
+    hint: 'verb',
+    original: 'Copy',
+    value: 'Kopioi'
+  },
+  'file-copy-title': {
+    original: 'Copy To Clipboard',
+    value: 'Kopioi leikepöydälle'
+  },
+  'file-paste': {
+    original: 'Paste',
+    value: 'Liitä'
+  },
+  'file-share': {
+    hint: 'Common feature on phones. Pressing share button allows to send data to a different app, e.g. as a text message to someone.',
+    original: 'Share',
+    value: 'Jaa'
+  },
+  'file-storage': {
+    hint: 'Made up term. Allows users to store drawing in the browser. (not synced across devices)',
+    original: 'Browser Storage',
+    value: 'Selaimen tallennustila'
+  },
+  'file-storage-thumb-title': {
+    hint: 'when reopening or reloading',
+    original: 'Restores when reopening page',
+    value: 'Palauttaa, kun selain avataan uudelleen'
+  },
+  'file-storage-about': {
+    hint: 'link to Browser Storage help/user manual',
+    original: 'About Browser Storage',
+    value: 'Lisätietoja selaimen talennustilasta'
+  },
+  'file-storage-cant-access': {
+    hint: 'an error. Can’t access the storage.',
+    original: "Can't access",
+    value: 'Pääsy evätty'
+  },
+  'file-storage-empty': {
+    hint: 'nothing stored',
+    original: 'Empty',
+    value: 'Tyhjä'
+  },
+  'file-storage-store': {
+    hint: 'verb',
+    original: 'Store',
+    value: 'Tallenna'
+  },
+  'file-storage-clear': {
+    original: 'Clear',
+    value: 'Tyhjennä'
+  },
+  'file-storage-clear-prompt': {
+    original: 'Clear Browser Storage?',
+    value: 'Tyhjennetäänkö selaimen tallennustila?'
+  },
+  'file-storage-storing': {
+    hint: 'while it is in the process of storing',
+    original: 'Storing',
+    value: 'Tallennetaan'
+  },
+  'file-storage-overwrite': {
+    hint: 'overwrite what is already stored',
+    original: 'Overwrite',
+    value: 'Korvaa vanha'
+  },
+  'file-storage-min-ago': {
+    hint: "{x} <- needs to stay, it's a placeholder.",
+    original: '{x}min ago',
+    value: '{x} min sitten'
+  },
+  'file-storage-hours-ago': {
+    original: '{x}h ago',
+    value: '{x} tuntia sitten'
+  },
+  'file-storage-days-ago': {
+    original: '{x}d ago',
+    value: '{x} päivää sitten'
+  },
+  'file-storage-month-ago': {
+    original: '> 1month ago',
+    value: '> 1 kk sitten'
+  },
+  'file-storage-restored': {
+    original: 'Restored from Browser Storage',
+    value: 'Palautettu selaimen tallennustilasta'
+  },
+  'file-storage-stored': {
+    original: 'Stored to Browser Storage',
+    value: 'Tallennettu selaimen tallennustilaan'
+  },
+  'file-storage-failed': {
+    original: 'Failed to store to Browser Storage',
+    value: 'Selaimen tallennustilaan kirjoitus epäonnistui'
+  },
+  'file-storage-failed-1': {
+    original: 'Failed to store. Possible causes:',
+    value: 'Tallennus epäonnistui. Mahdollisia syitä:'
+  },
+  'file-storage-failed-2': {
+    original: 'Out of disk space',
+    value: 'Tallennustila on täynnä'
+  },
+  'file-storage-failed-3': {
+    original: 'Storage disabled in incognito tab',
+    value: 'Tallennustilaa ei ole selaimen yksityisessä välilehdessä'
+  },
+  'file-storage-failed-4': {
+    hint: 'as in: unsupported feature',
+    original: "Browser doesn't support storage",
+    value: 'Selaimessa ei ole tallennustilaa'
+  },
+  'file-storage-failed-clear': {
+    original: 'Failed to clear.',
+    value: 'Tyhjennys epäonnistui.'
+  },
+  'file-upload': {
+    hint: 'verb',
+    original: 'Upload',
+    value: 'Lataa'
+  },
+  'cleared-layer': {
+    hint: 'the layer has been cleared. It is now empty',
+    original: 'Cleared layer',
+    value: 'Taso on tyhjennetty'
+  },
+  'cleared-selected-area': {
+    original: 'Cleared selected area',
+    value: 'Valittu alue on tyhjennetty'
+  },
+  filled: {
+    hint: 'layer got filled with a color',
+    original: 'Filled',
+    value: 'Täytetty'
+  },
+  'filled-selected-area': {
+    original: 'Filled selection',
+    value: 'Valittu alue on täytetty'
+  },
+  'new-title': {
+    original: 'New Image',
+    value: 'Uusi kuva'
+  },
+  'new-current': {
+    hint: 'as in "reuse the current image resolution"',
+    original: 'Current',
+    value: 'Nykyinen'
+  },
+  'new-fit': {
+    hint: 'make dimensions of image fit your window size',
+    original: 'Fit',
+    value: 'Sovita'
+  },
+  'new-oversize': {
+    hint: 'like oversized clothes.',
+    original: 'Oversize',
+    value: 'Ylisuuri'
+  },
+  'new-square': {
+    hint: 'square image format',
+    original: 'Square',
+    value: 'Neliö'
+  },
+  'new-landscape': {
+    hint: 'https://en.wikipedia.org/wiki/Page_orientation',
+    original: 'Landscape',
+    value: 'Vaakasuuntainen'
+  },
+  'new-portrait': {
+    original: 'Portrait',
+    value: 'Pystysuuntainen'
+  },
+  'new-screen': {
+    hint: 'resolution of computer screen',
+    original: 'Screen',
+    value: 'Näyttö'
+  },
+  'new-video': {
+    hint: 'dimensions of a video (usually 16:9)',
+    original: 'Video',
+    value: 'Video'
+  },
+  'new-din-paper': {
+    hint: 'https://en.wikipedia.org/wiki/Paper_size',
+    original: 'DIN Paper',
+    value: 'A4-paperi'
+  },
+  'new-px': {
+    hint: 'abbreviation of pixel',
+    original: 'px',
+    value: 'px'
+  },
+  'new-ratio': {
+    hint: 'aspect ratio',
+    original: 'Ratio',
+    value: 'suhde'
+  },
+  'upload-title': {
+    hint: '"Imgur" is a website name.',
+    original: 'Upload to Imgur',
+    value: 'Siirrä Imgur-palveluun'
+  },
+  'upload-link-notice': {
+    hint: 'Explaining to user even though their upload is unlisted, they should be careful who they share the link with. No password protection.',
+    original: 'Anyone with the link to your uploaded image will be able to view it.',
+    value: 'Kuka tahansa voi nähdä siirtämäsi kuvan, jos hänellä on linkki siihen.'
+  },
+  'upload-name': {
+    hint: 'noun',
+    original: 'Title',
+    value: 'Otsikko'
+  },
+  'upload-title-untitled': {
+    original: 'Untitled',
+    value: 'Nimetön'
+  },
+  'upload-caption': {
+    hint: 'as in image caption / description',
+    original: 'Caption',
+    value: 'Kuvateksti'
+  },
+  'upload-submit': {
+    hint: 'verb',
+    original: 'Upload',
+    value: 'Siirrä'
+  },
+  'upload-uploading': {
+    hint: 'in the process of uploading',
+    original: 'Uploading...',
+    value: 'Siirretään...'
+  },
+  'upload-success': {
+    original: 'Upload Successful',
+    value: 'Siirto onnistui'
+  },
+  'upload-failed': {
+    original: 'Upload failed.',
+    value: 'Siirto epäonnistui.'
+  },
+  'upload-delete': {
+    original: 'To delete your image from Imgur visit:',
+    value: 'Poistaaksesi kuvan Imgur-palvelusta siirry tähän osoitteeseen:'
+  },
+  'cropcopy-title-copy': {
+    original: 'Copy To Clipboard',
+    value: 'Kopioi leikepöydälle'
+  },
+  'cropcopy-title-crop': {
+    hint: 'Cropping is a common feature in image editing.',
+    original: 'Crop',
+    value: 'Rajaa'
+  },
+  'cropcopy-click-hold': {
+    original: 'Right-click or press hold to copy.',
+    value: 'Klikkaa oikealla tai paina pitkään kopioidaksesi.'
+  },
+  'cropcopy-btn-copy': {
+    hint: 'confirmation button. Should be short.',
+    original: 'To Clipboard',
+    value: 'Leikepöydälle'
+  },
+  'cropcopy-copied': {
+    original: 'Copied.',
+    value: 'Kopioitu.'
+  },
+  'cropcopy-btn-crop': {
+    hint: 'confirmation button. Should be short.',
+    original: 'Apply Crop',
+    value: 'Tee rajaus'
+  },
+  'crop-drag-to-crop': {
+    hint: 'drag the mouse to adjust cropping',
+    original: 'Drag to crop',
+    value: 'Raahaa rajataksesi'
+  },
+  'filter-crop-extend': {
+    original: 'Crop/Extend',
+    value: 'Rajaa/laajenna'
+  },
+  'filter-flip': {
+    original: 'Flip',
+    value: 'Peilikuva'
+  },
+  'filter-perspective': {
+    hint: 'perspective transformation',
+    original: 'Perspective',
+    value: 'Perspektiivi'
+  },
+  'filter-resize': {
+    original: 'Resize',
+    value: 'Skaalaa'
+  },
+  'filter-rotate': {
+    original: 'Rotate',
+    value: 'Kierrä'
+  },
+  'filter-transform': {
+    hint: 'more generic transformation. Commonly known as "free transform"',
+    original: 'Transform',
+    value: 'Muunna'
+  },
+  'filter-bright-contrast': {
+    hint: 'brightness contrast',
+    original: 'Bright/Contrast',
+    value: 'Kirkkaus/kontrasti'
+  },
+  'filter-curves': {
+    hint: 'color curves',
+    original: 'Curves',
+    value: 'Käyrät'
+  },
+  'filter-hue-sat': {
+    original: 'Hue/Saturation',
+    value: 'Sävy/kylläisyys'
+  },
+  'filter-invert': {
+    hint: 'invert the colors',
+    original: 'Invert',
+    value: 'Negatiivi'
+  },
+  'filter-tilt-shift': {
+    hint: 'or just depth-of-field. https://en.wikipedia.org/wiki/Tilt%E2%80%93shift_photography',
+    original: 'Tilt Shift',
+    value: 'Syväterävyys'
+  },
+  'filter-to-alpha': {
+    hint: 'feature that can isolate line drawings if it is a black and white image.',
+    original: 'To Alpha',
+    value: 'Luo alfa'
+  },
+  'filter-triangle-blur': {
+    hint: 'or just blur',
+    original: 'Triangle Blur',
+    value: 'Sumenna'
+  },
+  'filter-unsharp-mask': {
+    hint: 'or just sharpen, https://en.wikipedia.org/wiki/Unsharp_masking',
+    original: 'Unsharp Mask',
+    value: 'Terävöinti'
+  },
+  'filter-crop-title': {
+    hint: 'same as the button, but can be longer',
+    original: 'Crop / Extend',
+    value: 'Rajaa / laajenna'
+  },
+  'filter-crop-description': {
+    hint: 'descriptions explain the "filter" a tiny bit. Most importantly it says if it’s applied to a single layer, or the entire image (all layer)',
+    original: 'Crop or extend the image.',
+    value: 'Rajaa tai laajenna kuvaa'
+  },
+  'filter-crop-left': {
+    original: 'Left',
+    value: 'Vasen'
+  },
+  'filter-crop-right': {
+    original: 'Right',
+    value: 'Oikea'
+  },
+  'filter-crop-top': {
+    original: 'Top',
+    value: 'Yläosa'
+  },
+  'filter-crop-bottom': {
+    original: 'Bottom',
+    value: 'Alaosa'
+  },
+  'filter-crop-rule-thirds': {
+    hint: 'https://en.wikipedia.org/wiki/Rule_of_thirds',
+    original: 'Rule of Thirds',
+    value: 'Kolmanneksen sääntö'
+  },
+  'filter-crop-fill': {
+    hint: 'If image gets extended, what color to fill that new area with',
+    original: 'Fill',
+    value: 'Täytä'
+  },
+  'filter-flip-title': {
+    hint: 'same as the button, but can be longer',
+    original: 'Flip',
+    value: 'Peilikuva'
+  },
+  'filter-flip-description': {
+    original: 'Flips layer or whole image.',
+    value: 'Peilaa tason tai koko kuvan.'
+  },
+  'filter-flip-horizontal': {
+    original: 'Horizontal',
+    value: 'Vaakasuuntaan'
+  },
+  'filter-flip-vertical': {
+    original: 'Vertical',
+    value: 'Pystysuuntaan'
+  },
+  'filter-flip-image': {
+    original: 'Flip Image',
+    value: 'Peilaa kuva'
+  },
+  'filter-flip-layer': {
+    original: 'Flip Layer',
+    value: 'Peilaa taso'
+  },
+  'filter-perspective-title': {
+    hint: 'same as the button, but can be longer',
+    original: 'Perspective',
+    value: 'Perspektiivi'
+  },
+  'filter-perspective-description': {
+    original: 'Transforms the selected layer.',
+    value: 'Muuntaa valitun tason.'
+  },
+  'filter-resize-title': {
+    hint: 'same as the button, but can be longer',
+    original: 'Resize',
+    value: 'Skaalaa'
+  },
+  'filter-resize-description': {
+    original: 'Resizes the image.',
+    value: 'Skaalaa kuvan kokoa.'
+  },
+  'filter-rotate-title': {
+    hint: 'same as the button, but can be longer',
+    original: 'Rotate',
+    value: 'Kierrä'
+  },
+  'filter-rotate-description': {
+    original: 'Rotates the image.',
+    value: 'Kiertää kuvaa.'
+  },
+  'filter-transform-empty': {
+    hint: 'nothing on the layer, just transparency',
+    original: 'Layer is empty.',
+    value: 'Taso on tyhjä.'
+  },
+  'filter-transform-title': {
+    hint: 'same as the button, but can be longer',
+    original: 'Transform',
+    value: 'Muunna'
+  },
+  'filter-transform-description': {
+    hint: 'as in the Shift key.',
+    original: 'Transforms selected layer. Hold Shift for additional behavior.',
+    value: 'Muuntaa valitun tason. Paina Shift-nappia nähdäksesi lisätoiminnot.'
+  },
+  'filter-transform-rotation': {
+    hint: 'or Angle',
+    original: 'Rotation',
+    value: 'Kierrä'
+  },
+  'filter-transform-flip': {
+    original: 'Flip',
+    value: 'Peilikuva'
+  },
+  'filter-transform-center': {
+    hint: 'verb or noun',
+    original: 'Center',
+    value: 'Keskitä'
+  },
+  'filter-transform-constrain': {
+    hint: 'short version of "constrain proportions" – feature that locks the aspect ratio',
+    original: 'Constrain',
+    value: 'Säilytä kuvasuhde'
+  },
+  'filter-transform-snap': {
+    hint: 'or snapping. Common feature in graphics software. Makes stuff snap into place so it’s easier to align elements in an image',
+    original: 'Snap',
+    value: 'Tartu'
+  },
+  'filter-transform-snap-title': {
+    hint: 'same as above, but as a tooltip',
+    original: 'Snap Rotation And Position',
+    value: 'Tartu kiertoon ja sijaintiin'
+  },
+  'filter-bright-contrast-title': {
+    hint: 'same as the button, but can be longer',
+    original: 'Brightness / Contrast',
+    value: 'Kirkkaus / kontrasti'
+  },
+  'filter-bright-contrast-description': {
+    original: 'Change brightness and contrast for the selected layer.',
+    value: 'Säädä valitun tason kirkkautta ja kontrastia.'
+  },
+  'filter-bright-contrast-brightness': {
+    original: 'Brightness',
+    value: 'Kirkkaus'
+  },
+  'filter-bright-contrast-contrast': {
+    original: 'Contrast',
+    value: 'Kontrasti'
+  },
+  'filter-curves-title': {
+    hint: 'same as the button, but can be longer',
+    original: 'Curves',
+    value: 'Käyrät'
+  },
+  'filter-curves-description': {
+    original: 'Apply curves on the selected layer.',
+    value: 'Muuttaa sävyt käyrän mukaiseksi valitulla tasolla.'
+  },
+  'filter-curves-all': {
+    original: 'All',
+    value: 'Kaikki'
+  },
+  'filter-hue-sat-title': {
+    hint: 'same as the button, but can be longer',
+    original: 'Hue / Saturation',
+    value: 'Sävy / kylläisyys'
+  },
+  'filter-hue-sat-description': {
+    original: 'Change hue and saturation for the selected layer.',
+    value: 'Vaihtaa valitun tason sävyä ja kylläisyyttä'
+  },
+  'filter-hue-sat-hue': {
+    original: 'Hue',
+    value: 'Sävy'
+  },
+  'filter-hue-sat-saturation': {
+    original: 'Saturation',
+    value: 'Kylläisyys'
+  },
+  'filter-applied': {
+    hint: 'used like this: „Invert“ applied. Informs that a filter was applied',
+    original: 'applied',
+    value: 'toteutettu'
+  },
+  'filter-tilt-shift-title': {
+    hint: 'same as the button, but can be longer',
+    original: 'Tilt Shift',
+    value: 'Syväterävyys'
+  },
+  'filter-tilt-shift-description': {
+    original: 'Applies tilt shift on the selected layer.',
+    value: 'Tekee syväterävyysefektin valitulle tasolle.'
+  },
+  'filter-tilt-shift-blur': {
+    hint: 'words can be individually translated',
+    original: 'Blur Radius',
+    value: 'Sumennuksen säde'
+  },
+  'filter-tilt-shift-gradient': {
+    hint: 'words can be individually translated',
+    original: 'Gradient Radius',
+    value: 'Sumennuksen liukuma'
+  },
+  'filter-to-alpha-title': {
+    hint: 'same as the button, but can be longer',
+    original: 'To Alpha',
+    value: 'Luo alfa-kanava'
+  },
+  'filter-to-alpha-description': {
+    hint: 'after ":" follow two options',
+    original: 'Generates alpha channel for selected layer from:',
+    value: 'Luo alfa-kanavan valitusta tasosta:'
+  },
+  'filter-to-alpha-inverted-lum': {
+    hint: 'luminance is same as the layer blend mode "luminosity"',
+    original: 'Inverted Luminance',
+    value: 'Käänteinen kirkkaus'
+  },
+  'filter-to-alpha-lum': {
+    original: 'Luminance',
+    value: 'Kirkkaus'
+  },
+  'filter-to-alpha-replace': {
+    hint: 'What color to replace the rgb channels with',
+    original: 'Replace RGB',
+    value: 'Korvaa RGB'
+  },
+  'filter-triangle-blur-title': {
+    hint: 'same as the button, but can be longer',
+    original: 'Triangle Blur',
+    value: 'Sumenna'
+  },
+  'filter-triangle-blur-description': {
+    original: 'Applies triangle blur on the selected layer.',
+    value: 'Sumentaa valitun tason.'
+  },
+  'filter-unsharp-mask-title': {
+    hint: 'same as the button, but can be longer',
+    original: 'Unsharp Mask',
+    value: 'Terävöinti'
+  },
+  'filter-unsharp-mask-description': {
+    original: 'Sharpens the selected layer by scaling pixels away from the average of their neighbors.',
+    value: 'Terävöittää valitun tason muuttamalla pikselien väriä kauemmas viereisten pikselien keskiarvosta.'
+  },
+  'filter-unsharp-mask-strength': {
+    original: 'Strength',
+    value: 'Vahvuus'
+  },
+  'filter-grid': {
+    original: 'Grid',
+    value: 'Ruudukko'
+  },
+  'filter-grid-description': {
+    original: 'Draws grid on selected layer.',
+    value: 'Piirtää ruudukon valitulle tasolle.'
+  },
+  'filter-noise': {
+    original: 'Noise',
+    value: 'Kohina'
+  },
+  'filter-noise-description': {
+    original: 'Adds noise to selected layer.',
+    value: 'Lisää kohinaa valittuun tasoon.'
+  },
+  'filter-noise-scale': {
+    original: 'Scale',
+    value: 'Skaala'
+  },
+  'filter-noise-alpha': {
+    original: 'Alpha',
+    value: 'Alfa'
+  },
+  'filter-pattern': {
+    original: 'Pattern',
+    value: 'Kuvio'
+  },
+  'filter-pattern-description': {
+    original: 'Generates pattern on selected layer. Drag the preview for further controls.',
+    value: 'Luo kuvion valitulle tasolle. Vedä nähdäksesi esikatselun lisäasetuksista.'
+  },
+  'filter-distort': {
+    original: 'Distort',
+    value: 'Vääristä'
+  },
+  'filter-distort-description': {
+    original: 'Distorts the selected layer.',
+    value: 'Vääristää valitun tason.'
+  },
+  'filter-distort-phase': {
+    original: 'Phase',
+    value: 'Vaihe'
+  },
+  'filter-distort-stepsize': {
+    original: 'Step Size',
+    value: 'Askelkoko'
+  },
+  'filter-distort-sync-xy': {
+    original: 'Sync XY',
+    value: 'Lukitse X=Y'
+  },
+  'filter-vanish-point': {
+    original: 'Vanish Point',
+    value: 'Katoamispiste'
+  },
+  'filter-vanish-point-title': {
+    original: 'Vanishing Point',
+    value: 'Katoamispiste'
+  },
+  'filter-vanish-point-description': {
+    original: 'Adds vanishing point to selected layer. Drag preview to move.',
+    value: 'Lisää katoamispisteen valittuun tasoon. Raahaa pistettä esikatselussa.'
+  },
+  'filter-vanish-point-lines': {
+    hint: 'As in: the number of lines',
+    original: 'Lines',
+    value: 'Viivoja'
+  },
+  'dropper-drop': {
+    hint: 'as in, drag and drop a file',
+    original: 'Drop to import',
+    value: 'Pudota avattava tiedosto'
+  },
+  'dropper-as-image': {
+    original: 'As New Image',
+    value: 'Uudeksi kuvaksi'
+  },
+  'dropper-as-layer': {
+    original: 'As Layer',
+    value: 'Uudeksi tasoksi'
+  },
+  'import-opening': {
+    hint: 'in the process of opening a large file',
+    original: 'Opening file...',
+    value: 'Tiedostoa avataan...'
+  },
+  'import-title': {
+    original: 'Import Image',
+    value: 'Avaa kuva'
+  },
+  'import-too-large': {
+    original: 'Image too large, will be downscaled.',
+    value: 'Kuva on liian suuri, sitä pienennetään.'
+  },
+  'import-btn-as-layer': {
+    hint: 'import as layer. Button label, should be short',
+    original: 'As Layer',
+    value: 'Tasoksi'
+  },
+  'import-btn-as-image': {
+    hint: 'import as image. Button label, should be short',
+    original: 'As Image',
+    value: 'Kuvaksi'
+  },
+  'import-as-layer-title': {
+    original: 'Import Image as New Layer',
+    value: 'Avaa kuva uudeksi tasoksi'
+  },
+  'import-as-layer-description': {
+    original: 'Adjust the position of the imported image.',
+    value: 'Sijoita avattava kuva.'
+  },
+  'import-as-layer-limit-reached': {
+    hint: 'Kleki allows only a certain number of layers',
+    original: 'Layer limit reached. Image will be placed on existing layer.',
+    value: 'Tasoja ei voi enää lisätä. Kuva sijoitetaan olemassa olevalle tasolle.'
+  },
+  'import-as-layer-fit': {
+    hint: 'verb. imported image made to fit inside canvas.',
+    original: 'Fit',
+    value: 'Sovita'
+  },
+  'import-flatten': {
+    hint: 'Turn image that has multiple layers into an image that has only one layer.',
+    original: 'Flatten image',
+    value: 'Yhdistä tasot'
+  },
+  'import-unsupported-file': {
+    hint: 'e.g. user tried to open a WAV',
+    original: 'Unsupported file type. See Help for supported types.',
+    value: 'Tuntematon tiedostomuoto. Toimivat tiedostomuodot löytyvät ohjeista.'
+  },
+  'import-broken-file': {
+    hint: 'if an image file is broken',
+    original: "Couldn't load image. File might be corrupted.",
+    value: 'Kuvan avaus epäonnistui. Tiedosto voi olla viallinen.'
+  },
+  'import-psd-unsupported': {
+    hint: 'PSD is photoshop file format. flatten as in „flatten image“ in photoshop. Merged all layers',
+    original: 'Unsupported features. PSD had to be flattened.',
+    value: 'Tiedostossa on ei-tuettuja ominaisuuksia. PSD-tiedoston tasot täytyi yhdistää.'
+  },
+  'import-psd-limited-support': {
+    hint: 'PSD has lots of fancy features that Kleki doesn\'t have, so when importing a PSD it often has to simplify things. So it might look different compared to when opening in Photoshop. We’re informing the user if they "flatten" the image it will be accurate despite losing layers. The user has to weigh, do they care about having layers, or do they care about it looking right.',
+    original: 'PSD support is limited. Flattened will more likely look correct.',
+    value: 'PSD-tiedostojen tuki on rajoitettu. Yksitasoiset kuvat toimivat todennäköisesti parhaiten.'
+  },
+  'import-psd-too-large': {
+    original: 'Image exceeds maximum dimensions of {x} x {x} pixels. Unable to import.',
+    value: 'Kuvan koko ylittää maksimimitat {x} x {x} pikseliä. Kuvaa ei voitu avata.'
+  },
+  'import-psd-size': {
+    original: 'Image size',
+    value: 'Kuvan koko'
+  },
+  'clipboard-read-fail': {
+    original: 'Failed to read from clipboard.',
+    value: 'Leikepöydän lukeminen epäonnistu.'
+  },
+  'clipboard-no-image': {
+    original: 'No image found in clipboard.',
+    value: 'Leikepöydältä ei löytynyt kuvaa.'
+  },
+  'hand-reset': {
+    hint: 'resets zoom (to 100%) and rotation (to 0°)',
+    original: 'Reset',
+    value: 'Palauta'
+  },
+  'hand-fit': {
+    hint: 'makes canvas cover whole working area',
+    original: 'Fit',
+    value: 'Sovita'
+  },
+  'hand-inertia-scrolling': {
+    hint: 'Canvas will continue to move even after releasing pointer.',
+    original: 'Inertia Scrolling',
+    value: 'Hidastuva siirto'
+  },
+  'bucket-tolerance': {
+    hint: 'a common feature for paint bucket',
+    original: 'Tolerance',
+    value: 'Raja-arvo'
+  },
+  'bucket-sample': {
+    hint: 'like "taking a sample"',
+    original: 'Sample',
+    value: 'Näyte'
+  },
+  'bucket-sample-title': {
+    original: 'Which layers to sample color from',
+    value: 'Mistä tasoista värinäyte otetaan'
+  },
+  'bucket-sample-all': {
+    hint: 'all layers',
+    original: 'All',
+    value: 'Kaikki'
+  },
+  'bucket-sample-active': {
+    hint: 'currently active layer',
+    original: 'Active',
+    value: 'Aktiivinen'
+  },
+  'bucket-sample-above': {
+    hint: 'layer above active layer',
+    original: 'Above',
+    value: 'Ylempi taso'
+  },
+  'bucket-grow': {
+    hint: 'verb. Or expand.',
+    original: 'Grow',
+    value: 'Kasvata'
+  },
+  'bucket-grow-title': {
+    original: 'Grow filled area (in pixels)',
+    value: 'Kasvata täytettävä alue (pikseleinä)'
+  },
+  'bucket-contiguous': {
+    hint: 'common setting for paint bucket in image editing software',
+    original: 'Contiguous',
+    value: 'Jatkuva'
+  },
+  'bucket-contiguous-title': {
+    hint: 'tooltip explaining Contiguous',
+    original: 'Only fill connected areas',
+    value: 'Täytä vain yhdistetyt alueet'
+  },
+  'gradient-linear': {
+    original: 'Linear',
+    value: 'Lineaarinen'
+  },
+  'gradient-linear-mirror': {
+    original: 'Linear-Mirror',
+    value: 'Käänteisesti lineaarinen'
+  },
+  'gradient-radial': {
+    original: 'Radial',
+    value: 'Säteittäinen'
+  },
+  'shape-stroke': {
+    original: 'Stroke',
+    value: 'Viiva'
+  },
+  'shape-fill': {
+    original: 'Fill',
+    value: 'Täyttö'
+  },
+  'shape-rect': {
+    hint: 'rectangle shape',
+    original: 'Rectangle',
+    value: 'Suorakulmio'
+  },
+  'shape-ellipse': {
+    hint: 'ellipse shape',
+    original: 'Ellipse',
+    value: 'Ellipsi'
+  },
+  'shape-line': {
+    original: 'Line',
+    value: 'Suora'
+  },
+  'shape-line-width': {
+    original: 'Line Width',
+    value: 'Suoran leveys'
+  },
+  'shape-outwards': {
+    hint: 'grows shape from the center outwards',
+    original: 'Outwards',
+    value: 'Ulospäin'
+  },
+  'shape-fixed': {
+    hint: 'fixed ratio of 1:1',
+    original: 'Fixed 1:1',
+    value: 'Lukittu 1:1'
+  },
+  'shape-auto-pan': {
+    original: 'Auto-pan',
+    value: 'Autom. siirto'
+  },
+  'shape-auto-pan-title': {
+    original: 'Automatically moves as you draw',
+    value: 'Piirtoalue siirtyy automaattisesti seuraten piirtämistä'
+  },
+  'text-instruction': {
+    original: 'Click canvas to place text',
+    value: 'Klikkaa kuvaa sijoittaaksesi tekstin'
+  },
+  'text-title': {
+    original: 'Add Text',
+    value: 'Lisää teksti'
+  },
+  'text-text': {
+    original: 'Text',
+    value: 'Teksti'
+  },
+  'text-font': {
+    original: 'Font',
+    value: 'Kirjastin'
+  },
+  'text-placeholder': {
+    hint: 'placeholder in text input.',
+    original: 'Your text',
+    value: 'Tekstisi'
+  },
+  'text-color': {
+    original: 'Color',
+    value: 'Väri'
+  },
+  'text-size': {
+    original: 'Size',
+    value: 'Koko'
+  },
+  'text-line-height': {
+    original: 'Line Height',
+    value: 'Rivin korkeus'
+  },
+  'text-letter-spacing': {
+    original: 'Letter Spacing',
+    value: 'Kirjainten välistys'
+  },
+  'text-left': {
+    hint: 'left, center, right text formatting like in Word',
+    original: 'Left',
+    value: 'Vasen'
+  },
+  'text-center': {
+    original: 'Center',
+    value: 'Keskitetty'
+  },
+  'text-right': {
+    original: 'Right',
+    value: 'Oikea'
+  },
+  'text-italic': {
+    original: 'Italic',
+    value: 'Kursiivi'
+  },
+  'text-bold': {
+    original: 'Bold',
+    value: 'Lihavoitu'
+  },
+  'select-select': {
+    original: 'Select',
+    value: 'Valitse'
+  },
+  'select-transform': {
+    original: 'Transform',
+    value: 'Muunna'
+  },
+  'select-lasso': {
+    original: 'Lasso',
+    value: 'Lasso'
+  },
+  'select-polygon': {
+    original: 'Polygon',
+    value: 'Monikulmio'
+  },
+  'select-boolean-replace': {
+    original: 'Replace',
+    value: 'Korvaa'
+  },
+  'select-boolean-add': {
+    original: 'Add',
+    value: 'Lisää'
+  },
+  'select-boolean-subtract': {
+    original: 'Subtract',
+    value: 'Poista'
+  },
+  'select-all': {
+    original: 'All',
+    value: 'Kaikki'
+  },
+  'select-invert': {
+    original: 'Invert',
+    value: 'Käänteinen'
+  },
+  'select-reset': {
+    original: 'Reset',
+    value: 'Palauta'
+  },
+  'select-fill': {
+    original: 'Fill',
+    value: 'Täytä'
+  },
+  'select-erase': {
+    original: 'Erase',
+    value: 'Poista'
+  },
+  'select-transform-clone': {
+    original: 'Clone',
+    value: 'Monista'
+  },
+  'select-transform-clone-applied': {
+    original: 'Cloned',
+    value: 'Monistettu'
+  },
+  'select-transform-move-to-layer': {
+    original: 'Move to layer:',
+    value: 'Siirrä tasolle:'
+  },
+  'select-transform-applied': {
+    original: 'Transformation applied',
+    value: 'Muutokset tehty'
+  },
+  'select-transform-empty': {
+    original: 'Selected area on active layer is empty.',
+    value: 'Aktiivisen tason valittu alue on tyhjä.'
+  },
+  'save-reminder-title': {
+    hint: 'Save Reminder is a popup that shows up after 20 minutes of not saving. Allows user to save on the spot.',
+    original: 'Unsaved Work',
+    value: 'Tallentamattomia muutoksia'
+  },
+  'save-reminder-text': {
+    hint: 'turns into: "...saved in <strong>12 minutes</strong>. Save..."',
+    original: 'Image was not saved in {a} minutes{b}. Save now to prevent eventual loss.',
+    value: 'Kuvaa ei ole tallennettu viimeiseen {a} minuuttiin. Tallenna nyt estääksesi muutosten katoamisen.'
+  },
+  'save-reminder-save-psd': {
+    original: 'Save As PSD',
+    value: 'Tallenna PSD-muodossa'
+  },
+  'save-reminder-psd-layers': {
+    original: 'PSD will remember all layers.',
+    value: 'PSD tallentaa kaikki tasot.'
+  },
+  'backup-drawing': {
+    hint: '(Embed) If the upload failed, the user can backup/download their drawing.',
+    original: 'You can backup your drawing.',
+    value: 'Voit varmuuskopioida kuvan.'
+  },
+  submit: {
+    original: 'Submit',
+    value: 'Lähetä'
+  },
+  'submit-title': {
+    hint: 'tooltip when hovering "Submit" button',
+    original: 'Submit Drawing',
+    value: 'Lähetä kuva'
+  },
+  'submit-prompt': {
+    hint: 'Dialog asking for confirmation',
+    original: 'Submit drawing?',
+    value: 'Lähetetäänkö kuva?'
+  },
+  'submit-submitting': {
+    hint: 'in the process of uploading',
+    original: 'Submitting',
+    value: 'Lähetetään'
+  },
+  'embed-init-loading': {
+    hint: 'when opening the app',
+    original: 'Loading app',
+    value: 'Sovellusta ladataan'
+  },
+  'embed-init-waiting': {
+    hint: 'The app is loaded, but it’s still waiting for image',
+    original: 'Waiting for image',
+    value: 'Odotetaan kuvaa'
+  },
+  unsaved: {
+    original: 'Unsaved',
+    value: 'Tallentamaton'
+  },
+  help: {
+    hint: 'or user manual',
+    original: 'Help',
+    value: 'Ohje'
+  },
+  'tab-settings': {
+    original: 'Settings',
+    value: 'Asetukset'
+  },
+  'settings-language': {
+    original: 'Language',
+    value: 'Kieli'
+  },
+  'settings-language-reload': {
+    hint: 'changes will be visible after reloading the page',
+    original: 'Will update after reloading.',
+    value: 'Muutokset tulevat voimaan, kun päivität sivun.'
+  },
+  'settings-theme': {
+    original: 'Theme',
+    value: 'Teema'
+  },
+  'settings-save-reminder-label': {
+    original: 'Save Reminder',
+    value: 'Muistutus tallennuksesta'
+  },
+  'settings-save-reminder-disabled': {
+    original: 'disabled',
+    value: 'ei muistutusta'
+  },
+  'settings-save-reminder-confirm-title': {
+    original: 'Turn off Save Reminder?',
+    value: 'Kytketäänkö tallennusmuistutus pois päältä?'
+  },
+  'settings-save-reminder-confirm-a': {
+    original: "There is no autosave and browser tabs don't last forever. If you don't periodically save you will likely lose work.",
+    value: 'Automaattitallennus on pois päältä ja kuva ei välttämättä säily selaimen välilehdessä. Tallenna kuvasi säännöllisesti!'
+  },
+  'settings-save-reminder-confirm-b': {
+    original: 'Disable at your own risk?',
+    value: 'Otatko riskin ja kytket pois päältä?'
+  },
+  'settings-save-reminder-confirm-disable': {
+    original: 'Disable',
+    value: 'Ei muistutusta'
+  },
+  'theme-dark': {
+    original: 'Dark',
+    value: 'Tumma'
+  },
+  'theme-light': {
+    original: 'Light',
+    value: 'Vaalea'
+  },
+  'terms-of-service': {
+    original: 'Terms of Service',
+    value: 'Käyttöehdot'
+  },
+  licenses: {
+    hint: 'as in software licenses',
+    original: 'Licenses',
+    value: 'Lisenssit'
+  },
+  'source-code': {
+    original: 'Source Code',
+    value: 'Lähdekoodi'
+  },
+  auto: {
+    hint: 'automatically decided',
+    original: 'auto',
+    value: 'automaattinen'
+  },
+  'zoom-in': {
+    original: 'Zoom In',
+    value: 'Suurenna'
+  },
+  'zoom-out': {
+    original: 'Zoom Out',
+    value: 'Pienennä'
+  },
+  radius: {
+    original: 'Radius',
+    value: 'Säde'
+  },
+  'constrain-proportions': {
+    original: 'Constrain Proportions',
+    value: 'Säilytä kuvasuhde'
+  },
+  width: {
+    original: 'Width',
+    value: 'Leveys'
+  },
+  height: {
+    original: 'Height',
+    value: 'Korkeus'
+  },
+  opacity: {
+    hint: 'for layer opacity, brush opacity, text opacity, ...',
+    original: 'Opacity',
+    value: 'Peitto'
+  },
+  scatter: {
+    hint: 'for brush scatter',
+    original: 'Scatter',
+    value: 'Hajonta'
+  },
+  red: {
+    original: 'Red',
+    value: 'Punainen'
+  },
+  green: {
+    original: 'Green',
+    value: 'Vihreä'
+  },
+  blue: {
+    original: 'Blue',
+    value: 'Sininen'
+  },
+  eraser: {
+    hint: 'noun. As short as possible',
+    original: 'Eraser',
+    value: 'Kumi'
+  },
+  center: {
+    hint: 'verb',
+    original: 'Center',
+    value: 'Keskitä'
+  },
+  layers: {
+    hint: 'layers in the context of image editing software',
+    original: 'Layers',
+    value: 'Tasot'
+  },
+  background: {
+    hint: 'as in background layer',
+    original: 'Background',
+    value: 'Tausta'
+  },
+  'scaling-algorithm': {
+    hint: 'Label for dropdown where user chooses which computer graphics algorithm should be used to scale the image',
+    original: 'Scaling Algorithm',
+    value: 'Skaalausalgoritmi'
+  },
+  'algorithm-smooth': {
+    original: 'Smooth',
+    value: 'Sulava'
+  },
+  'algorithm-pixelated': {
+    original: 'Pixelated',
+    value: 'Pikselöity'
+  },
+  preview: {
+    hint: 'subject. When applying a filter user sees a preview of what the result would look like.',
+    original: 'Preview',
+    value: 'Esikatselu'
+  },
+  'angle-snap': {
+    hint: 'Snapping. Like when transforming an image and it snaps to the side of the frame.',
+    original: 'Snap',
+    value: 'Tartu'
+  },
+  'angle-snap-title': {
+    original: '45° Angle Snapping',
+    value: 'Tartu 45° kulmassa'
+  },
+  'lock-alpha': {
+    hint: 'Short. Freezes the alpha channel of image. Images consist of 4 channels (red, green, blue, alpha). Alpha lock also found in Procreate and photoshop',
+    original: 'Lock Alpha',
+    value: 'Lukitse alfa'
+  },
+  'lock-alpha-title': {
+    hint: "same as 'lock-alpha' but longer version. Shows up as a tooltip when hovering",
+    original: "Locks layer's alpha channel",
+    value: 'Lukitsee tason alfa-kanavan'
+  },
+  reverse: {
+    hint: 'Reversing the direction of a color gradient',
+    original: 'Reverse',
+    value: 'Käänteinen'
+  },
+  'compare-before': {
+    original: 'Before',
+    value: 'Ennen'
+  },
+  'compare-after': {
+    original: 'After',
+    value: 'Jälkeen'
+  },
+  loading: {
+    original: 'Loading',
+    value: 'Ladataan'
+  },
+  more: {
+    original: 'More',
+    value: 'Lisää'
+  },
+  'x-minutes': {
+    original: '{x}min',
+    value: '{x} min'
+  },
+  wip: {
+    original: 'Work in progress',
+    value: 'Työ käynnissä'
+  },
+  'browser-zoom-help': {
+    original: 'Double-tap or pinch-out to reset browser zoom.',
+    value: 'Palauta selaimen zoomaus kaksoisnapauttamalla tai nipistämällä sormia erilleen.'
+  },
+  dismiss: {
+    original: 'Dismiss',
+    value: 'Poistu'
+  }
+}
