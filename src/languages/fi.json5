@@ -64,7 +64,7 @@
   'tool-hand': {
     hint: 'Tool for navigating (or scrolling around) the canvas. Same name in Photoshop.',
     original: 'Hand Tool',
-    value: 'Siirto'
+    value: 'Käsi'
   },
   'tool-select': {
     original: 'Select Tool',
