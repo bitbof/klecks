@@ -219,7 +219,7 @@
   'mci-copy': {
     hint: 'verb',
     original: 'Copy',
-    value: 'salin'
+    value: 'Salin'
   },
   'modal-ok': {
     hint: 'main confirmation button in dialogs. Can be to confirm an action, not just acknowledge information.',
@@ -387,7 +387,7 @@
   'layers-rename-colors': {
     hint: 'noun. Name suggestion for a layer',
     original: 'Colors',
-    value: 'Warna-Warna'
+    value: 'Warna-warna'
   },
   'layers-rename-shading': {
     hint: 'noun. Name suggestion for a layer',
@@ -402,7 +402,7 @@
   'layers-rename-effects': {
     hint: 'noun. Name suggestion for a layer',
     original: 'Effects',
-    value: 'Efek-Efek'
+    value: 'Efek-efek'
   },
   'layers-rename-foreground': {
     hint: 'noun. Name suggestion for a layer',
@@ -495,13 +495,26 @@
     original: 'Store',
     value: 'Menyimpan'
   },
+  'file-storage-open': {
+    hint: 'verb. to open, or to load',
+    original: 'Open',
+    value: 'Buka'
+  },
+  'file-storage-open-confirmation': {
+    original: 'This image is already open in another tab. Open it here too?',
+    value: 'Gambar ini sudah terbuka di tab lain. Buka di sini juga?'
+  },
+  'file-storage-open-failed': {
+    original: 'Failed to load.',
+    value: 'Gagal memuat.'
+  },
   'file-storage-clear': {
     original: 'Clear',
     value: 'Bersih'
   },
   'file-storage-clear-prompt': {
-    original: 'Clear Browser Storage?',
-    value: 'Hapus Penyimpanan Peramban?'
+    original: 'Clear Browser Storage? Clearing can not be undone.',
+    value: 'Menghapus Penyimpanan Browser? Kliring tidak dapat dibatalkan.'
   },
   'file-storage-storing': {
     hint: 'while it is in the process of storing',
@@ -512,6 +525,10 @@
     hint: 'overwrite what is already stored',
     original: 'Overwrite',
     value: 'Timpa'
+  },
+  'file-storage-overwrite-confirm': {
+    original: 'Overwrite Browser Storage? Overwritten data will be permanently deleted.',
+    value: 'Menimpa Penyimpanan Browser? Data yang ditimpa akan dihapus secara permanen.'
   },
   'file-storage-min-ago': {
     hint: "{x} <- needs to stay, it's a placeholder.",
@@ -567,6 +584,43 @@
     hint: 'verb',
     original: 'Upload',
     value: 'Unggah'
+  },
+  'tab-recovery-recover-tabs': {
+    hint: 'allows user to recover browser tabs (including the drawing) of this app.',
+    original: 'Recover closed tabs',
+    value: 'Memulihkan tab yang tertutup'
+  },
+  'tab-recovery-explanation': {
+     original: 'Recovery data is only kept for a little while. Save to ensure your work is not lost.',
+     value: 'Data pemulihan hanya disimpan untuk sementara waktu. Simpan untuk memastikan pekerjaan Anda tidak hilang.'
+  },
+  'tab-recovery-total-quota-label': {
+     original: 'Total:',
+     value: 'Total:'
+  },
+  'tab-recovery-empty': {
+     original: 'Nothing to recover.',
+     value: 'Tidak ada yang bisa dipulihkan.'
+  },
+  'tab-recovery-recover': {
+     original: 'Recovery',
+     value: 'Pulihkan'
+  },
+  'tab-recovery-delete': {
+     original: 'Delete',
+     value: 'Hapus'
+  },
+  'tab-recovery-delete-confirmation': {
+     original: 'Delete this recovery? Deletion can not be undone.',
+     value: 'Menghapus pemulihan ini? Penghapusan tidak dapat dibatalkan.'
+  },
+  'tab-recovery-failed-to-recover': {
+     original: 'Failed to recover tab.',
+     value: 'Gagal memulihkan tab.'
+  },
+  'tab-recovery-recovered': {
+     original: 'Tab recovered.',
+     value: 'Tab dipulihkan.'
   },
   'cleared-layer': {
     hint: 'the layer has been cleared. It is now empty',
