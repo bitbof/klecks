@@ -21,7 +21,7 @@ export async function shareDialog (
 ):  Promise<void> {
     const mainDiv = BB.el();
     const canvas = BB.canvas(800, 800)
-    QRCode.toCanvas(canvas, p.backendUrl + "/sharing/" + p.imageId, { width: 200})
+    QRCode.toCanvas(canvas, p.backendUrl + "/sharing/" + p.session + "/" + p.imageId, { width: 200})
 
     const formData = new FormData();
     formData.append('image', p.image);
