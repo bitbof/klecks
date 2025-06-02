@@ -16,7 +16,8 @@ export async function shareDialog (
         image: string,
         imageId: string,
         getKlCanvas: () => KlCanvas,
-        session: string
+        session: string,
+        printingEnabled: boolean
     }
 ):  Promise<void> {
     const mainDiv = BB.el();
@@ -36,7 +37,6 @@ export async function shareDialog (
     canvas.style.position = 'absolute';
     canvas.style.bottom = '67px';
     canvas.style.left = '20px';
-
     
     var image = new Image()
     image.src = "data:image/png;base64," + p.image;
@@ -48,11 +48,15 @@ export async function shareDialog (
     image.style.display = 'block';
     mainDiv.append(image)
     mainDiv.append(canvas)
+    let buttons = ['Ok']
+    if(p.printingEnabled){
+        buttons = buttons.concat('Print')
+    }
     showModal({
         target: document.body,
         message: `<b>${LANG('share-title')}</b>`,
         div: mainDiv,
-        buttons: ['Ok',],
+        buttons: buttons,
         style: {
             width: 'calc(100% - 50px)',
             maxWidth: '800px',
@@ -60,9 +64,13 @@ export async function shareDialog (
             boxSizing: 'border-box',
         },
         callback: function (result) {
-            if (
-                result === 'Cancel'
-            ) {
+            if (result === 'Cancel') {
+                return;
+            }
+            else if(result === 'Print'){
+                    fetch(p.backendUrl + "/Printing/Print?session=" + p.session, {
+                        method: 'POST',
+                    })
                 return;
             }
         },

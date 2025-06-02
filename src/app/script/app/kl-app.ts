@@ -134,6 +134,7 @@ export class KlApp {
     private readonly bottomBarWrapper: HTMLElement;
     private selectedStyle: Style;
     private styleOptions: Style[];
+    private sessionSettings: SessionSettings;
 
     private updateCollapse(): void {
         //collapser
@@ -285,11 +286,16 @@ export class KlApp {
         this.session = p.session;
         this.backendUrl = process.env.BACKEND_URL ?? "";
         this.styleOptions = [];
+        this.sessionSettings = {} as SessionSettings;
         this.selectedStyle = {name: 'van gogh', negativePrompt:'(van gogh style:1.1) (Post-Impressionism:1.3) (Expressive:1.1), (bold brushstrokes:1.2), (vibrant colors:1.2), painting style, intense emotions, distorted forms, dynamic compositions, raw authenticity, vg, painting, <lora:vincent_van_gogh_xl.safetensors:0.5>',
              positivePrompt: 'photo, photorealistic, painting of Van Gogh, logo, cartoon, naked, tits, nude, porn'};
         fetch(`${this.backendUrl}/GenerateStyles/List/${p.session}?workflowType=PictureThis`).then(async response => {
-            this.styleOptions = await response.json() as [{name : string, positivePrompt : string, negativePrompt : string}]
+            this.styleOptions = await response.json() as Style[]
             this.selectedStyle = this.styleOptions[0];
+        })
+
+        fetch(`${this.backendUrl}/SessionSettings/GetBySession/${p.session}`).then(async response => {
+            this.sessionSettings = await response.json() as SessionSettings
         })
 
         if (!p.saveReminder) {
@@ -1525,7 +1531,7 @@ export class KlApp {
         };
 
         const shareImage = (callback?: () => void) => {
-            KL.shareDialog({image: this.uploadImage.getLatestGeneration(), imageId: this.uploadImage.getimageId(), backendUrl: this.backendUrl, getKlCanvas: () => this.klCanvas, session: this.session}, );
+            KL.shareDialog({image: this.uploadImage.getLatestGeneration(), imageId: this.uploadImage.getimageId(), backendUrl: this.backendUrl, getKlCanvas: () => this.klCanvas, session: this.session, printingEnabled: this.sessionSettings.printingEnabled});
         };
 
         this.saveToComputer = new KL.SaveToComputer(
@@ -2046,4 +2052,7 @@ export class KlApp {
     isDrawing(): boolean {
         return this.lineSanitizer.getIsDrawing() || this.easel.getIsLocked();
     }
+}
+export interface SessionSettings {
+    printingEnabled: boolean;
 }
