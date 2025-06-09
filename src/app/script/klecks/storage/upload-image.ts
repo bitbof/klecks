@@ -83,6 +83,7 @@ export class UploadImage {
 
         var response = await fetch(this.backendUrl + '/generate/' + this.session, {
             method: 'POST',
+            credentials: 'include',
             body: formData,
         });
 

@@ -29,9 +29,10 @@ export async function shareDialog (
     const inputImage = getImage(p.getKlCanvas().getCompleteCanvas(1));
     formData.append('input-image', inputImage)
     formData.append('session', p.session)
-    fetch(p.backendUrl + "/share/" + p.imageId, {
+    fetch(`${p.backendUrl}/share/${p.imageId}?session=${p.session}`, {
         method: 'POST',
         body: formData,
+        credentials: 'include'
     })
 
     canvas.style.position = 'absolute';
@@ -70,6 +71,7 @@ export async function shareDialog (
             else if(result === 'Print'){
                     fetch(p.backendUrl + "/Printing/Print?session=" + p.session, {
                         method: 'POST',
+                        credentials: 'include'
                     })
                 return;
             }
