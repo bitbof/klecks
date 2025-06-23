@@ -1118,12 +1118,26 @@ iframe {
 /* Styles for the Style Selection Image Grid in Settings */
 .style-selection-grid-wrapper {
     margin-bottom: 15px; /* Add some space below the grid */
+    /* Counteract potential 10px margin/padding from parent (e.g. settings UI root) */
+    margin-left: -10px;
+    margin-right: -10px;
+    /* The image-radio-wrapper child will now use this expanded width */
 }
 
 .style-selection-grid-wrapper .image-radio-wrapper {
     flex-wrap: wrap; /* Allow items to wrap to the next line */
     justify-content: flex-start; /* Align items to the start */
     gap: 10px; /* Increase gap for larger items */
+
+    /* Scrolling for style options */
+    overflow-y: auto;
+    max-height: 250px; /* Shows approx 2 full rows of 80px items before scrolling */
+
+    /* Padding to align content with elements that respect original 10px sidebar margin/padding,
+       plus space for scrollbar. Assumes parent style-selection-grid-wrapper has negative margins. */
+    padding-left: 10px;
+    padding-right: 15px; /* 10px for alignment, ~5px for scrollbar */
+    box-sizing: border-box;
 }
 
 .style-selection-grid-wrapper .image-toggle {
@@ -1136,7 +1150,7 @@ iframe {
 .style-selection-grid-wrapper .image-toggle__im {
     width: 100%;
     height: 100%;
-    object-fit: cover; /* Cover the area, crop if necessary */
+    background-size: 100% 100%; /* Fill the area, potentially stretching */
     border-radius: 2px; /* Slightly rounded corners for the image itself */
 }
 
