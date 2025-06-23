@@ -68,6 +68,7 @@ import { PinchZoomWatcher } from '../klecks/ui/components/pinch-zoom-watcher';
 import { EASEL_MAX_SCALE, EASEL_MIN_SCALE } from '../klecks/ui/easel/easel.config';
 import { UploadImage } from '../klecks/storage/upload-image';
 import { Style } from '../klecks/kl-types';
+import { StyleSelectionUi } from '../klecks/ui/components/style-selection-ui';
 
 importFilters();
 
@@ -135,6 +136,7 @@ export class KlApp {
     private selectedStyle: Style;
     private styleOptions: Style[];
     private sessionSettings: SessionSettings;
+    private styleSelectionUi: StyleSelectionUi | undefined;
 
     private updateCollapse(): void {
         //collapser
@@ -287,9 +289,24 @@ export class KlApp {
         this.backendUrl = process.env.BACKEND_URL ?? "";
         this.styleOptions = [];
         this.sessionSettings = {} as SessionSettings;
-        this.selectedStyle = {name: 'van gogh', negativePrompt:'(van gogh style:1.1) (Post-Impressionism:1.3) (Expressive:1.1), (bold brushstrokes:1.2), (vibrant colors:1.2), painting style, intense emotions, distorted forms, dynamic compositions, raw authenticity, vg, painting, <lora:vincent_van_gogh_xl.safetensors:0.5>',
-             positivePrompt: 'photo, photorealistic, painting of Van Gogh, logo, cartoon, naked, tits, nude, porn'};
-        // Style fetching moved to after settingsUi initialization
+        this.styleOptions = []; // Initialize as empty array
+        this.selectedStyle = { // Default selected style before fetch
+            name: 'van gogh',
+            positivePrompt: 'photo, photorealistic, painting of Van Gogh, logo, cartoon, naked, tits, nude, porn',
+            negativePrompt:'(van gogh style:1.1) (Post-Impressionism:1.3) (Expressive:1.1), (bold brushstrokes:1.2), (vibrant colors:1.2), painting style, intense emotions, distorted forms, dynamic compositions, raw authenticity, vg, painting, <lora:vincent_van_gogh_xl.safetensors:0.5>',
+            image: '' // Placeholder image
+        };
+
+        this.styleSelectionUi = new StyleSelectionUi({ // Direct import
+            styleOptions: this.styleOptions,
+            selectedStyle: this.selectedStyle,
+            onStyleSelect: (style) => {
+                this.selectedStyle = style;
+                this.uploadImage.setStyle(style);
+                this.uploadImage.Send();
+            }
+        });
+        // Style fetching will be done later, and will call this.styleSelectionUi.updateStyleSelection
 
         fetch(`${this.backendUrl}/SessionSettings/GetBySession/${p.session}`, { credentials: 'include'}).then(async response => {
             this.sessionSettings = await response.json() as SessionSettings
@@ -1310,6 +1327,18 @@ export class KlApp {
                 ...Object.entries(KL.brushesUI).map(([b]) => brushUiMap[b].getElement()),
             ]);
 
+        // Append StyleSelection UI to brushDiv
+        if (this.styleSelectionUi) {
+            const styleWrapperEl = BB.el({
+                css: {
+                    padding: '10px', // Match padding of brush UI elements
+                    borderTop: '1px solid #ccc', // Separator from brush options
+                    marginTop: '10px',
+                }
+            });
+            styleWrapperEl.append(this.styleSelectionUi.getElement());
+            brushDiv.append(styleWrapperEl);
+        }
         
 
         const handUi = new KL.HandUi({
@@ -1628,38 +1657,40 @@ export class KlApp {
             },
             saveReminder: this.embed ? undefined : p.saveReminder,
             customAbout: p.aboutEl,
-            styleOptions: this.styleOptions,
-            selectedStyle: this.selectedStyle,
-            onStyleSelect: (style) => {
-                this.selectedStyle = style;
-                this.uploadImage.setStyle(style);
-                this.uploadImage.Send();
-                // Potentially update other UI elements or trigger re-renders if necessary
-            },
+            // styleOptions, selectedStyle, onStyleSelect removed
         });
 
-        // Fetch styles and update SettingsUi
+        // Fetch styles logic will be reused for the new StyleSelectionUi instance
+        // The call to settingsUi.updateStyleSelection is removed from here.
+        // This fetch will be modified later to update the new StyleSelectionUi
         fetch(`${this.backendUrl}/GenerateStyles/List/${p.session}?workflowType=PictureThis`, { credentials: 'include'}).then(async response => {
             if (!response.ok) {
                 console.error("Failed to fetch styles:", response.status, await response.text());
-                this.styleOptions = []; // Ensure it's an empty array on error
-                this.selectedStyle = { name: 'Error', positivePrompt: '', negativePrompt: '', image: '' }; // Placeholder
+                this.styleOptions = [];
+                this.selectedStyle = { name: 'Error', positivePrompt: '', negativePrompt: '', image: '' };
             } else {
                 this.styleOptions = await response.json() as Style[];
                 if (this.styleOptions && this.styleOptions.length > 0) {
                     this.selectedStyle = this.styleOptions[0];
                 } else {
                     this.styleOptions = [];
-                    this.selectedStyle = { name: 'Default', positivePrompt: '', negativePrompt: '', image: '' }; // Placeholder
+                    this.selectedStyle = { name: 'Default', positivePrompt: '', negativePrompt: '', image: '' };
                     console.warn("No styles fetched or empty style list.");
                 }
             }
-            settingsUi.updateStyleSelection(this.styleOptions, this.selectedStyle);
+            if (this.styleSelectionUi) {
+                this.styleSelectionUi.updateStyleSelection(this.styleOptions, this.selectedStyle);
+            }
+            if (this.uploadImage && this.selectedStyle) { // Ensure uploadImage is initialized
+                this.uploadImage.setStyle(this.selectedStyle); // Set initial style for upload manager
+            }
         }).catch(error => {
             console.error("Error fetching styles:", error);
             this.styleOptions = [];
-            this.selectedStyle = { name: 'Error', positivePrompt: '', negativePrompt: '', image: '' }; // Placeholder
-            settingsUi.updateStyleSelection(this.styleOptions, this.selectedStyle);
+            this.selectedStyle = { name: 'Error', positivePrompt: '', negativePrompt: '', image: '' };
+            if (this.styleSelectionUi) {
+                this.styleSelectionUi.updateStyleSelection(this.styleOptions, this.selectedStyle);
+            }
         });
 
         mainTabRow = new KL.TabRow({
@@ -1876,6 +1907,7 @@ export class KlApp {
             mainTabRow.getElement(),
             ] : [],
             brushDiv,
+            // To be added after brushDiv: this.styleSelectionUi.getElement(),
             ...!this.simpleUi ? [
             handUi.getElement(),
             fillUi.getElement(),
