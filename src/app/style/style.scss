@@ -109,6 +109,7 @@ a:not([href]):hover {
 
 .kl-toolspace-row {
     background: linear-gradient(to top, rgba(255, 255, 255, 0) 20%, rgba(255, 255, 255, 0.6) 100%);
+    flex: 0 0 auto;
     box-shadow:
         0 1px 3px rgba(0, 0, 0, 0.1),
         0 1px #cecece;
@@ -1117,39 +1118,34 @@ iframe {
 
 /* Styles for the Style Selection Image Grid in Settings */
 .style-selection-grid-wrapper {
-    margin-bottom: 15px; /* Add some space below the grid */
-    /* Counteract potential 10px margin/padding from parent (e.g. settings UI root) */
+    padding: 10px;
+    border-top: 1px solid rgb(204, 204, 204);
+    margin-top: 10px;
+    flex: 1 1 auto;
+    overflow-y: auto;
+    flex-direction: column;
+    margin-bottom: 0px;
     margin-left: -10px;
     margin-right: -10px;
-    /* The image-radio-wrapper child will now use this expanded width */
-
-    /* Make this wrapper fill its container and arrange its children (title, image-radio-wrapper) vertically */
-    height: 100%; /* Assumes parent allows this to fill space */
     display: flex;
-    flex-direction: column;
+    min-height: 300px;
 }
 
 .style-selection-grid-wrapper .image-radio-wrapper {
-    flex-wrap: wrap; /* Allow items to wrap to the next line */
-    justify-content: flex-start; /* Align items to the start */
-    gap: 10px; /* Increase gap for larger items */
-
-    /* Scrolling for style options */
-    overflow-y: auto;
-    /* max-height: 800px; */ /* Replaced by flex properties */
-    flex-grow: 1; /* Allow this element to take up available vertical space */
-    min-height: 0; /* Crucial for scrollable flex children to not overflow their container */
-
-    /* Padding to align content with elements that respect original 10px sidebar margin/padding,
-       plus space for scrollbar. Assumes parent style-selection-grid-wrapper has negative margins. */
-    padding: 10px;
     box-sizing: border-box;
+    flex-wrap: wrap;
+    flex-grow: 1;
+    justify-content: flex-start;
+    gap: 10px;
+    padding: 10px;
+    overflow-y: auto;
 }
 
 .style-selection-grid-wrapper .image-toggle {
-    width: 112px;
-    height: 112px;
-    padding: 2px; /* Small padding around the image */
+    width: 47%;
+    height: auto;
+    aspect-ratio: 1;
+    padding: 2%; /* Small padding around the image */
     border-radius: 4px; /* Consistent with other elements */
 }
 

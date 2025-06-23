@@ -162,7 +162,7 @@ export class KlApp {
                         left: '0',
                     });
                 }
-                this.toolspace.style.display = 'block';
+                this.toolspace.style.display = 'flex';
                 this.easel.setSize(Math.max(0, this.uiWidth - this.toolWidth), this.uiHeight);
                 this.statusOverlay.setWide(false);
             } else {
@@ -188,7 +188,7 @@ export class KlApp {
                     left: '271px',
                 });
             }
-            this.toolspace.style.display = 'block';
+            this.toolspace.style.display = 'flex';
             this.easel.setSize(Math.max(0, this.uiWidth - this.toolWidth), this.uiHeight);
             this.statusOverlay.setWide(false);
         }
@@ -1002,6 +1002,8 @@ export class KlApp {
                 overflow: 'hidden',
                 userSelect: 'none',
                 touchAction: 'none',
+                display: 'flex',
+                flexDirection: 'column'
             },
         });
         this.toolspaceInner = BB.el({
@@ -1332,17 +1334,8 @@ export class KlApp {
 
         // Append StyleSelection UI to brushDiv
         if (this.styleSelectionUi) {
-            const styleWrapperEl = BB.el({
-                css: {
-                    padding: '10px', // Match padding of brush UI elements
-                    borderTop: '1px solid rgb(204, 204, 204)', // Separator from brush options
-                    marginTop: '10px',
-                }
-            });
-            styleWrapperEl.append(this.styleSelectionUi.getElement());
-            brushDiv.append(styleWrapperEl);
+            this.toolspace.append(this.styleSelectionUi.getElement());
         }
-        
 
         const handUi = new KL.HandUi({
             scale: this.easel.getTransform().scale,
@@ -1910,7 +1903,6 @@ export class KlApp {
             mainTabRow.getElement(),
             ] : [],
             brushDiv,
-            settingsUi.getElement(),
             // To be added after brushDiv: this.styleSelectionUi.getElement(),
             ...!this.simpleUi ? [
             handUi.getElement(),
@@ -1930,6 +1922,8 @@ export class KlApp {
             }),
             this.bottomBarWrapper ? this.bottomBarWrapper : undefined,
         ]);
+
+        BB.append(this.toolspace, [settingsUi.getElement()]);
 
         this.toolspaceScroller = new KL.ToolspaceScroller({
             toolspace: this.toolspace,

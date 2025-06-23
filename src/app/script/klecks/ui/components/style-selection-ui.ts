@@ -19,11 +19,7 @@ export class StyleSelectionUi {
 
     constructor(params: TStyleSelectionUiParams) {
         this.rootEl = BB.el({
-            className: 'style-selection-grid-wrapper', // For styling
-            css: {
-                // Add any specific styles for the wrapper itself if needed, e.g., margin
-                // margin: '10px 0', // Example: if it needs space around it below brushDiv
-            },
+            className: 'style-selection-grid-wrapper' // For styling
         });
         this.onStyleSelectCallback = params.onStyleSelect;
         this.currentStyleOptions = params.styleOptions;
