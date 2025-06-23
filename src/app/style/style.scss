@@ -1122,6 +1122,11 @@ iframe {
     margin-left: -10px;
     margin-right: -10px;
     /* The image-radio-wrapper child will now use this expanded width */
+
+    /* Make this wrapper fill its container and arrange its children (title, image-radio-wrapper) vertically */
+    height: 100%; /* Assumes parent allows this to fill space */
+    display: flex;
+    flex-direction: column;
 }
 
 .style-selection-grid-wrapper .image-radio-wrapper {
@@ -1131,7 +1136,9 @@ iframe {
 
     /* Scrolling for style options */
     overflow-y: auto;
-    max-height: 800px;
+    /* max-height: 800px; */ /* Replaced by flex properties */
+    flex-grow: 1; /* Allow this element to take up available vertical space */
+    min-height: 0; /* Crucial for scrollable flex children to not overflow their container */
 
     /* Padding to align content with elements that respect original 10px sidebar margin/padding,
        plus space for scrollbar. Assumes parent style-selection-grid-wrapper has negative margins. */
