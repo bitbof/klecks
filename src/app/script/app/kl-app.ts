@@ -1335,7 +1335,7 @@ export class KlApp {
             const styleWrapperEl = BB.el({
                 css: {
                     padding: '10px', // Match padding of brush UI elements
-                    borderTop: '1px solid #ccc', // Separator from brush options
+                    borderTop: '1px solid rgb(204, 204, 204)', // Separator from brush options
                     marginTop: '10px',
                 }
             });

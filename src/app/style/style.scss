@@ -1131,18 +1131,17 @@ iframe {
 
     /* Scrolling for style options */
     overflow-y: auto;
-    max-height: 250px; /* Shows approx 2 full rows of 80px items before scrolling */
+    max-height: 800px;
 
     /* Padding to align content with elements that respect original 10px sidebar margin/padding,
        plus space for scrollbar. Assumes parent style-selection-grid-wrapper has negative margins. */
-    padding-left: 10px;
-    padding-right: 15px; /* 10px for alignment, ~5px for scrollbar */
+    padding: 10px;
     box-sizing: border-box;
 }
 
 .style-selection-grid-wrapper .image-toggle {
-    width: 80px; /* Increased width for style previews */
-    height: 80px; /* Increased height for style previews */
+    width: 112px;
+    height: 112px;
     padding: 2px; /* Small padding around the image */
     border-radius: 4px; /* Consistent with other elements */
 }
@@ -1150,7 +1149,8 @@ iframe {
 .style-selection-grid-wrapper .image-toggle__im {
     width: 100%;
     height: 100%;
-    background-size: 100% 100%; /* Fill the area, potentially stretching */
+    object-fit: cover; /* Cover the area, crop if necessary */
+    background-size: 100%; /* Fill the area, potentially stretching */
     border-radius: 2px; /* Slightly rounded corners for the image itself */
 }
 

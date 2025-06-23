@@ -47,12 +47,12 @@ export class StyleSelectionUi {
 
         if (styleOptions && styleOptions.length > 0 && selectedStyle) {
             const titleEl = BB.el({
-                content: LANG('select-style-title') + ':', // TODO: Consider a more appropriate title like "Styles" or "Art Styles"
+                content: `${LANG('select-style-title')}:`,
                 css: {
-                    display: 'block', // Make title take full width
+                    display: 'block',
                     fontWeight: 'bold',
                     marginBottom: '8px',
-                    // paddingLeft: '10px' // If inside a toolspace that has its own padding
+                    paddingLeft: '10px'
                 },
             });
             this.rootEl.append(titleEl);

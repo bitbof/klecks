@@ -200,27 +200,27 @@ export class Preview {
             drawBackground: true,
         });
 
-        const doubleTapper = new DoubleTapper({
-            onDoubleTap: (e) => {
-                const m = createMatrixFromTransform(this.viewport.getTransform());
-                const tl = applyToPoint(m, { x: 0, y: 0 });
-                const br = applyToPoint(m, { x: this.project.width, y: this.project.height });
-                const isInside = BB.isInsideRect(
-                    { x: e.relX, y: e.relY },
-                    {
-                        x: tl.x,
-                        y: tl.y,
-                        width: br.x - tl.x,
-                        height: br.y - tl.y,
-                    },
-                );
+        // const doubleTapper = new DoubleTapper({
+        //     onDoubleTap: (e) => {
+        //         const m = createMatrixFromTransform(this.viewport.getTransform());
+        //         const tl = applyToPoint(m, { x: 0, y: 0 });
+        //         const br = applyToPoint(m, { x: this.project.width, y: this.project.height });
+        //         const isInside = BB.isInsideRect(
+        //             { x: e.relX, y: e.relY },
+        //             {
+        //                 x: tl.x,
+        //                 y: tl.y,
+        //                 width: br.x - tl.x,
+        //                 height: br.y - tl.y,
+        //             },
+        //         );
 
-                if (!this.isReset || isInside) {
-                    this.resetOrZoom(e.relX, e.relY);
-                }
-            },
-            isInstant: true,
-        });
+        //         if (!this.isReset || isInside) {
+        //             this.resetOrZoom(e.relX, e.relY);
+        //         }
+        //     },
+        //     isInstant: true,
+        // });
         // let oldTransform: TViewportTransform | undefined = undefined;
         // const pinchZoomer = new PinchZoomer({
         //     onPinch: (e) => {

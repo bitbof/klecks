@@ -398,7 +398,7 @@ renaming keys across language files:
 
   "new-title": "New Image",
   "share-title": "Share",
-  "select-style-title": "Select Style",
+  "select-style-title": "Style",
   "new-current": {
     "hint": "as in \"reuse the current image resolution\"",
     "value": "Current"

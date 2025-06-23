@@ -55,8 +55,8 @@ export class EaselPointerPreprocessor {
         this.pointerEventChain = new EventChain({
             chainArr: [
                 ...nFingerSubChain,
-                this.mainDoubleTapper as IChainElement,
-                this.middleDoubleTapper as IChainElement,
+                // this.mainDoubleTapper as IChainElement,
+                // this.middleDoubleTapper as IChainElement,
                 // this.pinchZoomer as IChainElement,
                 new BB.OnePointerLimiter() as IChainElement,
             ],
