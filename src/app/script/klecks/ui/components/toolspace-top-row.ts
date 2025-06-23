@@ -122,14 +122,6 @@ export class ToolspaceTopRow {
             darkInvert: true,
         });
 
-        const helpButton = createButton({
-            onClick: p.onHelp,
-            title: LANG('help'),
-            image: helpImg,
-            contain: true,
-            darkInvert: true,
-        });
-
         if(!p.simpleUi){
             BB.append(this.rootEl, [
                 importButton.el,
@@ -141,7 +133,6 @@ export class ToolspaceTopRow {
             logoButton.el,
             newButton.el,
             shareButton ? shareButton.el : undefined,
-            helpButton.el,
         ]);
     }
 

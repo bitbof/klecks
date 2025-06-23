@@ -309,6 +309,6 @@ export interface Style {
     name: string;
     positivePrompt: string;
     negativePrompt: string;
-    image: string; // URL or path to the style image
+    imageUrl: string;
     darkInvert?: boolean; // Optional: whether the image should be inverted in dark mode
 }

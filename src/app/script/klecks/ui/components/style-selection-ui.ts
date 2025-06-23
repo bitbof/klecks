@@ -7,6 +7,7 @@ export type TStyleSelectionUiParams = {
     styleOptions: Style[];
     selectedStyle: Style;
     onStyleSelect: (style: Style) => void;
+    backendUrl: string;
 };
 
 export class StyleSelectionUi {
@@ -14,6 +15,7 @@ export class StyleSelectionUi {
     private imageRadioList: ImageRadioList<string> | undefined;
     private onStyleSelectCallback: (style: Style) => void;
     private currentStyleOptions: Style[] = [];
+    private backendUrl: string;
 
     constructor(params: TStyleSelectionUiParams) {
         this.rootEl = BB.el({
@@ -25,6 +27,7 @@ export class StyleSelectionUi {
         });
         this.onStyleSelectCallback = params.onStyleSelect;
         this.currentStyleOptions = params.styleOptions;
+        this.backendUrl = params.backendUrl;
 
         this.updateStyleSelection(params.styleOptions, params.selectedStyle);
     }
@@ -37,7 +40,6 @@ export class StyleSelectionUi {
         this.currentStyleOptions = styleOptions;
 
         // Clear previous content
-        BB.clearNode(this.rootEl);
         if (this.imageRadioList) {
             this.imageRadioList.destroy();
             this.imageRadioList = undefined;
@@ -59,7 +61,7 @@ export class StyleSelectionUi {
                 optionArr: styleOptions.map(style => ({
                     id: style.name,
                     title: style.name, // Tooltip for the image
-                    image: style.image,
+                    image: this.backendUrl + style.imageUrl,
                     darkInvert: !!style.darkInvert,
                 })),
                 initId: selectedStyle.name,
@@ -72,14 +74,7 @@ export class StyleSelectionUi {
             });
             this.rootEl.append(this.imageRadioList.getElement());
 
-            // Optional: Add a separator if it visually fits below the style grid and before next elements
-            // const hr = BB.el({ className: 'grid-hr', css: { margin: '15px 0' } });
-            // this.rootEl.append(hr);
-
         } else {
-            // Optionally, display a message if no styles are available or failed to load
-            // For now, it will just be empty if no styles.
-            // BB.el({ parent: this.rootEl, content: 'No styles available.' });
         }
     }
 
@@ -87,6 +82,5 @@ export class StyleSelectionUi {
         if (this.imageRadioList) {
             this.imageRadioList.destroy();
         }
-        BB.clearNode(this.rootEl);
     }
 }

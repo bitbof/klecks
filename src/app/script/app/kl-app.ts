@@ -294,10 +294,11 @@ export class KlApp {
             name: 'van gogh',
             positivePrompt: 'photo, photorealistic, painting of Van Gogh, logo, cartoon, naked, tits, nude, porn',
             negativePrompt:'(van gogh style:1.1) (Post-Impressionism:1.3) (Expressive:1.1), (bold brushstrokes:1.2), (vibrant colors:1.2), painting style, intense emotions, distorted forms, dynamic compositions, raw authenticity, vg, painting, <lora:vincent_van_gogh_xl.safetensors:0.5>',
-            image: '' // Placeholder image
+            imageUrl: '' // Placeholder image
         };
 
-        this.styleSelectionUi = new StyleSelectionUi({ // Direct import
+        this.styleSelectionUi = new StyleSelectionUi({
+            backendUrl: this.backendUrl,
             styleOptions: this.styleOptions,
             selectedStyle: this.selectedStyle,
             onStyleSelect: (style) => {
@@ -1193,9 +1194,11 @@ export class KlApp {
                 // this.easel.scale(newScale / oldScale);
             },
             onUndo: () => {
+                this.uploadImage.Send();
                 undo();
             },
             onRedo: () => {
+                this.uploadImage.Send();
                 redo();
             },
         });
@@ -1667,14 +1670,14 @@ export class KlApp {
             if (!response.ok) {
                 console.error("Failed to fetch styles:", response.status, await response.text());
                 this.styleOptions = [];
-                this.selectedStyle = { name: 'Error', positivePrompt: '', negativePrompt: '', image: '' };
+                this.selectedStyle = { name: 'Error', positivePrompt: '', negativePrompt: '', imageUrl: '' };
             } else {
                 this.styleOptions = await response.json() as Style[];
                 if (this.styleOptions && this.styleOptions.length > 0) {
                     this.selectedStyle = this.styleOptions[0];
                 } else {
                     this.styleOptions = [];
-                    this.selectedStyle = { name: 'Default', positivePrompt: '', negativePrompt: '', image: '' };
+                    this.selectedStyle = { name: 'Default', positivePrompt: '', negativePrompt: '', imageUrl: '' };
                     console.warn("No styles fetched or empty style list.");
                 }
             }
@@ -1687,7 +1690,7 @@ export class KlApp {
         }).catch(error => {
             console.error("Error fetching styles:", error);
             this.styleOptions = [];
-            this.selectedStyle = { name: 'Error', positivePrompt: '', negativePrompt: '', image: '' };
+            this.selectedStyle = { name: 'Error', positivePrompt: '', negativePrompt: '', imageUrl: '' };
             if (this.styleSelectionUi) {
                 this.styleSelectionUi.updateStyleSelection(this.styleOptions, this.selectedStyle);
             }
@@ -1907,6 +1910,7 @@ export class KlApp {
             mainTabRow.getElement(),
             ] : [],
             brushDiv,
+            settingsUi.getElement(),
             // To be added after brushDiv: this.styleSelectionUi.getElement(),
             ...!this.simpleUi ? [
             handUi.getElement(),
@@ -1918,7 +1922,6 @@ export class KlApp {
             this.layersUi.getElement(),
             filterUi.getElement(),
             fileUi ? fileUi.getElement() : undefined,
-            settingsUi.getElement(),
             ] : [],
             BB.el({
                 css: {
