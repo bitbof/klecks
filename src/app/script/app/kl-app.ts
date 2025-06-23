@@ -67,7 +67,7 @@ import { KlHistoryExecutor } from '../klecks/history/kl-history-executor';
 import { PinchZoomWatcher } from '../klecks/ui/components/pinch-zoom-watcher';
 import { EASEL_MAX_SCALE, EASEL_MIN_SCALE } from '../klecks/ui/easel/easel.config';
 import { UploadImage } from '../klecks/storage/upload-image';
-import { Style } from '../klecks/ui/modals/select-style-dialog';
+import { Style } from '../klecks/kl-types';
 
 importFilters();
 
@@ -289,10 +289,7 @@ export class KlApp {
         this.sessionSettings = {} as SessionSettings;
         this.selectedStyle = {name: 'van gogh', negativePrompt:'(van gogh style:1.1) (Post-Impressionism:1.3) (Expressive:1.1), (bold brushstrokes:1.2), (vibrant colors:1.2), painting style, intense emotions, distorted forms, dynamic compositions, raw authenticity, vg, painting, <lora:vincent_van_gogh_xl.safetensors:0.5>',
              positivePrompt: 'photo, photorealistic, painting of Van Gogh, logo, cartoon, naked, tits, nude, porn'};
-        fetch(`${this.backendUrl}/GenerateStyles/List/${p.session}?workflowType=PictureThis`, { credentials: 'include'}).then(async response => {
-            this.styleOptions = await response.json() as Style[]
-            this.selectedStyle = this.styleOptions[0];
-        })
+        // Style fetching moved to after settingsUi initialization
 
         fetch(`${this.backendUrl}/SessionSettings/GetBySession/${p.session}`, { credentials: 'include'}).then(async response => {
             this.sessionSettings = await response.json() as SessionSettings
@@ -1119,7 +1116,13 @@ export class KlApp {
                     await shareImage();
                 },
                 onHelp: () => {
-                    showStyleSelectDialog();
+                    // Previously showStyleSelectDialog();
+                    // Now, style selection is in settings.
+                    // Consider if this help button should open settings or a different help modal.
+                    // For now, let's make it open the settings tab.
+                    if (mainTabRow) {
+                        mainTabRow.open('settings');
+                    }
                 },
             });
         }
@@ -1526,9 +1529,9 @@ export class KlApp {
             });
         };
 
-        const showStyleSelectDialog = () => {            
-            KL.selectStyleDialog({selectedStyle: this.selectedStyle, styleOptions: this.styleOptions, onStyleSelect: (style) => {this.selectedStyle = style; this.uploadImage.setStyle(style); this.uploadImage.Send()}});
-        };
+        // const showStyleSelectDialog = () => {
+        //     KL.selectStyleDialog({selectedStyle: this.selectedStyle, styleOptions: this.styleOptions, onStyleSelect: (style) => {this.selectedStyle = style; this.uploadImage.setStyle(style); this.uploadImage.Send()}});
+        // };
 
         const shareImage = (callback?: () => void) => {
             KL.shareDialog({image: this.uploadImage.getLatestGeneration(), imageId: this.uploadImage.getimageId(), backendUrl: this.backendUrl, getKlCanvas: () => this.klCanvas, session: this.session, printingEnabled: this.sessionSettings.printingEnabled});
@@ -1625,6 +1628,38 @@ export class KlApp {
             },
             saveReminder: this.embed ? undefined : p.saveReminder,
             customAbout: p.aboutEl,
+            styleOptions: this.styleOptions,
+            selectedStyle: this.selectedStyle,
+            onStyleSelect: (style) => {
+                this.selectedStyle = style;
+                this.uploadImage.setStyle(style);
+                this.uploadImage.Send();
+                // Potentially update other UI elements or trigger re-renders if necessary
+            },
+        });
+
+        // Fetch styles and update SettingsUi
+        fetch(`${this.backendUrl}/GenerateStyles/List/${p.session}?workflowType=PictureThis`, { credentials: 'include'}).then(async response => {
+            if (!response.ok) {
+                console.error("Failed to fetch styles:", response.status, await response.text());
+                this.styleOptions = []; // Ensure it's an empty array on error
+                this.selectedStyle = { name: 'Error', positivePrompt: '', negativePrompt: '', image: '' }; // Placeholder
+            } else {
+                this.styleOptions = await response.json() as Style[];
+                if (this.styleOptions && this.styleOptions.length > 0) {
+                    this.selectedStyle = this.styleOptions[0];
+                } else {
+                    this.styleOptions = [];
+                    this.selectedStyle = { name: 'Default', positivePrompt: '', negativePrompt: '', image: '' }; // Placeholder
+                    console.warn("No styles fetched or empty style list.");
+                }
+            }
+            settingsUi.updateStyleSelection(this.styleOptions, this.selectedStyle);
+        }).catch(error => {
+            console.error("Error fetching styles:", error);
+            this.styleOptions = [];
+            this.selectedStyle = { name: 'Error', positivePrompt: '', negativePrompt: '', image: '' }; // Placeholder
+            settingsUi.updateStyleSelection(this.styleOptions, this.selectedStyle);
         });
 
         mainTabRow = new KL.TabRow({

@@ -12,23 +12,43 @@ import { showLicensesDialog } from '../modals/licenses-dialog/show-licenses-dial
 import { c } from '../../../bb/base/c';
 import { SaveReminder } from '../components/save-reminder';
 import { showModal } from '../modals/base/showModal';
+import { ImageRadioList } from '../components/image-radio-list';
+import { Style } from '../../kl-types';
 
 export type TSettingsUiParams = {
     onLeftRight: () => void;
     saveReminder: SaveReminder | undefined;
     customAbout?: HTMLElement;
+    styleOptions: Style[];
+    selectedStyle: Style;
+    onStyleSelect: (style: Style) => void;
 };
 
 export class SettingsUi {
     private readonly rootEl: HTMLElement;
+    private styleRadioList: ImageRadioList<string> | undefined;
+    private styleSectionWrapper: HTMLElement | undefined;
+    private onStyleSelectCallback: ((style: Style) => void) | undefined;
+    private currentStyleOptions: Style[] = [];
 
     // ----------------------------------- public -----------------------------------
-    constructor({ onLeftRight, saveReminder, customAbout }: TSettingsUiParams) {
+    constructor({ onLeftRight, saveReminder, customAbout, styleOptions, selectedStyle, onStyleSelect }: TSettingsUiParams) {
         this.rootEl = BB.el({
             css: {
                 margin: '10px',
             },
         });
+        this.onStyleSelectCallback = onStyleSelect;
+        this.currentStyleOptions = styleOptions;
+
+        // Placeholder for style section
+        this.styleSectionWrapper = BB.el({
+            className: 'style-selection-grid-wrapper',
+        });
+        this.rootEl.append(this.styleSectionWrapper);
+        // Initial population, could be empty if styles not loaded yet
+        this.updateStyleSelection(styleOptions, selectedStyle);
+
 
         // ---- language ----
         const autoLanguage = languageStrings.getAutoLanguage();
@@ -271,5 +291,61 @@ export class SettingsUi {
 
     getElement(): HTMLElement {
         return this.rootEl;
+    }
+
+    public updateStyleSelection(styleOptions: Style[], selectedStyle: Style | undefined): void {
+        this.currentStyleOptions = styleOptions;
+        if (!this.styleSectionWrapper) {
+            return;
+        }
+        // Clear previous style selection
+        BB.clearNode(this.styleSectionWrapper);
+        if (this.styleRadioList) {
+            this.styleRadioList.destroy();
+            this.styleRadioList = undefined;
+        }
+
+        if (styleOptions && styleOptions.length > 0 && selectedStyle) {
+            const titleEl = BB.el({
+                parent: this.styleSectionWrapper,
+                content: LANG('select-style-title') + ':', // Using existing language key, might need a new one
+                css: {
+                    marginBottom: '5px',
+                    fontWeight: 'bold',
+                },
+            });
+
+            this.styleRadioList = new ImageRadioList<string>({
+                optionArr: styleOptions.map(style => ({
+                    id: style.name, // Assuming name is unique identifier
+                    title: style.name,
+                    image: style.image, // Assuming image is a URL
+                    darkInvert: !!style.darkInvert, // Or determine based on theme/style property
+                })),
+                initId: selectedStyle.name,
+                onChange: (styleName) => {
+                    const currentSelectedStyle = this.currentStyleOptions.find(s => s.name === styleName);
+                    if (currentSelectedStyle && this.onStyleSelectCallback) {
+                        this.onStyleSelectCallback(currentSelectedStyle);
+                    }
+                },
+            });
+            this.styleSectionWrapper.append(titleEl, this.styleRadioList.getElement());
+
+            // Separator
+            const hr = BB.el({ className: 'grid-hr', css: { margin: '15px 0' } });
+            this.styleSectionWrapper.append(hr);
+
+            // Ensure the style section is inserted before the language section if it wasn't already.
+            // This is a bit of a workaround for ordering; ideally, the layout is more structured.
+            const languageSectionMarker = this.rootEl.querySelector('.kl-toolspace-note'); // A bit fragile selector
+            if (languageSectionMarker && languageSectionMarker.parentElement) {
+                 if(this.styleSectionWrapper.nextSibling !== languageSectionMarker.parentElement) {
+                    this.rootEl.insertBefore(this.styleSectionWrapper, languageSectionMarker.parentElement);
+                 }
+            }
+
+
+        }
     }
 }

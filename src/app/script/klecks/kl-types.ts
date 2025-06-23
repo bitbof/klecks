@@ -304,3 +304,11 @@ export type TFillSampling = 'current' | 'all' | 'above';
 
 export type TUiLayout = 'left' | 'right';
 export type TExportType = 'png' | 'layers' | 'psd';
+
+export interface Style {
+    name: string;
+    positivePrompt: string;
+    negativePrompt: string;
+    image: string; // URL or path to the style image
+    darkInvert?: boolean; // Optional: whether the image should be inverted in dark mode
+}

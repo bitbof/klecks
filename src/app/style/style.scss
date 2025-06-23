@@ -1114,3 +1114,38 @@ iframe {
 .kl-pinch-overlay {
     background: rgba(255,255,255,0.5);
 }
+
+/* Styles for the Style Selection Image Grid in Settings */
+.style-selection-grid-wrapper {
+    margin-bottom: 15px; /* Add some space below the grid */
+}
+
+.style-selection-grid-wrapper .image-radio-wrapper {
+    flex-wrap: wrap; /* Allow items to wrap to the next line */
+    justify-content: flex-start; /* Align items to the start */
+    gap: 10px; /* Increase gap for larger items */
+}
+
+.style-selection-grid-wrapper .image-toggle {
+    width: 80px; /* Increased width for style previews */
+    height: 80px; /* Increased height for style previews */
+    padding: 2px; /* Small padding around the image */
+    border-radius: 4px; /* Consistent with other elements */
+}
+
+.style-selection-grid-wrapper .image-toggle__im {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Cover the area, crop if necessary */
+    border-radius: 2px; /* Slightly rounded corners for the image itself */
+}
+
+/* Ensure the title/tooltip for style images is readable if it overflows */
+.style-selection-grid-wrapper .image-toggle[title] {
+    overflow: hidden; /* Prevent title from breaking layout if it's too long and shown by browser */
+}
+
+/* Active state could be more prominent for larger items */
+.style-selection-grid-wrapper .image-toggle-active {
+    box-shadow: var(--active-highlight-color) 0 0 0 3px, 0 0 8px var(--active-highlight-color); /* More prominent shadow */
+}
