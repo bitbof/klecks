@@ -24,7 +24,7 @@ NODES=(
     "https://github.com/cubiq/ComfyUI_essentials"
 	"https://github.com/cubiq/ComfyUI_InstantID"
 	"https://github.com/SeanScripts/ComfyUI-PixtralLlamaMolmoVision"
-	"--branch 8.16.1 https://github.com/ltdrdata/ComfyUI-Impact-Pack"
+	"https://github.com/ltdrdata/ComfyUI-Impact-Pack"
 )
 
 CHECKPOINT_MODELS=(
