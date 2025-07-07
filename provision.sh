@@ -14,6 +14,7 @@ APT_PACKAGES=(
 )
 
 PIP_PACKAGES=(
+    "piexif"
     #"package-1"
     #"package-2"
 )
