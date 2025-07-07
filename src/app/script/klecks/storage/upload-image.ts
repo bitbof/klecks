@@ -78,8 +78,7 @@ export class UploadImage {
 
         const formData = new FormData();
         formData.append('file', data);
-        formData.append('negativePrompt', this.style.negativePrompt);
-        formData.append('positivePrompt', this.style.positivePrompt);
+        formData.append('generateStyleId', this.style.id);
 
         var response = await fetch(this.backendUrl + '/generate/' + this.session, {
             method: 'POST',

@@ -291,9 +291,9 @@ export class KlApp {
         this.sessionSettings = {} as SessionSettings;
         this.styleOptions = []; // Initialize as empty array
         this.selectedStyle = { // Default selected style before fetch
+            id: 'default-initial-style', // Added default ID
             name: 'van gogh',
-            positivePrompt: 'photo, photorealistic, painting of Van Gogh, logo, cartoon, naked, tits, nude, porn',
-            negativePrompt:'(van gogh style:1.1) (Post-Impressionism:1.3) (Expressive:1.1), (bold brushstrokes:1.2), (vibrant colors:1.2), painting style, intense emotions, distorted forms, dynamic compositions, raw authenticity, vg, painting, <lora:vincent_van_gogh_xl.safetensors:0.5>',
+            // positivePrompt and negativePrompt removed by previous change
             imageUrl: '' // Placeholder image
         };
 
@@ -1663,14 +1663,16 @@ export class KlApp {
             if (!response.ok) {
                 console.error("Failed to fetch styles:", response.status, await response.text());
                 this.styleOptions = [];
-                this.selectedStyle = { name: 'Error', positivePrompt: '', negativePrompt: '', imageUrl: '' };
+                // Ensure fallback style also has an id
+                this.selectedStyle = { id: 'error-style-id', name: 'Error', imageUrl: '' };
             } else {
                 this.styleOptions = await response.json() as Style[];
                 if (this.styleOptions && this.styleOptions.length > 0) {
-                    this.selectedStyle = this.styleOptions[0];
+                    this.selectedStyle = this.styleOptions[0]; // Assumes fetched styles have an id
                 } else {
                     this.styleOptions = [];
-                    this.selectedStyle = { name: 'Default', positivePrompt: '', negativePrompt: '', imageUrl: '' };
+                    // Ensure fallback style also has an id
+                    this.selectedStyle = { id: 'default-fallback-style-id', name: 'Default', imageUrl: '' };
                     console.warn("No styles fetched or empty style list.");
                 }
             }

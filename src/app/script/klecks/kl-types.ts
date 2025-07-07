@@ -306,9 +306,8 @@ export type TUiLayout = 'left' | 'right';
 export type TExportType = 'png' | 'layers' | 'psd';
 
 export interface Style {
+    id: string;
     name: string;
-    positivePrompt: string;
-    negativePrompt: string;
     imageUrl: string;
     darkInvert?: boolean; // Optional: whether the image should be inverted in dark mode
 }
