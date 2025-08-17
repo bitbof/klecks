@@ -2,9 +2,9 @@ import { BB } from '../../bb/bb';
 import { EVENT_RES_MS } from './filters-consts';
 import { KlSlider } from '../ui/components/kl-slider';
 import { getSharedFx } from '../../fx-canvas/shared-fx';
-import { IFilterApply, IFilterGetDialogParam, TFilterGetDialogResult } from '../kl-types';
+import { TFilterApply, TFilterGetDialogParam, TFilterGetDialogResult } from '../kl-types';
 import { LANG } from '../../language/language';
-import { IVector2D } from '../../bb/bb-types';
+import { TVector2D } from '../../bb/bb-types';
 import { FxPreviewRenderer } from '../ui/project-viewport/fx-preview-renderer';
 import { TProjectViewportProject } from '../ui/project-viewport/project-viewport';
 import { Preview } from '../ui/project-viewport/preview';
@@ -16,14 +16,14 @@ import { getPreviewHeight, getPreviewWidth } from '../ui/utils/preview-size';
 import { canvasToLayerTiles } from '../history/push-helpers/canvas-to-layer-tiles';
 
 export type TFilterTiltShiftInput = {
-    a: IVector2D;
-    b: IVector2D;
+    a: TVector2D;
+    b: TVector2D;
     blur: number;
     gradient: number;
 };
 
 export const filterTiltShift = {
-    getDialog(params: IFilterGetDialogParam) {
+    getDialog(params: TFilterGetDialogParam) {
         const context = params.context;
         const klCanvas = params.klCanvas;
         if (!context || !klCanvas) {
@@ -183,7 +183,7 @@ export const filterTiltShift = {
         return result;
     },
 
-    apply(params: IFilterApply<TFilterTiltShiftInput>): boolean {
+    apply(params: TFilterApply<TFilterTiltShiftInput>): boolean {
         const context = params.layer.context;
         const klHistory = params.klHistory;
         const a = params.input.a;

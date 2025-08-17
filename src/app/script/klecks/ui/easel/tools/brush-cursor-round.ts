@@ -1,11 +1,11 @@
 import { BB } from '../../../../bb/bb';
 import { TViewportTransform } from '../../project-viewport/project-viewport';
-import { IVector2D } from '../../../../bb/bb-types';
+import { TVector2D } from '../../../../bb/bb-types';
 
 export class BrushCursorRound {
     private readonly rootEl: SVGElement;
 
-    // --------------------- public ------------------
+    // ----------------------------------- public -----------------------------------
     constructor() {
         this.rootEl = BB.createSvg({
             elementType: 'g',
@@ -30,7 +30,7 @@ export class BrushCursorRound {
         });
     }
 
-    update(transform: TViewportTransform, position: IVector2D, size: number): void {
+    update(transform: TViewportTransform, position: TVector2D, size: number): void {
         BB.setAttributes(this.rootEl.children[0], {
             r: '' + Math.max(0, size * transform.scale - 1),
         });

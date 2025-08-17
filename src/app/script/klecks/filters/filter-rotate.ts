@@ -1,6 +1,5 @@
 import { BB } from '../../bb/bb';
-import { IFilterApply, IFilterGetDialogParam, TFilterGetDialogResult } from '../kl-types';
-import { theme } from '../../theme/theme';
+import { TFilterApply, TFilterGetDialogParam, TFilterGetDialogResult } from '../kl-types';
 import { SMALL_PREVIEW } from '../ui/utils/preview-size';
 
 export type TFilterRotateInput = {
@@ -8,7 +7,7 @@ export type TFilterRotateInput = {
 };
 
 export const filterRotate = {
-    getDialog(params: IFilterGetDialogParam) {
+    getDialog(params: TFilterGetDialogParam) {
         const klCanvas = params.klCanvas;
         if (!klCanvas) {
             return false;
@@ -82,29 +81,17 @@ export const filterRotate = {
                 marginLeft: 'auto',
                 marginRight: 'auto',
                 overflow: 'hidden',
+                background: 'var(--kl-checkerboard-background)',
+                backgroundSize: '16px',
             },
         });
 
-        function updateCheckerboard(): void {
-            BB.createCheckerDataUrl(
-                8,
-                function (url) {
-                    canvasWrapper.style.background = 'url(' + url + ')';
-                },
-                theme.isDark(),
-            );
-        }
-        theme.addIsDarkListener(updateCheckerboard);
-        updateCheckerboard();
-
-        canvasWrapper.style.transition = 'all 0.2s ease-out';
+        canvasWrapper.style.transition = 'transform 0.2s ease-out';
 
         rootEl.append(previewWrapper);
         update();
 
-        result.destroy = (): void => {
-            theme.removeIsDarkListener(updateCheckerboard);
-        };
+        result.destroy = (): void => {};
         result.getInput = function (): TFilterRotateInput {
             result.destroy!();
             return {
@@ -114,7 +101,7 @@ export const filterRotate = {
         return result;
     },
 
-    apply(params: IFilterApply<TFilterRotateInput>): boolean {
+    apply(params: TFilterApply<TFilterRotateInput>): boolean {
         const klCanvas = params.klCanvas;
         if (!klCanvas) {
             return false;

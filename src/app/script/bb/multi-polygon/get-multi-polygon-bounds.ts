@@ -1,7 +1,7 @@
 import { MultiPolygon } from 'polygon-clipping';
-import { IBounds } from '../bb-types';
+import { TBounds } from '../bb-types';
 
-export function getMultiPolyBounds(poly: MultiPolygon): IBounds {
+export function getMultiPolyBounds(poly: MultiPolygon): TBounds {
     let x1: number | undefined = undefined;
     let y1: number | undefined = undefined;
     let x2: number | undefined = undefined;

@@ -1,6 +1,6 @@
 import { BB } from '../../../../bb/bb';
-import { IVector2D } from '../../../../bb/bb-types';
-import { IPointerEvent, TPointerType } from '../../../../bb/input/event.types';
+import { TVector2D } from '../../../../bb/bb-types';
+import { TPointerEvent, TPointerType } from '../../../../bb/input/event.types';
 import { TEaselInterface, TEaselTool, TEaselToolTrigger } from '../easel.types';
 import { InertiaScrolling } from '../inertia-scrolling';
 
@@ -31,7 +31,7 @@ export class EaselHand implements TEaselTool {
         return this.svgEl;
     }
 
-    onPointer(e: IPointerEvent): void {
+    onPointer(e: TPointerEvent): void {
         this.easel.setCursor('grab');
 
         if (e.type === 'pointerdown' && ['left', 'middle'].includes(e.button!)) {
@@ -56,7 +56,7 @@ export class EaselHand implements TEaselTool {
         this.easel = easelInterface;
     }
 
-    activate(cursorPos?: IVector2D): void {
+    activate(cursorPos?: TVector2D): void {
         this.easel.setCursor('grab');
     }
 

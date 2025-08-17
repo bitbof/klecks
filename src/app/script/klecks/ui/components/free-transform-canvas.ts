@@ -1,11 +1,11 @@
 import { BB } from '../../../bb/bb';
 import { FreeTransform } from './free-transform';
-import { IKlBasicLayer } from '../../kl-types';
-import { IRect } from '../../../bb/bb-types';
+import { TKlBasicLayer } from '../../kl-types';
+import { TRect } from '../../../bb/bb-types';
 import { Preview } from '../project-viewport/preview';
 import { TProjectViewportProject } from '../project-viewport/project-viewport';
 import { css } from '@emotion/css/dist/emotion-css.cjs';
-import { IFreeTransform } from './free-transform-utils';
+import { TFreeTransform } from './free-transform-utils';
 
 /**
  * a basic canvas where you can transform one layer(move around, rotate, scale)
@@ -13,11 +13,11 @@ import { IFreeTransform } from './free-transform-utils';
 export class FreeTransformCanvas {
     private readonly rootEl: HTMLElement;
     private readonly freeTransform: FreeTransform;
-    private readonly layers: IKlBasicLayer[];
+    private readonly layers: TKlBasicLayer[];
     private readonly transformIndex: number;
     private readonly imageWidth: number;
     private readonly imageHeight: number;
-    private readonly initTransform: IRect;
+    private readonly initTransform: TRect;
     private readonly previewLayerArr: TProjectViewportProject['layers'];
     private readonly preview: Preview;
     private readonly previewCanvas: HTMLCanvasElement;
@@ -49,7 +49,7 @@ export class FreeTransformCanvas {
         elementHeight: number;
         imageWidth: number;
         imageHeight: number;
-        layers: IKlBasicLayer[];
+        layers: TKlBasicLayer[];
         transformIndex: number;
     }) {
         this.imageWidth = p.imageWidth;
@@ -180,7 +180,7 @@ export class FreeTransformCanvas {
     /**
      * gives you the transformation in the original scale
      */
-    getTransformation(): IFreeTransform {
+    getTransformation(): TFreeTransform {
         return this.freeTransform.getValue();
     }
 

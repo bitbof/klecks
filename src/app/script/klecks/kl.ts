@@ -1,6 +1,6 @@
 import { showModal } from './ui/modals/base/showModal';
 import { DynamicModal } from './ui/modals/base/dynamic-modal';
-import { dialogCounter } from './ui/modals/modal-count';
+import { DIALOG_COUNTER } from './ui/modals/modal-count';
 import { Checkbox } from './ui/components/checkbox';
 import { input } from './ui/components/input';
 import { Select } from './ui/components/select';
@@ -45,18 +45,16 @@ import { floodFillBits } from './image-operations/flood-fill';
 import * as PSD from './storage/psd';
 import { drawShape, ShapeTool } from './image-operations/shape-tool';
 import { KlCanvas } from './canvas/kl-canvas';
-import * as indexedDb from './storage/indexed-db';
-import { setDbName } from './storage/indexed-db';
-import { filterLib, filterLibStatus } from './filters/filters';
+import { FILTER_LIB, FILTER_LIB_STATUS } from './filters/filters';
 import { BRUSHES } from './brushes/brushes';
-import { brushesUI } from './brushes-ui/brushes-ui';
+import { BRUSHES_UI } from './brushes-ui/brushes-ui';
 import { showIframeModal } from './ui/modals/show-iframe-modal';
 import { RadioList } from './ui/components/radio-list';
 import { BrowserStorageUi } from './ui/components/browser-storage-ui';
 import { drawProject } from './canvas/draw-project';
 import { ProjectStore } from './storage/project-store';
 import { FileUi } from './ui/tool-tabs/file-ui';
-import { FilterUi } from './ui/tool-tabs/filter-ui';
+import { EditUi } from './ui/tool-tabs/edit-ui';
 import { imgurUpload } from './ui/modals/imgur-upload';
 import { loadAgPsd } from './storage/load-ag-psd';
 import { SaveReminder } from './ui/components/save-reminder';
@@ -73,8 +71,8 @@ import { drawGradient, GradientTool } from './image-operations/gradient-tool';
  */
 export const KL = {
     // --- brushes ---
-    brushes: BRUSHES,
-    brushesUI,
+    BRUSHES,
+    BRUSHES_UI,
     BrushSettingService,
 
     // --- canvas ---
@@ -85,8 +83,8 @@ export const KL = {
     KlCanvasPreview,
 
     // --- filters ---
-    filterLibStatus,
-    filterLib,
+    FILTER_LIB_STATUS,
+    FILTER_LIB,
 
     // --- image operations ---
     renderText,
@@ -98,8 +96,6 @@ export const KL = {
 
     // --- storage ---
     PSD,
-    setDbName,
-    indexedDb,
     ProjectStore,
     loadAgPsd,
     SaveToComputer,
@@ -140,7 +136,7 @@ export const KL = {
     ToolspaceScroller,
 
     // --- ui - modals ---
-    dialogCounter,
+    DIALOG_COUNTER,
     popup: showModal,
     Popup: DynamicModal,
     clipboardDialog,
@@ -158,7 +154,7 @@ export const KL = {
     TextUi,
     ShapeUi,
     FileUi,
-    FilterUi,
+    EditUi,
     SettingsUi,
     LayersUi,
 };

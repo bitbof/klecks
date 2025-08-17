@@ -1,4 +1,4 @@
-import { IBounds } from '../../bb/bb-types';
+import { TBounds } from '../../bb/bb-types';
 
 /**
  * Set values in data within rect to 254, unless they're 255
@@ -68,7 +68,7 @@ function floodFill(
     tolerance: number,
     grow: number,
     isContiguous: boolean,
-): IBounds {
+): TBounds {
     const initR = srcArr[(py * width + px) * 4];
     const initG = srcArr[(py * width + px) * 4 + 1];
     const initB = srcArr[(py * width + px) * 4 + 2];
@@ -76,7 +76,7 @@ function floodFill(
     const view = new DataView(srcArr.buffer);
     const init = view.getUint32((py * width + px) * 4, true);
     const toleranceSquared = tolerance ** 2;
-    const bounds: IBounds = { x1: px, y1: py, x2: px, y2: py };
+    const bounds: TBounds = { x1: px, y1: py, x2: px, y2: py };
 
     if (isContiguous) {
         const q: number[] = []; // queue of pixel indices. they are already filled.
@@ -290,7 +290,7 @@ export function floodFillBits(
     isContiguous: boolean,
 ): {
     data: Uint8Array;
-    bounds: IBounds; // what area changed
+    bounds: TBounds; // what area changed
 } {
     x = Math.round(x); // just in case
     y = Math.round(y);

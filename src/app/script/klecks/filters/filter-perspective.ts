@@ -1,6 +1,6 @@
 import { BB } from '../../bb/bb';
 import { getSharedFx } from '../../fx-canvas/shared-fx';
-import { IFilterApply, IFilterGetDialogParam, TFilterGetDialogResult } from '../kl-types';
+import { TFilterApply, TFilterGetDialogParam, TFilterGetDialogResult } from '../kl-types';
 import { LANG } from '../../language/language';
 import { TwoTabs } from '../ui/components/two-tabs';
 import { TRectanglePoints } from '../../fx-canvas/filters/perspective';
@@ -19,7 +19,7 @@ export type TFilterPerspectiveInput = {
 };
 
 export const filterPerspective = {
-    getDialog(params: IFilterGetDialogParam) {
+    getDialog(params: TFilterGetDialogParam) {
         const context = params.context;
         const klCanvas = params.klCanvas;
         if (!context || !klCanvas) {
@@ -170,7 +170,7 @@ export const filterPerspective = {
         return result;
     },
 
-    apply(params: IFilterApply<TFilterPerspectiveInput>): boolean {
+    apply(params: TFilterApply<TFilterPerspectiveInput>): boolean {
         const context = params.layer.context;
         const klHistory = params.klHistory;
         const before = params.input.before;

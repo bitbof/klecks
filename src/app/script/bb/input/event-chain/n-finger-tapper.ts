@@ -1,5 +1,5 @@
 import { dist } from '../../math/math';
-import { IPointerEvent } from '../event.types';
+import { TPointerEvent } from '../event.types';
 
 /**
  * A ChainElement. Detects a single tap with N 'touch' pointers
@@ -13,7 +13,7 @@ export class NFingerTapper {
     private readonly maxFirstLastFingerDownMs = 250;
     private readonly maxPressedDistancePx = 12; //5 + fingers * 5;
 
-    private chainOut: ((e: IPointerEvent) => void) | undefined;
+    private chainOut: ((e: TPointerEvent) => void) | undefined;
     private fingerArr: {
         pointerId: number;
         downTimeMs: number;
@@ -21,7 +21,7 @@ export class NFingerTapper {
         downPageY: number;
         isUp?: boolean;
     }[] = [];
-    private eventQueueArr: IPointerEvent[] = [];
+    private eventQueueArr: TPointerEvent[] = [];
     private firstDownTime: number = 0;
     private lastEventTime: number = 0;
     private nowTime: number = performance.now();
@@ -71,7 +71,7 @@ export class NFingerTapper {
         return true;
     }
 
-    private processEvent(event: IPointerEvent): true | void {
+    private processEvent(event: TPointerEvent): true | void {
         const tempLastEventTime = this.lastEventTime;
         this.lastEventTime = event.time;
 
@@ -265,7 +265,7 @@ export class NFingerTapper {
         this.onTap = p.onTap;
     }
 
-    chainIn(event: IPointerEvent): IPointerEvent | null {
+    chainIn(event: TPointerEvent): TPointerEvent | null {
         const result = this.processEvent(event);
 
         //console.log(fingerArr.length);
@@ -283,7 +283,7 @@ export class NFingerTapper {
         return null;
     }
 
-    setChainOut(func: (e: IPointerEvent) => void): void {
+    setChainOut(func: (e: TPointerEvent) => void): void {
         this.chainOut = func;
     }
 }

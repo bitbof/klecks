@@ -1,0 +1,20 @@
+.recoveryBubble {
+    height: 20px;
+    min-width: 20px;
+    padding: 0 6px;
+    margin-left: 10px;
+    display: none;
+    border-radius: 5px;
+
+    background: var(--kl-note-1);
+    box-shadow: 0 0 0 1px var(--kl-note-2);
+    color: var(--kl-note-3);
+}
+
+:global(body.kl-theme-dark) {
+    .recoveryBubble {
+        background: unset;
+        box-shadow: 0 0 0 1px var(--kl-note-1);
+        color: var(--kl-note-1);
+    }
+}

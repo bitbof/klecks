@@ -1,6 +1,6 @@
 import { BB } from '../../../../bb/bb';
 import { throwIfNull } from '../../../../bb/base/base';
-import { theme } from '../../../../theme/theme';
+import { THEME } from '../../../../theme/theme';
 import { renderText, TRenderTextParam } from '../../../image-operations/render-text';
 import { KlCanvas } from '../../../canvas/kl-canvas';
 import { KlSlider } from '../../components/kl-slider';
@@ -9,7 +9,7 @@ import { LANG } from '../../../../language/language';
 import toolZoomInImg from '/src/app/img/ui/tool-zoom-in.svg';
 import toolZoomOutImg from '/src/app/img/ui/tool-zoom-out.svg';
 import { c } from '../../../../bb/base/c';
-import { IVector2D } from '../../../../bb/bb-types';
+import { TVector2D } from '../../../../bb/bb-types';
 import { KeyListener } from '../../../../bb/input/key-listener';
 
 type TViewportParams = Pick<TRenderTextParam, 'x' | 'y' | 'angleRad'>;
@@ -26,7 +26,7 @@ export class TextToolViewportUI {
     private readonly inputsRootEl: HTMLElement;
     private readonly previewWrapper: HTMLElement;
     private text: TRenderTextParam;
-    private offset: IVector2D = { x: 0, y: 0 };
+    private offset: TVector2D = { x: 0, y: 0 };
     private interval: ReturnType<typeof setInterval> | undefined;
 
     private width: number;
@@ -65,7 +65,7 @@ export class TextToolViewportUI {
 
     private readonly onDarkChange = () => {
         this.checkerPattern = throwIfNull(
-            this.previewCtx.createPattern(BB.createCheckerCanvas(8, theme.isDark()), 'repeat'),
+            this.previewCtx.createPattern(BB.createCheckerCanvas(8, THEME.isDark()), 'repeat'),
         );
         this.render();
     };
@@ -136,7 +136,7 @@ export class TextToolViewportUI {
         });
         this.previewWrapper.append(this.previewCanvas);
         this.checkerPattern = throwIfNull(
-            this.previewCtx.createPattern(BB.createCheckerCanvas(8, theme.isDark()), 'repeat'),
+            this.previewCtx.createPattern(BB.createCheckerCanvas(8, THEME.isDark()), 'repeat'),
         );
         this.emptyCanvas = BB.canvas(1, 1);
         this.emptyCanvasLight = BB.canvas(1, 1);
@@ -149,7 +149,7 @@ export class TextToolViewportUI {
             ctx.fillRect(0, 0, 1, 1);
         }
 
-        theme.addIsDarkListener(this.onDarkChange);
+        THEME.addIsDarkListener(this.onDarkChange);
 
         this.previewCanvas.oncontextmenu = (e) => e.preventDefault();
         let dragged = false;
@@ -363,7 +363,7 @@ export class TextToolViewportUI {
         this.targetCtx.drawImage(this.textCanvas, -centerX, -centerY);
         this.targetCtx.restore();
 
-        const isDark = theme.isDark();
+        const isDark = THEME.isDark();
 
         // --- layers ---
         this.layersCtx.save();
@@ -506,6 +506,11 @@ export class TextToolViewportUI {
     }
 
     setSize(width: number, height: number): void {
+        // prevents: Failed to execute 'drawImage' on 'CanvasRenderingContext2D':
+        // The image argument is a canvas element with a width or height of 0.
+        width = Math.max(1, width);
+        height = Math.max(1, height);
+
         if (width === this.width && height === this.height) {
             return;
         }
@@ -539,6 +544,6 @@ export class TextToolViewportUI {
         this.eventCapture.remove();
         this.previewPointerListener.destroy();
         this.keyListener.destroy();
-        theme.removeIsDarkListener(this.onDarkChange);
+        THEME.removeIsDarkListener(this.onDarkChange);
     }
 }

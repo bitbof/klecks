@@ -1,14 +1,14 @@
 import { NFingerTapper } from '../../../bb/input/event-chain/n-finger-tapper';
-import { DoubleTapper, IDoubleTapperEvent } from '../../../bb/input/event-chain/double-tapper';
+import { DoubleTapper, TDoubleTapperEvent } from '../../../bb/input/event-chain/double-tapper';
 import { PinchZoomer, TPinchZoomerEvent } from '../../../bb/input/event-chain/pinch-zoomer';
 import { BB } from '../../../bb/bb';
 import { EventChain } from '../../../bb/input/event-chain/event-chain';
-import { IChainElement } from '../../../bb/input/event-chain/event-chain.types';
-import { IPointerEvent, TPointerType } from '../../../bb/input/event.types';
+import { TChainElement } from '../../../bb/input/event-chain/event-chain.types';
+import { TPointerEvent, TPointerType } from '../../../bb/input/event.types';
 
 export type TEaselPointerPreprocessor = {
-    onChainOut: (e: IPointerEvent) => void;
-    onDoubleTap: (e: IDoubleTapperEvent) => void;
+    onChainOut: (e: TPointerEvent) => void;
+    onDoubleTap: (e: TDoubleTapperEvent) => void;
     onUndo?: () => void;
     onRedo?: () => void;
     onPinch: (e: TPinchZoomerEvent) => void;
@@ -29,20 +29,20 @@ export class EaselPointerPreprocessor {
 
     // ----------------------------------- public -----------------------------------
     constructor(p: TEaselPointerPreprocessor) {
-        const nFingerSubChain: IChainElement[] = [];
+        const nFingerSubChain: TChainElement[] = [];
         if (p.onUndo) {
             this.twoFingerTap = new BB.NFingerTapper({
                 fingers: 2,
                 onTap: p.onUndo,
             });
-            nFingerSubChain.push(this.twoFingerTap as IChainElement);
+            nFingerSubChain.push(this.twoFingerTap as TChainElement);
         }
         if (p.onRedo) {
             this.threeFingerTap = new BB.NFingerTapper({
                 fingers: 3,
                 onTap: p.onRedo,
             });
-            nFingerSubChain.push(this.threeFingerTap as IChainElement);
+            nFingerSubChain.push(this.threeFingerTap as TChainElement);
         }
         this.mainDoubleTapper = new BB.DoubleTapper({ onDoubleTap: p.onDoubleTap });
         this.mainDoubleTapper.setAllowedPointerTypeArr(['touch']);
@@ -55,16 +55,16 @@ export class EaselPointerPreprocessor {
         this.pointerEventChain = new EventChain({
             chainArr: [
                 ...nFingerSubChain,
-                this.mainDoubleTapper as IChainElement,
-                this.middleDoubleTapper as IChainElement,
-                this.pinchZoomer as IChainElement,
-                new BB.OnePointerLimiter() as IChainElement,
+                this.mainDoubleTapper as TChainElement,
+                this.middleDoubleTapper as TChainElement,
+                this.pinchZoomer as TChainElement,
+                new BB.OnePointerLimiter() as TChainElement,
             ],
         });
         this.pointerEventChain.setChainOut(p.onChainOut);
     }
 
-    chainIn(e: IPointerEvent): void {
+    chainIn(e: TPointerEvent): void {
         this.pointerEventChain.chainIn(e);
     }
 

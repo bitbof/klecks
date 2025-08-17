@@ -72,6 +72,11 @@ export class ToolspaceCollapser {
         return this.stateIsOpen;
     }
 
+    setIsOpen(b: boolean): void {
+        this.stateIsOpen = b;
+        this.update();
+    }
+
     setOrientation(dirStr: TUiLayout): void {
         this.orientation = dirStr;
         this.update();

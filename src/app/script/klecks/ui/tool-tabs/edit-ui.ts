@@ -1,18 +1,19 @@
 import { BB } from '../../../bb/bb';
 import { KL } from '../../kl';
-import { IKeyString } from '../../../bb/bb-types';
+import { TKeyString } from '../../../bb/bb-types';
 import { StatusOverlay } from '../components/status-overlay';
 import { KlCanvas, TKlCanvasLayer } from '../../canvas/kl-canvas';
 import { LANG } from '../../../language/language';
-import { IFilterApply, IFilterGetDialogParam, TFilterGetDialogResult } from '../../kl-types';
+import { TFilterApply, TFilterGetDialogParam, TFilterGetDialogResult } from '../../kl-types';
 import { KlColorSlider } from '../components/kl-color-slider';
 import { LayersUi } from './layers-ui/layers-ui';
 import { RGB } from '../../../bb/color/color';
 import { getSharedFx } from '../../../fx-canvas/shared-fx';
 import { c } from '../../../bb/base/c';
 import { KlHistory } from '../../history/kl-history';
+import copyImg from '/src/app/img/ui/copy.svg';
 
-export type TFilterUiParams = {
+export type TEditUiParams = {
     klRootEl: HTMLElement;
     klColorSlider: KlColorSlider;
     layersUi: LayersUi;
@@ -25,9 +26,11 @@ export type TFilterUiParams = {
     onCanvasChanged: () => void; // dimensions/orientation changed
     applyUncommitted: () => void;
     klHistory: KlHistory;
+    onCopyToClipboard: () => void;
+    onPaste: () => void;
 };
 
-export class FilterUi {
+export class EditUi {
     // from params
     private readonly klRootEl: HTMLElement;
     private readonly klColorSlider: KlColorSlider;
@@ -41,6 +44,8 @@ export class FilterUi {
     private readonly onCanvasChanged: () => void; // dimensions/orientation changed
     private readonly applyUncommitted: () => void;
     private readonly klHistory: KlHistory;
+    private readonly onCopyToClipboard: () => void;
+    private readonly onPaste: () => void;
 
     private readonly rootEl: HTMLDivElement;
     private isInit = false;
@@ -49,28 +54,11 @@ export class FilterUi {
         return !!getSharedFx();
     }
 
-    constructor(p: TFilterUiParams) {
-        this.klRootEl = p.klRootEl;
-        this.klColorSlider = p.klColorSlider;
-        this.layersUi = p.layersUi;
-        this.getCurrentColor = p.getCurrentColor;
-        this.maxCanvasSize = p.maxCanvasSize;
-        this.klCanvas = p.klCanvas;
-        this.getCurrentLayer = p.getCurrentLayer;
-        this.isEmbed = p.isEmbed;
-        this.statusOverlay = p.statusOverlay;
-        this.onCanvasChanged = p.onCanvasChanged;
-        this.applyUncommitted = p.applyUncommitted;
-        this.klHistory = p.klHistory;
-
-        this.rootEl = document.createElement('div');
-    }
-
     private init(): void {
-        const filters = KL.filterLib;
+        const filters = KL.FILTER_LIB;
         const buttons = [];
 
-        if (!KL.filterLibStatus.isLoaded) {
+        if (!KL.FILTER_LIB_STATUS.isLoaded) {
             throw new Error('filters not loaded');
         }
 
@@ -190,7 +178,7 @@ This has been reported to Google.
                             klCanvas: this.klCanvas,
                             klHistory: this.klHistory,
                             input: input,
-                        } as IFilterApply);
+                        } as TFilterApply);
                         if (!filterResult) {
                             KL.popup({
                                 target: this.klRootEl,
@@ -229,7 +217,7 @@ This has been reported to Google.
                                     g: secondaryColorRGB.g,
                                     b: secondaryColorRGB.b,
                                 },
-                            } as IFilterGetDialogParam) as TFilterGetDialogResult;
+                            } as TFilterGetDialogParam) as TFilterGetDialogResult;
                         } catch (e) {
                             setTimeout(() => {
                                 throw e;
@@ -261,7 +249,7 @@ This has been reported to Google.
                             closeFunc();
                         };
 
-                        const style: IKeyString = {};
+                        const style: TKeyString = {};
                         if ('width' in filterDialog) {
                             style.width = filterDialog.width + 'px';
                         }
@@ -340,6 +328,49 @@ This has been reported to Google.
         ];
         const groupC = ['grid', 'noise', 'pattern', 'vanishPoint'];
 
+        if (!this.isEmbed) {
+            const im =
+                '<img ' +
+                ' height="20" width="18" src="' +
+                copyImg +
+                '" style="margin-right: 3px" alt="icon" />';
+            const copyBtn = BB.el({
+                tagName: 'button',
+                className: 'grid-button grid-button--filter',
+                content: im + LANG('file-copy'),
+                onClick: () => this.onCopyToClipboard(),
+                title: LANG('file-copy-title'),
+                custom: {
+                    tabIndex: '-1',
+                },
+                css: {
+                    lineHeight: '20px',
+                },
+            });
+
+            const pasteBtn = BB.el({
+                tagName: 'button',
+                className: 'grid-button grid-button--filter',
+                content: [
+                    BB.el({
+                        css: {
+                            height: '20px',
+                            cssFloat: 'left',
+                        },
+                    }),
+                    LANG('file-paste'),
+                ],
+                custom: {
+                    tabIndex: '-1',
+                },
+                css: {
+                    lineHeight: '20px',
+                },
+                onClick: () => this.onPaste(),
+            });
+
+            this.rootEl.append(copyBtn, pasteBtn, BB.el({ className: 'grid-hr' }));
+        }
         addGroup(groupA);
         this.rootEl.append(BB.el({ className: 'grid-hr' }));
         addGroup(groupB);
@@ -347,6 +378,27 @@ This has been reported to Google.
         addGroup(groupC);
 
         this.isInit = true;
+    }
+
+    // ----------------------------------- public -----------------------------------
+
+    constructor(p: TEditUiParams) {
+        this.klRootEl = p.klRootEl;
+        this.klColorSlider = p.klColorSlider;
+        this.layersUi = p.layersUi;
+        this.getCurrentColor = p.getCurrentColor;
+        this.maxCanvasSize = p.maxCanvasSize;
+        this.klCanvas = p.klCanvas;
+        this.getCurrentLayer = p.getCurrentLayer;
+        this.isEmbed = p.isEmbed;
+        this.statusOverlay = p.statusOverlay;
+        this.onCanvasChanged = p.onCanvasChanged;
+        this.applyUncommitted = p.applyUncommitted;
+        this.klHistory = p.klHistory;
+        this.onCopyToClipboard = p.onCopyToClipboard;
+        this.onPaste = p.onPaste;
+
+        this.rootEl = BB.el();
     }
 
     getElement(): HTMLElement {

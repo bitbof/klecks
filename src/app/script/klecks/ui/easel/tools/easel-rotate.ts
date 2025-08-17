@@ -1,6 +1,6 @@
 import { BB } from '../../../../bb/bb';
-import { IPointerEvent } from '../../../../bb/input/event.types';
-import { IVector2D } from '../../../../bb/bb-types';
+import { TPointerEvent } from '../../../../bb/input/event.types';
+import { TVector2D } from '../../../../bb/bb-types';
 import { TViewportTransform } from '../../project-viewport/project-viewport';
 import { createMatrixFromTransform } from '../../../../bb/transform/create-matrix-from-transform';
 import { applyToPoint, inverse } from 'transformation-matrix';
@@ -15,7 +15,7 @@ export type TEaselRotateParams = {
 export class EaselRotate implements TEaselTool {
     private readonly svgEl: SVGElement;
     private easel: TEaselInterface = {} as TEaselInterface;
-    private downPos: IVector2D | undefined = undefined;
+    private downPos: TVector2D | undefined = undefined;
     private downTransform: TViewportTransform | undefined;
 
     private readonly compassSize: number;
@@ -111,7 +111,7 @@ export class EaselRotate implements TEaselTool {
         return this.svgEl;
     }
 
-    onPointer(e: IPointerEvent): void {
+    onPointer(e: TPointerEvent): void {
         this.easel.setCursor(e.button === 'left' ? 'grabbing' : 'grab');
 
         if (e.type === 'pointerdown' && e.button === 'left') {
@@ -164,7 +164,7 @@ export class EaselRotate implements TEaselTool {
         this.easel = easelInterface;
     }
 
-    activate(cursorPos?: IVector2D): void {
+    activate(cursorPos?: TVector2D): void {
         this.easel.setCursor('grab');
         const { width, height } = this.easel.getSize();
         this.compass.setAttribute('transform', 'translate(' + width / 2 + ', ' + height / 2 + ')');

@@ -1,7 +1,7 @@
 import { BB } from '../../../../bb/bb';
-import { IPointerEvent } from '../../../../bb/input/event.types';
+import { TPointerEvent } from '../../../../bb/input/event.types';
 import zoomEwImg from '/src/app/img/ui/cursor-zoom-ew.png';
-import { IVector2D } from '../../../../bb/bb-types';
+import { TVector2D } from '../../../../bb/bb-types';
 import { TViewportTransform } from '../../project-viewport/project-viewport';
 import { applyToPoint, inverse } from 'transformation-matrix';
 import { createMatrixFromTransform } from '../../../../bb/transform/create-matrix-from-transform';
@@ -13,7 +13,7 @@ export type TEaselZoomParams = Record<string, never>;
 export class EaselZoom implements TEaselTool {
     private readonly svgEl: SVGElement;
     private easel: TEaselInterface = {} as TEaselInterface;
-    private downPos: IVector2D | undefined = undefined;
+    private downPos: TVector2D | undefined = undefined;
     private downTransform: TViewportTransform | undefined;
 
     // ----------------------------------- public -----------------------------------
@@ -29,7 +29,7 @@ export class EaselZoom implements TEaselTool {
         return this.svgEl;
     }
 
-    onPointer(e: IPointerEvent): void {
+    onPointer(e: TPointerEvent): void {
         this.easel.setCursor("url('" + zoomEwImg + "') 7 7, zoom-in");
 
         if (e.type === 'pointerdown' && ['left'].includes(e.button!)) {
@@ -70,7 +70,7 @@ export class EaselZoom implements TEaselTool {
         this.easel = easelInterface;
     }
 
-    activate(cursorPos?: IVector2D): void {
+    activate(cursorPos?: TVector2D): void {
         this.easel.setCursor("url('" + zoomEwImg + "') 7 7, zoom-in");
     }
 }

@@ -1,7 +1,7 @@
 import { BB } from '../../../../bb/bb';
 import { TRenderTextParam } from '../../../image-operations/render-text';
 import { showModal } from '../base/showModal';
-import { IRGB } from '../../../kl-types';
+import { TRgb } from '../../../kl-types';
 import { KlCanvas } from '../../../canvas/kl-canvas';
 import { LANG } from '../../../../language/language';
 import { TextToolFillUI } from './text-tool-fill-ui';
@@ -17,8 +17,8 @@ import { TabRow } from '../../components/tab-row';
 export function textToolDialog(p: {
     klCanvas: KlCanvas;
     layerIndex: number;
-    primaryColor: IRGB;
-    secondaryColor: IRGB;
+    primaryColor: TRgb;
+    secondaryColor: TRgb;
 
     text: TRenderTextParam;
     onConfirm: (confirmP: TRenderTextParam) => void;

@@ -1,14 +1,14 @@
 import { BB } from '../../../../bb/bb';
-import { IVector2D } from '../../../../bb/bb-types';
-import { IPointerEvent } from '../../../../bb/input/event.types';
+import { TVector2D } from '../../../../bb/bb-types';
+import { TPointerEvent } from '../../../../bb/input/event.types';
 import pickerImg from '/src/app/img/ui/cursor-picker.png';
 import { createMatrixFromTransform } from '../../../../bb/transform/create-matrix-from-transform';
 import { applyToPoint, inverse } from 'transformation-matrix';
 import { TEaselInterface, TEaselTool, TEaselToolTrigger } from '../easel.types';
-import { IRGB } from '../../../kl-types';
+import { TRgb } from '../../../kl-types';
 
 export type TEaselEyedropperParams = {
-    onPick: (p: IVector2D) => IRGB;
+    onPick: (p: TVector2D) => TRgb;
     onPickEnd: () => void;
 };
 
@@ -53,13 +53,13 @@ export class EaselEyedropper implements TEaselTool {
         return this.svgEl;
     }
 
-    onPointer(e: IPointerEvent): void {
+    onPointer(e: TPointerEvent): void {
         this.easel.setCursor("url('" + pickerImg + "') 0 15, crosshair");
         const transform = this.easel.getTransform();
         const m = createMatrixFromTransform(transform);
         const p = applyToPoint(inverse(m), { x: e.relX, y: e.relY });
 
-        let color: IRGB | undefined = undefined;
+        let color: TRgb | undefined = undefined;
         let isDown = ['left', 'right'].includes(e.button!);
         if (isDown) {
             this.svgEl.setAttribute('transform', `translate(${e.relX},${e.relY})`);
@@ -94,7 +94,7 @@ export class EaselEyedropper implements TEaselTool {
         this.easel = easelInterface;
     }
 
-    activate(cursorPos?: IVector2D): void {
+    activate(cursorPos?: TVector2D): void {
         this.easel.setCursor("url('" + pickerImg + "') 0 15, crosshair");
         this.isDragging = false;
         this.svgEl.style.opacity = '0';

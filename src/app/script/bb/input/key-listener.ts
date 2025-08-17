@@ -1,4 +1,4 @@
-import { IKeyString } from '../bb-types';
+import { TKeyString } from '../bb-types';
 
 type TGlobalKey = {
     add: (keyListenerRef: TKeyListenerRef) => void;
@@ -84,7 +84,7 @@ const globalKey = ((): TGlobalKey => {
             });
         }
         return acc;
-    }, {} as IKeyString);
+    }, {} as TKeyString);
 
     let comboArr: string[] = [];
 
@@ -310,6 +310,7 @@ export class KeyListener {
     private readonly onBlur: TOnBlur | undefined;
     private readonly ref: TKeyListenerRef;
 
+    // ----------------------------------- public -----------------------------------
     constructor(p: TKeyListenerParams) {
         this.onDown = p.onDown;
         this.onUp = p.onUp;

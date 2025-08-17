@@ -1,5 +1,5 @@
 import { BB } from '../../bb/bb';
-import { IFilterApply, IFilterGetDialogParam, TFilterGetDialogResult } from '../kl-types';
+import { TFilterApply, TFilterGetDialogParam, TFilterGetDialogResult } from '../kl-types';
 import { KlSlider } from '../ui/components/kl-slider';
 import { LANG } from '../../language/language';
 import { EVENT_RES_MS } from './filters-consts';
@@ -27,7 +27,7 @@ export type TFilterDistortInput = {
 };
 
 export const filterDistort = {
-    getDialog(params: IFilterGetDialogParam) {
+    getDialog(params: TFilterGetDialogParam) {
         const isSmall = testIsSmall();
         const rootEl = BB.el();
         const context = params.context;
@@ -157,6 +157,7 @@ export const filterDistort = {
                     sync('x');
                 }
             },
+            name: 'sync-xy',
         });
 
         topRowEl.append(
@@ -349,7 +350,7 @@ export const filterDistort = {
         return result;
     },
 
-    apply(params: IFilterApply<TFilterDistortInput>): boolean {
+    apply(params: TFilterApply<TFilterDistortInput>): boolean {
         const klCanvas = params.klCanvas;
         const context = params.layer.context;
         const klHistory = params.klHistory;

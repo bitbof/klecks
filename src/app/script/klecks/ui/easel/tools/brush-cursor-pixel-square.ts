@@ -1,6 +1,6 @@
 import { BB } from '../../../../bb/bb';
 import { TViewportTransform } from '../../project-viewport/project-viewport';
-import { IVector2D } from '../../../../bb/bb-types';
+import { TVector2D } from '../../../../bb/bb-types';
 import { setAttributes } from '../../../../bb/base/base';
 import { applyToPoint, inverse } from 'transformation-matrix';
 import { createMatrixFromTransform } from '../../../../bb/transform/create-matrix-from-transform';
@@ -8,7 +8,7 @@ import { createMatrixFromTransform } from '../../../../bb/transform/create-matri
 export class BrushCursorPixelSquare {
     private readonly rootEl: SVGElement;
 
-    // --------------------- public ------------------
+    // ----------------------------------- public -----------------------------------
     constructor() {
         this.rootEl = BB.createSvg({
             elementType: 'g',
@@ -29,7 +29,7 @@ export class BrushCursorPixelSquare {
         });
     }
 
-    update(transform: TViewportTransform, position: IVector2D, size: number): void {
+    update(transform: TViewportTransform, position: TVector2D, size: number): void {
         const mat = createMatrixFromTransform(transform);
         size = Math.round(size * 2) / 2;
         const width = Math.round(size * 2);

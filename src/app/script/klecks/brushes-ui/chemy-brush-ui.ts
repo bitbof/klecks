@@ -4,10 +4,10 @@ import { Checkbox } from '../ui/components/checkbox';
 import { BRUSHES } from '../brushes/brushes';
 import { KlSlider } from '../ui/components/kl-slider';
 import brushIconImg from '/src/app/img/ui/brush-chemy.svg';
-import { IBrushUi } from '../kl-types';
+import { TBrushUi } from '../kl-types';
 import { Options } from '../ui/components/options';
 import { BoxToggle } from '../ui/components/box-toggle';
-import { LANG, languageStrings } from '../../language/language';
+import { LANG, LANGUAGE_STRINGS } from '../../language/language';
 import { ChemyBrush } from '../brushes/chemy-brush';
 
 export const chemyBrushUi = (function () {
@@ -24,9 +24,9 @@ export const chemyBrushUi = (function () {
             min: 1 / 100,
             max: 1,
         },
-    } as IBrushUi<ChemyBrush>;
+    } as TBrushUi<ChemyBrush>;
 
-    languageStrings.subscribe(() => {
+    LANGUAGE_STRINGS.subscribe(() => {
         brushInterface.tooltip = LANG('brush-chemy');
     });
 
@@ -101,6 +101,7 @@ export const chemyBrushUi = (function () {
                     marginTop: '10px',
                     marginLeft: '10px',
                 },
+                name: 'eraser-toggle',
             });
 
             const lockAlphaToggle = new Checkbox({
@@ -114,6 +115,7 @@ export const chemyBrushUi = (function () {
                 css: {
                     marginTop: '10px',
                 },
+                name: 'lock-alpha-toggle',
             });
 
             const toggleRow = BB.el({
@@ -363,7 +365,7 @@ export const chemyBrushUi = (function () {
         this.getElement = function () {
             return div;
         };
-    } as IBrushUi<ChemyBrush>['Ui'];
+    } as TBrushUi<ChemyBrush>['Ui'];
 
     return brushInterface;
 })();

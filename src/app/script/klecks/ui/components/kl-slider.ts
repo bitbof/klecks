@@ -1,12 +1,12 @@
 import { BB } from '../../../bb/bb';
 import { calcSliderFalloffFactor } from './slider-falloff';
-import { IKlSliderConfig } from '../../kl-types';
-import { languageStrings } from '../../../language/language';
+import { TKlSliderConfig } from '../../kl-types';
+import { LANGUAGE_STRINGS } from '../../../language/language';
 import { KlSliderManualInput } from './kl-slider-manual-input';
 import { SplineInterpolator } from '../../../bb/math/line';
 import { PointerListener } from '../../../bb/input/pointer-listener';
-import { IPointerEvent } from '../../../bb/input/event.types';
-import { IChainElement } from '../../../bb/input/event-chain/event-chain.types';
+import { TPointerEvent } from '../../../bb/input/event.types';
+import { TChainElement } from '../../../bb/input/event-chain/event-chain.types';
 
 /**
  * Horizontal slider, can be changed by dragging anywhere on it. Has a label & value.
@@ -85,7 +85,7 @@ export class KlSlider {
     private updateLabel(): void {
         let displayValue: number | string = this.valueToDisplayValue(this.value);
         displayValue = this.formatFunc ? this.formatFunc(displayValue) : Math.round(displayValue);
-        displayValue = displayValue.toLocaleString(languageStrings.getCode());
+        displayValue = displayValue.toLocaleString(LANGUAGE_STRINGS.getCode());
         const unit = this.unit !== undefined ? this.unit : '';
         this.labelValueEl.textContent = displayValue + unit;
 
@@ -305,11 +305,11 @@ export class KlSlider {
         });
         doubleTapper.setAllowedButtonArr(['left', 'right']);
         const eventChain = new BB.EventChain({
-            chainArr: [doubleTapper as IChainElement],
+            chainArr: [doubleTapper as TChainElement],
         });
 
         let virtualVal: number;
-        const onPointer = (event: IPointerEvent) => {
+        const onPointer = (event: TPointerEvent) => {
             event.eventPreventDefault();
 
             if (!this.isEnabled) {
@@ -397,7 +397,7 @@ export class KlSlider {
         return this.valueToDisplayValue(this.value);
     }
 
-    update(config: IKlSliderConfig): void {
+    update(config: TKlSliderConfig): void {
         this.min = config.min;
         this.max = config.max;
         this.useSpline = !!config.curve;

@@ -1,11 +1,13 @@
 import { BB } from '../../bb/bb';
-import { IRGB, TPressureInput } from '../kl-types';
-import { IVector2D } from '../../bb/bb-types';
+import { TPressureInput, TRgb } from '../kl-types';
+import { TBounds, TRect, TVector2D } from '../../bb/bb-types';
 import { BezierLine } from '../../bb/math/line';
 import { ERASE_COLOR } from './erase-color';
 import { throwIfNull } from '../../bb/base/base';
 import { KlHistory } from '../history/kl-history';
 import { getPushableLayerChange } from '../history/push-helpers/get-pushable-layer-change';
+import { getChangedTiles, updateChangedTiles } from '../history/push-helpers/changed-tiles';
+import { canvasAndChangedTilesToLayerTiles } from '../history/push-helpers/canvas-to-layer-tiles';
 
 export class PixelBrush {
     private klHistory: KlHistory = {} as KlHistory;
@@ -15,7 +17,7 @@ export class PixelBrush {
     private settingSize: number = 0.5;
     private settingSpacing: number = 0.9;
     private settingOpacity: number = 1;
-    private settingColor: IRGB = {} as IRGB;
+    private settingColor: TRgb = {} as TRgb;
     private settingColorStr: string = '';
     private settingLockLayerAlpha: boolean = false;
     private settingIsEraser: boolean = false;
@@ -48,6 +50,49 @@ export class PixelBrush {
     private readonly ditherCtx: CanvasRenderingContext2D;
     private ditherPattern: CanvasPattern = {} as CanvasPattern;
 
+    /*
+        Draw brush into fresh canvas for each line,
+        because otherwise chrome slows the main canvas down.
+        Multiple reads on a canvas -> canvas moved to CPU. (my guess)
+     */
+    private canvasClone: HTMLCanvasElement = {} as HTMLCanvasElement;
+    private ctxClone: CanvasRenderingContext2D = {} as CanvasRenderingContext2D;
+
+    // changed tiles that will be drawn to klCanvas
+    private redrawTiles: boolean[] = [];
+    // changed tiles that will be pushed to history
+    private historyTiles: boolean[] = [];
+
+    private bresenheimPath: Path2D | undefined;
+
+    private updateChangedTiles(bounds: TBounds) {
+        const changedTiles = getChangedTiles(
+            bounds,
+            this.context.canvas.width,
+            this.context.canvas.height,
+        );
+        this.redrawTiles = updateChangedTiles(this.redrawTiles, [...changedTiles]);
+        this.historyTiles = updateChangedTiles(this.historyTiles, changedTiles);
+    }
+
+    private initClone(): void {
+        this.canvasClone = BB.canvas(this.context.canvas.width, this.context.canvas.height);
+        this.ctxClone = BB.ctx(this.canvasClone);
+        this.ctxClone.drawImage(this.context.canvas, 0, 0);
+    }
+
+    private freeClone(): void {
+        BB.freeCanvas(this.canvasClone);
+        this.ctxClone = {} as CanvasRenderingContext2D;
+    }
+
+    private redrawToCanvas(): void {
+        this.context.save();
+        this.context.clearRect(0, 0, this.context.canvas.width, this.context.canvas.height);
+        this.context.drawImage(this.canvasClone, 0, 0);
+        this.context.restore();
+    }
+
     private updateDither(): void {
         this.ditherCtx.clearRect(0, 0, 4, 4);
         this.ditherCtx.fillStyle = this.settingIsEraser
@@ -67,10 +112,10 @@ export class PixelBrush {
      * Tests p1->p2 or p3->p4 deviate in their direction more than max, compared to p1->p4
      */
     private cubicCurveOverThreshold(
-        p1: IVector2D,
-        p2: IVector2D,
-        p3: IVector2D,
-        p4: IVector2D,
+        p1: TVector2D,
+        p2: TVector2D,
+        p3: TVector2D,
+        p4: TVector2D,
         maxAngleRad: number,
     ): boolean {
         const d = BB.Vec2.nor({
@@ -91,7 +136,7 @@ export class PixelBrush {
         return Math.max(BB.Vec2.dist(d, d2), BB.Vec2.dist(d, d3)) > maxAngleRad;
     }
 
-    private plotCubicBezierLine(p1: IVector2D, p2: IVector2D, p3: IVector2D, p4: IVector2D): void {
+    private plotCubicBezierLine(p1: TVector2D, p2: TVector2D, p3: TVector2D, p4: TVector2D): void {
         const isOverThreshold = this.cubicCurveOverThreshold(p1, p2, p3, p4, 0.1);
 
         p1.x = Math.floor(p1.x);
@@ -101,6 +146,12 @@ export class PixelBrush {
 
         const dist = BB.dist(p1.x, p1.y, p4.x, p4.y);
         if (!isOverThreshold || dist < 7) {
+            this.updateChangedTiles({
+                x1: p1.x,
+                y1: p1.y,
+                x2: p4.x,
+                y2: p4.y,
+            });
             this.plotLine(p1.x, p1.y, p4.x, p4.y, true);
             return;
         }
@@ -120,6 +171,12 @@ export class PixelBrush {
         }
 
         for (let i = 0; i < n; i++) {
+            this.updateChangedTiles({
+                x1: Math.round(pointArr[i].x),
+                y1: Math.round(pointArr[i].y),
+                x2: Math.round(pointArr[i + 1].x),
+                y2: Math.round(pointArr[i + 1].y),
+            });
             this.plotLine(
                 Math.round(pointArr[i].x),
                 Math.round(pointArr[i].y),
@@ -131,30 +188,39 @@ export class PixelBrush {
     }
 
     private drawDot(x: number, y: number, size: number, opacity: number): void {
-        this.context.save();
+        const rect: TRect = {
+            x: Math.round(x + -size),
+            y: Math.round(y + -size),
+            width: Math.round(size * 2),
+            height: Math.round(size * 2),
+        };
+        this.updateChangedTiles({
+            x1: rect.x,
+            y1: rect.y,
+            x2: rect.x + rect.width,
+            y2: rect.y + rect.height,
+        });
+
+        this.ctxClone.save();
         if (this.settingIsEraser) {
-            this.context.fillStyle = this.settingUseDither ? this.ditherPattern : '#fff';
+            this.ctxClone.fillStyle = this.settingUseDither ? this.ditherPattern : '#fff';
             if (this.settingLockLayerAlpha) {
-                this.context.globalCompositeOperation = 'source-atop';
+                this.ctxClone.globalCompositeOperation = 'source-atop';
             } else {
-                this.context.globalCompositeOperation = 'destination-out';
+                this.ctxClone.globalCompositeOperation = 'destination-out';
             }
         } else {
-            this.context.fillStyle = this.settingUseDither
+            this.ctxClone.fillStyle = this.settingUseDither
                 ? this.ditherPattern
                 : this.settingColorStr;
             if (this.settingLockLayerAlpha) {
-                this.context.globalCompositeOperation = 'source-atop';
+                this.ctxClone.globalCompositeOperation = 'source-atop';
             }
         }
-        this.context.globalAlpha = this.settingUseDither ? 1 : opacity;
-        this.context.fillRect(
-            Math.round(x + -size),
-            Math.round(y + -size),
-            Math.round(size * 2),
-            Math.round(size * 2),
-        );
-        this.context.restore();
+        this.ctxClone.globalAlpha = this.settingUseDither ? 1 : opacity;
+
+        this.ctxClone.fillRect(rect.x, rect.y, rect.width, rect.height);
+        this.ctxClone.restore();
     }
 
     private continueLine(x: number | null, y: number | null, size: number, pressure: number): void {
@@ -163,7 +229,7 @@ export class PixelBrush {
             this.bezierLine.add(this.lastInput.x, this.lastInput.y, 0, () => {});
         }
 
-        this.context.save();
+        this.ctxClone.save();
 
         const dotCallback = (val: {
             x: number;
@@ -184,20 +250,39 @@ export class PixelBrush {
         };
 
         const controlCallback = (controlObj: {
-            p1: IVector2D;
-            p2: IVector2D;
-            p3: IVector2D;
-            p4: IVector2D;
+            p1: TVector2D;
+            p2: TVector2D;
+            p3: TVector2D;
+            p4: TVector2D;
         }): void => {
             this.plotCubicBezierLine(controlObj.p1, controlObj.p2, controlObj.p3, controlObj.p4);
         };
 
         if (Math.round(this.settingSize * 2) === 1) {
+            this.bresenheimPath = new Path2D();
             if (x === null || y === null) {
                 this.bezierLine.addFinal(4, undefined, controlCallback);
             } else {
                 this.bezierLine.add(x, y, 4, undefined, controlCallback);
             }
+            if (this.settingIsEraser) {
+                this.ctxClone.fillStyle = this.settingUseDither ? this.ditherPattern : '#fff';
+                if (this.settingLockLayerAlpha) {
+                    this.ctxClone.globalCompositeOperation = 'source-atop';
+                } else {
+                    this.ctxClone.globalCompositeOperation = 'destination-out';
+                }
+            } else {
+                this.ctxClone.fillStyle = this.settingUseDither
+                    ? this.ditherPattern
+                    : this.settingColorStr;
+                if (this.settingLockLayerAlpha) {
+                    this.ctxClone.globalCompositeOperation = 'source-atop';
+                }
+            }
+            this.ctxClone.globalAlpha = this.settingUseDither ? 1 : this.settingOpacity;
+            this.ctxClone.fill(this.bresenheimPath!);
+            this.bresenheimPath = undefined;
         } else {
             const localSpacing = size * this.settingSpacing;
 
@@ -208,32 +293,13 @@ export class PixelBrush {
             }
         }
 
-        this.context.restore();
+        this.ctxClone.restore();
     }
 
     /**
      * bresenheim line drawing
      */
     private plotLine(x0: number, y0: number, x1: number, y1: number, skipFirst: boolean): void {
-        this.context.save();
-
-        if (this.settingIsEraser) {
-            this.context.fillStyle = this.settingUseDither ? this.ditherPattern : '#fff';
-            if (this.settingLockLayerAlpha) {
-                this.context.globalCompositeOperation = 'source-atop';
-            } else {
-                this.context.globalCompositeOperation = 'destination-out';
-            }
-        } else {
-            this.context.fillStyle = this.settingUseDither
-                ? this.ditherPattern
-                : this.settingColorStr;
-            if (this.settingLockLayerAlpha) {
-                this.context.globalCompositeOperation = 'source-atop';
-            }
-        }
-        this.context.globalAlpha = this.settingUseDither ? 1 : this.settingOpacity;
-
         x0 = Math.floor(x0);
         y0 = Math.floor(y0);
         x1 = Math.floor(x1);
@@ -244,12 +310,13 @@ export class PixelBrush {
         const dY = -Math.abs(y1 - y0);
         const sY = y0 < y1 ? 1 : -1;
         let err = dX + dY;
+
         // eslint-disable-next-line no-constant-condition
         while (true) {
             if (skipFirst) {
                 skipFirst = false;
             } else {
-                this.context.fillRect(x0, y0, 1, 1);
+                this.bresenheimPath?.rect(x0, y0, 1, 1);
             }
             if (x0 === x1 && y0 === y1) {
                 break;
@@ -264,8 +331,6 @@ export class PixelBrush {
                 y0 += sY;
             }
         }
-
-        this.context.restore();
     }
 
     // ----------------------------------- public -----------------------------------
@@ -277,9 +342,12 @@ export class PixelBrush {
     // ---- interface ----
 
     startLine(x: number, y: number, p: number): void {
+        this.historyTiles = [];
+        this.redrawTiles = [];
         if (this.settingUseDither) {
             this.updateDither();
         }
+        this.initClone();
 
         p = Math.max(0, Math.min(1, p));
         const localOpacity = this.settingHasOpacityPressure
@@ -296,12 +364,14 @@ export class PixelBrush {
         this.lastInput.y = y;
         this.lastInput.pressure = p;
         this.lastInput2 = BB.copyObj(this.lastInput);
+        this.redrawToCanvas();
     }
 
     goLine(x: number, y: number, p: number): void {
         if (!this.inputIsDrawing) {
             return;
         }
+        this.redrawTiles = [];
 
         //debug
         //drawDot(x, y, 1, 0.5);
@@ -317,9 +387,11 @@ export class PixelBrush {
         this.lastInput.x = x;
         this.lastInput.y = y;
         this.lastInput.pressure = pressure;
+        this.redrawToCanvas();
     }
 
     endLine(): void {
+        this.redrawTiles = [];
         const localSize = this.settingHasSizePressure
             ? Math.max(0.1, this.lastInput.pressure * this.settingSize)
             : Math.max(0.1, this.settingSize);
@@ -333,48 +405,22 @@ export class PixelBrush {
 
         this.bezierLine = null;
 
-        this.klHistory.push(
-            getPushableLayerChange(this.klHistory.getComposed(), this.context.canvas),
-        );
+        this.redrawToCanvas();
+        if (this.historyTiles.some((item) => item)) {
+            this.klHistory.push(
+                getPushableLayerChange(
+                    this.klHistory.getComposed(),
+                    canvasAndChangedTilesToLayerTiles(this.canvasClone, this.historyTiles),
+                ),
+            );
+        }
+        this.freeClone();
     }
 
-    //cheap n' ugly
     drawLineSegment(x1: number, y1: number, x2: number, y2: number): void {
-        this.lastInput.x = x2;
-        this.lastInput.y = y2;
-        this.lastInput.pressure = 1;
-
-        if (this.inputIsDrawing || x1 === undefined) {
-            return;
-        }
-
-        if (this.settingUseDither) {
-            this.updateDither();
-        }
-
-        if (Math.round(this.settingSize * 2) === 1) {
-            this.plotLine(x1, y1, x2, y2, true);
-        } else {
-            // const angle = BB.pointsToAngleDeg({x: x1, y: y1}, {x: x2, y: y2});
-            const mouseDist = Math.sqrt(Math.pow(x2 - x1, 2.0) + Math.pow(y2 - y1, 2.0));
-            const eX = (x2 - x1) / mouseDist;
-            const eY = (y2 - y1) / mouseDist;
-            let loopDist;
-            const bdist = this.settingSize * this.settingSpacing;
-            this.lineToolLastDot = this.settingSize * this.settingSpacing;
-            for (loopDist = this.lineToolLastDot; loopDist <= mouseDist; loopDist += bdist) {
-                this.drawDot(
-                    x1 + eX * loopDist,
-                    y1 + eY * loopDist,
-                    this.settingSize,
-                    this.settingOpacity,
-                );
-            }
-        }
-
-        this.klHistory.push(
-            getPushableLayerChange(this.klHistory.getComposed(), this.context.canvas),
-        );
+        this.startLine(x1, y1, 1);
+        this.goLine(x2, y2, 1);
+        this.endLine();
     }
 
     //IS
@@ -383,7 +429,7 @@ export class PixelBrush {
     }
 
     //SET
-    setColor(c: IRGB): void {
+    setColor(c: TRgb): void {
         if (this.settingColor === c) {
             return;
         }

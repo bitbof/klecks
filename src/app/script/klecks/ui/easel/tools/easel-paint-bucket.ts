@@ -1,13 +1,13 @@
 import { BB } from '../../../../bb/bb';
-import { IVector2D } from '../../../../bb/bb-types';
-import { IPointerEvent } from '../../../../bb/input/event.types';
+import { TVector2D } from '../../../../bb/bb-types';
+import { TPointerEvent } from '../../../../bb/input/event.types';
 import fillImg from '/src/app/img/ui/cursor-fill.png';
 import { createMatrixFromTransform } from '../../../../bb/transform/create-matrix-from-transform';
 import { applyToPoint, inverse } from 'transformation-matrix';
 import { TEaselInterface, TEaselTool } from '../easel.types';
 
 export type TEaselPaintBucketParams = {
-    onFill: (p: IVector2D) => void; // int position
+    onFill: (p: TVector2D) => void; // int position
 };
 
 export class EaselPaintBucket implements TEaselTool {
@@ -27,7 +27,7 @@ export class EaselPaintBucket implements TEaselTool {
         return this.svgEl;
     }
 
-    onPointer(e: IPointerEvent): void {
+    onPointer(e: TPointerEvent): void {
         this.easel.setCursor("url('" + fillImg + "') 1 12, crosshair");
         const vTransform = this.easel.getTransform();
         const m = createMatrixFromTransform(vTransform);
@@ -45,7 +45,7 @@ export class EaselPaintBucket implements TEaselTool {
         this.easel = easelInterface;
     }
 
-    activate(cursorPos?: IVector2D): void {
+    activate(cursorPos?: TVector2D): void {
         this.easel.setCursor("url('" + fillImg + "') 1 12, crosshair");
     }
 }

@@ -1,6 +1,5 @@
 import { BB } from '../../../bb/bb';
 import { KL } from '../../kl';
-import { SaveReminder } from '../components/save-reminder';
 import { KlCanvas } from '../../canvas/kl-canvas';
 import { LANG } from '../../../language/language';
 import loadingImg from '/src/app/img/ui/loading.gif';
@@ -101,20 +100,21 @@ async function upload(
 export function imgurUpload(
     klCanvas: KlCanvas,
     klRootEl: HTMLElement,
-    saveReminder: SaveReminder,
     imgurKey: string, // API key
+    onUploaded: () => void,
 ): void {
     if (!imgurKey) {
         throw new Error('imgur key missing');
     }
 
-    const inputTitle = BB.el({ tagName: 'input' });
+    const inputTitle = BB.el({ tagName: 'input', custom: { name: 'image-title' } });
     inputTitle.type = 'text';
     inputTitle.value = LANG('upload-title-untitled');
     const inputDescription = BB.el({
         tagName: 'textarea',
         custom: {
             rows: '2',
+            name: 'image-description',
         },
         css: {
             width: '100%',
@@ -189,7 +189,7 @@ export function imgurUpload(
                         message: `<h3>${LANG('upload-success')}</h3><br>${LANG('upload-delete')}<br><a target='_blank' rel="noopener noreferrer" href='https://imgur.com/delete/${result.deletehash}'>imgur.com/delete/${result.deletehash}</a><br><br>`,
                         buttons: ['Ok'],
                     });
-                    saveReminder.reset();
+                    onUploaded();
                 } catch (e) {
                     KL.popup({
                         target: klRootEl,

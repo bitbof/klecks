@@ -35,6 +35,7 @@ export class ToolspaceStabilizerRow {
             onChange: function (val) {
                 p.onSelect(parseInt(val));
             },
+            name: 'stabilizer-strength',
         });
         this.rootEl.append(strengthSelect.getElement());
 

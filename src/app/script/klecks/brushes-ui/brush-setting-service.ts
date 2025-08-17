@@ -1,24 +1,24 @@
-import { IRGB, ISliderConfig } from '../kl-types';
+import { TRgb, TSliderConfig } from '../kl-types';
 
 export type TBrushSettingEmit =
-    | { type: 'color'; value: IRGB }
+    | { type: 'color'; value: TRgb }
     | { type: 'opacity'; value: number }
     | { type: 'size'; value: number }
     | { type: 'scatter'; value: number }
-    | { type: 'sliderConfig'; value: ISliderConfig };
+    | { type: 'sliderConfig'; value: TSliderConfig };
 
 export type TBrushSettingSubscriber = (p: TBrushSettingEmit) => void;
 
 export type TBrushSettingServiceParams = {
-    onSetColor: (rgb: IRGB) => void;
+    onSetColor: (rgb: TRgb) => void;
     onSetSize: (size: number) => void;
     onSetOpacity: (opacity: number) => void;
     onSetScatter: (scatter: number) => void;
-    onGetColor: () => IRGB;
+    onGetColor: () => TRgb;
     onGetSize: () => number;
     onGetOpacity: () => number;
     onGetScatter: () => number;
-    onGetSliderConfig: () => ISliderConfig;
+    onGetSliderConfig: () => TSliderConfig;
 };
 
 /**
@@ -29,15 +29,15 @@ export class BrushSettingService {
     subscriberArr: TBrushSettingSubscriber[] = [];
 
     // from params
-    private readonly onSetColor: (rgb: IRGB) => void;
+    private readonly onSetColor: (rgb: TRgb) => void;
     private readonly onSetSize: (size: number) => void;
     private readonly onSetOpacity: (opacity: number) => void;
     private readonly onSetScatter: (scatter: number) => void;
-    private readonly onGetColor: () => IRGB;
+    private readonly onGetColor: () => TRgb;
     private readonly onGetSize: () => number;
     private readonly onGetOpacity: () => number;
     private readonly onGetScatter: () => number;
-    private readonly onGetSliderConfig: () => ISliderConfig;
+    private readonly onGetSliderConfig: () => TSliderConfig;
 
     private emit(obj: TBrushSettingEmit, skipSubscriber?: TBrushSettingSubscriber): void {
         for (let i = 0; i < this.subscriberArr.length; i++) {
@@ -67,7 +67,7 @@ export class BrushSettingService {
         BrushSettingService.instance = this;
     }
 
-    emitColor(color: IRGB, skipSubscriber?: TBrushSettingSubscriber): void {
+    emitColor(color: TRgb, skipSubscriber?: TBrushSettingSubscriber): void {
         this.emit(
             {
                 type: 'color',
@@ -107,7 +107,7 @@ export class BrushSettingService {
         );
     }
 
-    emitSliderConfig(sliderConfig: ISliderConfig, skipSubscriber?: TBrushSettingSubscriber) {
+    emitSliderConfig(sliderConfig: TSliderConfig, skipSubscriber?: TBrushSettingSubscriber) {
         this.emit(
             {
                 type: 'sliderConfig',
@@ -122,7 +122,7 @@ export class BrushSettingService {
      * @param color
      * @param skipSubscriber
      */
-    setColor(color: IRGB, skipSubscriber?: TBrushSettingSubscriber) {
+    setColor(color: TRgb, skipSubscriber?: TBrushSettingSubscriber) {
         this.onSetColor(color);
         this.emitColor(color, skipSubscriber);
     }
@@ -160,7 +160,7 @@ export class BrushSettingService {
     /**
      * get current brush color
      */
-    getColor(): IRGB {
+    getColor(): TRgb {
         return this.onGetColor();
     }
 
@@ -176,7 +176,7 @@ export class BrushSettingService {
         return this.onGetScatter();
     }
 
-    getSliderConfig(): ISliderConfig {
+    getSliderConfig(): TSliderConfig {
         return this.onGetSliderConfig();
     }
 

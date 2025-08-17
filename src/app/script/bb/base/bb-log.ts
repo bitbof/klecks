@@ -3,6 +3,7 @@ type TLogListener = (msg: any) => void;
 export class BbLog {
     private static listeners: TLogListener[] = [];
 
+    // ----------------------------------- public -----------------------------------
     constructor() {}
 
     static subscribe(listener: TLogListener): void {

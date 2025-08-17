@@ -1,5 +1,5 @@
 import { BB } from '../../bb/bb';
-import { IFilterApply, IFilterGetDialogParam, TFilterGetDialogResult } from '../kl-types';
+import { TFilterApply, TFilterGetDialogParam, TFilterGetDialogResult } from '../kl-types';
 import { LANG } from '../../language/language';
 import { input } from '../ui/components/input';
 import { ColorOptions } from '../ui/components/color-options';
@@ -20,7 +20,7 @@ export type TFilterGridInput = {
 };
 
 export const filterGrid = {
-    getDialog(params: IFilterGetDialogParam) {
+    getDialog(params: TFilterGetDialogParam) {
         const context = params.context;
         const klCanvas = params.klCanvas;
         if (!context || !klCanvas) {
@@ -201,7 +201,7 @@ export const filterGrid = {
         return result;
     },
 
-    apply(params: IFilterApply<TFilterGridInput>): boolean {
+    apply(params: TFilterApply<TFilterGridInput>): boolean {
         const context = params.layer.context;
         const klCanvas = params.klCanvas;
         const klHistory = params.klHistory;

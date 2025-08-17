@@ -6,8 +6,8 @@ import { KlSlider } from '../ui/components/kl-slider';
 import { createPenPressureToggle } from '../ui/components/create-pen-pressure-toggle';
 import brushIconImg from '/src/app/img/ui/brush-pen.svg';
 import { genBrushAlpha01, genBrushAlpha02 } from '../brushes/alphas/brush-alphas';
-import { IBrushUi } from '../kl-types';
-import { LANG, languageStrings } from '../../language/language';
+import { TBrushUi } from '../kl-types';
+import { LANG, LANGUAGE_STRINGS } from '../../language/language';
 import { Options } from '../ui/components/options';
 import { PenBrush } from '../brushes/pen-brush';
 
@@ -34,7 +34,7 @@ export const penBrushUi = (function () {
             max: 100,
             curve: BB.powerSplineInput(0, 100, 0.1, 2.5),
         },
-    } as IBrushUi<PenBrush>;
+    } as TBrushUi<PenBrush>;
 
     let alphaNames = [
         LANG('brush-pen-circle'),
@@ -42,7 +42,7 @@ export const penBrushUi = (function () {
         LANG('brush-pen-calligraphy'),
         LANG('brush-pen-square'),
     ];
-    languageStrings.subscribe(() => {
+    LANGUAGE_STRINGS.subscribe(() => {
         brushInterface.tooltip = LANG('brush-pen');
         alphaNames = [
             LANG('brush-pen-circle'),
@@ -113,6 +113,7 @@ export const penBrushUi = (function () {
             css: {
                 display: 'inline-block',
             },
+            name: 'lock-alpha-toggle',
         });
 
         const spacingSpline = new BB.SplineInterpolator([
@@ -304,6 +305,6 @@ export const penBrushUi = (function () {
         this.getElement = function () {
             return div;
         };
-    } as IBrushUi<PenBrush>['Ui'];
+    } as TBrushUi<PenBrush>['Ui'];
     return brushInterface;
 })();

@@ -3,14 +3,15 @@ import { showModal } from './base/showModal';
 import { CropCopy } from '../components/crop-copy';
 import { LANG } from '../../../language/language';
 import { StatusOverlay } from '../components/status-overlay';
-import { ICropRect } from '../../../bb/bb-types';
+import { TCropRect } from '../../../bb/bb-types';
 
 export function clipboardDialog(
     parent: HTMLElement,
     fullCanvas: HTMLCanvasElement,
-    cropCallback: (crop: ICropRect) => void,
+    cropCallback: (crop: TCropRect) => void,
     output: StatusOverlay,
     showCropButton: boolean,
+    closeOnBlur: boolean = true,
 ): void {
     let clipboardItemIsSupported: boolean = false;
     try {
@@ -36,39 +37,17 @@ export function clipboardDialog(
         width: isSmall ? 340 : 540,
         height: isSmall ? 300 : 350,
         canvas: fullCanvas,
-        isNotCopy: false,
-        onChange: () => setTimeout(() => updateBlob()),
+        enableRightClickCopy: true,
     });
-    BB.css(cropCopy.getEl(), {
+    BB.css(cropCopy.getElement(), {
         marginTop: '10px',
         marginLeft: '-20px',
     });
-    div.append(cropCopy.getEl());
-
-    let blob: Blob | undefined = undefined;
-
-    // Safari doesn't allow any async operations between user interaction (click) and navigator.clipboard.write.
-    // It throws "NotAllowedError: the request is not allowed by the user agent or the platform in the current context,
-    // possibly because the user denied permission."
-    // So, we try to prepare blob beforehand.
-    let cropTimeout: ReturnType<typeof setTimeout> | undefined;
-    function updateBlob() {
-        if (!clipboardItemIsSupported) {
-            return;
-        }
-        clearTimeout(cropTimeout);
-        cropTimeout = setTimeout(() => {
-            cropCopy.getCroppedCanvas().toBlob((result) => {
-                blob = result ?? undefined;
-            }, 'image/png');
-        }, 50);
-    }
+    div.append(cropCopy.getElement());
 
     async function toClipboard() {
-        if (!blob) {
-            return;
-        }
         try {
+            const blob = cropCopy.getCroppedBlob();
             await (navigator.clipboard as any).write([
                 new ClipboardItem({
                     [blob.type]: blob,
@@ -94,7 +73,9 @@ export function clipboardDialog(
 
     let closeFunc: () => void;
     function blur() {
-        closeFunc && closeFunc();
+        if (closeOnBlur) {
+            closeFunc && closeFunc();
+        }
     }
     window.addEventListener('blur', blur);
 
@@ -127,7 +108,7 @@ export function clipboardDialog(
             if (result === LANG('cropcopy-btn-copy')) {
                 toClipboard();
             } else if (result === LANG('cropcopy-btn-crop')) {
-                const rectObj = cropCopy.getRect();
+                const rectObj = cropCopy.getCropRect();
                 cropCallback({
                     left: Math.round(-rectObj.x),
                     right: Math.round(rectObj.x + rectObj.width - fullCanvas.width),

@@ -1,6 +1,6 @@
 import { BB } from '../../../../bb/bb';
-import { IPointerEvent, TPointerType } from '../../../../bb/input/event.types';
-import { IVector2D } from '../../../../bb/bb-types';
+import { TPointerEvent, TPointerType } from '../../../../bb/input/event.types';
+import { TVector2D } from '../../../../bb/bb-types';
 import { TSelectToolMode } from '../../tool-tabs/select-ui';
 import { createMatrixFromTransform } from '../../../../bb/transform/create-matrix-from-transform';
 import { applyToPoint, inverse } from 'transformation-matrix';
@@ -12,7 +12,7 @@ import { TBooleanOperation, TSelectShape } from '../../../select-tool/select-too
 import { getSelectionPath2d } from '../../../../bb/multi-polygon/get-selection-path-2d';
 import { EventChain } from '../../../../bb/input/event-chain/event-chain';
 import { DoubleTapper } from '../../../../bb/input/event-chain/double-tapper';
-import { IChainElement } from '../../../../bb/input/event-chain/event-chain.types';
+import { TChainElement } from '../../../../bb/input/event-chain/event-chain.types';
 import { CornerPanning } from '../corner-panning';
 
 const modeToCursor: Record<TSelectToolMode, string> = {
@@ -28,14 +28,14 @@ const operationToCursor: Record<TBooleanOperation, string> = {
 
 export type TEaselSelectParams = {
     selectMode: TSelectToolMode;
-    onStartSelect: (p: IVector2D, operation: TBooleanOperation) => void;
-    onGoSelect: (p: IVector2D) => void;
+    onStartSelect: (p: TVector2D, operation: TBooleanOperation) => void;
+    onGoSelect: (p: TVector2D) => void;
     onEndSelect: () => void;
-    onStartMoveSelect: (p: IVector2D) => void;
-    onGoMoveSelect: (p: IVector2D) => void;
+    onStartMoveSelect: (p: TVector2D) => void;
+    onGoMoveSelect: (p: TVector2D) => void;
     onEndMoveSelect: () => void;
-    onSelectAddPoly: (path: IVector2D[], operation: TBooleanOperation) => void;
-    onTranslateTransform: (d: IVector2D) => void;
+    onSelectAddPoly: (path: TVector2D[], operation: TBooleanOperation) => void;
+    onTranslateTransform: (d: TVector2D) => void;
     onResetSelection: () => void;
 };
 
@@ -44,13 +44,13 @@ export type TEaselSelectParams = {
  */
 export class EaselSelect implements TEaselTool {
     // from params
-    private readonly onStartSelect: (p: IVector2D, operation: TBooleanOperation) => void;
-    private readonly onGoSelect: (p: IVector2D) => void;
+    private readonly onStartSelect: (p: TVector2D, operation: TBooleanOperation) => void;
+    private readonly onGoSelect: (p: TVector2D) => void;
     private readonly onEndSelect: () => void;
-    private readonly onStartMoveSelect: (p: IVector2D) => void;
-    private readonly onGoMoveSelect: (p: IVector2D) => void;
+    private readonly onStartMoveSelect: (p: TVector2D) => void;
+    private readonly onGoMoveSelect: (p: TVector2D) => void;
     private readonly onEndMoveSelect: () => void;
-    private readonly onSelectAddPoly: (path: IVector2D[], operation: TBooleanOperation) => void;
+    private readonly onSelectAddPoly: (path: TVector2D[], operation: TBooleanOperation) => void;
     private readonly onTranslateTransform: TEaselSelectParams['onTranslateTransform'];
     private readonly onResetSelection: () => void;
 
@@ -73,13 +73,13 @@ export class EaselSelect implements TEaselTool {
     private defaultBooleanOperation: TBooleanOperation = 'new'; // set by the UI
     private appliedBooleanOperation: TBooleanOperation | undefined; // once dragging, the locked in boolean operation
     private selectShape: TSelectShape = 'rect';
-    private polyShape: (IVector2D & { temp?: true })[] = [];
+    private polyShape: (TVector2D & { temp?: true })[] = [];
 
     // transform-mode state
-    private transformPointerStart: IVector2D = { x: 0, y: 0 }; // initial position, canvas coordinate
-    private transformPreviousPointer: IVector2D = { x: 0, y: 0 };
+    private transformPointerStart: TVector2D = { x: 0, y: 0 }; // initial position, canvas coordinate
+    private transformPreviousPointer: TVector2D = { x: 0, y: 0 };
 
-    private viewportToCanvas(p: IVector2D): IVector2D {
+    private viewportToCanvas(p: TVector2D): TVector2D {
         const matrix = inverse(createMatrixFromTransform(this.easel.getTransform()));
         return applyToPoint(matrix, p);
     }
@@ -121,7 +121,7 @@ export class EaselSelect implements TEaselTool {
 
     private getDoMoveSelection(
         effectiveOperation: TBooleanOperation,
-        cursorCanvasPos: IVector2D,
+        cursorCanvasPos: TVector2D,
     ): boolean {
         const isOverSelection =
             this.polyShape.length < 2 &&
@@ -131,7 +131,7 @@ export class EaselSelect implements TEaselTool {
     }
 
     // can be repeatedly called with the same event
-    private selectOnPointer(event: IPointerEvent): void {
+    private selectOnPointer(event: TPointerEvent): void {
         const effectiveOperation = this.getEffectiveBooleanOperation();
         const wasDragging = this.isDragging;
         const cursorCanvasPos = this.viewportToCanvas({ x: event.relX, y: event.relY });
@@ -239,7 +239,7 @@ export class EaselSelect implements TEaselTool {
     }
 
     // can be repeatedly called with the same event
-    private transformOnPointer(event: IPointerEvent): void {
+    private transformOnPointer(event: TPointerEvent): void {
         this.easel.setCursor('move');
         const transform = this.easel.getTransform();
         const matrix = inverse(createMatrixFromTransform(transform));
@@ -270,7 +270,7 @@ export class EaselSelect implements TEaselTool {
         }
     }
 
-    private onPointerChainOut(event: IPointerEvent): void {
+    private onPointerChainOut(event: TPointerEvent): void {
         this.cornerPanning.onPointer(event);
 
         if (this.mode === 'select') {
@@ -330,7 +330,7 @@ export class EaselSelect implements TEaselTool {
                         }
                     },
                     isInstant: true,
-                }) as IChainElement,
+                }) as TChainElement,
             ],
         });
 
@@ -343,7 +343,7 @@ export class EaselSelect implements TEaselTool {
         return this.svgEl;
     }
 
-    onPointer(event: IPointerEvent): void {
+    onPointer(event: TPointerEvent): void {
         this.onPointerChainOut(event);
         this.pointerChain.chainIn(event);
     }
@@ -358,7 +358,7 @@ export class EaselSelect implements TEaselTool {
         this.resetPolyShape();
     }
 
-    activate(cursorPos?: IVector2D, poppedTemp?: boolean): void {
+    activate(cursorPos?: TVector2D, poppedTemp?: boolean): void {
         this.easel.setCursor(modeToCursor[this.mode]);
         this.isDragging = false;
         this.onUpdateTransform(this.easel.getTransform());

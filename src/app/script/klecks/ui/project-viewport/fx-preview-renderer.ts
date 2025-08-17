@@ -3,8 +3,8 @@ import { TProjectViewportLayerFunc, TViewportTransformXY } from './project-viewp
 import { BB } from '../../../bb/bb';
 import { getSharedFx } from '../../../fx-canvas/shared-fx';
 import { throwIfNull } from '../../../bb/base/base';
-import { IRect } from '../../../bb/bb-types';
-import { compose, translate, applyToPoint, inverse, scale } from 'transformation-matrix';
+import { TRect } from '../../../bb/bb-types';
+import { applyToPoint, compose, inverse, scale, translate } from 'transformation-matrix';
 import { createMatrixFromTransform } from '../../../bb/transform/create-matrix-from-transform';
 import { matrixToTuple } from '../../../bb/math/matrix-to-tuple';
 
@@ -53,7 +53,7 @@ export class FxPreviewRenderer {
         const viewportMat = createMatrixFromTransform(viewportTransform);
         const padding = 0; // render more than visible with padding < 0
 
-        let clippedViewportRect: IRect; // rect in viewport coordinates which contains the canvas
+        let clippedViewportRect: TRect; // rect in viewport coordinates which contains the canvas
         {
             const topLeft = applyToPoint(viewportMat, { x: 0, y: 0 });
             const bottomRight = applyToPoint(viewportMat, {

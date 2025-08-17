@@ -1,7 +1,7 @@
 import { KlSlider } from '../ui/components/kl-slider';
 import { EVENT_RES_MS } from './filters-consts';
 import { getSharedFx } from '../../fx-canvas/shared-fx';
-import { IFilterApply, IFilterGetDialogParam, TFilterGetDialogResult } from '../kl-types';
+import { TFilterApply, TFilterGetDialogParam, TFilterGetDialogResult } from '../kl-types';
 import { LANG } from '../../language/language';
 import { FxPreviewRenderer } from '../ui/project-viewport/fx-preview-renderer';
 import { Preview } from '../ui/project-viewport/preview';
@@ -17,7 +17,7 @@ export type TFilterBlurInput = {
 };
 
 export const filterBlur = {
-    getDialog(params: IFilterGetDialogParam) {
+    getDialog(params: TFilterGetDialogParam) {
         const klCanvas = params.klCanvas;
         const context = params.context;
         if (!klCanvas || !context) {
@@ -112,7 +112,7 @@ export const filterBlur = {
         return result;
     },
 
-    apply(params: IFilterApply<TFilterBlurInput>): boolean {
+    apply(params: TFilterApply<TFilterBlurInput>): boolean {
         const context = params.layer.context;
         const klHistory = params.klHistory;
         const radius = params.input.radius;

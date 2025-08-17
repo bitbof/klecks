@@ -51,3 +51,18 @@ export function unsetEventHandler(obj: HTMLElement, ...handlers: [...THandler[]]
         obj[handler] = null;
     });
 }
+
+export function printStorageQuota(): void {
+    navigator.storage.estimate().then((estimate) => {
+        if (estimate.quota === undefined || estimate.usage === undefined) {
+            console.log('no quota info');
+            return;
+        }
+        console.log(
+            `using ${((estimate.usage / estimate.quota) * 100).toFixed(2)}% of total quota`,
+        );
+
+        console.log('usage (GB)', (estimate.usage / 1024 / 1024 / 1024).toFixed(2));
+        console.log('quota (GB)', (estimate.quota / 1024 / 1024 / 1024).toFixed(2));
+    });
+}

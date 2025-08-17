@@ -1,7 +1,7 @@
 import { MultiPolygon } from 'polygon-clipping';
-import { IRect } from '../bb-types';
+import { TRect } from '../bb-types';
 
-export function multiPolygonFromRect(rect: IRect): MultiPolygon {
+export function multiPolygonFromRect(rect: TRect): MultiPolygon {
     return [
         [
             [

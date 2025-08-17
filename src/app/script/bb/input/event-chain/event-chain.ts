@@ -1,15 +1,15 @@
-import { IChainElement, TChainOutFunc } from './event-chain.types';
-import { IPointerEvent } from '../event.types';
+import { TChainElement, TChainOutFunc } from './event-chain.types';
+import { TPointerEvent } from '../event.types';
 
 /**
  * for chaining event processing. useful for gestures (double tap, pinch zoom, max pointer filter).
  * each element in the chain might hold back the events, swallow them, transform them, or create new ones
  */
 export class EventChain {
-    private readonly chainArr: IChainElement[];
+    private readonly chainArr: TChainElement[];
     private chainOut: TChainOutFunc | undefined;
 
-    private continueChain(i: number, event: IPointerEvent): null {
+    private continueChain(i: number, event: TPointerEvent): null {
         for (; i < this.chainArr.length; i++) {
             event = this.chainArr[i].chainIn(event);
             if (event === null) {
@@ -21,12 +21,12 @@ export class EventChain {
     }
 
     // ----------------------------------- public -----------------------------------
-    constructor(p: { chainArr: IChainElement[] }) {
+    constructor(p: { chainArr: TChainElement[] }) {
         this.chainArr = p.chainArr;
 
         for (let i = 0; i < this.chainArr.length; i++) {
             ((i) => {
-                this.chainArr[i].setChainOut((event: IPointerEvent) => {
+                this.chainArr[i].setChainOut((event: TPointerEvent) => {
                     this.continueChain(i + 1, event);
                 });
             })(i);
@@ -36,7 +36,7 @@ export class EventChain {
     /**
      * feed an event into the chain
      */
-    chainIn(event: IPointerEvent): null {
+    chainIn(event: TPointerEvent): null {
         return this.continueChain(0, event);
     }
 

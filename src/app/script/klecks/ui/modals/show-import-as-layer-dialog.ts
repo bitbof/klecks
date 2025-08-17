@@ -2,7 +2,7 @@ import { BB } from '../../../bb/bb';
 import { FreeTransformCanvas } from '../components/free-transform-canvas';
 import { showModal } from './base/showModal';
 import { KlCanvas } from '../../canvas/kl-canvas';
-import { IKlBasicLayer } from '../../kl-types';
+import { TKlBasicLayer } from '../../kl-types';
 import { LANG } from '../../../language/language';
 import { testIsSmall } from '../utils/test-is-small';
 import { getPreviewHeight, getPreviewWidth } from '../utils/preview-size';
@@ -26,15 +26,8 @@ export function showImportAsLayerDialog(params: {
     BB.appendTextDiv(div, LANG('import-as-layer-description'));
     if (params.klCanvas.isLayerLimitReached()) {
         const noteEl = BB.el({
+            className: 'kl-import-note',
             content: LANG('import-as-layer-limit-reached'),
-            css: {
-                background: '#ff0',
-                padding: '10px',
-                marginTop: '5px',
-                marginBottom: '5px',
-                border: '1px solid #e7d321',
-                borderRadius: '5px',
-            },
         });
         div.append(noteEl);
     }
@@ -78,7 +71,7 @@ export function showImportAsLayerDialog(params: {
     buttonRowEl.append(originalSizeBtn, fitSizeBtn, centerBtn);
     div.append(buttonRowEl);
 
-    const layers: IKlBasicLayer[] = [];
+    const layers: TKlBasicLayer[] = [];
     {
         const klCanvasLayerArr = params.klCanvas.getLayers();
         for (let i = 0; i < klCanvasLayerArr.length; i++) {

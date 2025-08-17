@@ -1,5 +1,5 @@
 import { TChainOutFunc } from './event-chain.types';
-import { IPointerEvent } from '../event.types';
+import { TPointerEvent } from '../event.types';
 
 /**
  * only lets through events from one pointer at a time.
@@ -13,7 +13,7 @@ export class OnePointerLimiter {
     private readonly ignorePointerIdArr: number[] = [];
 
     // ----------------------------------- public -----------------------------------
-    chainIn(event: IPointerEvent): IPointerEvent | null {
+    chainIn(event: TPointerEvent): TPointerEvent | null {
         if (this.ignorePointerIdArr.includes(event.pointerId)) {
             if (event.type === 'pointerup') {
                 for (let i = 0; i < this.ignorePointerIdArr.length; i++) {

@@ -1,9 +1,9 @@
-import { IPointerEvent } from '../event.types';
+import { TPointerEvent } from '../event.types';
 import { copyObj } from '../../base/base';
 
-export interface ICoalescedPointerEvent extends IPointerEvent {
+export type TCoalescedPointerEvent = TPointerEvent & {
     isCoalesced: boolean;
-}
+};
 
 /**
  * A ChainElement. Splits up coalesced events into their own pointermove events. Otherwise regular pass through.
@@ -15,21 +15,21 @@ export interface ICoalescedPointerEvent extends IPointerEvent {
  * but how could that even work?
  */
 export class CoalescedExploder {
-    private chainOut: ((e: ICoalescedPointerEvent) => void) | undefined;
+    private chainOut: ((e: TCoalescedPointerEvent) => void) | undefined;
 
     // ----------------------------------- public -----------------------------------
 
-    setChainOut(func: (e: ICoalescedPointerEvent) => void) {
+    setChainOut(func: (e: TCoalescedPointerEvent) => void) {
         this.chainOut = func;
     }
 
-    chainIn(event: IPointerEvent): IPointerEvent | null {
+    chainIn(event: TPointerEvent): TPointerEvent | null {
         if (event.type === 'pointermove') {
             if (event.coalescedArr && event.coalescedArr.length > 0) {
                 for (let i = 0; i < event.coalescedArr.length; i++) {
-                    const eventCopy: ICoalescedPointerEvent = copyObj(
+                    const eventCopy: TCoalescedPointerEvent = copyObj(
                         event,
-                    ) as ICoalescedPointerEvent;
+                    ) as TCoalescedPointerEvent;
                     if (i === 0) {
                         eventCopy.coalescedArr = [];
                     }

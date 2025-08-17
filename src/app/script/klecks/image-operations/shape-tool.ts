@@ -1,6 +1,6 @@
 import { BB } from '../../bb/bb';
-import { IRGB, IShapeToolObject } from '../kl-types';
-import { IBounds, IRect, IVector2D } from '../../bb/bb-types';
+import { TRgb, TShapeToolObject } from '../kl-types';
+import { TBounds, TRect, TVector2D } from '../../bb/bb-types';
 import { transformBounds } from '../../bb/transform/transform-bounds';
 import { compose, rotate } from 'transformation-matrix';
 import { matrixToTuple } from '../../bb/math/matrix-to-tuple';
@@ -55,7 +55,7 @@ export class ShapeTool {
 /**
  * Draw a shape (rectangle, ellipse, line)
  */
-export function drawShape(ctx: CanvasRenderingContext2D, shapeObj: IShapeToolObject): IBounds {
+export function drawShape(ctx: CanvasRenderingContext2D, shapeObj: TShapeToolObject): TBounds {
     shapeObj = {
         // defaults
         angleRad: 0,
@@ -66,7 +66,7 @@ export function drawShape(ctx: CanvasRenderingContext2D, shapeObj: IShapeToolObj
 
         ...BB.copyObj(shapeObj),
     };
-    let bounds: IBounds = { x1: 0, y1: 0, x2: 0, y2: 0 };
+    let bounds: TBounds = { x1: 0, y1: 0, x2: 0, y2: 0 };
 
     if (['rect', 'ellipse', 'line'].includes(shapeObj.type)) {
         if (shapeObj.angleRad === undefined) {
@@ -84,7 +84,7 @@ export function drawShape(ctx: CanvasRenderingContext2D, shapeObj: IShapeToolObj
         ) {
             throw new Error('fillRgb and strokeRgb undefined');
         }
-        const colorRGB: IRGB = shapeObj.isEraser
+        const colorRgb: TRgb = shapeObj.isEraser
             ? { r: 255, g: 255, b: 255 }
             : shapeObj.fillRgb
               ? shapeObj.fillRgb
@@ -104,9 +104,9 @@ export function drawShape(ctx: CanvasRenderingContext2D, shapeObj: IShapeToolObj
         const transformation = compose(rotate(-shapeObj.angleRad));
         ctx.setTransform(...matrixToTuple(transformation));
         if (shapeObj.fillRgb) {
-            ctx.fillStyle = BB.ColorConverter.toRgbStr(colorRGB);
+            ctx.fillStyle = BB.ColorConverter.toRgbStr(colorRgb);
         } else if (shapeObj.strokeRgb) {
-            ctx.strokeStyle = BB.ColorConverter.toRgbStr(colorRGB);
+            ctx.strokeStyle = BB.ColorConverter.toRgbStr(colorRgb);
             ctx.lineWidth = lineWidth;
         }
 
@@ -365,7 +365,7 @@ export function drawShape(ctx: CanvasRenderingContext2D, shapeObj: IShapeToolObj
 
             p1 = BB.rotate(p1.x, p1.y, (shapeObj.angleRad / Math.PI) * 180);
             p2 = BB.rotate(p2.x, p2.y, (shapeObj.angleRad / Math.PI) * 180);
-            const rect: IRect = {
+            const rect: TRect = {
                 x: p1.x,
                 y: p1.y,
                 width: p2.x - p1.x,
@@ -396,7 +396,7 @@ export function drawShape(ctx: CanvasRenderingContext2D, shapeObj: IShapeToolObj
             y = p1.y;
             dX = p2.x - p1.x;
             dY = p2.y - p1.y;
-            const center: IVector2D = {
+            const center: TVector2D = {
                 x: x + dX / 2,
                 y: y + dY / 2,
             };

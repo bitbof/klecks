@@ -1,7 +1,7 @@
 import { KlSlider } from '../ui/components/kl-slider';
 import { EVENT_RES_MS } from './filters-consts';
 import { getSharedFx } from '../../fx-canvas/shared-fx';
-import { IFilterApply, IFilterGetDialogParam, TFilterGetDialogResult } from '../kl-types';
+import { TFilterApply, TFilterGetDialogParam, TFilterGetDialogResult } from '../kl-types';
 import { LANG } from '../../language/language';
 import { FxPreviewRenderer } from '../ui/project-viewport/fx-preview-renderer';
 import { TProjectViewportProject } from '../ui/project-viewport/project-viewport';
@@ -18,7 +18,7 @@ export type TFilterBrightnessContrastInput = {
 };
 
 export const filterBrightnessContrast = {
-    getDialog(params: IFilterGetDialogParam) {
+    getDialog(params: TFilterGetDialogParam) {
         const rootEl = BB.el();
         const result: TFilterGetDialogResult<TFilterBrightnessContrastInput> = {
             element: rootEl,
@@ -127,7 +127,7 @@ export const filterBrightnessContrast = {
         return result;
     },
 
-    apply(params: IFilterApply<TFilterBrightnessContrastInput>): boolean {
+    apply(params: TFilterApply<TFilterBrightnessContrastInput>): boolean {
         const context = params.layer.context;
         const brightness = params.input.brightness;
         const contrast = params.input.contrast;

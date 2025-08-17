@@ -1,10 +1,10 @@
-export interface IWheelCleanerEvent {
+export type TWheelCleanerEvent = {
     deltaY: number;
     pageX: number;
     pageY: number;
     clientX: number;
     clientY: number;
-}
+};
 
 const SEQUENCE_TIMEOUT_MS = 200;
 
@@ -61,7 +61,7 @@ export class WheelCleaner {
 
     // ----------------------------------- public -----------------------------------
 
-    constructor(private callback: (p: IWheelCleanerEvent) => void) {}
+    constructor(private callback: (p: TWheelCleanerEvent) => void) {}
 
     process(event: WheelEvent): void {
         this.position = {

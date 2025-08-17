@@ -1,6 +1,6 @@
 import { BB } from '../../../bb/bb';
 import { noise } from '../../../bb/math/perlin';
-import { IVector2D } from '../../../bb/bb-types';
+import { TVector2D } from '../../../bb/bb-types';
 
 // chalk
 export function genBrushAlpha01(w: number): HTMLCanvasElement {
@@ -46,7 +46,7 @@ export function genBrushAlpha01(w: number): HTMLCanvasElement {
 }
 
 // https://www.shadertoy.com/view/3tdSDj
-function udSegment(p: IVector2D, a: IVector2D, b: IVector2D): number {
+function udSegment(p: TVector2D, a: TVector2D, b: TVector2D): number {
     const ba = BB.Vec2.sub(b, a);
     const pa = BB.Vec2.sub(p, a);
     const h = BB.clamp(BB.Vec2.dot(pa, ba) / BB.Vec2.dot(ba, ba), 0.0, 1.0);

@@ -505,6 +505,6 @@ export class KlAppSelect {
     }
 
     destroy(): void {
-        // todo
+        // ...
     }
 }

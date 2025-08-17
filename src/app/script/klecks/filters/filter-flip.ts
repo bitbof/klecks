@@ -2,10 +2,10 @@ import { BB } from '../../bb/bb';
 import { Checkbox } from '../ui/components/checkbox';
 import { KlCanvasPreview } from '../ui/project-viewport/kl-canvas-preview';
 import {
-    IFilterApply,
-    IFilterGetDialogParam,
+    TFilterApply,
+    TFilterGetDialogParam,
     TFilterGetDialogResult,
-    IKlBasicLayer,
+    TKlBasicLayer,
     TMixMode,
 } from '../kl-types';
 import { LANG } from '../../language/language';
@@ -20,7 +20,7 @@ export type TFilterFlipInput = {
 };
 
 export const filterFlip = {
-    getDialog(params: IFilterGetDialogParam) {
+    getDialog(params: TFilterGetDialogParam) {
         const context = params.context;
         const klCanvas = params.klCanvas;
         if (!context || !klCanvas) {
@@ -53,6 +53,7 @@ export const filterFlip = {
             css: {
                 marginBottom: '10px',
             },
+            name: 'flip-horizontal',
         });
         const verticalCheckbox = new Checkbox({
             init: isVertical,
@@ -65,6 +66,7 @@ export const filterFlip = {
             css: {
                 marginBottom: '10px',
             },
+            name: 'flip-vertical',
         });
         rootEl.append(horizontalCheckbox.getElement());
         rootEl.append(verticalCheckbox.getElement());
@@ -96,7 +98,7 @@ export const filterFlip = {
             },
         });
 
-        const previewLayer: IKlBasicLayer = {
+        const previewLayer: TKlBasicLayer = {
             image: BB.canvas(Math.round(w), Math.round(h)),
             isVisible: true,
             opacity: 1,
@@ -187,7 +189,7 @@ export const filterFlip = {
         return result;
     },
 
-    apply(params: IFilterApply<TFilterFlipInput>): boolean {
+    apply(params: TFilterApply<TFilterFlipInput>): boolean {
         const context = params.layer.context;
         const klCanvas = params.klCanvas;
         const horizontal = params.input.horizontal;

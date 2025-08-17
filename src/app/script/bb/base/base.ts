@@ -1,4 +1,4 @@
-import { IKeyString, ISize2D, ISVG, IVector2D } from '../bb-types';
+import { TKeyString, TSize2D, TSvg, TVector2D } from '../bb-types';
 
 export function insertAfter(referenceNode: Element, newNode: Element): void {
     if (referenceNode.parentNode) {
@@ -45,7 +45,7 @@ export function css(el: HTMLElement | SVGElement, styleObj: Partial<CSSStyleDecl
     });
 }
 
-export function setAttributes(el: Element, attrObj: IKeyString): void {
+export function setAttributes(el: Element, attrObj: TKeyString): void {
     const keyArr = Object.keys(attrObj);
     let keyStr;
     for (let i = 0; i < keyArr.length; i++) {
@@ -66,7 +66,7 @@ export function append(target: HTMLElement, els: (HTMLElement | string | undefin
 /**
  * a needs to fit into b
  */
-export function fitInto(aw: number, ah: number, bw: number, bh: number, min?: number): ISize2D {
+export function fitInto(aw: number, ah: number, bw: number, bh: number, min?: number): TSize2D {
     let width = aw * bw,
         height = ah * bw;
     if (width > bw) {
@@ -91,7 +91,7 @@ export function fitInto(aw: number, ah: number, bw: number, bh: number, min?: nu
  * @param bw
  * @param bh
  */
-export function centerWithin(aw: number, ah: number, bw: number, bh: number): IVector2D {
+export function centerWithin(aw: number, ah: number, bw: number, bh: number): TVector2D {
     return {
         x: aw / 2 - bw / 2,
         y: ah / 2 - bh / 2,
@@ -122,6 +122,12 @@ export function decToFraction(decimalNumber: number): [number, number] {
     const denominator = Math.pow(10, len);
     const numerator = decimalNumber * denominator;
     return reduce(numerator, denominator);
+}
+
+export function isBlob(maybeBlob: unknown): maybeBlob is Blob {
+    return (
+        maybeBlob instanceof Blob || Object.prototype.toString.call(maybeBlob) === '[object Blob]'
+    );
 }
 
 /**
@@ -208,6 +214,8 @@ export function shareCanvas(p: {
  * Prevent ipad from zooming in when double tapping. iPadOS 13 bug.
  * Give it your click event
  *
+ * Can have GLOBAL EFFECT!
+ *
  * @param clickEvent
  * @returns {boolean}
  */
@@ -216,18 +224,22 @@ export function handleClick(clickEvent: Event): boolean {
     if (!target) {
         return false;
     }
-    if (['A', 'LABEL', 'INPUT', 'SUMMARY'].includes(target.tagName) || (target as any).allowClick) {
-        return true;
+    let el: HTMLElement | null = target;
+    while (el) {
+        if (['A', 'LABEL', 'INPUT', 'SUMMARY'].includes(el.tagName)) {
+            return true;
+        }
+        el = el.parentElement;
     }
     clickEvent.preventDefault();
     return false;
 }
 
-export function createSvg(p: ISVG): SVGElement {
+export function createSvg(p: TSvg): SVGElement {
     const result = document.createElementNS('http://www.w3.org/2000/svg', p.elementType);
     Object.entries(p).forEach(([keyStr, item]) => {
         if (keyStr === 'childrenArr') {
-            (item as ISVG[]).forEach((child) => {
+            (item as TSvg[]).forEach((child) => {
                 result.append(createSvg(child));
             });
         } else if (keyStr !== 'elementType') {
@@ -293,4 +305,50 @@ export function base64ToBlob(base64Str: string): Blob {
 
 export function createArray<T>(length: number, fillValue: T): T[] {
     return new Array(length).fill(fillValue);
+}
+
+export function randomUuid(): string {
+    if ('randumUUID' in crypto) {
+        return crypto.randomUUID();
+    }
+    // fallback just for dev
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+        const r = (Math.random() * 16) | 0,
+            v = c === 'x' ? r : (r & 0x3) | 0x8;
+        return v.toString(16);
+    });
+}
+
+export function sleep(ms: number) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+// if a promise takes too long
+export async function timeoutWrapper<G>(
+    promise: Promise<G>,
+    name: string,
+    timeoutMs: number = 5000,
+): Promise<G> {
+    return Promise.race<G>([
+        promise,
+        new Promise((_, reject) => {
+            setTimeout(() => reject(new Error(`Promise "${name}" timed out.`)), timeoutMs);
+        }),
+    ]);
+}
+
+export async function loadSvg(url: string): Promise<SVGSVGElement> {
+    const response = await fetch(url);
+    const svgText = await response.text();
+
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(svgText, 'image/svg+xml');
+    const svg = doc.querySelector('svg');
+
+    if (!svg) {
+        throw new Error('No <svg> found in the file');
+    }
+
+    // Optional: Clone to prevent reusing the same node
+    return svg.cloneNode(true) as SVGSVGElement;
 }

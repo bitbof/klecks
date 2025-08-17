@@ -1,11 +1,11 @@
 import { getSharedFx } from '../../fx-canvas/shared-fx';
-import { IFilterApply } from '../kl-types';
+import { TFilterApply } from '../kl-types';
 import { canvasToLayerTiles } from '../history/push-helpers/canvas-to-layer-tiles';
 
 export type TFilterInvertInput = null;
 
 export const filterInvert = {
-    apply(params: IFilterApply<TFilterInvertInput>): boolean {
+    apply(params: TFilterApply<TFilterInvertInput>): boolean {
         const context = params.layer.context;
         const klHistory = params.klHistory;
         if (!context) {

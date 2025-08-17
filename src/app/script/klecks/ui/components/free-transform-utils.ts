@@ -1,21 +1,21 @@
-import { IVector2D } from '../../../bb/bb-types';
+import { TVector2D } from '../../../bb/bb-types';
 import { BB } from '../../../bb/bb';
 import { PointerListener } from '../../../bb/input/pointer-listener';
 
-export interface IFreeTransform {
+export type TFreeTransform = {
     x: number; // center of transform region. image space
     y: number;
     width: number; // size of transform region. image space
     height: number;
     angleDeg: number; // angle of transform region. degrees
-}
+};
 
 export type TFreeTransformCorner = {
     i: number; // index in corners array
     el: HTMLElement; // draggable corner circle in DOM
     x: number; // unscaled position (transform space)
     y: number;
-    virtualPos: IVector2D; // unscaled temporary position (image space)
+    virtualPos: TVector2D; // unscaled temporary position (image space)
     updateDOM: () => void; // update styling in DOM
     pointerListener: PointerListener;
 };
@@ -36,7 +36,7 @@ export type TFreeTransformEdge = {
  *
  * @param transform
  */
-export function snapToPixel(transform: IFreeTransform): void {
+export function snapToPixel(transform: TFreeTransform): void {
     if (Math.abs(transform.angleDeg) % 90 !== 0) {
         return;
     }
@@ -56,7 +56,7 @@ export function snapToPixel(transform: IFreeTransform): void {
             : Math.round(transform.y - 0.5) + 0.5;
 }
 
-export function copyTransform(transform: IFreeTransform): IFreeTransform {
+export function copyTransform(transform: TFreeTransform): TFreeTransform {
     return {
         x: transform.x,
         y: transform.y,
@@ -77,7 +77,7 @@ export function copyTransform(transform: IFreeTransform): IFreeTransform {
  * @param y
  * @param transform
  */
-export function toTransformSpace(x: number, y: number, transform: IFreeTransform): IVector2D {
+export function toTransformSpace(x: number, y: number, transform: TFreeTransform): TVector2D {
     let px, py;
     px = x - transform.x;
     py = y - transform.y;
@@ -98,7 +98,7 @@ export function toTransformSpace(x: number, y: number, transform: IFreeTransform
  * @param y
  * @param transform
  */
-export function toImageSpace(x: number, y: number, transform: IFreeTransform): IVector2D {
+export function toImageSpace(x: number, y: number, transform: TFreeTransform): TVector2D {
     const rot = BB.rotateAround({ x: 0, y: 0 }, { x: x, y: y }, transform.angleDeg);
     return {
         x: rot.x + transform.x,

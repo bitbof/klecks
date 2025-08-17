@@ -1,0 +1,132 @@
+@keyframes rootAnim {
+    0% {
+        opacity: 0;
+    }
+    100% {
+    }
+}
+
+.root {
+    position: fixed;
+    left: 0;
+    width: 100%;
+    pointer-events: none;
+    display: flex;
+    justify-content: center;
+    transition: opacity 0.4s;
+
+    animation-name: rootAnim;
+    animation-duration: 400ms;
+    animation-fill-mode: none;
+    animation-iteration-count: 1;
+}
+
+@media (max-width: 767px) {
+    .root {
+        background: linear-gradient(180deg, rgba(0, 0, 0, 0.45) 100px, rgba(0, 0, 0, 0) 100%);
+        height: 100vh;
+    }
+}
+
+.banner {
+    position: relative;
+    align-self: flex-start;
+    pointer-events: initial;
+    user-select: none;
+    background: var(--ui-bg-color);
+    padding: 10px;
+    border-radius: 5px;
+    box-shadow: 0 0 0 1px #9a9a9a;
+    margin-top: 10px;
+    color: rgba(0, 0, 0, 0.6);
+
+    display: flex;
+    gap: 10px;
+    flex-direction: column;
+}
+
+.closeArea {
+    pointer-events: initial;
+    position: absolute;
+    left: -150px;
+    top: -150px;
+    width: calc(100% + 300px);
+    height: calc(100% + 300px);
+    z-index: -1;
+}
+
+.mainContent {
+    display: flex;
+    gap: 10px;
+}
+
+.preview {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+
+    overflow: hidden;
+    box-shadow: 0 0 0 1px #aaa;
+    background: #cdcdcd;
+
+    &:hover {
+        box-shadow: 0 0 0 1px #fff;
+    }
+
+    img {
+        display: block;
+        max-width: 100%;
+        height: 100%;
+        box-shadow: 0 0 0 1px #aaa;
+        background: var(--kl-checkerboard-background);
+    }
+}
+
+.btn {
+    display: block;
+    width: 100%;
+}
+
+.rightCol {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    gap: 10px;
+    padding-top: 19px;
+}
+
+.closeButton {
+    position: absolute;
+    right: 0;
+    top: 0;
+    background: none !important;
+    box-shadow: none !important;
+}
+
+:global(body.kl-theme-dark) {
+    @media (max-width: 767px) {
+        .root {
+            background: linear-gradient(180deg, rgba(0, 0, 0, 0.45) 100px, rgba(0, 0, 0, 0) 100%);
+        }
+    }
+
+    .banner {
+        background: #333333;
+        box-shadow: 0 0 0 1px #636363;
+        color: #ccc;
+    }
+
+    .preview {
+        box-shadow: 0 0 0 1px #636363;
+        background: rgb(33, 33, 33);
+
+        &:hover {
+            box-shadow: 0 0 0 1px #aaa;
+        }
+
+        img {
+            box-shadow: 0 0 0 1px #636363;
+        }
+    }
+}

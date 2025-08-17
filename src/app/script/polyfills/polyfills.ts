@@ -58,6 +58,34 @@ if (!Array.prototype.flat) {
     });
 }
 
+// chrome 69, edge 79, safari 12, firefox 62
+if (!Array.prototype.flatMap) {
+    Object.defineProperty(Array.prototype, 'flatMap', {
+        configurable: true,
+        writable: true,
+        value: function (
+            callback: (value: any, index: number, array: any[]) => any,
+            thisArg?: any,
+        ) {
+            if (typeof callback !== 'function') {
+                throw new TypeError(callback + ' is not a function');
+            }
+            const result: any[] = [];
+            for (let i = 0; i < this.length; i++) {
+                if (i in this) {
+                    const mapped = callback.call(thisArg, this[i], i, this);
+                    if (Array.isArray(mapped)) {
+                        result.push(...mapped);
+                    } else {
+                        result.push(mapped);
+                    }
+                }
+            }
+            return result;
+        },
+    });
+}
+
 // Chrome 85, Firefox 77, Safari 13.1
 // if there are problems, maybe use core-js
 if (!String.prototype.replaceAll) {

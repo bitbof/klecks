@@ -91,6 +91,7 @@ export class FillUi {
                 ['above', LANG('bucket-sample-above')],
             ],
             initValue: 'all',
+            name: 'sampling-mode',
         });
         const modePointerListener = new BB.PointerListener({
             target: this.modeSelect.getElement(),
@@ -121,6 +122,7 @@ export class FillUi {
                 ['7', '7'],
             ],
             initValue: '0',
+            name: 'fill-growth',
         });
         const growPointerListener = new BB.PointerListener({
             target: this.growSelect.getElement(),
@@ -139,21 +141,13 @@ export class FillUi {
             callback: (b) => {
                 this.isContiguous = b;
             },
-            css: {
-                paddingRight: '5px',
-                display: 'inline-block',
-                width: '50%',
-            },
+            name: 'is-contiguous',
         });
 
         this.eraserToggle = new Checkbox({
             init: false,
             label: LANG('eraser'),
-            css: {
-                paddingRight: '5px',
-                display: 'inline-block',
-                width: '50%',
-            },
+            name: 'eraser-toggle',
         });
 
         this.rootEl.append(
@@ -162,6 +156,7 @@ export class FillUi {
                 css: {
                     display: 'flex',
                     marginTop: '10px',
+                    gap: '10px',
                 },
             }),
         );

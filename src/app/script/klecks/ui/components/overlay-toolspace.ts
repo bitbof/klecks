@@ -3,8 +3,8 @@ import { KlColorSliderSmall } from './kl-color-slider-small';
 import { KlSlider } from './kl-slider';
 import { BrushSettingService, TBrushSettingEmit } from '../../brushes-ui/brush-setting-service';
 import { LANG } from '../../../language/language';
-import { IRGB } from '../../kl-types';
-import { IVector2D } from '../../../bb/bb-types';
+import { TRgb } from '../../kl-types';
+import { TVector2D } from '../../../bb/bb-types';
 
 /**
  * Compressed HUD toolspace. When you hold ctrl+alt.
@@ -30,7 +30,7 @@ export class OverlayToolspace {
             className: 'kl-overlay-toolspace',
         });
         const queuedObj: {
-            color: IRGB | null;
+            color: TRgb | null;
             size: number | null;
             opacity: number | null;
         } = {
@@ -51,7 +51,7 @@ export class OverlayToolspace {
             heightSV: sizeObj.svHeight,
             heightH: sizeObj.hHeight,
             color: p.brushSettingService.getColor(),
-            callback: (rgbObj: IRGB) => {
+            callback: (rgbObj: TRgb) => {
                 selectedColorEl.style.backgroundColor =
                     'rgb(' + rgbObj.r + ',' + rgbObj.g + ',' + rgbObj.b + ')';
                 p.brushSettingService.setColor(rgbObj, subscriptionFunc);
@@ -72,7 +72,7 @@ export class OverlayToolspace {
 
         colorEl.append(selectedColorEl, colorSlider.getElement());
 
-        const updateColor = (rgbObj: IRGB) => {
+        const updateColor = (rgbObj: TRgb) => {
             colorSlider.setColor(rgbObj);
             selectedColorEl.style.backgroundColor =
                 'rgb(' + rgbObj.r + ',' + rgbObj.g + ',' + rgbObj.b + ')';
@@ -180,7 +180,7 @@ export class OverlayToolspace {
             }
         };
 
-        let mousePos: IVector2D | null = null;
+        let mousePos: TVector2D | null = null;
         document.addEventListener(
             'pointermove',
             (event) => {

@@ -1,5 +1,5 @@
 import { TRenderTextParam } from '../../../image-operations/render-text';
-import { IRGB, IRGBA } from '../../../kl-types';
+import { TRgb, TRgba } from '../../../kl-types';
 import { ColorOptions } from '../../components/color-options';
 import { KlSlider } from '../../components/kl-slider';
 import { LANG } from '../../../../language/language';
@@ -9,8 +9,8 @@ import { createSvg } from '../../../../bb/base/base';
 type TFillParams = Pick<TRenderTextParam, 'fill'>;
 
 export type TFillUIParams = TFillParams & {
-    primaryColor: IRGB;
-    secondaryColor: IRGB;
+    primaryColor: TRgb;
+    secondaryColor: TRgb;
     onUpdate: (v: Partial<TFillParams>) => void;
 };
 
@@ -26,7 +26,7 @@ export class TextToolFillUI {
             p.onUpdate(this.getValues());
         };
 
-        const colorOptionsArr: (IRGBA | null)[] = [
+        const colorOptionsArr: (TRgba | null)[] = [
             null,
             p.fill
                 ? {

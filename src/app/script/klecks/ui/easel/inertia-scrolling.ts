@@ -1,4 +1,4 @@
-import { IVector2D } from '../../../bb/bb-types';
+import { TVector2D } from '../../../bb/bb-types';
 import { TViewportTransform } from '../project-viewport/project-viewport';
 import { BB } from '../../../bb/bb';
 
@@ -16,7 +16,7 @@ export class InertiaScrolling {
     private readonly setTransform: (transform: TViewportTransform) => void;
 
     private readonly defaultDeltaMs = 1000 / 60; // time factor is 1 for 60fps, 2 for 120fps
-    private momentum: IVector2D = { x: 0, y: 0 };
+    private momentum: TVector2D = { x: 0, y: 0 };
     private isDragging: boolean = false;
     private lastDragTimestamp: number = 0;
     private lastTransform: TViewportTransform | undefined;
@@ -86,7 +86,7 @@ export class InertiaScrolling {
         this.setTransform(transform);
     }
 
-    // -------------------- public --------------------------
+    // ----------------------------------- public -----------------------------------
 
     constructor(p: TInertiaScrollingParams) {
         this.getTransform = p.getTransform;

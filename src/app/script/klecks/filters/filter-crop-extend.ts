@@ -3,10 +3,9 @@ import { input } from '../ui/components/input';
 import { Checkbox } from '../ui/components/checkbox';
 import { ColorOptions } from '../ui/components/color-options';
 import { Cropper } from '../ui/components/cropper';
-import { IFilterApply, IFilterGetDialogParam, TFilterGetDialogResult, IRGBA } from '../kl-types';
+import { TFilterApply, TFilterGetDialogParam, TFilterGetDialogResult, TRgba } from '../kl-types';
 import { LANG } from '../../language/language';
-import { theme } from '../../theme/theme';
-import { IRect } from '../../bb/bb-types';
+import { TRect } from '../../bb/bb-types';
 import { SMALL_PREVIEW } from '../ui/utils/preview-size';
 
 export type TFilterCropExtendInput = {
@@ -14,11 +13,11 @@ export type TFilterCropExtendInput = {
     right: number;
     top: number;
     bottom: number;
-    fillColor?: IRGBA;
+    fillColor?: TRgba;
 };
 
 export const filterCropExtend = {
-    getDialog(params: IFilterGetDialogParam) {
+    getDialog(params: TFilterGetDialogParam) {
         const klCanvas = params.klCanvas;
         if (!klCanvas) {
             return false;
@@ -203,6 +202,7 @@ export const filterCropExtend = {
                 useRuleOfThirds = b;
                 cropper.showThirds(useRuleOfThirds);
             },
+            name: 'rule-of-thirds',
         });
         rootEl.append(
             BB.el({
@@ -253,7 +253,7 @@ export const filterCropExtend = {
 
         // when input field changed, or dragging in preview finished
         // adjusts the zoom
-        function update(transform: IRect): void {
+        function update(transform: TRect): void {
             const fit = BB.fitInto(transform.width, transform.height, 260, 180, 1);
             scale = fit.width / transform.width;
 
@@ -279,17 +279,12 @@ export const filterCropExtend = {
             rightInput.value = '' + right;
             bottomInput.value = '' + bottom;
 
-            BB.createCheckerDataUrl(
-                parseInt('' + 50 * scale),
-                function (url) {
-                    previewWrapper.style.background = 'url(' + url + ')';
-                    if (selectedRgbaObj.a !== 0) {
-                        tempCanvas.style.background = 'url(' + url + ')';
-                    }
-                },
-                theme.isDark(),
-            );
+            if (selectedRgbaObj.a !== 0) {
+                tempCanvas.style.background = 'var(--kl-checkerboard-background)';
+                tempCanvas.style.backgroundSize = 100 * scale + 'px';
+            }
             previewWrapper.style.backgroundPosition = offset.x + 'px ' + offset.y + 'px';
+            previewWrapper.style.backgroundSize = 100 * scale + 'px';
 
             cropper.setScale(scale);
         }
@@ -309,6 +304,7 @@ export const filterCropExtend = {
                 overflow: 'hidden',
                 userSelect: 'none',
                 touchAction: 'none',
+                background: 'var(--kl-checkerboard-background)',
             },
         });
         previewWrapper.oncontextmenu = function () {
@@ -365,26 +361,14 @@ export const filterCropExtend = {
                 tempCanvas.style.background = '';
             } else {
                 bgColorOverlay.style.background = BB.ColorConverter.toRgbStr(selectedRgbaObj);
-
-                BB.createCheckerDataUrl(
-                    parseInt('' + 50 * scale),
-                    function (url) {
-                        tempCanvas.style.background = 'url(' + url + ')';
-                    },
-                    theme.isDark(),
-                );
+                tempCanvas.style.background = 'var(--kl-checkerboard-background)';
+                tempCanvas.style.backgroundSize = 100 * scale + 'px';
             }
         }
-
-        function updateIsDark(): void {
-            updateInput();
-        }
-        theme.addIsDarkListener(updateIsDark);
 
         result.destroy = (): void => {
             cropper.destroy();
             ruleOThirdsCheckbox.destroy();
-            theme.removeIsDarkListener(updateIsDark);
             colorOptions.destroy();
         };
         result.getInput = function (): TFilterCropExtendInput {
@@ -400,7 +384,7 @@ export const filterCropExtend = {
         return result;
     },
 
-    apply(params: IFilterApply<TFilterCropExtendInput>): boolean {
+    apply(params: TFilterApply<TFilterCropExtendInput>): boolean {
         const klCanvas = params.klCanvas;
         if (
             !klCanvas ||

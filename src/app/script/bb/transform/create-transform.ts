@@ -1,10 +1,10 @@
 import { TViewportTransform } from '../../klecks/ui/project-viewport/project-viewport';
-import { IVector2D } from '../bb-types';
-import { compose, rotate, scale as scaleFunc, applyToPoint } from 'transformation-matrix';
+import { TVector2D } from '../bb-types';
+import { applyToPoint, compose, rotate, scale as scaleFunc } from 'transformation-matrix';
 
 export function createTransform(
-    viewportPoint: IVector2D,
-    canvasPoint: IVector2D,
+    viewportPoint: TVector2D,
+    canvasPoint: TVector2D,
     scale: number,
     angleDeg: number,
 ): TViewportTransform {

@@ -2,7 +2,7 @@ import { gl } from '../core/gl';
 import { FxShader } from '../core/fx-shader';
 import { simpleShader } from '../core/simple-shader';
 import { TFxCanvas } from '../fx-canvas-types';
-import { IRGBA } from '../../klecks/kl-types';
+import { TRgba } from '../../klecks/kl-types';
 
 /**
  * To Alpha
@@ -13,7 +13,7 @@ import { IRGBA } from '../../klecks/kl-types';
 export type TFilterToAlpha = (
     this: TFxCanvas,
     isInverted: boolean,
-    replaceRGBA: IRGBA | null,
+    replaceRGBA: TRgba | null,
 ) => TFxCanvas;
 
 export const toAlpha: TFilterToAlpha = function (isInverted, replaceRGBA) {

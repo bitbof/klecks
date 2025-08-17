@@ -1,12 +1,13 @@
-import { IKlPsd, IRGB, TDropOption } from '../klecks/kl-types';
+import { TDropOption, TKlPsd, TRgb } from '../klecks/kl-types';
 import { KL } from '../klecks/kl';
 import { LANG } from '../language/language';
 import { BB } from '../bb/bb';
 import { KlCanvas, TKlCanvasLayer } from '../klecks/canvas/kl-canvas';
 import { LayersUi } from '../klecks/ui/tool-tabs/layers-ui/layers-ui';
-import { IRect, ISize2D } from '../bb/bb-types';
+import { TRect, TSize2D } from '../bb/bb-types';
 import { throwIfNull, throwIfUndefined } from '../bb/base/base';
 import { getNextLayerId } from '../klecks/history/get-next-layer-id';
+import { detectFiletype } from '../klecks/storage/file-header-detection';
 
 // todo later:
 // onImage: (project: IKlProject) => void
@@ -21,11 +22,11 @@ export class KlAppImportHandler {
     private readonly onImportConfirm: () => void;
     private readonly applyUncommitted: () => void;
 
-    private readonly onColor: (rgb: IRGB) => void;
+    private readonly onColor: (rgb: TRgb) => void;
 
     private importFinishedLoading(
         importedImage: // convertedPsd | {type: 'image', width: number, height: number, canvas: image | canvas}
-        | IKlPsd
+        | TKlPsd
             | {
                   type: 'image';
                   width: number;
@@ -51,7 +52,7 @@ export class KlAppImportHandler {
             return;
         }
 
-        const getResizedDimensions = (width: number, height: number): ISize2D => {
+        const getResizedDimensions = (width: number, height: number): TSize2D => {
             let w = parseInt('' + width);
             let h = parseInt('' + height);
             if (w > this.klMaxCanvasSize) {
@@ -96,13 +97,13 @@ export class KlAppImportHandler {
         /**
          * convertedPsdObj has no layers if flattened
          */
-        const importAsImagePsd = (convertedPsdObj: IKlPsd, cropObj?: IRect) => {
+        const importAsImagePsd = (convertedPsdObj: TKlPsd, cropObj?: TRect) => {
             this.applyUncommitted();
             // crop
             const crop = (
                 targetCanvas: HTMLCanvasElement,
                 cropCanvas: HTMLCanvasElement,
-                cropObj: IRect,
+                cropObj: TRect,
             ): void => {
                 // eslint-disable-next-line no-self-assign
                 cropCanvas.width = cropCanvas.width;
@@ -190,20 +191,28 @@ export class KlAppImportHandler {
                     if (!transformObj) {
                         return;
                     }
-                    this.klCanvas.addLayer(undefined, {
-                        name: filename,
-                        isVisible: true,
-                        opacity: 1,
-                        image: (ctx) => {
-                            BB.drawTransformedImageWithBounds(
-                                ctx,
-                                canvas,
-                                transformObj,
-                                undefined,
-                                isPixelated,
-                            );
-                        },
-                    });
+                    const operation = (ctx: CanvasRenderingContext2D) => {
+                        BB.drawTransformedImageWithBounds(
+                            ctx,
+                            canvas,
+                            transformObj,
+                            undefined,
+                            isPixelated,
+                        );
+                    };
+                    if (
+                        !this.klCanvas.addLayer(undefined, {
+                            name: filename,
+                            isVisible: true,
+                            opacity: 1,
+                            image: operation,
+                        })
+                    ) {
+                        this.klCanvas.drawOperation(
+                            this.klCanvas.getLayers().length - 1,
+                            operation,
+                        );
+                    }
                     const layers = this.klCanvas.getLayers();
                     const activeLayerIndex = layers.length - 1;
                     this.setCurrentLayer(this.klCanvas.getLayer(activeLayerIndex));
@@ -255,7 +264,7 @@ export class KlAppImportHandler {
             applyUncommitted: () => void;
         },
         callback: {
-            onColor: (rgb: IRGB) => void;
+            onColor: (rgb: TRgb) => void;
         },
     ) {
         this.klRootEl = input.klRootEl;
@@ -325,7 +334,7 @@ export class KlAppImportHandler {
     }
 
     onPaste(e: ClipboardEvent): void {
-        if (KL.dialogCounter.get() > 0) {
+        if (KL.DIALOG_COUNTER.get() > 0) {
             return;
         }
 
@@ -404,7 +413,7 @@ export class KlAppImportHandler {
         }
     }
 
-    handleFileSelect(files: FileList, optionStr: TDropOption): void {
+    async handleFileSelect(files: FileList, optionStr: TDropOption): Promise<void> {
         const showWarningPsdFlattened = () => {
             KL.popup({
                 target: this.klRootEl,
@@ -415,11 +424,33 @@ export class KlAppImportHandler {
         };
 
         let hasUnsupportedFile = false;
+        // files need to be copied, because the input is reset
+        const fileArr = [...files];
         // eslint-disable-next-line no-cond-assign
-        for (let i = 0, file; (file = files[i]); i++) {
-            const nameSplit = file.name.split('.');
-            const extension = nameSplit[nameSplit.length - 1].toLowerCase();
-            if (extension === 'psd') {
+        for (let i = 0; i < fileArr.length; i++) {
+            const file = fileArr[i];
+            const fileType = await detectFiletype(file);
+            if (fileType === 'image') {
+                ((f) => {
+                    window.URL = window.URL || window.webkitURL;
+                    const url = window.URL.createObjectURL(f);
+                    const im = new Image();
+                    im.src = url;
+                    BB.loadImage(im, () => {
+                        URL.revokeObjectURL(url);
+                        this.importFinishedLoading(
+                            {
+                                type: 'image',
+                                width: im.width,
+                                height: im.height,
+                                canvas: im,
+                            },
+                            f.name,
+                            optionStr,
+                        );
+                    });
+                })(file);
+            } else if (fileType === 'psd') {
                 ((f) => {
                     const loaderSizeBytes = 1024 * 1024 * 25; // 25mb
                     const maxSizeBytes = 1024 * 1024 * 1024; // 1gb
@@ -436,7 +467,7 @@ export class KlAppImportHandler {
                         return;
                     }
 
-                    const doShowLoader = files.length === 1 && f.size >= loaderSizeBytes;
+                    const doShowLoader = fileArr.length === 1 && f.size >= loaderSizeBytes;
                     let loaderIsOpen = true;
                     let closeLoader: (() => void) | null;
 
@@ -563,25 +594,6 @@ export class KlAppImportHandler {
                             });
                     };
                     reader.readAsArrayBuffer(f);
-                })(file);
-            } else if (file.type.match('image.*')) {
-                ((f) => {
-                    window.URL = window.URL || window.webkitURL;
-                    const url = window.URL.createObjectURL(f);
-                    const im = new Image();
-                    im.src = url;
-                    BB.loadImage(im, () => {
-                        this.importFinishedLoading(
-                            {
-                                type: 'image',
-                                width: im.width,
-                                height: im.height,
-                                canvas: im,
-                            },
-                            f.name,
-                            optionStr,
-                        );
-                    });
                 })(file);
             } else {
                 hasUnsupportedFile = true;

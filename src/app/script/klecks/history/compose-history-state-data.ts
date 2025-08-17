@@ -90,6 +90,7 @@ export function composeHistoryStateData(
     }
     entries = entries.slice(0, targetIndex + 1);
     return {
+        projectId: getLatestDefinedProp(entries, 'projectId'),
         size: getLatestDefinedProp(entries, 'size'),
         activeLayerId: getLatestDefinedProp(entries, 'activeLayerId'),
         selection: getLatestDefinedProp(entries, 'selection'),

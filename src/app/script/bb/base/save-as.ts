@@ -1,10 +1,10 @@
-type FilePickerAcceptType = {
+type TFilePickerAcceptType = {
     description?: string;
     accept: Record<string, string[]>;
 };
 
 type TMimeType = string;
-const types: Record<TMimeType, FilePickerAcceptType> = {
+const types: Record<TMimeType, TFilePickerAcceptType> = {
     'image/png': {
         description: 'PNG Image',
         accept: { 'image/png': ['.png'] },

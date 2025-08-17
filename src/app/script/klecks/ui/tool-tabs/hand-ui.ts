@@ -164,6 +164,7 @@ export class HandUi {
                 LocalStorage.setItem(LS_INERTIA_KEY, '' + b);
                 p.onChangeUseInertiaScrolling(b);
             },
+            name: 'enable-inertia-scrolling',
         });
         setTimeout(() => {
             p.onChangeUseInertiaScrolling(inertiaToggle.getValue());

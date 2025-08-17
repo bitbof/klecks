@@ -1,6 +1,6 @@
 import { BB } from '../../bb/bb';
-import { IBounds, IPressureInput, IVector2D } from '../../bb/bb-types';
-import { IRGB } from '../kl-types';
+import { TBounds, TPressureInput, TVector2D } from '../../bb/bb-types';
+import { TRgb } from '../kl-types';
 import { clamp } from '../../bb/math/math';
 import { BezierLine, TBezierLineCallback } from '../../bb/math/line';
 import { KlHistory } from '../history/kl-history';
@@ -23,20 +23,20 @@ import { createArray } from '../../bb/base/base';
 
 const CELL_SIZE = 256;
 
-interface ISmudgeParams {
-    aP: IVector2D;
-    bP: IVector2D;
+type TSmudgeParams = {
+    aP: TVector2D;
+    bP: TVector2D;
     size: {
         w: number;
         h: number;
     };
     brush: {
-        center: IVector2D;
+        center: TVector2D;
         size: number;
         opacity: number;
         alphaLock: boolean;
     };
-}
+};
 
 /**
  * determine bounds of smudge
@@ -49,12 +49,12 @@ interface ISmudgeParams {
 function prepSmudge(
     imWidth: number,
     imHeight: number,
-    aP: IVector2D, // top left of source, integers
-    bP: IVector2D, // top left of dest, integers
+    aP: TVector2D, // top left of source, integers
+    bP: TVector2D, // top left of dest, integers
     size: { w: number; h: number }, // size of both rectangles, integers
 ): {
-    aP: IVector2D;
-    bP: IVector2D;
+    aP: TVector2D;
+    bP: TVector2D;
     size: { w: number; h: number };
 } | null {
     if (aP.x === bP.x && aP.y === bP.y) {
@@ -132,7 +132,7 @@ function prepSmudge(
  * @param imageData
  * @param p
  */
-function smudge(imageData: ImageData, p: ISmudgeParams): void {
+function smudge(imageData: ImageData, p: TSmudgeParams): void {
     p = BB.copyObj(p);
 
     const cSize = p.brush.size;
@@ -269,7 +269,7 @@ export class SmudgeBrush {
     private context: CanvasRenderingContext2D = {} as CanvasRenderingContext2D;
     private klHistory: KlHistory = {} as KlHistory;
 
-    private settingColor: IRGB = { r: 0, g: 0, b: 0 };
+    private settingColor: TRgb = { r: 0, g: 0, b: 0 };
     private settingSize: number = 35;
     private settingSpacing: number = 0.20446882736951905;
     private settingOpacity: number = 0.8;
@@ -278,20 +278,20 @@ export class SmudgeBrush {
     private settingLockLayerAlpha: boolean = false;
 
     private lineToolLastDot: number = 0;
-    private lastInput: IPressureInput = { x: 0, y: 0, pressure: 0 };
-    private lastInput2: IPressureInput = { x: 0, y: 0, pressure: 0 };
-    private lastDot: IVector2D | undefined;
+    private lastInput: TPressureInput = { x: 0, y: 0, pressure: 0 };
+    private lastInput2: TPressureInput = { x: 0, y: 0, pressure: 0 };
+    private lastDot: TVector2D | undefined;
 
     private isDrawing: boolean = false;
 
     private bezierLine: BezierLine | undefined;
 
-    private redrawBounds: IBounds | undefined;
-    private completeRedrawBounds: IBounds | undefined;
+    private redrawBounds: TBounds | undefined;
+    private completeRedrawBounds: TBounds | undefined;
 
     private copyImageData: ImageData = {} as ImageData;
 
-    private drawBuffer: ISmudgeParams[] = [];
+    private drawBuffer: TSmudgeParams[] = [];
 
     private copiedCells: boolean[] = [];
 
@@ -300,7 +300,7 @@ export class SmudgeBrush {
         this.redrawBounds = undefined;
     }
 
-    private updateRedrawBounds(bounds: IBounds): void {
+    private updateRedrawBounds(bounds: TBounds): void {
         this.redrawBounds = BB.updateBounds(this.redrawBounds, bounds);
     }
 
@@ -319,7 +319,7 @@ export class SmudgeBrush {
     copyFromCanvas(): void {
         const touchedCells = this.copiedCells.map(() => false);
 
-        const bounds: IBounds[] = [];
+        const bounds: TBounds[] = [];
         const cellsW = Math.ceil(this.copyImageData.width / CELL_SIZE);
 
         if (!this.redrawBounds) {
@@ -417,7 +417,7 @@ export class SmudgeBrush {
         );
 
         if (bounds) {
-            const params: ISmudgeParams = {
+            const params: TSmudgeParams = {
                 aP: bounds.aP,
                 bP: bounds.bP,
                 size: bounds.size,
@@ -646,7 +646,7 @@ export class SmudgeBrush {
         return this.isDrawing;
     }
 
-    setColor(c: IRGB): void {
+    setColor(c: TRgb): void {
         if (
             this.settingColor.r === c.r &&
             this.settingColor.g === c.g &&

@@ -1,0 +1,36 @@
+.preview {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    max-width: 100%;
+    box-shadow: 0 0 0 1px #aaa;
+    background: #cdcdcd;
+    overflow: hidden;
+
+    &:hover {
+        box-shadow: 0 0 0 1px #fff;
+    }
+
+    img,
+    canvas {
+        cursor: pointer;
+        max-width: 100%;
+        object-fit: contain;
+        box-shadow: 0 0 0 1px #aaa;
+        background: var(--kl-checkerboard-background);
+    }
+}
+
+:global(body.kl-theme-dark) {
+    .preview {
+        background: #212121;
+        box-shadow: 0 0 0 1px #5e5e5e;
+        &:hover {
+            box-shadow: 0 0 0 1px #aaa;
+        }
+
+        img {
+            box-shadow: 0 0 0 1px #5e5e5e;
+        }
+    }
+}

@@ -1,18 +1,30 @@
-import { IBounds } from '../../../bb/bb-types';
+import { TBounds } from '../../../bb/bb-types';
 import { HISTORY_TILE_SIZE } from '../kl-history';
-import { clamp } from '../../../bb/math/math';
+import { boundsInArea, clamp } from '../../../bb/math/math';
 import { createArray } from '../../../bb/base/base';
 
 // returns array, each entry represents a tile, as a boolean
 // true - intersected with bounds
 export function getChangedTiles(
-    bounds: IBounds, // canvas space
+    bounds: TBounds, // canvas space
     width: number,
     height: number,
     tileSize: number = HISTORY_TILE_SIZE,
 ): boolean[] {
+    // ensure: 1 top left, 2 bottom right
+    bounds = {
+        x1: Math.min(bounds.x1, bounds.x2),
+        y1: Math.min(bounds.y1, bounds.y2),
+        x2: Math.max(bounds.x1, bounds.x2),
+        y2: Math.max(bounds.y1, bounds.y2),
+    };
+    const boundsInCanvas = boundsInArea(bounds, width, height);
     const tilesX = Math.ceil(width / tileSize);
     const tilesY = Math.ceil(height / tileSize);
+    if (!boundsInCanvas) {
+        // no change if bounds don't overlap canvas
+        return createArray(tilesX * tilesY, false);
+    }
     const result: boolean[] = createArray(tilesX * tilesY, false);
 
     const tileBounds = {

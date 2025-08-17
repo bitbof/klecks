@@ -1,8 +1,8 @@
-import { IBounds, IKeyString, IRect } from '../bb-types';
+import { TBounds, TKeyString, TRect } from '../bb-types';
 import { createCanvas } from './create-canvas';
 import { asyncLoadImage, base64ToBlob, copyObj } from './base';
 
-export function copyCanvas(canvas: HTMLCanvasElement): HTMLCanvasElement {
+export function copyCanvas(canvas: HTMLCanvasElement | HTMLImageElement): HTMLCanvasElement {
     const resultCanvas = createCanvas(canvas.width, canvas.height);
     const ctx = resultCanvas.getContext('2d');
     if (!ctx) {
@@ -217,11 +217,8 @@ export const createCheckerCanvas = function (size: number, isDark?: boolean): HT
 };
 
 export const createCheckerDataUrl = (function () {
-    const cache: IKeyString = {
-        // previously created dataUrls
-        '8l': 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAMElEQVQ4T2M8ceLEfwY8wNzcHJ80A+OoAcMiDP7//483HZw8eRJ/Ohg1gIFx6IcBAIhJUqnarXQ1AAAAAElFTkSuQmCC',
-        '4l': 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAYAAADED76LAAAAJ0lEQVQoU2M8ceLEfwYkYG5ujsxlYKSDgv///6O44eTJk6huoL0CAGsOKVVu8UYvAAAAAElFTkSuQmCC',
-    };
+    // previously created dataUrls
+    const cache: TKeyString = {};
 
     return function (
         size: number,
@@ -417,8 +414,8 @@ export function freeCanvas(canvas: HTMLCanvasElement): void {
  */
 export function canvasBounds(
     context: CanvasRenderingContext2D,
-    integerBounds?: IBounds,
-): IRect | undefined {
+    integerBounds?: TBounds,
+): TRect | undefined {
     const searchBounds = integerBounds ?? {
         x1: 0,
         y1: 0,
@@ -438,7 +435,7 @@ export function canvasBounds(
             height: searchBounds.y2 - searchBounds.y1 + 1,
         };
     }
-    const tempBounds: Partial<IBounds> = {
+    const tempBounds: Partial<TBounds> = {
         x1: undefined,
         y1: undefined,
         x2: undefined,

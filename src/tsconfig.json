@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "target": "ES2022",
+    "target": "ESNext",
     "module": "commonjs",
     "strict": true,
     "esModuleInterop": true,
@@ -9,5 +9,8 @@
   },
   "$schema": "https://json.schemastore.org/tsconfig",
   "display": "Recommended",
-  "exclude": ["languages"]
+  "exclude": [
+    "app/script/fx-canvas/filters/unused",
+    "languages",
+  ]
 }

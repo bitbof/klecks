@@ -1,15 +1,15 @@
 import { BB } from '../../../../bb/bb';
-import { IVector2D } from '../../../../bb/bb-types';
-import { IPointerEvent } from '../../../../bb/input/event.types';
+import { TVector2D } from '../../../../bb/bb-types';
+import { TPointerEvent } from '../../../../bb/input/event.types';
 import { createMatrixFromTransform } from '../../../../bb/transform/create-matrix-from-transform';
 import { applyToPoint, inverse } from 'transformation-matrix';
 import { TEaselInterface, TEaselTool } from '../easel.types';
 import { CornerPanning } from '../corner-panning';
 
 export type tEaselShapeParams = {
-    onDown: (p: IVector2D, angleRad: number) => void;
-    onMove: (p: IVector2D) => void;
-    onUp: (p: IVector2D) => void;
+    onDown: (p: TVector2D, angleRad: number) => void;
+    onMove: (p: TVector2D) => void;
+    onUp: (p: TVector2D) => void;
 };
 
 export class EaselShape implements TEaselTool {
@@ -48,7 +48,7 @@ export class EaselShape implements TEaselTool {
         return this.svgEl;
     }
 
-    onPointer(e: IPointerEvent, isRepeat?: boolean): void {
+    onPointer(e: TPointerEvent, isRepeat?: boolean): void {
         if (this.doPan && !isRepeat) {
             this.cornerPanning.onPointer(e);
         }
@@ -78,7 +78,7 @@ export class EaselShape implements TEaselTool {
     getIsLocked(): boolean {
         return this.isDragging;
     }
-    activate(cursorPos?: IVector2D): void {
+    activate(cursorPos?: TVector2D): void {
         this.easel.setCursor('crosshair');
         this.isDragging = false;
     }

@@ -1,8 +1,8 @@
 import { BB } from '../../bb/bb';
-import { IRGB, TPressureInput } from '../kl-types';
+import { TPressureInput, TRgb } from '../kl-types';
 import { KlHistory } from '../history/kl-history';
 import { getPushableLayerChange } from '../history/push-helpers/get-pushable-layer-change';
-import { IBounds } from '../../bb/bb-types';
+import { TBounds } from '../../bb/bb-types';
 import { canvasToLayerTiles } from '../history/push-helpers/canvas-to-layer-tiles';
 
 const sampleCanvas = BB.canvas(32, 32);
@@ -10,7 +10,7 @@ const sampleCtx = BB.ctx(sampleCanvas);
 
 export class SketchyBrush {
     private context: CanvasRenderingContext2D = {} as CanvasRenderingContext2D;
-    private settingColor: IRGB = {} as IRGB;
+    private settingColor: TRgb = {} as TRgb;
     private settingSize: number = 1;
     private settingOpacity: number = 0.2;
     private settingBlending: number = 0.5;
@@ -24,10 +24,10 @@ export class SketchyBrush {
     private points: [number, number][] = []; // x y
     private count: number = 0;
     private readonly mixMode = [
-        (c1: IRGB): IRGB => {
+        (c1: TRgb): TRgb => {
             return c1;
         },
-        (c1: IRGB, c2: IRGB): IRGB => {
+        (c1: TRgb, c2: TRgb): TRgb => {
             // why
             const result = new BB.RGB(c1.r, c1.g, c1.b);
             result.r *= c2.r / 255;
@@ -37,7 +37,7 @@ export class SketchyBrush {
         },
     ];
 
-    private changedBounds: IBounds | undefined;
+    private changedBounds: TBounds | undefined;
 
     private rand(): number {
         this.sketchySeed++;
@@ -65,7 +65,7 @@ export class SketchyBrush {
         return this.settingSize / 2;
     }
 
-    setColor(c: IRGB): void {
+    setColor(c: TRgb): void {
         this.settingColor = c;
     }
 
@@ -115,7 +115,7 @@ export class SketchyBrush {
         }
     }
 
-    goLine(p_x: number, p_y: number, pressure: number, preMixedColor: IRGB | undefined): void {
+    goLine(p_x: number, p_y: number, pressure: number, preMixedColor: TRgb | undefined): void {
         if (!this.inputIsDrawing || (p_x === this.lastInput.x && p_y === this.lastInput.y)) {
             return;
         }
@@ -228,7 +228,11 @@ export class SketchyBrush {
 
         if (this.changedBounds) {
             const layerData = canvasToLayerTiles(this.context.canvas, this.changedBounds);
-            this.klHistory.push(getPushableLayerChange(this.klHistory.getComposed(), layerData));
+            if (layerData.some((item) => item)) {
+                this.klHistory.push(
+                    getPushableLayerChange(this.klHistory.getComposed(), layerData),
+                );
+            }
         }
     }
     //cheap 'n' ugly
@@ -339,12 +343,12 @@ export class SketchyBrush {
         });
 
         if (this.changedBounds) {
-            this.klHistory.push(
-                getPushableLayerChange(
-                    this.klHistory.getComposed(),
-                    canvasToLayerTiles(this.context.canvas, this.changedBounds),
-                ),
-            );
+            const layerData = canvasToLayerTiles(this.context.canvas, this.changedBounds);
+            if (layerData.some((item) => item)) {
+                this.klHistory.push(
+                    getPushableLayerChange(this.klHistory.getComposed(), layerData),
+                );
+            }
         }
     }
 

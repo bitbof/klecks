@@ -1,9 +1,6 @@
-// not the best
-
 /**
- * how many modals are open
+ * track how many modals are opened
  */
-
 export class DialogCounter {
     private listeners: ((v: number) => void)[] = [];
     private count = 0;
@@ -13,6 +10,7 @@ export class DialogCounter {
             item(this.count);
         });
     }
+    // ----------------------------------- public -----------------------------------
 
     increase(v?: number): void {
         if (v !== undefined) {
@@ -38,4 +36,4 @@ export class DialogCounter {
     }
 }
 
-export const dialogCounter = new DialogCounter();
+export const DIALOG_COUNTER = new DialogCounter();

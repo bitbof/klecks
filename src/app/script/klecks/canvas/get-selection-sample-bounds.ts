@@ -1,9 +1,9 @@
 import { TSelectionSample } from './kl-canvas';
-import { IBounds } from '../../bb/bb-types';
+import { TBounds } from '../../bb/bb-types';
 import { transformBounds } from '../../bb/transform/transform-bounds';
 import { integerBounds } from '../../bb/math/math';
 
-export function getSelectionSampleBounds(selectionSample: TSelectionSample): IBounds | undefined {
+export function getSelectionSampleBounds(selectionSample: TSelectionSample): TBounds | undefined {
     if (!selectionSample.image) {
         return undefined;
     }

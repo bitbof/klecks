@@ -470,11 +470,6 @@
     original: 'Browser Storage',
     value: 'Browser-Speicher'
   },
-  'file-storage-thumb-title': {
-    hint: 'when reopening or reloading',
-    original: 'Restores when reopening page',
-    value: 'Wiederhergestellt bei Neuladen'
-  },
   'file-storage-about': {
     hint: 'link to Browser Storage help/user manual',
     original: 'About Browser Storage',
@@ -482,8 +477,8 @@
   },
   'file-storage-cant-access': {
     hint: 'an error. Can’t access the storage.',
-    original: "Can't access",
-    value: 'Kein Zugriff'
+    original: "Can't access storage.",
+    value: 'Kein Zugriff auf Speicher.'
   },
   'file-storage-empty': {
     hint: 'nothing stored',
@@ -495,13 +490,26 @@
     original: 'Store',
     value: 'Speichern'
   },
+  'file-storage-open': {
+    hint: 'verb. to open, or to load',
+    original: 'Open',
+    value: 'Öffnen'
+  },
+  'file-storage-open-confirmation': {
+    original: 'This image is already open in another tab. Open it here too?',
+    value: 'Dieses Bild is bereits in einem anderen Tab geöffnet. Erneut öffnen?'
+  },
+  'file-storage-open-failed': {
+    original: 'Failed to load.',
+    value: 'Öffnen fehlgeschlagen.'
+  },
   'file-storage-clear': {
     original: 'Clear',
     value: 'Leeren'
   },
   'file-storage-clear-prompt': {
-    original: 'Clear Browser Storage?',
-    value: 'Browser-Speicher leeren?'
+    original: 'Clear Browser Storage? Clearing can not be undone.',
+    value: 'Browser-Speicher leeren? Löschen kann nicht rückgängig gemacht werden.'
   },
   'file-storage-storing': {
     hint: 'while it is in the process of storing',
@@ -512,6 +520,10 @@
     hint: 'overwrite what is already stored',
     original: 'Overwrite',
     value: 'Überschreiben'
+  },
+  'file-storage-overwrite-confirm': {
+    original: 'Overwrite Browser Storage? Overwritten data will be permanently deleted.',
+    value: 'Browser-Speicher überschreiben? Überschriebene Daten werden endgültig gelöscht.'
   },
   'file-storage-min-ago': {
     hint: "{x} <- needs to stay, it's a placeholder.",
@@ -567,6 +579,43 @@
     hint: 'verb',
     original: 'Upload',
     value: 'Hochladen'
+  },
+  'tab-recovery-recover-tabs': {
+    hint: 'allows user to recover browser tabs (including the drawing) of this app.',
+    original: 'Recover closed tabs',
+    value: 'Tabs wiederherstellen'
+  },
+  'tab-recovery-explanation': {
+    original: 'Recovery data is only kept for a little while. Save to ensure your work is not lost.',
+    value: 'Wiederherstellungsdaten bleiben nur kurz erhalten. Speichere, um den Verlust deiner Arbeit zu vermeiden.'
+  },
+  'tab-recovery-total-quota-label': {
+    original: 'Total:',
+    value: 'Gesamt:'
+  },
+  'tab-recovery-empty': {
+    original: 'Nothing to recover.',
+    value: 'Nichts zum Wiederherstellen.'
+  },
+  'tab-recovery-recover': {
+    original: 'Recover',
+    value: 'Wiederherstellen'
+  },
+  'tab-recovery-delete': {
+    original: 'Delete',
+    value: 'Löschen'
+  },
+  'tab-recovery-delete-confirmation': {
+    original: 'Delete this recovery? Deletion can not be undone.',
+    value: 'Diese Wiederherstellung löschen? Das Löschen kann nicht rückgängig gemacht werden.'
+  },
+  'tab-recovery-failed-to-recover': {
+    original: 'Failed to recover tab.',
+    value: 'Tab konnte nicht wiederhergestellt werden.'
+  },
+  'tab-recovery-recovered': {
+    original: 'Tab recovered.',
+    value: 'Tab wiederhergestellt.'
   },
   'cleared-layer': {
     hint: 'the layer has been cleared. It is now empty',
@@ -1496,10 +1545,6 @@
     hint: 'The app is loaded, but it’s still waiting for image',
     original: 'Waiting for image',
     value: 'Warten auf Bild'
-  },
-  unsaved: {
-    original: 'Unsaved',
-    value: 'Ungespeichert'
   },
   help: {
     hint: 'or user manual',

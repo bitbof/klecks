@@ -1,5 +1,5 @@
 import { BB } from '../../bb/bb';
-import { IDrawMoveEvent, TDrawEvent } from '../kl-types';
+import { TDrawEvent, TDrawMoveEvent } from '../kl-types';
 
 /**
  * Line smoothing. EventChain element. Smoothing via blending new position with old position.
@@ -60,7 +60,7 @@ export class LineSmoothing {
             if (this.smoothing > 0) {
                 this.timeout = setTimeout(() => {
                     this.interval = setInterval(() => {
-                        event = JSON.parse(JSON.stringify(event)) as IDrawMoveEvent;
+                        event = JSON.parse(JSON.stringify(event)) as TDrawMoveEvent;
 
                         event.x = BB.mix(inputX, this.lastMixedInput!.x, this.smoothing);
                         event.y = BB.mix(inputY, this.lastMixedInput!.y, this.smoothing);

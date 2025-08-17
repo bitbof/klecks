@@ -2,6 +2,8 @@ import { HISTORY_TILE_SIZE } from '../history/kl-history';
 import { TKlCanvasLayer } from './kl-canvas';
 import { THistoryEntryDataComposed } from '../history/history.types';
 import { BB } from '../../bb/bb';
+import { sortLayerMap } from '../history/sort-layer-map';
+import { isLayerFill } from '../kl-types';
 
 /**
  * Applies history delta to the project, optimized for performance.
@@ -30,9 +32,7 @@ export function updateLayersViaComposed(
                 composedAfterLayer.tiles.forEach((item, index) => {
                     const x = index % tilesPerX;
                     const y = Math.floor(index / tilesPerX);
-                    if (item instanceof ImageData) {
-                        context.putImageData(item, x * HISTORY_TILE_SIZE, y * HISTORY_TILE_SIZE);
-                    } else {
+                    if (isLayerFill(item)) {
                         context.save();
                         context.fillStyle = item!.fill;
                         context.fillRect(
@@ -42,6 +42,12 @@ export function updateLayersViaComposed(
                             HISTORY_TILE_SIZE,
                         );
                         context.restore();
+                    } else {
+                        context.putImageData(
+                            item.data,
+                            x * HISTORY_TILE_SIZE,
+                            y * HISTORY_TILE_SIZE,
+                        );
                     }
                 });
             } else {
@@ -54,9 +60,7 @@ export function updateLayersViaComposed(
                     }
                     const x = index % tilesPerX;
                     const y = Math.floor(index / tilesPerX);
-                    if (item instanceof ImageData) {
-                        context.putImageData(item, x * HISTORY_TILE_SIZE, y * HISTORY_TILE_SIZE);
-                    } else {
+                    if (isLayerFill(item)) {
                         context.save();
                         context.fillStyle = item.fill;
                         context.clearRect(
@@ -72,6 +76,12 @@ export function updateLayersViaComposed(
                             HISTORY_TILE_SIZE,
                         );
                         context.restore();
+                    } else {
+                        context.putImageData(
+                            item.data,
+                            x * HISTORY_TILE_SIZE,
+                            y * HISTORY_TILE_SIZE,
+                        );
                     }
                 });
             }
@@ -87,13 +97,5 @@ export function updateLayersViaComposed(
                 context,
             };
         })
-        .sort((a, b) => {
-            if (a.index > b.index) {
-                return 1;
-            }
-            if (a.index < b.index) {
-                return -1;
-            }
-            return 0;
-        });
+        .sort(sortLayerMap);
 }

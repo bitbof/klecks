@@ -46,6 +46,21 @@ To run Klecks (standalone) within a Docker container, run the following commands
 
 It is then accessible through: http://localhost:5050
 
+# Contributing
+
+How you can contribute to this project:
+- Bug reporting:
+  - Creating detailed bug reports that are reproducible
+  - Making hard to reproduce bugs easier to reproduce
+  - Reporting bugs to browsers vendors if the cause for a bug in Klecks is actually a browser bug.
+- Reviewing / optimization / refactoring of codebase
+  - Feel free to go over the existing codebase and share your concerns with constructive improvement suggestions
+  - Optimize performance of critical operations - e.g. optimizing the flood fill algorithm
+  - Improve stability or decrease memory footprint
+- Adding new features
+  - Check Kleki's roadmap to avoid conflicts
+- Contribute to translations (see below)
+- Donate to this project (Klecks, Kleki) [Donate](https://kleki.com/donate/)
 
 # Translations
 Are you a native speaker or have advanced skills in a language with no translation yet?
@@ -95,11 +110,10 @@ the embed-version.
 - `npm run lang:build` - generates JSON & TS files in `src/app/languages`
   - Problems are printed to the command line output
 
-# Contribute
+# Help fund this project
 Klecks and Kleki are community funded. [Donate today](https://kleki.com/donate/)
 
 # License
 
 bitbof © 2025 - Released under the MIT License. Icons by bitbof are public domain (excluding the Klecks logo, bitbof logo).
-
-If you wish to say you're using "Kleki" and use its branding you must acquire a license from bitbof. You are free to say you're using "Klecks".
+While Kleki and Klecks are jointly developed, Kleki's license is separate from Klecks. Kleki must be licensed from bitbof.

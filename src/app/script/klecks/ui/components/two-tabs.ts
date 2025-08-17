@@ -15,13 +15,13 @@ export class TwoTabs {
     }
 
     // ----------------------------------- public -----------------------------------
-    constructor(params: {
+    constructor(p: {
         left: string;
         right: string;
         init: number; //0, 1
         onChange: (val: number) => void;
     }) {
-        this.value = params.init;
+        this.value = p.init;
 
         this.rootEl = BB.el({
             className: 'kl-2-tabs',
@@ -29,14 +29,14 @@ export class TwoTabs {
 
         this.leftTab = BB.el({
             parent: this.rootEl,
-            content: params.left,
+            content: p.left,
             className: 'kl-2-tabs__left',
         });
         this.leftTab.onpointerdown = () => false;
 
         this.rightTab = BB.el({
             parent: this.rootEl,
-            content: params.right,
+            content: p.right,
             className: 'kl-2-tabs__right',
         });
         this.rightTab.onpointerdown = () => false;
@@ -49,7 +49,7 @@ export class TwoTabs {
             }
             this.value = 0;
             this.update();
-            params.onChange(this.value);
+            p.onChange(this.value);
         };
 
         this.rightTab.onclick = () => {
@@ -58,7 +58,7 @@ export class TwoTabs {
             }
             this.value = 1;
             this.update();
-            params.onChange(this.value);
+            p.onChange(this.value);
         };
     }
 

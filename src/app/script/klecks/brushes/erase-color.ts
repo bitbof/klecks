@@ -1,8 +1,8 @@
-import { theme } from '../../theme/theme';
-import { IRGB } from '../kl-types';
+import { THEME } from '../../theme/theme';
+import { TRgb } from '../kl-types';
 
-export const ERASE_COLOR = theme.isDark() ? 255 : 255;
+export const ERASE_COLOR = THEME.isDark() ? 255 : 255;
 
-export function getEraseColor(): IRGB {
+export function getEraseColor(): TRgb {
     return { r: ERASE_COLOR, g: ERASE_COLOR, b: ERASE_COLOR };
 }

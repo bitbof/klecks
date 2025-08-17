@@ -2,7 +2,7 @@ export type TPointerEventType = 'pointerdown' | 'pointermove' | 'pointerup';
 export type TPointerType = 'touch' | 'mouse' | 'pen';
 export type TPointerButton = 'left' | 'middle' | 'right';
 
-export interface IPointerEvent {
+export type TPointerEvent = {
     type: TPointerEventType;
     pointerId: number; // long
     pointerType: TPointerType;
@@ -35,13 +35,13 @@ export interface IPointerEvent {
 
     eventPreventDefault: () => void;
     eventStopPropagation: () => void;
-}
+};
 
-export interface IWheelEvent {
+export type TWheelEvent = {
     deltaY: number; // increments of 1
     pageX: number; // todo docs
     pageY: number;
     relX: number; // todo docs
     relY: number;
     event?: WheelEvent;
-}
+};

@@ -2,10 +2,9 @@ import { BB } from '../../bb/bb';
 import { KL } from '../kl';
 import { KlCanvas } from '../canvas/kl-canvas';
 import { TExportType } from '../kl-types';
-import { SaveReminder } from '../ui/components/save-reminder';
 import { saveAs } from '../../bb/base/save-as';
 import { Psd } from 'ag-psd/dist/psd';
-import { klConfig } from '../kl-config';
+import { KL_CONFIG } from '../kl-config';
 import { canvasToBlob } from '../../bb/base/canvas';
 
 export class SaveToComputer {
@@ -21,15 +20,14 @@ export class SaveToComputer {
         await saveAs(blob, filename, showDialog);
     }
 
+    // ----------------------------------- public -----------------------------------
     constructor(
-        private saveReminder: SaveReminder,
         private getExportType: () => TExportType,
         private klCanvas: KlCanvas,
+        private onSaved: () => void,
     ) {}
 
     async save(format?: 'psd' | 'layers' | 'png'): Promise<void> {
-        this.saveReminder.reset();
-
         if (!format) {
             format = this.getExportType();
         }
@@ -37,7 +35,7 @@ export class SaveToComputer {
         if (format === 'png') {
             const extension = 'png';
             const mimeType = 'image/png';
-            const filename = BB.getDate() + klConfig.filenameBase + '.' + extension;
+            const filename = BB.getDate() + KL_CONFIG.filenameBase + '.' + extension;
             const fullCanvas = this.klCanvas.getCompleteCanvas(1);
             try {
                 await this.saveImage(fullCanvas, filename, mimeType, this.showSaveDialog);
@@ -49,7 +47,7 @@ export class SaveToComputer {
         } else if (format === 'layers') {
             const extension = 'png';
             const mimeType = 'image/png';
-            const fileBase = BB.getDate() + klConfig.filenameBase;
+            const fileBase = BB.getDate() + KL_CONFIG.filenameBase;
             const layerArr = this.klCanvas.getLayersFast();
             for (let i = 0; i < layerArr.length; i++) {
                 const item = layerArr[i];
@@ -94,7 +92,7 @@ export class SaveToComputer {
                     });
                     saveAs(
                         blob,
-                        BB.getDate() + klConfig.filenameBase + '.psd',
+                        BB.getDate() + KL_CONFIG.filenameBase + '.psd',
                         this.showSaveDialog,
                     );
                 })
@@ -102,6 +100,7 @@ export class SaveToComputer {
                     alert('Error: failed to load PSD library');
                 });
         }
+        this.onSaved();
     }
 
     setShowSaveDialog(b: boolean) {

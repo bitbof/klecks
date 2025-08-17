@@ -1,4 +1,5 @@
 import { THistoryEntryData } from './history.types';
+import { isLayerFill } from '../kl-types';
 
 // estimates how much memory a history entry uses
 export function estimateBytes(entry: THistoryEntryData): number {
@@ -13,14 +14,14 @@ export function estimateBytes(entry: THistoryEntryData): number {
 
     entry.layerMap &&
         Object.entries(entry.layerMap).forEach(([, layer]) => {
-            layer.tiles?.forEach((data) => {
-                if (data === undefined) {
+            layer.tiles?.forEach((tile) => {
+                if (tile === undefined) {
                     return;
                 }
-                if (data instanceof ImageData) {
-                    result += data.width * data.height * 4; // 4 channels, each 1 byte
+                if (isLayerFill(tile)) {
+                    result += tile.fill.length * 2; // 2 byte per character
                 } else {
-                    result += data.fill.length * 2; // 2 byte per character
+                    result += tile.data.width * tile.data.height * 4; // 4 channels, each 1 byte
                 }
             });
         });

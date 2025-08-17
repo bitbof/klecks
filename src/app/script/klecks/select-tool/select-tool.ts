@@ -1,4 +1,4 @@
-import { IVector2D } from '../../bb/bb-types';
+import { TVector2D } from '../../bb/bb-types';
 import { MultiPolygon, Polygon } from 'polygon-clipping';
 import { translateMultiPolygon } from '../../bb/multi-polygon/translate-multi-polygon';
 import { getEllipsePath } from '../../bb/multi-polygon/get-ellipse-path';
@@ -28,8 +28,8 @@ export class SelectTool {
     private shape: TSelectShape = 'rect';
     private selection: MultiPolygon | undefined;
     private selectOperation: TBooleanOperation = 'new';
-    private selectDragInputs: IVector2D[] = [];
-    private moveLastPos: IVector2D | undefined;
+    private selectDragInputs: TVector2D[] = [];
+    private moveLastPos: TVector2D | undefined;
     private didMove: boolean = false; // was selection moved
 
     // ----------------------------------- public -----------------------------------
@@ -109,7 +109,7 @@ export class SelectTool {
     }
 
     // --- selecting ---
-    startSelect(pos: IVector2D, operation: TBooleanOperation): void {
+    startSelect(pos: TVector2D, operation: TBooleanOperation): void {
         this.selectOperation = operation;
         if (this.selectOperation === 'new') {
             this.reset();
@@ -117,7 +117,7 @@ export class SelectTool {
         this.selectDragInputs = [pos];
     }
 
-    goSelect(pos: IVector2D): void {
+    goSelect(pos: TVector2D): void {
         this.selectDragInputs.push({
             x: pos.x,
             y: pos.y,
@@ -134,7 +134,7 @@ export class SelectTool {
         this.selectDragInputs = [];
     }
 
-    addPoly(polygon: IVector2D[], operation: TBooleanOperation): void {
+    addPoly(polygon: TVector2D[], operation: TBooleanOperation): void {
         this.selectOperation = operation;
         this.selection = this.combineSelection([
             polygon.map((p) => [limitPrecision(p.x), limitPrecision(p.y)]),
@@ -142,12 +142,12 @@ export class SelectTool {
     }
 
     // --- moving selection ---
-    startMoveSelect(pos: IVector2D): void {
+    startMoveSelect(pos: TVector2D): void {
         this.moveLastPos = pos;
         this.didMove = false;
     }
 
-    goMoveSelect(pos: IVector2D): void {
+    goMoveSelect(pos: TVector2D): void {
         if (!this.moveLastPos) {
             return;
         }

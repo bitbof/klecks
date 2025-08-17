@@ -9,16 +9,16 @@ import toolHandImg from '/src/app/img/ui/tool-hand.svg';
 import editPencilImg from '/src/app/img/ui/edit-pencil.svg';
 import { EventChain } from '../../../bb/input/event-chain/event-chain';
 import { DoubleTapper } from '../../../bb/input/event-chain/double-tapper';
-import { IChainElement } from '../../../bb/input/event-chain/event-chain.types';
+import { TChainElement } from '../../../bb/input/event-chain/event-chain.types';
 import { css } from '@emotion/css';
 import { zoomByStep } from './utils/zoom-by-step';
 import { PinchZoomer } from '../../../bb/input/event-chain/pinch-zoomer';
 import { LANG } from '../../../language/language';
-import { inverse, applyToPoint } from 'transformation-matrix';
+import { applyToPoint, inverse } from 'transformation-matrix';
 import { createTransform } from '../../../bb/transform/create-transform';
 import { toMetaTransform } from '../../../bb/transform/to-meta-transform';
 import { Options } from '../components/options';
-import { IPointerEvent, IWheelEvent } from '../../../bb/input/event.types';
+import { TPointerEvent, TWheelEvent } from '../../../bb/input/event.types';
 import { createMatrixFromTransform } from '../../../bb/transform/create-matrix-from-transform';
 
 export type TPreviewMode = 'edit' | 'hand';
@@ -252,7 +252,7 @@ export class Preview {
         });
 
         this.pointerChain = new EventChain({
-            chainArr: [pinchZoomer as IChainElement, doubleTapper as IChainElement],
+            chainArr: [pinchZoomer as TChainElement, doubleTapper as TChainElement],
         });
         this.pointerChain.setChainOut((e) => {
             if (e.button && ['left', 'middle'].includes(e.button)) {
@@ -419,11 +419,11 @@ export class Preview {
         return this.viewport.getTransform();
     }
 
-    onPointer(event: IPointerEvent): void {
+    onPointer(event: TPointerEvent): void {
         this.pointerChain.chainIn(event);
     }
 
-    onWheel = (e: IWheelEvent): void => {
+    onWheel = (e: TWheelEvent): void => {
         const viewportRect = this.viewport.getElement().getBoundingClientRect();
         const vX = e.pageX - viewportRect.x;
         const vY = e.pageY - viewportRect.y;

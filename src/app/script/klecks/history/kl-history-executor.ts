@@ -57,7 +57,7 @@ export class KlHistoryExecutor {
         return this.klHistory.canRedo();
     }
 
-    // ---------------- public ----------------------
+    // ----------------------------------- public -----------------------------------
     constructor(p: TKlHistoryExecutorParams) {
         this.klHistory = p.klHistory;
         this.tempHistory = p.tempHistory;

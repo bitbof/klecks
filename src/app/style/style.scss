@@ -7,6 +7,13 @@
     --body-bg-color: #{vars.$bodyBgColor};
     --kl-color: #{vars.$klColor};
     --ui-bg-color: #{vars.$uiBgColor};
+
+    --kl-note-1: #{vars.$klNote1};
+    --kl-note-2: #{vars.$klNote2};
+    --kl-note-3: #{vars.$klNote3};
+
+    --kl-checkerboard-background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 2 2'><path d='M0,0h2v2H0z' fill='%23fff'/><path d='M0,0h1v1H0zM1,1h1v1H1z' fill='%23c8c8c8'/></svg>")
+        0 0 / 8px;
 }
 
 @keyframes consoleIn {
@@ -85,6 +92,10 @@ a:not([href]):hover {
 
 .kl-select {
     background: #fff;
+}
+
+.hr {
+    border-top: 1px solid rgba(0, 0, 0, 0.15);
 }
 
 .grid-hr {
@@ -275,7 +286,17 @@ a:not([href]):hover {
     }
 }
 
-button {
+.kl-button-link {
+    color: #666 !important;
+    text-decoration: none !important;
+    text-align: center;
+    &:hover {
+        color: #777 !important;
+    }
+}
+
+button,
+.kl-button {
     padding: 5px;
     min-width: 30px;
     font-size: 15px;
@@ -284,6 +305,7 @@ button {
     border: none;
     background-color: #f3f3f3;
     border-radius: 4px;
+    cursor: pointer;
 
     background-image: linear-gradient(
         to top,
@@ -300,20 +322,22 @@ button {
     -webkit-user-select: none;
 }
 
-button:hover {
+button:hover,
+.kl-button:hover {
     background-color: #fff;
     color: #777;
-    cursor: pointer;
 }
 
-button:active {
+button:active,
+.kl-button:active {
     background-color: #ddd;
     box-shadow:
         inset 2px 2px 10px rgba(0, 0, 0, 0.2),
         0 2px 2px #ddd;
 }
 
-button:disabled {
+button:disabled,
+.kl-button:disabled {
     padding: 5px;
     min-width: 30px;
     font-size: 15px;
@@ -331,11 +355,14 @@ button:disabled {
     box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.05);
 }
 
-button:disabled img {
+button:disabled img,
+,
+.kl-button:disabled img {
     opacity: 0.2;
 }
 
-button img {
+button img,
+.kl-button img {
     float: left;
     pointer-events: none;
 }
@@ -360,6 +387,24 @@ button img {
     );
     color: #fff;
     box-shadow: unset;
+}
+
+.kl-button-delete:not(:disabled) {
+    background: linear-gradient(#f1b8b8, #f3aeae);
+    color: #423333;
+    &:hover {
+        background: #ffbaba;
+        color: #111;
+    }
+    &:active {
+        background: #f3aeae;
+        color: #000;
+    }
+}
+
+.kl-button--extra-focus:focus {
+    outline: 3px solid var(--active-highlight-color);
+    outline-offset: 3px;
 }
 
 .grid-button {
@@ -691,7 +736,7 @@ clip-path seems the cleanest.
     background: #f5f5f5;
     // webstorm complains for no reason https://youtrack.jetbrains.com/issue/WEB-56824/Mismatched-property-value-error-for-clip-path-path...
     // noinspection CssInvalidPropertyValue
-    clip-path: path("M 11 10 11 0 10 0 A 10 10 0 0 1 0 10");
+    clip-path: path('M 11 10 11 0 10 0 A 10 10 0 0 1 0 10');
     filter: none !important;
 
     animation-name: fadeInRounding;
@@ -709,7 +754,7 @@ clip-path seems the cleanest.
     height: 10px;
     background: #f5f5f5;
     // noinspection CssInvalidPropertyValue
-    clip-path: path("M 0 0 0 10 11 10 A 10 10 0 0 1 1 0");
+    clip-path: path('M 0 0 0 10 11 10 A 10 10 0 0 1 1 0');
     filter: none !important;
 
     animation-name: fadeInRounding;
@@ -774,6 +819,7 @@ clip-path seems the cleanest.
     border-radius: 4px;
     //transition: all 0.1s ease-in-out;
 
+    background: var(--ui-bg-color);
     color: rgba(0, 0, 0, 0.6);
     box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.3);
 
@@ -1047,6 +1093,7 @@ clip-path seems the cleanest.
     margin-left: auto;
     margin-right: auto;
     box-shadow: 0 0 3px rgba(0, 0, 0, 0.5);
+    background: var(--kl-checkerboard-background);
 }
 
 .kl-stabilizer {
@@ -1058,20 +1105,20 @@ clip-path seems the cleanest.
 }
 
 .kl-toolspace-note {
-    color: #534a3c;
-    background: rgba(255, 255, 0, 0.5);
-    border: 1px solid #e7d321;
+    color: var(--kl-note-3);
+    background: var(--kl-note-1);
+    border: 1px solid var(--kl-note-2);
     border-radius: 5px;
     padding: 8px;
     text-align: center;
 }
 
 .kl-import-note {
-    background: rgba(255, 255, 0, 0.5);
+    background: var(--kl-note-1);
     padding: 8px;
     margin-top: 5px;
     margin-bottom: 5px;
-    border: 1px solid #e7d321;
+    border: 1px solid var(--kl-note-2);
     border-radius: 5px;
 }
 
@@ -1092,25 +1139,39 @@ clip-path seems the cleanest.
 }
 
 .kl-storage-preview {
-    grid-area: preview;
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-top: 10px;
     position: relative;
-    box-shadow: inset 0 0 0 1px #aaa;
+    box-shadow: 0 0 0 1px #aaa;
     background: #cdcdcd;
     color: #545454;
-    min-height: 67px;
+    min-height: 70px; // handle extreme landscape ratio
+    height: 100%;
+    max-height: 110px; // handle extreme portrait ratio
+    cursor: pointer;
+    overflow: hidden;
+    flex-grow: 1;
+
+    &:hover {
+        box-shadow: 0 0 0 1px #fff;
+    }
+}
+
+.kl-storage-preview--disabled {
+    opacity: 0.5;
+    box-shadow: none !important;
+    pointer-events: none;
 }
 
 .kl-storage-preview__im {
     display: block;
-    max-width: calc(100% - 2px);
-    max-height: calc(100% - 2px);
+    max-width: 100%;
+    max-height: 100%;
     margin: 0 auto;
     box-shadow: 0 0 0 1px #aaa;
     pointer-events: none;
+    background: var(--kl-checkerboard-background);
 }
 
 .kl-info-btn {
@@ -1135,17 +1196,6 @@ clip-path seems the cleanest.
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
 }
 
-.kl-file-save-wrapper {
-    box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.15);
-    border-radius: 5px;
-    margin: 10px 10px 0 10px;
-    padding-bottom: 10px;
-    padding-right: 10px;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
-
 .kl-dropdown-menu {
     position: absolute;
     margin-top: 1px;
@@ -1162,4 +1212,13 @@ clip-path seems the cleanest.
 
 .kl-pinch-overlay {
     background: rgba(255, 255, 255, 0.5);
+}
+
+.kl-floating-window-header {
+    background: var(--ui-bg-color);
+    display: flex;
+    justify-content: flex-end;
+    cursor: move;
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
 }

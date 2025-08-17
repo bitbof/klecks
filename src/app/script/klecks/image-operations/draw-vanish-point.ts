@@ -1,6 +1,6 @@
 import { drawShape } from './shape-tool';
 import { BB } from '../../bb/bb';
-import { IRGB } from '../kl-types';
+import { TRgb } from '../kl-types';
 
 export function drawVanishPoint(
     ctx: CanvasRenderingContext2D,
@@ -8,7 +8,7 @@ export function drawVanishPoint(
     y: number,
     lines: number, // int, [2, inf]
     thickness: number, // px
-    color: IRGB,
+    color: TRgb,
     opacity: number, // 0 - 1
 ): void {
     ctx.save();

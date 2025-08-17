@@ -470,11 +470,6 @@
     original: 'Browser Storage',
     value: '브라우저 저장소'
   },
-  'file-storage-thumb-title': {
-    hint: 'when reopening or reloading',
-    original: 'Restores when reopening page',
-    value: '페이지를 다시 열 때 복원'
-  },
   'file-storage-about': {
     hint: 'link to Browser Storage help/user manual',
     original: 'About Browser Storage',
@@ -482,8 +477,8 @@
   },
   'file-storage-cant-access': {
     hint: 'an error. Can’t access the storage.',
-    original: "Can't access",
-    value: '접근할 수 없음'
+    original: "Can't access storage.",
+    value: '저장소에 접근할 수 없음.'
   },
   'file-storage-empty': {
     hint: 'nothing stored',
@@ -495,12 +490,25 @@
     original: 'Store',
     value: '저장'
   },
+  'file-storage-open': {
+    hint: 'verb. to open, or to load',
+    original: 'Open',
+    value: ''
+  },
+  'file-storage-open-confirmation': {
+    original: 'This image is already open in another tab. Open it here too?',
+    value: ''
+  },
+  'file-storage-open-failed': {
+    original: 'Failed to load.',
+    value: ''
+  },
   'file-storage-clear': {
     original: 'Clear',
     value: '지우기'
   },
   'file-storage-clear-prompt': {
-    original: 'Clear Browser Storage?',
+    original: 'Clear Browser Storage? Clearing can not be undone.',
     value: ''
   },
   'file-storage-storing': {
@@ -512,6 +520,10 @@
     hint: 'overwrite what is already stored',
     original: 'Overwrite',
     value: '덮어쓰기'
+  },
+  'file-storage-overwrite-confirm': {
+    original: 'Overwrite Browser Storage? Overwritten data will be permanently deleted.',
+    value: ''
   },
   'file-storage-min-ago': {
     hint: "{x} <- needs to stay, it's a placeholder.",
@@ -567,6 +579,43 @@
     hint: 'verb',
     original: 'Upload',
     value: '업로드'
+  },
+  'tab-recovery-recover-tabs': {
+    hint: 'allows user to recover browser tabs (including the drawing) of this app.',
+    original: 'Recover closed tabs',
+    value: ''
+  },
+  'tab-recovery-explanation': {
+    original: 'Recovery data is only kept for a little while. Save to ensure your work is not lost.',
+    value: ''
+  },
+  'tab-recovery-total-quota-label': {
+    original: 'Total:',
+    value: ''
+  },
+  'tab-recovery-empty': {
+    original: 'Nothing to recover.',
+    value: ''
+  },
+  'tab-recovery-recover': {
+    original: 'Recover',
+    value: ''
+  },
+  'tab-recovery-delete': {
+    original: 'Delete',
+    value: ''
+  },
+  'tab-recovery-delete-confirmation': {
+    original: 'Delete this recovery? Deletion can not be undone.',
+    value: ''
+  },
+  'tab-recovery-failed-to-recover': {
+    original: 'Failed to recover tab.',
+    value: ''
+  },
+  'tab-recovery-recovered': {
+    original: 'Tab recovered.',
+    value: ''
   },
   'cleared-layer': {
     hint: 'the layer has been cleared. It is now empty',
@@ -1496,10 +1545,6 @@
     hint: 'The app is loaded, but it’s still waiting for image',
     original: 'Waiting for image',
     value: '이미지를 기다리는 중'
-  },
-  unsaved: {
-    original: 'Unsaved',
-    value: '저장되지 않음'
   },
   help: {
     hint: 'or user manual',

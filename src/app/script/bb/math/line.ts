@@ -1,6 +1,6 @@
 import { Vec2 } from './vec2';
 import { clamp, dist, mix, pointsToAngleDeg } from './math';
-import { IVector2D } from '../bb-types';
+import { TVector2D } from '../bb-types';
 import { copyObj } from '../base/base';
 
 /**
@@ -10,10 +10,10 @@ import { copyObj } from '../base/base';
  * @param p
  */
 export const projectPointOnLine = function (
-    lineStart: IVector2D,
-    lineEnd: IVector2D,
-    p: IVector2D,
-): IVector2D {
+    lineStart: TVector2D,
+    lineEnd: TVector2D,
+    p: TVector2D,
+): TVector2D {
     let x, y;
     if (lineStart.x === lineEnd.x) {
         x = lineStart.x;
@@ -47,7 +47,7 @@ export class PointLine {
     }[];
 
     // ----------------------------------- public -----------------------------------
-    constructor(p: { points: IVector2D[] }) {
+    constructor(p: { points: TVector2D[] }) {
         this.segmentArr = [];
 
         for (let i = 0; i < p.points.length; i++) {
@@ -76,7 +76,7 @@ export class PointLine {
      * returns point when traveling *dist* along the line, > 0
      * @param dist
      */
-    getAtDist(dist: number): IVector2D {
+    getAtDist(dist: number): TVector2D {
         let remainder = Math.min(this.getLength(), dist);
         let i = 0;
 
@@ -112,17 +112,17 @@ export type TBezierLineCallback = (v: {
     dAngle: number;
 }) => void;
 type TBezierLineControlsCallback = (v: {
-    p1: IVector2D;
-    p2: IVector2D;
-    p3: IVector2D;
-    p4: IVector2D;
+    p1: TVector2D;
+    p2: TVector2D;
+    p3: TVector2D;
+    p4: TVector2D;
 }) => void;
 
 type TBezierLinePoint = {
     x: number;
     y: number;
     spacing: number;
-    dir: IVector2D;
+    dir: TVector2D;
 };
 
 /**
@@ -132,8 +132,8 @@ type TBezierLinePoint = {
 export class BezierLine {
     private readonly pointArr: TBezierLinePoint[];
     private lastDot: number = 0;
-    private lastPoint: IVector2D | undefined;
-    private lastCallbackPoint: IVector2D | undefined;
+    private lastPoint: TVector2D | undefined;
+    private lastCallbackPoint: TVector2D | undefined;
     private lastAngle: number | undefined;
     private lastSpacing: number | undefined;
 
@@ -147,12 +147,12 @@ export class BezierLine {
      * @returns bezier curve made up of points {x: float, y: float}
      */
     private getBezierPoints(
-        p1: IVector2D,
-        p2: IVector2D,
-        p3: IVector2D,
-        p4: IVector2D,
+        p1: TVector2D,
+        p2: TVector2D,
+        p3: TVector2D,
+        p4: TVector2D,
         resolution: number,
-    ): IVector2D[] {
+    ): TVector2D[] {
         const curvePoints = [];
         let t;
         for (let i = 0; i <= resolution; i++) {

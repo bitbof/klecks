@@ -1,36 +1,51 @@
 import { KL } from '../../kl';
 import { BB } from '../../../bb/bb';
 import { LANG } from '../../../language/language';
-import { BrowserStorageUi } from './browser-storage-ui';
 import { ProjectStore } from '../../storage/project-store';
-import { IKlProject } from '../../kl-types';
+import { TKlProject } from '../../kl-types';
 import { KlHistory } from '../../history/kl-history';
 import { LocalStorage } from '../../../bb/base/local-storage';
+import * as classes from './save-reminder.module.scss';
+import { BrowserStorageUi } from './browser-storage-ui';
 
 export type TSaveReminderSetting = '20min' | '40min' | 'disabled';
 
-const unsavedActionsLimit = 100; // number of actions user did since last save
+const DEBUG_TIME_LIMIT_MS: undefined | number = undefined;
+const DEBUG_UNSAVED_ACTIONS_LIMIT: undefined | number = undefined;
+// minimum number of actions required for reminder to show up (regardless of time limit)
+const UNSAVED_ACTIONS_LIMIT = DEBUG_UNSAVED_ACTIONS_LIMIT ?? 100;
 const LS_REMINDER_KEY = 'kl-save-reminder';
+
+export type TSaveReminderParams = {
+    onSaveAsPsd: () => void;
+    isDrawing: () => boolean;
+    projectStore: ProjectStore; // needed if showReminder
+    getProject: () => TKlProject; // needed if showReminder
+    onStored: () => void;
+    applyUncommitted: () => void;
+    klHistory: KlHistory;
+};
 
 /**
  * remind user of saving, keep user aware of save state
  */
 export class SaveReminder {
-    private setting: TSaveReminderSetting;
-
+    private readonly onSaveAsPsd: () => void;
+    private readonly isDrawing: () => boolean;
+    private readonly projectStore: ProjectStore;
+    private readonly getProject: () => TKlProject;
+    private readonly onStored: () => void;
+    private readonly applyUncommitted: () => void;
     private klHistory: KlHistory = {} as KlHistory;
+
+    private setting: TSaveReminderSetting;
     private lastSavedHistoryIndex: number | undefined;
     private lastSavedAt: number = 0;
 
     private lastReminderShownAt: number = 0;
-    private unsavedInterval: ReturnType<typeof setInterval> | undefined;
     private closeFunc: (() => void) | undefined;
 
     showPopup(): void {
-        if (!this.projectStore || !this.getProject) {
-            throw new Error('projectStore and getProject need to be set');
-        }
-
         const min = Math.round((performance.now() - this.lastSavedAt) / 1000 / 60);
 
         const contentEl = BB.el();
@@ -48,15 +63,10 @@ export class SaveReminder {
         );
 
         const psdWrapper = BB.el({
-            css: {
-                borderTop: '1px solid #aaa',
-                margin: '0 -20px',
-                padding: '20px',
-            },
+            className: classes.psdWrapper,
         });
         const storageWrapper = BB.el({
             css: {
-                borderTop: '1px solid #aaa',
                 margin: '0 -20px',
                 padding: '20px',
                 paddingBottom: '0',
@@ -66,34 +76,41 @@ export class SaveReminder {
 
         const psdBtn = BB.el({
             tagName: 'button',
-            className: 'kl-button',
+            className: 'kl-button kl-button-primary kl-button--extra-focus',
             content: LANG('save-reminder-save-psd'),
-            onClick: () => this.onSaveAsPsd(),
+            onClick: () => {
+                this.applyUncommitted();
+                this.onSaveAsPsd();
+            },
+            css: { padding: '14px' },
+            noRef: true,
         });
         psdWrapper.append(
             psdBtn,
             BB.el({
-                content: LANG('save-reminder-psd-layers'),
+                content: '✔ ' + LANG('save-reminder-psd-layers'),
                 css: {
                     marginTop: '10px',
                 },
             }),
         );
 
-        const storageUi = new BrowserStorageUi(
-            this.projectStore,
-            this.getProject,
-            this,
-            document.body,
-            () => {},
-            {
+        const storageUi = new BrowserStorageUi({
+            projectStore: this.projectStore,
+            getProject: this.getProject,
+            klRootEl: document.body,
+            applyUncommitted: this.applyUncommitted,
+            options: {
                 hideClearButton: true,
                 isFocusable: true,
             },
-        );
+            onStored: () => this.onStored(),
+        });
+        storageUi.show();
         storageWrapper.append(storageUi.getElement());
 
         KL.popup({
+            type: 'warning',
             target: document.body,
             message: `<b>${LANG('save-reminder-title')}</b>`,
             div: contentEl,
@@ -113,17 +130,18 @@ export class SaveReminder {
         }, 40);
     }
 
-    constructor(
-        private showReminder: boolean,
-        private changeTitle: boolean,
-        private onSaveAsPsd: () => void,
-        private isDrawing: () => boolean,
-        private projectStore: ProjectStore | null, // needed if showReminder
-        private getProject: (() => IKlProject) | null, // needed if showReminder
-        private title: string = 'Klecks',
-    ) {
+    // ----------------------------------- public -----------------------------------
+    constructor(p: TSaveReminderParams) {
+        this.onSaveAsPsd = p.onSaveAsPsd;
+        this.isDrawing = p.isDrawing;
+        this.projectStore = p.projectStore;
+        this.getProject = p.getProject;
+        this.onStored = p.onStored;
+        this.applyUncommitted = p.applyUncommitted;
+        this.klHistory = p.klHistory;
+
         this.setting =
-            (LocalStorage.getItem(LS_REMINDER_KEY) as TSaveReminderSetting | null) ?? '20min';
+            (LocalStorage.getItem(LS_REMINDER_KEY) as TSaveReminderSetting | null) ?? '40min';
     }
 
     init(): void {
@@ -135,18 +153,18 @@ export class SaveReminder {
         this.lastReminderShownAt = performance.now();
         this.lastSavedAt = performance.now();
 
-        if (this.showReminder) {
-            setInterval(() => {
-                if (document.visibilityState !== 'visible') {
-                    return;
-                }
+        setInterval(() => {
+            if (document.visibilityState !== 'visible') {
+                return;
+            }
 
-                const unsavedActions = Math.abs(
-                    this.klHistory.getTotalIndex() - this.lastSavedHistoryIndex!,
-                );
+            const unsavedActions = Math.abs(
+                this.klHistory.getTotalIndex() - this.lastSavedHistoryIndex!,
+            );
 
-                const timeLimitMs =
-                    1000 *
+            const timeLimitMs =
+                DEBUG_TIME_LIMIT_MS ??
+                1000 *
                     60 *
                     {
                         '20min': 20,
@@ -154,58 +172,16 @@ export class SaveReminder {
                         disabled: 0,
                     }[this.setting];
 
-                if (
-                    timeLimitMs > 0 &&
-                    KL.dialogCounter.get() === 0 &&
-                    !this.isDrawing() &&
-                    this.lastReminderShownAt + timeLimitMs < performance.now() &&
-                    unsavedActions >= unsavedActionsLimit
-                ) {
-                    this.showPopup();
-                }
-            }, 1000 * 5);
-        }
-
-        // confirmation dialog when closing tab
-        function onBeforeUnload(e: BeforeUnloadEvent) {
-            e.preventDefault();
-            e.returnValue = '';
-        }
-
-        this.klHistory.addListener(() => {
-            const historyIndex = this.klHistory.getTotalIndex();
-            if (this.lastSavedHistoryIndex !== historyIndex) {
-                window.onbeforeunload = onBeforeUnload;
-            } else {
-                window.onbeforeunload = null;
+            if (
+                timeLimitMs > 0 &&
+                KL.DIALOG_COUNTER.get() === 0 &&
+                !this.isDrawing() &&
+                this.lastReminderShownAt + timeLimitMs < performance.now() &&
+                unsavedActions >= UNSAVED_ACTIONS_LIMIT
+            ) {
+                this.showPopup();
             }
-        });
-
-        if (this.changeTitle) {
-            document.addEventListener('visibilitychange', () => {
-                if (document.visibilityState === 'visible') {
-                    document.title = this.title;
-                    clearInterval(this.unsavedInterval);
-                } else {
-                    const historyIndex = this.klHistory.getTotalIndex();
-                    if (this.lastSavedHistoryIndex !== historyIndex) {
-                        document.title = LANG('unsaved') + ' - ' + this.title;
-                        let state = 0;
-                        this.unsavedInterval = setInterval(
-                            () => {
-                                state = (state + 1) % 2;
-                                if (state === 1) {
-                                    document.title = LANG('unsaved') + ' · ' + this.title;
-                                } else {
-                                    document.title = LANG('unsaved') + ' - ' + this.title;
-                                }
-                            },
-                            1000 * 60 * 3,
-                        );
-                    }
-                }
-            });
-        }
+        }, 1000 * 5);
     }
 
     reset(): void {
@@ -231,9 +207,5 @@ export class SaveReminder {
     setSetting(setting: TSaveReminderSetting): void {
         this.setting = setting;
         LocalStorage.setItem(LS_REMINDER_KEY, this.setting);
-    }
-
-    setHistory(history: KlHistory): void {
-        this.klHistory = history;
     }
 }

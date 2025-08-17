@@ -15,11 +15,11 @@ import {
     TEaselTool,
     TEaselToolTrigger,
 } from './easel.types';
-import { IBounds, IVector2D } from '../../../bb/bb-types';
+import { TBounds, TVector2D } from '../../../bb/bb-types';
 import { zoomByStep } from '../project-viewport/utils/zoom-by-step';
 import { SelectionRenderer } from './selection-renderer';
 import { TVec4 } from '../../../bb/math/matrix';
-import { klConfig } from '../../kl-config';
+import { KL_CONFIG } from '../../kl-config';
 import { minimizeAngleDeg, snapAngleDeg } from '../../../bb/math/math';
 import {
     DEFAULT_DOUBLE_TAP_POINTER_TYPES,
@@ -83,7 +83,7 @@ export class Easel<GToolId extends string> {
     private tempTool: GToolId | undefined;
     private animationFrameId: ReturnType<typeof requestAnimationFrame> | undefined;
     private doRender = false; // true -> will render on next renderLoop
-    private cursorPos: IVector2D | undefined; // so brush cursor not top left corner after reload
+    private cursorPos: TVector2D | undefined; // so brush cursor not top left corner after reload
     private isFrozen: boolean = false; // disable interaction with the easel whatsoever
     private lastRenderedTransform: TViewportTransform = {} as TViewportTransform; // previously rendered viewport transformation
     private pinchInitialTransform: TViewportTransform | undefined; // when starting a pinch-to-zoom gesture
@@ -272,7 +272,7 @@ export class Easel<GToolId extends string> {
             canvasPointsArr[i][1] = coords[1];
         }
 
-        const boundsObj: Partial<IBounds> = {};
+        const boundsObj: Partial<TBounds> = {};
         for (let i = 0; i < canvasPointsArr.length; i++) {
             if (boundsObj.x1 === undefined || canvasPointsArr[i][0] < boundsObj.x1) {
                 boundsObj.x1 = canvasPointsArr[i][0];
@@ -820,7 +820,7 @@ export class Easel<GToolId extends string> {
     resetOrFitTransform(isImmediate?: boolean): void {
         const threshold = 4; // >= 400% zoom. pixelated, not blurry
         if (
-            !klConfig.disableAutoFit &&
+            !KL_CONFIG.disableAutoFit &&
             this.project.width <= this.width / threshold &&
             this.project.height <= this.height / threshold
         ) {

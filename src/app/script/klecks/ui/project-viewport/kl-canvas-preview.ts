@@ -1,6 +1,5 @@
 import { BB } from '../../../bb/bb';
-import { IKlBasicLayer } from '../../kl-types';
-import { theme } from '../../../theme/theme';
+import { TKlBasicLayer } from '../../kl-types';
 
 /**
  * preview of image with layers. can do mix modes and opacity.
@@ -9,14 +8,13 @@ import { theme } from '../../../theme/theme';
 export class KlCanvasPreview {
     private readonly canvas: HTMLCanvasElement;
     private readonly ctx: CanvasRenderingContext2D | null;
-    private readonly layers: IKlBasicLayer[];
-    private readonly updateCheckerboard: () => void;
+    private readonly layers: TKlBasicLayer[];
 
     // ----------------------------------- public -----------------------------------
     constructor(p: {
         width: number;
         height: number;
-        layers: IKlBasicLayer[]; // items can be changed after the fact - but not the object
+        layers: TKlBasicLayer[]; // items can be changed after the fact - but not the object
     }) {
         this.layers = p.layers;
 
@@ -25,21 +23,17 @@ export class KlCanvasPreview {
         const height = scale > 1 ? p.layers[0].image.height : p.height;
 
         this.canvas = BB.canvas(width, height);
-        this.updateCheckerboard = () => {
-            this.canvas.style.backgroundImage =
-                'url(' + BB.createCheckerDataUrl(8, undefined, theme.isDark()) + ')';
-        };
-        this.updateCheckerboard();
         this.ctx = BB.ctx(this.canvas);
 
         BB.css(this.canvas, {
             width: '100%',
             height: '100%',
             imageRendering: scale > 1 ? 'pixelated' : undefined,
+            background: 'var(--kl-checkerboard-background)',
+            backgroundSize: '16px',
         });
 
         setTimeout(() => this.render(), 0);
-        theme.addIsDarkListener(this.updateCheckerboard);
     }
 
     getElement(): HTMLCanvasElement {
@@ -69,7 +63,5 @@ export class KlCanvasPreview {
         this.ctx.restore();
     }
 
-    destroy(): void {
-        theme.removeIsDarkListener(this.updateCheckerboard);
-    }
+    destroy(): void {}
 }

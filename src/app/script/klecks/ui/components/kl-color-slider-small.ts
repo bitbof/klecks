@@ -1,6 +1,6 @@
 import { BB } from '../../../bb/bb';
 import { calcSliderFalloffFactor } from './slider-falloff';
-import { IRGB } from '../../kl-types';
+import { TRgb } from '../../kl-types';
 import { PointerListener } from '../../../bb/input/pointer-listener';
 import { HSV } from '../../../bb/color/color';
 
@@ -23,7 +23,7 @@ export class KlColorSliderSmall {
     private updateSV(): void {
         const ctx = BB.ctx(this.canvasSV);
         if (!ctx) {
-            throw new Error('couldnt create canvas');
+            throw new Error("couldn't create canvas");
         }
         for (let i = 0; i < this.canvasSV.height; i += 1) {
             const gradient1 = ctx.createLinearGradient(0, 0, this.canvasSV.width, 0);
@@ -60,8 +60,8 @@ export class KlColorSliderSmall {
         width: number;
         heightSV: number; // height of saturation/value
         heightH: number; // height of hue
-        color: IRGB;
-        callback: (c: IRGB) => void;
+        color: TRgb;
+        callback: (c: TRgb) => void;
     }) {
         this.rootEl = BB.el({
             css: {
@@ -257,14 +257,18 @@ export class KlColorSliderSmall {
     }
 
     // ---- interface ----
-    setColor(c: IRGB): void {
+    setColor(c: TRgb): void {
+        if (this.hPointerId !== null || this.svPointerId !== null) {
+            return;
+        }
+
         this.color = BB.ColorConverter.toHSV(new BB.RGB(c.r, c.g, c.b));
         this.updateSV();
         this.updateSVPointer();
         this.updateHPointer();
     }
 
-    getColor(): IRGB {
+    getColor(): TRgb {
         return BB.ColorConverter.toRGB(this.color);
     }
 

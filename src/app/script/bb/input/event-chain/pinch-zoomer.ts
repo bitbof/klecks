@@ -1,5 +1,5 @@
 import { dist, pointsToAngleRad } from '../../math/math';
-import { IPointerEvent } from '../event.types';
+import { TPointerEvent } from '../event.types';
 
 export type TPinchZoomerEvent =
     | { type: 'end' }
@@ -42,10 +42,10 @@ export class PinchZoomer {
     private readonly firstFingerMaxDistancePx = 10;
     private readonly untilSecondFingerDurationMs = 250;
 
-    private chainOut: ((e: IPointerEvent) => void) | undefined;
+    private chainOut: ((e: TPointerEvent) => void) | undefined;
     private readonly pointersDownIdArr: number[] = [];
     private gestureObj: null | TPinchGesture = null;
-    private eventQueueArr: IPointerEvent[] = [];
+    private eventQueueArr: TPointerEvent[] = [];
     private nowTime: number = performance.now();
     private readonly timeoutObj: {
         secondFingerTimeout: ReturnType<typeof setTimeout> | null;
@@ -91,7 +91,7 @@ export class PinchZoomer {
         return true;
     }
 
-    private processEvent(event: IPointerEvent): void {
+    private processEvent(event: TPointerEvent): void {
         if (event.type === 'pointerdown') {
             this.pointersDownIdArr.push(event.pointerId);
         } else if (event.type === 'pointerup') {
@@ -417,7 +417,7 @@ export class PinchZoomer {
         this.onPinch = p.onPinch;
     }
 
-    chainIn(event: IPointerEvent): IPointerEvent | null {
+    chainIn(event: TPointerEvent): TPointerEvent | null {
         this.processEvent(event);
         if (this.gestureObj) {
             if (!this.gestureObj.isInProgress) {
@@ -430,7 +430,7 @@ export class PinchZoomer {
         return null;
     }
 
-    setChainOut(func: (e: IPointerEvent) => void): void {
+    setChainOut(func: (e: TPointerEvent) => void): void {
         this.chainOut = func;
     }
 }

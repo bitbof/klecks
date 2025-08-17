@@ -1,25 +1,25 @@
-import { IBounds, IVector2D } from '../../bb/bb-types';
+import { TBounds, TVector2D } from '../../bb/bb-types';
 import { MultiPolygon } from 'polygon-clipping';
 import { getSelectionPath2d } from '../../bb/multi-polygon/get-selection-path-2d';
 import {
+    applyToPoint,
     compose,
+    decomposeTSR,
+    identity,
     Matrix,
+    rotate,
     scale,
     translate,
-    identity,
-    rotate,
-    applyToPoint,
-    decomposeTSR,
 } from 'transformation-matrix';
 import { transformMultiPolygon } from '../../bb/multi-polygon/transform-multi-polygon';
 import { getMultiPolyBounds } from '../../bb/multi-polygon/get-multi-polygon-bounds';
 import { TLayerComposite, TSelectionSample } from '../canvas/kl-canvas';
 import { BB } from '../../bb/bb';
-import { IFreeTransform, snapToPixel } from '../ui/components/free-transform-utils';
+import { snapToPixel, TFreeTransform } from '../ui/components/free-transform-utils';
 import { integerBounds } from '../../bb/math/math';
 import { matrixToTuple } from '../../bb/math/matrix-to-tuple';
 
-function matrixToFreeTransform(transform: Matrix, bounds: IBounds): IFreeTransform {
+function matrixToFreeTransform(transform: Matrix, bounds: TBounds): TFreeTransform {
     const centerBefore = {
         x: bounds.x1 + (bounds.x2 - bounds.x1) / 2,
         y: bounds.y1 + (bounds.y2 - bounds.y1) / 2,
@@ -62,7 +62,7 @@ function matrixToFreeTransform(transform: Matrix, bounds: IBounds): IFreeTransfo
     };
 }
 
-function freeTransformToMatrix(transform: IFreeTransform, bounds: IBounds): Matrix {
+function freeTransformToMatrix(transform: TFreeTransform, bounds: TBounds): Matrix {
     const centerBefore = {
         x: bounds.x1 + (bounds.x2 - bounds.x1) / 2,
         y: bounds.y1 + (bounds.y2 - bounds.y1) / 2,
@@ -89,7 +89,7 @@ function freeTransformToMatrix(transform: IFreeTransform, bounds: IBounds): Matr
  */
 export class SelectTransformTool {
     private selection: MultiPolygon = [];
-    private selectionBounds: IBounds = {} as IBounds;
+    private selectionBounds: TBounds = {} as TBounds;
     private transform: Matrix = {} as Matrix;
     private doClone: boolean = false; // true -> draw selected area twice (original position, and transformed position)
     private selectionSample: TSelectionSample | undefined;
@@ -133,7 +133,7 @@ export class SelectTransformTool {
 
     // ---- transform ----
 
-    translate(d: IVector2D): void {
+    translate(d: TVector2D): void {
         this.transform = compose(translate(d.x, d.y), this.transform);
     }
 

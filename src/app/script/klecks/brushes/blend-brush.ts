@@ -1,14 +1,15 @@
 import { BB } from '../../bb/bb';
-import { IRGB, IRGBA, isLayerFill } from '../kl-types';
-import { IBounds, IPressureInput } from '../../bb/bb-types';
+import { isLayerFill, TRgb, TRgba } from '../kl-types';
+import { TBounds, TPressureInput } from '../../bb/bb-types';
 import { clamp } from '../../bb/math/math';
 import { BezierLine, TBezierLineCallback } from '../../bb/math/line';
 import { HISTORY_TILE_SIZE, KlHistory } from '../history/kl-history';
 import { getPushableLayerChange } from '../history/push-helpers/get-pushable-layer-change';
 import { copyImageData } from '../utils/copy-image-data';
 import { createArray } from '../../bb/base/base';
+import { createImageDataTile } from '../history/image-data-tile';
 
-interface IDrawBufferItem {
+type TDrawBufferItem = {
     x: number;
     y: number;
     size: number;
@@ -20,7 +21,7 @@ interface IDrawBufferItem {
     r: number;
     g: number;
     b: number;
-}
+};
 
 export class BlendBrush {
     // testing mode - context only gets updated when line is finished
@@ -28,7 +29,7 @@ export class BlendBrush {
 
     private context: CanvasRenderingContext2D = {} as CanvasRenderingContext2D;
     private layerId: string = 'NOT_SET';
-    private color: IRGB = {} as IRGB;
+    private color: TRgb = {} as TRgb;
     private size: number = 29; // radius - 0.5 - 99999
     private opacity: number = 0.6; // 0-1
     private blending: number = 0.65; // 0-1
@@ -37,22 +38,22 @@ export class BlendBrush {
     private settingSizePressure: boolean = true;
     private settingOpacityPressure: boolean = false;
 
-    private blendCol: IRGBA = { r: 0, g: 0, b: 0, a: 1 }; // todo docs
+    private blendCol: TRgba = { r: 0, g: 0, b: 0, a: 1 }; // todo docs
     private blendMix: number = 0.45; // todo docs
-    private mixCol: IRGB = { r: 0, g: 0, b: 0 }; // todo docs
-    private localColOld: IRGBA = {} as IRGBA; // todo docs
+    private mixCol: TRgb = { r: 0, g: 0, b: 0 }; // todo docs
+    private localColOld: TRgba = {} as TRgba; // todo docs
 
     private isDrawing: boolean = false;
-    private lastInput: IPressureInput = { x: 0, y: 0, pressure: 0 }; // todo docs
-    private lastInput2: IPressureInput = { x: 0, y: 0, pressure: 0 }; // todo docs
+    private lastInput: TPressureInput = { x: 0, y: 0, pressure: 0 }; // todo docs
+    private lastInput2: TPressureInput = { x: 0, y: 0, pressure: 0 }; // todo docs
     private bezierLine: undefined | BezierLine;
 
     private klHistory: KlHistory = {} as KlHistory;
-    private redrawBounds: IBounds | undefined;
+    private redrawBounds: TBounds | undefined;
     private cells: (ImageData | undefined)[] = [];
-    private drawBuffer: IDrawBufferItem[] = [];
+    private drawBuffer: TDrawBufferItem[] = [];
 
-    private updateRedrawBounds(bounds: IBounds): void {
+    private updateRedrawBounds(bounds: TBounds): void {
         this.redrawBounds = BB.updateBounds(this.redrawBounds, bounds);
     }
 
@@ -96,7 +97,7 @@ export class BlendBrush {
         this.redrawBounds = undefined;
     }
 
-    private getTouchedCells(bounds: IBounds): boolean[] {
+    private getTouchedCells(bounds: TBounds): boolean[] {
         const touchedCells = this.cells.map(() => false);
         const cellsW = this.getCellsWidth();
         bounds = {
@@ -118,9 +119,9 @@ export class BlendBrush {
      * @param bounds
      * @private
      */
-    private sliceBounds(bounds: IBounds): { index: number; bounds: IBounds }[] {
+    private sliceBounds(bounds: TBounds): { index: number; bounds: TBounds }[] {
         const cellsW = this.getCellsWidth();
-        const result: { index: number; bounds: IBounds }[] = [];
+        const result: { index: number; bounds: TBounds }[] = [];
         const touchedCells = this.getTouchedCells(bounds);
 
         touchedCells.forEach((cell, i) => {
@@ -154,7 +155,7 @@ export class BlendBrush {
     /**
      * update copyImageData. copy over new regions if needed
      */
-    private copyFromCanvas(bounds: IBounds | undefined): void {
+    private copyFromCanvas(bounds: TBounds | undefined): void {
         if (!bounds) {
             return;
         }
@@ -175,12 +176,12 @@ export class BlendBrush {
                 ctx.fillRect(0, 0, HISTORY_TILE_SIZE, HISTORY_TILE_SIZE);
                 this.cells[i] = ctx.getImageData(0, 0, HISTORY_TILE_SIZE, HISTORY_TILE_SIZE);
             } else {
-                this.cells[i] = copyImageData(composedTile);
+                this.cells[i] = copyImageData(composedTile.data);
             }
         });
     }
 
-    private getAverage(x: number, y: number, size: number): IRGBA {
+    private getAverage(x: number, y: number, size: number): TRgba {
         size = Math.max(0.5, size * 0.75);
         const x1 = Math.max(0, Math.floor(x - size));
         const y1 = Math.max(0, Math.floor(y - size));
@@ -236,7 +237,7 @@ export class BlendBrush {
         };
     }
 
-    private prepDot(x: number, y: number, size: number): IBounds | undefined {
+    private prepDot(x: number, y: number, size: number): TBounds | undefined {
         size = Math.max(0.5, size);
         const x1 = Math.max(0, Math.floor(x - size));
         const y1 = Math.max(0, Math.floor(y - size));
@@ -248,7 +249,7 @@ export class BlendBrush {
         return { x1, y1, x2, y2 };
     }
 
-    private drawDot(params: IDrawBufferItem): void {
+    private drawDot(params: TDrawBufferItem): void {
         // array with random numbers. faster than Math.random()
         let randI = 0;
         const randLen = params.size > 30 ? 1024 : 512; // lower lengths lead to noticeable patterns
@@ -400,7 +401,7 @@ export class BlendBrush {
         const avgX = x === undefined ? this.lastInput.x : x;
         const avgY = y === undefined ? this.lastInput.y : y;
 
-        let localColNew: IRGBA;
+        let localColNew: TRgba;
 
         if (this.blending === 0) {
             this.mixCol.r = this.color.r;
@@ -558,7 +559,7 @@ export class BlendBrush {
         this.blending = b;
     }
 
-    setColor(c: IRGB): void {
+    setColor(c: TRgb): void {
         this.color = BB.copyObj(c);
     }
 
@@ -712,7 +713,16 @@ export class BlendBrush {
 
         this.drawChangedCells();
 
-        this.klHistory.push(getPushableLayerChange(this.klHistory.getComposed(), this.cells));
+        if (this.cells.some((item) => item)) {
+            this.klHistory.push(
+                getPushableLayerChange(
+                    this.klHistory.getComposed(),
+                    this.cells.map((cell) => {
+                        return cell ? createImageDataTile(cell) : undefined;
+                    }),
+                ),
+            );
+        }
         this.cells = [];
     }
 
@@ -810,7 +820,16 @@ export class BlendBrush {
             y2: y2 + localSize,
         });
         this.drawChangedCells();
-        this.klHistory.push(getPushableLayerChange(this.klHistory.getComposed(), this.cells));
+        if (this.cells.some((item) => item)) {
+            this.klHistory.push(
+                getPushableLayerChange(
+                    this.klHistory.getComposed(),
+                    this.cells.map((cell) => {
+                        return cell ? createImageDataTile(cell) : undefined;
+                    }),
+                ),
+            );
+        }
         this.cells = [];
     }
 }

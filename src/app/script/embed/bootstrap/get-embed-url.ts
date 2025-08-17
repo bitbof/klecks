@@ -1,6 +1,6 @@
 let embedUrl: string;
 
-function getBaseURL(url: string): string {
+function getBaseUrl(url: string): string {
     return ('' + url).replace(/^((?:https?|file|ftp):\/\/.+)\/[^/]+$/, '$1') + '/';
 }
 
@@ -23,6 +23,6 @@ export function getEmbedUrl(): string {
             index = i;
         }
     });
-    embedUrl = getBaseURL(match![index]);
+    embedUrl = getBaseUrl(match![index]);
     return embedUrl;
 }

@@ -1,10 +1,10 @@
 import { BB } from '../../bb/bb';
 import {
-    IFilterApply,
-    IFilterGetDialogParam,
+    TFilterApply,
+    TFilterGetDialogParam,
     TFilterGetDialogResult,
-    IRGB,
     TMixMode,
+    TRgb,
 } from '../kl-types';
 import { LANG } from '../../language/language';
 import { KlSlider } from '../ui/components/kl-slider';
@@ -27,7 +27,7 @@ import { testIsSmall } from '../ui/utils/test-is-small';
 import { canvasToLayerTiles } from '../history/push-helpers/canvas-to-layer-tiles';
 
 // see noise(...) in fx-canvas
-interface INoisePreset {
+type TNoisePreset = {
     type: number;
     scaleX: number;
     scaleY: number;
@@ -39,16 +39,16 @@ interface INoisePreset {
     brightness: number;
     contrast: number;
     isReversed: boolean;
-}
+};
 
 type TNoiseChannels = 'rgb' | 'alpha';
 
-interface INoiseSettings extends INoisePreset {
+type TNoiseSettings = TNoisePreset & {
     seed?: number;
-    colA?: IRGB;
-    colB?: IRGB;
+    colA?: TRgb;
+    colB?: TRgb;
     channels?: TNoiseChannels; // default rgb
-}
+};
 
 export type TFilterNoiseInput = {
     seed: number;
@@ -60,11 +60,11 @@ export type TFilterNoiseInput = {
 
     // only for channels = rgb
     mixModeStr: GlobalCompositeOperation; // how mixed with image
-    colA: IRGB;
-    colB: IRGB;
+    colA: TRgb;
+    colB: TRgb;
 };
 
-const presetArr: INoisePreset[] = [
+const presetArr: TNoisePreset[] = [
     // each pixel random value
     {
         type: 0,
@@ -186,7 +186,7 @@ const presetArr: INoisePreset[] = [
     },
 ];
 
-function drawNoise(fxCanvas: TFxCanvas, settings: INoiseSettings): void {
+function drawNoise(fxCanvas: TFxCanvas, settings: TNoiseSettings): void {
     fxCanvas
         .noise(
             settings.seed,
@@ -207,7 +207,7 @@ function drawNoise(fxCanvas: TFxCanvas, settings: INoiseSettings): void {
 }
 
 export const filterNoise = {
-    getDialog(params: IFilterGetDialogParam) {
+    getDialog(params: TFilterGetDialogParam) {
         const context = params.context;
         const klCanvas = params.klCanvas;
         if (!context || !klCanvas) {
@@ -229,7 +229,7 @@ export const filterNoise = {
 
             presetArr.forEach((preset) => {
                 const thumbImg = new Image();
-                const presetCopy = BB.copyObj(preset) as INoiseSettings;
+                const presetCopy = BB.copyObj(preset) as TNoiseSettings;
                 presetCopy.scaleX /= 10;
                 presetCopy.scaleY /= 10;
                 drawNoise(fxCanvas, presetCopy);
@@ -355,6 +355,7 @@ export const filterNoise = {
                 update();
             },
             allowTab: true,
+            name: 'reverse-gradient',
         });
 
         const mixModes: (TMixMode | undefined)[] = [
@@ -391,6 +392,7 @@ export const filterNoise = {
                 settingsObj.mixModeStr = val;
                 update();
             },
+            name: 'blend-mode',
         });
         blendSelect.getElement().title = LANG('layers-blending');
 
@@ -448,7 +450,7 @@ export const filterNoise = {
             onUpdate: (fxCanvas, transform) => {
                 const settingsCopy = BB.copyObj(
                     presetArr[settingsObj.presetIndex],
-                ) as INoiseSettings;
+                ) as TNoiseSettings;
                 settingsCopy.seed = settingsObj.seed;
                 settingsCopy.scaleX =
                     ((settingsCopy.scaleX * settingsObj.scale) / 50) * transform.scaleX;
@@ -547,7 +549,7 @@ export const filterNoise = {
         return result;
     },
 
-    apply(params: IFilterApply<TFilterNoiseInput>): boolean {
+    apply(params: TFilterApply<TFilterNoiseInput>): boolean {
         const context = params.layer.context;
         const klCanvas = params.klCanvas;
         const klHistory = params.klHistory;
@@ -564,9 +566,9 @@ export const filterNoise = {
         texture.destroy();
 
         const input = params.input;
-        const presetCopy: INoiseSettings = BB.copyObj(
+        const presetCopy: TNoiseSettings = BB.copyObj(
             presetArr[input.presetIndex],
-        ) as INoiseSettings;
+        ) as TNoiseSettings;
         presetCopy.seed = input.seed;
         presetCopy.scaleX = (presetCopy.scaleX * input.scale) / 50;
         presetCopy.scaleY = (presetCopy.scaleY * input.scale) / 50;

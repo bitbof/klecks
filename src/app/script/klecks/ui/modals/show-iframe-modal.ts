@@ -42,9 +42,13 @@ export function showIframeModal(url: string, isEmbed: boolean) {
         });
         iframe.onload = () => {
             if (linkEl && iframe.contentWindow) {
-                BB.setAttributes(linkEl, {
-                    href: '' + iframe.contentWindow.location,
-                });
+                try {
+                    BB.setAttributes(linkEl, {
+                        href: '' + iframe.contentWindow.location,
+                    });
+                } catch (e) {
+                    // might not have access
+                }
             }
             iframe.style.opacity = '';
         };

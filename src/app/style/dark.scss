@@ -3,6 +3,9 @@
 }
 
 body.kl-theme-dark {
+    --kl-checkerboard-background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 2 2'><path d='M0,0h2v2H0z' fill='%235a5a5a'/><path d='M0,0h1v1H0zM1,1h1v1H1z' fill='%233f3f3f'/></svg>")
+        0 0 / 8px;
+
     color-scheme: dark;
     color: #ccc;
     background: rgb(33, 33, 33);
@@ -120,7 +123,18 @@ body.kl-theme-dark {
         box-shadow: 0 0 0 1px #636363;
     }
 
-    button {
+    .kl-button-link {
+        color: #ccc !important;
+        &:hover {
+            color: #eee !important;
+        }
+        &:active {
+            color: #fff !important;
+        }
+    }
+
+    button,
+    .kl-button {
         color: #ccc;
         background-color: #4a4a4a;
         background-image: none;
@@ -128,18 +142,21 @@ body.kl-theme-dark {
         user-select: none;
     }
 
-    button:hover {
+    button:hover,
+    .kl-button:hover {
         background-color: #555;
         color: #eee;
     }
 
-    button:active {
+    button:active,
+    .kl-button:active {
         background-color: #555;
         color: #fff;
         box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.2);
     }
 
-    button:disabled {
+    button:disabled,
+    .kl-button:disabled {
         color: #999;
         background-color: transparent;
         background-image: none;
@@ -160,7 +177,22 @@ body.kl-theme-dark {
         }
     }
 
-    button:not(.kl-button-primary, .kl-button-cancel) img:not(.dark-no-invert) {
+    .kl-button-delete:not(:disabled) {
+        background: #b84949;
+        color: #ffd2d2;
+        &:hover {
+            background: #d86363;
+            color: #fff;
+        }
+        &:active {
+            background: #b84949;
+            color: #fff;
+            box-shadow: 0 0 0 1px #d86363;
+        }
+    }
+
+    button:not(.kl-button-primary, .kl-button-cancel) img:not(.dark-no-invert),
+    .kl-button:not(.kl-button-primary, .kl-button-cancel) img:not(.dark-no-invert) {
         filter: invert(1) hue-rotate(180deg);
     }
 
@@ -216,6 +248,7 @@ body.kl-theme-dark {
     }
 
     .kl-box-toggle {
+        background: var(--ui-bg-dark);
         color: #ccc;
         box-shadow: inset 0 0 0 1px #606060;
 
@@ -390,9 +423,9 @@ body.kl-theme-dark {
 
     .kl-import-note,
     .kl-toolspace-note {
-        background: none;
-        color: #d5d558;
-        border: 1px solid #d5d558;
+        background: unset;
+        color: var(--kl-note-1);
+        border: 1px solid var(--kl-note-1);
     }
 
     .kl-curves-graph {
@@ -409,8 +442,11 @@ body.kl-theme-dark {
 
     .kl-storage-preview {
         background: #212121;
-        box-shadow: inset 0 0 0 1px #5e5e5e;
+        box-shadow: 0 0 0 1px #5e5e5e;
         color: #aaa;
+        &:hover {
+            box-shadow: 0 0 0 1px #aaa;
+        }
     }
 
     .kl-storage-preview__im {
@@ -472,13 +508,12 @@ body.kl-theme-dark {
         background: #606060;
     }
 
-    .kl-file-save-wrapper {
-        box-shadow: inset 0 0 0 1px #fff3;
+    .hr {
+        border-top: 1px solid #fff3;
     }
 
     .grid-hr {
-        border-bottom: 1px solid #fff3;
-        border-top: none;
+        border-top: 1px solid #fff3;
     }
 
     .kl-color-option {
@@ -504,5 +539,9 @@ body.kl-theme-dark {
 
     .kl-pinch-overlay {
         background: rgba(0, 0, 0, 0.5);
+    }
+
+    .kl-floating-window-header {
+        background: var(--ui-bg-dark);
     }
 }

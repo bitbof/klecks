@@ -1,10 +1,10 @@
 import { createCanvas } from '../../bb/base/create-canvas';
 import { BlendMode, Layer, Psd } from 'ag-psd/dist/psd';
-import { IKlProject, IKlPsd, TKlPsdError, TKlPsdLayer, TMixMode } from '../kl-types';
+import { TKlProject, TKlPsd, TKlPsdError, TKlPsdLayer, TMixMode } from '../kl-types';
 import { LANG } from '../../language/language';
 import { MAX_LAYERS } from '../canvas/kl-canvas';
 import { BB } from '../../bb/bb';
-import { throwIfUndefined } from '../../bb/base/base';
+import { randomUuid, throwIfUndefined } from '../../bb/base/base';
 
 let kl2PsdMap: Record<TMixMode, BlendMode>;
 let psd2KlMap: Record<BlendMode, TMixMode>;
@@ -53,11 +53,11 @@ export function blendKlToPsd(str: TMixMode): BlendMode {
  * Converts ag-psd object into something that KlCanvas can represent
  * @param psdObj
  */
-export function readPsd(psdObj: Psd): IKlPsd {
+export function readPsd(psdObj: Psd): TKlPsd {
     if (!psdObj.canvas) {
         throw new Error('psdObj.canvas undefined');
     }
-    const result: IKlPsd = {
+    const result: TKlPsd = {
         type: 'psd',
         canvas: psdObj.canvas,
         width: psdObj.width,
@@ -452,9 +452,10 @@ export function readPsd(psdObj: Psd): IKlPsd {
     return result;
 }
 
-export function klPsdToKlProject(klPsd: IKlPsd): IKlProject {
+export function klPsdToKlProject(klPsd: TKlPsd): TKlProject {
     // only share references to Canvas elements
-    const result: IKlProject = {
+    const result: TKlProject = {
+        projectId: randomUuid(),
         width: klPsd.width,
         height: klPsd.height,
         layers: [],

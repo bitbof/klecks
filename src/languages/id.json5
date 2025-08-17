@@ -219,7 +219,7 @@
   'mci-copy': {
     hint: 'verb',
     original: 'Copy',
-    value: 'salin'
+    value: 'Salin'
   },
   'modal-ok': {
     hint: 'main confirmation button in dialogs. Can be to confirm an action, not just acknowledge information.',
@@ -377,7 +377,7 @@
   'layers-rename-clear': {
     hint: 'aka action of deleting entered name',
     original: 'Clear Name',
-    value: 'Bersih nama'
+    value: 'Bersih Nama'
   },
   'layers-rename-sketch': {
     hint: 'noun. Name suggestion for a layer',
@@ -387,7 +387,7 @@
   'layers-rename-colors': {
     hint: 'noun. Name suggestion for a layer',
     original: 'Colors',
-    value: 'Warna-Warna'
+    value: 'Warna-warna'
   },
   'layers-rename-shading': {
     hint: 'noun. Name suggestion for a layer',
@@ -402,7 +402,7 @@
   'layers-rename-effects': {
     hint: 'noun. Name suggestion for a layer',
     original: 'Effects',
-    value: 'Efek-Efek'
+    value: 'Efek-efek'
   },
   'layers-rename-foreground': {
     hint: 'noun. Name suggestion for a layer',
@@ -470,11 +470,6 @@
     original: 'Browser Storage',
     value: 'Penyimpanan Peramban'
   },
-  'file-storage-thumb-title': {
-    hint: 'when reopening or reloading',
-    original: 'Restores when reopening page',
-    value: 'Memulihkan saat membuka kembali halaman'
-  },
   'file-storage-about': {
     hint: 'link to Browser Storage help/user manual',
     original: 'About Browser Storage',
@@ -482,8 +477,8 @@
   },
   'file-storage-cant-access': {
     hint: 'an error. Can’t access the storage.',
-    original: "Can't access",
-    value: 'Tidak bisa akses'
+    original: "Can't access storage.",
+    value: 'Tidak bisa akses penyimpanan.'
   },
   'file-storage-empty': {
     hint: 'nothing stored',
@@ -495,13 +490,26 @@
     original: 'Store',
     value: 'Menyimpan'
   },
+  'file-storage-open': {
+    hint: 'verb. to open, or to load',
+    original: 'Open',
+    value: 'Buka'
+  },
+  'file-storage-open-confirmation': {
+    original: 'This image is already open in another tab. Open it here too?',
+    value: 'Gambar ini sudah terbuka di tab lain. Buka di sini juga?'
+  },
+  'file-storage-open-failed': {
+    original: 'Failed to load.',
+    value: 'Gagal memuat.'
+  },
   'file-storage-clear': {
     original: 'Clear',
     value: 'Bersih'
   },
   'file-storage-clear-prompt': {
-    original: 'Clear Browser Storage?',
-    value: 'Hapus Penyimpanan Peramban?'
+    original: 'Clear Browser Storage? Clearing can not be undone.',
+    value: 'Menghapus Penyimpanan Browser? Kliring tidak dapat dibatalkan.'
   },
   'file-storage-storing': {
     hint: 'while it is in the process of storing',
@@ -512,6 +520,10 @@
     hint: 'overwrite what is already stored',
     original: 'Overwrite',
     value: 'Timpa'
+  },
+  'file-storage-overwrite-confirm': {
+    original: 'Overwrite Browser Storage? Overwritten data will be permanently deleted.',
+    value: 'Menimpa Penyimpanan Browser? Data yang ditimpa akan dihapus secara permanen.'
   },
   'file-storage-min-ago': {
     hint: "{x} <- needs to stay, it's a placeholder.",
@@ -567,6 +579,43 @@
     hint: 'verb',
     original: 'Upload',
     value: 'Unggah'
+  },
+  'tab-recovery-recover-tabs': {
+    hint: 'allows user to recover browser tabs (including the drawing) of this app.',
+    original: 'Recover closed tabs',
+    value: 'Memulihkan tab yang tertutup'
+  },
+  'tab-recovery-explanation': {
+    original: 'Recovery data is only kept for a little while. Save to ensure your work is not lost.',
+    value: 'Data pemulihan hanya disimpan untuk sementara waktu. Simpan untuk memastikan pekerjaan Anda tidak hilang.'
+  },
+  'tab-recovery-total-quota-label': {
+    original: 'Total:',
+    value: 'Total:'
+  },
+  'tab-recovery-empty': {
+    original: 'Nothing to recover.',
+    value: 'Tidak ada yang bisa dipulihkan.'
+  },
+  'tab-recovery-recover': {
+    original: 'Recover',
+    value: 'Pulihkan'
+  },
+  'tab-recovery-delete': {
+    original: 'Delete',
+    value: 'Hapus'
+  },
+  'tab-recovery-delete-confirmation': {
+    original: 'Delete this recovery? Deletion can not be undone.',
+    value: 'Menghapus pemulihan ini? Penghapusan tidak dapat dibatalkan.'
+  },
+  'tab-recovery-failed-to-recover': {
+    original: 'Failed to recover tab.',
+    value: 'Gagal memulihkan tab.'
+  },
+  'tab-recovery-recovered': {
+    original: 'Tab recovered.',
+    value: 'Tab dipulihkan.'
   },
   'cleared-layer': {
     hint: 'the layer has been cleared. It is now empty',
@@ -1116,7 +1165,7 @@
   },
   'dropper-as-layer': {
     original: 'As Layer',
-    value: ' Sebagai Lapisan'
+    value: 'Sebagai Lapisan'
   },
   'import-opening': {
     hint: 'in the process of opening a large file',
@@ -1496,10 +1545,6 @@
     hint: 'The app is loaded, but it’s still waiting for image',
     original: 'Waiting for image',
     value: 'Tunggu untuk gambar'
-  },
-  unsaved: {
-    original: 'Unsaved',
-    value: 'Tidak disimpan'
   },
   help: {
     hint: 'or user manual',

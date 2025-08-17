@@ -1,9 +1,9 @@
 import { BB } from '../../bb/bb';
 import { Checkbox } from '../ui/components/checkbox';
 import { FreeTransform } from '../ui/components/free-transform';
-import { IFreeTransform } from '../ui/components/free-transform-utils';
+import { TFreeTransform } from '../ui/components/free-transform-utils';
 import { Select } from '../ui/components/select';
-import { IFilterApply, IFilterGetDialogParam, TFilterGetDialogResult } from '../kl-types';
+import { TFilterApply, TFilterGetDialogParam, TFilterGetDialogResult } from '../kl-types';
 import { LANG } from '../../language/language';
 import { throwIfNull } from '../../bb/base/base';
 import { Preview } from '../ui/project-viewport/preview';
@@ -15,12 +15,12 @@ import { canvasToLayerTiles } from '../history/push-helpers/canvas-to-layer-tile
 
 export type TFilterTransformInput = {
     bounds: { x: number; y: number; width: number; height: number };
-    transform: IFreeTransform;
+    transform: TFreeTransform;
     isPixelated: boolean;
 };
 
 export const filterTransform = {
-    getDialog(params: IFilterGetDialogParam) {
+    getDialog(params: TFilterGetDialogParam) {
         const context = params.context;
         const klCanvas = params.klCanvas;
         if (!context || !klCanvas) {
@@ -258,6 +258,7 @@ export const filterTransform = {
             css: {
                 display: 'inline-block',
             },
+            name: 'constrain-proportions',
         });
         let isSnapping = false;
         const snappingCheckbox = new Checkbox({
@@ -273,6 +274,7 @@ export const filterTransform = {
                 display: 'inline-block',
                 marginLeft: '10px',
             },
+            name: 'enable-snapping',
         });
         const checkboxWrapper = BB.el();
         checkboxWrapper.append(constrainCheckbox.getElement(), snappingCheckbox.getElement());
@@ -307,6 +309,7 @@ export const filterTransform = {
             onChange: (): void => {
                 updatePreview(true);
             },
+            name: 'interpolation-algorithm',
         });
         bottomRow.append(checkboxWrapper, algorithmSelect.getElement());
 
@@ -451,7 +454,7 @@ export const filterTransform = {
         return result;
     },
 
-    apply(params: IFilterApply<TFilterTransformInput>): boolean {
+    apply(params: TFilterApply<TFilterTransformInput>): boolean {
         const context = params.layer.context;
         const klHistory = params.klHistory;
         if (!context) {

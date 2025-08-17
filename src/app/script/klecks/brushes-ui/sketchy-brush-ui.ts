@@ -2,8 +2,8 @@ import { BRUSHES } from '../brushes/brushes';
 import { EVENT_RES_MS } from './brushes-consts';
 import { KlSlider } from '../ui/components/kl-slider';
 import brushIconImg from '/src/app/img/ui/brush-sketchy.png';
-import { IBrushUi } from '../kl-types';
-import { LANG, languageStrings } from '../../language/language';
+import { TBrushUi } from '../kl-types';
+import { LANG, LANGUAGE_STRINGS } from '../../language/language';
 import { BB } from '../../bb/bb';
 import { SketchyBrush } from '../brushes/sketchy-brush';
 
@@ -19,9 +19,9 @@ export const sketchyBrushUi = (function () {
             min: 1 / 100,
             max: 1,
         },
-    } as IBrushUi<SketchyBrush>;
+    } as TBrushUi<SketchyBrush>;
 
-    languageStrings.subscribe(() => {
+    LANGUAGE_STRINGS.subscribe(() => {
         brushInterface.tooltip = LANG('brush-sketchy');
     });
 
@@ -169,7 +169,7 @@ export const sketchyBrushUi = (function () {
         this.getElement = function () {
             return div;
         };
-    } as IBrushUi<SketchyBrush>['Ui'];
+    } as TBrushUi<SketchyBrush>['Ui'];
 
     return brushInterface;
 })();

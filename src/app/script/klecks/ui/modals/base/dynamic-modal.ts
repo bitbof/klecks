@@ -1,5 +1,5 @@
 import { KeyListener } from '../../../../bb/input/key-listener';
-import { dialogCounter } from '../modal-count';
+import { DIALOG_COUNTER } from '../modal-count';
 import { BB } from '../../../../bb/bb';
 import { LANG } from '../../../../language/language';
 import './scroll-fix';
@@ -31,7 +31,7 @@ export class DynamicModal {
         width: number;
         isMaxHeight: boolean; // todo - not implemented
     }) {
-        dialogCounter.increase();
+        DIALOG_COUNTER.increase();
         this.onClose = p.onClose;
         this.parent = document.body;
         this.rootEl = BB.el({
@@ -150,7 +150,7 @@ export class DynamicModal {
 
     // ---- interface ----
     close(): void {
-        dialogCounter.decrease();
+        DIALOG_COUNTER.decrease();
         BB.destroyEl(this.rootEl);
         this.rootEl.remove();
         window.removeEventListener('resize', this.updatePos);

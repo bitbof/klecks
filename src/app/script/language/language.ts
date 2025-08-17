@@ -108,19 +108,19 @@ export function getLanguage(useLocalStorage?: boolean): string {
 }
 
 const activeLanguageCode = getLanguage(true);
-export const languageStrings = new LanguageStrings();
+export const LANGUAGE_STRINGS = new LanguageStrings();
 
 export const LANG = (code: TTranslationCode, replace?: { [key: string]: string }): string => {
     if (replace) {
-        let result = languageStrings.get(code);
+        let result = LANGUAGE_STRINGS.get(code);
         const keyArr = Object.keys(replace);
         keyArr.forEach((key) => {
             result = result.replace(`{${key}}`, replace[key]);
         });
         return result;
     } else {
-        return languageStrings.get(code);
+        return LANGUAGE_STRINGS.get(code);
     }
 };
 
-export const initLANG = () => languageStrings.setLanguage(activeLanguageCode);
+export const initLANG = () => LANGUAGE_STRINGS.setLanguage(activeLanguageCode);

@@ -1,10 +1,11 @@
-import { IKeyString } from '../../../../bb/bb-types';
-import { dialogCounter } from '../modal-count';
+import { TKeyString } from '../../../../bb/bb-types';
+import { DIALOG_COUNTER } from '../modal-count';
 import { BB } from '../../../../bb/bb';
 import { LANG } from '../../../../language/language';
 import './scroll-fix';
 import cancelImg from '/src/app/img/ui/cancel.svg';
 import checkImg from '/src/app/img/ui/check.svg';
+import removeLayerImg from '/src/app/img/ui/remove-layer.svg';
 
 export function showModal(p: {
     target: HTMLElement;
@@ -13,16 +14,17 @@ export function showModal(p: {
     callback?: (result: string) => void;
     buttons?: string[]; // "Ok", and "Cancel" will be automatically translated
     primaries?: string[];
-    type?: 'error' | 'warning' | 'upload' | 'ok'; // todo
+    deleteButtonName?: string;
+    type?: 'error' | 'warning' | 'upload' | 'ok'; // todo (...what is to be done?)
     closeFunc?: (f: () => void) => void; // returns a function you can call to close (Cancel) the dialog
-    style?: IKeyString;
+    style?: TKeyString;
     clickOnEnter?: string; // name of button - will be clicked if enter key pressed
     autoFocus?: false | string; // name of  to automatically focus - default 'Ok' - false -> none
     ignoreBackground?: boolean; // default false; if true clicking on background doesn't close
 }): {
     setIgnoreBackground: (b: boolean) => void;
 } {
-    dialogCounter.increase();
+    DIALOG_COUNTER.increase();
     let isClosed = false;
     let ignoreBackground = !!p.ignoreBackground;
 
@@ -198,6 +200,9 @@ export function showModal(p: {
             if (buttonName === 'Ok' || (p.primaries && p.primaries.includes(buttonName))) {
                 btnClasses.push('kl-button-primary');
             }
+            if (buttonName === p.deleteButtonName) {
+                btnClasses.push('kl-button-delete');
+            }
             let iconUrl;
             let label = buttonName;
             if (buttonName === 'Ok') {
@@ -208,6 +213,9 @@ export function showModal(p: {
                 label = LANG('modal-cancel');
                 iconUrl = cancelImg;
                 btnClasses.push('kl-button-cancel');
+            }
+            if (buttonName === p.deleteButtonName) {
+                iconUrl = removeLayerImg;
             }
             let iconImg: HTMLElement | undefined = undefined;
             if (iconUrl) {
@@ -260,7 +268,7 @@ export function showModal(p: {
         BB.clearSelection();
         BB.unfocusAnyInput();
         rootRootEl.remove();
-        dialogCounter.decrease();
+        DIALOG_COUNTER.decrease();
         BB.destroyEl(xButton);
         BB.destroyEl(bgEl);
         keyListener.destroy();

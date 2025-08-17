@@ -1,30 +1,30 @@
-import { ISize2D, IVector2D } from '../../../bb/bb-types';
-import { IPointerEvent } from '../../../bb/input/event.types';
+import { TSize2D, TVector2D } from '../../../bb/bb-types';
+import { TPointerEvent } from '../../../bb/input/event.types';
 import { TViewportTransform } from '../project-viewport/project-viewport';
 
 export type TCornerPanningParams = {
-    getEaselSize: () => ISize2D;
+    getEaselSize: () => TSize2D;
     getTransform: () => TViewportTransform;
     setTransform: (transform: TViewportTransform) => void;
     testCanPan: (buttonIsPressed: boolean) => boolean;
-    onRepeatEvent: (e: IPointerEvent) => void;
+    onRepeatEvent: (e: TPointerEvent) => void;
 };
 
 export class CornerPanning {
     // from params
-    private getEaselSize: () => ISize2D;
+    private getEaselSize: () => TSize2D;
     private readonly getTransform: () => TViewportTransform;
     private readonly setTransform: (transform: TViewportTransform) => void;
     private readonly testCanPan: (buttonIsPressed: boolean) => boolean;
-    private readonly onRepeatEvent: (e: IPointerEvent) => void;
+    private readonly onRepeatEvent: (e: TPointerEvent) => void;
 
     private readonly thresholdPx = 25;
 
     // state
     private animationFrameHandle: ReturnType<typeof requestAnimationFrame> | undefined;
     private lastFrameTimestamp = 0;
-    private cornerDirection: IVector2D | undefined;
-    private repeatEvent: IPointerEvent = {} as IPointerEvent;
+    private cornerDirection: TVector2D | undefined;
+    private repeatEvent: TPointerEvent = {} as TPointerEvent;
 
     // only call through requestAnimationFrame when animationFrameHandle undefined
     private movementLoop(): void {
@@ -55,7 +55,7 @@ export class CornerPanning {
         return Math.min(thresholdDelta, this.thresholdPx) * (2 / 5);
     }
 
-    // ----------------- public ------------------
+    // ----------------------------------- public -----------------------------------
 
     constructor(p: TCornerPanningParams) {
         this.getEaselSize = p.getEaselSize;
@@ -65,7 +65,7 @@ export class CornerPanning {
         this.onRepeatEvent = p.onRepeatEvent;
     }
 
-    onPointer(event: IPointerEvent): void {
+    onPointer(event: TPointerEvent): void {
         let isMoving = false;
         this.cornerDirection = { x: 0, y: 0 };
 

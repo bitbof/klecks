@@ -1,4 +1,4 @@
-import { IFilter } from '../kl-types';
+import { TFilter } from '../kl-types';
 import glBrightnessContrastImg from '/src/app/img/ui/edit-brightness-contrast.svg';
 import cropExtendImg from '/src/app/img/ui/edit-crop.svg';
 import glCurvesImg from '/src/app/img/ui/edit-curves.svg';
@@ -19,11 +19,11 @@ import patternImg from '/src/app/img/ui/edit-pattern.svg';
 import vanishPointImg from '/src/app/img/ui/edit-vanish-point.svg';
 import distortImg from '/src/app/img/ui/edit-distort.svg';
 
-export const filterLibStatus = {
+export const FILTER_LIB_STATUS = {
     isLoaded: false,
 };
-export const filterLib: {
-    [key: string]: IFilter;
+export const FILTER_LIB: {
+    [key: string]: TFilter;
 } = {
     brightnessContrast: {
         lang: {

@@ -1,6 +1,6 @@
 import { BB } from '../../bb/bb';
-import { IBounds, IRect } from '../../bb/bb-types';
-import { IRGBA } from '../kl-types';
+import { TBounds, TRect } from '../../bb/bb-types';
+import { TRgba } from '../kl-types';
 
 export type TTextFormat = 'left' | 'center' | 'right';
 export type TTextFont = 'serif' | 'monospace' | 'sans-serif' | 'cursive' | 'fantasy' | string;
@@ -19,16 +19,16 @@ export type TRenderTextParam = {
     letterSpacing?: number;
     lineHeight?: number; // em
     fill?: {
-        color: IRGBA;
+        color: TRgba;
     };
     stroke?: {
-        color: IRGBA;
+        color: TRgba;
         lineWidth: number;
     };
 };
 
 // accurately represents the bounds of the text, even it's fancy Zalgo text that tries to break layout
-function textMetricToRect(metrics: TextMetrics, align: TTextFormat): IRect {
+function textMetricToRect(metrics: TextMetrics, align: TTextFormat): TRect {
     const ascent = metrics.actualBoundingBoxAscent;
     const descent = metrics.actualBoundingBoxDescent;
     const left = metrics.actualBoundingBoxLeft;
@@ -69,7 +69,7 @@ function textMetricToRect(metrics: TextMetrics, align: TTextFormat): IRect {
  * @param canvas
  * @param p
  */
-export function renderText(canvas: HTMLCanvasElement, p: TRenderTextParam): IRect {
+export function renderText(canvas: HTMLCanvasElement, p: TRenderTextParam): TRect {
     p = BB.copyObj(p);
 
     // setup context
@@ -106,7 +106,7 @@ export function renderText(canvas: HTMLCanvasElement, p: TRenderTextParam): IRec
     const lines = p.text.split('\n').map((line) => line.replaceAll('\t', '    '));
 
     // bounds
-    const bounds: IBounds = {
+    const bounds: TBounds = {
         x1: 0,
         y1: 0,
         x2: 0,

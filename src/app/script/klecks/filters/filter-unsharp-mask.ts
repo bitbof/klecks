@@ -1,6 +1,6 @@
 import { KlSlider } from '../ui/components/kl-slider';
 import { getSharedFx } from '../../fx-canvas/shared-fx';
-import { IFilterApply, IFilterGetDialogParam, TFilterGetDialogResult } from '../kl-types';
+import { TFilterApply, TFilterGetDialogParam, TFilterGetDialogResult } from '../kl-types';
 import { LANG } from '../../language/language';
 import { Preview } from '../ui/project-viewport/preview';
 import { TProjectViewportProject } from '../ui/project-viewport/project-viewport';
@@ -17,7 +17,7 @@ export type TFilterUnsharpMaskInput = {
 };
 
 export const filterUnsharpMask = {
-    getDialog(params: IFilterGetDialogParam) {
+    getDialog(params: TFilterGetDialogParam) {
         const context = params.context;
         const klCanvas = params.klCanvas;
         if (!context || !klCanvas) {
@@ -143,7 +143,7 @@ export const filterUnsharpMask = {
         return result;
     },
 
-    apply(params: IFilterApply<TFilterUnsharpMaskInput>): boolean {
+    apply(params: TFilterApply<TFilterUnsharpMaskInput>): boolean {
         const context = params.layer.context;
         const klHistory = params.klHistory;
         const radius = params.input.radius;

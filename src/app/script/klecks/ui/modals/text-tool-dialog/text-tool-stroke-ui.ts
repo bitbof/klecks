@@ -1,6 +1,6 @@
 import { BB } from '../../../../bb/bb';
 import { TRenderTextParam } from '../../../image-operations/render-text';
-import { IRGB, IRGBA } from '../../../kl-types';
+import { TRgb, TRgba } from '../../../kl-types';
 import { ColorOptions } from '../../components/color-options';
 import { KlSlider } from '../../components/kl-slider';
 import { LANG } from '../../../../language/language';
@@ -10,8 +10,8 @@ import { createSvg } from '../../../../bb/base/base';
 type TStrokeParams = Pick<TRenderTextParam, 'stroke'>;
 
 export type TStrokeUIParams = TStrokeParams & {
-    primaryColor: IRGB;
-    secondaryColor: IRGB;
+    primaryColor: TRgb;
+    secondaryColor: TRgb;
     onUpdate: (v: Partial<TStrokeParams>) => void;
 };
 
@@ -34,7 +34,7 @@ export class TextToolStrokeUI {
             p.onUpdate(this.getValues());
         };
 
-        const colorOptionsArr: (IRGBA | null)[] = [
+        const colorOptionsArr: (TRgba | null)[] = [
             null,
             p.stroke
                 ? {

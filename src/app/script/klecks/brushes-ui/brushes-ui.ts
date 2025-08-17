@@ -5,7 +5,7 @@ import { pixelBrushUi } from './pixel-brush-ui';
 import { eraserBrushUi } from './eraser-brush-ui';
 import { smudgeBrushUi } from './smudge-brush-ui';
 import { chemyBrushUi } from './chemy-brush-ui';
-import { IBrushUi } from '../kl-types';
+import { TBrushUi } from '../kl-types';
 
 /**
  * UI for brushes.
@@ -13,8 +13,8 @@ import { IBrushUi } from '../kl-types';
  * So if you want to draw, you do it through the UI. should be changed sometime.
  */
 
-export const brushesUI: {
-    [key: string]: IBrushUi<any>;
+export const BRUSHES_UI: {
+    [key: string]: TBrushUi<any>;
 } = {
     penBrush: penBrushUi,
     blendBrush: blendBrushUi,

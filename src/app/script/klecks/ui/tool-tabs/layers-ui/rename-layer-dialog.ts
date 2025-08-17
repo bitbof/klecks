@@ -25,6 +25,7 @@ export function renameLayerDialog(
     const input = BB.el({ tagName: 'input' });
     input.value = currentName;
     input.setAttribute('data-ignore-focus', 'true');
+    input.style.flexGrow = '1';
     const clearBtn = BB.el({
         tagName: 'button',
         content: '<img src="' + removeLayerImg + '" height="20"/>',

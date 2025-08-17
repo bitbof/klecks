@@ -1,5 +1,5 @@
 import { BB } from '../../bb/bb';
-import { IFilterApply, IFilterGetDialogParam, TFilterGetDialogResult, IRGB } from '../kl-types';
+import { TFilterApply, TFilterGetDialogParam, TFilterGetDialogResult, TRgb } from '../kl-types';
 import { LANG } from '../../language/language';
 import { input } from '../ui/components/input';
 import { ColorOptions } from '../ui/components/color-options';
@@ -19,12 +19,12 @@ export type TFilterVanishPointInput = {
     y: number;
     lines: number;
     thickness: number;
-    color: IRGB;
+    color: TRgb;
     opacity: number;
 };
 
 export const filterVanishPoint = {
-    getDialog(params: IFilterGetDialogParam) {
+    getDialog(params: TFilterGetDialogParam) {
         const context = params.context;
         const klCanvas = params.klCanvas;
         if (!context || !klCanvas) {
@@ -262,7 +262,7 @@ export const filterVanishPoint = {
         return result;
     },
 
-    apply(params: IFilterApply<TFilterVanishPointInput>): boolean {
+    apply(params: TFilterApply<TFilterVanishPointInput>): boolean {
         const context = params.layer.context;
         const klCanvas = params.klCanvas;
         const klHistory = params.klHistory;

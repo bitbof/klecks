@@ -99,7 +99,7 @@ export class PointSlider {
 
     // ---- interface ----
 
-    getEl(): HTMLElement {
+    getElement(): HTMLElement {
         return this.rootEl;
     }
 

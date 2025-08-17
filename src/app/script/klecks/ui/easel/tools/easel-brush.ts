@@ -1,16 +1,16 @@
 import { BB } from '../../../../bb/bb';
-import { IPointerEvent } from '../../../../bb/input/event.types';
+import { TPointerEvent } from '../../../../bb/input/event.types';
 import { createMatrixFromTransform } from '../../../../bb/transform/create-matrix-from-transform';
 import { applyToPoint, inverse } from 'transformation-matrix';
 import {
     CoalescedExploder,
-    ICoalescedPointerEvent,
+    TCoalescedPointerEvent,
 } from '../../../../bb/input/event-chain/coalesced-exploder';
 import { EventChain } from '../../../../bb/input/event-chain/event-chain';
-import { IChainElement } from '../../../../bb/input/event-chain/event-chain.types';
+import { TChainElement } from '../../../../bb/input/event-chain/event-chain.types';
 import { TViewportTransform } from '../../project-viewport/project-viewport';
 import { TEaselInterface, TEaselTool } from '../easel.types';
-import { IVector2D } from '../../../../bb/bb-types';
+import { TVector2D } from '../../../../bb/bb-types';
 import { BrushCursorPixelSquare } from './brush-cursor-pixel-square';
 import { BrushCursorRound } from './brush-cursor-round';
 
@@ -27,7 +27,7 @@ export type TEaselBrushParams = {
     onLineStart: (e: TEaselBrushEvent) => void;
     onLineGo: (e: TEaselBrushEvent) => void;
     onLineEnd: () => void;
-    onLine: (p1: IVector2D, p2: IVector2D) => void;
+    onLine: (p1: TVector2D, p2: TVector2D) => void;
 };
 
 type TLineToolDirection = 'x' | 'y';
@@ -46,14 +46,14 @@ export class EaselBrush implements TEaselTool {
     private readonly brushCursorRound: BrushCursorRound;
     private readonly brushCursorPixelSquare: BrushCursorPixelSquare;
     private currentCursor: BrushCursorRound | BrushCursorPixelSquare;
-    private lastPos: IVector2D = { x: 0, y: 0 };
-    private lastLineEnd: IVector2D | undefined; // in canvas coords
+    private lastPos: TVector2D = { x: 0, y: 0 };
+    private lastLineEnd: TVector2D | undefined; // in canvas coords
     private lineToolDirection: TLineToolDirection | undefined;
-    private firstShiftPos: IVector2D | undefined;
+    private firstShiftPos: TVector2D | undefined;
     private hideCursorTimeout: ReturnType<typeof setTimeout> | undefined;
     private isOver: boolean = false;
 
-    private onExplodedPointer(e: ICoalescedPointerEvent): void {
+    private onExplodedPointer(e: TCoalescedPointerEvent): void {
         const vTransform = this.easel.getTransform();
         const m = createMatrixFromTransform(vTransform);
         // canvas coordinates
@@ -154,10 +154,10 @@ export class EaselBrush implements TEaselTool {
         this.svgEl.append(this.currentCursor.getElement());
 
         this.eventChain = new EventChain({
-            chainArr: [new CoalescedExploder() as IChainElement],
+            chainArr: [new CoalescedExploder() as TChainElement],
         });
         this.eventChain.setChainOut((e) => {
-            this.onExplodedPointer(e as ICoalescedPointerEvent);
+            this.onExplodedPointer(e as TCoalescedPointerEvent);
         });
     }
 
@@ -165,7 +165,7 @@ export class EaselBrush implements TEaselTool {
         return this.svgEl;
     }
 
-    onPointer(e: IPointerEvent): void {
+    onPointer(e: TPointerEvent): void {
         this.eventChain.chainIn(e);
     }
 
@@ -215,11 +215,11 @@ export class EaselBrush implements TEaselTool {
         }
     }
 
-    setLastDrawEvent(p?: IVector2D): void {
+    setLastDrawEvent(p?: TVector2D): void {
         this.lastLineEnd = p ? { ...p } : undefined;
     }
 
-    activate(cursorPos?: IVector2D): void {
+    activate(cursorPos?: TVector2D): void {
         this.easel.setCursor('crosshair');
         this.isDragging = false;
         if (cursorPos) {

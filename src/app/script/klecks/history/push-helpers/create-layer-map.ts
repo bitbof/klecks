@@ -1,5 +1,5 @@
 import { TKlCanvasLayer } from '../../canvas/kl-canvas';
-import { IBounds } from '../../../bb/bb-types';
+import { TBounds } from '../../../bb/bb-types';
 import { THistoryEntryLayer, THistoryEntryLayerTile, TLayerId } from '../history.types';
 import { canvasToLayerTiles } from './canvas-to-layer-tiles';
 
@@ -10,7 +10,7 @@ type TLayerMapGeneric = {
 type TLayerMapLayer = {
     layerId: string;
     attributes: 'all' | TLayerKey[];
-    bounds?: IBounds; // changed bounds
+    bounds?: TBounds; // changed bounds
     tiles?: (THistoryEntryLayerTile | undefined)[]; // custom tiles. bounds ignored if tiles set.
 };
 export type TLayerMapConfigItem = TLayerMapGeneric | TLayerMapLayer;
@@ -19,7 +19,7 @@ export type TLayerMapConfigItem = TLayerMapGeneric | TLayerMapLayer;
 function createEntryLayer(
     layer: TKlCanvasLayer,
     attributes: 'all' | TLayerKey[],
-    bounds?: IBounds,
+    bounds?: TBounds,
     tiles?: (THistoryEntryLayerTile | undefined)[],
 ): THistoryEntryLayer {
     const useAll = attributes === 'all';

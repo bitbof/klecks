@@ -470,11 +470,6 @@
     original: 'Browser Storage',
     value: 'Armazenamento do Navegador'
   },
-  'file-storage-thumb-title': {
-    hint: 'when reopening or reloading',
-    original: 'Restores when reopening page',
-    value: 'Restaura ao reabrir a página'
-  },
   'file-storage-about': {
     hint: 'link to Browser Storage help/user manual',
     original: 'About Browser Storage',
@@ -482,8 +477,8 @@
   },
   'file-storage-cant-access': {
     hint: 'an error. Can’t access the storage.',
-    original: "Can't access",
-    value: 'Erro ao acessar'
+    original: "Can't access storage.",
+    value: 'Erro ao acessar o armazenamento.'
   },
   'file-storage-empty': {
     hint: 'nothing stored',
@@ -495,13 +490,26 @@
     original: 'Store',
     value: 'Armazenar'
   },
+  'file-storage-open': {
+    hint: 'verb. to open, or to load',
+    original: 'Open',
+    value: ''
+  },
+  'file-storage-open-confirmation': {
+    original: 'This image is already open in another tab. Open it here too?',
+    value: ''
+  },
+  'file-storage-open-failed': {
+    original: 'Failed to load.',
+    value: ''
+  },
   'file-storage-clear': {
     original: 'Clear',
     value: 'Limpar'
   },
   'file-storage-clear-prompt': {
-    original: 'Clear Browser Storage?',
-    value: 'Limpar'
+    original: 'Clear Browser Storage? Clearing can not be undone.',
+    value: 'Limpar o armazenamento do navegador? A limpeza não pode ser desfeita.'
   },
   'file-storage-storing': {
     hint: 'while it is in the process of storing',
@@ -512,6 +520,10 @@
     hint: 'overwrite what is already stored',
     original: 'Overwrite',
     value: 'Substituir'
+  },
+  'file-storage-overwrite-confirm': {
+    original: 'Overwrite Browser Storage? Overwritten data will be permanently deleted.',
+    value: ''
   },
   'file-storage-min-ago': {
     hint: "{x} <- needs to stay, it's a placeholder.",
@@ -567,6 +579,43 @@
     hint: 'verb',
     original: 'Upload',
     value: 'Upload'
+  },
+  'tab-recovery-recover-tabs': {
+    hint: 'allows user to recover browser tabs (including the drawing) of this app.',
+    original: 'Recover closed tabs',
+    value: ''
+  },
+  'tab-recovery-explanation': {
+    original: 'Recovery data is only kept for a little while. Save to ensure your work is not lost.',
+    value: ''
+  },
+  'tab-recovery-total-quota-label': {
+    original: 'Total:',
+    value: ''
+  },
+  'tab-recovery-empty': {
+    original: 'Nothing to recover.',
+    value: ''
+  },
+  'tab-recovery-recover': {
+    original: 'Recover',
+    value: ''
+  },
+  'tab-recovery-delete': {
+    original: 'Delete',
+    value: ''
+  },
+  'tab-recovery-delete-confirmation': {
+    original: 'Delete this recovery? Deletion can not be undone.',
+    value: ''
+  },
+  'tab-recovery-failed-to-recover': {
+    original: 'Failed to recover tab.',
+    value: ''
+  },
+  'tab-recovery-recovered': {
+    original: 'Tab recovered.',
+    value: ''
   },
   'cleared-layer': {
     hint: 'the layer has been cleared. It is now empty',
@@ -1496,10 +1545,6 @@
     hint: 'The app is loaded, but it’s still waiting for image',
     original: 'Waiting for image',
     value: 'Esperando imagem'
-  },
-  unsaved: {
-    original: 'Unsaved',
-    value: 'Não Salvo'
   },
   help: {
     hint: 'or user manual',

@@ -261,6 +261,7 @@ export class ShapeUi {
             callback: () => {
                 updatePreviews();
             },
+            name: 'enable-eraser',
         });
 
         this.lockAlphaToggle = new Checkbox({
@@ -268,6 +269,7 @@ export class ShapeUi {
             label: LANG('lock-alpha'),
             title: LANG('lock-alpha-title'),
             doHighlight: true,
+            name: 'enable-alpha-lock',
         });
         this.lockAlphaToggle.getElement().style.marginTop = '10px';
 
@@ -276,6 +278,7 @@ export class ShapeUi {
             label: LANG('shape-auto-pan'),
             title: LANG('shape-auto-pan-title'),
             callback: (b) => p.onChangePanning(b),
+            name: 'enable-auto-pan',
         });
         this.panningToggle.getElement().style.marginTop = '10px';
 
@@ -327,16 +330,14 @@ export class ShapeUi {
                 display: 'flex',
                 alignItems: 'center',
                 marginTop: '10px',
+                gap: '10px',
             },
         });
 
         this.outwardsToggle = new Checkbox({
             init: false,
             label: LANG('shape-outwards'),
-            css: {
-                width: '50%',
-                marginRight: '10px',
-            },
+            name: 'enable-outwards',
         });
         row2.append(this.outwardsToggle.getElement());
 
@@ -346,9 +347,7 @@ export class ShapeUi {
             callback: () => {
                 updatePreviews();
             },
-            css: {
-                flexGrow: '1',
-            },
+            name: 'enable-fixed-proportions',
         });
         row2.append(this.fixedToggle.getElement());
 
@@ -359,9 +358,7 @@ export class ShapeUi {
             callback: () => {
                 updatePreviews();
             },
-            css: {
-                flexGrow: '1',
-            },
+            name: 'enable-angle-snapping',
         });
         row2.append(this.snapToggle.getElement());
 

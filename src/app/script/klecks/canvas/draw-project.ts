@@ -1,7 +1,7 @@
 import { BB } from '../../bb/bb';
-import { IKlProject, isLayerFill } from '../kl-types';
+import { isLayerFill, TKlProject } from '../kl-types';
 
-export function drawProject(project: IKlProject, factor: number): HTMLCanvasElement {
+export function drawProject(project: TKlProject, factor: number): HTMLCanvasElement {
     const resultCanvas = BB.canvas(
         Math.max(1, Math.round(project.width * factor)),
         Math.max(1, Math.round(project.height * factor)),
@@ -22,6 +22,8 @@ export function drawProject(project: IKlProject, factor: number): HTMLCanvasElem
         if (isLayerFill(layer.image)) {
             ctx.fillStyle = layer.image.fill;
             ctx.fillRect(0, 0, resultCanvas.width, resultCanvas.height);
+        } else if (layer.image instanceof Array) {
+            throw new Error('not implemented');
         } else {
             ctx.drawImage(layer.image, 0, 0, resultCanvas.width, resultCanvas.height);
         }

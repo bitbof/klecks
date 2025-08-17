@@ -10,6 +10,7 @@ You can potentially be 268.44 MB over the memory limit.
 The new entry should only be created after freeing up some space in entries.
  */
 
+// tied to indexed db. don't change.
 export const HISTORY_TILE_SIZE = 256;
 
 export type TKlHistoryListener = () => void;
@@ -71,7 +72,7 @@ export class KlHistory {
         );
     }
 
-    // ----------------- public ----------------------
+    // ----------------------------------- public -----------------------------------
     constructor(p: TKlHistoryParams) {
         this.entries = [
             {

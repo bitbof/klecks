@@ -1,8 +1,8 @@
-import { IPointerEvent } from '../event.types';
+import { TPointerEvent } from '../event.types';
 
-export type TChainOutFunc = (event: IPointerEvent) => void;
+export type TChainOutFunc = (event: TPointerEvent) => void;
 
-export interface IChainElement {
-    chainIn: (event: IPointerEvent) => IPointerEvent;
-    setChainOut: (f: (event: IPointerEvent) => void) => void;
-}
+export type TChainElement = {
+    chainIn: (event: TPointerEvent) => TPointerEvent;
+    setChainOut: (f: (event: TPointerEvent) => void) => void;
+};

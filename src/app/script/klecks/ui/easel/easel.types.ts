@@ -1,11 +1,11 @@
-import { IPointerEvent, TPointerType } from '../../../bb/input/event.types';
+import { TPointerEvent, TPointerType } from '../../../bb/input/event.types';
 import { KeyListener, TOnBlur, TOnKeyDown, TOnKeyUp } from '../../../bb/input/key-listener';
 import {
     TProjectViewportProject,
     TViewportTransform,
     TViewportTransformXY,
 } from '../project-viewport/project-viewport';
-import { ISize2D, IVector2D } from '../../../bb/bb-types';
+import { TSize2D, TVector2D } from '../../../bb/bb-types';
 import { MultiPolygon } from 'polygon-clipping';
 import { TEMP_TRIGGERS } from './easel.config';
 
@@ -18,8 +18,8 @@ export type TEaselInterface = {
     setAngleDeg: (angleDeg: number, isRelative: undefined | boolean) => void;
     minScale: number;
     maxScale: number;
-    getSize: () => ISize2D; // size of DOM element
-    getProjectSize: () => ISize2D;
+    getSize: () => TSize2D; // size of DOM element
+    getProjectSize: () => TSize2D;
     requestRender: () => void;
     keyListener: KeyListener;
     isKeyPressed: (keyStr: string) => boolean;
@@ -37,7 +37,7 @@ export type TEaselTool = {
     blockTrigger?: TEaselToolTrigger; // tool won't switch to temp tool when trigger blocked
     onArrowKeys?: (key: TArrowKey) => boolean; // true -> cancel default
     doubleTapPointerTypes?: TPointerType[]; // which pointer types can trigger double-tap gesture
-    onPointer: (e: IPointerEvent) => void;
+    onPointer: (e: TPointerEvent) => void;
     onPointerLeave?: () => void;
     onKeyDown?: TOnKeyDown;
     onKeyUp?: TOnKeyUp;
@@ -47,7 +47,7 @@ export type TEaselTool = {
     onUpdateTransform?: (transform: TViewportTransform) => void; // whenever transform updates
     onUpdateSelection?: (selection?: MultiPolygon) => void;
     getIsLocked?: () => boolean; // if returns true, can't change mode -> e.g. while drawing
-    activate?: (last?: IVector2D, poppedTemp?: boolean) => void; // tells tool when it is active; last undefined if cursor left easel.
+    activate?: (last?: TVector2D, poppedTemp?: boolean) => void; // tells tool when it is active; last undefined if cursor left easel.
     onResize?: (width: number, height: number) => void;
     renderAfterViewport?: (ctx: CanvasRenderingContext2D, transform: TViewportTransformXY) => void;
     onClickOutside?: () => void; // clicked outside of easel

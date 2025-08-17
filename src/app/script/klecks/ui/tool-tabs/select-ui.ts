@@ -320,13 +320,9 @@ export class SelectUi {
         // --- transform ---
         const transformModeEl = BB.el();
         const transformFlipXBtn = BB.el({
-            parent: transformModeEl,
             tagName: 'button',
             content: LANG('filter-transform-flip') + ' X',
             className: 'kl-button',
-            css: {
-                marginRight: '5px',
-            },
             onClick: () => {
                 p.transform.onFlipX();
             },
@@ -335,12 +331,8 @@ export class SelectUi {
             },
         });
         const transformFlipYBtn = BB.el({
-            parent: transformModeEl,
             tagName: 'button',
             content: LANG('filter-transform-flip') + ' Y',
-            css: {
-                marginRight: '5px',
-            },
             onClick: () => {
                 p.transform.onFlipY();
             },
@@ -349,28 +341,20 @@ export class SelectUi {
             },
         });
         const rotateNegativeBtn = BB.el({
-            parent: transformModeEl,
             tagName: 'button',
             content: '-90°',
             onClick: () => {
                 p.transform.onRotateDeg(-90);
-            },
-            css: {
-                marginRight: '5px',
             },
             custom: {
                 tabindex: '-1',
             },
         });
         const rotatePositiveBtn = BB.el({
-            parent: transformModeEl,
             tagName: 'button',
             content: '+90°',
             onClick: () => {
                 p.transform.onRotateDeg(90);
-            },
-            css: {
-                marginRight: '5px',
             },
             custom: {
                 tabindex: '-1',
@@ -378,18 +362,29 @@ export class SelectUi {
         });
 
         this.transformDuplicateBtn = BB.el({
-            parent: transformModeEl,
             tagName: 'button',
             content: LANG('select-transform-clone'),
             onClick: () => {
                 p.transform.onClone();
             },
-            css: {
-                marginTop: '10px',
-                display: 'block',
-            },
             custom: {
                 tabindex: '-1',
+            },
+        });
+
+        const actionsRow = BB.el({
+            parent: transformModeEl,
+            content: [
+                transformFlipXBtn,
+                transformFlipYBtn,
+                rotateNegativeBtn,
+                rotatePositiveBtn,
+                this.transformDuplicateBtn,
+            ],
+            css: {
+                display: 'flex',
+                flexWrap: 'wrap',
+                gap: '5px',
             },
         });
 
@@ -401,6 +396,7 @@ export class SelectUi {
             onChange: (val) => {
                 p.transform.onMoveToLayer(+val);
             },
+            name: 'move-to-layer',
         });
 
         transformModeEl.append(
@@ -415,6 +411,7 @@ export class SelectUi {
             callback: (b) => {
                 p.transform.onChangeTransparentBackground(b);
             },
+            name: 'enable-transparent-background',
         });
         BB.css(this.transparentBackgroundToggle.getElement(), {
             marginTop: '10px',
@@ -490,6 +487,6 @@ export class SelectUi {
     }
 
     destroy(): void {
-        // todo
+        // ...
     }
 }

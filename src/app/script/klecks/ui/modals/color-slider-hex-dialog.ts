@@ -3,7 +3,7 @@ import { input } from '../components/input';
 import { showModal } from './base/showModal';
 import { LANG } from '../../../language/language';
 import copyImg from '/src/app/img/ui/copy.svg';
-import { IRGB } from '../../kl-types';
+import { TRgb } from '../../kl-types';
 import { RGB } from '../../../bb/color/color';
 import { c } from '../../../bb/base/c';
 import { css } from '@emotion/css';
@@ -19,7 +19,7 @@ type TInputRow = {
  */
 export class HexColorDialog {
     // ----------------------------------- public -----------------------------------
-    constructor(p: { color: IRGB; onClose: (rgb: IRGB | undefined) => void }) {
+    constructor(p: { color: TRgb; onClose: (rgb: TRgb | undefined) => void }) {
         let lastValidRgb: RGB = new BB.RGB(p.color.r, p.color.g, p.color.b);
 
         const previewEl = BB.el({

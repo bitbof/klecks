@@ -2,9 +2,17 @@ import { MultiPolygon } from 'polygon-clipping';
 import { TLayerFill, TMixMode } from '../kl-types';
 
 export type TLayerId = string;
+export type TImageDataTile = {
+    id: string;
+    /*
+    // unix timestamp
+    timestamp: number;
+     */
+    data: ImageData;
+};
 // image data, or a fill color
 // can be transparent: {fill: 'transparent'} -> useful if empty layer
-export type THistoryEntryLayerTile = ImageData | TLayerFill;
+export type THistoryEntryLayerTile = TImageDataTile | TLayerFill;
 export type THistoryEntryLayer = {
     // if layer exists but did not change, must be in the layerMap. object can be empty
 
@@ -27,6 +35,11 @@ export type THistoryEntryLayer = {
     tiles?: (THistoryEntryLayerTile | undefined)[]; // undefined if tile did not change
 };
 export type THistoryEntryData = {
+    // if project changed
+    projectId?: {
+        value: string; // uuid
+    };
+
     // if size changed
     size?: {
         width: number;

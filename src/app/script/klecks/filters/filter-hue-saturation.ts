@@ -1,7 +1,7 @@
 import { EVENT_RES_MS } from './filters-consts';
 import { KlSlider } from '../ui/components/kl-slider';
 import { getSharedFx } from '../../fx-canvas/shared-fx';
-import { IFilterApply, IFilterGetDialogParam, TFilterGetDialogResult } from '../kl-types';
+import { TFilterApply, TFilterGetDialogParam, TFilterGetDialogResult } from '../kl-types';
 import { LANG } from '../../language/language';
 import { FxPreviewRenderer } from '../ui/project-viewport/fx-preview-renderer';
 import { TProjectViewportProject } from '../ui/project-viewport/project-viewport';
@@ -18,7 +18,7 @@ export type TFilterHueSaturationInput = {
 };
 
 export const filterHueSaturation = {
-    getDialog(params: IFilterGetDialogParam) {
+    getDialog(params: TFilterGetDialogParam) {
         const context = params.context;
         const klCanvas = params.klCanvas;
         if (!context || !klCanvas) {
@@ -127,7 +127,7 @@ export const filterHueSaturation = {
         return result;
     },
 
-    apply(params: IFilterApply<TFilterHueSaturationInput>): boolean {
+    apply(params: TFilterApply<TFilterHueSaturationInput>): boolean {
         const context = params.layer.context;
         const hue = params.input.hue;
         const klHistory = params.klHistory;

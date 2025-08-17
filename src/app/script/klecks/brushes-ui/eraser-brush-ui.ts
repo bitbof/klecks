@@ -5,8 +5,8 @@ import { KlSlider } from '../ui/components/kl-slider';
 import { createPenPressureToggle } from '../ui/components/create-pen-pressure-toggle';
 import { Checkbox } from '../ui/components/checkbox';
 import brushIconImg from '/src/app/img/ui/brush-eraser.svg';
-import { IBrushUi } from '../kl-types';
-import { LANG, languageStrings } from '../../language/language';
+import { TBrushUi } from '../kl-types';
+import { LANG, LANGUAGE_STRINGS } from '../../language/language';
 import { EraserBrush } from '../brushes/eraser-brush';
 
 export const eraserBrushUi = (function () {
@@ -22,9 +22,9 @@ export const eraserBrushUi = (function () {
             min: 1 / 100,
             max: 1,
         },
-    } as IBrushUi<EraserBrush>;
+    } as TBrushUi<EraserBrush>;
 
-    languageStrings.subscribe(() => {
+    LANGUAGE_STRINGS.subscribe(() => {
         brushInterface.tooltip = LANG('eraser') + ' [E]';
     });
 
@@ -120,6 +120,7 @@ export const eraserBrushUi = (function () {
                 css: {
                     marginTop: '10px',
                 },
+                name: 'transparency-toggle',
             });
             div.append(transparencyToggle.getElement());
         }
@@ -176,7 +177,7 @@ export const eraserBrushUi = (function () {
         this.getElement = function () {
             return div;
         };
-    } as IBrushUi<EraserBrush>['Ui'];
+    } as TBrushUi<EraserBrush>['Ui'];
 
     return brushInterface;
 })();

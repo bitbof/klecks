@@ -4,13 +4,13 @@ import { BB } from '../../../bb/bb';
  * Checkbox - with label
  */
 export class Checkbox {
-    private readonly element: HTMLElement;
+    private readonly rootEl: HTMLElement;
     private check: HTMLInputElement;
     private readonly doHighlight: boolean;
 
     // ----------------------------------- public -----------------------------------
 
-    constructor(params: {
+    constructor(p: {
         init?: boolean; // default false
         label: string;
         callback?: (b: boolean) => void;
@@ -18,15 +18,16 @@ export class Checkbox {
         title?: string;
         doHighlight?: boolean; // default false
         css?: Partial<CSSStyleDeclaration>;
+        name: string;
     }) {
-        this.doHighlight = !!params.doHighlight;
+        this.doHighlight = !!p.doHighlight;
 
-        this.element = BB.el({
+        this.rootEl = BB.el({
             className: 'kl-checkbox',
         });
 
         const innerEl = BB.el({
-            parent: this.element,
+            parent: this.rootEl,
             tagName: 'label',
             className: 'kl-checkbox__inner',
             css: {
@@ -42,39 +43,39 @@ export class Checkbox {
             },
             custom: {
                 type: 'checkbox',
+                name: p.name,
             },
         });
 
-        this.check.checked = !!params.init;
+        this.check.checked = !!p.init;
         if (this.doHighlight && this.check.checked) {
-            this.element.classList.add('kl-checkbox--highlight');
+            this.rootEl.classList.add('kl-checkbox--highlight');
         }
-        if (!params.allowTab) {
+        if (!p.allowTab) {
             this.check.tabIndex = -1;
         }
 
-        if (params.title) {
-            innerEl.title = params.title;
+        if (p.title) {
+            innerEl.title = p.title;
         }
 
         const label = BB.el({
             parent: innerEl,
-            content: params.label,
+            content: p.label,
             css: {},
         });
-        (label as any).allowClick = true;
 
         this.check.onchange = () => {
             if (this.doHighlight) {
-                this.element.classList.toggle('kl-checkbox--highlight', this.check.checked);
+                this.rootEl.classList.toggle('kl-checkbox--highlight', this.check.checked);
             }
-            params.callback && params.callback(this.check.checked);
+            p.callback && p.callback(this.check.checked);
             setTimeout(() => {
                 this.check.blur();
             }, 0);
         };
-        if (params.css) {
-            BB.css(this.element, params.css);
+        if (p.css) {
+            BB.css(this.rootEl, p.css);
         }
     }
 
@@ -85,12 +86,12 @@ export class Checkbox {
     setValue(b: boolean): void {
         this.check.checked = b;
         if (this.doHighlight) {
-            this.element.classList.toggle('kl-checkbox--highlight', this.check.checked);
+            this.rootEl.classList.toggle('kl-checkbox--highlight', this.check.checked);
         }
     }
 
     getElement(): HTMLElement {
-        return this.element;
+        return this.rootEl;
     }
 
     destroy(): void {

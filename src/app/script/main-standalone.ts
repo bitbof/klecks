@@ -3,15 +3,22 @@
  */
 
 import './polyfills/polyfills';
-import { KL } from './klecks/kl';
 import { KlApp } from './app/kl-app';
-import { IKlProject } from './klecks/kl-types';
-import { ProjectStore } from './klecks/storage/project-store';
+import { TDeserializedKlStorageProject, TKlProject } from './klecks/kl-types';
 import { initLANG, LANG } from './language/language';
 import '../script/theme/theme';
-import { nullToUndefined } from './bb/base/base';
+import {
+    getKlIndexedDbName,
+    KL_INDEXED_DB,
+    KL_INDEXED_DB_STORES,
+    KL_INDEXED_DB_UPGRADER,
+    KL_INDEXED_DB_VERSION,
+    setKlIndexedDbName,
+} from './klecks/storage/kl-indexed-db';
+import { KL_CONFIG } from './klecks/kl-config';
+import { KlRecoveryManager } from './klecks/storage/kl-recovery-manager';
 
-function initError(e: Error): void {
+function showInitError(e: Error): void {
     const el = document.createElement('div');
     el.style.textAlign = 'center';
     el.style.background = '#fff';
@@ -25,82 +32,52 @@ function initError(e: Error): void {
 }
 
 (async () => {
-    let klApp: KlApp;
-    let domIsLoaded = false;
-
     try {
-        window.addEventListener('DOMContentLoaded', () => {
-            domIsLoaded = true;
-        });
+        const outQueue: string[] = [];
         await initLANG();
-    } catch (e) {
-        initError(e as Error);
-        return;
-    }
 
-    function onProjectLoaded(project: IKlProject | null, projectStore: ProjectStore) {
-        if (klApp) {
-            throw 'onKlProjectObjLoaded called more than once';
+        KL_INDEXED_DB.init(
+            getKlIndexedDbName(),
+            KL_INDEXED_DB_STORES,
+            KL_INDEXED_DB_VERSION,
+            KL_INDEXED_DB_UPGRADER,
+        );
+        if (!(await KL_INDEXED_DB.testConnection())) {
+            outQueue.push(LANG('file-storage-cant-access'));
         }
+
+        const klRecoveryManager: KlRecoveryManager | undefined = KL_INDEXED_DB.getIsAvailable()
+            ? new KlRecoveryManager({})
+            : undefined;
+        let project: TKlProject | undefined = undefined;
+        try {
+            const readResult: TDeserializedKlStorageProject | undefined = klRecoveryManager
+                ? await klRecoveryManager.getRecovery()
+                : undefined;
+            if (readResult) {
+                project = readResult.project;
+                outQueue.push(LANG('tab-recovery-recovered'));
+            }
+        } catch (e) {
+            setTimeout(() => {
+                throw e;
+            });
+            outQueue.push(LANG('tab-recovery-failed-to-recover'));
+        }
+
         // in case an extension manipulated the page
         const loadingScreenEl = document.getElementById('loading-screen');
         loadingScreenEl?.remove();
 
-        const saveReminder = new KL.SaveReminder(
-            true,
-            true,
-            () => klApp.saveAsPsd(),
-            () => {
-                return klApp ? klApp.isDrawing() : false;
-            },
-            null,
-            null,
-        );
-        klApp = new KlApp({ project: nullToUndefined(project), saveReminder, projectStore });
-        saveReminder.init();
-        if (project) {
-            setTimeout(() => {
-                klApp.out(LANG('file-storage-restored'));
-            }, 100);
-        }
+        const klApp = new KlApp({ project, klRecoveryManager });
+        document.body.append(klApp.getElement());
 
-        document.body.append(klApp.getEl());
-    }
-
-    async function onDomLoaded() {
-        try {
-            window.removeEventListener('DOMContentLoaded', onDomLoaded);
-            const projectStore = new KL.ProjectStore();
-            let project: IKlProject | null = null;
-            try {
-                const readResult = await projectStore.read();
-                if (readResult) {
-                    project = readResult.project;
-                }
-            } catch (e) {
-                let message: string;
-                if ((e as Error).message.indexOf('db-error') === 0) {
-                    message = 'Failed to access Browser Storage';
-                } else if ((e as Error).message.indexOf('format-error') === 0) {
-                    message = 'Failed to restore from Browser Storage';
-                } else {
-                    message = 'Failed to restore from Browser Storage';
-                }
-                if (message) {
-                    setTimeout(function () {
-                        klApp && klApp.out(message);
-                        throw new Error('Initial browser storage error, ' + e);
-                    }, 100);
-                }
-            }
-            onProjectLoaded(project, projectStore);
-        } catch (e) {
-            initError(e as Error);
-        }
-    }
-    if (domIsLoaded) {
-        onDomLoaded();
-    } else {
-        window.addEventListener('DOMContentLoaded', onDomLoaded);
+        setTimeout(() => {
+            outQueue.forEach((msg) => {
+                klApp.out(msg);
+            });
+        }, 100);
+    } catch (e) {
+        showInitError(e as Error);
     }
 })();

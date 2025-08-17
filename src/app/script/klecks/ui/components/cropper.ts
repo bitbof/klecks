@@ -1,5 +1,5 @@
 import { BB } from '../../../bb/bb';
-import { IRect, IVector2D } from '../../../bb/bb-types';
+import { TRect, TVector2D } from '../../../bb/bb-types';
 import { KeyListener } from '../../../bb/input/key-listener';
 import { PointerListener } from '../../../bb/input/pointer-listener';
 
@@ -19,7 +19,7 @@ export class Cropper {
     private width: number;
     private height: number;
     private scale: number;
-    private readonly grips: IVector2D[]; // aka corner coordinates
+    private readonly grips: TVector2D[]; // aka corner coordinates
     private readonly edges: TUpdateElement[];
     private readonly cornerElArr: TUpdateElement[];
     private readonly darken: TUpdateElement[];
@@ -27,7 +27,7 @@ export class Cropper {
     private readonly thirdsHorizontal: TUpdateElement;
     private readonly thirdsVertical: TUpdateElement;
     private readonly keyListener: KeyListener;
-    private readonly pointerRemainder: IVector2D;
+    private readonly pointerRemainder: TVector2D;
 
     private readonly outlinePointerListener: PointerListener;
 
@@ -41,7 +41,7 @@ export class Cropper {
     private readonly edge2PointerListener: PointerListener;
     private readonly edge3PointerListener: PointerListener;
 
-    private readonly callback: (val: IRect) => void;
+    private readonly callback: (val: TRect) => void;
 
     private update(): void {
         this.edges[0].update();
@@ -68,7 +68,7 @@ export class Cropper {
     }
 
     // ----------------------------------- public -----------------------------------
-    constructor(params: {
+    constructor(p: {
         x: number; // int, pos in relation to image
         y: number; // int
         width: number; // int
@@ -76,17 +76,17 @@ export class Cropper {
         maxW: number;
         maxH: number;
         scale: number; // float, zoom
-        callback: (val: IRect) => void;
+        callback: (val: TRect) => void;
     }) {
-        this.x = params.x;
-        this.y = params.y;
-        this.width = params.width;
-        this.height = params.height;
-        this.scale = params.scale;
-        this.callback = params.callback;
+        this.x = p.x;
+        this.y = p.y;
+        this.width = p.width;
+        this.height = p.height;
+        this.scale = p.scale;
+        this.callback = p.callback;
 
-        const maxW = params.maxW;
-        const maxH = params.maxW;
+        const maxW = p.maxW;
+        const maxH = p.maxW;
         this.rootEl = BB.el();
         const gripCursors = ['nw', 'n', 'ne', 'e', 'se', 's', 'sw', 'w'];
 
@@ -633,7 +633,7 @@ export class Cropper {
     }
 
     // ---- interface ----
-    getTransform(): IRect {
+    getTransform(): TRect {
         this.grips[1].x -= this.grips[0].x;
         this.grips[1].y -= this.grips[0].y;
         this.grips[2].x -= this.grips[0].x;
@@ -652,7 +652,7 @@ export class Cropper {
         };
     }
 
-    setTransform(p: IRect): void {
+    setTransform(p: TRect): void {
         this.x = p.x;
         this.y = p.y;
         this.width = p.width;

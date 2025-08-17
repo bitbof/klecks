@@ -1,18 +1,18 @@
 import { createMatrixFromTransform } from './create-matrix-from-transform';
 import { TViewportTransform } from '../../klecks/ui/project-viewport/project-viewport';
-import { IVector2D } from '../bb-types';
-import { inverse, applyToPoint } from 'transformation-matrix';
+import { TVector2D } from '../bb-types';
+import { applyToPoint, inverse } from 'transformation-matrix';
 
 export type TMetaTransform = {
-    viewportP: IVector2D;
-    canvasP: IVector2D;
+    viewportP: TVector2D;
+    canvasP: TVector2D;
     scale: number;
     angleDeg: number;
 };
 
 export function toMetaTransform(
     transform: TViewportTransform,
-    viewportP: IVector2D,
+    viewportP: TVector2D,
 ): TMetaTransform {
     const m = createMatrixFromTransform(transform);
     const canvasP = applyToPoint(inverse(m), viewportP);

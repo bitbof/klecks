@@ -1,32 +1,32 @@
 import { EVENT_USES_HIGH_RES_TIMESTAMP, HAS_POINTER_EVENTS, IS_FIREFOX } from '../base/browser';
-import { IWheelCleanerEvent, WheelCleaner } from './wheel-cleaner';
+import { TWheelCleanerEvent, WheelCleaner } from './wheel-cleaner';
 import {
-    IPointerEvent,
-    IWheelEvent,
     TPointerButton,
+    TPointerEvent,
     TPointerEventType,
     TPointerType,
+    TWheelEvent,
 } from './event.types';
 import { PressureNormalizer } from './pressure-normalizer';
 
-export interface IPointerListenerParams {
+export type TPointerListenerParams = {
     target: HTMLElement | SVGElement;
-    onPointer?: (pointerEvent: IPointerEvent) => void;
-    onWheel?: (wheelEvent: IWheelEvent) => void;
+    onPointer?: (pointerEvent: TPointerEvent) => void;
+    onWheel?: (wheelEvent: TWheelEvent) => void;
     useDirtyWheel?: boolean; // default false - use dirty wheel events - not just increments of 1
     isWheelPassive?: boolean; // default false
     onEnterLeave?: (isOver: boolean) => void; // optional
     maxPointers?: number; // int [1,n] default is 1 - how many concurrent pointers to pay attention to
     fixScribble?: boolean; // fix ipad scribble issue - TODO remove, fixed start of 2022 -> https://bugs.webkit.org/show_bug.cgi?id=217430#c2
-}
+};
 
-interface IPointer {
+type TPointer = {
     pointerId: number;
     lastPageX: number | null;
     lastPageY: number | null;
-}
+};
 
-interface IDragObj {
+type TDragObj = {
     pointerId: number; // long
     pointerType?: TPointerType;
     downPageX: number; //where was pointer when down-event occurred
@@ -35,9 +35,9 @@ interface IDragObj {
     lastPageX: number; //pageX in previous event - only for touch events, because they don't have movementX/Y
     lastPageY: number;
     lastTimeStamp?: number;
-}
+};
 
-interface ICoalescedPointerEvent {
+type TCoalescedPointerEvent = {
     pageX: number;
     pageY: number;
     clientX: number;
@@ -46,9 +46,9 @@ interface ICoalescedPointerEvent {
     movementY: number;
     timeStamp: number;
     pressure: number;
-}
+};
 
-interface ICorrectedPointerEvent {
+type TCorrectedPointerEvent = {
     pointerId: number;
     pointerType: string;
     pageX: number;
@@ -61,20 +61,20 @@ interface ICorrectedPointerEvent {
     pressure: number; // normalized
     buttons: number;
     button: number;
-    coalescedArr: ICoalescedPointerEvent[];
+    coalescedArr: TCoalescedPointerEvent[];
     eventPreventDefault: () => void;
     eventStopPropagation: () => void;
-}
+};
 
-interface TExtendedDOMPointerEvent extends PointerEvent {
-    corrected: ICorrectedPointerEvent;
-}
+type TExtendedDOMPointerEvent = PointerEvent & {
+    corrected: TCorrectedPointerEvent;
+};
 
 // keeping track of pointers for movement fallback
-const pointerArr: IPointer[] = [];
+const pointerArr: TPointer[] = [];
 
-function addPointer(event: ICorrectedPointerEvent): IPointer {
-    const pointerObj: IPointer = {
+function addPointer(event: TCorrectedPointerEvent): TPointer {
+    const pointerObj: TPointer = {
         pointerId: event.pointerId,
         lastPageX: null,
         lastPageY: null,
@@ -88,7 +88,7 @@ function addPointer(event: ICorrectedPointerEvent): IPointer {
     return pointerObj;
 }
 
-function getPointer(event: ICorrectedPointerEvent): IPointer | null {
+function getPointer(event: TCorrectedPointerEvent): TPointer | null {
     for (let i = pointerArr.length - 1; i >= 0; i--) {
         if (event.pointerId === pointerArr[i].pointerId) {
             return pointerArr[i];
@@ -126,7 +126,7 @@ const pointerEnterEvt = (HAS_POINTER_EVENTS ? 'pointerenter' : 'mouseenter') as 
  */
 function correctPointerEvent(
     event: PointerEvent | TExtendedDOMPointerEvent,
-): ICorrectedPointerEvent {
+): TCorrectedPointerEvent {
     if ('corrected' in event) {
         return event.corrected;
     }
@@ -151,7 +151,7 @@ function correctPointerEvent(
         return 0;
     }
 
-    const correctedObj: ICorrectedPointerEvent = {
+    const correctedObj: TCorrectedPointerEvent = {
         pointerId: event.pointerId,
         pointerType: event.pointerType,
         pageX: event.pageX,
@@ -210,7 +210,7 @@ function correctPointerEvent(
     // chrome somehow movementX not same scale as pageX. todo: only chrome?
     // so make my own
 
-    const pointerObj: IPointer = getPointer(correctedObj) || addPointer(correctedObj);
+    const pointerObj: TPointer = getPointer(correctedObj) || addPointer(correctedObj);
 
     const totalLastX = pointerObj.lastPageX;
     const totalLastY = pointerObj.lastPageY;
@@ -261,15 +261,15 @@ export class PointerListener {
     // ts has problems with (HTMLElement|SVGElement) when adding event listeners
     // https://github.com/microsoft/TypeScript/issues/46819
     private readonly targetElement: HTMLElement;
-    private readonly onPointerCallback: undefined | ((pointerEvent: IPointerEvent) => void);
-    private readonly onWheelCallback: undefined | ((wheelEvent: IWheelEvent) => void);
+    private readonly onPointerCallback: undefined | ((pointerEvent: TPointerEvent) => void);
+    private readonly onWheelCallback: undefined | ((wheelEvent: TWheelEvent) => void);
     private readonly onEnterLeaveCallback: undefined | ((isOver: boolean) => void);
     private readonly maxPointers: number;
     private readonly wheelCleaner: WheelCleaner | undefined;
     private isOverCounter: number = 0;
 
     // pointers that are pressing a button
-    private dragObjArr: IDragObj[] = [];
+    private dragObjArr: TDragObj[] = [];
     private dragPointerIdArr: number[] = [];
 
     // chrome input glitch workaround
@@ -294,7 +294,7 @@ export class PointerListener {
     private readonly onTouchEnd: ((e: TouchEvent) => void) | undefined;
     private readonly onTouchCancel: ((e: TouchEvent) => void) | undefined;
 
-    private getDragObj(pointerId: number): IDragObj | null {
+    private getDragObj(pointerId: number): TDragObj | null {
         for (let i = 0; i < this.dragObjArr.length; i++) {
             if (pointerId === this.dragObjArr[i].pointerId) {
                 return this.dragObjArr[i];
@@ -303,8 +303,8 @@ export class PointerListener {
         return null;
     }
 
-    private removeDragObj(pointerId: number): IDragObj | null {
-        let removedDragObj: IDragObj | null = null;
+    private removeDragObj(pointerId: number): TDragObj | null {
+        let removedDragObj: TDragObj | null = null;
         for (let i = 0; i < this.dragPointerIdArr.length; i++) {
             if (this.dragPointerIdArr[i] === pointerId) {
                 removedDragObj = this.dragObjArr[i];
@@ -321,11 +321,11 @@ export class PointerListener {
      */
     private createPointerOutEvent(
         typeStr: TPointerEventType,
-        correctedEvent: ICorrectedPointerEvent,
-        custom?: Partial<IPointerEvent>,
-    ): IPointerEvent {
+        correctedEvent: TCorrectedPointerEvent,
+        custom?: Partial<TPointerEvent>,
+    ): TPointerEvent {
         const bounds: DOMRect = this.targetElement.getBoundingClientRect();
-        const result: IPointerEvent = {
+        const result: TPointerEvent = {
             type: typeStr,
             pointerId: correctedEvent.pointerId,
             pointerType: correctedEvent.pointerType as TPointerType,
@@ -391,19 +391,19 @@ export class PointerListener {
 
     // ----------------------------------- public -----------------------------------
 
-    constructor(p: IPointerListenerParams) {
+    constructor(p: TPointerListenerParams) {
         this.targetElement = p.target as HTMLElement;
         this.onPointerCallback = p.onPointer;
         this.onWheelCallback = p.onWheel;
         this.onEnterLeaveCallback = p.onEnterLeave;
         this.maxPointers = Math.max(1, p.maxPointers ?? 1);
 
-        const finalizeWheelEvent = (e: WheelEvent | IWheelCleanerEvent): void => {
+        const finalizeWheelEvent = (e: WheelEvent | TWheelCleanerEvent): void => {
             if (this.isDestroyed || !this.onWheelCallback) {
                 return;
             }
             const bounds = this.targetElement.getBoundingClientRect();
-            const whlEvent: IWheelEvent = {
+            const whlEvent: TWheelEvent = {
                 ...(e instanceof WheelEvent
                     ? { deltaY: e.deltaY / 120, pageX: e.pageX, pageY: e.pageY }
                     : e),
@@ -463,7 +463,7 @@ export class PointerListener {
                 if (this.dragObjArr.length === 0 && !onSkipGlobal) {
                     this.setupDocumentListeners();
                 }
-                const dragObj: IDragObj = {
+                const dragObj: TDragObj = {
                     pointerId: correctedEvent.pointerId,
                     pointerType: correctedEvent.pointerType as TPointerType,
                     downPageX: correctedEvent.pageX,
@@ -476,7 +476,7 @@ export class PointerListener {
                 this.dragObjArr.push(dragObj);
                 this.dragPointerIdArr.push(correctedEvent.pointerId);
 
-                const outEvent: IPointerEvent = this.createPointerOutEvent(
+                const outEvent: TPointerEvent = this.createPointerOutEvent(
                     'pointerdown',
                     correctedEvent,
                     {

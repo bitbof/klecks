@@ -1,22 +1,23 @@
 import { KlCanvas, TKlCanvasLayer } from './canvas/kl-canvas';
 import { TTranslationCode } from '../../languages/languages';
 import { KlHistory } from './history/kl-history';
+import { THistoryEntryLayerTile } from './history/history.types';
 
-export interface IFilterApply<T = unknown> {
+export type TFilterApply<T = unknown> = {
     layer: TKlCanvasLayer; // active layer
     klCanvas: KlCanvas;
     input: T; // parameters chosen in modal
     klHistory: KlHistory;
-}
+};
 
-export interface IFilterGetDialogParam {
+export type TFilterGetDialogParam = {
     context: CanvasRenderingContext2D; // context of selected layer
     klCanvas: KlCanvas;
     maxWidth: number; // limit for klCanvas size
     maxHeight: number;
-    currentColorRgb: IRGB;
-    secondaryColorRgb: IRGB;
-}
+    currentColorRgb: TRgb;
+    secondaryColorRgb: TRgb;
+};
 
 export type TFilterGetDialogResult<T = unknown> =
     | {
@@ -28,7 +29,7 @@ export type TFilterGetDialogResult<T = unknown> =
       }
     | { error: string };
 
-export interface IFilter {
+export type TFilter = {
     lang: {
         name: TTranslationCode; // title in modal
         button: TTranslationCode; // text on button in filter tab
@@ -38,11 +39,11 @@ export interface IFilter {
     icon: string; // image url
     isInstant?: boolean; // default false - if instant no modal
     inEmbed: boolean; // is available in embed
-    getDialog: null | ((p: IFilterGetDialogParam) => any);
-    apply: null | ((p: IFilterApply) => boolean);
+    getDialog: null | ((p: TFilterGetDialogParam) => any);
+    apply: null | ((p: TFilterApply) => boolean);
     darkNoInvert?: boolean;
     webGL?: boolean; // does the filter require webgl
-}
+};
 
 export type TLayerFromKlCanvas = {
     context: CanvasRenderingContext2D;
@@ -82,63 +83,78 @@ export function isLayerFill(obj: unknown): obj is TLayerFill {
     );
 }
 
-export type IKlBasicLayer = {
+export type TKlBasicLayer = {
     opacity: number; // 0 - 1
     isVisible: boolean;
     mixModeStr?: TMixMode; // default "source-over"
     image: HTMLImageElement | HTMLCanvasElement; // already loaded
 };
 
-export type IKlProjectLayer = {
+export type TKlProjectLayer = {
     name: string;
     isVisible: boolean;
     opacity: number; // 0 - 1
     mixModeStr?: TMixMode; // default "source-over"
-    image: HTMLImageElement | HTMLCanvasElement | TLayerFill; // image already loaded
+    image: HTMLImageElement | HTMLCanvasElement | TLayerFill | THistoryEntryLayerTile[]; // image already loaded
 };
 
-export type IKlProject = {
+// A UUID, to make the project identifiable. (Not the recovery indexedDb key)
+// Used to test if current project is equal to what is in Browser Storage.
+// If they're not equal, it's possible to show the user a warning.
+export type TProjectId = string;
+
+export type TKlProject = {
     width: number; // int
     height: number; // int
-    layers: IKlProjectLayer[];
+    layers: TKlProjectLayer[];
+    projectId: TProjectId;
 };
 
-// stored in indexedDB
-export type IKlStorageProject = {
-    id: 1;
+export type TKlProjectWithOptionalId = {
+    width: number; // int
+    height: number; // int
+    layers: TKlProjectLayer[];
+    projectId?: TProjectId;
+};
+
+export type TRawMeta = {
     timestamp: number;
-    thumbnail?: Blob; // png - may not exist pre 0.5.1
-    width: number; // int
-    height: number; // int
-    layers: {
-        name: string;
-        isVisible: boolean;
-        opacity: number; // 0 - 1
-        mixModeStr?: TMixMode; // default "source-over"
-        blob: Blob; // png
-    }[];
+    thumbnail: Blob;
+    projectId: TProjectId;
+};
+
+export type TKlProjectMeta = {
+    timestamp: number;
+    thumbnail: HTMLImageElement | HTMLCanvasElement;
+    projectId: TProjectId;
+};
+
+export type TDeserializedKlStorageProject = {
+    project: TKlProject;
+    timestamp: number;
+    thumbnail: HTMLImageElement | HTMLCanvasElement;
 };
 
 export type TDropOption = 'default' | 'layer' | 'image';
 
-export interface IRGB {
+export type TRgb = {
     r: number; // [0, 255]
     g: number;
     b: number;
-}
+};
 
-export interface IRGBA {
+export type TRgba = {
     r: number; // [0, 255]
     g: number;
     b: number;
     a: number; // [0, 1]
-}
+};
 
 export type TGradientType = 'linear' | 'linear-mirror' | 'radial';
 
-export interface IGradient {
+export type TGradient = {
     type: TGradientType;
-    color1: IRGB;
+    color1: TRgb;
     isReversed: boolean; // color1 actually color2
     opacity: number; // [0, 1]
     doLockAlpha: boolean;
@@ -149,13 +165,13 @@ export interface IGradient {
     y2: number;
     angleRad: number; // angle of canvas
     isEraser: boolean;
-}
+};
 
 export type TShapeToolType = 'rect' | 'ellipse' | 'line';
 
 export type TShapeToolMode = 'stroke' | 'fill';
 
-export interface IShapeToolObject {
+export type TShapeToolObject = {
     type: TShapeToolType;
     x1: number;
     y1: number;
@@ -171,20 +187,20 @@ export interface IShapeToolObject {
     isAngleSnap?: boolean; // 45° deg angle snapping
     isFixedRatio?: boolean; // 1:1 for rect or ellipse
     doLockAlpha?: boolean; // default false
-}
+};
 
-export interface IKlSliderConfig {
+export type TKlSliderConfig = {
     min: number;
     max: number;
     curve?: [number, number][] | 'quadratic';
     isDisabled?: boolean; // default enabled
-}
+};
 
-export interface ISliderConfig {
-    sizeSlider: IKlSliderConfig;
-    opacitySlider: IKlSliderConfig;
-    scatterSlider: IKlSliderConfig;
-}
+export type TSliderConfig = {
+    sizeSlider: TKlSliderConfig;
+    opacitySlider: TKlSliderConfig;
+    scatterSlider: TKlSliderConfig;
+};
 
 export type TBrushUiInstance<GBrush> = {
     increaseSize: (f: number) => void;
@@ -195,7 +211,7 @@ export type TBrushUiInstance<GBrush> = {
     setOpacity: (opacity: number) => void;
     getScatter: () => number;
     setScatter: (opacity: number) => void;
-    setColor: (c: IRGB) => void;
+    setColor: (c: TRgb) => void;
     setLayer: (layer: TKlCanvasLayer) => void;
     startLine: (x: number, y: number, p: number) => void;
     goLine: (x: number, y: number, p: number, isCoalesced?: boolean) => void;
@@ -209,7 +225,7 @@ export type TBrushUiInstance<GBrush> = {
     toggleEraser?: () => void;
 };
 
-export interface IBrushUi<GBrush> extends ISliderConfig {
+export type TBrushUi<GBrush> = TSliderConfig & {
     image: string;
     tooltip: string;
     Ui: (
@@ -222,7 +238,7 @@ export interface IBrushUi<GBrush> extends ISliderConfig {
             onConfigChange: () => void;
         },
     ) => TBrushUiInstance<GBrush>;
-}
+};
 
 export type TPressureInput = {
     x: number;
@@ -230,7 +246,7 @@ export type TPressureInput = {
     pressure: number;
 };
 
-export interface IDrawDownEvent {
+export type TDrawDownEvent = {
     type: 'down';
     scale: number;
     shiftIsPressed: boolean;
@@ -238,9 +254,9 @@ export interface IDrawDownEvent {
     isCoalesced: boolean;
     x: number;
     y: number;
-}
+};
 
-export interface IDrawMoveEvent {
+export type TDrawMoveEvent = {
     type: 'move';
     scale: number;
     shiftIsPressed: boolean;
@@ -248,16 +264,16 @@ export interface IDrawMoveEvent {
     isCoalesced: boolean;
     x: number;
     y: number;
-}
+};
 
-export interface IDrawUpEvent {
+export type TDrawUpEvent = {
     type: 'up';
     scale: number;
     shiftIsPressed: boolean;
     isCoalesced: boolean;
-}
+};
 
-export interface IDrawLine {
+export type TDrawLine = {
     type: 'line';
     x0: number | null;
     y0: number | null;
@@ -265,9 +281,9 @@ export interface IDrawLine {
     y1: number;
     pressure0: number | null;
     pressure1: number;
-}
+};
 
-export type TDrawEvent = IDrawDownEvent | IDrawMoveEvent | IDrawUpEvent | IDrawLine;
+export type TDrawEvent = TDrawDownEvent | TDrawMoveEvent | TDrawUpEvent | TDrawLine;
 
 export type TToolType = 'brush' | 'paintBucket' | 'text' | 'shape' | 'gradient' | 'hand' | 'select';
 
@@ -292,7 +308,7 @@ export type TKlPsdLayer = {
 /**
  * Psd interpreted for usage in Klecks.
  */
-export interface IKlPsd {
+export type TKlPsd = {
     type: 'psd';
     canvas: HTMLCanvasElement;
     width: number;
@@ -302,7 +318,7 @@ export interface IKlPsd {
     // because Klecks can't properly represent them (yet)
     warningArr?: TKlPsdError[];
     error?: boolean; // true if flattened (too many layers)
-}
+};
 
 export type TFillSampling = 'current' | 'all' | 'above';
 

@@ -93,4 +93,4 @@ class Theme {
     }
 }
 
-export const theme = new Theme();
+export const THEME = new Theme();

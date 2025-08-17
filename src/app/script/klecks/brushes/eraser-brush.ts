@@ -5,7 +5,7 @@ import { ERASE_COLOR } from './erase-color';
 import { TKlCanvasLayer } from '../canvas/kl-canvas';
 import { KlHistory } from '../history/kl-history';
 import { getPushableLayerChange } from '../history/push-helpers/get-pushable-layer-change';
-import { IBounds } from '../../bb/bb-types';
+import { TBounds } from '../../bb/bb-types';
 import { canvasAndChangedTilesToLayerTiles } from '../history/push-helpers/canvas-to-layer-tiles';
 import { getChangedTiles, updateChangedTiles } from '../history/push-helpers/changed-tiles';
 
@@ -30,7 +30,7 @@ export class EraserBrush {
 
     private changedTiles: boolean[] = [];
 
-    private updateChangedTiles(bounds: IBounds) {
+    private updateChangedTiles(bounds: TBounds) {
         this.changedTiles = updateChangedTiles(
             this.changedTiles,
             getChangedTiles(bounds, this.context.canvas.width, this.context.canvas.height),
@@ -156,12 +156,14 @@ export class EraserBrush {
         this.started = false;
         this.bezierLine = undefined;
 
-        this.klHistory.push(
-            getPushableLayerChange(
-                this.klHistory.getComposed(),
-                canvasAndChangedTilesToLayerTiles(this.context.canvas, this.changedTiles),
-            ),
-        );
+        if (this.changedTiles.some((item) => item)) {
+            this.klHistory.push(
+                getPushableLayerChange(
+                    this.klHistory.getComposed(),
+                    canvasAndChangedTilesToLayerTiles(this.context.canvas, this.changedTiles),
+                ),
+            );
+        }
     }
 
     drawLineSegment(x1: number, y1: number, x2: number, y2: number): void {
@@ -185,12 +187,14 @@ export class EraserBrush {
             this.drawDot(x1 + eX * loopDist, y1 + eY * loopDist, this.size, this.opacity);
         }
 
-        this.klHistory.push(
-            getPushableLayerChange(
-                this.klHistory.getComposed(),
-                canvasAndChangedTilesToLayerTiles(this.context.canvas, this.changedTiles),
-            ),
-        );
+        if (this.changedTiles.some((item) => item)) {
+            this.klHistory.push(
+                getPushableLayerChange(
+                    this.klHistory.getComposed(),
+                    canvasAndChangedTilesToLayerTiles(this.context.canvas, this.changedTiles),
+                ),
+            );
+        }
     }
 
     //IS

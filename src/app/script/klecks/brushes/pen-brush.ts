@@ -1,10 +1,10 @@
 import { BB } from '../../bb/bb';
 import { ALPHA_IM_ARR } from './brushes-common';
-import { IRGB, TPressureInput } from '../kl-types';
+import { TPressureInput, TRgb } from '../kl-types';
 import { BezierLine } from '../../bb/math/line';
 import { KlHistory } from '../history/kl-history';
 import { getPushableLayerChange } from '../history/push-helpers/get-pushable-layer-change';
-import { IBounds } from '../../bb/bb-types';
+import { TBounds } from '../../bb/bb-types';
 import { canvasAndChangedTilesToLayerTiles } from '../history/push-helpers/canvas-to-layer-tiles';
 import { getChangedTiles, updateChangedTiles } from '../history/push-helpers/changed-tiles';
 
@@ -26,7 +26,7 @@ export class PenBrush {
     private settingSpacing: number = 0.8489;
     private settingOpacity: number = 1;
     private settingScatter: number = 0;
-    private settingColor: IRGB = {} as IRGB;
+    private settingColor: TRgb = {} as TRgb;
     private settingColorStr: string = '';
     private settingAlphaId: number = ALPHA_CIRCLE;
     private settingLockLayerAlpha: boolean = false;
@@ -47,7 +47,7 @@ export class PenBrush {
 
     private changedTiles: boolean[] = [];
 
-    private updateChangedTiles(bounds: IBounds) {
+    private updateChangedTiles(bounds: TBounds) {
         this.changedTiles = updateChangedTiles(
             this.changedTiles,
             getChangedTiles(bounds, this.context.canvas.width, this.context.canvas.height),
@@ -341,12 +341,14 @@ export class PenBrush {
 
         this.bezierLine = null;
 
-        this.klHistory.push(
-            getPushableLayerChange(
-                this.klHistory.getComposed(),
-                canvasAndChangedTilesToLayerTiles(this.context.canvas, this.changedTiles),
-            ),
-        );
+        if (this.changedTiles.some((item) => item)) {
+            this.klHistory.push(
+                getPushableLayerChange(
+                    this.klHistory.getComposed(),
+                    canvasAndChangedTilesToLayerTiles(this.context.canvas, this.changedTiles),
+                ),
+            );
+        }
 
         this.hasDrawnDot = false;
         this.inputArr = [];
@@ -383,12 +385,14 @@ export class PenBrush {
         }
         this.context.restore();
 
-        this.klHistory.push(
-            getPushableLayerChange(
-                this.klHistory.getComposed(),
-                canvasAndChangedTilesToLayerTiles(this.context.canvas, this.changedTiles),
-            ),
-        );
+        if (this.changedTiles.some((item) => item)) {
+            this.klHistory.push(
+                getPushableLayerChange(
+                    this.klHistory.getComposed(),
+                    canvasAndChangedTilesToLayerTiles(this.context.canvas, this.changedTiles),
+                ),
+            );
+        }
     }
 
     //IS
@@ -405,7 +409,7 @@ export class PenBrush {
         this.updateAlphaCanvas();
     }
 
-    setColor(c: IRGB): void {
+    setColor(c: TRgb): void {
         if (this.settingColor === c) {
             return;
         }

@@ -1,5 +1,5 @@
 import { BB } from '../../../bb/bb';
-import { dialogCounter } from '../modals/modal-count';
+import { DIALOG_COUNTER } from '../modals/modal-count';
 import toolPaintImg from '/src/app/img/ui/tool-paint.svg';
 import toolFillImg from '/src/app/img/ui/tool-fill.svg';
 import toolGradientImg from '/src/app/img/ui/tool-gradient.svg';
@@ -41,7 +41,9 @@ export class ToolDropdown {
     private readonly imArr;
 
     private updateButton() {
-        this.activeButton.title = this.titleArr[this.currentActiveIndex];
+        this.activeButton.title =
+            this.titleArr[this.currentActiveIndex] +
+            (this.isActive ? ' (click again for more tools)' : ''); // todo translate
         this.activeButtonIm.style.backgroundImage =
             "url('" + this.imArr[this.currentActiveIndex] + "')";
     }
@@ -317,10 +319,10 @@ export class ToolDropdown {
         }
 
         const showDropdown = () => {
-            if (dialogCounter.get() > 0) {
+            if (DIALOG_COUNTER.get() > 0) {
                 return;
             }
-            dialogCounter.increase(0.5);
+            DIALOG_COUNTER.increase(0.5);
             isOpen = true;
 
             for (let i = 0; i < this.optionArr.length; i++) {
@@ -335,7 +337,7 @@ export class ToolDropdown {
         };
 
         const closeDropdown = () => {
-            dialogCounter.decrease(0.5);
+            DIALOG_COUNTER.decrease(0.5);
             isOpen = false;
             this.arrowButton.style.removeProperty('opacity');
             this.arrowButton.style.removeProperty('pointer-events');
@@ -377,6 +379,7 @@ export class ToolDropdown {
         } else {
             this.isActive = false;
             this.activeButton.classList.remove('toolspace-row-button-activated');
+            this.updateButton();
         }
     }
 

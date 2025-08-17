@@ -1,93 +1,152 @@
 import { BB } from '../../../bb/bb';
 
 import removeLayerImg from '/src/app/img/ui/remove-layer.svg';
-import { IKlProject } from '../../kl-types';
-import { showIframeModal } from '../modals/show-iframe-modal';
-import { SaveReminder } from './save-reminder';
-import { IProjectStoreListener, ProjectStore } from '../../storage/project-store';
+import { TKlProject } from '../../kl-types';
+import { ProjectStore, TProjectStoreListener } from '../../storage/project-store';
 import { KL } from '../../kl';
 import { LANG } from '../../../language/language';
-import { theme } from '../../../theme/theme';
 import { showModal } from '../modals/base/showModal';
+import { timestampToAge } from '../utils/timestamp-to-age';
+import { BrowserStorageHeaderUi } from './browser-storage-header-ui';
+import * as classes from './browser-storage-ui.module.scss';
+import { makeUnfocusable } from '../../../bb/base/ui';
+import { requestPersistentStorage } from '../../storage/request-persistent-storage';
+import { copyCanvas } from '../../../bb/base/canvas';
+
+export type TBrowserStorageUiParams = {
+    projectStore: ProjectStore;
+    getProject: () => TKlProject;
+    klRootEl: HTMLElement;
+    applyUncommitted: () => void;
+    options?: { hideClearButton?: boolean; isFocusable?: boolean }; // isFocusable default = false
+    onOpen?: () => void;
+    onStored: () => void;
+};
 
 export class BrowserStorageUi {
-    private previewEl: HTMLDivElement = {} as HTMLDivElement;
-    private readonly infoEl: HTMLElement = {} as HTMLElement;
+    private readonly rootEl: HTMLDivElement;
+    private readonly contentEl: HTMLDivElement;
+    private readonly previewEl: HTMLDivElement = {} as HTMLDivElement;
+    private readonly header: BrowserStorageHeaderUi;
     private readonly ageEl: HTMLElement = {} as HTMLElement;
+    private readonly emptyEl: HTMLElement = {} as HTMLElement;
+    private readonly openButtonEl: HTMLButtonElement | undefined;
     private readonly storeButtonEl: HTMLButtonElement = {} as HTMLButtonElement;
     private readonly clearButtonEl: HTMLButtonElement = {} as HTMLButtonElement;
-    private readonly storeListener: IProjectStoreListener = {} as IProjectStoreListener;
-    private readonly updateCheckerboard: () => void = () => {};
+    private readonly storeListener: TProjectStoreListener = {} as TProjectStoreListener;
+    private isFirst: boolean = true;
 
     private timestamp: number | undefined;
     private thumbnail: HTMLImageElement | HTMLCanvasElement | undefined;
+    private projectStore: ProjectStore;
+    private readonly getProject: () => TKlProject;
+    private readonly onStored: () => void;
+    private readonly klRootEl: HTMLElement;
+    private readonly applyUncommitted: () => void;
+    private options: { hideClearButton?: boolean; isFocusable?: boolean } | undefined;
+    private readonly onOpen: (() => void) | undefined;
+    private readonly updateAgeInterval: ReturnType<typeof setInterval>;
 
-    private updateAge() {
+    private updateAge(): void {
         if (!this.timestamp) {
             return;
         }
-        let age = new Date().getTime() - this.timestamp;
-        let ageStr;
-        age = Math.floor(age / 1000 / 60);
-        ageStr = LANG('file-storage-min-ago').replace('{x}', '' + age);
-        if (age > 60) {
-            age = Math.floor(age / 60);
-            ageStr = LANG('file-storage-hours-ago').replace('{x}', '' + age);
-            if (age > 24) {
-                age = Math.floor(age / 24);
-                ageStr = LANG('file-storage-days-ago').replace('{x}', '' + age);
-                if (age > 31) {
-                    ageStr = LANG('file-storage-month-ago');
-                }
-            }
-        }
-        this.ageEl.textContent = ageStr;
+        this.ageEl.textContent = timestampToAge(this.timestamp);
     }
 
-    private resetButtons() {
+    private resetButtons(): void {
+        this.previewEl.classList.remove('kl-storage-preview--disabled');
         if (this.timestamp) {
+            if (this.openButtonEl) {
+                this.openButtonEl.disabled = false;
+            }
             this.storeButtonEl.textContent = LANG('file-storage-overwrite');
             this.storeButtonEl.disabled = false;
             this.clearButtonEl.disabled = false;
         } else {
+            if (this.openButtonEl) {
+                this.openButtonEl.disabled = true;
+            }
             this.storeButtonEl.textContent = LANG('file-storage-store');
             this.storeButtonEl.disabled = false;
             this.clearButtonEl.disabled = true;
         }
     }
 
-    private updateThumb(timestamp?: number, thumbnail?: HTMLImageElement | HTMLCanvasElement) {
+    private updateThumb(
+        timestamp?: number,
+        thumbnail?: HTMLImageElement | HTMLCanvasElement,
+    ): void {
         this.timestamp = timestamp;
-        this.thumbnail = thumbnail;
-        if (this.timestamp && thumbnail) {
-            thumbnail.classList.add('kl-storage-preview__im');
-            this.previewEl.innerHTML = '';
+        this.thumbnail?.remove();
+        this.thumbnail = thumbnail ? copyCanvas(thumbnail) : undefined;
+
+        const thumbnailCanvas = this.thumbnail; // typescript being weird
+        if (thumbnailCanvas && timestamp) {
+            thumbnailCanvas.classList.add('kl-storage-preview__im');
+            this.ageEl.remove();
+            this.emptyEl.remove();
             this.updateAge();
-            this.previewEl.append(thumbnail, this.ageEl);
-            this.previewEl.style.pointerEvents = '';
+            this.previewEl.append(thumbnailCanvas, this.ageEl);
+            this.previewEl.style.pointerEvents = this.onOpen ? '' : 'none';
+
+            if (typeof performance !== 'undefined' && timestamp > performance.timeOrigin) {
+                const animEl = BB.el({
+                    parent: this.previewEl,
+                    className: classes.animEl,
+                });
+                setTimeout(() => {
+                    animEl.remove();
+                }, 500);
+            }
         } else {
-            this.previewEl.innerHTML = LANG('file-storage-empty');
+            this.ageEl.remove();
+            this.previewEl.append(this.emptyEl);
             this.previewEl.style.pointerEvents = 'none'; // prevent title
         }
         this.resetButtons();
     }
 
-    private async store() {
-        this.applyUncommitted?.();
-        // https://developer.mozilla.org/en-US/docs/Web/API/StorageManager/persist
-        // Might reduce deletions of indexedDB data by browser.
-        if ('storage' in navigator && 'persist' in navigator.storage) {
-            await navigator.storage.persist();
+    private async store(): Promise<void> {
+        const meta = this.projectStore.getCurrentMeta();
+        const project = this.getProject();
+
+        if (meta && meta.projectId !== project.projectId) {
+            const doOverwrite = await new Promise<boolean>((resolve, reject) => {
+                showModal({
+                    target: document.body,
+                    type: 'warning',
+                    message: LANG('file-storage-overwrite-confirm'),
+                    buttons: [LANG('file-storage-overwrite'), 'Cancel'],
+                    callback: async (result) => {
+                        if (result === 'Cancel') {
+                            resolve(false);
+                            return;
+                        }
+                        resolve(true);
+                    },
+                });
+            });
+            if (!doOverwrite) {
+                return;
+            }
+        }
+
+        this.applyUncommitted();
+        await requestPersistentStorage();
+        if (this.openButtonEl) {
+            this.openButtonEl.disabled = true;
         }
         this.storeButtonEl.textContent = LANG('file-storage-storing');
         this.storeButtonEl.disabled = true;
         this.clearButtonEl.disabled = true;
+        this.previewEl.classList.add('kl-storage-preview--disabled');
         await new Promise((resolve) => {
             setTimeout(() => resolve(null), 20);
         });
         try {
-            await this.projectStore.store(this.getProject());
-            this.saveReminder.reset();
+            await this.projectStore.store(project);
+            this.onStored();
         } catch (e) {
             this.resetButtons();
             KL.popup({
@@ -108,16 +167,21 @@ export class BrowserStorageUi {
         }
     }
 
-    private async clear() {
+    private async clear(): Promise<void> {
         showModal({
             target: document.body,
+            type: 'warning',
             message: LANG('file-storage-clear-prompt'),
             buttons: [LANG('file-storage-clear'), 'Cancel'],
+            deleteButtonName: LANG('file-storage-clear'),
             callback: async (result) => {
                 if (result === 'Cancel') {
                     return;
                 }
 
+                if (this.openButtonEl) {
+                    this.openButtonEl.disabled = true;
+                }
                 this.storeButtonEl.disabled = true;
                 this.clearButtonEl.disabled = true;
                 try {
@@ -138,166 +202,181 @@ export class BrowserStorageUi {
         });
     }
 
-    element: HTMLDivElement;
-
-    constructor(
-        private projectStore: ProjectStore,
-        private getProject: () => IKlProject,
-        private saveReminder: SaveReminder,
-        private klRootEl: HTMLElement,
-        private applyUncommitted?: () => void,
-        private options?: { hideClearButton?: boolean; isFocusable?: boolean }, // isFocusable default = false
-    ) {
-        this.element = BB.el({
+    private showError(): void {
+        this.contentEl.innerHTML = '';
+        BB.el({
+            parent: this.contentEl,
+            content: '🔴 ' + LANG('file-storage-cant-access'),
             css: {
-                display: 'grid',
-                gridTemplateColumns: '1fr 0fr',
-                gridTemplateRows: '0fr 0fr 0fr',
-                gap: '0 0',
-                gridTemplateAreas: '"title title" "preview store" "preview clear"',
+                marginTop: '10px',
             },
         });
+    }
 
-        const title = BB.el({
-            parent: this.element,
-            content: LANG('file-storage'),
-            css: {
-                gridArea: 'title',
-                display: 'flex',
-                margin: '-5px 0',
-                gap: '5px',
-                //background: '#f00',
-            },
+    // ----------------------------------- public -----------------------------------
+    constructor(p: TBrowserStorageUiParams) {
+        this.updateAgeInterval = setInterval(() => this.updateAge(), 1000 * 60);
+        this.projectStore = p.projectStore;
+        this.getProject = p.getProject;
+        this.onStored = p.onStored;
+        this.klRootEl = p.klRootEl;
+        this.applyUncommitted = p.applyUncommitted;
+        this.options = p.options;
+        this.onOpen = p.onOpen;
+
+        this.rootEl = BB.el({});
+
+        this.header = new BrowserStorageHeaderUi();
+        this.rootEl.append(this.header.getElement());
+
+        this.contentEl = BB.el({
+            parent: this.rootEl,
         });
 
-        this.infoEl = BB.el({
-            parent: title,
-            content: '?',
-            className: 'kl-info-btn',
-            title: LANG('file-storage-about'),
-            onClick: () => {
-                showIframeModal('./help/#help-browser-storage', false);
-            },
-        });
-
-        if (this.projectStore.isBroken()) {
-            BB.el({
-                parent: this.element,
-                content: '🔴 ' + LANG('file-storage-cant-access'),
-                css: {
-                    marginTop: '10px',
-                },
-            });
+        if (!this.projectStore.getIsAvailable()) {
+            this.showError();
             return;
         }
 
         this.previewEl = BB.el({
-            parent: this.element,
-            title: LANG('file-storage-thumb-title'),
             className: 'kl-storage-preview',
+            onClick: () => this.onOpen?.(),
+            title: LANG('file-storage-open'),
+            noRef: true,
+        });
+        this.emptyEl = BB.el({
+            content: LANG('file-storage-empty'),
         });
         this.ageEl = BB.el({
             css: {
                 position: 'absolute',
-                right: '1px',
-                bottom: '1px',
-                width: 'calc(100% - 2px)',
+                right: '0',
+                bottom: '0',
+                width: '100%',
                 textAlign: 'center',
                 background: 'rgba(0,0,0,0.7)',
                 color: '#fff',
                 fontSize: '13px',
             },
         });
-        const btnCustom: { [key: string]: string } = options?.isFocusable
-            ? {}
-            : {
-                  tabIndex: '-1',
-              };
+        if (this.onOpen) {
+            this.openButtonEl = BB.el({
+                tagName: 'button',
+                className: 'grid-button',
+                content: LANG('file-storage-open'),
+                css: {
+                    margin: '0',
+                },
+                onClick: () => this.onOpen?.(),
+                noRef: true,
+            });
+        }
         this.storeButtonEl = BB.el({
-            parent: this.element,
             tagName: 'button',
             className: 'grid-button',
             content: LANG('file-storage-store'),
             css: {
-                gridArea: 'store',
-                //background: '#00f',
+                margin: '0',
             },
-            custom: btnCustom,
             onClick: () => this.store(),
+            noRef: true,
         });
         this.clearButtonEl = BB.el({
-            parent: this.element,
             tagName: 'button',
-            className: 'grid-button',
+            className: 'grid-button kl-button-delete',
             content:
                 '<img src="' + removeLayerImg + '" height="20"/> ' + LANG('file-storage-clear'),
             css: {
-                gridArea: 'clear',
-                //background: '#ff0',
+                margin: '0',
             },
-            custom: btnCustom,
             onClick: () => this.clear(),
+            noRef: true,
         });
+        if (!this.options?.isFocusable) {
+            this.openButtonEl && makeUnfocusable(this.openButtonEl);
+            makeUnfocusable(this.storeButtonEl);
+            makeUnfocusable(this.clearButtonEl);
+        }
 
         if (this.options?.hideClearButton) {
             this.clearButtonEl.style.visibility = 'hidden';
         }
 
+        this.contentEl.append(
+            BB.el({
+                content: [
+                    BB.el({
+                        content: this.previewEl,
+                        css: {
+                            alignSelf: 'stretch',
+                            flexGrow: '1',
+                        },
+                    }),
+                    BB.el({
+                        content: [this.openButtonEl, this.storeButtonEl, this.clearButtonEl],
+                        css: {
+                            display: 'flex',
+                            gap: '10px',
+                            flexDirection: 'column',
+                        },
+                    }),
+                ],
+                css: {
+                    marginTop: '10px',
+                    display: 'flex',
+                    gap: '10px',
+                },
+            }),
+        );
+
         this.storeListener = {
-            onUpdate: (timestamp, thumbnail) => {
-                this.updateThumb(timestamp, thumbnail);
+            onUpdate: (project) => {
+                this.updateThumb(project?.timestamp, project?.thumbnail);
             },
         };
         this.projectStore.subscribe(this.storeListener);
+        this.updateThumb();
+    }
 
-        this.updateCheckerboard = (): void => {
-            if (!this.thumbnail) {
-                return;
+    getElement(): HTMLElement {
+        return this.rootEl;
+    }
+
+    show(): void {
+        if (this.isFirst) {
+            this.isFirst = false;
+            if (!this.projectStore.getIsAvailable()) {
+                this.showError();
+            } else {
+                (async () => {
+                    try {
+                        await this.projectStore.update();
+                        const meta = this.projectStore.getCurrentMeta();
+                        if (meta) {
+                            this.updateThumb(meta.timestamp, meta.thumbnail);
+                        } else {
+                            this.updateThumb();
+                        }
+                    } catch (e) {
+                        this.showError();
+                        throw new Error(
+                            'browser-storage-ui: failed initial read browser storage, ' + e,
+                        );
+                    }
+                })();
             }
-            BB.css(this.thumbnail, {
-                background:
-                    "url('" +
-                    BB.createCheckerCanvas(4, theme.isDark()).toDataURL('image/png') +
-                    "')",
-            });
-        };
-        theme.addIsDarkListener(this.updateCheckerboard);
-
-        setInterval(() => this.updateAge(), 1000 * 60);
-
-        (async () => {
-            try {
-                const readResult = await this.projectStore.read();
-                if (readResult) {
-                    this.updateThumb(readResult.timestamp, readResult.thumbnail);
-                } else {
-                    this.updateThumb();
-                }
-            } catch (e) {
-                setTimeout(() => {
-                    throw new Error('storage-ui: failed initial read browser storage, ' + e);
-                }, 0);
-            }
-        })();
+        }
     }
 
-    getElement() {
-        return this.element;
+    hide(): void {
+        // ...
     }
 
-    show() {
-        // todo
-    }
-
-    hide() {
-        // todo
-    }
-
-    destroy() {
-        BB.destroyEl(this.infoEl);
+    destroy(): void {
+        this.header.destroy();
         BB.destroyEl(this.storeButtonEl);
         BB.destroyEl(this.clearButtonEl);
-        theme.removeIsDarkListener(this.updateCheckerboard);
+        clearInterval(this.updateAgeInterval);
         this.projectStore.unsubscribe(this.storeListener);
     }
 }

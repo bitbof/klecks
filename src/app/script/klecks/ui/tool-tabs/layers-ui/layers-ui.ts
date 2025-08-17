@@ -6,10 +6,9 @@ import { TMixMode, TUiLayout } from '../../../kl-types';
 import { LANG } from '../../../../language/language';
 import { translateBlending } from '../../../canvas/translate-blending';
 import { PointerListener } from '../../../../bb/input/pointer-listener';
-import { IPointerEvent } from '../../../../bb/input/event.types';
+import { TPointerEvent } from '../../../../bb/input/event.types';
 import { renameLayerDialog } from './rename-layer-dialog';
 import { mergeLayerDialog } from './merge-layer-dialog';
-import { theme } from '../../../../theme/theme';
 import { throwIfNull } from '../../../../bb/base/base';
 import { HAS_POINTER_EVENTS } from '../../../../bb/base/browser';
 import { c } from '../../../../bb/base/c';
@@ -179,7 +178,6 @@ export class LayersUi {
         }
         this.oldHistoryState = this.klHistory.getChangeCount();
         this.klCanvasLayerArr = this.klCanvas.getLayers();
-        const checkerImUrl = BB.createCheckerDataUrl(4, undefined, theme.isDark());
 
         const createLayerEntry = (index: number): void => {
             const klLayer = throwIfNull(this.klCanvas.getLayerOld(index));
@@ -233,6 +231,7 @@ export class LayersUi {
                     custom: {
                         type: 'checkbox',
                         tabindex: '-1',
+                        name: 'layer-visibility',
                     },
                     css: {
                         display: 'block',
@@ -286,7 +285,7 @@ export class LayersUi {
                     left: (32 - layer.thumb.width) / 2 + paddingLeft + 'px',
                     top: (32 - layer.thumb.height) / 2 + 1 + 'px',
                 });
-                layer.thumb.style.backgroundImage = 'url(' + checkerImUrl + ')';
+                layer.thumb.style.background = 'var(--kl-checkerboard-background)';
             }
 
             //layerlabel
@@ -302,10 +301,11 @@ export class LayersUi {
                     left: 1 + 32 + 5 + paddingLeft + 'px',
                     top: 1 + 'px',
                     fontSize: '13px',
-                    width: '170px',
+                    width: '165px',
                     height: '20px',
                     overflow: 'hidden',
                     whiteSpace: 'nowrap',
+                    textOverflow: 'ellipsis',
                 });
 
                 layer.label.ondblclick = () => {
@@ -356,7 +356,7 @@ export class LayersUi {
                     this.onUpdateProject();
                 },
             });
-            BB.css(opacitySlider.getEl(), {
+            BB.css(opacitySlider.getElement(), {
                 position: 'absolute',
                 left: 39 + paddingLeft + 'px',
                 top: '17px',
@@ -431,12 +431,17 @@ export class LayersUi {
                 }, 300);
             };
 
-            container1.append(layer.thumb, layer.label, layer.opacityLabel, opacitySlider.getEl());
+            container1.append(
+                layer.thumb,
+                layer.label,
+                layer.opacityLabel,
+                opacitySlider.getElement(),
+            );
             let dragstart = false;
             let freshSelection = false;
 
             //events for moving layers up and down
-            const dragEventHandler = (event: IPointerEvent) => {
+            const dragEventHandler = (event: TPointerEvent) => {
                 if (event.type === 'pointerdown' && event.button === 'left') {
                     BB.css(layer, {
                         transition: 'box-shadow 0.3s ease-in-out',
@@ -547,23 +552,16 @@ export class LayersUi {
             css: {
                 position: 'absolute',
                 top: '500px',
-                background: '#aaa',
                 boxShadow: '1px 1px 3px rgba(0,0,0,0.3)',
                 pointerEvents: 'none',
                 padding: '0',
                 border: '1px solid #aaa',
                 transition: 'opacity 0.3s ease-out',
                 userSelect: 'none',
+                background: 'var(--kl-checkerboard-background)',
             },
         });
         this.setUiState(this.uiState);
-        BB.createCheckerDataUrl(
-            4,
-            (url) => {
-                this.largeThumbDiv.style.backgroundImage = 'url(' + url + ')';
-            },
-            theme.isDark(),
-        );
         this.largeThumbCanvas = BB.canvas(200, 200);
         this.largeThumbCanvas.style.display = 'block';
         this.largeThumbDiv.append(this.largeThumbCanvas);
@@ -824,6 +822,7 @@ export class LayersUi {
                 css: {
                     marginBottom: '10px',
                 },
+                name: 'layer-blend-mode',
             });
 
             modeWrapper.append(this.modeSelect.getElement());
@@ -837,10 +836,6 @@ export class LayersUi {
                 return;
             }
             this.createLayerList();
-        });
-
-        theme.addIsDarkListener(() => {
-            this.createLayerList(true); // force, because history did not change
         });
 
         this.createLayerList();

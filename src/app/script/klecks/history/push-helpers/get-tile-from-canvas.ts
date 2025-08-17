@@ -12,7 +12,7 @@ export function getTileFromCanvas(
     const height = Math.min(canvas.height, (row + 1) * tileSize) - row * tileSize;
 
     if (width <= 0 || height <= 0) {
-        return new ImageData(0, 0);
+        throw new Error('invalid out-of-bounds tile');
     }
 
     return ctx.getImageData(col * tileSize, row * tileSize, width, height);

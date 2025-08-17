@@ -5,8 +5,8 @@ import { Checkbox } from '../ui/components/checkbox';
 import { KlSlider } from '../ui/components/kl-slider';
 import { createPenPressureToggle } from '../ui/components/create-pen-pressure-toggle';
 import brushIconImg from '/src/app/img/ui/brush-pixel.svg';
-import { IBrushUi } from '../kl-types';
-import { LANG, languageStrings } from '../../language/language';
+import { TBrushUi } from '../kl-types';
+import { LANG, LANGUAGE_STRINGS } from '../../language/language';
 import { PixelBrush } from '../brushes/pixel-brush';
 
 export const pixelBrushUi = (function () {
@@ -27,9 +27,9 @@ export const pixelBrushUi = (function () {
                 [1, 1],
             ],
         },
-    } as IBrushUi<PixelBrush>;
+    } as TBrushUi<PixelBrush>;
 
-    languageStrings.subscribe(() => {
+    LANGUAGE_STRINGS.subscribe(() => {
         brushInterface.tooltip = LANG('brush-pixel');
     });
 
@@ -49,6 +49,7 @@ export const pixelBrushUi = (function () {
             },
             doHighlight: true,
             title: LANG('lock-alpha-title'),
+            name: 'lock-alpha-toggle',
         });
 
         const eraserToggle = new Checkbox({
@@ -57,6 +58,7 @@ export const pixelBrushUi = (function () {
             callback: function (b) {
                 brush.setIsEraser(b);
             },
+            name: 'eraser-toggle',
         });
 
         const ditherToggle = new Checkbox({
@@ -65,6 +67,7 @@ export const pixelBrushUi = (function () {
             callback: function (b) {
                 brush.setUseDither(b);
             },
+            name: 'dither-toggle',
         });
 
         const spacingSpline = new BB.SplineInterpolator([
@@ -200,6 +203,6 @@ export const pixelBrushUi = (function () {
         this.getElement = function () {
             return div;
         };
-    } as IBrushUi<PixelBrush>['Ui'];
+    } as TBrushUi<PixelBrush>['Ui'];
     return brushInterface;
 })();

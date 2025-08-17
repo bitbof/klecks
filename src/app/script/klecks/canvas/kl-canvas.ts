@@ -1,23 +1,23 @@
 import { BB } from '../../bb/bb';
 import { floodFillBits } from '../image-operations/flood-fill';
 import { drawShape } from '../image-operations/shape-tool';
-import { TRenderTextParam, renderText } from '../image-operations/render-text';
+import { renderText, TRenderTextParam } from '../image-operations/render-text';
 import {
-    IGradient,
-    IKlProject,
-    IRGB,
-    IShapeToolObject,
     isLayerFill,
     TFillSampling,
+    TGradient,
+    TKlProject,
     TLayerFromKlCanvas,
     TMixMode,
+    TRgb,
+    TShapeToolObject,
 } from '../kl-types';
 import { drawProject } from './draw-project';
 import { LANG } from '../../language/language';
 import { drawGradient } from '../image-operations/gradient-tool';
-import { IBounds, IRect } from '../../bb/bb-types';
+import { TBounds, TRect } from '../../bb/bb-types';
 import { MultiPolygon } from 'polygon-clipping';
-import { compose, identity, Matrix, translate, rotate } from 'transformation-matrix';
+import { compose, identity, Matrix, rotate, translate } from 'transformation-matrix';
 import { getSelectionPath2d } from '../../bb/multi-polygon/get-selection-path-2d';
 import { transformMultiPolygon } from '../../bb/multi-polygon/transform-multi-polygon';
 import { getMultiPolyBounds } from '../../bb/multi-polygon/get-multi-polygon-bounds';
@@ -40,7 +40,8 @@ import { transformBounds } from '../../bb/transform/transform-bounds';
 import { getSelectionSampleBounds } from './get-selection-sample-bounds';
 import { createLayerMap } from '../history/push-helpers/create-layer-map';
 import { Eyedropper } from './eyedropper';
-import { copyImageData } from '../utils/copy-image-data';
+import { copyImageDataTile } from '../history/image-data-tile';
+import { randomUuid } from '../../bb/base/base';
 
 // TODO remove in 2026
 // workaround for chrome bug https://bugs.chromium.org/p/chromium/issues/detail?id=1281185
@@ -227,6 +228,7 @@ export class KlCanvas {
         this.height = 0;
         this.updateViaComposed(
             {
+                projectId: { value: randomUuid() },
                 size: { width: 0, height: 0 },
                 activeLayerId: '',
                 selection: { value: [] },
@@ -242,9 +244,10 @@ export class KlCanvas {
      * @param p
      */
     reset(p: {
+        projectId?: string; // uuid
         width: number;
         height: number;
-        color?: IRGB; // optional - fill color
+        color?: TRgb; // optional - fill color
         image?: HTMLImageElement | HTMLCanvasElement; // image drawn on layer
         layerName?: string; // if via image
         layers?: {
@@ -312,6 +315,9 @@ export class KlCanvas {
 
         if (!this.klHistory.isPaused()) {
             const historyEntryData: THistoryEntryDataComposed = {
+                projectId: {
+                    value: p.projectId ?? randomUuid(),
+                },
                 size: {
                     width: this.width,
                     height: this.height,
@@ -343,7 +349,7 @@ export class KlCanvas {
     /**
      * without resizing
      */
-    setSize(width: number, height: number) {
+    setSize(width: number, height: number): void {
         this.width = width;
         this.height = height;
     }
@@ -416,7 +422,7 @@ export class KlCanvas {
         top: number;
         right: number;
         bottom: number;
-        fillColor?: IRGB;
+        fillColor?: TRgb;
     }): void {
         const newW = Math.round(p.left) + this.width + Math.round(p.right);
         const newH = Math.round(p.top) + this.height + Math.round(p.bottom);
@@ -568,7 +574,7 @@ export class KlCanvas {
                         HISTORY_TILE_SIZE,
                     );
                 } else {
-                    ctx.putImageData(tile, x * HISTORY_TILE_SIZE, y * HISTORY_TILE_SIZE);
+                    ctx.putImageData(tile.data, x * HISTORY_TILE_SIZE, y * HISTORY_TILE_SIZE);
                 }
                 ctx.restore();
             });
@@ -589,7 +595,7 @@ export class KlCanvas {
                             if (isLayerFill(tile)) {
                                 return { ...tile };
                             }
-                            return copyImageData(tile);
+                            return copyImageDataTile(tile);
                         }),
                     },
                 ),
@@ -917,9 +923,26 @@ export class KlCanvas {
         });
     }
 
+    // arbitrary drawing operation & focus layer
+    drawOperation(layerIndex: number, operation: (ctx: CanvasRenderingContext2D) => void): void {
+        const targetLayer = this.layers[layerIndex];
+        const ctx = targetLayer.context;
+        operation(ctx);
+
+        if (!this.klHistory.isPaused()) {
+            this.klHistory.push({
+                activeLayerId: targetLayer.id,
+                layerMap: createLayerMap(this.layers, {
+                    layerId: targetLayer.id,
+                    attributes: ['tiles'],
+                }),
+            });
+        }
+    }
+
     layerFill(
         layerIndex: number,
-        colorObj: IRGB,
+        colorObj: TRgb,
         compositeOperation?: string,
         doClipSelection?: boolean,
     ): void {
@@ -931,7 +954,7 @@ export class KlCanvas {
             ctx.globalCompositeOperation = compositeOperation as GlobalCompositeOperation;
         }
 
-        let bounds: IBounds | undefined;
+        let bounds: TBounds | undefined;
         if (doClipSelection && this.selection) {
             const selectionPath = getSelectionPath2d(this.selection);
             ctx.clip(selectionPath);
@@ -1004,7 +1027,7 @@ export class KlCanvas {
         layerIndex: number, // index of layer to be filled
         x: number, // starting point
         y: number,
-        rgb: IRGB | null, // fill color, if null -> erase
+        rgb: TRgb | null, // fill color, if null -> erase
         opacity: number,
         tolerance: number,
         sampleStr: TFillSampling,
@@ -1138,7 +1161,7 @@ export class KlCanvas {
      * @param layerIndex
      * @param shapeObj
      */
-    drawShape(layerIndex: number, shapeObj: IShapeToolObject): void {
+    drawShape(layerIndex: number, shapeObj: TShapeToolObject): void {
         if (shapeObj.x1 === shapeObj.x2 && shapeObj.y1 === shapeObj.y2) {
             return;
         }
@@ -1163,7 +1186,7 @@ export class KlCanvas {
         }
     }
 
-    drawGradient(layerIndex: number, gradientObj: IGradient): void {
+    drawGradient(layerIndex: number, gradientObj: TGradient): void {
         const targetLayer = this.layers[layerIndex];
         drawGradient(targetLayer.context, gradientObj);
         if (!this.klHistory.isPaused()) {
@@ -1223,7 +1246,7 @@ export class KlCanvas {
         const targetLayer = this.layers[p.layerIndex];
         const ctx = targetLayer.context;
         ctx.save();
-        let bounds: IBounds | undefined;
+        let bounds: TBounds | undefined;
         if (p.useSelection && this.selection) {
             const selectionPath = getSelectionPath2d(this.selection);
             ctx.clip(selectionPath);
@@ -1329,7 +1352,7 @@ export class KlCanvas {
         return this.layers[index];
     }
 
-    getColorAt(x: number, y: number): IRGB {
+    getColorAt(x: number, y: number): TRgb {
         return this.eyedropper.getColorAt(x, y, this.klHistory.getComposed());
     }
 
@@ -1337,8 +1360,9 @@ export class KlCanvas {
         return drawProject(this.getProject(), factor);
     }
 
-    getProject(): IKlProject {
+    getProject(): TKlProject {
         return {
+            projectId: this.klHistory.getComposed().projectId.value,
             width: this.width,
             height: this.height,
             layers: this.layers.map((layer) => {
@@ -1543,7 +1567,7 @@ export class KlCanvas {
         this.selectionSample = undefined;
     }
 
-    getSelectionArea(layerIndex: number): IRect | undefined {
+    getSelectionArea(layerIndex: number): TRect | undefined {
         const srcLayer = this.layers[layerIndex];
 
         const selection = this.getSelectionOrFallback();

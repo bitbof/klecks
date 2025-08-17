@@ -1,6 +1,6 @@
 import { BB } from '../../bb/bb';
 import { getSharedFx } from '../../fx-canvas/shared-fx';
-import { IFilterApply, IFilterGetDialogParam, TFilterGetDialogResult } from '../kl-types';
+import { TFilterApply, TFilterGetDialogParam, TFilterGetDialogResult } from '../kl-types';
 import { CurvesInput, getDefaultCurvesInput, TCurvesInput } from './filter-curves/curves-input';
 import { Options } from '../ui/components/options';
 import { FxPreviewRenderer } from '../ui/project-viewport/fx-preview-renderer';
@@ -16,7 +16,7 @@ export type TFilterCurvesInput = {
 };
 
 export const filterCurves = {
-    getDialog(params: IFilterGetDialogParam) {
+    getDialog(params: TFilterGetDialogParam) {
         const context = params.context;
         const klCanvas = params.klCanvas;
         if (!context || !klCanvas) {
@@ -102,7 +102,7 @@ export const filterCurves = {
         return result;
     },
 
-    apply(params: IFilterApply<TFilterCurvesInput>): boolean {
+    apply(params: TFilterApply<TFilterCurvesInput>): boolean {
         const context = params.layer.context;
         const curves = params.input.curves;
         const klHistory = params.klHistory;

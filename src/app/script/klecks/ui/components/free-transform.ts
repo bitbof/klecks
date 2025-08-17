@@ -1,12 +1,12 @@
 import { BB } from '../../../bb/bb';
 import rotateImg from '/src/app/img/ui/cursor-rotate.png';
 import { KeyListener } from '../../../bb/input/key-listener';
-import { IVector2D } from '../../../bb/bb-types';
+import { TVector2D } from '../../../bb/bb-types';
 import { PointerListener } from '../../../bb/input/pointer-listener';
 import {
     copyTransform,
-    IFreeTransform,
     snapToPixel,
+    TFreeTransform,
     TFreeTransformCorner,
     TFreeTransformEdge,
     toImageSpace,
@@ -42,7 +42,7 @@ import {
  */
 export class FreeTransform {
     // --- private ---
-    private readonly value: IFreeTransform; // coordinates and dimensions of transformation
+    private readonly value: TFreeTransform; // coordinates and dimensions of transformation
     private isConstrained: boolean;
     private ratio: number; // aspect ratio of transform
     private viewportTransform: { scale: number; x: number; y: number };
@@ -58,7 +58,7 @@ export class FreeTransform {
     private snappingEnabled: boolean;
     private readonly snapX: number[];
     private readonly snapY: number[];
-    private readonly callback: (transform: IFreeTransform) => void;
+    private readonly callback: (transform: TFreeTransform) => void;
 
     private readonly cornerCursors = ['nw', 'n', 'ne', 'e', 'se', 's', 'sw', 'w'];
     private readonly gripSize = 16;
@@ -101,7 +101,7 @@ export class FreeTransform {
      * @param iY - image space
      * @private
      */
-    private snapCorner(iX: number, iY: number): IVector2D {
+    private snapCorner(iX: number, iY: number): TVector2D {
         if (!this.snappingEnabled) {
             return { x: iX, y: iY };
         }
@@ -160,7 +160,7 @@ export class FreeTransform {
      * @param iY
      * @private
      */
-    private constrainCorner(cornerIndex: number, iX: number, iY: number): IVector2D {
+    private constrainCorner(cornerIndex: number, iX: number, iY: number): TVector2D {
         if (!this.isConstrained) {
             return {
                 x: iX,
@@ -313,7 +313,7 @@ export class FreeTransform {
     }
 
     // ----------------------------------- public -----------------------------------
-    constructor(params: {
+    constructor(p: {
         x: number; // center of transform region. image space
         y: number;
         width: number; // size of transform region. image space
@@ -324,23 +324,23 @@ export class FreeTransform {
         snapX: number[]; // where snapping along X axis. image space
         snapY: number[]; // where snapping along X axis. image space
         viewportTransform: { scale: number; x: number; y: number };
-        callback: (transform: IFreeTransform) => void;
+        callback: (transform: TFreeTransform) => void;
     }) {
-        this.viewportTransform = { ...params.viewportTransform };
+        this.viewportTransform = { ...p.viewportTransform };
         this.value = {
             // coordinates and dimensions of transformation
-            x: params.x,
-            y: params.y,
-            width: params.width,
-            height: params.height,
-            angleDeg: params.angleDeg,
+            x: p.x,
+            y: p.y,
+            width: p.width,
+            height: p.height,
+            angleDeg: p.angleDeg,
         };
 
-        this.isConstrained = params.isConstrained;
+        this.isConstrained = p.isConstrained;
 
-        this.snapX = params.snapX;
-        this.snapY = params.snapY;
-        this.callback = params.callback;
+        this.snapX = p.snapX;
+        this.snapY = p.snapY;
+        this.callback = p.callback;
         this.snappingEnabled = true;
         this.ratio = this.value.width / this.value.height;
 
@@ -911,7 +911,7 @@ export class FreeTransform {
         ]);
     }
 
-    getValue(): IFreeTransform {
+    getValue(): TFreeTransform {
         return copyTransform(this.value);
     }
 
@@ -926,7 +926,7 @@ export class FreeTransform {
         this.snappingEnabled = b;
     }
 
-    setPos(p: IVector2D): void {
+    setPos(p: TVector2D): void {
         this.value.x = p.x;
         this.value.y = p.y;
         this.updateDOM(true);

@@ -1,8 +1,9 @@
 import { THistoryEntryLayerTile } from '../history.types';
 import { HISTORY_TILE_SIZE } from '../kl-history';
 import { getTileFromCanvas } from './get-tile-from-canvas';
-import { IBounds } from '../../../bb/bb-types';
+import { TBounds } from '../../../bb/bb-types';
 import { getChangedTiles } from './changed-tiles';
+import { createImageDataTile } from '../image-data-tile';
 
 export function canvasAndChangedTilesToLayerTiles(
     canvas: HTMLCanvasElement,
@@ -16,7 +17,7 @@ export function canvasAndChangedTilesToLayerTiles(
         for (let col = 0; col < tilesX; col++) {
             result.push(
                 changedTiles[row * tilesX + col]
-                    ? getTileFromCanvas(canvas, col, row, HISTORY_TILE_SIZE)
+                    ? createImageDataTile(getTileFromCanvas(canvas, col, row, HISTORY_TILE_SIZE))
                     : undefined,
             );
         }
@@ -27,23 +28,14 @@ export function canvasAndChangedTilesToLayerTiles(
 export function canvasToLayerTiles(canvas: HTMLCanvasElement): THistoryEntryLayerTile[];
 export function canvasToLayerTiles(
     canvas: HTMLCanvasElement,
-    bounds?: IBounds, // canvas area that changed. if undefined -> everything changed
+    bounds?: TBounds, // canvas area that changed. if undefined -> everything changed
 ): (THistoryEntryLayerTile | undefined)[];
 export function canvasToLayerTiles(
     canvas: HTMLCanvasElement,
-    bounds?: IBounds, // canvas area that changed. if undefined -> everything changed
+    bounds?: TBounds, // canvas area that changed. if undefined -> everything changed
 ): (THistoryEntryLayerTile | undefined)[] {
     if (bounds) {
-        const changedTiles = getChangedTiles(
-            {
-                x1: Math.max(0, bounds.x1),
-                y1: Math.max(0, bounds.y1),
-                x2: Math.min(canvas.width, bounds.x2),
-                y2: Math.min(canvas.height, bounds.y2),
-            },
-            canvas.width,
-            canvas.height,
-        );
+        const changedTiles = getChangedTiles(bounds, canvas.width, canvas.height);
         return canvasAndChangedTilesToLayerTiles(canvas, changedTiles);
     } else {
         // only do a single read back
@@ -70,7 +62,7 @@ export function canvasToLayerTiles(
                         destStart,
                     );
                 }
-                result.push(tileData);
+                result.push(createImageDataTile(tileData));
             }
         }
         return result;

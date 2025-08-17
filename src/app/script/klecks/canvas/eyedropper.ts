@@ -1,14 +1,15 @@
-import { IRGB } from '../kl-types';
+import { isLayerFill, TRgb } from '../kl-types';
 import { BB } from '../../bb/bb';
 import { THistoryEntryDataComposed } from '../history/history.types';
 import { HISTORY_TILE_SIZE } from '../history/kl-history';
+import { sortLayerMap } from '../history/sort-layer-map';
 
 export class Eyedropper {
     // ----------------------------------- public -----------------------------------
     constructor() {}
 
     // Reads from history (ImageData) to avoid reading from canvas.
-    getColorAt(x: number, y: number, composed: THistoryEntryDataComposed): IRGB {
+    getColorAt(x: number, y: number, composed: THistoryEntryDataComposed): TRgb {
         x = Math.floor(x);
         y = Math.floor(y);
         if (x < 0 || x >= composed.size.width || y < 0 || y >= composed.size.height) {
@@ -25,22 +26,16 @@ export class Eyedropper {
         const tileIndex = tileRow * tilesX + tileCol;
 
         Object.values(composed.layerMap)
-            .sort((a, b) => {
-                if (a.index > b.index) {
-                    return 1;
-                }
-                if (a.index < b.index) {
-                    return -1;
-                }
-                return 0;
-            })
+            .sort(sortLayerMap)
             .forEach((layer) => {
                 if (!layer.isVisible || layer.opacity === 0) {
                     return;
                 }
                 const tile = layer.tiles[tileIndex];
                 let fillStyle = '';
-                if (tile instanceof ImageData) {
+                if (isLayerFill(tile)) {
+                    fillStyle = tile.fill;
+                } else {
                     let tileWidth = HISTORY_TILE_SIZE;
                     if (composed.size.width % HISTORY_TILE_SIZE !== 0 && tileCol === tilesX - 1) {
                         tileWidth = composed.size.width % HISTORY_TILE_SIZE;
@@ -48,18 +43,16 @@ export class Eyedropper {
                     const pixelIndex =
                         (y % HISTORY_TILE_SIZE) * tileWidth + (x % HISTORY_TILE_SIZE);
 
-                    if (tile.data[pixelIndex * 4 + 3] === 0) {
+                    if (tile.data.data[pixelIndex * 4 + 3] === 0) {
                         return;
                     }
 
                     fillStyle = BB.ColorConverter.toRgbaStr({
-                        r: tile.data[pixelIndex * 4],
-                        g: tile.data[pixelIndex * 4 + 1],
-                        b: tile.data[pixelIndex * 4 + 2],
-                        a: tile.data[pixelIndex * 4 + 3] / 255,
+                        r: tile.data.data[pixelIndex * 4],
+                        g: tile.data.data[pixelIndex * 4 + 1],
+                        b: tile.data.data[pixelIndex * 4 + 2],
+                        a: tile.data.data[pixelIndex * 4 + 3] / 255,
                     });
-                } else {
-                    fillStyle = tile.fill;
                 }
 
                 ctx.fillStyle = fillStyle;

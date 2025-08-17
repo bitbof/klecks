@@ -5,8 +5,8 @@ import { Checkbox } from '../ui/components/checkbox';
 import { BRUSHES } from '../brushes/brushes';
 import { KlSlider } from '../ui/components/kl-slider';
 import brushIconImg from '/src/app/img/ui/brush-blend.svg';
-import { IBrushUi } from '../kl-types';
-import { LANG, languageStrings } from '../../language/language';
+import { TBrushUi } from '../kl-types';
+import { LANG, LANGUAGE_STRINGS } from '../../language/language';
 import { BlendBrush } from '../brushes/blend-brush';
 
 export const blendBrushUi = (function () {
@@ -22,9 +22,9 @@ export const blendBrushUi = (function () {
             min: 1 / 100,
             max: 1,
         },
-    } as IBrushUi<BlendBrush>;
+    } as TBrushUi<BlendBrush>;
 
-    languageStrings.subscribe(() => {
+    LANGUAGE_STRINGS.subscribe(() => {
         brushInterface.tooltip = LANG('brush-blend');
     });
 
@@ -109,6 +109,7 @@ export const blendBrushUi = (function () {
                     marginTop: '10px',
                     display: 'inline-block',
                 },
+                name: 'lock-alpha',
             });
 
             div.append(
@@ -186,7 +187,7 @@ export const blendBrushUi = (function () {
         this.getElement = function () {
             return div;
         };
-    } as IBrushUi<BlendBrush>['Ui'];
+    } as TBrushUi<BlendBrush>['Ui'];
 
     return brushInterface;
 })();

@@ -2,6 +2,7 @@ import { BB } from '../../../bb/bb';
 import { ToolspaceCollapser } from './toolspace-collapser';
 import { KL } from '../../kl';
 import { TUiLayout } from '../../kl-types';
+import { LocalStorage } from '../../../bb/base/local-storage';
 
 export type TMobileUiParams = {
     onShowToolspace: (b: boolean) => void;
@@ -15,19 +16,29 @@ export class MobileUi {
     private isVisible: boolean = false;
     private readonly toolspaceCollapser: ToolspaceCollapser;
     private readonly mobileWrapperEl: HTMLElement;
+    private readonly onShowToolspace: TMobileUiParams['onShowToolspace'];
 
     // ----------------------------------- public -----------------------------------
     constructor(p: TMobileUiParams) {
+        this.onShowToolspace = p.onShowToolspace;
         this.toolspaceCollapser = new KL.ToolspaceCollapser({
             onChange: () => {
                 this.toolspaceIsOpen = this.toolspaceCollapser.isOpen();
-                p.onShowToolspace(this.toolspaceIsOpen);
+                this.onShowToolspace(this.toolspaceIsOpen);
+                if (this.toolspaceIsOpen) {
+                    LocalStorage.removeItem('uiShowMobile');
+                } else {
+                    LocalStorage.setItem('uiShowMobile', 'true');
+                }
             },
         });
 
         this.mobileWrapperEl = BB.el({
             css: {
                 marginTop: '4px',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '4px',
             },
         });
         this.mobileWrapperEl.append(...p.toolUis);
@@ -59,7 +70,7 @@ export class MobileUi {
                     });
                 }
             } else {
-                this.mobileWrapperEl.style.display = 'block';
+                this.mobileWrapperEl.style.display = 'flex';
                 if (this.orientation === 'left') {
                     BB.css(this.rootEl, {
                         left: '0',
@@ -89,6 +100,12 @@ export class MobileUi {
 
     getToolspaceIsOpen(): boolean {
         return this.toolspaceIsOpen;
+    }
+
+    setToolspaceIsOpen(b: boolean): void {
+        this.toolspaceIsOpen = b;
+        this.toolspaceCollapser.setIsOpen(b);
+        this.onShowToolspace(b);
     }
 
     getElement(): HTMLElement {

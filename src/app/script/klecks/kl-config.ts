@@ -3,6 +3,6 @@ type TKlConfig = {
     disableAutoFit?: boolean;
 };
 
-export const klConfig: TKlConfig = {
+export const KL_CONFIG: TKlConfig = {
     filenameBase: 'Klecks',
 };

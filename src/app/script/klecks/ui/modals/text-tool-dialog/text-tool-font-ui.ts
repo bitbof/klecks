@@ -177,6 +177,7 @@ export class TextToolFontUI {
                     font: v,
                 });
             },
+            name: 'font',
         });
         this.onFocus = () => this.loadBundledFonts();
         this.fontSelect.getElement().addEventListener('focus', this.onFocus);
@@ -221,6 +222,7 @@ export class TextToolFontUI {
             css: {
                 width: '70px',
             },
+            name: 'font-size',
         });
 
         this.lineHeightInput = new Input({
@@ -240,6 +242,7 @@ export class TextToolFontUI {
             css: {
                 width: '60px',
             },
+            name: 'line-height',
         });
 
         this.letterSpacingInput = new Input({
@@ -258,6 +261,7 @@ export class TextToolFontUI {
             css: {
                 width: '60px',
             },
+            name: 'letter-spacing',
         });
 
         this.alignRadioList = new ImageRadioList<TTextFormat>({

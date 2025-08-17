@@ -224,7 +224,7 @@
   'modal-ok': {
     hint: 'main confirmation button in dialogs. Can be to confirm an action, not just acknowledge information.',
     original: 'Ok',
-    value: 'OKÉ'
+    value: 'Oké'
   },
   'modal-cancel': {
     original: 'Cancel',
@@ -238,7 +238,7 @@
   'layers-active-layer': {
     hint: 'currently selected layer that user is drawing on',
     original: 'Active Layer',
-    value: 'Lapisan aktip'
+    value: 'Lapisan Aktip'
   },
   'layers-layer': {
     original: 'Layer',
@@ -470,11 +470,6 @@
     original: 'Browser Storage',
     value: 'Panyimpenan Browser'
   },
-  'file-storage-thumb-title': {
-    hint: 'when reopening or reloading',
-    original: 'Restores when reopening page',
-    value: 'Restores nalika muka deui kaca'
-  },
   'file-storage-about': {
     hint: 'link to Browser Storage help/user manual',
     original: 'About Browser Storage',
@@ -482,8 +477,8 @@
   },
   'file-storage-cant-access': {
     hint: 'an error. Can’t access the storage.',
-    original: "Can't access",
-    value: 'Teu bisa ngakses'
+    original: "Can't access storage.",
+    value: 'Teu bisa ngakses panyimpenan.'
   },
   'file-storage-empty': {
     hint: 'nothing stored',
@@ -495,13 +490,26 @@
     original: 'Store',
     value: 'Store'
   },
+  'file-storage-open': {
+    hint: 'verb. to open, or to load',
+    original: 'Open',
+    value: 'Kabuka'
+  },
+  'file-storage-open-confirmation': {
+    original: 'This image is already open in another tab. Open it here too?',
+    value: 'Gambar ieu parantos dibuka dina tab anu sanés. Buka di dieu oge?'
+  },
+  'file-storage-open-failed': {
+    original: 'Failed to load.',
+    value: 'Gagal ngamuat.'
+  },
   'file-storage-clear': {
     original: 'Clear',
     value: 'Jelas'
   },
   'file-storage-clear-prompt': {
-    original: 'Clear Browser Storage?',
-    value: 'Hapus Panyimpenan Browser?'
+    original: 'Clear Browser Storage? Clearing can not be undone.',
+    value: 'Hapus Panyimpenan Browser? Hapusanna henteu tiasa dibalikeun deui.'
   },
   'file-storage-storing': {
     hint: 'while it is in the process of storing',
@@ -512,6 +520,10 @@
     hint: 'overwrite what is already stored',
     original: 'Overwrite',
     value: 'Nimpa'
+  },
+  'file-storage-overwrite-confirm': {
+    original: 'Overwrite Browser Storage? Overwritten data will be permanently deleted.',
+    value: 'Nimpa Panyimpenan Browser? Data overwritten bakal dihapus permanén.'
   },
   'file-storage-min-ago': {
     hint: "{x} <- needs to stay, it's a placeholder.",
@@ -567,6 +579,43 @@
     hint: 'verb',
     original: 'Upload',
     value: 'Unggah'
+  },
+  'tab-recovery-recover-tabs': {
+    hint: 'allows user to recover browser tabs (including the drawing) of this app.',
+    original: 'Recover closed tabs',
+    value: 'Cageur tab katutup'
+  },
+  'tab-recovery-explanation': {
+    original: 'Recovery data is only kept for a little while. Save to ensure your work is not lost.',
+    value: 'Data Pamulihan ngan disimpen sakedap. Simpen pikeun mastikeun karya anjeun teu leungit.'
+  },
+  'tab-recovery-total-quota-label': {
+    original: 'Total:',
+    value: 'Total:'
+  },
+  'tab-recovery-empty': {
+    original: 'Nothing to recover.',
+    value: 'Euweuh nu cageur.'
+  },
+  'tab-recovery-recover': {
+    original: 'Recover',
+    value: 'Cageur'
+  },
+  'tab-recovery-delete': {
+    original: 'Delete',
+    value: 'Hapus'
+  },
+  'tab-recovery-delete-confirmation': {
+    original: 'Delete this recovery? Deletion can not be undone.',
+    value: 'Pupus pamulihan ieu? Hapusan teu tiasa dibolaykeun.'
+  },
+  'tab-recovery-failed-to-recover': {
+    original: 'Failed to recover tab.',
+    value: 'Gagal cageur tab.'
+  },
+  'tab-recovery-recovered': {
+    original: 'Tab recovered.',
+    value: 'Tab pulih.'
   },
   'cleared-layer': {
     hint: 'the layer has been cleared. It is now empty',
@@ -1496,10 +1545,6 @@
     hint: 'The app is loaded, but it’s still waiting for image',
     original: 'Waiting for image',
     value: 'Nungguan gambar'
-  },
-  unsaved: {
-    original: 'Unsaved',
-    value: 'Teu disimpen'
   },
   help: {
     hint: 'or user manual',

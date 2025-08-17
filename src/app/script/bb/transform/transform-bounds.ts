@@ -1,7 +1,7 @@
-import { IBounds } from '../bb-types';
+import { TBounds } from '../bb-types';
 import { applyToPoint, Matrix } from 'transformation-matrix';
 
-export function transformBounds(bounds: IBounds, transform: Matrix): IBounds {
+export function transformBounds(bounds: TBounds, transform: Matrix): TBounds {
     const p1 = applyToPoint(transform, { x: bounds.x1, y: bounds.y1 });
     const p2 = applyToPoint(transform, { x: bounds.x2, y: bounds.y1 });
     const p3 = applyToPoint(transform, { x: bounds.x2, y: bounds.y2 });

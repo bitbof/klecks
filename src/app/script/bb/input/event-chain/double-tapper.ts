@@ -1,13 +1,13 @@
 import { TChainOutFunc } from './event-chain.types';
 import { dist } from '../../math/math';
-import { IPointerEvent, TPointerButton, TPointerType } from '../event.types';
+import { TPointerButton, TPointerEvent, TPointerType } from '../event.types';
 
-export interface IDoubleTapperEvent {
+export type TDoubleTapperEvent = {
     pageX: number;
     pageY: number;
     relX: number;
     relY: number;
-}
+};
 
 type TDoubleTapperTimeoutType = 'fail' | 'maxUntilSecondDown' | 'success';
 
@@ -18,7 +18,7 @@ type TDoubleTapperTimeoutType = 'fail' | 'maxUntilSecondDown' | 'success';
  * out IPointerEvent
  */
 export class DoubleTapper {
-    private readonly onDoubleTap: (e: IDoubleTapperEvent) => void;
+    private readonly onDoubleTap: (e: TDoubleTapperEvent) => void;
     private chainOut: TChainOutFunc | undefined;
     private allowedPointerTypeArr: TPointerType[] = ['touch', 'mouse', 'pen'];
     private allowedButtonArr: TPointerButton[] = ['left'];
@@ -51,7 +51,7 @@ export class DoubleTapper {
     private pointersDownIdArr: number[] = [];
     private lastUpTime: number = 0;
     private nowTime: number = 0;
-    private eventQueueArr: IPointerEvent[] = [];
+    private eventQueueArr: TPointerEvent[] = [];
     private timeoutObj: {
         [K in TDoubleTapperTimeoutType]: ReturnType<typeof setTimeout> | null;
     } = {
@@ -98,7 +98,7 @@ export class DoubleTapper {
     /**
      * @param event object - a pointer event from BB.PointerListener
      */
-    private processEvent(event: IPointerEvent): void {
+    private processEvent(event: TPointerEvent): void {
         if (event.type === 'pointerdown') {
             this.pointersDownIdArr.push(event.pointerId);
         } else if (event.type === 'pointerup') {
@@ -312,7 +312,7 @@ export class DoubleTapper {
 
     // ----------------------------------- public -----------------------------------
     constructor(p: {
-        onDoubleTap: (e: IDoubleTapperEvent) => void; // fires when double tap occurs
+        onDoubleTap: (e: TDoubleTapperEvent) => void; // fires when double tap occurs
         isInstant?: boolean;
     }) {
         this.onDoubleTap = p.onDoubleTap;
@@ -343,7 +343,7 @@ export class DoubleTapper {
         };
     }
 
-    chainIn(event: IPointerEvent): IPointerEvent | null {
+    chainIn(event: TPointerEvent): TPointerEvent | null {
         this.processEvent(event);
 
         if (this.sequenceArr.length === 0) {

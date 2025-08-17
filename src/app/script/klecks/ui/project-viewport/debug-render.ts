@@ -69,4 +69,4 @@ class DebugRender {
     }
 }
 
-export const debugRender = new DebugRender();
+export const DEBUG_RENDER = new DebugRender();

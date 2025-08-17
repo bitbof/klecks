@@ -1,5 +1,5 @@
 import { TViewportTransform } from '../project-viewport';
-import { ISize2D, IVector2D } from '../../../../bb/bb-types';
+import { TSize2D, TVector2D } from '../../../../bb/bb-types';
 import { isTransformEqual } from './is-transform-equal';
 import { BB } from '../../../../bb/bb';
 import { TMetaTransform, toMetaTransform } from '../../../../bb/transform/to-meta-transform';
@@ -10,8 +10,8 @@ import { applyToPoint } from 'transformation-matrix';
 export function blendTransform(
     currentTransform: TViewportTransform,
     targetTransform: TViewportTransform,
-    projectSize: ISize2D,
-    viewportCenter: IVector2D,
+    projectSize: TSize2D,
+    viewportCenter: TVector2D,
     easeFactor: number,
 ): TViewportTransform {
     // equal

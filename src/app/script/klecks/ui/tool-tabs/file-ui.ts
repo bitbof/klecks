@@ -1,8 +1,7 @@
 import { BB } from '../../../bb/bb';
 import { KL } from '../../kl';
 import { BrowserStorageUi } from '../components/browser-storage-ui';
-import { IKlProject, TDropOption, TExportType } from '../../kl-types';
-import { SaveReminder } from '../components/save-reminder';
+import { TDropOption, TExportType, TKlProject } from '../../kl-types';
 import { ProjectStore } from '../../storage/project-store';
 import { LANG } from '../../../language/language';
 import newImageImg from '/src/app/img/ui/new-image.svg';
@@ -10,16 +9,36 @@ import exportImg from '/src/app/img/ui/export.svg';
 import shareImg from '/src/app/img/ui/share.svg';
 import uploadImg from '/src/app/img/ui/upload.svg';
 import importImg from '/src/app/img/ui/import.svg';
-import copyImg from '/src/app/img/ui/copy.svg';
 import { Checkbox } from '../components/checkbox';
 import { LocalStorage } from '../../../bb/base/local-storage';
+import { KlRecoveryManager, TKlRecoveryListener } from '../../storage/kl-recovery-manager';
+import { showRecoveryManagerPanel } from '../modals/recovery-manager-panel/show-recovery-manager-panel';
+import * as classes from './file-ui.module.scss';
+import { BrowserStorageHeaderUi } from '../components/browser-storage-header-ui';
 
 const LS_SHOW_SAVE_DIALOG = 'kl-save-dialog';
 
+const createSpacer = (): HTMLElement => {
+    const el = document.createElement('div');
+    const clearer = document.createElement('div');
+    const line = BB.el({
+        className: 'grid-hr',
+    });
+    el.append(clearer, line);
+    BB.css(clearer, {
+        clear: 'both',
+    });
+    return el;
+};
+
+const createButtonContent = (text: string, icon: string, noInvert?: boolean): string => {
+    return `<img ${noInvert ? 'class="dark-no-invert"' : ''} src='${icon}' alt='icon' height='20'/>${text}`;
+};
+
 export type TFileUiParams = {
     klRootEl: HTMLElement;
-    projectStore: ProjectStore;
-    getProject: () => IKlProject;
+    projectStore?: ProjectStore;
+    getProject: () => TKlProject;
     exportType: TExportType;
     onExportTypeChange: (type: TExportType) => void;
     onFileSelect: (fileList: FileList, optionStr: TDropOption) => void;
@@ -27,11 +46,11 @@ export type TFileUiParams = {
     onNewImage: () => void;
     onShareImage: (callback: () => void) => void;
     onUpload: () => void;
-    onCopyToClipboard: () => void;
-    onPaste: () => void;
-    saveReminder: SaveReminder;
     applyUncommitted: () => void;
     onChangeShowSaveDialog: (b: boolean) => void;
+    klRecoveryManager?: KlRecoveryManager;
+    onOpenBrowserStorage: () => void;
+    onStoredToBrowserStorage: () => void;
 };
 
 export class FileUi {
@@ -40,8 +59,24 @@ export class FileUi {
     private readonly applyUncommitted: () => void;
 
     private readonly rootEl: HTMLDivElement;
-    private importButton: undefined | HTMLInputElement;
-    private fileBrowserStorage: undefined | BrowserStorageUi;
+    private importInput: undefined | HTMLInputElement;
+    private browserStorageUi: undefined | BrowserStorageUi;
+    private klRecoveryManager: KlRecoveryManager | undefined;
+    private recoveryCountBubble: HTMLElement | undefined;
+    private recoveryListener: TKlRecoveryListener = (metas) => {
+        if (!this.recoveryCountBubble) {
+            return;
+        }
+        const count = metas.length;
+        if (count === 0) {
+            this.recoveryCountBubble.style.display = 'none';
+        } else {
+            this.recoveryCountBubble.textContent = '' + count;
+            this.recoveryCountBubble.style.display = 'inline-block';
+        }
+    };
+
+    // ----------------------------------- public -----------------------------------
 
     constructor(p: TFileUiParams) {
         this.exportType = p.exportType;
@@ -50,51 +85,78 @@ export class FileUi {
         this.rootEl = document.createElement('div');
 
         const asyncCreation = (): void => {
-            const fileMenu = document.createElement('div');
-            const newButton = document.createElement('button');
-            const saveButton = document.createElement('button');
-            const shareButton = document.createElement('button');
-            const uploadImgurButton = document.createElement('button');
-            const clipboardButton = document.createElement('button');
-            const pasteButton = document.createElement('button');
-
-            newButton.style.cssFloat = 'left';
-            BB.css(saveButton, {
-                cssFloat: 'left',
-                clear: 'both',
-                flexGrow: '1',
-            });
-            BB.css(clipboardButton, {
-                cssFloat: 'left',
-                clear: 'both',
+            // --- hint ---
+            const saveNote = BB.el({
+                className: 'kl-toolspace-note',
+                textContent: LANG('file-no-autosave'),
+                css: {
+                    margin: '10px 10px 0 10px',
+                },
             });
 
-            newButton.tabIndex = -1;
-            saveButton.tabIndex = -1;
-            shareButton.tabIndex = -1;
-            uploadImgurButton.tabIndex = -1;
-            clipboardButton.tabIndex = -1;
-            pasteButton.tabIndex = -1;
-
-            newButton.innerHTML = `<img class="dark-no-invert" src='${newImageImg}' alt='icon' height='20'/>${LANG('file-new')}`;
-            saveButton.innerHTML = `<img src='${exportImg}' alt='icon' height='20'/>${LANG('file-save')}`;
-            shareButton.innerHTML = `<img src='${shareImg}' alt='icon' height='20'/>${LANG('file-share')}`;
-            uploadImgurButton.innerHTML = `<img style='float:left' src='${uploadImg}' height='20' alt='icon'/>${LANG('file-upload')}`;
-            clipboardButton.innerHTML = `<img src='${copyImg}' alt='icon' height='20'/>${LANG('file-copy')}`;
-            clipboardButton.title = LANG('file-copy-title');
-            pasteButton.innerHTML = LANG('file-paste');
-            newButton.className = 'grid-button';
-            saveButton.className = 'grid-button grid-button--filter';
-            shareButton.className = 'grid-button';
-            uploadImgurButton.className = 'grid-button';
-            clipboardButton.className = 'grid-button';
-            pasteButton.className = 'grid-button';
-
+            // --- new, import, save ---
+            const newButton = BB.el({
+                tagName: 'button',
+                className: 'grid-button',
+                content: createButtonContent(LANG('file-new'), newImageImg, true),
+                custom: {
+                    tabIndex: '-1',
+                },
+                css: {
+                    cssFloat: 'left',
+                },
+                onClick: () => p.onNewImage(),
+            });
+            const importButton = BB.el({
+                tagName: 'button',
+                className: 'grid-button',
+                content: createButtonContent(LANG('file-import'), importImg, true),
+                css: {
+                    position: 'relative',
+                    cursor: 'pointer',
+                    cssFloat: 'left',
+                },
+                custom: {
+                    tabIndex: '-1',
+                },
+                onClick: () => this.importInput!.click(),
+            });
+            this.importInput = BB.el({
+                tagName: 'input',
+                css: {
+                    display: 'none',
+                },
+                onChange: () => {
+                    this.applyUncommitted();
+                    this.importInput!.files && p.onFileSelect(this.importInput!.files, 'default');
+                    this.importInput!.value = '';
+                },
+                custom: {
+                    tabIndex: '-1',
+                },
+            });
+            this.importInput.type = 'file';
+            this.importInput.multiple = true;
+            this.importInput.accept = 'image/*,.psd'; // .psd needed for chrome, although it's image/vnd.adobe.photoshop
+            const saveButton = BB.el({
+                tagName: 'button',
+                className: 'grid-button grid-button--filter',
+                content: createButtonContent(LANG('file-save'), exportImg),
+                custom: {
+                    tabIndex: '-1',
+                },
+                css: {
+                    cssFloat: 'left',
+                    flex: '1 0 0',
+                    margin: '0',
+                },
+                onClick: () => p.onSaveImageToComputer(),
+            });
             const canShowSaveDialog = 'showSaveFilePicker' in window;
             const showSaveDialogRaw = LocalStorage.getItem(LS_SHOW_SAVE_DIALOG);
             const initialShowSaveDialog =
                 showSaveDialogRaw === null ? false : showSaveDialogRaw === 'true';
-            const showSaveDialogCheck = new Checkbox({
+            const saveDialogCheckbox = new Checkbox({
                 init: initialShowSaveDialog,
                 label: LANG('file-show-save-dialog'),
                 callback: (value) => {
@@ -106,72 +168,13 @@ export class FileUi {
                     p.onChangeShowSaveDialog(value);
                 },
                 css: {
-                    marginLeft: '10px',
                     maxWidth: 'fit-content',
                 },
+                name: 'show-save-dialog',
             });
             p.onChangeShowSaveDialog(initialShowSaveDialog);
 
-            const importWrapper = BB.el({
-                className: 'grid-button',
-                css: {
-                    position: 'relative',
-                    cursor: 'pointer',
-                    cssFloat: 'left',
-                },
-            });
-            const innerMask = BB.el({
-                parent: importWrapper,
-                css: {
-                    width: '120px',
-                    height: '28px',
-                    overflow: 'hidden',
-                    cursor: 'pointer',
-                    position: 'relative',
-                },
-            });
-            this.importButton = BB.el({
-                tagName: 'input',
-                parent: innerMask,
-                css: {
-                    display: 'none',
-                },
-            });
-            this.importButton.tabIndex = -1;
-            this.importButton.type = 'file';
-            this.importButton.multiple = true;
-            this.importButton.accept = 'image';
-            this.importButton.size = 71;
-            this.importButton.onchange = () => {
-                if (!this.importButton) {
-                    return;
-                }
-                this.applyUncommitted();
-                this.importButton.files && p.onFileSelect(this.importButton.files, 'default');
-                this.importButton.value = '';
-            };
-
-            const importFakeButton = BB.el({
-                tagName: 'button',
-                parent: importWrapper,
-                content:
-                    "<img class=\"dark-no-invert\" style='float:left' height='20' src='" +
-                    importImg +
-                    "' alt='icon'/>" +
-                    LANG('file-import'),
-                css: {
-                    width: '120px',
-                    display: 'box',
-                    position: 'absolute',
-                    left: '0',
-                    top: '0',
-                    cursor: 'pointer',
-                },
-            });
-            importFakeButton.tabIndex = -1;
-            importFakeButton.onclick = () => this.importButton && this.importButton.click();
-
-            // --- export filetype dropdown ---
+            // export filetype dropdown
             const exportTypeSelect = new KL.Select({
                 optionArr: [
                     ['png', 'PNG'],
@@ -185,68 +188,45 @@ export class FileUi {
                     p.onSaveImageToComputer();
                 },
                 title: LANG('file-format'),
+                name: 'export-type',
             });
             BB.css(exportTypeSelect.getElement(), {
-                width: '50%',
                 height: '30px',
-                marginTop: '10px',
-                marginLeft: '10px',
+                width: 'calc(50% - 10px)',
+                flex: '1 0 0',
             });
 
-            newButton.onclick = p.onNewImage;
-            saveButton.onclick = () => {
-                p.onSaveImageToComputer();
-            };
-            shareButton.onclick = () => {
-                shareButton.disabled = true;
-                p.onShareImage(() => {
-                    shareButton.disabled = false;
+            // --- browser storage ---
+            let browserStorageFallbackEl: HTMLElement | undefined;
+            if (p.projectStore) {
+                this.browserStorageUi = new BrowserStorageUi({
+                    projectStore: p.projectStore,
+                    getProject: p.getProject,
+                    klRootEl: p.klRootEl,
+                    applyUncommitted: this.applyUncommitted,
+                    onOpen: p.onOpenBrowserStorage,
+                    onStored: () => p.onStoredToBrowserStorage(),
                 });
-            };
-            uploadImgurButton.onclick = () => p.onUpload();
-
-            clipboardButton.onclick = () => {
-                clipboardButton.blur();
-                p.onCopyToClipboard();
-            };
-
-            pasteButton.onclick = () => {
-                pasteButton.blur();
-                p.onPaste();
-            };
-
-            const saveNote = BB.el({
-                className: 'kl-toolspace-note',
-                textContent: LANG('file-no-autosave'),
-                css: {
-                    margin: '10px 10px 0 10px',
-                },
-            });
-
-            const createSpacer = () => {
-                const el = document.createElement('div');
-                const clearer = document.createElement('div');
-                const line = BB.el({
-                    className: 'grid-hr',
+                BB.css(this.browserStorageUi.getElement(), {
+                    margin: '10px',
                 });
-                el.append(clearer, line);
-                BB.css(clearer, {
-                    clear: 'both',
+            } else {
+                const header = new BrowserStorageHeaderUi();
+                browserStorageFallbackEl = BB.el({
+                    content: [
+                        header.getElement(),
+                        BB.el({
+                            content: '🔴 ' + LANG('file-storage-cant-access'),
+                            css: {
+                                marginTop: '10px',
+                            },
+                        }),
+                    ],
+                    css: {
+                        margin: '10px 10px 0 10px',
+                    },
                 });
-                return el;
-            };
-
-            this.fileBrowserStorage = new BrowserStorageUi(
-                p.projectStore,
-                p.getProject,
-                p.saveReminder,
-                p.klRootEl,
-                this.applyUncommitted,
-            );
-            BB.css(this.fileBrowserStorage.getElement(), {
-                //background: 'red',
-                margin: '10px',
-            });
+            }
 
             const saveRow = BB.el({
                 content: [
@@ -254,34 +234,98 @@ export class FileUi {
                         content: [saveButton, exportTypeSelect.getElement()],
                         css: {
                             display: 'flex',
+                            gap: '10px',
                         },
                     }),
-                    ...(canShowSaveDialog ? [showSaveDialogCheck.getElement()] : []),
+                    ...(canShowSaveDialog ? [saveDialogCheckbox.getElement()] : []),
                 ],
-                className: 'kl-file-save-wrapper',
+                css: {
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '10px',
+                    margin: '10px 10px 0 10px',
+                },
             });
 
-            //actual structure
-            BB.append(fileMenu, [
+            // --- recovery ---
+            this.klRecoveryManager = p.klRecoveryManager;
+            const recoveryWrapper = BB.el({});
+            this.recoveryCountBubble = BB.el({
+                className: classes.recoveryBubble,
+            });
+
+            const recoveryBrowserButton = BB.el({
+                tagName: 'button',
+                content: [LANG('tab-recovery-recover-tabs'), this.recoveryCountBubble],
+                onClick: () => showRecoveryManagerPanel(this.klRecoveryManager),
+                custom: {
+                    tabIndex: '-1',
+                },
+                css: {
+                    margin: '10px 0 0 10px',
+                    width: 'calc(100% - 20px)',
+                },
+            });
+
+            recoveryWrapper.append(recoveryBrowserButton, createSpacer());
+
+            (async () => {
+                if (!this.klRecoveryManager) {
+                    return;
+                }
+                this.klRecoveryManager.subscribe(this.recoveryListener);
+                await this.klRecoveryManager.update();
+                this.klRecoveryManager.unsubscribe(this.recoveryListener);
+            })();
+
+            // --- upload, share ---
+            const shareButton = BB.el({
+                tagName: 'button',
+                className: 'grid-button',
+                content: createButtonContent(LANG('file-share'), shareImg),
+                custom: {
+                    tabIndex: '-1',
+                },
+                css: {
+                    cssFloat: 'left',
+                },
+                onClick: () => {
+                    shareButton.disabled = true;
+                    p.onShareImage(() => {
+                        shareButton.disabled = false;
+                    });
+                },
+            });
+            const uploadImgurButton = BB.el({
+                tagName: 'button',
+                className: 'grid-button',
+                content: createButtonContent(LANG('file-upload'), uploadImg),
+                custom: {
+                    tabIndex: '-1',
+                },
+                css: {
+                    cssFloat: 'left',
+                },
+                onClick: () => {
+                    p.onUpload();
+                },
+            });
+
+            BB.append(this.rootEl, [
                 saveNote,
                 newButton,
-                importWrapper,
+                importButton,
                 BB.el({ css: { clear: 'both' } }),
-
                 saveRow,
-
-                clipboardButton,
-                pasteButton,
+                createSpacer(),
+                this.browserStorageUi?.getElement(),
+                browserStorageFallbackEl,
+                createSpacer(),
+                recoveryWrapper,
+                uploadImgurButton,
                 BB.canShareFiles() ? shareButton : undefined,
                 BB.el({ css: { clear: 'both' } }),
-
-                createSpacer(),
-                this.fileBrowserStorage.getElement(),
-                createSpacer(),
-                uploadImgurButton,
             ]);
-
-            this.rootEl.append(fileMenu);
         };
 
         setTimeout(asyncCreation, 1);
@@ -296,10 +340,19 @@ export class FileUi {
     setIsVisible(isVisible: boolean): void {
         if (isVisible) {
             this.refresh();
+            this.browserStorageUi?.show();
+            if (this.klRecoveryManager) {
+                this.klRecoveryManager.subscribe(this.recoveryListener);
+                this.klRecoveryManager.update();
+            }
+        } else {
+            if (this.klRecoveryManager) {
+                this.klRecoveryManager.unsubscribe(this.recoveryListener);
+            }
         }
     }
 
     triggerImport(): void {
-        this.importButton && this.importButton.click();
+        this.importInput && this.importInput.click();
     }
 }
