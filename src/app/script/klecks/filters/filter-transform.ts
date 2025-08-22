@@ -12,11 +12,102 @@ import { css } from '@emotion/css/dist/emotion-css.cjs';
 import { testIsSmall } from '../ui/utils/test-is-small';
 import { getPreviewHeight, getPreviewWidth, MEDIUM_PREVIEW } from '../ui/utils/preview-size';
 import { canvasToLayerTiles } from '../history/push-helpers/canvas-to-layer-tiles';
+import { getSelectionBounds } from '../select-tool/get-selection-bounds';
+import { getSelectionPath2d } from '../../bb/multi-polygon/get-selection-path-2d';
+import { compose, Matrix, rotate, scale, translate } from 'transformation-matrix';
+import { matrixToTuple } from '../../bb/math/matrix-to-tuple';
+import { MultiPolygon } from 'polygon-clipping';
+import { TRect } from '../../bb/bb-types';
+import { transformMultiPolygon } from '../../bb/multi-polygon/transform-multi-polygon';
+
+function drawTransform(
+    ctx: CanvasRenderingContext2D,
+    copiedCanvas: HTMLCanvasElement,
+    isPixelated: boolean,
+    transform: TFreeTransform,
+    selection?: MultiPolygon,
+    boundsObj?: TRect,
+    doClone?: boolean,
+    isTransparentBg?: boolean,
+): Matrix | undefined {
+    const width = ctx.canvas.width;
+    const height = ctx.canvas.height;
+    ctx.save();
+    ctx.clearRect(0, 0, width, height);
+
+    ctx.save();
+    if (selection) {
+        // draw original with clipped selection
+        ctx.drawImage(copiedCanvas, 0, 0);
+        if (!doClone) {
+            const selectionPath = getSelectionPath2d(selection);
+            ctx.clip(selectionPath);
+            ctx.globalCompositeOperation = isTransparentBg ? 'destination-out' : 'source-atop';
+            ctx.fillStyle = 'white';
+            ctx.fillRect(0, 0, width, height);
+        }
+    } else {
+        if (!isTransparentBg) {
+            ctx.fillStyle = 'white';
+            ctx.fillRect(0, 0, width, height);
+        }
+        if (doClone) {
+            ctx.drawImage(copiedCanvas, 0, 0);
+        }
+    }
+    ctx.restore();
+
+    let matrix: Matrix | undefined;
+    if (selection) {
+        const bounds = boundsObj ?? {
+            x: 0,
+            y: 0,
+            width: ctx.canvas.width,
+            height: ctx.canvas.height,
+        };
+        if (
+            isPixelated ||
+            BB.testShouldPixelate(
+                transform,
+                transform.width / bounds.width,
+                transform.height / bounds.height,
+            )
+        ) {
+            ctx.imageSmoothingEnabled = false;
+        } else {
+            ctx.imageSmoothingEnabled = true;
+            ctx.imageSmoothingQuality = 'high';
+        }
+        // derived from drawTransformedImageWithBounds
+        matrix = compose(
+            translate(transform.x, transform.y),
+            rotate((transform.angleDeg / 180) * Math.PI),
+            scale(transform.width > 0 ? 1 : -1, transform.height > 0 ? 1 : -1),
+            translate(-Math.abs(transform.width) / 2, -Math.abs(transform.height) / 2),
+            scale(
+                Math.abs(transform.width / bounds.width),
+                Math.abs(transform.height / bounds.height),
+            ),
+            translate(-bounds.x, -bounds.y),
+        );
+        ctx.setTransform(...matrixToTuple(matrix));
+        const selectionPath = getSelectionPath2d(selection);
+        ctx.clip(selectionPath);
+        ctx.drawImage(copiedCanvas, 0, 0);
+    } else {
+        BB.drawTransformedImageWithBounds(ctx, copiedCanvas, transform, boundsObj, isPixelated);
+    }
+
+    ctx.restore();
+    return matrix;
+}
 
 export type TFilterTransformInput = {
     bounds: { x: number; y: number; width: number; height: number };
     transform: TFreeTransform;
     isPixelated: boolean;
+    doClone: boolean;
+    isTransparentBg: boolean;
 };
 
 export const filterTransform = {
@@ -31,10 +122,18 @@ export const filterTransform = {
         const layers = klCanvas.getLayers();
         const selectedLayerIndex = throwIfNull(klCanvas.getLayerIndex(context.canvas));
 
+        const selection = params.klCanvas.getSelection();
+
         // determine bounds and initial transformation
-        const boundsObj = BB.canvasBounds(context);
+        const boundsObj = selection
+            ? getSelectionBounds(selection, context)
+            : BB.canvasBounds(context);
         if (!boundsObj) {
-            return { error: LANG('filter-transform-empty') };
+            return {
+                error: LANG(
+                    selection ? 'filter-transform-empty-selection' : 'filter-transform-empty',
+                ),
+            };
         }
         const initTransform = {
             x: boundsObj.x + boundsObj.width / 2,
@@ -145,16 +244,14 @@ export const filterTransform = {
         }
 
         // buttons
-        const actionBtnCss = {
-            marginLeft: '10px',
-            marginTop: '10px',
-        };
         const buttonRow = BB.el({
             parent: rootEl,
             css: {
                 display: 'flex',
                 flexWrap: 'wrap',
-                marginLeft: '-10px',
+                alignItems: 'center',
+                gap: '10px',
+                marginTop: '10px',
             },
         });
         const flipXBtn = BB.el({
@@ -165,7 +262,6 @@ export const filterTransform = {
                 const t = freeTransform.getValue();
                 freeTransform.setSize(-t.width, t.height);
             },
-            css: actionBtnCss,
         });
         const flipYBtn = BB.el({
             parent: buttonRow,
@@ -175,7 +271,6 @@ export const filterTransform = {
                 const t = freeTransform.getValue();
                 freeTransform.setSize(t.width, -t.height);
             },
-            css: actionBtnCss,
         });
         const scaleRotLeftBtn = BB.el({
             parent: buttonRow,
@@ -189,7 +284,6 @@ export const filterTransform = {
                 inputR.value = '' + Math.round(t.angleDeg);
                 updatePreview();
             },
-            css: actionBtnCss,
         });
         const scaleRotRightBtn = BB.el({
             parent: buttonRow,
@@ -203,7 +297,6 @@ export const filterTransform = {
                 inputR.value = '' + Math.round(t.angleDeg);
                 updatePreview();
             },
-            css: actionBtnCss,
         });
         const scaleDoubleBtn = BB.el({
             parent: buttonRow,
@@ -212,12 +305,14 @@ export const filterTransform = {
             onClick: () => {
                 const t = freeTransform.getValue();
                 if (constrainCheckbox.getValue()) {
-                    freeTransform.setSize(freeTransform.getRatio() * t.height * 2, t.height * 2);
+                    freeTransform.setSize(
+                        (t.width < 0 ? -1 : 1) * freeTransform.getRatio() * Math.abs(t.height) * 2,
+                        t.height * 2,
+                    );
                 } else {
                     freeTransform.setSize(t.width * 2, t.height * 2);
                 }
             },
-            css: actionBtnCss,
         });
         const scaleHalfBtn = BB.el({
             parent: buttonRow,
@@ -227,7 +322,6 @@ export const filterTransform = {
                 const t = freeTransform.getValue();
                 freeTransform.setSize(Math.round(t.width / 2), Math.round(t.height / 2));
             },
-            css: actionBtnCss,
         });
         const centerBtn = BB.el({
             parent: buttonRow,
@@ -242,8 +336,37 @@ export const filterTransform = {
                 freeTransform.setAngleDeg(t.angleDeg);
                 updatePreview();
             },
-            css: actionBtnCss,
         });
+
+        let doClone = false;
+        const cloneCheckbox = new Checkbox({
+            init: doClone,
+            label: LANG('select-transform-clone'),
+            allowTab: true,
+            callback: function (b) {
+                doClone = b;
+                updatePreview(true);
+            },
+            css: {
+                display: 'inline-block',
+            },
+            name: 'clone-before-transforming',
+        });
+        let isTransparentBg = false;
+        const transparentBgCheckbox = new Checkbox({
+            init: isTransparentBg,
+            label: LANG('brush-eraser-transparent-bg'),
+            allowTab: true,
+            callback: function (b) {
+                isTransparentBg = b;
+                updatePreview(true);
+            },
+            css: {
+                display: 'inline-block',
+            },
+            name: 'transparent-background',
+        });
+        buttonRow.append(cloneCheckbox.getElement(), transparentBgCheckbox.getElement());
 
         let isConstrained = true;
         const constrainCheckbox = new Checkbox({
@@ -367,21 +490,16 @@ export const filterTransform = {
             lastDrawnTransformStr = JSON.stringify(transform);
 
             const ctx = BB.ctx(previewCanvas);
-            ctx.save();
-            ctx.clearRect(0, 0, previewCanvas.width, previewCanvas.height);
-            BB.drawTransformedImageWithBounds(
+            drawTransform(
                 ctx,
                 layers[selectedLayerIndex].context.canvas,
+                algorithmSelect.getValue() === 'pixelated',
                 transform,
+                selection,
                 boundsObj,
-                algorithmSelect.getValue() === 'pixelated' ||
-                    BB.testShouldPixelate(
-                        transform,
-                        transform.width / initTransform.width,
-                        transform.height / initTransform.height,
-                    ),
+                doClone,
+                isTransparentBg || selectedLayerIndex > 0,
             );
-            ctx.restore();
             preview.render();
         }
 
@@ -440,13 +558,9 @@ export const filterTransform = {
             const input: TFilterTransformInput = {
                 transform,
                 bounds: boundsObj,
-                isPixelated:
-                    algorithmSelect.getValue() === 'pixelated' ||
-                    BB.testShouldPixelate(
-                        transform,
-                        transform.width / initTransform.width,
-                        transform.height / initTransform.height,
-                    ),
+                isPixelated: algorithmSelect.getValue() === 'pixelated',
+                doClone,
+                isTransparentBg,
             };
             result.destroy!();
             return BB.copyObj(input);
@@ -460,17 +574,28 @@ export const filterTransform = {
         if (!context) {
             return false;
         }
+        klHistory.pause(true);
         const input = params.input;
+        const selectedLayerIndex = params.klCanvas.getLayerIndex(context.canvas)!;
 
         const copyCanvas = BB.copyCanvas(context.canvas);
-        context.clearRect(0, 0, context.canvas.width, context.canvas.height);
-        BB.drawTransformedImageWithBounds(
+        let selection = params.klCanvas.getSelection();
+        const matrix = drawTransform(
             context,
             copyCanvas,
-            input.transform,
-            input.bounds,
             input.isPixelated,
+            input.transform,
+            params.klCanvas.getSelection(),
+            input.bounds,
+            input.doClone,
+            input.isTransparentBg || selectedLayerIndex > 0,
         );
+        if (selection && matrix) {
+            selection = transformMultiPolygon(selection, matrix);
+            params.klCanvas.setSelection(selection);
+        }
+        klHistory.pause(false);
+
         {
             const layerMap = Object.fromEntries(
                 params.klCanvas.getLayers().map((layerItem) => {
@@ -488,6 +613,7 @@ export const filterTransform = {
             );
             klHistory.push({
                 layerMap,
+                ...(selection ? { selection: { value: selection } } : undefined),
             });
         }
         return true;

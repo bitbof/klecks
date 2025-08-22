@@ -21,8 +21,7 @@ import { compose, identity, Matrix, rotate, translate } from 'transformation-mat
 import { getSelectionPath2d } from '../../bb/multi-polygon/get-selection-path-2d';
 import { transformMultiPolygon } from '../../bb/multi-polygon/transform-multi-polygon';
 import { getMultiPolyBounds } from '../../bb/multi-polygon/get-multi-polygon-bounds';
-import { intBoundsWithinArea, integerBounds } from '../../bb/math/math';
-import { canvasBounds } from '../../bb/base/canvas';
+import { integerBounds } from '../../bb/math/math';
 import { matrixToTuple } from '../../bb/math/matrix-to-tuple';
 import { getEraseColor } from '../brushes/erase-color';
 import { HISTORY_TILE_SIZE, KlHistory } from '../history/kl-history';
@@ -42,6 +41,7 @@ import { createLayerMap } from '../history/push-helpers/create-layer-map';
 import { Eyedropper } from './eyedropper';
 import { copyImageDataTile } from '../history/image-data-tile';
 import { randomUuid } from '../../bb/base/base';
+import { getSelectionBounds } from '../select-tool/get-selection-bounds';
 
 // TODO remove in 2026
 // workaround for chrome bug https://bugs.chromium.org/p/chromium/issues/detail?id=1281185
@@ -1569,19 +1569,8 @@ export class KlCanvas {
 
     getSelectionArea(layerIndex: number): TRect | undefined {
         const srcLayer = this.layers[layerIndex];
-
         const selection = this.getSelectionOrFallback();
-        const selectionBounds = getMultiPolyBounds(selection);
-        // integer bounds that are within the canvas
-        const canvasSelectionBounds = intBoundsWithinArea(selectionBounds, this.width, this.height);
-
-        // selection area outside of canvas
-        if (!canvasSelectionBounds) {
-            return undefined;
-        }
-
-        // bounds of where pixels are non-transparent
-        return canvasBounds(srcLayer.context, canvasSelectionBounds);
+        return getSelectionBounds(selection, srcLayer.context);
     }
 
     getSelectionSample(): TSelectionSample | undefined {
