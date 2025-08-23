@@ -14,7 +14,7 @@ import { Preview } from '../ui/project-viewport/preview';
 import { css } from '@emotion/css/dist/emotion-css.cjs';
 import { testIsSmall } from '../ui/utils/test-is-small';
 import { getPreviewHeight, getPreviewWidth, MEDIUM_PREVIEW } from '../ui/utils/preview-size';
-import { canvasToLayerTiles } from '../history/push-helpers/canvas-to-layer-tiles';
+import { applyFxFilter } from './apply-fx-filter';
 
 // see fx-canvas distort
 export type TFilterDistortInput = {
@@ -297,6 +297,7 @@ export const filterDistort = {
 
                 return fxCanvas.multiplyAlpha().distort(scaledSettings).unmultiplyAlpha();
             },
+            selection: klCanvas.getSelection(),
         });
 
         const previewLayerArr: TProjectViewportProject['layers'] = layers.map((item, i) => {
@@ -316,6 +317,7 @@ export const filterDistort = {
                 height: context.canvas.height,
                 layers: previewLayerArr,
             },
+            selection: klCanvas.getSelection(),
         });
         preview.render();
         preview.getElement().classList.add(
@@ -357,35 +359,13 @@ export const filterDistort = {
         if (!klCanvas) {
             return false;
         }
-        const fxCanvas = getSharedFx();
-        if (!fxCanvas) {
-            return false; // todo more specific error?
-        }
-        const texture = fxCanvas.texture(context.canvas);
-        fxCanvas.draw(texture).multiplyAlpha().distort(params.input).unmultiplyAlpha().update();
-        context.clearRect(0, 0, context.canvas.width, context.canvas.height);
-        context.drawImage(fxCanvas, 0, 0);
-        texture.destroy();
-
-        {
-            const layerMap = Object.fromEntries(
-                params.klCanvas.getLayers().map((layerItem) => {
-                    if (layerItem.id === params.layer.id) {
-                        return [
-                            layerItem.id,
-                            {
-                                tiles: canvasToLayerTiles(params.layer.canvas),
-                            },
-                        ];
-                    }
-
-                    return [layerItem.id, {}];
-                }),
-            );
-            klHistory.push({
-                layerMap,
-            });
-        }
-        return true;
+        return applyFxFilter(
+            context,
+            params.klCanvas.getSelection(),
+            (fxCanvas) => {
+                fxCanvas.multiplyAlpha().distort(params.input).unmultiplyAlpha();
+            },
+            klHistory,
+        );
     },
 };

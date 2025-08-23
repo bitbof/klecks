@@ -1,6 +1,8 @@
 import { TBounds, TKeyString, TRect } from '../bb-types';
 import { createCanvas } from './create-canvas';
 import { asyncLoadImage, base64ToBlob, copyObj } from './base';
+import { MultiPolygon } from 'polygon-clipping';
+import { getSelectionPath2d } from '../multi-polygon/get-selection-path-2d';
 
 export function copyCanvas(canvas: HTMLCanvasElement | HTMLImageElement): HTMLCanvasElement {
     const resultCanvas = createCanvas(canvas.width, canvas.height);
@@ -495,4 +497,18 @@ export async function canvasToBlob(canvas: HTMLCanvasElement, mimeType: string):
         // assume base64
         return base64ToBlob(canvas.toDataURL(mimeType));
     }
+}
+
+export function drawSelectionMask(
+    selection: MultiPolygon,
+    context: CanvasRenderingContext2D,
+): void {
+    const canvas = context.canvas;
+    context.save();
+    context.fillRect(0, 0, canvas.width, canvas.height);
+    const selectionPath = getSelectionPath2d(selection);
+    context.clip(selectionPath);
+    context.fillStyle = 'white';
+    context.fillRect(0, 0, canvas.width, canvas.height);
+    context.restore();
 }

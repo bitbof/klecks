@@ -4,9 +4,12 @@ import { BB } from '../../../bb/bb';
 import { getSharedFx } from '../../../fx-canvas/shared-fx';
 import { throwIfNull } from '../../../bb/base/base';
 import { TRect } from '../../../bb/bb-types';
-import { applyToPoint, compose, inverse, scale, translate } from 'transformation-matrix';
+import { applyToPoint, compose, identity, inverse, scale, translate } from 'transformation-matrix';
 import { createMatrixFromTransform } from '../../../bb/transform/create-matrix-from-transform';
 import { matrixToTuple } from '../../../bb/math/matrix-to-tuple';
+import { MultiPolygon } from 'polygon-clipping';
+import { drawSelectionMask } from '../../../bb/base/canvas';
+import { transformMultiPolygon } from '../../../bb/multi-polygon/transform-multi-polygon';
 
 type TPostMix = {
     opacity: number;
@@ -17,12 +20,15 @@ export type TFxPreviewRendererParams = {
     original: Exclude<CanvasImageSource, VideoFrame | HTMLOrSVGImageElement> | HTMLImageElement;
     onUpdate: (fxCanvas: TFxCanvas, transform: TViewportTransformXY) => TFxCanvas;
     postMix?: TPostMix; // mix the result with the original
+    selection?: MultiPolygon;
 };
 
 export class FxPreviewRenderer {
     private readonly original: TFxPreviewRendererParams['original'];
     private readonly onUpdate: TFxPreviewRendererParams['onUpdate'];
     private texture: TWrappedTexture | undefined = undefined;
+    private maskCanvas: HTMLCanvasElement | undefined = undefined; // prevent destroying the mask repeatedly
+    private maskTexture: TWrappedTexture | undefined = undefined;
     private readonly textureSource: HTMLCanvasElement;
     private ctx: CanvasRenderingContext2D;
     private oldOnUpdateProps = {
@@ -38,6 +44,7 @@ export class FxPreviewRenderer {
     };
     private fxCanvas: TFxCanvas;
     private postMix: TPostMix | undefined;
+    private selection: MultiPolygon | undefined;
 
     // ----------------------------------- public -----------------------------------
     constructor(p: TFxPreviewRendererParams) {
@@ -47,6 +54,7 @@ export class FxPreviewRenderer {
         this.ctx = BB.ctx(this.textureSource);
         this.fxCanvas = throwIfNull(getSharedFx());
         this.postMix = p.postMix;
+        this.selection = p.selection;
     }
 
     render: TProjectViewportLayerFunc = (viewportTransform, viewportWidth, viewportHeight) => {
@@ -54,6 +62,7 @@ export class FxPreviewRenderer {
         const padding = 0; // render more than visible with padding < 0
 
         let clippedViewportRect: TRect; // rect in viewport coordinates which contains the canvas
+        let transformMatrix = identity();
         {
             const topLeft = applyToPoint(viewportMat, { x: 0, y: 0 });
             const bottomRight = applyToPoint(viewportMat, {
@@ -155,11 +164,11 @@ export class FxPreviewRenderer {
             this.ctx.save();
             this.ctx.imageSmoothingEnabled = false;
             if (viewportTransform.scaleX > 1) {
-                this.ctx.setTransform(
-                    ...matrixToTuple(createMatrixFromTransform(onUpdateProps.transform)),
-                );
+                transformMatrix = createMatrixFromTransform(onUpdateProps.transform);
+                this.ctx.setTransform(...matrixToTuple(transformMatrix));
             } else {
-                this.ctx.setTransform(...matrixToTuple(inverse(resultTransform)));
+                transformMatrix = inverse(resultTransform);
+                this.ctx.setTransform(...matrixToTuple(transformMatrix));
             }
             this.ctx.drawImage(this.original, 0, 0);
             this.ctx.restore();
@@ -173,12 +182,34 @@ export class FxPreviewRenderer {
             });
             document.body.append(this.canvas);*/
 
-            if (
-                !this.texture ||
-                JSON.stringify(onUpdateProps) !== JSON.stringify(this.oldOnUpdateProps)
-            ) {
-                this.texture && this.texture.destroy();
-                this.texture = this.fxCanvas.texture(this.textureSource);
+            const propsDidChange =
+                JSON.stringify(onUpdateProps) !== JSON.stringify(this.oldOnUpdateProps);
+            if (!this.texture || propsDidChange) {
+                if (this.texture) {
+                    this.texture.loadContentsOf(this.textureSource);
+                } else {
+                    this.texture = this.fxCanvas.texture(this.textureSource);
+                }
+            }
+
+            if (this.selection && (!this.maskTexture || propsDidChange)) {
+                if (!this.maskCanvas) {
+                    this.maskCanvas = BB.canvas(
+                        onUpdateProps.textureWidth,
+                        onUpdateProps.textureHeight,
+                    );
+                } else {
+                    this.maskCanvas.width = onUpdateProps.textureWidth;
+                    this.maskCanvas.height = onUpdateProps.textureHeight;
+                }
+                const ctx = BB.ctx(this.maskCanvas);
+                const transformedSelection = transformMultiPolygon(this.selection, transformMatrix);
+                drawSelectionMask(transformedSelection, ctx);
+                if (this.maskTexture) {
+                    this.maskTexture.loadContentsOf(this.maskCanvas);
+                } else {
+                    this.maskTexture = this.fxCanvas.texture(this.maskCanvas);
+                }
             }
 
             if (!this.postMix) {
@@ -188,16 +219,17 @@ export class FxPreviewRenderer {
         }
         this.oldOnUpdateProps = onUpdateProps;
 
-        const resultFx = this.onUpdate(
-            this.fxCanvas.draw(this.texture),
-            onUpdateProps.transform,
-        ).update();
+        this.onUpdate(this.fxCanvas.draw(this.texture), onUpdateProps.transform);
+        if (this.maskTexture) {
+            this.fxCanvas.mask(this.texture, this.maskTexture);
+        }
+        this.fxCanvas.update();
 
         if (this.postMix) {
             this.ctx.save();
             this.ctx.globalAlpha = this.postMix.opacity;
             this.ctx.globalCompositeOperation = this.postMix.operation;
-            this.ctx.drawImage(resultFx, 0, 0);
+            this.ctx.drawImage(this.fxCanvas, 0, 0);
             this.ctx.restore();
             return {
                 image: this.textureSource,
@@ -206,7 +238,7 @@ export class FxPreviewRenderer {
         }
 
         return {
-            image: resultFx,
+            image: this.fxCanvas,
             transform: resultTransform,
         };
     };
@@ -217,10 +249,13 @@ export class FxPreviewRenderer {
 
     destroy(): void {
         BB.freeCanvas(this.textureSource);
+        this.maskCanvas && BB.freeCanvas(this.maskCanvas);
         if (this.texture) {
             this.texture = this.fxCanvas.texture(this.textureSource);
             this.fxCanvas.draw(this.texture).update();
             this.texture && this.texture.destroy();
         }
+        // I don't remember why the other texture is destroyed differently.
+        this.maskTexture?.destroy();
     }
 }

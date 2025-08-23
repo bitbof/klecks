@@ -1,7 +1,6 @@
 import { BB } from '../../bb/bb';
 import { EVENT_RES_MS } from './filters-consts';
 import { KlSlider } from '../ui/components/kl-slider';
-import { getSharedFx } from '../../fx-canvas/shared-fx';
 import { TFilterApply, TFilterGetDialogParam, TFilterGetDialogResult } from '../kl-types';
 import { LANG } from '../../language/language';
 import { TVector2D } from '../../bb/bb-types';
@@ -13,7 +12,7 @@ import { applyToPoint } from 'transformation-matrix';
 import { DraggableInput } from '../ui/components/draggable-input';
 import { testIsSmall } from '../ui/utils/test-is-small';
 import { getPreviewHeight, getPreviewWidth } from '../ui/utils/preview-size';
-import { canvasToLayerTiles } from '../history/push-helpers/canvas-to-layer-tiles';
+import { applyFxFilter } from './apply-fx-filter';
 
 export type TFilterTiltShiftInput = {
     a: TVector2D;
@@ -69,6 +68,7 @@ export const filterTiltShift = {
                     )
                     .unmultiplyAlpha();
             },
+            selection: klCanvas.getSelection(),
         });
 
         function update() {
@@ -150,6 +150,7 @@ export const filterTiltShift = {
                 height: context.canvas.height,
                 layers: previewLayerArr,
             },
+            selection: klCanvas.getSelection(),
         });
 
         preview.render();
@@ -193,39 +194,16 @@ export const filterTiltShift = {
         if (!context) {
             return false;
         }
-        const fxCanvas = getSharedFx();
-        if (!fxCanvas) {
-            return false; // todo more specific error?
-        }
-        const texture = fxCanvas.texture(context.canvas);
-        fxCanvas
-            .draw(texture)
-            .multiplyAlpha()
-            .tiltShift(a.x, a.y, b.x, b.y, blur, gradient)
-            .unmultiplyAlpha()
-            .update();
-        context.clearRect(0, 0, context.canvas.width, context.canvas.height);
-        context.drawImage(fxCanvas, 0, 0);
-        texture.destroy();
-        {
-            const layerMap = Object.fromEntries(
-                params.klCanvas.getLayers().map((layerItem) => {
-                    if (layerItem.id === params.layer.id) {
-                        return [
-                            layerItem.id,
-                            {
-                                tiles: canvasToLayerTiles(params.layer.canvas),
-                            },
-                        ];
-                    }
-
-                    return [layerItem.id, {}];
-                }),
-            );
-            klHistory.push({
-                layerMap,
-            });
-        }
-        return true;
+        return applyFxFilter(
+            context,
+            params.klCanvas.getSelection(),
+            (fxCanvas) => {
+                fxCanvas
+                    .multiplyAlpha()
+                    .tiltShift(a.x, a.y, b.x, b.y, blur, gradient)
+                    .unmultiplyAlpha();
+            },
+            klHistory,
+        );
     },
 };

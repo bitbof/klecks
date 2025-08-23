@@ -1,5 +1,4 @@
 import { BB } from '../../bb/bb';
-import { getSharedFx } from '../../fx-canvas/shared-fx';
 import { TFilterApply, TFilterGetDialogParam, TFilterGetDialogResult } from '../kl-types';
 import { CurvesInput, getDefaultCurvesInput, TCurvesInput } from './filter-curves/curves-input';
 import { Options } from '../ui/components/options';
@@ -9,7 +8,7 @@ import { Preview } from '../ui/project-viewport/preview';
 import { css } from '@emotion/css/dist/emotion-css.cjs';
 import { testIsSmall } from '../ui/utils/test-is-small';
 import { getPreviewHeight, getPreviewWidth } from '../ui/utils/preview-size';
-import { canvasToLayerTiles } from '../history/push-helpers/canvas-to-layer-tiles';
+import { applyFxFilter } from './apply-fx-filter';
 
 export type TFilterCurvesInput = {
     curves: TCurvesInput;
@@ -41,6 +40,7 @@ export const filterCurves = {
             onUpdate: (fxCanvas) => {
                 return fxCanvas.curves(curves.r, curves.g, curves.b);
             },
+            selection: klCanvas.getSelection(),
         });
 
         const previewLayerArr: TProjectViewportProject['layers'] = [];
@@ -67,6 +67,7 @@ export const filterCurves = {
                 height: context.canvas.height,
                 layers: previewLayerArr,
             },
+            selection: klCanvas.getSelection(),
         });
         preview.getElement().classList.add(
             css({
@@ -109,36 +110,13 @@ export const filterCurves = {
         if (!context) {
             return false;
         }
-        const fxCanvas = getSharedFx();
-        if (!fxCanvas) {
-            return false; // todo more specific error?
-        }
-        const texture = fxCanvas.texture(context.canvas);
-        fxCanvas.draw(texture).curves(curves.r, curves.g, curves.b).update();
-        context.clearRect(0, 0, context.canvas.width, context.canvas.height);
-        context.drawImage(fxCanvas, 0, 0);
-        texture.destroy();
-
-        {
-            const layerMap = Object.fromEntries(
-                params.klCanvas.getLayers().map((layerItem) => {
-                    if (layerItem.id === params.layer.id) {
-                        return [
-                            layerItem.id,
-                            {
-                                tiles: canvasToLayerTiles(params.layer.canvas),
-                            },
-                        ];
-                    }
-
-                    return [layerItem.id, {}];
-                }),
-            );
-            klHistory.push({
-                layerMap,
-            });
-        }
-
-        return true;
+        return applyFxFilter(
+            context,
+            params.klCanvas.getSelection(),
+            (fxCanvas) => {
+                fxCanvas.curves(curves.r, curves.g, curves.b);
+            },
+            klHistory,
+        );
     },
 };

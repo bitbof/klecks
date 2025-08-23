@@ -1,5 +1,4 @@
 import { KlSlider } from '../ui/components/kl-slider';
-import { getSharedFx } from '../../fx-canvas/shared-fx';
 import { TFilterApply, TFilterGetDialogParam, TFilterGetDialogResult } from '../kl-types';
 import { LANG } from '../../language/language';
 import { Preview } from '../ui/project-viewport/preview';
@@ -9,7 +8,7 @@ import { FxPreviewRenderer } from '../ui/project-viewport/fx-preview-renderer';
 import { BB } from '../../bb/bb';
 import { testIsSmall } from '../ui/utils/test-is-small';
 import { getPreviewHeight, getPreviewWidth } from '../ui/utils/preview-size';
-import { canvasToLayerTiles } from '../history/push-helpers/canvas-to-layer-tiles';
+import { applyFxFilter } from './apply-fx-filter';
 
 export type TFilterUnsharpMaskInput = {
     radius: number;
@@ -43,6 +42,7 @@ export const filterUnsharpMask = {
             onUpdate: (fxCanvas, transform) => {
                 return fxCanvas.unsharpMask(radius * transform.scaleX, strength);
             },
+            selection: klCanvas.getSelection(),
         });
 
         function update() {
@@ -116,6 +116,7 @@ export const filterUnsharpMask = {
                 height: context.canvas.height,
                 layers: previewLayerArr,
             },
+            selection: klCanvas.getSelection(),
         });
         update();
         preview.getElement().classList.add(
@@ -151,34 +152,13 @@ export const filterUnsharpMask = {
         if (!context || radius === null || strength === null) {
             return false;
         }
-        const fxCanvas = getSharedFx();
-        if (!fxCanvas) {
-            return false; // todo more specific error?
-        }
-        const texture = fxCanvas.texture(context.canvas);
-        fxCanvas.draw(texture).unsharpMask(radius, strength).update();
-        context.clearRect(0, 0, context.canvas.width, context.canvas.height);
-        context.drawImage(fxCanvas, 0, 0);
-        texture.destroy();
-        {
-            const layerMap = Object.fromEntries(
-                params.klCanvas.getLayers().map((layerItem) => {
-                    if (layerItem.id === params.layer.id) {
-                        return [
-                            layerItem.id,
-                            {
-                                tiles: canvasToLayerTiles(params.layer.canvas),
-                            },
-                        ];
-                    }
-
-                    return [layerItem.id, {}];
-                }),
-            );
-            klHistory.push({
-                layerMap,
-            });
-        }
-        return true;
+        return applyFxFilter(
+            context,
+            params.klCanvas.getSelection(),
+            (fxCanvas) => {
+                fxCanvas.unsharpMask(radius, strength);
+            },
+            klHistory,
+        );
     },
 };

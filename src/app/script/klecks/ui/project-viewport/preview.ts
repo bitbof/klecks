@@ -20,6 +20,8 @@ import { toMetaTransform } from '../../../bb/transform/to-meta-transform';
 import { Options } from '../components/options';
 import { TPointerEvent, TWheelEvent } from '../../../bb/input/event.types';
 import { createMatrixFromTransform } from '../../../bb/transform/create-matrix-from-transform';
+import { MultiPolygon } from 'polygon-clipping';
+import { SelectionRenderer } from '../easel/selection-renderer';
 
 export type TPreviewMode = 'edit' | 'hand';
 
@@ -33,6 +35,7 @@ export type TPreviewParams = {
     padding?: number; //default -> DEFAULT_PADDING
     hasBorder?: boolean; // default true
     editIcon?: string;
+    selection?: MultiPolygon;
 };
 
 const DEFAULT_PADDING = 10;
@@ -57,6 +60,7 @@ export class Preview {
     };
     private readonly modeToggle: Options<TPreviewMode> | undefined;
     private readonly pointerChain: EventChain;
+    private selectionRenderer: SelectionRenderer | undefined;
 
     private renderLoop = (): void => {
         this.animationFrameId = requestAnimationFrame(this.renderLoop);
@@ -65,6 +69,7 @@ export class Preview {
             this.doRender = false;
             this.viewport.render();
             const viewportTransform = this.viewport.getTransform();
+            this.selectionRenderer?.setTransform(viewportTransform);
             if (
                 this.onTransformChange &&
                 JSON.stringify(this.lastEmittedTransform) !== JSON.stringify(viewportTransform)
@@ -302,6 +307,27 @@ export class Preview {
             e.preventDefault();
         });
 
+        const svgRoot = BB.createSvg({
+            elementType: 'svg',
+        });
+        BB.css(svgRoot, {
+            position: 'absolute',
+            left: '0',
+            top: '0',
+            width: '100%',
+            height: '100%',
+            pointerEvents: 'none',
+        });
+        if (p.selection) {
+            this.selectionRenderer = new SelectionRenderer({
+                transform: this.lastEmittedTransform,
+                selection: p.selection,
+                width: this.width,
+                height: this.height,
+            });
+            svgRoot.append(this.selectionRenderer.getElement());
+        }
+
         if (p.hasEditMode) {
             this.modeToggle = new Options<TPreviewMode>({
                 optionArr: (['edit', 'hand'] as const).map((id) => {
@@ -354,6 +380,7 @@ export class Preview {
             },
             [
                 this.viewport.getElement(),
+                svgRoot,
                 ...(this.modeToggle
                     ? [
                           c(',pos-absolute,left-5,top-5,z-1,pointer-auto', [
@@ -449,5 +476,6 @@ export class Preview {
         this.viewportPointerListener.destroy();
         this.rootEl.remove();
         this.modeToggle && this.modeToggle.destroy();
+        this.selectionRenderer?.destroy();
     }
 }

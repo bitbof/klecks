@@ -1,6 +1,5 @@
 import { Options } from '../ui/components/options';
 import { ColorOptions } from '../ui/components/color-options';
-import { getSharedFx } from '../../fx-canvas/shared-fx';
 import { TFilterApply, TFilterGetDialogParam, TFilterGetDialogResult, TRgba } from '../kl-types';
 import { LANG } from '../../language/language';
 import { FxPreviewRenderer } from '../ui/project-viewport/fx-preview-renderer';
@@ -10,7 +9,7 @@ import { TProjectViewportProject } from '../ui/project-viewport/project-viewport
 import { BB } from '../../bb/bb';
 import { testIsSmall } from '../ui/utils/test-is-small';
 import { getPreviewHeight, getPreviewWidth } from '../ui/utils/preview-size';
-import { canvasToLayerTiles } from '../history/push-helpers/canvas-to-layer-tiles';
+import { applyFxFilter } from './apply-fx-filter';
 
 export type TFilterToAlphaInput = {
     sourceId: string;
@@ -42,6 +41,7 @@ export const filterToAlpha = {
             onUpdate: (fxCanvas) => {
                 return fxCanvas.toAlpha(sourceId === 'inverted-luminance', selectedRgbaObj);
             },
+            selection: klCanvas.getSelection(),
         });
 
         // source
@@ -122,6 +122,7 @@ export const filterToAlpha = {
                 height: context.canvas.height,
                 layers: previewLayerArr,
             },
+            selection: klCanvas.getSelection(),
         });
         preview.render();
         preview.getElement().classList.add(
@@ -157,37 +158,13 @@ export const filterToAlpha = {
         if (!context || !sourceId) {
             return false;
         }
-        const fxCanvas = getSharedFx();
-        if (!fxCanvas) {
-            return false; // todo more specific error?
-        }
-        const texture = fxCanvas.texture(context.canvas);
-        fxCanvas
-            .draw(texture)
-            .toAlpha(sourceId === 'inverted-luminance', selectedRgbaObj)
-            .update();
-        context.clearRect(0, 0, context.canvas.width, context.canvas.height);
-        context.drawImage(fxCanvas, 0, 0);
-        texture.destroy();
-        {
-            const layerMap = Object.fromEntries(
-                params.klCanvas.getLayers().map((layerItem) => {
-                    if (layerItem.id === params.layer.id) {
-                        return [
-                            layerItem.id,
-                            {
-                                tiles: canvasToLayerTiles(params.layer.canvas),
-                            },
-                        ];
-                    }
-
-                    return [layerItem.id, {}];
-                }),
-            );
-            klHistory.push({
-                layerMap,
-            });
-        }
-        return true;
+        return applyFxFilter(
+            context,
+            params.klCanvas.getSelection(),
+            (fxCanvas) => {
+                fxCanvas.toAlpha(sourceId === 'inverted-luminance', selectedRgbaObj);
+            },
+            klHistory,
+        );
     },
 };

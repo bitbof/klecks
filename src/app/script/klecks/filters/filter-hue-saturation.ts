@@ -1,6 +1,5 @@
 import { EVENT_RES_MS } from './filters-consts';
 import { KlSlider } from '../ui/components/kl-slider';
-import { getSharedFx } from '../../fx-canvas/shared-fx';
 import { TFilterApply, TFilterGetDialogParam, TFilterGetDialogResult } from '../kl-types';
 import { LANG } from '../../language/language';
 import { FxPreviewRenderer } from '../ui/project-viewport/fx-preview-renderer';
@@ -10,7 +9,7 @@ import { css } from '@emotion/css/dist/emotion-css.cjs';
 import { BB } from '../../bb/bb';
 import { testIsSmall } from '../ui/utils/test-is-small';
 import { getPreviewHeight, getPreviewWidth } from '../ui/utils/preview-size';
-import { canvasToLayerTiles } from '../history/push-helpers/canvas-to-layer-tiles';
+import { applyFxFilter } from './apply-fx-filter';
 
 export type TFilterHueSaturationInput = {
     hue: number;
@@ -44,6 +43,7 @@ export const filterHueSaturation = {
             onUpdate: (fxCanvas) => {
                 return fxCanvas.hueSaturation(hue, saturation);
             },
+            selection: klCanvas.getSelection(),
         });
 
         const hueSlider = new KlSlider({
@@ -100,6 +100,7 @@ export const filterHueSaturation = {
                 height: context.canvas.height,
                 layers: previewLayerArr,
             },
+            selection: klCanvas.getSelection(),
         });
         preview.render();
         preview.getElement().classList.add(
@@ -135,34 +136,13 @@ export const filterHueSaturation = {
         if (!context || hue === null || saturation === null) {
             return false;
         }
-        const fxCanvas = getSharedFx();
-        if (!fxCanvas) {
-            return false; // todo more specific error?
-        }
-        const texture = fxCanvas.texture(context.canvas);
-        fxCanvas.draw(texture).hueSaturation(hue, saturation).update();
-        context.clearRect(0, 0, context.canvas.width, context.canvas.height);
-        context.drawImage(fxCanvas, 0, 0);
-        texture.destroy();
-        {
-            const layerMap = Object.fromEntries(
-                params.klCanvas.getLayers().map((layerItem) => {
-                    if (layerItem.id === params.layer.id) {
-                        return [
-                            layerItem.id,
-                            {
-                                tiles: canvasToLayerTiles(params.layer.canvas),
-                            },
-                        ];
-                    }
-
-                    return [layerItem.id, {}];
-                }),
-            );
-            klHistory.push({
-                layerMap,
-            });
-        }
-        return true;
+        return applyFxFilter(
+            context,
+            params.klCanvas.getSelection(),
+            (fxCanvas) => {
+                fxCanvas.hueSaturation(hue, saturation);
+            },
+            klHistory,
+        );
     },
 };
