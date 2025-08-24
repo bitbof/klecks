@@ -34,7 +34,7 @@ export const brightnessContrast: TFilterBrightnessContrast = function (brightnes
             } else {\
                 color.rgb = (color.rgb - 0.5) * (1.0 + contrast) + 0.5;\
             }\
-            gl_FragColor = color;\
+            gl_FragColor = clamp(color, 0.0, 1.0);\
         }\
     ',
             'brightnessContrast',

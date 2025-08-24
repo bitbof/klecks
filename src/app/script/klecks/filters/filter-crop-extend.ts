@@ -7,6 +7,8 @@ import { TFilterApply, TFilterGetDialogParam, TFilterGetDialogResult, TRgba } fr
 import { LANG } from '../../language/language';
 import { TRect } from '../../bb/bb-types';
 import { SMALL_PREVIEW } from '../ui/utils/preview-size';
+import { integerBounds } from '../../bb/math/math';
+import { getMultiPolyBounds } from '../../bb/multi-polygon/get-multi-polygon-bounds';
 
 export type TFilterCropExtendInput = {
     left: number;
@@ -50,9 +52,24 @@ export const filterCropExtend = {
             maxHeight = params.maxHeight;
         let scale: number = 1;
 
+        const selection = klCanvas.getSelection();
+        let selectionBounds = selection ? integerBounds(getMultiPolyBounds(selection)) : undefined;
+        if (selectionBounds) {
+            const boundsWidth = selectionBounds.x2 - selectionBounds.x1;
+            const boundsHeight = selectionBounds.y2 - selectionBounds.y1;
+            if (boundsWidth <= maxWidth && boundsHeight <= maxHeight) {
+                top = selectionBounds.y1;
+                right = selectionBounds.x2 - klCanvas.getWidth();
+                bottom = selectionBounds.y2 - klCanvas.getHeight();
+                left = selectionBounds.x1;
+            } else {
+                selectionBounds = undefined;
+            }
+        }
+
         // --- input elements ---
         const leftInput = input({
-            init: 0,
+            init: left,
             type: 'number',
             min: -klCanvas.getWidth(),
             max: maxWidth,
@@ -63,7 +80,7 @@ export const filterCropExtend = {
             },
         });
         const rightInput = input({
-            init: 0,
+            init: right,
             type: 'number',
             min: -klCanvas.getWidth(),
             max: maxWidth,
@@ -74,7 +91,7 @@ export const filterCropExtend = {
             },
         });
         const topInput = input({
-            init: 0,
+            init: top,
             type: 'number',
             min: -klCanvas.getHeight(),
             max: maxHeight,
@@ -85,7 +102,7 @@ export const filterCropExtend = {
             },
         });
         const bottomInput = input({
-            init: 0,
+            init: bottom,
             type: 'number',
             min: -klCanvas.getHeight(),
             max: maxHeight,
@@ -351,6 +368,7 @@ export const filterCropExtend = {
             callback: update,
             maxW: maxWidth,
             maxH: maxHeight,
+            init: selectionBounds,
         });
         update(cropper.getTransform());
         offsetWrapper.append(cropper.getElement());

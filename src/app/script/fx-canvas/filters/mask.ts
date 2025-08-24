@@ -6,18 +6,25 @@ import { TFxCanvas, TWrappedTexture } from '../fx-canvas-types';
 /**
  * Mask
  * @description Blends with an unfiltered image using a mask.
- * @param originalTexture original/unfiltered image
  * @param maskTexture mask (grayscale). 0 - unfiltered, 255 - filtered
+ * @param originalTexture original/unfiltered image. undefined -> empty original
  */
 export type TFilterMask = (
     this: TFxCanvas,
-    originalTexture: TWrappedTexture,
     maskTexture: TWrappedTexture,
+    originalTexture?: TWrappedTexture,
 ) => TFxCanvas;
 
-export const mask: TFilterMask = function (originalTexture, maskTexture) {
-    originalTexture._.use(1);
-    maskTexture._.use(2);
+export const mask: TFilterMask = function (maskTexture, originalTexture) {
+    maskTexture._.use(1);
+
+    if (originalTexture) {
+        originalTexture._.use(2);
+    } else {
+        // should be faster than introducing a conditional in the shader
+        this._.extraTexture.use(2);
+        this._.extraTexture.initFromBytes(1, 1, [0, 0, 0, 0]);
+    }
 
     gl.mask =
         gl.mask ||
@@ -25,8 +32,8 @@ export const mask: TFilterMask = function (originalTexture, maskTexture) {
             null,
             `
         uniform sampler2D texture;
-        uniform sampler2D original;
         uniform sampler2D mask;
+        uniform sampler2D original;
         varying vec2 texCoord;
 
         void main() {
@@ -40,8 +47,8 @@ export const mask: TFilterMask = function (originalTexture, maskTexture) {
         );
 
     gl.mask.textures({
-        original: 1,
-        mask: 2,
+        mask: 1,
+        original: 2,
     });
 
     simpleShader.call(this, gl.mask, {});

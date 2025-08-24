@@ -223,6 +223,7 @@ void main() {
 
         // Core methods
         canvas.texture = wrap(texture);
+        canvas.initialize = wrap(initialize);
         canvas.draw = wrap(draw);
         canvas.update = wrap(update);
         canvas.contents = wrap(contents);

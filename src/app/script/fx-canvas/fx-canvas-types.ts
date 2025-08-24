@@ -96,6 +96,11 @@ export type TFxCanvas = HTMLCanvasElement &
         texture: (element: TFxSupportedElements) => TWrappedTexture;
 
         /**
+         * Sets size of canvas. Resets internal state.
+         */
+        initialize: (width: number, height: number) => void;
+
+        /**
          * This replaces the internal contents of the canvas with the image stored in texture. All filter operations take
          * place in a chain that starts with fxCanvas.draw() and ends with fxCanvas.update().
          *

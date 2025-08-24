@@ -1,5 +1,5 @@
 import { BB } from '../../../bb/bb';
-import { TRect, TVector2D } from '../../../bb/bb-types';
+import { TBounds, TRect, TVector2D } from '../../../bb/bb-types';
 import { KeyListener } from '../../../bb/input/key-listener';
 import { PointerListener } from '../../../bb/input/pointer-listener';
 
@@ -77,6 +77,7 @@ export class Cropper {
         maxH: number;
         scale: number; // float, zoom
         callback: (val: TRect) => void;
+        init?: TBounds;
     }) {
         this.x = p.x;
         this.y = p.y;
@@ -192,12 +193,21 @@ export class Cropper {
         const gripSize = 40;
         const gripOverlay = 10;
 
-        this.grips = [
-            { x: 0, y: 0 }, // top left
-            { x: this.width, y: 0 }, // top right
-            { x: this.width, y: this.height }, // bottom right
-            { x: 0, y: this.height }, //bottom left
-        ];
+        if (p.init) {
+            this.grips = [
+                { x: p.init.x1, y: p.init.y1 }, // top left
+                { x: p.init.x2, y: p.init.y1 }, // top right
+                { x: p.init.x2, y: p.init.y2 }, // bottom right
+                { x: p.init.x1, y: p.init.y2 }, //bottom left
+            ];
+        } else {
+            this.grips = [
+                { x: 0, y: 0 }, // top left
+                { x: this.width, y: 0 }, // top right
+                { x: this.width, y: this.height }, // bottom right
+                { x: 0, y: this.height }, //bottom left
+            ];
+        }
 
         const transformTop = (dY: number) => {
             this.grips[0].y += dY;

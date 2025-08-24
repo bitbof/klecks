@@ -21,6 +21,7 @@ export type TFxPreviewRendererParams = {
     onUpdate: (fxCanvas: TFxCanvas, transform: TViewportTransformXY) => TFxCanvas;
     postMix?: TPostMix; // mix the result with the original
     selection?: MultiPolygon;
+    isMaskingWithEmptyOriginal?: boolean;
 };
 
 export class FxPreviewRenderer {
@@ -42,9 +43,10 @@ export class FxPreviewRenderer {
             y: 0,
         },
     };
-    private fxCanvas: TFxCanvas;
+    private readonly fxCanvas: TFxCanvas;
     private postMix: TPostMix | undefined;
-    private selection: MultiPolygon | undefined;
+    private readonly selection: MultiPolygon | undefined;
+    private readonly isMaskingWithEmptyOriginal: boolean;
 
     // ----------------------------------- public -----------------------------------
     constructor(p: TFxPreviewRendererParams) {
@@ -55,6 +57,7 @@ export class FxPreviewRenderer {
         this.fxCanvas = throwIfNull(getSharedFx());
         this.postMix = p.postMix;
         this.selection = p.selection;
+        this.isMaskingWithEmptyOriginal = !!p.isMaskingWithEmptyOriginal;
     }
 
     render: TProjectViewportLayerFunc = (viewportTransform, viewportWidth, viewportHeight) => {
@@ -221,7 +224,10 @@ export class FxPreviewRenderer {
 
         this.onUpdate(this.fxCanvas.draw(this.texture), onUpdateProps.transform);
         if (this.maskTexture) {
-            this.fxCanvas.mask(this.texture, this.maskTexture);
+            this.fxCanvas
+                .multiplyAlpha()
+                .mask(this.maskTexture, this.isMaskingWithEmptyOriginal ? undefined : this.texture)
+                .unmultiplyAlpha();
         }
         this.fxCanvas.update();
 

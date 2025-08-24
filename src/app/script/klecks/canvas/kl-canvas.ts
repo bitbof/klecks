@@ -17,7 +17,7 @@ import { LANG } from '../../language/language';
 import { drawGradient } from '../image-operations/gradient-tool';
 import { TBounds, TRect } from '../../bb/bb-types';
 import { MultiPolygon } from 'polygon-clipping';
-import { compose, identity, Matrix, rotate, translate } from 'transformation-matrix';
+import { compose, identity, Matrix, rotate, scale, translate } from 'transformation-matrix';
 import { getSelectionPath2d } from '../../bb/multi-polygon/get-selection-path-2d';
 import { transformMultiPolygon } from '../../bb/multi-polygon/transform-multi-polygon';
 import { getMultiPolyBounds } from '../../bb/multi-polygon/get-multi-polygon-bounds';
@@ -42,6 +42,7 @@ import { Eyedropper } from './eyedropper';
 import { copyImageDataTile } from '../history/image-data-tile';
 import { randomUuid } from '../../bb/base/base';
 import { getSelectionBounds } from '../select-tool/get-selection-bounds';
+import { translateMultiPolygon } from '../../bb/multi-polygon/translate-multi-polygon';
 
 // TODO remove in 2026
 // workaround for chrome bug https://bugs.chromium.org/p/chromium/issues/detail?id=1281185
@@ -399,6 +400,12 @@ export class KlCanvas {
             throw new Error('unknown resize algorithm');
         }
 
+        if (this.selection) {
+            this.selection = transformMultiPolygon(
+                this.selection,
+                scale(w / this.width, h / this.height),
+            );
+        }
         this.width = w;
         this.height = h;
 
@@ -408,6 +415,7 @@ export class KlCanvas {
                 height: this.height,
             },
             layerMap: createLayerMap(this.layers, { attributes: ['tiles'] }),
+            ...(this.selection ? { selection: { value: this.selection } } : {}),
         });
 
         return true;
@@ -415,7 +423,6 @@ export class KlCanvas {
 
     /**
      * crop / extend
-     * @param p
      */
     resizeCanvas(p: {
         left: number;
@@ -453,12 +460,16 @@ export class KlCanvas {
         this.width = newW;
         this.height = newH;
 
+        if (this.selection) {
+            this.selection = translateMultiPolygon(this.selection, offX, offY);
+        }
         this.klHistory.push({
             size: {
                 width: this.width,
                 height: this.height,
             },
             layerMap: createLayerMap(this.layers, { attributes: ['tiles'] }),
+            ...(this.selection ? { selection: { value: this.selection } } : {}),
         });
     }
 
@@ -831,46 +842,48 @@ export class KlCanvas {
         return 0;
     }
 
+    // rotates the canvas with all layers. either by 90, 180, or 270 degrees
     rotate(deg: number): void {
         while (deg < 0) {
             deg += 360;
         }
         deg %= 360;
-        if (deg % 90 != 0 || deg === 0) {
+        if (deg !== 90 && deg !== 180 && deg !== 270) {
             return;
         }
         const temp = BB.canvas();
-        if (deg === 0 || deg === 180) {
+        if (deg === 180) {
             temp.width = this.width;
             temp.height = this.height;
         } else if (deg === 90 || deg === 270) {
             temp.width = this.height;
             temp.height = this.width;
         }
+        let matrix: Matrix = identity();
+        if (deg === 90) {
+            matrix = compose(translate(this.height, 0), rotate(Math.PI / 2));
+        } else if (deg === 180) {
+            matrix = compose(translate(this.width, this.height), rotate(Math.PI));
+        } else if (deg === 270) {
+            matrix = compose(translate(0, this.width), rotate((3 * Math.PI) / 2));
+        }
         const ctx = BB.ctx(temp);
         for (let i = 0; i < this.layers.length; i++) {
             ctx.clearRect(0, 0, temp.width, temp.height);
             ctx.save();
-            ctx.translate(temp.width / 2, temp.height / 2);
-            ctx.rotate((deg * Math.PI) / 180);
-            if (deg === 180) {
-                ctx.drawImage(this.layers[i].canvas, -temp.width / 2, -temp.height / 2);
-            } else if (deg === 90 || deg === 270) {
-                ctx.drawImage(this.layers[i].canvas, -temp.height / 2, -temp.width / 2);
-            }
+            ctx.setTransform(...matrixToTuple(matrix));
+            ctx.drawImage(this.layers[i].canvas, 0, 0);
+            ctx.restore();
             this.layers[i].canvas.width = temp.width;
             this.layers[i].canvas.height = temp.height;
-            this.layers[i].context.clearRect(
-                0,
-                0,
-                this.layers[i].canvas.width,
-                this.layers[i].canvas.height,
-            );
             this.layers[i].context.drawImage(temp, 0, 0);
-            ctx.restore();
         }
         this.width = temp.width;
         this.height = temp.height;
+
+        if (this.selection) {
+            this.selection = transformMultiPolygon(this.selection, matrix);
+        }
 
         this.klHistory.push({
             size: {
@@ -878,6 +891,7 @@ export class KlCanvas {
                 height: this.height,
             },
             layerMap: createLayerMap(this.layers, { attributes: ['tiles'] }),
+            ...(this.selection ? { selection: { value: this.selection } } : {}),
         });
     }
 
@@ -891,6 +905,12 @@ export class KlCanvas {
         temp.height = this.height;
         const tempCtx = BB.ctx(temp);
 
+        const matrix = compose(
+            translate(temp.width / 2, temp.height / 2),
+            scale(isHorizontal ? -1 : 1, isVertical ? -1 : 1),
+            translate(-temp.width / 2, -temp.height / 2),
+        );
+
         for (let i = 0; i < this.layers.length; i++) {
             if ((layerIndex || layerIndex === 0) && i !== layerIndex) {
                 continue;
@@ -898,9 +918,8 @@ export class KlCanvas {
 
             tempCtx.save();
             tempCtx.clearRect(0, 0, temp.width, temp.height);
-            tempCtx.translate(temp.width / 2, temp.height / 2);
-            tempCtx.scale(isHorizontal ? -1 : 1, isVertical ? -1 : 1);
-            tempCtx.drawImage(this.layers[i].canvas, -temp.width / 2, -temp.height / 2);
+            tempCtx.setTransform(...matrixToTuple(matrix));
+            tempCtx.drawImage(this.layers[i].canvas, 0, 0);
             tempCtx.restore();
 
             this.layers[i].context.clearRect(
@@ -912,6 +931,10 @@ export class KlCanvas {
             this.layers[i].context.drawImage(temp, 0, 0);
         }
 
+        if (this.selection) {
+            this.selection = transformMultiPolygon(this.selection, matrix);
+        }
+
         const targetLayer = layerIndex === undefined ? undefined : this.layers[layerIndex];
         this.klHistory.push({
             layerMap: createLayerMap(
@@ -920,6 +943,7 @@ export class KlCanvas {
                     ? { layerId: targetLayer.id, attributes: ['tiles'] }
                     : { attributes: ['tiles'] },
             ),
+            ...(this.selection ? { selection: { value: this.selection } } : {}),
         });
     }
 

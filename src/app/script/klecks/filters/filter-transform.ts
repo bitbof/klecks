@@ -20,6 +20,8 @@ import { MultiPolygon } from 'polygon-clipping';
 import { TRect } from '../../bb/bb-types';
 import { transformMultiPolygon } from '../../bb/multi-polygon/transform-multi-polygon';
 
+let settingIsTransparentBg = false;
+
 function drawTransform(
     ctx: CanvasRenderingContext2D,
     copiedCanvas: HTMLCanvasElement,
@@ -122,7 +124,7 @@ export const filterTransform = {
         const layers = klCanvas.getLayers();
         const selectedLayerIndex = throwIfNull(klCanvas.getLayerIndex(context.canvas));
 
-        const selection = params.klCanvas.getSelection();
+        const selection = klCanvas.getSelection();
 
         // determine bounds and initial transformation
         const boundsObj = selection
@@ -352,7 +354,7 @@ export const filterTransform = {
             },
             name: 'clone-before-transforming',
         });
-        let isTransparentBg = false;
+        let isTransparentBg = settingIsTransparentBg;
         const transparentBgCheckbox = new Checkbox({
             init: isTransparentBg,
             label: LANG('brush-eraser-transparent-bg'),
@@ -555,6 +557,7 @@ export const filterTransform = {
         };
         result.getInput = function (): TFilterTransformInput {
             const transform = freeTransform.getValue();
+            settingIsTransparentBg = isTransparentBg;
             const input: TFilterTransformInput = {
                 transform,
                 bounds: boundsObj,
@@ -585,7 +588,7 @@ export const filterTransform = {
             copyCanvas,
             input.isPixelated,
             input.transform,
-            params.klCanvas.getSelection(),
+            selection,
             input.bounds,
             input.doClone,
             input.isTransparentBg || selectedLayerIndex > 0,
