@@ -41,8 +41,13 @@ export class GradientTool {
     }
 }
 
-export function drawGradient(ctx: CanvasRenderingContext2D, gradientObj: TGradient): void {
+export function drawGradient(
+    ctx: CanvasRenderingContext2D,
+    gradientObj: TGradient,
+    selectionPath?: Path2D,
+): void {
     ctx.save();
+    selectionPath && ctx.clip(selectionPath);
 
     const x1 = gradientObj.x1;
     const y1 = gradientObj.y1;

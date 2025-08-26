@@ -19,7 +19,7 @@ export type TKlHistoryParams = {
     oldest: THistoryEntryDataComposed;
 };
 
-const HISTORY_DEBUGGING = false;
+const HISTORY_DEBUGGING = true;
 
 export class KlHistory {
     // total number of non-free undo steps

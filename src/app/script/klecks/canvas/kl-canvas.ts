@@ -43,6 +43,7 @@ import { copyImageDataTile } from '../history/image-data-tile';
 import { randomUuid } from '../../bb/base/base';
 import { getSelectionBounds } from '../select-tool/get-selection-bounds';
 import { translateMultiPolygon } from '../../bb/multi-polygon/translate-multi-polygon';
+import { getBinaryMask } from '../select-tool/get-binary-mask';
 
 // TODO remove in 2026
 // workaround for chrome bug https://bugs.chromium.org/p/chromium/issues/detail?id=1281185
@@ -1119,11 +1120,18 @@ export class KlCanvas {
                     : targetCtx.getImageData(0, 0, this.width, this.height);
         }
 
+        const mask = this.selection
+            ? getBinaryMask(this.selection, this.width, this.height)
+            : undefined;
+        const maskTest = (index: number) => {
+            return mask ? mask[index] : true;
+        };
+
         const targetData = targetImageData.data;
         if (rgb) {
             if (opacity === 1) {
                 for (let i = 0; i < this.width * this.height; i++) {
-                    if (result.data[i] === 255) {
+                    if (result.data[i] === 255 && maskTest(i)) {
                         targetData[i * 4] = rgb.r;
                         targetData[i * 4 + 1] = rgb.g;
                         targetData[i * 4 + 2] = rgb.b;
@@ -1132,7 +1140,7 @@ export class KlCanvas {
                 }
             } else {
                 for (let i = 0; i < this.width * this.height; i++) {
-                    if (result.data[i] === 255) {
+                    if (result.data[i] === 255 && maskTest(i)) {
                         targetData[i * 4] = BB.mix(targetData[i * 4], rgb.r, opacity);
                         targetData[i * 4 + 1] = BB.mix(targetData[i * 4 + 1], rgb.g, opacity);
                         targetData[i * 4 + 2] = BB.mix(targetData[i * 4 + 2], rgb.b, opacity);
@@ -1144,13 +1152,13 @@ export class KlCanvas {
             // erase
             if (opacity === 1) {
                 for (let i = 0; i < this.width * this.height; i++) {
-                    if (result.data[i] === 255) {
+                    if (result.data[i] === 255 && maskTest(i)) {
                         targetData[i * 4 + 3] = 0;
                     }
                 }
             } else {
                 for (let i = 0; i < this.width * this.height; i++) {
-                    if (result.data[i] === 255) {
+                    if (result.data[i] === 255 && maskTest(i)) {
                         targetData[i * 4 + 3] = BB.mix(targetData[i * 4 + 3], 0, opacity);
                     }
                 }
@@ -1190,7 +1198,10 @@ export class KlCanvas {
             return;
         }
         const targetLayer = this.layers[layerIndex];
-        const bounds = integerBounds(drawShape(targetLayer.context, shapeObj));
+        const selectionPath = this.selection
+            ? new Path2D(getSelectionPath2d(this.selection))
+            : undefined;
+        const bounds = integerBounds(drawShape(targetLayer.context, shapeObj, selectionPath));
 
         // debug
         /*const ctx = this.layers[layerIndex].context;
@@ -1212,7 +1223,10 @@ export class KlCanvas {
 
     drawGradient(layerIndex: number, gradientObj: TGradient): void {
         const targetLayer = this.layers[layerIndex];
-        drawGradient(targetLayer.context, gradientObj);
+        const selectionPath = this.selection
+            ? new Path2D(getSelectionPath2d(this.selection))
+            : undefined;
+        drawGradient(targetLayer.context, gradientObj, selectionPath);
         if (!this.klHistory.isPaused()) {
             this.klHistory.push({
                 layerMap: createLayerMap(this.layers, {
@@ -1225,7 +1239,11 @@ export class KlCanvas {
 
     text(layerIndex: number, p: TRenderTextParam): void {
         const targetLayer = this.layers[layerIndex];
-        const rect = renderText(targetLayer.canvas, BB.copyObj(p));
+        const rect = renderText(
+            targetLayer.canvas,
+            BB.copyObj(p),
+            this.selection ? new Path2D(getSelectionPath2d(this.selection)) : undefined,
+        );
 
         // add 2, because rect not entirely accurate
         const padding = 2 + (p.stroke ? p.stroke.lineWidth / 2 : 0);

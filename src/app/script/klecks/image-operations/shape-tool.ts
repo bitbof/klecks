@@ -55,7 +55,11 @@ export class ShapeTool {
 /**
  * Draw a shape (rectangle, ellipse, line)
  */
-export function drawShape(ctx: CanvasRenderingContext2D, shapeObj: TShapeToolObject): TBounds {
+export function drawShape(
+    ctx: CanvasRenderingContext2D,
+    shapeObj: TShapeToolObject,
+    selectionPath?: Path2D,
+): TBounds {
     shapeObj = {
         // defaults
         angleRad: 0,
@@ -92,6 +96,7 @@ export function drawShape(ctx: CanvasRenderingContext2D, shapeObj: TShapeToolObj
 
         // --- prep canvas ---
         ctx.save();
+        selectionPath && ctx.clip(selectionPath);
         if (shapeObj.opacity) {
             ctx.globalAlpha = shapeObj.opacity;
         }

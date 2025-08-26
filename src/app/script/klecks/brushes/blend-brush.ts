@@ -1,13 +1,16 @@
 import { BB } from '../../bb/bb';
 import { isLayerFill, TRgb, TRgba } from '../kl-types';
 import { TBounds, TPressureInput } from '../../bb/bb-types';
-import { clamp } from '../../bb/math/math';
+import { boundsOverlap, clamp, integerBounds } from '../../bb/math/math';
 import { BezierLine, TBezierLineCallback } from '../../bb/math/line';
 import { HISTORY_TILE_SIZE, KlHistory } from '../history/kl-history';
 import { getPushableLayerChange } from '../history/push-helpers/get-pushable-layer-change';
 import { copyImageData } from '../utils/copy-image-data';
 import { createArray } from '../../bb/base/base';
 import { createImageDataTile } from '../history/image-data-tile';
+import { getBinaryMask } from '../select-tool/get-binary-mask';
+import { getMultiPolyBounds } from '../../bb/multi-polygon/get-multi-polygon-bounds';
+import { getChangedTiles } from '../history/push-helpers/changed-tiles';
 
 type TDrawBufferItem = {
     x: number;
@@ -53,8 +56,15 @@ export class BlendBrush {
     private cells: (ImageData | undefined)[] = [];
     private drawBuffer: TDrawBufferItem[] = [];
 
+    private selectionBounds: TBounds | undefined;
+    private mask: Uint8Array | undefined;
+
     private updateRedrawBounds(bounds: TBounds): void {
-        this.redrawBounds = BB.updateBounds(this.redrawBounds, bounds);
+        const boundsWithinSelection = boundsOverlap(bounds, this.selectionBounds);
+        if (!boundsWithinSelection) {
+            return;
+        }
+        this.redrawBounds = BB.updateBounds(this.redrawBounds, boundsWithinSelection);
     }
 
     private getCellsWidth(): number {
@@ -188,33 +198,43 @@ export class BlendBrush {
         const x2 = Math.min(this.context.canvas.width - 1, Math.ceil(x + size));
         const y2 = Math.min(this.context.canvas.height - 1, Math.ceil(y + size));
         if (x1 > x2 || y1 > y2) {
-            return {
-                r: 0,
-                g: 0,
-                b: 0,
-                a: 0,
-            };
+            return { r: 0, g: 0, b: 0, a: 0 };
         }
 
         let ar = 0,
             ag = 0,
             ab = 0,
-            aa = 0,
-            alpha;
+            aa = 0;
 
         const slicedBounds = this.sliceBounds({ x1, y1, x2, y2 });
+        const cellsW = this.getCellsWidth();
+
         slicedBounds.forEach((slice) => {
+            const cellOffsetX = (slice.index % cellsW) * HISTORY_TILE_SIZE;
+            const cellOffsetY = Math.floor(slice.index / cellsW) * HISTORY_TILE_SIZE;
             const width = this.cells[slice.index]!.width;
             const data = this.cells[slice.index]!.data;
             const bounds = slice.bounds;
 
-            for (let i = bounds.y1; i <= bounds.y2; i += 4) {
+            for (let i = bounds.y1, globalY = i + cellOffsetY; i <= bounds.y2; i++, globalY++) {
                 for (
-                    let e = bounds.x1, e2 = i * width * 4 + bounds.x1 * 4;
+                    let e = bounds.x1, globalX = e + cellOffsetX, e2 = (i * width + bounds.x1) * 4;
                     e <= bounds.x2;
-                    e += 4, e2 += 4 * 4
+                    e++, globalX++, e2 += 4
                 ) {
-                    alpha = data[e2 + 3];
+                    if (
+                        this.mask &&
+                        this.mask[globalY * this.context.canvas.width + globalX] === 0
+                    ) {
+                        // don't same where the mask is 0
+                        continue;
+                    }
+
+                    const alpha = data[e2 + 3] / 255;
+                    if (alpha === 0) {
+                        continue;
+                    }
+
                     ar += data[e2] * alpha;
                     ag += data[e2 + 1] * alpha;
                     ab += data[e2 + 2] * alpha;
@@ -229,12 +249,7 @@ export class BlendBrush {
             ab /= aa;
             aa = Math.min(1, aa);
         }
-        return {
-            r: ar,
-            g: ag,
-            b: ab,
-            a: aa,
-        };
+        return { r: ar, g: ag, b: ab, a: aa };
     }
 
     private prepDot(x: number, y: number, size: number): TBounds | undefined {
@@ -298,7 +313,8 @@ export class BlendBrush {
             // i - y index within cell
             // e - x index within cell
 
-            // e2 - index in image data
+            // e2 - index in image data (a tile)
+            // mi - index in mask (one mask for the entire image)
 
             // ri - y index within image relative to dot-center
             // re - x index within image relative to dot-center
@@ -310,11 +326,18 @@ export class BlendBrush {
             ) {
                 for (
                     let e = slice.bounds.x1,
-                        e2 = i * cellWidth * 4 + slice.bounds.x1 * 4,
+                        mi =
+                            (i + cellOffsetY) * this.context.canvas.width +
+                            (slice.bounds.x1 + cellOffsetX),
+                        e2 = (i * cellWidth + slice.bounds.x1) * 4,
                         re = e + cellOffsetX - params.x;
                     e <= slice.bounds.x2;
-                    e++, e2 += 4, re++
+                    e++, mi++, e2 += 4, re++
                 ) {
+                    if (this.mask && this.mask[mi] === 0) {
+                        continue;
+                    }
+
                     // O = over -> brush-dot
                     // U = under -> image
 
@@ -593,6 +616,11 @@ export class BlendBrush {
     }
 
     startLine(x: number, y: number, p: number): void {
+        const selection = this.klHistory.getComposed().selection.value;
+        this.selectionBounds = selection ? integerBounds(getMultiPolyBounds(selection)) : undefined;
+        this.mask = selection
+            ? getBinaryMask(selection, this.context.canvas.width, this.context.canvas.height)
+            : undefined;
         const totalCells =
             Math.ceil(this.context.canvas.width / HISTORY_TILE_SIZE) *
             Math.ceil(this.context.canvas.height / HISTORY_TILE_SIZE);
@@ -714,10 +742,22 @@ export class BlendBrush {
         this.drawChangedCells();
 
         if (this.cells.some((item) => item)) {
+            let cells = this.cells;
+            if (this.selectionBounds) {
+                const tilesInSelection = getChangedTiles(
+                    this.selectionBounds,
+                    this.context.canvas.width,
+                    this.context.canvas.height,
+                );
+                cells = cells.map((cell, index) => {
+                    return tilesInSelection[index] ? cell : undefined;
+                });
+            }
+
             this.klHistory.push(
                 getPushableLayerChange(
                     this.klHistory.getComposed(),
-                    this.cells.map((cell) => {
+                    cells.map((cell) => {
                         return cell ? createImageDataTile(cell) : undefined;
                     }),
                 ),
@@ -728,6 +768,11 @@ export class BlendBrush {
 
     drawLineSegment(x1: number, y1: number, x2: number, y2: number): void {
         // todo - should sample more often for blending
+        const selection = this.klHistory.getComposed().selection.value;
+        this.selectionBounds = selection ? integerBounds(getMultiPolyBounds(selection)) : undefined;
+        this.mask = selection
+            ? getBinaryMask(selection, this.context.canvas.width, this.context.canvas.height)
+            : undefined;
         this.lastInput.x = x2;
         this.lastInput.y = y2;
 

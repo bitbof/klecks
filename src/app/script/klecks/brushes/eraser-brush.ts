@@ -8,6 +8,10 @@ import { getPushableLayerChange } from '../history/push-helpers/get-pushable-lay
 import { TBounds } from '../../bb/bb-types';
 import { canvasAndChangedTilesToLayerTiles } from '../history/push-helpers/canvas-to-layer-tiles';
 import { getChangedTiles, updateChangedTiles } from '../history/push-helpers/changed-tiles';
+import { MultiPolygon } from 'polygon-clipping';
+import { getSelectionPath2d } from '../../bb/multi-polygon/get-selection-path-2d';
+import { boundsOverlap, integerBounds } from '../../bb/math/math';
+import { getMultiPolyBounds } from '../../bb/multi-polygon/get-multi-polygon-bounds';
 
 export class EraserBrush {
     private size: number = 30;
@@ -30,7 +34,15 @@ export class EraserBrush {
 
     private changedTiles: boolean[] = [];
 
+    private selection: MultiPolygon | undefined;
+    private selectionPath: Path2D | undefined;
+    private selectionBounds: TBounds | undefined;
+
     private updateChangedTiles(bounds: TBounds) {
+        const boundsWithinSelection = boundsOverlap(bounds, this.selectionBounds);
+        if (!boundsWithinSelection) {
+            return;
+        }
         this.changedTiles = updateChangedTiles(
             this.changedTiles,
             getChangedTiles(bounds, this.context.canvas.width, this.context.canvas.height),
@@ -100,11 +112,14 @@ export class EraserBrush {
             this.drawDot(val.x, val.y, localSize, localOpacity);
         };
 
+        this.context.save();
+        this.selectionPath && this.context.clip(this.selectionPath);
         if (x === undefined || y === undefined) {
             this.bezierLine!.addFinal(bdist, bezierCallback);
         } else {
             this.bezierLine!.add(x, y, bdist, bezierCallback);
         }
+        this.context.restore();
     }
 
     // ----------------------------------- public -----------------------------------
@@ -112,6 +127,11 @@ export class EraserBrush {
 
     // ---- interface ----
     startLine(x: number, y: number, p: number): void {
+        this.selection = this.klHistory.getComposed().selection.value;
+        this.selectionPath = this.selection ? getSelectionPath2d(this.selection) : undefined;
+        this.selectionBounds = this.selection
+            ? integerBounds(getMultiPolyBounds(this.selection))
+            : undefined;
         this.changedTiles = [];
         this.isBaseLayer = 0 === this.layer.index;
 
@@ -123,7 +143,10 @@ export class EraserBrush {
 
         this.started = true;
         if (localSize > 1) {
+            this.context.save();
+            this.selectionPath && this.context.clip(this.selectionPath);
             this.drawDot(x, y, localSize, localOpacity);
+            this.context.restore();
         }
         this.lastDot = localSize * this.spacing;
         this.lastInput.x = x;
@@ -167,6 +190,11 @@ export class EraserBrush {
     }
 
     drawLineSegment(x1: number, y1: number, x2: number, y2: number): void {
+        this.selection = this.klHistory.getComposed().selection.value;
+        this.selectionPath = this.selection ? getSelectionPath2d(this.selection) : undefined;
+        this.selectionBounds = this.selection
+            ? integerBounds(getMultiPolyBounds(this.selection))
+            : undefined;
         this.changedTiles = [];
         this.isBaseLayer = 0 === this.layer.index;
 
@@ -183,9 +211,12 @@ export class EraserBrush {
         let loopDist;
         const bdist = Math.max(1, Math.max(0.5, 1 - this.opacity) * this.size * this.spacing);
         this.lastDot = 0;
+        this.context.save();
+        this.selectionPath && this.context.clip(this.selectionPath);
         for (loopDist = this.lastDot; loopDist <= mouseDist; loopDist += bdist) {
             this.drawDot(x1 + eX * loopDist, y1 + eY * loopDist, this.size, this.opacity);
         }
+        this.context.restore();
 
         if (this.changedTiles.some((item) => item)) {
             this.klHistory.push(

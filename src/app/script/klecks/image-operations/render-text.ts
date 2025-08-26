@@ -65,11 +65,12 @@ function textMetricToRect(metrics: TextMetrics, align: TTextFormat): TRect {
 /**
  * Draws text on a canvas.
  * Return bounds, relative to p.x, p.y.
- *
- * @param canvas
- * @param p
  */
-export function renderText(canvas: HTMLCanvasElement, p: TRenderTextParam): TRect {
+export function renderText(
+    canvas: HTMLCanvasElement,
+    p: TRenderTextParam,
+    selectionPath?: Path2D,
+): TRect {
     p = BB.copyObj(p);
 
     // setup context
@@ -77,6 +78,7 @@ export function renderText(canvas: HTMLCanvasElement, p: TRenderTextParam): TRec
         letterSpacing: string;
     };
     ctx.save();
+    selectionPath && ctx.clip(selectionPath);
     ctx.textAlign = p.align;
     ctx.letterSpacing = p.letterSpacing ? p.letterSpacing + 'px' : '0';
 

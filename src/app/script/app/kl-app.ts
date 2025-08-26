@@ -80,6 +80,7 @@ import { runBrowserStorageBanner } from '../klecks/ui/components/browser-storage
 import { requestPersistentStorage } from '../klecks/storage/request-persistent-storage';
 import { CrossTabChannel } from '../bb/base/cross-tab-channel';
 import { MobileColorUi } from '../klecks/ui/mobile/mobile-color-ui';
+import { getSelectionPath2d } from '../bb/multi-polygon/get-selection-path-2d';
 
 importFilters();
 
@@ -1452,9 +1453,13 @@ export class KlApp {
                     this.klCanvas.setComposite(layerIndex, undefined);
                     this.klCanvas.drawGradient(layerIndex, gradientObj);
                 } else {
+                    const selection = this.klCanvas.getSelection();
+                    const selectionPath = selection
+                        ? new Path2D(getSelectionPath2d(selection))
+                        : undefined;
                     this.klCanvas.setComposite(layerIndex, {
                         draw: (ctx) => {
-                            KL.drawGradient(ctx, gradientObj);
+                            KL.drawGradient(ctx, gradientObj, selectionPath);
                         },
                     });
                 }
@@ -1497,9 +1502,13 @@ export class KlApp {
                     this.klCanvas.setComposite(layerIndex, undefined);
                     this.klCanvas.drawShape(layerIndex, shapeObj);
                 } else {
+                    const selection = this.klCanvas.getSelection();
+                    const selectionPath = selection
+                        ? new Path2D(getSelectionPath2d(selection))
+                        : undefined;
                     this.klCanvas.setComposite(layerIndex, {
                         draw: (ctx) => {
-                            KL.drawShape(ctx, shapeObj);
+                            KL.drawShape(ctx, shapeObj, selectionPath);
                         },
                     });
                 }

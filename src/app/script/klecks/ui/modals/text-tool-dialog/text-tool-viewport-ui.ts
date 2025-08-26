@@ -11,6 +11,7 @@ import toolZoomOutImg from '/src/app/img/ui/tool-zoom-out.svg';
 import { c } from '../../../../bb/base/c';
 import { TVector2D } from '../../../../bb/bb-types';
 import { KeyListener } from '../../../../bb/input/key-listener';
+import { getSelectionPath2d } from '../../../../bb/multi-polygon/get-selection-path-2d';
 
 type TViewportParams = Pick<TRenderTextParam, 'x' | 'y' | 'angleRad'>;
 
@@ -28,6 +29,7 @@ export class TextToolViewportUI {
     private text: TRenderTextParam;
     private offset: TVector2D = { x: 0, y: 0 };
     private interval: ReturnType<typeof setInterval> | undefined;
+    private readonly selectionPath: Path2D | undefined;
 
     private width: number;
     private height: number;
@@ -94,6 +96,8 @@ export class TextToolViewportUI {
         this.rootEl = c();
         this.text = p.text;
         this.layerIndex = p.layerIndex;
+        const selection = p.klCanvas.getSelection();
+        this.selectionPath = selection ? new Path2D(getSelectionPath2d(selection)) : undefined;
 
         const isSmallWidth = window.innerWidth < 550;
         const isSmallHeight = window.innerHeight < 630;
@@ -311,12 +315,27 @@ export class TextToolViewportUI {
 
         // --- draw text ---
         this.textCtx.clearRect(0, 0, this.textCanvas.width, this.textCanvas.height);
-        const bounds = renderText(this.textCanvas, {
-            ...this.text,
-            x: this.text.x,
-            y: this.text.y,
-            angleRad: this.rotationSlider.getValue(),
-        });
+        const bounds = renderText(
+            this.textCanvas,
+            {
+                ...this.text,
+                x: this.text.x,
+                y: this.text.y,
+                angleRad: this.rotationSlider.getValue(),
+            },
+            this.selectionPath,
+        );
+
+        if (this.selectionPath) {
+            this.textCtx.save();
+            this.textCtx.setLineDash([4]);
+            this.textCtx.strokeStyle = '#000';
+            this.textCtx.stroke(this.selectionPath);
+            this.textCtx.lineDashOffset = 4;
+            this.textCtx.strokeStyle = '#fff';
+            this.textCtx.stroke(this.selectionPath);
+            this.textCtx.restore();
+        }
 
         // transform offset
         const transformedOffset = BB.Vec2.mul(

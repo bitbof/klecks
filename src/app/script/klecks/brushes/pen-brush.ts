@@ -7,6 +7,10 @@ import { getPushableLayerChange } from '../history/push-helpers/get-pushable-lay
 import { TBounds } from '../../bb/bb-types';
 import { canvasAndChangedTilesToLayerTiles } from '../history/push-helpers/canvas-to-layer-tiles';
 import { getChangedTiles, updateChangedTiles } from '../history/push-helpers/changed-tiles';
+import { MultiPolygon } from 'polygon-clipping';
+import { getSelectionPath2d } from '../../bb/multi-polygon/get-selection-path-2d';
+import { boundsOverlap, integerBounds } from '../../bb/math/math';
+import { getMultiPolyBounds } from '../../bb/multi-polygon/get-multi-polygon-bounds';
 
 const ALPHA_CIRCLE = 0;
 const ALPHA_CHALK = 1;
@@ -47,10 +51,22 @@ export class PenBrush {
 
     private changedTiles: boolean[] = [];
 
+    private selection: MultiPolygon | undefined;
+    private selectionPath: Path2D | undefined;
+    private selectionBounds: TBounds | undefined;
+
     private updateChangedTiles(bounds: TBounds) {
+        const boundsWithinSelection = boundsOverlap(bounds, this.selectionBounds);
+        if (!boundsWithinSelection) {
+            return;
+        }
         this.changedTiles = updateChangedTiles(
             this.changedTiles,
-            getChangedTiles(bounds, this.context.canvas.width, this.context.canvas.height),
+            getChangedTiles(
+                boundsWithinSelection,
+                this.context.canvas.width,
+                this.context.canvas.height,
+            ),
         );
     }
 
@@ -251,6 +267,12 @@ export class PenBrush {
     // ---- interface ----
 
     startLine(x: number, y: number, p: number): void {
+        this.selection = this.klHistory.getComposed().selection.value;
+        this.selectionPath = this.selection ? getSelectionPath2d(this.selection) : undefined;
+        this.selectionBounds = this.selection
+            ? integerBounds(getMultiPolyBounds(this.selection))
+            : undefined;
+
         this.changedTiles = [];
         p = BB.clamp(p, 0, 1);
         const localOpacity = this.calcOpacity(p);
@@ -263,6 +285,7 @@ export class PenBrush {
 
         this.inputIsDrawing = true;
         this.context.save();
+        this.selectionPath && this.context.clip(this.selectionPath);
         this.drawDot(x, y, localSize, localOpacity, localScatter);
         this.context.restore();
 
@@ -292,6 +315,7 @@ export class PenBrush {
             : Math.max(0.1, this.settingSize);
 
         this.context.save();
+        this.selectionPath && this.context.clip(this.selectionPath);
         this.continueLine(x, y, localSize, this.lastInput.pressure);
 
         /*context.fillStyle = 'red';
@@ -317,6 +341,7 @@ export class PenBrush {
             ? Math.max(0.1, this.lastInput.pressure * this.settingSize)
             : Math.max(0.1, this.settingSize);
         this.context.save();
+        this.selectionPath && this.context.clip(this.selectionPath);
         this.continueLine(null, null, localSize, this.lastInput.pressure);
         this.context.restore();
 
@@ -332,6 +357,7 @@ export class PenBrush {
             });
 
             this.context.save();
+            this.selectionPath && this.context.clip(this.selectionPath);
             const p = BB.clamp(maxInput.pressure, 0, 1);
             const localOpacity = this.calcOpacity(p);
             const localScatter = this.calcScatter(p);
@@ -355,6 +381,11 @@ export class PenBrush {
     }
 
     drawLineSegment(x1: number, y1: number, x2: number, y2: number): void {
+        this.selection = this.klHistory.getComposed().selection.value;
+        this.selectionPath = this.selection ? getSelectionPath2d(this.selection) : undefined;
+        this.selectionBounds = this.selection
+            ? integerBounds(getMultiPolyBounds(this.selection))
+            : undefined;
         this.changedTiles = [];
         this.lastInput.x = x2;
         this.lastInput.y = y2;
@@ -372,6 +403,7 @@ export class PenBrush {
         const bdist = this.settingSize * this.settingSpacing;
         this.lineToolLastDot = this.settingSize * this.settingSpacing;
         this.context.save();
+        this.selectionPath && this.context.clip(this.selectionPath);
         const localScatter = this.calcScatter(1);
         for (loopDist = this.lineToolLastDot; loopDist <= mouseDist; loopDist += bdist) {
             this.drawDot(

@@ -430,16 +430,8 @@ export class SelectUi {
             }
         };
 
-        const wipNote = BB.el({
-            className: 'kl-toolspace-note',
-            textContent: LANG('wip'),
-            css: {
-                marginBottom: '10px',
-            },
-        });
-
         this.rootEl = BB.el({
-            content: [wipNote, this.modeOptions.getElement()],
+            content: [this.modeOptions.getElement()],
             css: {
                 margin: '10px',
             },

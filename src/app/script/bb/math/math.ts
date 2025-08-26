@@ -172,6 +172,27 @@ export function updateBounds(target: TBounds | undefined, bounds: TBounds | unde
     return target;
 }
 
+export function boundsOverlap(
+    bounds: TBounds | undefined,
+    limit: TBounds | undefined,
+): TBounds | undefined {
+    if (!bounds) {
+        return undefined;
+    }
+    if (!limit) {
+        return bounds;
+    }
+    const x1 = Math.max(limit.x1, bounds.x1);
+    const y1 = Math.max(limit.y1, bounds.y1);
+    const x2 = Math.min(limit.x2, bounds.x2);
+    const y2 = Math.min(limit.y2, bounds.y2);
+
+    if (x1 > x2 || y1 > y2) {
+        return undefined;
+    }
+    return { x1, y1, x2, y2 };
+}
+
 /**
  * determine overlap of bounds with width&height
  */
@@ -183,14 +204,7 @@ export function boundsInArea(
     if (!bounds) {
         return undefined;
     }
-    const x1 = Math.max(0, bounds.x1);
-    const y1 = Math.max(0, bounds.y1);
-    const x2 = Math.min(width - 1, bounds.x2);
-    const y2 = Math.min(height - 1, bounds.y2);
-    if (x1 > x2 || y1 > y2) {
-        return undefined;
-    }
-    return { x1, y1, x2, y2 };
+    return boundsOverlap(bounds, { x1: 0, y1: 0, x2: width - 1, y2: height - 1 });
 }
 
 export function intBoundsWithinArea(
@@ -206,6 +220,15 @@ export function intBoundsWithinArea(
         return undefined;
     }
     return { x1, y1, x2, y2 };
+}
+
+export function boundsToRect(bounds: TBounds, areIndices?: boolean): TRect {
+    return {
+        x: bounds.x1,
+        y: bounds.y1,
+        width: bounds.x2 - bounds.x1 + (areIndices ? 1 : 0),
+        height: bounds.y2 - bounds.y1 + (areIndices ? 1 : 0),
+    };
 }
 
 export function integerBounds(bounds: TBounds): TBounds {
