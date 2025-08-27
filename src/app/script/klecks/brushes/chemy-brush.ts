@@ -66,6 +66,9 @@ export class ChemyBrush {
         const boundsWithinSelection = this.selectionBounds
             ? boundsOverlap(bounds, this.selectionBounds)
             : bounds;
+        if (!boundsWithinSelection) {
+            return;
+        }
         this.completeRedrawBounds = BB.updateBounds(
             this.completeRedrawBounds,
             boundsWithinSelection,
