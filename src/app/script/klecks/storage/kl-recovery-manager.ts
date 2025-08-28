@@ -76,9 +76,7 @@ export type TKlRecoveryListener = (
     totalMemoryUsedBytes: number,
 ) => void;
 
-export type TKlRecoveryManagerParams = {
-    // ...
-};
+export type TKlRecoveryManagerParams = object;
 
 /**
  * handles all recovery logic.

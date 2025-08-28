@@ -1,4 +1,5 @@
 {
+  "type": "module",
   "browserslist": [
     "> 0.2%",
     "last 2 versions",
@@ -18,19 +19,16 @@
     "lang:build": "node src/languages/generate.js build"
   },
   "dependencies": {
-    "@emotion/css": "^11.11.2",
-    "@parcel/transformer-glsl": "^2.12.0",
-    "@parcel/transformer-sass": "^2.12.0",
-    "ag-psd": "^20.2.0",
+    "@emotion/css": "^11.13.5",
+    "@parcel/transformer-glsl": "^2.15.4",
+    "@parcel/transformer-sass": "^2.15.4",
+    "ag-psd": "^28.2.2",
     "buffer": "^6.0.3",
-    "js-beautify": "^1.15.1",
+    "js-beautify": "^1.15.4",
     "json5": "^2.2.3",
     "mdn-polyfills": "^5.20.0",
-    "parcel": "^2.12.0",
+    "parcel": "^2.15.4",
     "polygon-clipping": "^0.15.7",
-    "transformation-matrix": "^2.16.1"
-  },
-  "devDependencies": {
-    "process": "^0.11.10"
+    "transformation-matrix": "^3.1.0"
   }
 }

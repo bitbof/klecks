@@ -1,7 +1,7 @@
 import { BB } from '../../../../bb/bb';
 import { TVector2D } from '../../../../bb/bb-types';
 import { TPointerEvent } from '../../../../bb/input/event.types';
-import fillImg from '/src/app/img/ui/cursor-fill.png';
+import fillImg from 'url:/src/app/img/ui/cursor-fill.png';
 import { createMatrixFromTransform } from '../../../../bb/transform/create-matrix-from-transform';
 import { applyToPoint, inverse } from 'transformation-matrix';
 import { TEaselInterface, TEaselTool } from '../easel.types';

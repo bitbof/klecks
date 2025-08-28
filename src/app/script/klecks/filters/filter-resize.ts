@@ -1,7 +1,7 @@
 import { BB } from '../../bb/bb';
 import { Checkbox } from '../ui/components/checkbox';
 import { Select } from '../ui/components/select';
-import constrainImg from '/src/app/img/ui/constrain.svg';
+import constrainImg from 'url:/src/app/img/ui/constrain.svg';
 import { TFilterApply, TFilterGetDialogParam, TFilterGetDialogResult } from '../kl-types';
 import { LANG } from '../../language/language';
 import { table } from '../ui/components/table';

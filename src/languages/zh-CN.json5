@@ -929,6 +929,11 @@
     original: 'Layer is empty.',
     value: '图层为空'
   },
+  'filter-transform-empty-selection': {
+    hint: 'nothing on the layer, in selected area (via select tool), just transparency',
+    original: 'Layer is empty in selected area.',
+    value: ''
+  },
   'filter-transform-title': {
     hint: 'same as the button, but can be longer',
     original: 'Transform',

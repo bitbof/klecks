@@ -326,7 +326,7 @@ export function newImageDialog(p: {
         function hcf(u: number, v: number): number {
             let U = u,
                 V = v;
-            // eslint-disable-next-line no-constant-condition
+             
             while (true) {
                 if (!(U %= V)) {
                     return V;

@@ -13,9 +13,7 @@ import {
     KL_INDEXED_DB_STORES,
     KL_INDEXED_DB_UPGRADER,
     KL_INDEXED_DB_VERSION,
-    setKlIndexedDbName,
 } from './klecks/storage/kl-indexed-db';
-import { KL_CONFIG } from './klecks/kl-config';
 import { KlRecoveryManager } from './klecks/storage/kl-recovery-manager';
 
 function showInitError(e: Error): void {

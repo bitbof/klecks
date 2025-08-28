@@ -1,6 +1,6 @@
 import { BB } from '../../../bb/bb';
 import { LANG } from '../../../language/language';
-import iconImg from '/src/app/img/ui/brush-pressure.svg';
+import iconImg from 'url:/src/app/img/ui/brush-pressure.svg';
 import { BoxToggle } from './box-toggle';
 
 /**

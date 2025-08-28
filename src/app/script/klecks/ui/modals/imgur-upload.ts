@@ -2,7 +2,7 @@ import { BB } from '../../../bb/bb';
 import { KL } from '../../kl';
 import { KlCanvas } from '../../canvas/kl-canvas';
 import { LANG } from '../../../language/language';
-import loadingImg from '/src/app/img/ui/loading.gif';
+import loadingImg from 'url:/src/app/img/ui/loading.gif';
 import { canvasToBlob } from '../../../bb/base/canvas';
 
 type TImgurUploadResponse = {

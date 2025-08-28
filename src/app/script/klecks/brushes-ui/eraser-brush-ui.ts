@@ -4,7 +4,7 @@ import { EVENT_RES_MS } from './brushes-consts';
 import { KlSlider } from '../ui/components/kl-slider';
 import { createPenPressureToggle } from '../ui/components/create-pen-pressure-toggle';
 import { Checkbox } from '../ui/components/checkbox';
-import brushIconImg from '/src/app/img/ui/brush-eraser.svg';
+import brushIconImg from 'url:/src/app/img/ui/brush-eraser.svg';
 import { TBrushUi } from '../kl-types';
 import { LANG, LANGUAGE_STRINGS } from '../../language/language';
 import { EraserBrush } from '../brushes/eraser-brush';

@@ -53,9 +53,7 @@ type TGetResultItem = {
     status: 'success' | 'error';
 };
 
-export type TIndexedDbParams = {
-    // ...
-};
+export type TIndexedDbParams = object;
 
 export class IndexedDb {
     private dbVersion: number = -1;

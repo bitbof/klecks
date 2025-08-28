@@ -1,6 +1,6 @@
 import { BB } from '../../../bb/bb';
 
-import removeLayerImg from '/src/app/img/ui/remove-layer.svg';
+import removeLayerImg from 'url:/src/app/img/ui/remove-layer.svg';
 import { TKlProject } from '../../kl-types';
 import { ProjectStore, TProjectStoreListener } from '../../storage/project-store';
 import { KL } from '../../kl';

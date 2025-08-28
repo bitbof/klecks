@@ -1,17 +1,17 @@
 import { BB } from '../../../bb/bb';
 import { Options } from '../components/options';
-import modeSelectImg from '/src/app/img/ui/select-mode-select.svg';
-import modeMoveImg from '/src/app/img/ui/select-mode-move.svg';
+import modeSelectImg from 'url:/src/app/img/ui/select-mode-select.svg';
+import modeMoveImg from 'url:/src/app/img/ui/select-mode-move.svg';
 import { c } from '../../../bb/base/c';
 import { TBooleanOperation, TSelectShape } from '../../select-tool/select-tool';
-import defaultImSvg from '/src/app/img/ui/select-default.svg';
-import unionImSvg from '/src/app/img/ui/select-union.svg';
-import subtractImSvg from '/src/app/img/ui/select-subtract.svg';
-import rectSvg from '/src/app/img/ui/select-shape-rect.svg';
-import ellipseSvg from '/src/app/img/ui/select-shape-ellipse.svg';
-import lassoSvg from '/src/app/img/ui/select-shape-lasso.svg';
-import polySvg from '/src/app/img/ui/select-shape-poly.svg';
-import removeLayerImg from '/src/app/img/ui/remove-layer.svg';
+import defaultImSvg from 'url:/src/app/img/ui/select-default.svg';
+import unionImSvg from 'url:/src/app/img/ui/select-union.svg';
+import subtractImSvg from 'url:/src/app/img/ui/select-subtract.svg';
+import rectSvg from 'url:/src/app/img/ui/select-shape-rect.svg';
+import ellipseSvg from 'url:/src/app/img/ui/select-shape-ellipse.svg';
+import lassoSvg from 'url:/src/app/img/ui/select-shape-lasso.svg';
+import polySvg from 'url:/src/app/img/ui/select-shape-poly.svg';
+import removeLayerImg from 'url:/src/app/img/ui/remove-layer.svg';
 import { Select } from '../components/select';
 import { LANG } from '../../../language/language';
 import { Checkbox } from '../components/checkbox';
@@ -397,6 +397,9 @@ export class SelectUi {
                 p.transform.onMoveToLayer(+val);
             },
             name: 'move-to-layer',
+            css: {
+                width: '100%',
+            },
         });
 
         transformModeEl.append(

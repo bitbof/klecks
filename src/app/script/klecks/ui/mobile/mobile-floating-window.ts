@@ -2,7 +2,7 @@ import { BB } from '../../../bb/bb';
 import { TVector2D } from '../../../bb/bb-types';
 import { clamp } from '../../../bb/math/math';
 import { LANG } from '../../../language/language';
-import cancelImg from '/src/app/img/ui/cancel.svg';
+import cancelImg from 'url:/src/app/img/ui/cancel.svg';
 import { PointerListener } from '../../../bb/input/pointer-listener';
 
 export type TMobileFloatingWindowParams = {

@@ -426,7 +426,7 @@ export class KlAppImportHandler {
         let hasUnsupportedFile = false;
         // files need to be copied, because the input is reset
         const fileArr = [...files];
-        // eslint-disable-next-line no-cond-assign
+         
         for (let i = 0; i < fileArr.length; i++) {
             const file = fileArr[i];
             const fileType = await detectFiletype(file);

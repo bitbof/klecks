@@ -3,11 +3,11 @@ import { TRenderTextParam, TTextFormat } from '../../../image-operations/render-
 import { Input } from '../../components/input';
 import { LANG } from '../../../../language/language';
 import { ImageRadioList } from '../../components/image-radio-list';
-import alignLeftImg from '/src/app/img/ui/align-left.svg';
-import alignCenterImg from '/src/app/img/ui/align-center.svg';
-import alignRightImg from '/src/app/img/ui/align-right.svg';
-import typoItalicImg from '/src/app/img/ui/typo-italic.svg';
-import typoBoldImg from '/src/app/img/ui/typo-bold.svg';
+import alignLeftImg from 'url:/src/app/img/ui/align-left.svg';
+import alignCenterImg from 'url:/src/app/img/ui/align-center.svg';
+import alignRightImg from 'url:/src/app/img/ui/align-right.svg';
+import typoItalicImg from 'url:/src/app/img/ui/typo-italic.svg';
+import typoBoldImg from 'url:/src/app/img/ui/typo-bold.svg';
 import { ImageToggle } from '../../components/image-toggle';
 import { Select } from '../../components/select';
 import { c } from '../../../../bb/base/c';

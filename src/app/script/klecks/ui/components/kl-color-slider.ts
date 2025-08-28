@@ -1,7 +1,7 @@
 import { BB } from '../../../bb/bb';
 import { HexColorDialog } from '../modals/color-slider-hex-dialog';
 import { calcSliderFalloffFactor } from './slider-falloff';
-import eyedropperImg from '/src/app/img/ui/tool-picker.svg';
+import eyedropperImg from 'url:/src/app/img/ui/tool-picker.svg';
 import { LANG } from '../../../language/language';
 import { TRgb } from '../../kl-types';
 import { HSV, RGB } from '../../../bb/color/color';

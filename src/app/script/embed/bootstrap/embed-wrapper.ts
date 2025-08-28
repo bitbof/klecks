@@ -1,6 +1,6 @@
 import { Embed, TEmbedParams, TReadPSD } from '../../main-embed';
 import { TKlProject, TKlProjectWithOptionalId } from '../../klecks/kl-types';
-import logoImg from '/src/app/img/klecks-logo.png';
+import logoImg from 'url:/src/app/img/klecks-logo.png';
 import { getEmbedUrl } from './get-embed-url';
 import { initLANG, LANG } from '../../language/language';
 import { THEME } from '../../theme/theme';

@@ -3,7 +3,7 @@ import { DIALOG_COUNTER } from '../modal-count';
 import { BB } from '../../../../bb/bb';
 import { LANG } from '../../../../language/language';
 import './scroll-fix';
-import cancelImg from '/src/app/img/ui/cancel.svg';
+import cancelImg from 'url:/src/app/img/ui/cancel.svg';
 
 /**
  * popup that fill whole height, with some padding.

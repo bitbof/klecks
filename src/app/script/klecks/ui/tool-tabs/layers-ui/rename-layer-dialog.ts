@@ -1,7 +1,7 @@
 import { BB } from '../../../../bb/bb';
 import { LANG } from '../../../../language/language';
 import { showModal } from '../../modals/base/showModal';
-import removeLayerImg from '/src/app/img/ui/remove-layer.svg';
+import removeLayerImg from 'url:/src/app/img/ui/remove-layer.svg';
 
 export function renameLayerDialog(
     parentEl: HTMLElement,

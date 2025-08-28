@@ -1,6 +1,6 @@
 import { BB } from '../../../bb/bb';
 import { LANG } from '../../../language/language';
-import eyedropperImg from '/src/app/img/ui/tool-picker.svg';
+import eyedropperImg from 'url:/src/app/img/ui/tool-picker.svg';
 import { BoxToggle } from '../components/box-toggle';
 import { Icon } from '../components/icon';
 import { TRgb } from '../../kl-types';

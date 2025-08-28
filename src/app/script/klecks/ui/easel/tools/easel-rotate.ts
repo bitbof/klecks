@@ -8,9 +8,7 @@ import { createTransform } from '../../../../bb/transform/create-transform';
 import { TEaselInterface, TEaselTool, TEaselToolTrigger } from '../easel.types';
 import { minimizeAngleDeg } from '../../../../bb/math/math';
 
-export type TEaselRotateParams = {
-    /* */
-};
+export type TEaselRotateParams = object;
 
 export class EaselRotate implements TEaselTool {
     private readonly svgEl: SVGElement;

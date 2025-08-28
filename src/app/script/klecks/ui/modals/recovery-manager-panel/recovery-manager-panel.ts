@@ -11,7 +11,7 @@ import { showModal } from '../base/showModal';
 import { copyCanvas } from '../../../../bb/base/canvas';
 import * as classes from './recovery-manager-panel.module.scss';
 import { LANG } from '../../../../language/language';
-import removeLayerImg from '/src/app/img/ui/remove-layer.svg';
+import removeLayerImg from 'url:/src/app/img/ui/remove-layer.svg';
 
 export type TRecoveryManagerPanelParams = {
     klRecoveryManager: KlRecoveryManager;

@@ -277,11 +277,11 @@
   'layers-clear': {
     hint: 'to make a layer empty',
     original: 'Clear layer',
-    value: 'Effacer le calque',
+    value: 'Effacer le calque'
   },
   'layers-merge-all': {
     original: 'Merge all',
-    value: 'Tout fusionner',
+    value: 'Tout fusionner'
   },
   'layers-rename': {
     hint: 'action',
@@ -445,7 +445,7 @@
   'file-show-save-dialog': {
     hint: 'setting for showing/not showing a dialog where user picks folder and filename',
     original: 'Show save dialog',
-    value: 'Afficher le dialogue de sauvegarde',
+    value: 'Afficher le dialogue de sauvegarde'
   },
   'file-copy': {
     hint: 'verb',
@@ -928,6 +928,11 @@
     hint: 'nothing on the layer, just transparency',
     original: 'Layer is empty.',
     value: 'Le calque est vide.'
+  },
+  'filter-transform-empty-selection': {
+    hint: 'nothing on the layer, in selected area (via select tool), just transparency',
+    original: 'Layer is empty in selected area.',
+    value: ''
   },
   'filter-transform-title': {
     hint: 'same as the button, but can be longer',
@@ -1492,7 +1497,7 @@
   },
   'select-transform-empty': {
     original: 'Selected area on active layer is empty.',
-    value: 'La zone sélectionnée sur le calque actif est vide.',
+    value: 'La zone sélectionnée sur le calque actif est vide.'
   },
   'save-reminder-title': {
     hint: 'Save Reminder is a popup that shows up after 20 minutes of not saving. Allows user to save on the spot.',

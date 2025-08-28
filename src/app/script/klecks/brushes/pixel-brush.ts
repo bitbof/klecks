@@ -348,7 +348,7 @@ export class PixelBrush {
         const sY = y0 < y1 ? 1 : -1;
         let err = dX + dY;
 
-        // eslint-disable-next-line no-constant-condition
+         
         while (true) {
             if (skipFirst) {
                 skipFirst = false;

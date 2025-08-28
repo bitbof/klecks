@@ -13,12 +13,12 @@ import { throwIfNull } from '../../../../bb/base/base';
 import { HAS_POINTER_EVENTS } from '../../../../bb/base/browser';
 import { c } from '../../../../bb/base/c';
 import { DropdownMenu } from '../../components/dropdown-menu';
-import addLayerImg from '/src/app/img/ui/add-layer.svg';
-import duplicateLayerImg from '/src/app/img/ui/duplicate-layer.svg';
-import mergeLayerImg from '/src/app/img/ui/merge-layers.svg';
-import removeLayerImg from '/src/app/img/ui/remove-layer.svg';
-import renameLayerImg from '/src/app/img/ui/rename-layer.svg';
-import caretDownImg from '/src/app/img/ui/caret-down.svg';
+import addLayerImg from 'url:/src/app/img/ui/add-layer.svg';
+import duplicateLayerImg from 'url:/src/app/img/ui/duplicate-layer.svg';
+import mergeLayerImg from 'url:/src/app/img/ui/merge-layers.svg';
+import removeLayerImg from 'url:/src/app/img/ui/remove-layer.svg';
+import renameLayerImg from 'url:/src/app/img/ui/rename-layer.svg';
+import caretDownImg from 'url:/src/app/img/ui/caret-down.svg';
 import { KlHistory } from '../../../history/kl-history';
 
 const paddingLeft = 25;

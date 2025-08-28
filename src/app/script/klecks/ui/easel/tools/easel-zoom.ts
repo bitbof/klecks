@@ -1,6 +1,6 @@
 import { BB } from '../../../../bb/bb';
 import { TPointerEvent } from '../../../../bb/input/event.types';
-import zoomEwImg from '/src/app/img/ui/cursor-zoom-ew.png';
+import zoomEwImg from 'url:/src/app/img/ui/cursor-zoom-ew.png';
 import { TVector2D } from '../../../../bb/bb-types';
 import { TViewportTransform } from '../../project-viewport/project-viewport';
 import { applyToPoint, inverse } from 'transformation-matrix';

@@ -4,9 +4,7 @@ import { TPointerEvent, TPointerType } from '../../../../bb/input/event.types';
 import { TEaselInterface, TEaselTool, TEaselToolTrigger } from '../easel.types';
 import { InertiaScrolling } from '../inertia-scrolling';
 
-export type TEaselHandParams = {
-    /* */
-};
+export type TEaselHandParams = object;
 
 export class EaselHand implements TEaselTool {
     private readonly svgEl: SVGElement;

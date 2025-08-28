@@ -1,10 +1,11 @@
 // generates app/languages/...
-const fs = require('fs');
-const JSON5 = require('json5');
-const beautify = require('js-beautify').js;
-const path = require('path');
+import fs from 'fs';
+import JSON5 from 'json5';
+import jsBeautify from 'js-beautify';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
-const JSON_INDENT_SIZE = 2;
+export const JSON_INDENT_SIZE = 2;
 
 /**
  * A translation (not base)
@@ -20,7 +21,7 @@ const JSON_INDENT_SIZE = 2;
  * @param {KLBase} base
  * @returns {KLTranslation}
  */
-function addNewLanguage(base) {
+export function addNewLanguage(base) {
     const lang = JSON.parse(JSON.stringify(base));
     const keys = Object.keys(lang);
     keys.forEach((item) => {
@@ -40,14 +41,15 @@ function addNewLanguage(base) {
     return lang;
 }
 
-function syncLanguages() {}
+export function syncLanguages() {}
 
 /**
  *
  * @param {KLBase} baseEn
- * @param {KLTranslation[]}translations
+ * @param {KLTranslation[]} translations
+ * @param {boolean} showMissing
  */
-function buildLanguages(baseEn, translations) {
+export function buildLanguages(baseEn, translations, showMissing) {
     /**
      * @type {{name:string,"name-english":string,"iso-639-1":string}[]}
      */
@@ -124,13 +126,17 @@ export type TTranslationCode = `;
     }
 
     // translations
+    let hasMissing = false;
     translations.forEach((translation) => {
         const json = {};
         const keys = Object.keys(translation.data);
         const baseKeys = Object.keys(baseEn);
+        const missingMessages = [];
         baseKeys.forEach((key) => {
             if (!keys.includes(key)) {
-                console.log(`${translation.code}: Key "${key}" not in "${translation.code}".`);
+                missingMessages.push(
+                    `${translation.code}: Key "${key}" not in "${translation.code}".`,
+                );
             }
         });
         keys.forEach((key) => {
@@ -149,25 +155,37 @@ export type TTranslationCode = `;
                         `${translation.code}: Original not matching base for key "${key}".`,
                     );
                 } else if (item.value === '' || item.value === undefined || item.value === null) {
-                    console.log(`${translation.code}: Value empty for key "${key}".`);
+                    missingMessages.push(`${translation.code}: Value empty for key "${key}".`);
                 }
                 return;
             }
-            /*if (typeof item.value === 'string' && item.value.length > item.original.length + 10) {
-                const d = item.value.length - item.original.length;
-                console.log(`${translation.code}: "${key}"'s value longer than original by ${d} characters.`);
-            }*/
             json[key] = item.value;
         });
         fs.writeFileSync(`./src/app/languages/${translation.code}.json`, JSON.stringify(json));
+        if (showMissing) {
+            missingMessages.forEach((message) => {
+                console.log(message);
+            });
+        } else if (missingMessages.length > 0) {
+            hasMissing = true;
+            console.log(
+                `${translation.code}: ${missingMessages.length} keys missing their translation.`,
+            );
+        }
     });
+    if (hasMissing) {
+        console.log('Show missing translations by adding "-- --missing" to the command.');
+    }
+    console.log(
+        `\x1b[32m\u2714 Generated/updated ${translations.length + 2} files in "src/app/languages"\x1b[0m`,
+    );
 }
 
 /**
  * @param {string} code
  * @returns {void}
  */
-function cmdAdd(code) {
+export function cmdAdd(code) {
     if (!code) {
         console.log('error: argument missing for language code (ISO 639-1).');
         process.exit(1);
@@ -181,21 +199,21 @@ function cmdAdd(code) {
         JSON5.parse(fs.readFileSync('./src/languages/_base-en.json5', { encoding: 'utf-8' })),
         code,
     );
-    fs.writeFileSync(path, beautify(JSON5.stringify(lang), { indent_size: JSON_INDENT_SIZE }));
+    fs.writeFileSync(path, jsBeautify.js(JSON5.stringify(lang), { indent_size: JSON_INDENT_SIZE }));
     console.log('Created: ' + path);
 }
 
 /**
  * @returns {void}
  */
-function cmdSync() {
+export function cmdSync() {
     console.log('not implemented');
 }
 
 /**
  * @return {string[]}
  */
-function getCodes() {
+export function getCodes() {
     const codes = [];
     fs.readdirSync('./src/languages').forEach((file) => {
         if (file === '_base-en.json5') {
@@ -211,7 +229,7 @@ function getCodes() {
 /**
  * @returns {void}
  */
-function cmdBuild() {
+export function cmdBuild(showMissing) {
     const translations = [];
     const codes = getCodes();
     codes.forEach((code) => {
@@ -225,27 +243,20 @@ function cmdBuild() {
     buildLanguages(
         JSON5.parse(fs.readFileSync('./src/languages/_base-en.json5', { encoding: 'utf-8' })),
         translations,
+        showMissing,
     );
 }
 
-// --- exports ---
-exports.addNewLanguage = addNewLanguage;
-exports.syncLanguages = syncLanguages;
-exports.buildLanguages = buildLanguages;
-exports.cmdAdd = cmdAdd;
-exports.cmdSync = cmdSync;
-exports.getCodes = getCodes;
-exports.cmdBuild = cmdBuild;
-exports.JSON_INDENT_SIZE = JSON_INDENT_SIZE;
-
 // --- cli ---
+const __filename = fileURLToPath(import.meta.url);
 if (process.argv[1] === __filename) {
     if (process.argv[2] === 'add') {
         cmdAdd(process.argv[3]);
     } else if (process.argv[2] === 'sync') {
         cmdSync();
     } else if (process.argv[2] === 'build') {
-        cmdBuild();
+        const showMissing = process.argv.includes('--missing');
+        cmdBuild(showMissing);
     } else if (!process.argv[2]) {
         console.log('add argument "add <code>", "sync", or "build".');
     } else {

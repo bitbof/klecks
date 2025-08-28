@@ -1,5 +1,5 @@
 import { BB } from '../../../bb/bb';
-import rotateImg from '/src/app/img/ui/cursor-rotate.png';
+import rotateImg from 'url:/src/app/img/ui/cursor-rotate.png';
 import { KeyListener } from '../../../bb/input/key-listener';
 import { TVector2D } from '../../../bb/bb-types';
 import { PointerListener } from '../../../bb/input/pointer-listener';

@@ -4,7 +4,7 @@ import { EVENT_RES_MS } from './brushes-consts';
 import { Checkbox } from '../ui/components/checkbox';
 import { BRUSHES } from '../brushes/brushes';
 import { KlSlider } from '../ui/components/kl-slider';
-import brushIconImg from '/src/app/img/ui/brush-blend.svg';
+import brushIconImg from 'url:/src/app/img/ui/brush-blend.svg';
 import { TBrushUi } from '../kl-types';
 import { LANG, LANGUAGE_STRINGS } from '../../language/language';
 import { BlendBrush } from '../brushes/blend-brush';

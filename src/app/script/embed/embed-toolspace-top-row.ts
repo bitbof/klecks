@@ -1,6 +1,6 @@
 import { BB } from '../bb/bb';
-import uiSwapImg from '/src/app/img/ui/ui-swap-lr.svg';
-import helpImg from '/src/app/img/ui/help.svg';
+import uiSwapImg from 'url:/src/app/img/ui/ui-swap-lr.svg';
+import helpImg from 'url:/src/app/img/ui/help.svg';
 import { LANG } from '../language/language';
 import { PointerListener } from '../bb/input/pointer-listener';
 

@@ -1,5 +1,5 @@
 /* --- entrypoint for embed ---*/
-@import 'style';
+@use 'style';
 
 :root {
     --kl-color-hover: #0946e9;

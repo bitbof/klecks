@@ -1,5 +1,5 @@
 import { BB } from '../../../bb/bb';
-import collapseImg from '/src/app/img/ui/ui-collapse.svg';
+import collapseImg from 'url:/src/app/img/ui/ui-collapse.svg';
 import { LANG } from '../../../language/language';
 import { TUiLayout } from '../../kl-types';
 

@@ -54,8 +54,6 @@ export class Input {
             },
         });
 
-        this.input.type;
-
         this.type = p.type ?? 'text';
         try {
             this.input.type = this.type;

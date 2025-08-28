@@ -155,7 +155,7 @@ export const filterPerspective = {
         update();
         result.destroy = (): void => {
             preview.destroy();
-            texture.destroy;
+            texture.destroy();
             beforeInputs.forEach((item) => item.destroy());
             afterInputs.forEach((item) => item.destroy());
         };

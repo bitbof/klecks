@@ -7,7 +7,7 @@ import { applyToPoint, inverse } from 'transformation-matrix';
 import { createMatrixFromTransform } from '../../../bb/transform/create-matrix-from-transform';
 import { clamp } from '../../../bb/math/math';
 import { LANG } from '../../../language/language';
-import editCropImg from '/src/app/img/ui/edit-crop.svg';
+import editCropImg from 'url:/src/app/img/ui/edit-crop.svg';
 import { EventChain } from '../../../bb/input/event-chain/event-chain';
 import { OnePointerLimiter } from '../../../bb/input/event-chain/one-pointer-limiter';
 import { TChainElement } from '../../../bb/input/event-chain/event-chain.types';
