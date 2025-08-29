@@ -67,5 +67,9 @@ export async function saveAs(
     a.href = objectUrl;
 
     setTimeout(() => URL.revokeObjectURL(objectUrl), 40 /* sec */ * 1000);
-    setTimeout(() => a.click(), 1);
+    setTimeout(() => {
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+    }, 1);
 }
