@@ -560,8 +560,8 @@ export class SmudgeBrush {
                 0,
                 this.redrawBounds.x1,
                 this.redrawBounds.y1,
-                this.redrawBounds.x2 - this.redrawBounds.x1 - 1,
-                this.redrawBounds.y2 - this.redrawBounds.y1 - 1,
+                this.redrawBounds.x2 - this.redrawBounds.x1,
+                this.redrawBounds.y2 - this.redrawBounds.y1,
             );
             this.updateCompleteRedrawBounds(
                 this.redrawBounds.x1,
@@ -596,8 +596,8 @@ export class SmudgeBrush {
                 0,
                 this.redrawBounds.x1,
                 this.redrawBounds.y1,
-                this.redrawBounds.x2 - this.redrawBounds.x1 - 1,
-                this.redrawBounds.y2 - this.redrawBounds.y1 - 1,
+                this.redrawBounds.x2 - this.redrawBounds.x1,
+                this.redrawBounds.y2 - this.redrawBounds.y1,
             );
             this.updateCompleteRedrawBounds(
                 this.redrawBounds.x1,

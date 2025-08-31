@@ -1398,8 +1398,8 @@ export class KlCanvas {
         return this.eyedropper.getColorAt(x, y, this.klHistory.getComposed());
     }
 
-    getCompleteCanvas(factor: number): HTMLCanvasElement {
-        return drawProject(this.getProject(), factor);
+    getCompleteCanvas(factor: number, maskSelection?: boolean): HTMLCanvasElement {
+        return drawProject(this.getProject(), factor, maskSelection ? this.selection : undefined);
     }
 
     getProject(): TKlProject {

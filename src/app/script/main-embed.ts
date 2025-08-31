@@ -58,7 +58,7 @@ export class Embed {
                 },
             });
 
-            this.loadingScreenEl && void this.loadingScreenEl.remove();
+            void this.loadingScreenEl?.remove();
             this.loadingScreenEl = null;
             this.loadingScreenTextEl = null;
 

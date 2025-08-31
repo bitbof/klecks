@@ -509,6 +509,7 @@ renaming keys across language files:
     hint: 'Cropping is a common feature in image editing.',
     value: 'Crop',
   },
+  "cropcopy-mask": "Mask unselected",
   "cropcopy-click-hold": "Right-click or press hold to copy.",
   "cropcopy-btn-copy": {
     "hint": "confirmation button. Should be short.",

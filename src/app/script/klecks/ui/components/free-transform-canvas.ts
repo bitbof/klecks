@@ -21,6 +21,7 @@ export class FreeTransformCanvas {
     private readonly previewLayerArr: TProjectViewportProject['layers'];
     private readonly preview: Preview;
     private readonly previewCanvas: HTMLCanvasElement;
+    private algorithm: 'pixelated' | 'smooth' = 'smooth';
 
     private updatePreview(): void {
         const transform = this.freeTransform.getValue();
@@ -33,11 +34,12 @@ export class FreeTransformCanvas {
             this.layers[this.transformIndex].image,
             transform,
             undefined,
-            BB.testShouldPixelate(
-                transform,
-                transform.width / this.initTransform.width,
-                transform.height / this.initTransform.height,
-            ),
+            this.algorithm === 'pixelated' ||
+                BB.testShouldPixelate(
+                    transform,
+                    transform.width / this.initTransform.width,
+                    transform.height / this.initTransform.height,
+                ),
         );
         ctx.restore();
         this.preview.render();
@@ -177,6 +179,11 @@ export class FreeTransformCanvas {
         this.updatePreview();
     }
 
+    setAlgorithm(algo: 'pixelated' | 'smooth'): void {
+        this.algorithm = algo;
+        this.updatePreview();
+    }
+
     /**
      * gives you the transformation in the original scale
      */
@@ -186,10 +193,13 @@ export class FreeTransformCanvas {
 
     getIsPixelated(): boolean {
         const transform = this.freeTransform.getValue();
-        return BB.testShouldPixelate(
-            transform,
-            transform.width / this.initTransform.width,
-            transform.height / this.initTransform.height,
+        return (
+            this.algorithm === 'pixelated' ||
+            BB.testShouldPixelate(
+                transform,
+                transform.width / this.initTransform.width,
+                transform.height / this.initTransform.height,
+            )
         );
     }
 

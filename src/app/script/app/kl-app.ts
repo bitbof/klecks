@@ -952,13 +952,13 @@ export class KlApp {
                 }
                 if (comboStr === 'shift+e') {
                     event.preventDefault();
-                    currentBrushUi.toggleEraser && currentBrushUi.toggleEraser();
+                    currentBrushUi.toggleEraser?.();
                 } else if (comboStr === 'e') {
                     event.preventDefault();
                     applyUncommitted();
                     this.easel.setTool('brush');
                     this.toolspaceToolRow.setActive('brush');
-                    mainTabRow && mainTabRow.open('brush');
+                    mainTabRow?.open('brush');
                     updateMainTabVisibility();
                     brushTabRow.open('eraserBrush');
                 }
@@ -968,7 +968,7 @@ export class KlApp {
                     const prevMode = this.easel.getTool();
                     this.easel.setTool('brush');
                     this.toolspaceToolRow.setActive('brush');
-                    mainTabRow && mainTabRow.open('brush');
+                    mainTabRow?.open('brush');
                     updateMainTabVisibility();
                     brushTabRow.open(prevMode === 'brush' ? getNextBrushId() : currentBrushId);
                 }
@@ -979,7 +979,7 @@ export class KlApp {
                         this.easel.getTool() === 'paintBucket' ? 'gradient' : 'paintBucket';
                     this.easel.setTool(newMode);
                     this.toolspaceToolRow.setActive(newMode);
-                    mainTabRow && mainTabRow.open(newMode);
+                    mainTabRow?.open(newMode);
                     updateMainTabVisibility();
                 }
                 if (comboStr === 't') {
@@ -987,7 +987,7 @@ export class KlApp {
                     applyUncommitted();
                     this.easel.setTool('text');
                     this.toolspaceToolRow.setActive('text');
-                    mainTabRow && mainTabRow.open('text');
+                    mainTabRow?.open('text');
                     updateMainTabVisibility();
                 }
                 if (comboStr === 'u') {
@@ -995,7 +995,7 @@ export class KlApp {
                     applyUncommitted();
                     this.easel.setTool('shape');
                     this.toolspaceToolRow.setActive('shape');
-                    mainTabRow && mainTabRow.open('shape');
+                    mainTabRow?.open('shape');
                     updateMainTabVisibility();
                 }
                 if (comboStr === 'l') {
@@ -1003,7 +1003,7 @@ export class KlApp {
                     applyUncommitted();
                     this.easel.setTool('select');
                     this.toolspaceToolRow.setActive('select');
-                    mainTabRow && mainTabRow.open('select');
+                    mainTabRow?.open('select');
                     updateMainTabVisibility();
                 }
                 if (comboStr === 'x') {
@@ -1239,7 +1239,7 @@ export class KlApp {
                 } else {
                     throw new Error('unknown activeStr');
                 }
-                mainTabRow && mainTabRow.open(activeStr);
+                mainTabRow?.open(activeStr);
                 updateMainTabVisibility();
                 this.klColorSlider.setIsEyedropping(false);
                 this.mobileColorUi.setIsEyedropping(false);
@@ -1543,7 +1543,7 @@ export class KlApp {
         this.layerPreview = new KL.LayerPreview({
             klRootEl: this.rootEl,
             onClick: () => {
-                mainTabRow && mainTabRow.open('layers');
+                mainTabRow?.open('layers');
             },
             uiState: this.uiLayout,
             klHistory: this.klHistory,
@@ -1633,7 +1633,9 @@ export class KlApp {
         const copyToClipboard = (showCrop: boolean = false, closeOnBlur: boolean = true) => {
             KL.clipboardDialog(
                 this.rootEl,
-                this.klCanvas.getCompleteCanvas(1),
+                (maskSelection) => {
+                    return this.klCanvas.getCompleteCanvas(1, maskSelection);
+                },
                 (inputObj) => {
                     if (
                         inputObj.left === 0 &&
@@ -1657,6 +1659,7 @@ export class KlApp {
                 this.statusOverlay,
                 showCrop || false,
                 closeOnBlur,
+                this.klCanvas.getSelection(),
             );
         };
 

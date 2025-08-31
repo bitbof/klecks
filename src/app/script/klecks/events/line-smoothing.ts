@@ -32,8 +32,8 @@ export class LineSmoothing {
 
     chainIn(event: TDrawEvent): TDrawEvent | null {
         event = BB.copyObj(event);
-        this.timeout && clearTimeout(this.timeout);
-        this.interval && clearInterval(this.interval);
+        clearTimeout(this.timeout);
+        clearInterval(this.interval);
 
         if (event.type === 'down') {
             this.lastMixedInput = {
@@ -75,7 +75,7 @@ export class LineSmoothing {
                             pressure: event.pressure,
                         };
 
-                        this.chainOut && this.chainOut(event);
+                        this.chainOut?.(event);
                     }, 35);
                 }, 80);
             }

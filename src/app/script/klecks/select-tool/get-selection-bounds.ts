@@ -15,6 +15,7 @@ export function getSelectionBounds(
         selectionBounds,
         context.canvas.width,
         context.canvas.height,
+        true,
     );
 
     // selection area outside of canvas

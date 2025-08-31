@@ -211,11 +211,12 @@ export function intBoundsWithinArea(
     bounds: TBounds,
     width: number,
     height: number,
+    areIndices?: boolean,
 ): TBounds | undefined {
     const x1 = Math.max(0, Math.floor(bounds.x1));
     const y1 = Math.max(0, Math.floor(bounds.y1));
-    const x2 = Math.min(width - 1, Math.ceil(bounds.x2));
-    const y2 = Math.min(height - 1, Math.ceil(bounds.y2));
+    const x2 = Math.min(width - (areIndices ? 1 : 0), Math.ceil(bounds.x2));
+    const y2 = Math.min(height - (areIndices ? 1 : 0), Math.ceil(bounds.y2));
     if (x1 > x2 || y1 > y2) {
         return undefined;
     }

@@ -12,6 +12,7 @@ import { EventChain } from '../../../bb/input/event-chain/event-chain';
 import { OnePointerLimiter } from '../../../bb/input/event-chain/one-pointer-limiter';
 import { TChainElement } from '../../../bb/input/event-chain/event-chain.types';
 import { canvasToBlob } from '../../../bb/base/canvas';
+import { TProjectViewportProject } from '../project-viewport/project-viewport';
 
 export type TCropCopyParams = {
     // size of dom element
@@ -29,6 +30,9 @@ export type TCropCopyParams = {
     // If true, renders cropped area as invisible image on top.
     // You can't right-click on a canvas and copy it in Firefox.
     enableRightClickCopy: boolean;
+
+    // initial crop rect
+    init?: TRect;
 };
 
 /**
@@ -46,11 +50,12 @@ export class CropCopy {
     private croppedObjectUrl: string;
     private readonly keyListener: KeyListener;
     private readonly pointerListener: PointerListener;
-    private readonly canvas: HTMLImageElement | HTMLCanvasElement;
+    private canvas: HTMLImageElement | HTMLCanvasElement;
     private readonly onChange: undefined | ((width: number, height: number) => void);
     private readonly selectionRectEl: HTMLElement;
     private readonly preview: Preview;
     private mode: TPreviewMode = 'edit';
+    private previewLayer: TProjectViewportProject['layers'][number];
 
     private resetCrop(): void {
         this.cropRect = {
@@ -129,7 +134,11 @@ export class CropCopy {
         }
         this.canvas = p.canvas;
 
-        this.resetCrop();
+        if (p.init) {
+            this.cropRect = p.init;
+        } else {
+            this.resetCrop();
+        }
 
         const isInsideSelectionRect = (p: TVector2D): boolean => {
             return BB.isInsideRect(p, this.getViewportSelectionRect());
@@ -151,21 +160,20 @@ export class CropCopy {
         this.rootEl.append(this.eventTarget);
         this.updateCroppedCanvas();
 
+        this.previewLayer = {
+            image: p.canvas,
+            opacity: 1,
+            isVisible: true,
+            mixModeStr: 'source-over',
+            hasClipping: false,
+        };
         this.preview = new Preview({
             width: p.width,
             height: p.height - 2, // subtract border
             project: {
                 width: p.canvas.width,
                 height: p.canvas.height,
-                layers: [
-                    {
-                        image: p.canvas,
-                        opacity: 1,
-                        isVisible: true,
-                        mixModeStr: 'source-over',
-                        hasClipping: false,
-                    },
-                ],
+                layers: [this.previewLayer],
             },
             hasEditMode: true,
             onModeChange: (mode) => {
@@ -405,6 +413,13 @@ export class CropCopy {
     // image/png blob
     getCroppedBlob(): Blob {
         return this.croppedBlob;
+    }
+
+    setCanvas(canvas: HTMLCanvasElement): void {
+        this.canvas = canvas;
+        this.previewLayer.image = canvas;
+        this.updateCroppedCanvas();
+        this.preview.render();
     }
 
     destroy(): void {

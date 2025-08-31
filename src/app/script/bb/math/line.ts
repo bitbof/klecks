@@ -269,7 +269,7 @@ export class BezierLine {
             this.lastDot = d - len;
         } else {
             this.lastDot = 0;
-            controlsCallback && controlsCallback({ p1: p1, p2: p2, p3: p3, p4: p4 });
+            controlsCallback?.({ p1: p1, p2: p2, p3: p3, p4: p4 });
         }
 
         this.lastSpacing = spacing;

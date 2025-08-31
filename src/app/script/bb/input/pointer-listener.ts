@@ -443,7 +443,7 @@ export class PointerListener {
                 this.didSkip = false;
 
                 const outEvent = this.createPointerOutEvent('pointermove', correctedEvent);
-                this.onPointerCallback && this.onPointerCallback(outEvent);
+                this.onPointerCallback?.(outEvent);
             };
 
             this.onPointerDown = (event: PointerEvent, onSkipGlobal?: boolean) => {
@@ -487,7 +487,7 @@ export class PointerListener {
                     },
                 );
 
-                this.onPointerCallback && this.onPointerCallback(outEvent);
+                this.onPointerCallback?.(outEvent);
             };
 
             this.windowOnPointerMove = (event: PointerEvent) => {
@@ -519,7 +519,7 @@ export class PointerListener {
                         downPageX: dragObj.downPageX,
                         downPageY: dragObj.downPageY,
                     });
-                    this.onPointerCallback && this.onPointerCallback(outEvent);
+                    this.onPointerCallback?.(outEvent);
                     return;
                 }
 
@@ -545,7 +545,7 @@ export class PointerListener {
                 dragObj.lastPageY = correctedEvent.pageY;
                 dragObj.lastTimeStamp = correctedEvent.timeStamp;
 
-                this.onPointerCallback && this.onPointerCallback(outEvent);
+                this.onPointerCallback?.(outEvent);
             };
 
             this.windowOnPointerUp = (event: PointerEvent) => {
@@ -570,7 +570,7 @@ export class PointerListener {
                     downPageX: dragObj.downPageX,
                     downPageY: dragObj.downPageY,
                 });
-                this.onPointerCallback && this.onPointerCallback(outEvent);
+                this.onPointerCallback?.(outEvent);
             };
 
             this.windowOnPointerLeave = (event: PointerEvent) => {
@@ -596,7 +596,7 @@ export class PointerListener {
                     downPageX: dragObj.downPageX,
                     downPageY: dragObj.downPageY,
                 });
-                this.onPointerCallback && this.onPointerCallback(outEvent);
+                this.onPointerCallback?.(outEvent);
             };
 
             this.targetElement.addEventListener(
@@ -699,12 +699,12 @@ export class PointerListener {
         if (this.onEnterLeaveCallback) {
             this.onPointerEnter = () => {
                 this.isOverCounter++;
-                this.onEnterLeaveCallback && this.onEnterLeaveCallback(true);
+                this.onEnterLeaveCallback?.(true);
             };
 
             this.onPointerLeave = () => {
                 this.isOverCounter--;
-                this.onEnterLeaveCallback && this.onEnterLeaveCallback(false);
+                this.onEnterLeaveCallback?.(false);
             };
 
             this.targetElement.addEventListener(

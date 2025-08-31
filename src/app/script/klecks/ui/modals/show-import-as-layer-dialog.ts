@@ -6,6 +6,7 @@ import { TKlBasicLayer } from '../../kl-types';
 import { LANG } from '../../../language/language';
 import { testIsSmall } from '../utils/test-is-small';
 import { getPreviewHeight, getPreviewWidth } from '../utils/preview-size';
+import { Select } from '../components/select';
 
 export function showImportAsLayerDialog(params: {
     target: HTMLElement;
@@ -68,7 +69,26 @@ export function showImportAsLayerDialog(params: {
             freeTransformCanvas.setTransformCenter();
         },
     });
-    buttonRowEl.append(originalSizeBtn, fitSizeBtn, centerBtn);
+    const algorithmSelect = new Select({
+        isFocusable: true,
+        optionArr: [
+            ['smooth', LANG('algorithm-smooth')],
+            ['pixelated', LANG('algorithm-pixelated')],
+        ],
+        initValue: 'smooth',
+        title: LANG('scaling-algorithm'),
+        onChange: (val): void => {
+            freeTransformCanvas.setAlgorithm(val);
+        },
+        name: 'interpolation-algorithm',
+    });
+    buttonRowEl.append(
+        originalSizeBtn,
+        fitSizeBtn,
+        centerBtn,
+        BB.el({ css: { flexGrow: '1' } }),
+        algorithmSelect.getElement(),
+    );
     div.append(buttonRowEl);
 
     const layers: TKlBasicLayer[] = [];

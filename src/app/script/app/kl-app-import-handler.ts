@@ -426,7 +426,7 @@ export class KlAppImportHandler {
         let hasUnsupportedFile = false;
         // files need to be copied, because the input is reset
         const fileArr = [...files];
-         
+
         for (let i = 0; i < fileArr.length; i++) {
             const file = fileArr[i];
             const fileType = await detectFiletype(file);
@@ -575,7 +575,7 @@ export class KlAppImportHandler {
                                         );
                                     }
                                 } catch (e) {
-                                    closeLoader && closeLoader();
+                                    closeLoader?.();
                                     KL.popup({
                                         target: this.klRootEl,
                                         type: 'error',
@@ -589,7 +589,7 @@ export class KlAppImportHandler {
                                 }
                             })
                             .catch((e) => {
-                                closeLoader && closeLoader();
+                                closeLoader?.();
                                 alert('Error: failed to load PSD library');
                             });
                     };

@@ -3,15 +3,22 @@ import { showModal } from './base/showModal';
 import { CropCopy } from '../components/crop-copy';
 import { LANG } from '../../../language/language';
 import { StatusOverlay } from '../components/status-overlay';
-import { TCropRect } from '../../../bb/bb-types';
+import { TCropRect, TRect } from '../../../bb/bb-types';
+import { MultiPolygon } from 'polygon-clipping';
+import { boundsToRect, intBoundsWithinArea, integerBounds } from '../../../bb/math/math';
+import { getMultiPolyBounds } from '../../../bb/multi-polygon/get-multi-polygon-bounds';
+import { Checkbox } from '../components/checkbox';
+
+let maskSelection = false;
 
 export function clipboardDialog(
     parent: HTMLElement,
-    fullCanvas: HTMLCanvasElement,
+    getFullCanvas: (maskSelection?: boolean) => HTMLCanvasElement,
     cropCallback: (crop: TCropRect) => void,
     output: StatusOverlay,
     showCropButton: boolean,
     closeOnBlur: boolean = true,
+    selection?: MultiPolygon,
 ): void {
     let clipboardItemIsSupported: boolean = false;
     try {
@@ -23,21 +30,45 @@ export function clipboardDialog(
     const div = document.createElement('div');
     const isSmall = window.innerWidth < 550 || window.innerHeight < 550;
 
+    const maskToggle = selection
+        ? new Checkbox({
+              init: maskSelection,
+              label: LANG('cropcopy-mask'),
+              name: 'check-mask-selection',
+              css: {
+                  width: 'fit-content',
+              },
+              callback: (b) => {
+                  maskSelection = b;
+                  cropCopy.setCanvas(getFullCanvas(b));
+              },
+          })
+        : undefined;
     const topWrapper = BB.el({
-        content:
+        content: [
+            maskToggle?.getElement(),
             LANG('crop-drag-to-crop') +
-            (clipboardItemIsSupported ? '' : '<br>' + LANG('cropcopy-click-hold')),
+                (clipboardItemIsSupported ? '' : '<br>' + LANG('cropcopy-click-hold')),
+        ],
         css: {
             textAlign: 'center',
         },
     });
     div.append(topWrapper);
 
+    const fullCanvas = getFullCanvas(maskSelection);
+    let init: TRect | undefined;
+    if (selection) {
+        const bounds = getMultiPolyBounds(selection);
+        const boundsInCanvas = intBoundsWithinArea(bounds, fullCanvas.width, fullCanvas.height);
+        init = boundsInCanvas ? boundsToRect(boundsInCanvas) : undefined;
+    }
     const cropCopy = new CropCopy({
         width: isSmall ? 340 : 540,
         height: isSmall ? 300 : 350,
         canvas: fullCanvas,
         enableRightClickCopy: true,
+        init,
     });
     BB.css(cropCopy.getElement(), {
         marginTop: '10px',
@@ -74,7 +105,7 @@ export function clipboardDialog(
     let closeFunc: () => void;
     function blur() {
         if (closeOnBlur) {
-            closeFunc && closeFunc();
+            closeFunc?.();
         }
     }
     window.addEventListener('blur', blur);
