@@ -748,6 +748,10 @@
     original: 'Crop',
     value: 'Vág'
   },
+  'cropcopy-mask': {
+    original: 'Mask unselected',
+    value: ''
+  },
   'cropcopy-click-hold': {
     original: 'Right-click or press hold to copy.',
     value: 'Kattintson a jobb gombbal, vagy nyomja meg a tartást a másoláshoz.'

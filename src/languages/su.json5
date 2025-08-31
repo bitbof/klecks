@@ -748,6 +748,10 @@
     original: 'Crop',
     value: 'Pamotongan'
   },
+  'cropcopy-mask': {
+    original: 'Mask unselected',
+    value: ''
+  },
   'cropcopy-click-hold': {
     original: 'Right-click or press hold to copy.',
     value: 'Klik-katuhu atawa pencét tahan pikeun nyalin.'
