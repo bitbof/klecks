@@ -70,6 +70,7 @@ renaming keys across language files:
     "hint": "when hovering the caret on the tool button",
     "value": "More Tools",
   },
+  "tool-more-tools-click-again": "Click again for more tools",
 
 
   "undo": 'Undo',

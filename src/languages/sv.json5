@@ -79,6 +79,10 @@
     original: 'More Tools',
     value: 'Fler verktyg'
   },
+  'tool-more-tools-click-again': {
+    original: 'Click again for more tools',
+    value: ''
+  },
   undo: {
     original: 'Undo',
     value: 'Ångra'

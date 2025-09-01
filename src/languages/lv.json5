@@ -79,6 +79,10 @@
     original: 'More Tools',
     value: 'Vairāk rīku'
   },
+  'tool-more-tools-click-again': {
+    original: 'Click again for more tools',
+    value: ''
+  },
   undo: {
     original: 'Undo',
     value: 'Atsaukt'
