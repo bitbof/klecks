@@ -31,7 +31,7 @@
   'tab-edit': {
     hint: 'label for a tab that offer filters for making color adjustments, cropping, transforming, etc.',
     original: 'Edit',
-    value: 'Изменить'
+    value: 'Изменение'
   },
   'tab-file': {
     hint: 'label for a tab that lets user save the image, import, upload, etc.',
@@ -85,7 +85,7 @@
   },
   redo: {
     original: 'Redo',
-    value: 'Повторить действие'
+    value: 'Повтор'
   },
   'brush-pen': {
     hint: 'Generic "brush" that feels a bit like a pen or marker, as opposed to a paint brush.',
@@ -219,7 +219,7 @@
   'mci-copy': {
     hint: 'verb',
     original: 'Copy',
-    value: 'Скопировать'
+    value: 'Копировать'
   },
   'modal-ok': {
     hint: 'main confirmation button in dialogs. Can be to confirm an action, not just acknowledge information.',
@@ -445,12 +445,12 @@
   'file-show-save-dialog': {
     hint: 'setting for showing/not showing a dialog where user picks folder and filename',
     original: 'Show save dialog',
-    value: ''
+    value: 'Диалоговое окно сохранения'
   },
   'file-copy': {
     hint: 'verb',
     original: 'Copy',
-    value: 'Скопировать'
+    value: 'Копировать'
   },
   'file-copy-title': {
     original: 'Copy To Clipboard',
@@ -458,7 +458,7 @@
   },
   'file-paste': {
     original: 'Paste',
-    value: ''
+    value: 'Вставить'
   },
   'file-share': {
     hint: 'Common feature on phones. Pressing share button allows to send data to a different app, e.g. as a text message to someone.',
@@ -493,15 +493,15 @@
   'file-storage-open': {
     hint: 'verb. to open, or to load',
     original: 'Open',
-    value: ''
+    value: 'Открыть'
   },
   'file-storage-open-confirmation': {
     original: 'This image is already open in another tab. Open it here too?',
-    value: ''
+    value: 'Это изображение уже открыто в другой вкладке. Открыть его и здесь?'
   },
   'file-storage-open-failed': {
     original: 'Failed to load.',
-    value: ''
+    value: 'Не удалось загрузить.'
   },
   'file-storage-clear': {
     original: 'Clear',
@@ -523,7 +523,7 @@
   },
   'file-storage-overwrite-confirm': {
     original: 'Overwrite Browser Storage? Overwritten data will be permanently deleted.',
-    value: ''
+    value: 'Перезаписать хранилище браузера? Перезаписанные данные будут удалены безвозвратно.'
   },
   'file-storage-min-ago': {
     hint: "{x} <- needs to stay, it's a placeholder.",
@@ -583,39 +583,39 @@
   'tab-recovery-recover-tabs': {
     hint: 'allows user to recover browser tabs (including the drawing) of this app.',
     original: 'Recover closed tabs',
-    value: ''
+    value: 'Восстановить закрытые вкладки'
   },
   'tab-recovery-explanation': {
     original: 'Recovery data is only kept for a little while. Save to ensure your work is not lost.',
-    value: ''
+    value: 'Восстановленные данные хранятся недолго. Сохраните их для гарантии, что ваша работа не будет потеряна.'
   },
   'tab-recovery-total-quota-label': {
     original: 'Total:',
-    value: ''
+    value: 'Всего:'
   },
   'tab-recovery-empty': {
     original: 'Nothing to recover.',
-    value: ''
+    value: 'Восстанавливать нечего.'
   },
   'tab-recovery-recover': {
     original: 'Recover',
-    value: ''
+    value: 'Восстановить'
   },
   'tab-recovery-delete': {
     original: 'Delete',
-    value: ''
+    value: 'Удалить'
   },
   'tab-recovery-delete-confirmation': {
     original: 'Delete this recovery? Deletion can not be undone.',
-    value: ''
+    value: 'Удалить это восстановление? Удаление невозможно отменить.'
   },
   'tab-recovery-failed-to-recover': {
     original: 'Failed to recover tab.',
-    value: ''
+    value: 'Не удалось восстановить вкладку.'
   },
   'tab-recovery-recovered': {
     original: 'Tab recovered.',
-    value: ''
+    value: 'Вкладка восстановлена.'
   },
   'cleared-layer': {
     hint: 'the layer has been cleared. It is now empty',
@@ -750,7 +750,7 @@
   },
   'cropcopy-mask': {
     original: 'Mask unselected',
-    value: ''
+    value: 'Выделение с маски убрано'
   },
   'cropcopy-click-hold': {
     original: 'Right-click or press hold to copy.',
@@ -833,7 +833,7 @@
   'filter-triangle-blur': {
     hint: 'or just blur',
     original: 'Triangle Blur',
-    value: 'Треуг. размытие'
+    value: 'Геометр. размытие'
   },
   'filter-unsharp-mask': {
     hint: 'or just sharpen, https://en.wikipedia.org/wiki/Unsharp_masking',
@@ -936,7 +936,7 @@
   'filter-transform-empty-selection': {
     hint: 'nothing on the layer, in selected area (via select tool), just transparency',
     original: 'Layer is empty in selected area.',
-    value: ''
+    value: 'Слой в выделенной области пуст.'
   },
   'filter-transform-title': {
     hint: 'same as the button, but can be longer',
@@ -1075,11 +1075,11 @@
   'filter-triangle-blur-title': {
     hint: 'same as the button, but can be longer',
     original: 'Triangle Blur',
-    value: 'Треугольное размытие'
+    value: 'Геометрическое размытие'
   },
   'filter-triangle-blur-description': {
     original: 'Applies triangle blur on the selected layer.',
-    value: 'Применение треугольного размытия к выделенному слою.'
+    value: 'Применение геометрического размытия к выделенному слою.'
   },
   'filter-unsharp-mask-title': {
     hint: 'same as the button, but can be longer',
@@ -1210,7 +1210,7 @@
   'import-as-layer-limit-reached': {
     hint: 'Kleki allows only a certain number of layers',
     original: 'Layer limit reached. Image will be placed on existing layer.',
-    value: 'Достигнуто ограничение слоёв. Изображение будет помещено на существующий слой.'
+    value: 'Достигнут максимум слоёв. Изображение будет помещено на существующий слой.'
   },
   'import-as-layer-fit': {
     hint: 'verb. imported image made to fit inside canvas.',
@@ -1252,11 +1252,11 @@
   },
   'clipboard-read-fail': {
     original: 'Failed to read from clipboard.',
-    value: ''
+    value: 'Не удалось выполнить чтение из буфера обмена.'
   },
   'clipboard-no-image': {
     original: 'No image found in clipboard.',
-    value: ''
+    value: 'Изображение в буфере обмена не найдено.'
   },
   'hand-reset': {
     hint: 'resets zoom (to 100%) and rotation (to 0°)',
@@ -1371,11 +1371,11 @@
   },
   'shape-auto-pan': {
     original: 'Auto-pan',
-    value: ''
+    value: 'Автопанорамирование'
   },
   'shape-auto-pan-title': {
     original: 'Automatically moves as you draw',
-    value: ''
+    value: 'Автоматическое перемещение по мере рисования'
   },
   'text-instruction': {
     original: 'Click canvas to place text',
@@ -1579,7 +1579,7 @@
   },
   'settings-save-reminder-label': {
     original: 'Save Reminder',
-    value: 'Напоминание сохр.'
+    value: 'Напоминание сохранения'
   },
   'settings-save-reminder-disabled': {
     original: 'disabled',
@@ -1659,7 +1659,7 @@
   scatter: {
     hint: 'for brush scatter',
     original: 'Scatter',
-    value: ''
+    value: 'Рассеивание'
   },
   red: {
     original: 'Red',
