@@ -81,7 +81,7 @@
   },
   'tool-more-tools-click-again': {
     original: 'Click again for more tools',
-    value: ''
+    value: 'Нажмите еще раз, чтобы увидеть больше инструментов'
   },
   undo: {
     original: 'Undo',

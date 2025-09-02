@@ -81,7 +81,7 @@
   },
   'tool-more-tools-click-again': {
     original: 'Click again for more tools',
-    value: ''
+    value: 'Klicka igen för fler verktyg'
   },
   undo: {
     original: 'Undo',
@@ -527,7 +527,7 @@
   },
   'file-storage-overwrite-confirm': {
     original: 'Overwrite Browser Storage? Overwritten data will be permanently deleted.',
-    value: ''
+    value: 'Skriv över webbläsarlagring? Överskriven data kommer att raderas permanent.'
   },
   'file-storage-min-ago': {
     hint: "{x} <- needs to stay, it's a placeholder.",
@@ -754,7 +754,7 @@
   },
   'cropcopy-mask': {
     original: 'Mask unselected',
-    value: ''
+    value: 'Mask avmarkerad'
   },
   'cropcopy-click-hold': {
     original: 'Right-click or press hold to copy.',
@@ -940,7 +940,7 @@
   'filter-transform-empty-selection': {
     hint: 'nothing on the layer, in selected area (via select tool), just transparency',
     original: 'Layer is empty in selected area.',
-    value: ''
+    value: 'Lagret är tomt i det valda området.'
   },
   'filter-transform-title': {
     hint: 'same as the button, but can be longer',

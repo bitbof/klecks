@@ -68,7 +68,7 @@
   },
   'tool-select': {
     original: 'Select Tool',
-    value: ''
+    value: 'Válassza az Eszköz lehetőséget'
   },
   'tool-zoom': {
     original: 'Zoom',
@@ -77,11 +77,11 @@
   'tool-more-tools': {
     hint: 'when hovering the caret on the tool button',
     original: 'More Tools',
-    value: ''
+    value: 'További eszközök'
   },
   'tool-more-tools-click-again': {
     original: 'Click again for more tools',
-    value: ''
+    value: 'Kattintson újra további eszközökért'
   },
   undo: {
     original: 'Undo',
@@ -281,7 +281,7 @@
   'layers-clear': {
     hint: 'to make a layer empty',
     original: 'Clear layer',
-    value: ''
+    value: 'Tiszta réteg'
   },
   'layers-merge-all': {
     original: 'Merge all',
@@ -449,7 +449,7 @@
   'file-show-save-dialog': {
     hint: 'setting for showing/not showing a dialog where user picks folder and filename',
     original: 'Show save dialog',
-    value: ''
+    value: 'Mentés párbeszédpanel megjelenítése'
   },
   'file-copy': {
     hint: 'verb',
@@ -462,7 +462,7 @@
   },
   'file-paste': {
     original: 'Paste',
-    value: ''
+    value: 'Paszta'
   },
   'file-share': {
     hint: 'Common feature on phones. Pressing share button allows to send data to a different app, e.g. as a text message to someone.',
@@ -497,15 +497,15 @@
   'file-storage-open': {
     hint: 'verb. to open, or to load',
     original: 'Open',
-    value: ''
+    value: 'Nyitott'
   },
   'file-storage-open-confirmation': {
     original: 'This image is already open in another tab. Open it here too?',
-    value: ''
+    value: 'Ez a kép már meg van nyitva egy másik lapon. Megnyitja itt is?'
   },
   'file-storage-open-failed': {
     original: 'Failed to load.',
-    value: ''
+    value: 'Nem sikerült betölteni.'
   },
   'file-storage-clear': {
     original: 'Clear',
@@ -513,7 +513,7 @@
   },
   'file-storage-clear-prompt': {
     original: 'Clear Browser Storage? Clearing can not be undone.',
-    value: ''
+    value: 'Böngésző tárhelyének törlése? A törlés nem vonható vissza.'
   },
   'file-storage-storing': {
     hint: 'while it is in the process of storing',
@@ -527,7 +527,7 @@
   },
   'file-storage-overwrite-confirm': {
     original: 'Overwrite Browser Storage? Overwritten data will be permanently deleted.',
-    value: ''
+    value: 'Felülírja a böngésző tárhelyét? A felülírt adatok véglegesen törlődnek.'
   },
   'file-storage-min-ago': {
     hint: "{x} <- needs to stay, it's a placeholder.",
@@ -587,39 +587,39 @@
   'tab-recovery-recover-tabs': {
     hint: 'allows user to recover browser tabs (including the drawing) of this app.',
     original: 'Recover closed tabs',
-    value: ''
+    value: 'Zárt lapok helyreállítása'
   },
   'tab-recovery-explanation': {
     original: 'Recovery data is only kept for a little while. Save to ensure your work is not lost.',
-    value: ''
+    value: 'A helyreállítási adatokat csak rövid ideig tároljuk. Mentse el őket, hogy ne vesszen el a munkája.'
   },
   'tab-recovery-total-quota-label': {
     original: 'Total:',
-    value: ''
+    value: 'Teljes:'
   },
   'tab-recovery-empty': {
     original: 'Nothing to recover.',
-    value: ''
+    value: 'Nincs mit visszaszerezni.'
   },
   'tab-recovery-recover': {
     original: 'Recover',
-    value: ''
+    value: 'Visszaszerez'
   },
   'tab-recovery-delete': {
     original: 'Delete',
-    value: ''
+    value: 'Töröl'
   },
   'tab-recovery-delete-confirmation': {
     original: 'Delete this recovery? Deletion can not be undone.',
-    value: ''
+    value: 'Törli ezt a helyreállítást? A törlés nem vonható vissza.'
   },
   'tab-recovery-failed-to-recover': {
     original: 'Failed to recover tab.',
-    value: ''
+    value: 'Nem sikerült helyreállítani a lapot.'
   },
   'tab-recovery-recovered': {
     original: 'Tab recovered.',
-    value: ''
+    value: 'A lap helyreállt.'
   },
   'cleared-layer': {
     hint: 'the layer has been cleared. It is now empty',
@@ -754,7 +754,7 @@
   },
   'cropcopy-mask': {
     original: 'Mask unselected',
-    value: ''
+    value: 'A maszk kijelölése megszüntetve'
   },
   'cropcopy-click-hold': {
     original: 'Right-click or press hold to copy.',
@@ -903,7 +903,7 @@
   },
   'filter-flip-layer': {
     original: 'Flip Layer',
-    value: ''
+    value: 'Megfricskáz Réteg'
   },
   'filter-perspective-title': {
     hint: 'same as the button, but can be longer',
@@ -940,7 +940,7 @@
   'filter-transform-empty-selection': {
     hint: 'nothing on the layer, in selected area (via select tool), just transparency',
     original: 'Layer is empty in selected area.',
-    value: ''
+    value: 'A réteg üres a kiválasztott területen.'
   },
   'filter-transform-title': {
     hint: 'same as the button, but can be longer',
@@ -974,7 +974,7 @@
   'filter-transform-snap': {
     hint: 'or snapping. Common feature in graphics software. Makes stuff snap into place so it’s easier to align elements in an image',
     original: 'Snap',
-    value: ''
+    value: 'Csattanás'
   },
   'filter-transform-snap-title': {
     hint: 'same as above, but as a tooltip',
@@ -1170,15 +1170,15 @@
   'dropper-drop': {
     hint: 'as in, drag and drop a file',
     original: 'Drop to import',
-    value: ''
+    value: 'Húzza le az importáláshoz'
   },
   'dropper-as-image': {
     original: 'As New Image',
-    value: ''
+    value: 'Új képként'
   },
   'dropper-as-layer': {
     original: 'As Layer',
-    value: ''
+    value: 'Rétegként'
   },
   'import-opening': {
     hint: 'in the process of opening a large file',
@@ -1256,11 +1256,11 @@
   },
   'clipboard-read-fail': {
     original: 'Failed to read from clipboard.',
-    value: ''
+    value: 'Nem sikerült beolvasni a vágólapról.'
   },
   'clipboard-no-image': {
     original: 'No image found in clipboard.',
-    value: ''
+    value: 'Nem található kép a vágólapon.'
   },
   'hand-reset': {
     hint: 'resets zoom (to 100%) and rotation (to 0°)',
@@ -1275,7 +1275,7 @@
   'hand-inertia-scrolling': {
     hint: 'Canvas will continue to move even after releasing pointer.',
     original: 'Inertia Scrolling',
-    value: ''
+    value: 'Inerciális Görgetés'
   },
   'bucket-tolerance': {
     hint: 'a common feature for paint bucket',
@@ -1375,11 +1375,11 @@
   },
   'shape-auto-pan': {
     original: 'Auto-pan',
-    value: ''
+    value: 'Automatikus pásztázás'
   },
   'shape-auto-pan-title': {
     original: 'Automatically moves as you draw',
-    value: ''
+    value: 'Automatikusan mozog rajzolás közben'
   },
   'text-instruction': {
     original: 'Click canvas to place text',
@@ -1441,71 +1441,71 @@
   },
   'select-select': {
     original: 'Select',
-    value: ''
+    value: 'Válassza ki'
   },
   'select-transform': {
     original: 'Transform',
-    value: ''
+    value: 'Átalakítani'
   },
   'select-lasso': {
     original: 'Lasso',
-    value: ''
+    value: 'Lasszó'
   },
   'select-polygon': {
     original: 'Polygon',
-    value: ''
+    value: 'Poligon'
   },
   'select-boolean-replace': {
     original: 'Replace',
-    value: ''
+    value: 'Cserélje ki'
   },
   'select-boolean-add': {
     original: 'Add',
-    value: ''
+    value: 'Hozzáadás'
   },
   'select-boolean-subtract': {
     original: 'Subtract',
-    value: ''
+    value: 'Kivonás'
   },
   'select-all': {
     original: 'All',
-    value: ''
+    value: 'Minden'
   },
   'select-invert': {
     original: 'Invert',
-    value: ''
+    value: 'Megfordít'
   },
   'select-reset': {
     original: 'Reset',
-    value: ''
+    value: 'Rejteget'
   },
   'select-fill': {
     original: 'Fill',
-    value: ''
+    value: 'Töltse ki'
   },
   'select-erase': {
     original: 'Erase',
-    value: ''
+    value: 'Törlés'
   },
   'select-transform-clone': {
     original: 'Clone',
-    value: ''
+    value: 'Klón'
   },
   'select-transform-clone-applied': {
     original: 'Cloned',
-    value: ''
+    value: 'Klónozott'
   },
   'select-transform-move-to-layer': {
     original: 'Move to layer:',
-    value: ''
+    value: 'Ugrás a rétegre:'
   },
   'select-transform-applied': {
     original: 'Transformation applied',
-    value: ''
+    value: 'Átalakítás alkalmazva'
   },
   'select-transform-empty': {
     original: 'Selected area on active layer is empty.',
-    value: ''
+    value: 'Az aktív rétegen kijelölt terület üres.'
   },
   'save-reminder-title': {
     hint: 'Save Reminder is a popup that shows up after 20 minutes of not saving. Allows user to save on the spot.',
@@ -1663,7 +1663,7 @@
   scatter: {
     hint: 'for brush scatter',
     original: 'Scatter',
-    value: ''
+    value: 'Szétszór'
   },
   red: {
     original: 'Red',
@@ -1761,14 +1761,14 @@
   },
   wip: {
     original: 'Work in progress',
-    value: ''
+    value: 'Munka folyamatban'
   },
   'browser-zoom-help': {
     original: 'Double-tap or pinch-out to reset browser zoom.',
-    value: ''
+    value: 'Dupla koppintással vagy széthúzással állíthatja vissza a böngésző nagyítását.'
   },
   dismiss: {
     original: 'Dismiss',
-    value: ''
+    value: 'Elvetés'
   }
 }

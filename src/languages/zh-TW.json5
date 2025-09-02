@@ -68,7 +68,7 @@
   },
   'tool-select': {
     original: 'Select Tool',
-    value: ''
+    value: '選擇工具'
   },
   'tool-zoom': {
     original: 'Zoom',
@@ -77,11 +77,11 @@
   'tool-more-tools': {
     hint: 'when hovering the caret on the tool button',
     original: 'More Tools',
-    value: ''
+    value: '更多工具'
   },
   'tool-more-tools-click-again': {
     original: 'Click again for more tools',
-    value: ''
+    value: '再次點選看更多工具'
   },
   undo: {
     original: 'Undo',
@@ -281,11 +281,11 @@
   'layers-clear': {
     hint: 'to make a layer empty',
     original: 'Clear layer',
-    value: ''
+    value: '清除層'
   },
   'layers-merge-all': {
     original: 'Merge all',
-    value: ''
+    value: '全部合併'
   },
   'layers-rename': {
     hint: 'action',
@@ -449,7 +449,7 @@
   'file-show-save-dialog': {
     hint: 'setting for showing/not showing a dialog where user picks folder and filename',
     original: 'Show save dialog',
-    value: ''
+    value: '顯示儲存對話框'
   },
   'file-copy': {
     hint: 'verb',
@@ -462,7 +462,7 @@
   },
   'file-paste': {
     original: 'Paste',
-    value: ''
+    value: '貼上'
   },
   'file-share': {
     hint: 'Common feature on phones. Pressing share button allows to send data to a different app, e.g. as a text message to someone.',
@@ -497,15 +497,15 @@
   'file-storage-open': {
     hint: 'verb. to open, or to load',
     original: 'Open',
-    value: ''
+    value: '打開'
   },
   'file-storage-open-confirmation': {
     original: 'This image is already open in another tab. Open it here too?',
-    value: ''
+    value: '此圖片已在其他標籤頁中開啟。請在此打開嗎？'
   },
   'file-storage-open-failed': {
     original: 'Failed to load.',
-    value: ''
+    value: '加載失敗。'
   },
   'file-storage-clear': {
     original: 'Clear',
@@ -513,7 +513,7 @@
   },
   'file-storage-clear-prompt': {
     original: 'Clear Browser Storage? Clearing can not be undone.',
-    value: ''
+    value: '清除瀏覽器儲存空間？清除操作無法撤銷。'
   },
   'file-storage-storing': {
     hint: 'while it is in the process of storing',
@@ -527,7 +527,7 @@
   },
   'file-storage-overwrite-confirm': {
     original: 'Overwrite Browser Storage? Overwritten data will be permanently deleted.',
-    value: ''
+    value: '覆蓋瀏覽器儲存？覆蓋的資料將永久刪除。'
   },
   'file-storage-min-ago': {
     hint: "{x} <- needs to stay, it's a placeholder.",
@@ -587,39 +587,39 @@
   'tab-recovery-recover-tabs': {
     hint: 'allows user to recover browser tabs (including the drawing) of this app.',
     original: 'Recover closed tabs',
-    value: ''
+    value: '恢復已關閉的標籤頁'
   },
   'tab-recovery-explanation': {
     original: 'Recovery data is only kept for a little while. Save to ensure your work is not lost.',
-    value: ''
+    value: '恢復資料僅保留一小段時間。請儲存以確保您的工作不會遺失。'
   },
   'tab-recovery-total-quota-label': {
     original: 'Total:',
-    value: ''
+    value: '全部的：'
   },
   'tab-recovery-empty': {
     original: 'Nothing to recover.',
-    value: ''
+    value: '沒有什麼可以恢復的。'
   },
   'tab-recovery-recover': {
     original: 'Recover',
-    value: ''
+    value: '恢復'
   },
   'tab-recovery-delete': {
     original: 'Delete',
-    value: ''
+    value: '刪除'
   },
   'tab-recovery-delete-confirmation': {
     original: 'Delete this recovery? Deletion can not be undone.',
-    value: ''
+    value: '要刪除此恢復嗎？刪除操作無法撤銷。'
   },
   'tab-recovery-failed-to-recover': {
     original: 'Failed to recover tab.',
-    value: ''
+    value: '無法恢復標籤。'
   },
   'tab-recovery-recovered': {
     original: 'Tab recovered.',
-    value: ''
+    value: '標籤恢復了。'
   },
   'cleared-layer': {
     hint: 'the layer has been cleared. It is now empty',
@@ -628,7 +628,7 @@
   },
   'cleared-selected-area': {
     original: 'Cleared selected area',
-    value: ''
+    value: '清除選定區域'
   },
   filled: {
     hint: 'layer got filled with a color',
@@ -637,7 +637,7 @@
   },
   'filled-selected-area': {
     original: 'Filled selection',
-    value: ''
+    value: '填充選擇'
   },
   'new-title': {
     original: 'New Image',
@@ -754,7 +754,7 @@
   },
   'cropcopy-mask': {
     original: 'Mask unselected',
-    value: ''
+    value: '未選擇蒙版'
   },
   'cropcopy-click-hold': {
     original: 'Right-click or press hold to copy.',
@@ -940,7 +940,7 @@
   'filter-transform-empty-selection': {
     hint: 'nothing on the layer, in selected area (via select tool), just transparency',
     original: 'Layer is empty in selected area.',
-    value: ''
+    value: '選定區域中的圖層為空。'
   },
   'filter-transform-title': {
     hint: 'same as the button, but can be longer',
@@ -1170,15 +1170,15 @@
   'dropper-drop': {
     hint: 'as in, drag and drop a file',
     original: 'Drop to import',
-    value: ''
+    value: '拖放導入'
   },
   'dropper-as-image': {
     original: 'As New Image',
-    value: ''
+    value: '作為新形象'
   },
   'dropper-as-layer': {
     original: 'As Layer',
-    value: ''
+    value: '作為層'
   },
   'import-opening': {
     hint: 'in the process of opening a large file',
@@ -1256,11 +1256,11 @@
   },
   'clipboard-read-fail': {
     original: 'Failed to read from clipboard.',
-    value: ''
+    value: '無法從剪貼簿讀取。'
   },
   'clipboard-no-image': {
     original: 'No image found in clipboard.',
-    value: ''
+    value: '剪貼簿中未找到影像。'
   },
   'hand-reset': {
     hint: 'resets zoom (to 100%) and rotation (to 0°)',
@@ -1275,7 +1275,7 @@
   'hand-inertia-scrolling': {
     hint: 'Canvas will continue to move even after releasing pointer.',
     original: 'Inertia Scrolling',
-    value: ''
+    value: '慣性滾動'
   },
   'bucket-tolerance': {
     hint: 'a common feature for paint bucket',
@@ -1375,11 +1375,11 @@
   },
   'shape-auto-pan': {
     original: 'Auto-pan',
-    value: ''
+    value: '自動平移'
   },
   'shape-auto-pan-title': {
     original: 'Automatically moves as you draw',
-    value: ''
+    value: '隨你繪畫自動移動'
   },
   'text-instruction': {
     original: 'Click canvas to place text',
@@ -1391,11 +1391,11 @@
   },
   'text-text': {
     original: 'Text',
-    value: ''
+    value: '文字'
   },
   'text-font': {
     original: 'Font',
-    value: ''
+    value: '字體'
   },
   'text-placeholder': {
     hint: 'placeholder in text input.',
@@ -1412,11 +1412,11 @@
   },
   'text-line-height': {
     original: 'Line Height',
-    value: ''
+    value: '行高'
   },
   'text-letter-spacing': {
     original: 'Letter Spacing',
-    value: ''
+    value: '字母間距'
   },
   'text-left': {
     hint: 'left, center, right text formatting like in Word',
@@ -1441,71 +1441,71 @@
   },
   'select-select': {
     original: 'Select',
-    value: ''
+    value: '選擇'
   },
   'select-transform': {
     original: 'Transform',
-    value: ''
+    value: '轉換'
   },
   'select-lasso': {
     original: 'Lasso',
-    value: ''
+    value: '套索'
   },
   'select-polygon': {
     original: 'Polygon',
-    value: ''
+    value: '多邊形'
   },
   'select-boolean-replace': {
     original: 'Replace',
-    value: ''
+    value: '代替'
   },
   'select-boolean-add': {
     original: 'Add',
-    value: ''
+    value: '添加'
   },
   'select-boolean-subtract': {
     original: 'Subtract',
-    value: ''
+    value: '減去'
   },
   'select-all': {
     original: 'All',
-    value: ''
+    value: '全部'
   },
   'select-invert': {
     original: 'Invert',
-    value: ''
+    value: '倒置'
   },
   'select-reset': {
     original: 'Reset',
-    value: ''
+    value: '重置'
   },
   'select-fill': {
     original: 'Fill',
-    value: ''
+    value: '充滿'
   },
   'select-erase': {
     original: 'Erase',
-    value: ''
+    value: '擦除'
   },
   'select-transform-clone': {
     original: 'Clone',
-    value: ''
+    value: '複製'
   },
   'select-transform-clone-applied': {
     original: 'Cloned',
-    value: ''
+    value: '複製'
   },
   'select-transform-move-to-layer': {
     original: 'Move to layer:',
-    value: ''
+    value: '移動到圖層：'
   },
   'select-transform-applied': {
     original: 'Transformation applied',
-    value: ''
+    value: '已應用轉換'
   },
   'select-transform-empty': {
     original: 'Selected area on active layer is empty.',
-    value: ''
+    value: '活動圖層上選定的區域是空的。'
   },
   'save-reminder-title': {
     hint: 'Save Reminder is a popup that shows up after 20 minutes of not saving. Allows user to save on the spot.',
@@ -1583,27 +1583,27 @@
   },
   'settings-save-reminder-label': {
     original: 'Save Reminder',
-    value: ''
+    value: '儲存提醒'
   },
   'settings-save-reminder-disabled': {
     original: 'disabled',
-    value: ''
+    value: '殘障人士'
   },
   'settings-save-reminder-confirm-title': {
     original: 'Turn off Save Reminder?',
-    value: ''
+    value: '關閉儲存提醒？'
   },
   'settings-save-reminder-confirm-a': {
     original: "There is no autosave and browser tabs don't last forever. If you don't periodically save you will likely lose work.",
-    value: ''
+    value: '沒有自動儲存功能，瀏覽器標籤頁也不會永久儲存。如果不定期保存，你的工作很可能會遺失。'
   },
   'settings-save-reminder-confirm-b': {
     original: 'Disable at your own risk?',
-    value: ''
+    value: '禁用需要您自行承擔風險嗎？'
   },
   'settings-save-reminder-confirm-disable': {
     original: 'Disable',
-    value: ''
+    value: '停用'
   },
   'theme-dark': {
     original: 'Dark',
@@ -1663,7 +1663,7 @@
   scatter: {
     hint: 'for brush scatter',
     original: 'Scatter',
-    value: ''
+    value: '分散'
   },
   red: {
     original: 'Red',
@@ -1749,11 +1749,11 @@
   },
   loading: {
     original: 'Loading',
-    value: ''
+    value: '載入中'
   },
   more: {
     original: 'More',
-    value: ''
+    value: '更多的'
   },
   'x-minutes': {
     original: '{x}min',
@@ -1761,14 +1761,14 @@
   },
   wip: {
     original: 'Work in progress',
-    value: ''
+    value: '工作正在進行中'
   },
   'browser-zoom-help': {
     original: 'Double-tap or pinch-out to reset browser zoom.',
-    value: ''
+    value: '雙擊或張開可重設瀏覽器縮放。'
   },
   dismiss: {
     original: 'Dismiss',
-    value: ''
+    value: '解僱'
   }
 }

@@ -77,11 +77,11 @@
   'tool-more-tools': {
     hint: 'when hovering the caret on the tool button',
     original: 'More Tools',
-    value: ''
+    value: 'Más herramientas'
   },
   'tool-more-tools-click-again': {
     original: 'Click again for more tools',
-    value: ''
+    value: 'Haga clic nuevamente para obtener más herramientas'
   },
   undo: {
     original: 'Undo',
@@ -281,7 +281,7 @@
   'layers-clear': {
     hint: 'to make a layer empty',
     original: 'Clear layer',
-    value: ''
+    value: 'Limpiar capa'
   },
   'layers-merge-all': {
     original: 'Merge all',
@@ -449,7 +449,7 @@
   'file-show-save-dialog': {
     hint: 'setting for showing/not showing a dialog where user picks folder and filename',
     original: 'Show save dialog',
-    value: ''
+    value: 'Mostrar cuadro de diálogo para guardar'
   },
   'file-copy': {
     hint: 'verb',
@@ -462,7 +462,7 @@
   },
   'file-paste': {
     original: 'Paste',
-    value: ''
+    value: 'Pasta'
   },
   'file-share': {
     hint: 'Common feature on phones. Pressing share button allows to send data to a different app, e.g. as a text message to someone.',
@@ -497,15 +497,15 @@
   'file-storage-open': {
     hint: 'verb. to open, or to load',
     original: 'Open',
-    value: ''
+    value: 'Abierto'
   },
   'file-storage-open-confirmation': {
     original: 'This image is already open in another tab. Open it here too?',
-    value: ''
+    value: 'Esta imagen ya está abierta en otra pestaña. ¿Quieres abrirla aquí también?'
   },
   'file-storage-open-failed': {
     original: 'Failed to load.',
-    value: ''
+    value: 'Failed to load.'
   },
   'file-storage-clear': {
     original: 'Clear',
@@ -513,7 +513,7 @@
   },
   'file-storage-clear-prompt': {
     original: 'Clear Browser Storage? Clearing can not be undone.',
-    value: ''
+    value: '¿Quieres borrar el almacenamiento del navegador? Esta operación no se puede deshacer.'
   },
   'file-storage-storing': {
     hint: 'while it is in the process of storing',
@@ -527,7 +527,7 @@
   },
   'file-storage-overwrite-confirm': {
     original: 'Overwrite Browser Storage? Overwritten data will be permanently deleted.',
-    value: ''
+    value: '¿Sobrescribir el almacenamiento del navegador? Los datos sobrescritos se eliminarán permanentemente.'
   },
   'file-storage-min-ago': {
     hint: "{x} <- needs to stay, it's a placeholder.",
@@ -587,39 +587,39 @@
   'tab-recovery-recover-tabs': {
     hint: 'allows user to recover browser tabs (including the drawing) of this app.',
     original: 'Recover closed tabs',
-    value: ''
+    value: 'Recuperar pestañas cerradas'
   },
   'tab-recovery-explanation': {
     original: 'Recovery data is only kept for a little while. Save to ensure your work is not lost.',
-    value: ''
+    value: 'Los datos de recuperación solo se conservan temporalmente. Guárdalos para asegurarte de que no pierdas tu trabajo.'
   },
   'tab-recovery-total-quota-label': {
     original: 'Total:',
-    value: ''
+    value: 'Totalizado:'
   },
   'tab-recovery-empty': {
     original: 'Nothing to recover.',
-    value: ''
+    value: 'Nada que recuperar.'
   },
   'tab-recovery-recover': {
     original: 'Recover',
-    value: ''
+    value: 'Recuperar'
   },
   'tab-recovery-delete': {
     original: 'Delete',
-    value: ''
+    value: 'Borrar'
   },
   'tab-recovery-delete-confirmation': {
     original: 'Delete this recovery? Deletion can not be undone.',
-    value: ''
+    value: '¿Eliminar esta recuperación? La eliminación no se puede deshacer.'
   },
   'tab-recovery-failed-to-recover': {
     original: 'Failed to recover tab.',
-    value: ''
+    value: 'No se pudo recuperar la pestaña.'
   },
   'tab-recovery-recovered': {
     original: 'Tab recovered.',
-    value: ''
+    value: 'Pestaña recuperada.'
   },
   'cleared-layer': {
     hint: 'the layer has been cleared. It is now empty',
@@ -754,7 +754,7 @@
   },
   'cropcopy-mask': {
     original: 'Mask unselected',
-    value: ''
+    value: 'Máscara no seleccionada'
   },
   'cropcopy-click-hold': {
     original: 'Right-click or press hold to copy.',
@@ -940,7 +940,7 @@
   'filter-transform-empty-selection': {
     hint: 'nothing on the layer, in selected area (via select tool), just transparency',
     original: 'Layer is empty in selected area.',
-    value: ''
+    value: 'La capa está vacía en el área seleccionada.'
   },
   'filter-transform-title': {
     hint: 'same as the button, but can be longer',
@@ -1170,15 +1170,15 @@
   'dropper-drop': {
     hint: 'as in, drag and drop a file',
     original: 'Drop to import',
-    value: ''
+    value: 'Soltar para importar'
   },
   'dropper-as-image': {
     original: 'As New Image',
-    value: ''
+    value: 'Como Nueva Imagen'
   },
   'dropper-as-layer': {
     original: 'As Layer',
-    value: ''
+    value: 'Como Capa'
   },
   'import-opening': {
     hint: 'in the process of opening a large file',
@@ -1256,11 +1256,11 @@
   },
   'clipboard-read-fail': {
     original: 'Failed to read from clipboard.',
-    value: ''
+    value: 'Error al leer desde el portapapeles.'
   },
   'clipboard-no-image': {
     original: 'No image found in clipboard.',
-    value: ''
+    value: 'No se encontró ninguna imagen en el portapapeles.'
   },
   'hand-reset': {
     hint: 'resets zoom (to 100%) and rotation (to 0°)',
@@ -1375,11 +1375,11 @@
   },
   'shape-auto-pan': {
     original: 'Auto-pan',
-    value: ''
+    value: 'Panorámica automática'
   },
   'shape-auto-pan-title': {
     original: 'Automatically moves as you draw',
-    value: ''
+    value: 'Se mueve automáticamente mientras dibujas'
   },
   'text-instruction': {
     original: 'Click canvas to place text',

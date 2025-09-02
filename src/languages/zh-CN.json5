@@ -77,11 +77,11 @@
   'tool-more-tools': {
     hint: 'when hovering the caret on the tool button',
     original: 'More Tools',
-    value: ''
+    value: '更多工具'
   },
   'tool-more-tools-click-again': {
     original: 'Click again for more tools',
-    value: ''
+    value: '再次点击查看更多工具'
   },
   undo: {
     original: 'Undo',
@@ -281,7 +281,7 @@
   'layers-clear': {
     hint: 'to make a layer empty',
     original: 'Clear layer',
-    value: ''
+    value: '清除层'
   },
   'layers-merge-all': {
     original: 'Merge all',
@@ -449,7 +449,7 @@
   'file-show-save-dialog': {
     hint: 'setting for showing/not showing a dialog where user picks folder and filename',
     original: 'Show save dialog',
-    value: ''
+    value: '显示保存对话框'
   },
   'file-copy': {
     hint: 'verb',
@@ -462,7 +462,7 @@
   },
   'file-paste': {
     original: 'Paste',
-    value: ''
+    value: '粘贴'
   },
   'file-share': {
     hint: 'Common feature on phones. Pressing share button allows to send data to a different app, e.g. as a text message to someone.',
@@ -497,15 +497,15 @@
   'file-storage-open': {
     hint: 'verb. to open, or to load',
     original: 'Open',
-    value: ''
+    value: '打开'
   },
   'file-storage-open-confirmation': {
     original: 'This image is already open in another tab. Open it here too?',
-    value: ''
+    value: '此图片已在其他标签页中打开。请在此打开吗？'
   },
   'file-storage-open-failed': {
     original: 'Failed to load.',
-    value: ''
+    value: '加载失败。'
   },
   'file-storage-clear': {
     original: 'Clear',
@@ -513,7 +513,7 @@
   },
   'file-storage-clear-prompt': {
     original: 'Clear Browser Storage? Clearing can not be undone.',
-    value: ''
+    value: '清除浏览器存储空间？清除操作无法撤消。'
   },
   'file-storage-storing': {
     hint: 'while it is in the process of storing',
@@ -527,7 +527,7 @@
   },
   'file-storage-overwrite-confirm': {
     original: 'Overwrite Browser Storage? Overwritten data will be permanently deleted.',
-    value: ''
+    value: '覆盖浏览器存储？覆盖的数据将被永久删除。'
   },
   'file-storage-min-ago': {
     hint: "{x} <- needs to stay, it's a placeholder.",
@@ -587,39 +587,39 @@
   'tab-recovery-recover-tabs': {
     hint: 'allows user to recover browser tabs (including the drawing) of this app.',
     original: 'Recover closed tabs',
-    value: ''
+    value: '恢复已关闭的标签页'
   },
   'tab-recovery-explanation': {
     original: 'Recovery data is only kept for a little while. Save to ensure your work is not lost.',
-    value: ''
+    value: '恢复数据仅保留一小段时间。请保存以确保您的工作不会丢失。'
   },
   'tab-recovery-total-quota-label': {
     original: 'Total:',
-    value: ''
+    value: '全部的：'
   },
   'tab-recovery-empty': {
     original: 'Nothing to recover.',
-    value: ''
+    value: '没有什么可以恢复的。'
   },
   'tab-recovery-recover': {
     original: 'Recover',
-    value: ''
+    value: '恢复'
   },
   'tab-recovery-delete': {
     original: 'Delete',
-    value: ''
+    value: '删除'
   },
   'tab-recovery-delete-confirmation': {
     original: 'Delete this recovery? Deletion can not be undone.',
-    value: ''
+    value: '要删除此恢复吗？删除操作无法撤消。'
   },
   'tab-recovery-failed-to-recover': {
     original: 'Failed to recover tab.',
-    value: ''
+    value: '无法恢复标签。'
   },
   'tab-recovery-recovered': {
     original: 'Tab recovered.',
-    value: ''
+    value: '标签恢复了。'
   },
   'cleared-layer': {
     hint: 'the layer has been cleared. It is now empty',
@@ -754,7 +754,7 @@
   },
   'cropcopy-mask': {
     original: 'Mask unselected',
-    value: ''
+    value: '未选择蒙版'
   },
   'cropcopy-click-hold': {
     original: 'Right-click or press hold to copy.',
@@ -940,7 +940,7 @@
   'filter-transform-empty-selection': {
     hint: 'nothing on the layer, in selected area (via select tool), just transparency',
     original: 'Layer is empty in selected area.',
-    value: ''
+    value: '选定区域中的图层为空。'
   },
   'filter-transform-title': {
     hint: 'same as the button, but can be longer',
@@ -1170,15 +1170,15 @@
   'dropper-drop': {
     hint: 'as in, drag and drop a file',
     original: 'Drop to import',
-    value: ''
+    value: '拖放导入'
   },
   'dropper-as-image': {
     original: 'As New Image',
-    value: ''
+    value: '作为新形象'
   },
   'dropper-as-layer': {
     original: 'As Layer',
-    value: ''
+    value: '作为层'
   },
   'import-opening': {
     hint: 'in the process of opening a large file',
@@ -1256,11 +1256,11 @@
   },
   'clipboard-read-fail': {
     original: 'Failed to read from clipboard.',
-    value: ''
+    value: '无法从剪贴板读取。'
   },
   'clipboard-no-image': {
     original: 'No image found in clipboard.',
-    value: ''
+    value: '剪贴板中未找到图像。'
   },
   'hand-reset': {
     hint: 'resets zoom (to 100%) and rotation (to 0°)',
@@ -1375,11 +1375,11 @@
   },
   'shape-auto-pan': {
     original: 'Auto-pan',
-    value: ''
+    value: '自动平移'
   },
   'shape-auto-pan-title': {
     original: 'Automatically moves as you draw',
-    value: ''
+    value: '随你绘画自动移动'
   },
   'text-instruction': {
     original: 'Click canvas to place text',
@@ -1663,7 +1663,7 @@
   scatter: {
     hint: 'for brush scatter',
     original: 'Scatter',
-    value: ''
+    value: '分散'
   },
   red: {
     original: 'Red',
