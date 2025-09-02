@@ -81,7 +81,7 @@
   },
   'tool-more-tools-click-again': {
     original: 'Click again for more tools',
-    value: ''
+    value: 'Klik maneh kanggo alat liyane'
   },
   undo: {
     original: 'Undo',
@@ -754,7 +754,7 @@
   },
   'cropcopy-mask': {
     original: 'Mask unselected',
-    value: ''
+    value: 'Topeng ora dipilih'
   },
   'cropcopy-click-hold': {
     original: 'Right-click or press hold to copy.',
@@ -940,7 +940,7 @@
   'filter-transform-empty-selection': {
     hint: 'nothing on the layer, in selected area (via select tool), just transparency',
     original: 'Layer is empty in selected area.',
-    value: ''
+    value: 'Lapisan kosong ing area sing dipilih.'
   },
   'filter-transform-title': {
     hint: 'same as the button, but can be longer',
