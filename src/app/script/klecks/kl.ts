@@ -8,7 +8,6 @@ import { ImageToggle } from './ui/components/image-toggle';
 import { ImageRadioList } from './ui/components/image-radio-list';
 import { createPenPressureToggle } from './ui/components/create-pen-pressure-toggle';
 import { KlSlider } from './ui/components/kl-slider';
-import { calcSliderFalloffFactor } from './ui/components/slider-falloff';
 import { HexColorDialog } from './ui/modals/color-slider-hex-dialog';
 import { KlColorSlider } from './ui/components/kl-color-slider';
 import { KlColorSliderSmall } from './ui/components/kl-color-slider-small';
@@ -38,10 +37,8 @@ import { TextUi } from './ui/tool-tabs/text-ui';
 import { ShapeUi } from './ui/tool-tabs/shape-ui';
 import { newImageDialog } from './ui/modals/new-image-dialog';
 import { ToolspaceCollapser } from './ui/mobile/toolspace-collapser';
-import { renderText } from './image-operations/render-text';
 import { textToolDialog } from './ui/modals/text-tool-dialog/text-tool-dialog';
 import { showImportImageDialog } from './ui/modals/show-import-image-dialog';
-import { floodFillBits } from './image-operations/flood-fill';
 import * as PSD from './storage/psd';
 import { drawShape, ShapeTool } from './image-operations/shape-tool';
 import { KlCanvas } from './canvas/kl-canvas';
@@ -51,7 +48,6 @@ import { BRUSHES_UI } from './brushes-ui/brushes-ui';
 import { showIframeModal } from './ui/modals/show-iframe-modal';
 import { RadioList } from './ui/components/radio-list';
 import { BrowserStorageUi } from './ui/components/browser-storage-ui';
-import { drawProject } from './canvas/draw-project';
 import { ProjectStore } from './storage/project-store';
 import { FileUi } from './ui/tool-tabs/file-ui';
 import { EditUi } from './ui/tool-tabs/edit-ui';
@@ -77,7 +73,6 @@ export const KL = {
 
     // --- canvas ---
     KlCanvas,
-    drawProject,
 
     // --- canvas ui ---
     KlCanvasPreview,
@@ -87,8 +82,6 @@ export const KL = {
     FILTER_LIB,
 
     // --- image operations ---
-    renderText,
-    floodFillBits,
     ShapeTool,
     drawShape,
     GradientTool,
@@ -101,7 +94,6 @@ export const KL = {
     SaveToComputer,
 
     // --- ui - components ---
-    calcSliderFalloffFactor,
     Checkbox,
     input,
     Select,

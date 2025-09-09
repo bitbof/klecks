@@ -6,6 +6,7 @@ import { initLANG, LANG } from '../../language/language';
 import { THEME } from '../../theme/theme';
 import { loadAgPsd } from '../../klecks/storage/load-ag-psd';
 import { randomUuid } from '../../bb/base/base';
+import { createImage } from '../../bb/base/ui';
 
 // only one instance can exist
 let wrapperCreated = false;
@@ -73,13 +74,18 @@ export class EmbedWrapper {
                 loadingScreen.style[loadingStyleArr[i][0] as any] = loadingStyleArr[i][1];
             }
             loadingScreen.id = 'loading-screen';
-            const logoStyle = THEME.isDark() && !p.logoImg ? ' style="filter: invert(1)"' : '';
-            loadingScreen.innerHTML =
-                '<img width="150" height="54"' +
-                logoStyle +
-                ' src="' +
-                (p.logoImg ? p.logoImg : logoImg) +
-                '" alt="Logo"/>\n' +
+            loadingScreen.append(
+                createImage({
+                    width: 150,
+                    height: 54,
+                    alt: 'Logo',
+                    src: p.logoImg ? p.logoImg : logoImg,
+                    css: {
+                        filter: THEME.isDark() && !p.logoImg ? 'invert(1)' : undefined,
+                    },
+                }),
+            );
+            loadingScreen.innerHTML +=
                 '<div style="margin: 15px 0 0 0; display: flex; align-items: center">\n' +
                 '<div class="spinner"></div>\n' +
                 '<span id="loading-screen-text">' +

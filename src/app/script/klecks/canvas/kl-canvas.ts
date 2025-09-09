@@ -1063,9 +1063,18 @@ export class KlCanvas {
             return;
         }
         tolerance = Math.round(tolerance);
+        x = Math.round(x);
+        y = Math.round(y);
 
         if (!['above', 'current', 'all'].includes(sampleStr)) {
             throw new Error('invalid sampleStr');
+        }
+        const selectionMask = this.selection
+            ? getBinaryMask(this.selection, this.width, this.height)
+            : undefined;
+        if (selectionMask && selectionMask[y * this.width + x] === 0) {
+            // don't fill if outside of selection
+            return;
         }
 
         const targetLayer = this.layers[layerIndex];
@@ -1081,6 +1090,7 @@ export class KlCanvas {
             const srcData = srcImageData.data;
             result = floodFillBits(
                 srcData,
+                selectionMask,
                 this.width,
                 this.height,
                 x,
@@ -1104,6 +1114,7 @@ export class KlCanvas {
             const srcData = srcImageData.data;
             result = floodFillBits(
                 srcData,
+                selectionMask,
                 this.width,
                 this.height,
                 x,
@@ -1120,18 +1131,11 @@ export class KlCanvas {
                     : targetCtx.getImageData(0, 0, this.width, this.height);
         }
 
-        const mask = this.selection
-            ? getBinaryMask(this.selection, this.width, this.height)
-            : undefined;
-        const maskTest = (index: number) => {
-            return mask ? mask[index] : true;
-        };
-
         const targetData = targetImageData.data;
         if (rgb) {
             if (opacity === 1) {
                 for (let i = 0; i < this.width * this.height; i++) {
-                    if (result.data[i] === 255 && maskTest(i)) {
+                    if (result.data[i] === 255) {
                         targetData[i * 4] = rgb.r;
                         targetData[i * 4 + 1] = rgb.g;
                         targetData[i * 4 + 2] = rgb.b;
@@ -1140,7 +1144,7 @@ export class KlCanvas {
                 }
             } else {
                 for (let i = 0; i < this.width * this.height; i++) {
-                    if (result.data[i] === 255 && maskTest(i)) {
+                    if (result.data[i] === 255) {
                         targetData[i * 4] = BB.mix(targetData[i * 4], rgb.r, opacity);
                         targetData[i * 4 + 1] = BB.mix(targetData[i * 4 + 1], rgb.g, opacity);
                         targetData[i * 4 + 2] = BB.mix(targetData[i * 4 + 2], rgb.b, opacity);
@@ -1152,13 +1156,13 @@ export class KlCanvas {
             // erase
             if (opacity === 1) {
                 for (let i = 0; i < this.width * this.height; i++) {
-                    if (result.data[i] === 255 && maskTest(i)) {
+                    if (result.data[i] === 255) {
                         targetData[i * 4 + 3] = 0;
                     }
                 }
             } else {
                 for (let i = 0; i < this.width * this.height; i++) {
-                    if (result.data[i] === 255 && maskTest(i)) {
+                    if (result.data[i] === 255) {
                         targetData[i * 4 + 3] = BB.mix(targetData[i * 4 + 3], 0, opacity);
                     }
                 }

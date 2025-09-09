@@ -195,7 +195,16 @@ export class TextToolFontUI {
         });
 
         const sizeLabel = BB.el({
-            content: '<div><span style="font-size: 0.6em; margin-right: -1px">A</span>A</div>',
+            content: [
+                BB.el({
+                    tagName: 'span',
+                    content: 'A',
+                    css: {
+                        fontSize: '0.6em',
+                    },
+                }),
+                'A',
+            ],
             css: {
                 width: '25px',
                 height: '25px',

@@ -1,0 +1,19 @@
+.licenses {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+
+    details > div {
+        padding: 10px;
+        box-shadow: 0 0 0 1px;
+        margin-top: 5px;
+        font-family: monospace;
+        background: #aaa2;
+        overflow: hidden;
+    }
+
+    summary {
+        cursor: pointer;
+        user-select: none;
+    }
+}

@@ -6,7 +6,7 @@ import copyImg from 'url:/src/app/img/ui/copy.svg';
 import { TRgb } from '../../kl-types';
 import { RGB } from '../../../bb/color/color';
 import { c } from '../../../bb/base/c';
-import { css } from '@emotion/css';
+import * as classes from './color-slider-hex-dialog.module.scss';
 
 type TInputRow = {
     update: () => void;
@@ -130,16 +130,10 @@ export class HexColorDialog {
             createRgbInputRow(LANG('blue'), 'b'),
         ];
 
-        const tableCss = css({
-            borderCollapse: 'collapse',
-            td: {
-                paddingBottom: '5px',
-            },
-        });
         const rootEl = c('', [
             previewEl,
             hexRowEl,
-            c('table.' + tableCss, [
+            c('table.' + classes.table, [
                 c(
                     'tbody',
                     rgbArr.map((item) => item.element),

@@ -17,3 +17,51 @@
             0 -1px #636363;
     }
 }
+
+.tab {
+    min-width: 200px;
+    max-width: 500px;
+    flex-grow: 1;
+    border-bottom: none !important;
+}
+
+.viewportInputs {
+    position: relative;
+    z-index: 1;
+
+    > * {
+        position: absolute;
+        right: 0;
+        top: 10px;
+    }
+}
+
+.tabWrapper {
+    display: flex;
+    justify-content: space-between;
+    flex-direction: row-reverse;
+    flex-wrap: wrap;
+    margin-top: 10px;
+    margin-left: -20px;
+    margin-right: -20px;
+    padding: 0 20px;
+
+    @media (min-width: 700px) and (min-height: 700px) {
+        display: none !important;
+    }
+}
+
+.inputs {
+    min-height: 72px;
+    margin-top: 10px;
+
+    @media (min-width: 700px) and (min-height: 700px) {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+
+        > * {
+            display: flex !important;
+        }
+    }
+}

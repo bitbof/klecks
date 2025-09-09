@@ -1,30 +1,12 @@
 import { c } from '../../../../bb/base/c';
-import { css as emotionCss } from '@emotion/css';
+import * as classes from './show-licenses-dialog.module.scss';
 import { DynamicModal } from '../base/dynamic-modal';
 import { BB } from '../../../../bb/bb';
 import { LANG } from '../../../../language/language';
 
 export function showLicensesDialog() {
-    const licensesCss = emotionCss({
-        display: 'flex',
-        flexDirection: 'column',
-        gap: '10px',
-        'details > div': {
-            padding: '10px',
-            boxShadow: '0 0 0 1px',
-            marginTop: '5px',
-            fontFamily: 'monospace',
-            background: '#aaa2',
-            overflow: 'hidden',
-        },
-        summary: {
-            cursor: 'pointer',
-            userSelect: 'none',
-        },
-    });
-
-    const libraries = c('.' + licensesCss, LANG('loading'));
-    const fonts = c('.' + licensesCss, LANG('loading'));
+    const libraries = c('.' + classes.licenses, LANG('loading'));
+    const fonts = c('.' + classes.licenses, LANG('loading'));
 
     const content = c(',flex,flexCol,gap-10', [libraries, fonts]);
 

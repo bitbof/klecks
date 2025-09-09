@@ -46,9 +46,15 @@ function toleranceTest(
     );
 }
 
+// check is within selection
+function selectionMaskTest(selectionMaskArr: Uint8Array | undefined, i: number): boolean {
+    return !selectionMaskArr || !!selectionMaskArr[i];
+}
+
 /**
  *
  * @param srcArr Uint8ClampedArray rgba
+ * @param selectionMaskArr Uint8Array width x height, 0 or 1 values
  * @param targetArr Uint8Array
  * @param width int
  * @param height int
@@ -60,6 +66,7 @@ function toleranceTest(
  */
 function floodFill(
     srcArr: Uint8ClampedArray,
+    selectionMaskArr: Uint8Array | undefined,
     targetArr: Uint8Array,
     width: number,
     height: number,
@@ -99,6 +106,7 @@ function floodFill(
                 e = i - 1;
                 if (
                     targetArr[e] !== 255 &&
+                    selectionMaskTest(selectionMaskArr, e) &&
                     (view.getUint32(e * 4, true) === init ||
                         (tolerance > 0 &&
                             toleranceTest(srcArr, initR, initG, initB, initA, toleranceSquared, e)))
@@ -113,6 +121,7 @@ function floodFill(
                 e = i + 1;
                 if (
                     targetArr[e] !== 255 &&
+                    selectionMaskTest(selectionMaskArr, e) &&
                     (view.getUint32(e * 4, true) === init ||
                         (tolerance > 0 &&
                             toleranceTest(srcArr, initR, initG, initB, initA, toleranceSquared, e)))
@@ -127,6 +136,7 @@ function floodFill(
                 e = i - width;
                 if (
                     targetArr[e] !== 255 &&
+                    selectionMaskTest(selectionMaskArr, e) &&
                     (view.getUint32(e * 4, true) === init ||
                         (tolerance > 0 &&
                             toleranceTest(srcArr, initR, initG, initB, initA, toleranceSquared, e)))
@@ -141,6 +151,7 @@ function floodFill(
                 e = i + width;
                 if (
                     targetArr[e] !== 255 &&
+                    selectionMaskTest(selectionMaskArr, e) &&
                     (view.getUint32(e * 4, true) === init ||
                         (tolerance > 0 &&
                             toleranceTest(srcArr, initR, initG, initB, initA, toleranceSquared, e)))
@@ -157,7 +168,8 @@ function floodFill(
             for (let x = 0; x < width; x++, i++) {
                 if (
                     view.getUint32(i * 4, true) === init ||
-                    (tolerance > 0 &&
+                    (selectionMaskTest(selectionMaskArr, i) &&
+                        tolerance > 0 &&
                         toleranceTest(srcArr, initR, initG, initB, initA, toleranceSquared, i))
                 ) {
                     targetArr[i] = 255;
@@ -281,6 +293,8 @@ function floodFill(
  */
 export function floodFillBits(
     rgbaArr: Uint8ClampedArray,
+    // width x height, 0 or 1 values
+    selectionMaskArr: Uint8Array | undefined,
     width: number, // int
     height: number, // int
     x: number, // int
@@ -299,6 +313,7 @@ export function floodFillBits(
 
     const bounds = floodFill(
         rgbaArr,
+        selectionMaskArr,
         resultArr,
         width,
         height,

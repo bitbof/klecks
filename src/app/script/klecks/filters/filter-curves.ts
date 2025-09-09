@@ -5,7 +5,6 @@ import { Options } from '../ui/components/options';
 import { FxPreviewRenderer } from '../ui/project-viewport/fx-preview-renderer';
 import { TProjectViewportProject } from '../ui/project-viewport/project-viewport';
 import { Preview } from '../ui/project-viewport/preview';
-import { css } from '@emotion/css/dist/emotion-css.cjs';
 import { testIsSmall } from '../ui/utils/test-is-small';
 import { getPreviewHeight, getPreviewWidth } from '../ui/utils/preview-size';
 import { applyFxFilter } from './apply-fx-filter';
@@ -69,12 +68,10 @@ export const filterCurves = {
             },
             selection: klCanvas.getSelection(),
         });
-        preview.getElement().classList.add(
-            css({
-                marginLeft: '-20px',
-                marginRight: '-20px',
-            }),
-        );
+        BB.css(preview.getElement(), {
+            marginLeft: '-20px',
+            marginRight: '-20px',
+        });
 
         const input = new CurvesInput({
             curves,

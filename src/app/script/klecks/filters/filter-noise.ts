@@ -20,7 +20,6 @@ import { TWrappedTexture } from '../../fx-canvas/fx-canvas-types';
 import { throwIfNull } from '../../bb/base/base';
 import { FxPreviewRenderer } from '../ui/project-viewport/fx-preview-renderer';
 import { Preview } from '../ui/project-viewport/preview';
-import { css } from '@emotion/css/dist/emotion-css.cjs';
 import { TProjectViewportProject } from '../ui/project-viewport/project-viewport';
 import { getPreviewHeight, getPreviewWidth } from '../ui/utils/preview-size';
 import { testIsSmall } from '../ui/utils/test-is-small';
@@ -506,12 +505,10 @@ export const filterNoise = {
             selection: klCanvas.getSelection(),
         });
         preview.render();
-        preview.getElement().classList.add(
-            css({
-                marginLeft: '-20px',
-                marginRight: '-20px',
-            }),
-        );
+        BB.css(preview.getElement(), {
+            marginLeft: '-20px',
+            marginRight: '-20px',
+        });
         rootEl.append(preview.getElement());
 
         function update(): void {

@@ -242,6 +242,8 @@ export function createSvg(p: TSvg): SVGElement {
             (item as TSvg[]).forEach((child) => {
                 result.append(createSvg(child));
             });
+        } else if (keyStr === 'css') {
+            css(result, item as Partial<CSSStyleDeclaration>);
         } else if (keyStr !== 'elementType') {
             result.setAttribute(keyStr, item as string);
         }

@@ -1,0 +1,17 @@
+.viewport {
+    cursor: grab;
+
+    &:active {
+        cursor: grabbing;
+    }
+}
+
+.preview {
+    border-top: 1px solid #7f7f7f;
+    border-bottom: 1px solid #7f7f7f;
+
+    .kl-theme-dark & {
+        border-top: 1px solid #636363;
+        border-bottom: 1px solid #636363;
+    }
+}

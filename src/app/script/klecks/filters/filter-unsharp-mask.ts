@@ -3,7 +3,6 @@ import { TFilterApply, TFilterGetDialogParam, TFilterGetDialogResult } from '../
 import { LANG } from '../../language/language';
 import { Preview } from '../ui/project-viewport/preview';
 import { TProjectViewportProject } from '../ui/project-viewport/project-viewport';
-import { css } from '@emotion/css';
 import { FxPreviewRenderer } from '../ui/project-viewport/fx-preview-renderer';
 import { BB } from '../../bb/bb';
 import { testIsSmall } from '../ui/utils/test-is-small';
@@ -119,12 +118,10 @@ export const filterUnsharpMask = {
             selection: klCanvas.getSelection(),
         });
         update();
-        preview.getElement().classList.add(
-            css({
-                marginLeft: '-20px',
-                marginRight: '-20px',
-            }),
-        );
+        BB.css(preview.getElement(), {
+            marginLeft: '-20px',
+            marginRight: '-20px',
+        });
         rootEl.append(preview.getElement());
 
         result.destroy = (): void => {

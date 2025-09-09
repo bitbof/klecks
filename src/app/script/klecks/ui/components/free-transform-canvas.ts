@@ -4,7 +4,6 @@ import { TKlBasicLayer } from '../../kl-types';
 import { TRect } from '../../../bb/bb-types';
 import { Preview } from '../project-viewport/preview';
 import { TProjectViewportProject } from '../project-viewport/project-viewport';
-import { css } from '@emotion/css/dist/emotion-css.cjs';
 import { TFreeTransform } from './free-transform-utils';
 
 /**
@@ -100,13 +99,11 @@ export class FreeTransformCanvas {
             },
             padding: 30,
         });
-        this.preview.getElement().classList.add(
-            css({
-                overflow: 'hidden',
-                marginLeft: '-20px',
-                marginRight: '-20px',
-            }),
-        );
+        BB.css(this.preview.getElement(), {
+            overflow: 'hidden',
+            marginLeft: '-20px',
+            marginRight: '-20px',
+        });
         this.rootEl.append(this.preview.getElement());
 
         {
