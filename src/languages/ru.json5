@@ -81,15 +81,15 @@
   },
   'tool-more-tools-click-again': {
     original: 'Click again for more tools',
-    value: ''
+    value: 'нажмите снова для других инструментов'
   },
   undo: {
     original: 'Undo',
-    value: 'Отмена'
+    value: 'Шаг назад'
   },
   redo: {
     original: 'Redo',
-    value: 'Повтор'
+    value: 'Шаг вперёд'
   },
   'brush-pen': {
     hint: 'Generic "brush" that feels a bit like a pen or marker, as opposed to a paint brush.',
