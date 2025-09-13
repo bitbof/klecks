@@ -120,12 +120,16 @@ export class HandUi {
         BB.makeUnfocusable(fitButton);
         row2.append(resetButton, fitButton);
 
+        const leftRotateIcon = new Image();
+        leftRotateIcon.height = 20;
+        leftRotateIcon.src = rotateImg;
+        leftRotateIcon.alt = 'Rotate';
+        BB.css(leftRotateIcon, {
+            transform: 'scale(-1, 1)',
+        });
         const leftRotateButton = BB.el({
             tagName: 'button',
-            content:
-                '<img height="20" src="' +
-                rotateImg +
-                '" alt="Rotate" style="transform: scale(-1, 1)"/>',
+            content: leftRotateIcon,
             onClick: function () {
                 p.onAngleChange(-15, true);
             },

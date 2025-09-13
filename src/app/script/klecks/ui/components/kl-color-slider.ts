@@ -27,12 +27,11 @@ export class KlColorSlider {
     private readonly pickerButton: HTMLElement;
     private readonly width: number;
     private readonly height: number; // hue slider and output height
-    private readonly hueStop: Element;
 
     private readonly SVContainer: HTMLElement;
     private readonly pointerSV: HTMLElement;
     private svHeight: number;
-    private readonly svSvg: HTMLElement;
+    private readonly svGradient: HTMLElement;
 
     private readonly emitColor: (rgb: RGB) => void;
 
@@ -46,9 +45,10 @@ export class KlColorSlider {
 
     private updateSVCanvas(): void {
         const rgb = BB.ColorConverter.toRGB(new BB.HSV(this.primaryColorHsv.h, 100, 100));
-        BB.setAttributes(this.hueStop, {
-            'stop-color': '#' + BB.ColorConverter.toHexString(rgb),
-        });
+        this.svGradient.style.setProperty(
+            '--kl-color-picker--hue',
+            '#' + BB.ColorConverter.toHexString(rgb),
+        );
     }
 
     private updateSVPointer(): void {
@@ -135,25 +135,16 @@ export class KlColorSlider {
         this.secondaryColorHsv = BB.ColorConverter._RGBtoHSV(this.secondaryColorRgb); // BB.HSV
 
         const svWrapper = BB.el();
-        this.svSvg = new DOMParser().parseFromString(
-            '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="none"><defs><linearGradient id="value" gradientTransform="rotate(90)"><stop offset="0" stop-color="#fff"/><stop offset="100%" stop-color="#000"/></linearGradient><linearGradient id="hue" gradientTransform="rotate(0)"><stop offset="0" stop-color="#fff"/><stop id="hue-stop" offset="100%" stop-color="#f00"/></linearGradient></defs><rect x="0" y="0" width="100" height="100" fill="url(\'#hue\')"/><rect x="0" y="0" width="100" height="100" fill="url(\'#value\')" style="mix-blend-mode: multiply"/></svg>',
-            'image/svg+xml',
-        ).documentElement;
-        {
-            const hueStop = this.svSvg.querySelector('#hue-stop');
-            if (!hueStop) {
-                throw Error('#hue-stop not found in svSvg');
-            }
-            this.hueStop = hueStop;
-        }
-        BB.setAttributes(this.hueStop, {
-            'stop-color': '#f0f',
+        this.svGradient = BB.el({
+            css: {
+                background:
+                    'linear-gradient(0deg, #000 0%, rgba(255, 0, 0, 0) 100%), linear-gradient(-90deg, var(--kl-color-picker--hue) 0%, #fff 100%)',
+                width: this.width + 'px',
+                height: this.svHeight + 'px',
+            },
         });
-        BB.css(this.svSvg, {
-            width: this.width + 'px',
-            height: this.svHeight + 'px',
-        });
-        svWrapper.append(this.svSvg);
+
+        svWrapper.append(this.svGradient);
 
         const divH = BB.el({
             className: 'kl-color-picker__h',
@@ -554,7 +545,7 @@ export class KlColorSlider {
             return;
         }
         this.svHeight = h;
-        BB.css(this.svSvg, {
+        BB.css(this.svGradient, {
             width: this.width + 'px',
             height: this.svHeight + 'px',
         });

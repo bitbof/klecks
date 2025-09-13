@@ -43,7 +43,7 @@ export class ToolDropdown {
     private updateButton() {
         this.activeButton.title =
             this.titleArr[this.currentActiveIndex] +
-            (this.isActive ? ' (click again for more tools)' : ''); // todo translate
+            (this.isActive ? ' (' + LANG('tool-more-tools-click-again') + ')' : '');
         this.activeButtonIm.style.backgroundImage =
             "url('" + this.imArr[this.currentActiveIndex] + "')";
     }

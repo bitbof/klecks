@@ -12,6 +12,7 @@ import { getSharedFx } from '../../../fx-canvas/shared-fx';
 import { c } from '../../../bb/base/c';
 import { KlHistory } from '../../history/kl-history';
 import copyImg from 'url:/src/app/img/ui/copy.svg';
+import { createImage } from '../../../bb/base/ui';
 
 export type TEditUiParams = {
     klRootEl: HTMLElement;
@@ -103,22 +104,30 @@ This has been reported to Google.
         const createButton = (filterKey: string): HTMLElement => {
             const filter = filters[filterKey];
 
-            const button = document.createElement('button');
-            const buttonLabel = LANG(filter.lang.button);
-            const imClass = filter.darkNoInvert ? 'class="dark-no-invert"' : '';
-            const im =
-                '<img ' +
-                imClass +
-                ' height="20" width="18" src="' +
-                filter.icon +
-                '" style="margin-right: 3px" alt="icon" />';
-            button.innerHTML = im + buttonLabel;
-            button.className = 'grid-button grid-button--filter';
-            BB.css(button, {
-                lineHeight: '20px',
-                fontSize: '12px',
+            const button = BB.el({
+                tagName: 'button',
+                className: 'grid-button grid-button--filter',
+                content: [
+                    createImage({
+                        alt: 'icon',
+                        src: filter.icon,
+                        width: 18,
+                        height: 20,
+                        className: filter.darkNoInvert ? 'dark-no-invert' : '',
+                        css: {
+                            marginRight: '3px',
+                        },
+                    }),
+                    LANG(filter.lang.button),
+                ],
+                css: {
+                    lineHeight: '20px',
+                    fontSize: '12px',
+                },
+                custom: {
+                    tabIndex: '-1',
+                },
             });
-            button.tabIndex = -1;
 
             const filterName = LANG(filter.lang.name);
 
@@ -329,15 +338,21 @@ This has been reported to Google.
         const groupC = ['grid', 'noise', 'pattern', 'vanishPoint'];
 
         if (!this.isEmbed) {
-            const im =
-                '<img ' +
-                ' height="20" width="18" src="' +
-                copyImg +
-                '" style="margin-right: 3px" alt="icon" />';
             const copyBtn = BB.el({
                 tagName: 'button',
                 className: 'grid-button grid-button--filter',
-                content: im + LANG('file-copy'),
+                content: [
+                    createImage({
+                        alt: 'icon',
+                        src: copyImg,
+                        width: 18,
+                        height: 20,
+                        css: {
+                            marginRight: '3px',
+                        },
+                    }),
+                    LANG('file-copy'),
+                ],
                 onClick: () => this.onCopyToClipboard(),
                 title: LANG('file-copy-title'),
                 custom: {

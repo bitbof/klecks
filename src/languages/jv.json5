@@ -79,6 +79,10 @@
     original: 'More Tools',
     value: 'Piranti Liyane'
   },
+  'tool-more-tools-click-again': {
+    original: 'Click again for more tools',
+    value: ''
+  },
   undo: {
     original: 'Undo',
     value: 'Batalaken'

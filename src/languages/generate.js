@@ -101,7 +101,7 @@ export const languages: {code: string; name: string}[] = [
     },
 ${langArray.join(',\n')},
 ];
-export const loadLanguage = async (code: string): Promise<Record<TTranslationCode, string>> => {
+export const loadLanguage = async (code: string): Promise<Partial<Record<TTranslationCode, string>>> => {
     if (code === 'en') {
         return english;
 ${loadLanguage}    }

@@ -10,7 +10,7 @@ import editPencilImg from 'url:/src/app/img/ui/edit-pencil.svg';
 import { EventChain } from '../../../bb/input/event-chain/event-chain';
 import { DoubleTapper } from '../../../bb/input/event-chain/double-tapper';
 import { TChainElement } from '../../../bb/input/event-chain/event-chain.types';
-import { css } from '@emotion/css';
+import * as classes from './preview.module.scss';
 import { zoomByStep } from './utils/zoom-by-step';
 import { PinchZoomer } from '../../../bb/input/event-chain/pinch-zoomer';
 import { LANG } from '../../../language/language';
@@ -270,14 +270,7 @@ export class Preview {
             }
         });
 
-        this.viewport.getElement().classList.add(
-            css({
-                cursor: 'grab',
-                ':active': {
-                    cursor: 'grabbing',
-                },
-            }),
-        );
+        this.viewport.getElement().classList.add(classes.viewport);
         BB.css(this.viewport.getElement(), {
             userSelect: 'none',
             touchAction: 'none',
@@ -357,22 +350,10 @@ export class Preview {
             });
         }
 
-        const elCss = css(
-            p.hasBorder === false
-                ? {}
-                : {
-                      borderTop: '1px solid #7f7f7f',
-                      borderBottom: '1px solid #7f7f7f',
-                      '.kl-theme-dark &': {
-                          borderTop: '1px solid #636363',
-                          borderBottom: '1px solid #636363',
-                      },
-                  },
-        );
         // pointer-events: auto - So the canvas can be ignored, while the buttons still work.
         this.rootEl = c(
             {
-                className: elCss,
+                className: p.hasBorder === false ? undefined : classes.preview,
                 css: {
                     position: 'relative',
                     zIndex: '0', // prevent buttons from sitting on top of other modals

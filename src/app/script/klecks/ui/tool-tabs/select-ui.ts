@@ -15,6 +15,7 @@ import removeLayerImg from 'url:/src/app/img/ui/remove-layer.svg';
 import { Select } from '../components/select';
 import { LANG } from '../../../language/language';
 import { Checkbox } from '../components/checkbox';
+import { createImage } from '../../../bb/base/ui';
 
 export type TSelectUiParams = {
     onChangeMode: (mode: TSelectToolMode) => void;
@@ -262,11 +263,18 @@ export class SelectUi {
         this.selectResetBtn = BB.el({
             parent: actionRow,
             tagName: 'button',
-            content:
-                "<img src='" +
-                removeLayerImg +
-                '\' height="20" style="margin-right: 3px; filter: invert(1)"/>' +
+            content: [
+                createImage({
+                    src: removeLayerImg,
+                    alt: 'icon',
+                    height: 20,
+                    css: {
+                        marginRight: '3px',
+                        filter: 'invert(1)',
+                    },
+                }),
                 LANG('select-reset'),
+            ],
             className: 'kl-button kl-button-primary',
             css: {
                 paddingRight: '8px',

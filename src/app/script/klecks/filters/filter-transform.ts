@@ -8,7 +8,6 @@ import { LANG } from '../../language/language';
 import { throwIfNull } from '../../bb/base/base';
 import { Preview } from '../ui/project-viewport/preview';
 import { TProjectViewportProject } from '../ui/project-viewport/project-viewport';
-import { css } from '@emotion/css/dist/emotion-css.cjs';
 import { testIsSmall } from '../ui/utils/test-is-small';
 import { getPreviewHeight, getPreviewWidth, MEDIUM_PREVIEW } from '../ui/utils/preview-size';
 import { canvasToLayerTiles } from '../history/push-helpers/canvas-to-layer-tiles';
@@ -471,13 +470,11 @@ export const filterTransform = {
             padding: 30,
         });
         preview.render();
-        preview.getElement().classList.add(
-            css({
-                overflow: 'hidden',
-                marginLeft: '-20px',
-                marginRight: '-20px',
-            }),
-        );
+        BB.css(preview.getElement(), {
+            overflow: 'hidden',
+            marginLeft: '-20px',
+            marginRight: '-20px',
+        });
         rootEl.append(preview.getElement());
 
         let lastDrawnTransformStr = '';

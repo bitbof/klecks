@@ -214,3 +214,31 @@ export function destroyEl(el?: HTMLElement): void {
     // not found
     return;
 }
+
+export function createImage(p: {
+    src?: string;
+    alt?: string;
+    width?: number;
+    height?: number;
+    className?: string;
+    css?: Partial<CSSStyleDeclaration>;
+}): HTMLImageElement {
+    const result = new Image();
+    if (p.src !== undefined) {
+        result.src = p.src;
+    }
+    if (p.alt !== undefined) {
+        result.alt = p.alt;
+    }
+    if (p.width !== undefined) {
+        result.width = p.width;
+    }
+    if (p.height !== undefined) {
+        result.height = p.height;
+    }
+    if (p.className !== undefined) {
+        result.className = p.className;
+    }
+    p.css && css(result, p.css);
+    return result;
+}

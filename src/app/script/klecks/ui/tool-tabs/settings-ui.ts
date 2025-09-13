@@ -12,6 +12,7 @@ import { showLicensesDialog } from '../modals/licenses-dialog/show-licenses-dial
 import { c } from '../../../bb/base/c';
 import { SaveReminder } from '../components/save-reminder';
 import { showModal } from '../modals/base/showModal';
+import { createImage } from '../../../bb/base/ui';
 
 export type TSettingsUiParams = {
     onLeftRight: () => void;
@@ -183,11 +184,18 @@ export class SettingsUi {
         BB.el({
             tagName: 'button',
             parent: this.rootEl,
-            content:
-                '<img height="20" width="18" src="' +
-                uiSwapImg +
-                '" alt="icon" style="margin-right: 5px"/>' +
+            content: [
+                createImage({
+                    alt: 'icon',
+                    src: uiSwapImg,
+                    width: 18,
+                    height: 20,
+                    css: {
+                        marginRight: '5px',
+                    },
+                }),
                 LANG('switch-ui-left-right'),
+            ],
             onClick: () => onLeftRight(),
             css: {
                 marginTop: '15px',
@@ -219,7 +227,28 @@ export class SettingsUi {
                 });
                 minimalAbout.append(
                     BB.el({
-                        content: `<img alt="icon" height="20" style="vertical-align:middle" src="${bitbofLogoImg}"> <a href="https://bitbof.com" target="_blank" tabIndex="-1">bitbof</a> © 2025<br>`,
+                        content: [
+                            createImage({
+                                alt: 'icon',
+                                height: 20,
+                                src: bitbofLogoImg,
+                                css: {
+                                    verticalAlign: 'middle',
+                                },
+                            }),
+                            ' ',
+                            BB.el({
+                                tagName: 'a',
+                                content: 'bitbof',
+                                custom: {
+                                    href: 'https://bitbof.com',
+                                    target: '_blank',
+                                    tabIndex: '-1',
+                                },
+                            }),
+                            ' © 2025',
+                            BB.el({ tagName: 'br' }),
+                        ],
                     }),
                     makeLicenses(),
                 );
@@ -230,9 +259,35 @@ export class SettingsUi {
                 css: {
                     textAlign: 'center',
                 },
-                content: `
-<img alt="Klecks" class="dark-invert" height="25" src="${klecksLogoImg}"><br>
-<img alt="icon" height="20" style="vertical-align:middle" src="${bitbofLogoImg}"> <a href="https://bitbof.com" target="_blank" tabIndex="-1">bitbof</a> © 2025<br>`,
+                content: [
+                    createImage({
+                        alt: 'Klecks',
+                        className: 'dark-invert',
+                        height: 25,
+                        src: klecksLogoImg,
+                    }),
+                    BB.el({ tagName: 'br' }),
+                    createImage({
+                        alt: 'icon',
+                        height: 20,
+                        src: bitbofLogoImg,
+                        css: {
+                            verticalAlign: 'middle',
+                        },
+                    }),
+                    ' ',
+                    BB.el({
+                        tagName: 'a',
+                        content: 'bitbof',
+                        custom: {
+                            href: 'https://bitbof.com',
+                            target: '_blank',
+                            tabIndex: '-1',
+                        },
+                    }),
+                    ' © 2025',
+                    BB.el({ tagName: 'br' }),
+                ],
             });
 
             versionEl.append(

@@ -332,13 +332,13 @@ export class KlApp {
         const tempHistory = new KlTempHistory();
         let mainTabRow: TabRow | undefined = undefined;
 
-        const clearLayer = (showStatus?: boolean) => {
+        const clearLayer = (showStatus?: boolean, ignoreSelection?: boolean) => {
             applyUncommitted();
             const layerIndex = currentLayer.index;
             this.klCanvas.eraseLayer({
                 layerIndex,
                 useAlphaLock: layerIndex === 0 && !brushUiMap.eraserBrush.getIsTransparentBg(),
-                useSelection: true,
+                useSelection: !ignoreSelection,
             });
             showStatus &&
                 this.statusOverlay.out(
@@ -1538,7 +1538,7 @@ export class KlApp {
             applyUncommitted: () => applyUncommitted(),
             klHistory: this.klHistory,
             onUpdateProject: () => this.easelProjectUpdater.update(),
-            onClearLayer: () => clearLayer(),
+            onClearLayer: () => clearLayer(false, true),
         });
         this.layerPreview = new KL.LayerPreview({
             klRootEl: this.rootEl,

@@ -38,22 +38,47 @@ export const filterRotate = {
             }
         }
 
-        const btnPlus = document.createElement('button');
-        btnPlus.innerHTML = "<span style='font-size: 1.3em'>⟳</span> 90°";
-        const btnMinus = document.createElement('button');
-        btnMinus.innerHTML = "<span style='font-size: 1.3em'>⟲</span> 90°";
-        btnMinus.style.marginRight = '5px';
+        const minusBtn = BB.el({
+            tagName: 'button',
+            content: [
+                BB.el({
+                    tagName: 'span',
+                    content: '⟲',
+                    css: {
+                        fontSize: '1.3em',
+                    },
+                }),
+                ' 90°',
+            ],
+            onClick: () => {
+                deg -= 90;
+                update();
+            },
+            noRef: true,
+        });
+        const plusBtn = BB.el({
+            tagName: 'button',
+            content: [
+                BB.el({
+                    tagName: 'span',
+                    content: '⟳',
+                    css: {
+                        fontSize: '1.3em',
+                    },
+                }),
+                ' 90°',
+            ],
+            onClick: () => {
+                deg += 90;
+                update();
+            },
+            noRef: true,
+            css: {
+                marginLeft: '5px',
+            },
+        });
 
-        btnPlus.onclick = function () {
-            deg += 90;
-            update();
-        };
-        btnMinus.onclick = function () {
-            deg -= 90;
-            update();
-        };
-
-        rootEl.append(btnMinus, btnPlus);
+        rootEl.append(minusBtn, plusBtn);
 
         const previewWrapper = BB.el({
             className: 'kl-preview-wrapper',

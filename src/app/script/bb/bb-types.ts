@@ -29,7 +29,7 @@ export type TSvg = {
     height?: string;
     fill?: string;
     stroke?: string;
-    style?: string;
+    css?: Partial<CSSStyleDeclaration>;
     d?: string;
     x?: string;
     y?: string;

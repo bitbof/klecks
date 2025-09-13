@@ -4,7 +4,6 @@ import { TFilterApply, TFilterGetDialogParam, TFilterGetDialogResult, TRgba } fr
 import { LANG } from '../../language/language';
 import { FxPreviewRenderer } from '../ui/project-viewport/fx-preview-renderer';
 import { Preview } from '../ui/project-viewport/preview';
-import { css } from '@emotion/css/dist/emotion-css.cjs';
 import { TProjectViewportProject } from '../ui/project-viewport/project-viewport';
 import { BB } from '../../bb/bb';
 import { testIsSmall } from '../ui/utils/test-is-small';
@@ -125,12 +124,10 @@ export const filterToAlpha = {
             selection: klCanvas.getSelection(),
         });
         preview.render();
-        preview.getElement().classList.add(
-            css({
-                marginLeft: '-20px',
-                marginRight: '-20px',
-            }),
-        );
+        BB.css(preview.getElement(), {
+            marginLeft: '-20px',
+            marginRight: '-20px',
+        });
         rootEl.append(preview.getElement());
 
         result.destroy = (): void => {

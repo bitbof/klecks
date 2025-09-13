@@ -79,6 +79,10 @@
     original: 'More Tools',
     value: 'Meer Hulpmiddelen'
   },
+  'tool-more-tools-click-again': {
+    original: 'Click again for more tools',
+    value: ''
+  },
   undo: {
     original: 'Undo',
     value: 'Ongedaan maken'

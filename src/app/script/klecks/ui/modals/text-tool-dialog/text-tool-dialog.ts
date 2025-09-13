@@ -11,7 +11,6 @@ import { TextToolTextUI } from './text-tool-text-ui';
 import { TextToolViewportUI } from './text-tool-viewport-ui';
 import * as classes from './text-tool-dialog.module.scss';
 import { c } from '../../../../bb/base/c';
-import { css } from '@emotion/css';
 import { TabRow } from '../../components/tab-row';
 
 export function textToolDialog(p: {
@@ -121,59 +120,14 @@ export function textToolDialog(p: {
             },
         ],
     });
-    tabs.getElement().classList.add(
-        css({
-            minWidth: '200px',
-            maxWidth: '500px',
-            flexGrow: '1',
-            borderBottom: 'none !important',
-        }),
-    );
-
-    const viewportInputsCss = css({
-        position: 'relative',
-        zIndex: '1',
-        '>*': {
-            position: 'absolute',
-            right: 0,
-            top: 10,
-        },
-    });
-
-    const tabWrapperCss = css({
-        display: 'flex',
-        justifyContent: 'space-between',
-        flexDirection: 'row-reverse',
-        flexWrap: 'wrap',
-        marginTop: '10px',
-        marginLeft: '-20px',
-        marginRight: '-20px',
-        padding: '0 20px',
-        '@media (min-width: 700px) and (min-height: 700px)': {
-            display: 'none !important',
-        },
-    });
-
-    const inputsCss = css({
-        minHeight: 72,
-        marginTop: '10px',
-        '@media (min-width: 700px) and (min-height: 700px)': {
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '10px',
-            '>*': {
-                display: 'flex !important',
-            },
-        },
-    });
-
+    tabs.getElement().classList.add(classes.tab);
     rootEl.append(
         c('', [
             c(viewportWrapper, [viewportUI.getElement()]),
-            c('.' + viewportInputsCss, [viewportUI.getInputsElement()]),
-            c('.tabrow.' + tabWrapperCss, [c(',w-240,h-40'), tabs.getElement()]),
+            c('.' + classes.viewportInputs, [viewportUI.getInputsElement()]),
+            c('.tabrow.' + classes.tabWrapper, [c(',w-240,h-40'), tabs.getElement()]),
 
-            c('.' + inputsCss, [
+            c('.' + classes.inputs, [
                 c(colorWrapper, [fillUI.getElement(), strokeUI.getElement()]),
                 fontUI.getElement(),
                 textUI.getElement(),

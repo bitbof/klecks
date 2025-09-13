@@ -79,6 +79,10 @@
     original: 'More Tools',
     value: 'Mehr Werkzeuge'
   },
+  'tool-more-tools-click-again': {
+    original: 'Click again for more tools',
+    value: 'Klicke erneut für mehr Werkzeuge'
+  },
   undo: {
     original: 'Undo',
     value: 'Rückgängig'
@@ -750,7 +754,7 @@
   },
   'cropcopy-mask': {
     original: 'Mask unselected',
-    value: ''
+    value: 'Maskiere außerhalb der Auswahl'
   },
   'cropcopy-click-hold': {
     original: 'Right-click or press hold to copy.',

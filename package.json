@@ -19,7 +19,6 @@
     "lang:build": "node src/languages/generate.js build"
   },
   "dependencies": {
-    "@emotion/css": "^11.13.5",
     "@parcel/transformer-glsl": "^2.15.4",
     "@parcel/transformer-sass": "^2.15.4",
     "ag-psd": "^28.2.2",

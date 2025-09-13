@@ -130,9 +130,13 @@ export class BlendBrush {
      * @private
      */
     private sliceBounds(bounds: TBounds): { index: number; bounds: TBounds }[] {
+        const boundsWithinSelection = boundsOverlap(bounds, this.selectionBounds);
+        if (!boundsWithinSelection) {
+            return [];
+        }
         const cellsW = this.getCellsWidth();
         const result: { index: number; bounds: TBounds }[] = [];
-        const touchedCells = this.getTouchedCells(bounds);
+        const touchedCells = this.getTouchedCells(boundsWithinSelection);
 
         touchedCells.forEach((cell, i) => {
             if (!cell) {
@@ -145,10 +149,10 @@ export class BlendBrush {
             const cellHeight = this.cells[i]!.height;
 
             const inCellBounds = {
-                x1: Math.max(0, bounds.x1 - cellOffsetX),
-                y1: Math.max(0, bounds.y1 - cellOffsetY),
-                x2: Math.min(cellWidth - 1, bounds.x2 - cellOffsetX),
-                y2: Math.min(cellHeight - 1, bounds.y2 - cellOffsetY),
+                x1: Math.max(0, boundsWithinSelection.x1 - cellOffsetX),
+                y1: Math.max(0, boundsWithinSelection.y1 - cellOffsetY),
+                x2: Math.min(cellWidth - 1, boundsWithinSelection.x2 - cellOffsetX),
+                y2: Math.min(cellHeight - 1, boundsWithinSelection.y2 - cellOffsetY),
             };
             if (inCellBounds.x1 > inCellBounds.x2 || inCellBounds.y1 > inCellBounds.y2) {
                 return;
@@ -252,7 +256,7 @@ export class BlendBrush {
         return { r: ar, g: ag, b: ab, a: aa };
     }
 
-    private prepDot(x: number, y: number, size: number): TBounds | undefined {
+    private getDotBounds(x: number, y: number, size: number): TBounds | undefined {
         size = Math.max(0.5, size);
         const x1 = Math.max(0, Math.floor(x - size));
         const y1 = Math.max(0, Math.floor(y - size));
@@ -447,7 +451,7 @@ export class BlendBrush {
                         ? Math.max(0.5, p * this.size)
                         : Math.max(0.5, this.size),
                 ];
-                const bounds = this.prepDot(avgParams[0], avgParams[1], avgParams[2]);
+                const bounds = this.getDotBounds(avgParams[0], avgParams[1], avgParams[2]);
                 if (bounds) {
                     this.copyFromCanvas(bounds);
                 }
@@ -517,7 +521,7 @@ export class BlendBrush {
                 this.mixCol.g = localColNew.g;
                 this.mixCol.b = localColNew.b;
             }
-            const bounds = this.prepDot(val.x, val.y, localSize);
+            const bounds = this.getDotBounds(val.x, val.y, localSize);
             if (bounds) {
                 this.updateRedrawBounds(bounds);
                 this.drawBuffer.push({
@@ -638,7 +642,7 @@ export class BlendBrush {
             this.mixCol.g = this.color.g;
             this.mixCol.b = this.color.b;
         } else {
-            this.copyFromCanvas(this.prepDot(x, y, localSize));
+            this.copyFromCanvas(this.getDotBounds(x, y, localSize));
 
             const average = this.getAverage(
                 x,
@@ -677,7 +681,7 @@ export class BlendBrush {
         this.drawBuffer = [];
 
         if (this.blending < 1 || this.blendCol.a > 0) {
-            const bounds = this.prepDot(x, y, localSize);
+            const bounds = this.getDotBounds(x, y, localSize);
             if (bounds) {
                 this.updateRedrawBounds(bounds);
                 this.drawBuffer.push({
@@ -767,114 +771,20 @@ export class BlendBrush {
     }
 
     drawLineSegment(x1: number, y1: number, x2: number, y2: number): void {
-        // todo - should sample more often for blending
-        const selection = this.klHistory.getComposed().selection.value;
-        this.selectionBounds = selection ? integerBounds(getMultiPolyBounds(selection)) : undefined;
-        this.mask = selection
-            ? getBinaryMask(selection, this.context.canvas.width, this.context.canvas.height)
-            : undefined;
-        this.lastInput.x = x2;
-        this.lastInput.y = y2;
+        const dx = x2 - x1;
+        const dy = y2 - y1;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+        const steps = Math.ceil(distance / 10);
 
-        if (this.isDrawing || x1 === undefined) {
-            return;
+        this.startLine(x1, y1, 1);
+
+        for (let i = 1; i <= steps; i++) {
+            const t = i / steps;
+            const xi = x1 + dx * t;
+            const yi = y1 + dy * t;
+            this.goLine(xi, yi, 1, false);
         }
 
-        const totalCells =
-            Math.ceil(this.context.canvas.width / HISTORY_TILE_SIZE) *
-            Math.ceil(this.context.canvas.height / HISTORY_TILE_SIZE);
-        this.cells = createArray(totalCells, undefined);
-        this.redrawBounds = undefined;
-        this.drawBuffer = [];
-
-        this.copyFromCanvas(this.prepDot(x1, y1, Math.max(0.1, this.size)));
-        const average = this.getAverage(x1, y1, Math.max(0.1, this.size));
-
-        if (average.a === 0) {
-            this.blendCol = {
-                r: this.color.r,
-                g: this.color.g,
-                b: this.color.b,
-                a: 1 - this.blending,
-            };
-        } else {
-            this.blendCol = {
-                r: average.r,
-                g: average.g,
-                b: average.b,
-                a: average.a,
-            };
-        }
-
-        this.mixCol.r =
-            this.color.r * (1 - this.blendCol.a) +
-            (this.blending * this.blendCol.r + this.color.r * (1 - this.blending)) *
-                this.blendCol.a;
-        this.mixCol.g =
-            this.color.g * (1 - this.blendCol.a) +
-            (this.blending * this.blendCol.g + this.color.g * (1 - this.blending)) *
-                this.blendCol.a;
-        this.mixCol.b =
-            this.color.b * (1 - this.blendCol.a) +
-            (this.blending * this.blendCol.b + this.color.b * (1 - this.blending)) *
-                this.blendCol.a;
-
-        const p = 1;
-        const localOpacity = this.settingOpacityPressure ? this.opacity * p * p : this.opacity;
-        const localSize = this.settingSizePressure
-            ? Math.max(0.1, p * this.size)
-            : Math.max(0.1, this.size);
-
-        const mouseDist = Math.sqrt(Math.pow(x2 - x1, 2.0) + Math.pow(y2 - y1, 2.0));
-        const eX = (x2 - x1) / mouseDist;
-        const eY = (y2 - y1) / mouseDist;
-        const bDist = this.calcSpacing(localSize);
-        for (let loopDist = 0; loopDist <= mouseDist; loopDist += bDist) {
-            const bounds = this.prepDot(x1 + eX * loopDist, y1 + eY * loopDist, localSize);
-            if (bounds) {
-                this.copyFromCanvas(bounds);
-                this.drawBuffer.push({
-                    x: x1 + eX * loopDist,
-                    y: y1 + eY * loopDist,
-                    size: localSize,
-                    opacity: localOpacity,
-                    x1: bounds.x1,
-                    y1: bounds.y1,
-                    x2: bounds.x2,
-                    y2: bounds.y2,
-                    r: BB.mix(this.color.r, this.mixCol.r, this.blending),
-                    g: BB.mix(this.color.g, this.mixCol.g, this.blending),
-                    b: BB.mix(this.color.b, this.mixCol.b, this.blending),
-                });
-            }
-        }
-        this.drawBuffer.forEach((item) => {
-            this.drawDot(item);
-        });
-        this.drawBuffer = [];
-        this.updateRedrawBounds({
-            x1: x1 - localSize,
-            y1: y1 - localSize,
-            x2: x1 + localSize,
-            y2: y1 + localSize,
-        });
-        this.updateRedrawBounds({
-            x1: x2 - localSize,
-            y1: y2 - localSize,
-            x2: x2 + localSize,
-            y2: y2 + localSize,
-        });
-        this.drawChangedCells();
-        if (this.cells.some((item) => item)) {
-            this.klHistory.push(
-                getPushableLayerChange(
-                    this.klHistory.getComposed(),
-                    this.cells.map((cell) => {
-                        return cell ? createImageDataTile(cell) : undefined;
-                    }),
-                ),
-            );
-        }
-        this.cells = [];
+        this.endLine();
     }
 }

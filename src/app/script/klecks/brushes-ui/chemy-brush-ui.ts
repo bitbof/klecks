@@ -143,7 +143,10 @@ export const chemyBrushUi = (function () {
                                 {
                                     elementType: 'path',
                                     fill: '#000',
-                                    style: `transform-origin: 0 0; transform: translate(-0.5px, -0.5px) scale(${actualIconSize}, ${actualIconSize}) translate(0.5px, 0.5px)`,
+                                    css: {
+                                        transformOrigin: '0 0',
+                                        transform: `translate(-0.5px, -0.5px) scale(${actualIconSize}, ${actualIconSize}) translate(0.5px, 0.5px)`,
+                                    },
                                     d: 'M 0,0 C 1.5,0 -0.5,1 1,1',
                                 },
                             ],
@@ -162,7 +165,11 @@ export const chemyBrushUi = (function () {
                                     elementType: 'path',
                                     fill: 'none',
                                     stroke: '#000',
-                                    style: `stroke-width: 0.12px; transform-origin: 0 0; transform: translate(-0.5px, -0.5px) scale(${actualIconSize}, ${actualIconSize}) translate(0.5px, 0.5px)`,
+                                    css: {
+                                        strokeWidth: '0.12px',
+                                        transformOrigin: '0 0',
+                                        transform: `translate(-0.5px, -0.5px) scale(${actualIconSize}, ${actualIconSize}) translate(0.5px, 0.5px)`,
+                                    },
                                     d: 'M 0,0 C 1.5,0 -0.5,1 1,1',
                                 },
                             ],
@@ -194,7 +201,9 @@ export const chemyBrushUi = (function () {
                             elementType: 'path',
                             fill: 'none',
                             stroke: '#000',
-                            style: 'stroke-width: 1px',
+                            css: {
+                                strokeWidth: '1px',
+                            },
                             d: `M ${halfSize + padding},${padding} ${halfSize + padding},${actualIconSize + padding}`,
                         },
                     ],
@@ -217,7 +226,9 @@ export const chemyBrushUi = (function () {
                             elementType: 'path',
                             fill: 'none',
                             stroke: '#000',
-                            style: 'stroke-width: 1px',
+                            css: {
+                                strokeWidth: '1px',
+                            },
                             d: `M ${padding},${halfSize + padding} ${actualIconSize + padding},${halfSize + padding}`,
                         },
                     ],
