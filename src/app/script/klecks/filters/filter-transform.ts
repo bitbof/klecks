@@ -48,12 +48,17 @@ function drawTransform(
             ctx.fillRect(0, 0, width, height);
         }
     } else {
-        if (!isTransparentBg) {
-            ctx.fillStyle = 'white';
-            ctx.fillRect(0, 0, width, height);
-        }
-        if (doClone) {
+        if (isTransparentBg) {
+            if (doClone) {
+                ctx.drawImage(copiedCanvas, 0, 0);
+            }
+        } else {
             ctx.drawImage(copiedCanvas, 0, 0);
+            if (!doClone) {
+                ctx.fillStyle = 'white';
+                ctx.globalCompositeOperation = 'source-atop';
+                ctx.fillRect(0, 0, width, height);
+            }
         }
     }
     ctx.restore();

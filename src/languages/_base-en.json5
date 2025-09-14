@@ -915,6 +915,8 @@ Renaming a key across multiple language files:
   "text-right": "Right",
   "text-italic": "Italic",
   "text-bold": "Bold",
+  "text-failed-import": 'Failed to import the following files:',
+  "text-supported-formats": 'Supported formats:',
 
   // select tool (and transform)
   "select-select": "Select",

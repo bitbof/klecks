@@ -1439,6 +1439,14 @@
     original: 'Bold',
     value: 'Fett'
   },
+  'text-failed-import': {
+    original: 'Failed to import the following files:',
+    value: 'Folgende Dateien konnten nicht geladen werden:'
+  },
+  'text-supported-formats': {
+    original: 'Supported formats:',
+    value: 'Unterstützte Formate:'
+  },
   'select-select': {
     original: 'Select',
     value: 'Auswahl'
