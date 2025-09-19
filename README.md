@@ -27,7 +27,7 @@ Created by developer/artist [bitbof](https://bitbof.com)
 ---
 
 # Commands
-- initialize via `npm install` (requires node and npm to be installed already)
+- initialize via `npm ci` (requires node and npm to be installed already)
 - `npm run lang:build` - generate language files necessary to run Klecks
 - `npm run lang:build -- --missing` - generate language files and list all keys with a missing translation.
 - `npm run start` - dev server (to run it locally)

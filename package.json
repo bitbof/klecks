@@ -19,15 +19,15 @@
     "lang:build": "node src/languages/generate.js build"
   },
   "dependencies": {
-    "@parcel/transformer-glsl": "^2.15.4",
-    "@parcel/transformer-sass": "^2.15.4",
-    "ag-psd": "^28.2.2",
-    "buffer": "^6.0.3",
-    "js-beautify": "^1.15.4",
-    "json5": "^2.2.3",
-    "mdn-polyfills": "^5.20.0",
-    "parcel": "^2.15.4",
-    "polygon-clipping": "^0.15.7",
-    "transformation-matrix": "^3.1.0"
+    "@parcel/transformer-glsl": "2.16.0",
+    "@parcel/transformer-sass": "2.16.0",
+    "ag-psd": "28.3.1",
+    "buffer": "6.0.3",
+    "js-beautify": "1.15.4",
+    "json5": "2.2.3",
+    "mdn-polyfills": "5.20.0",
+    "parcel": "2.16.0",
+    "polygon-clipping": "0.15.7",
+    "transformation-matrix": "3.1.0"
   }
 }
