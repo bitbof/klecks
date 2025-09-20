@@ -1,5 +1,5 @@
 import { BB } from '../../../../bb/bb';
-import { throwIfNull } from '../../../../bb/base/base';
+import { css, throwIfNull } from '../../../../bb/base/base';
 import { THEME } from '../../../../theme/theme';
 import { renderText, TRenderTextParam } from '../../../image-operations/render-text';
 import { KlCanvas } from '../../../canvas/kl-canvas';
@@ -121,7 +121,7 @@ export class TextToolViewportUI {
         this.layersCtx = BB.ctx(this.layersCanvas);
         this.previewCanvas = BB.canvas(this.width, this.height); // the one that is visible
         this.previewCtx = BB.ctx(this.previewCanvas);
-        BB.css(this.previewCanvas, {
+        css(this.previewCanvas, {
             display: 'block',
         });
         this.previewWrapper = BB.el({

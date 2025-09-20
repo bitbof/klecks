@@ -30,6 +30,7 @@ import {
 } from './easel.config';
 import { isTransformEqual } from '../project-viewport/utils/is-transform-equal';
 import { blendTransform } from '../project-viewport/utils/blend-transform';
+import { css } from '../../../bb/base/base';
 
 function getToolEntries<GToolId extends string>(
     tools: Record<GToolId, TEaselTool>,
@@ -637,7 +638,7 @@ export class Easel<GToolId extends string> {
             width: '' + this.width,
             height: '' + this.height,
         });
-        BB.css(this.svgEl, {
+        css(this.svgEl, {
             position: 'absolute',
             left: '0',
             top: '0',

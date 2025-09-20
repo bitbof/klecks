@@ -1,5 +1,6 @@
 import { BB } from '../../../bb/bb';
 import { TKeyString } from '../../../bb/bb-types';
+import { css } from '../../../bb/base/base';
 
 type TSelectItem<ValueType> =
     | [ValueType, string]
@@ -41,7 +42,7 @@ export class Select<ValueType extends string> {
             },
         });
         if (p.css) {
-            BB.css(this.selectEl, p.css);
+            css(this.selectEl, p.css);
         }
 
         const isFocusable = p.isFocusable;
@@ -115,7 +116,7 @@ export class Select<ValueType extends string> {
             el.value = item[0];
             el.textContent = item[1];
             if (item[2]) {
-                BB.css(el, item[2].css);
+                css(el, item[2].css);
             }
             this.optionArr.push({
                 item,

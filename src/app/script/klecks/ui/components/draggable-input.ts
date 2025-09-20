@@ -4,6 +4,7 @@ import { TVector2D } from '../../../bb/bb-types';
 import { applyToPoint } from 'transformation-matrix';
 import { createMatrixFromTransform } from '../../../bb/transform/create-matrix-from-transform';
 import { PointerListener } from '../../../bb/input/pointer-listener';
+import { css } from '../../../bb/base/base';
 
 export type TDraggableInputParams = {
     value: TVector2D;
@@ -20,7 +21,7 @@ export class DraggableInput {
 
     private update(): void {
         const p = applyToPoint(createMatrixFromTransform(this.transform), this.value);
-        BB.css(this.rootEl, {
+        css(this.rootEl, {
             left: p.x - SIZE / 2 + 'px',
             top: p.y - SIZE / 2 + 'px',
         });

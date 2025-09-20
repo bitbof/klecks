@@ -6,6 +6,7 @@ import { LANG } from '../../../language/language';
 import { TRgb, TRgba } from '../../kl-types';
 import { TSize2D } from '../../../bb/bb-types';
 import { table } from '../components/table';
+import { css } from '../../../bb/base/base';
 
 export function newImageDialog(p: {
     currentColor: TRgb; // current color
@@ -67,7 +68,7 @@ export function newImageDialog(p: {
     widthInput.type = 'number';
     widthInput.min = '1';
     widthInput.max = '' + maxCanvasSize;
-    BB.css(widthInput, {
+    css(widthInput, {
         width: '70px',
     });
 
@@ -91,7 +92,7 @@ export function newImageDialog(p: {
         [BB.el({ css: { height: '5px' } }), '', ''],
         [LANG('height') + ':&nbsp;', heightInput, heightUnit],
     ]);
-    BB.css(sizeTable, {
+    css(sizeTable, {
         marginBottom: '10px',
     });
 
@@ -220,7 +221,7 @@ export function newImageDialog(p: {
         // safari: not empty without also setting it to null via timeout
         select.setValue(undefined);
     }, 0);
-    BB.css(select.getElement(), {
+    css(select.getElement(), {
         width: '80px',
         flexGrow: '1',
     });
@@ -326,7 +327,7 @@ export function newImageDialog(p: {
         function hcf(u: number, v: number): number {
             let U = u,
                 V = v;
-             
+
             while (true) {
                 if (!(U %= V)) {
                     return V;

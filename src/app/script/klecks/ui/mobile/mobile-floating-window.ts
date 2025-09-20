@@ -4,6 +4,7 @@ import { clamp } from '../../../bb/math/math';
 import { LANG } from '../../../language/language';
 import cancelImg from 'url:/src/app/img/ui/cancel.svg';
 import { PointerListener } from '../../../bb/input/pointer-listener';
+import { css } from '../../../bb/base/base';
 
 export type TMobileFloatingWindowParams = {
     content: HTMLElement;
@@ -22,7 +23,7 @@ export class MobileFloatingWindow {
         const rect = this.rootEl.getBoundingClientRect();
         this.position.x = clamp(this.position.x, 0, window.innerWidth - rect.width);
         this.position.y = clamp(this.position.y, 0, window.innerHeight - rect.height);
-        BB.css(this.rootEl, {
+        css(this.rootEl, {
             left: this.position.x + 'px',
             top: this.position.y + 'px',
         });

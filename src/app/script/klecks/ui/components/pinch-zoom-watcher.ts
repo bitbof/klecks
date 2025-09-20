@@ -1,5 +1,6 @@
 import { BB } from '../../../bb/bb';
 import { LANG } from '../../../language/language';
+import { css } from '../../../bb/base/base';
 
 /**
  * Users can get stuck when pinch-zooming in (via double tapping or pinching).
@@ -80,7 +81,7 @@ export class PinchZoomWatcher {
                 viewport.scale > 1;
 
             if (isZoomed) {
-                BB.css(rootEl, {
+                css(rootEl, {
                     left: viewport.offsetLeft + 'px',
                     top: viewport.offsetTop + 'px',
                     width: viewport.width + 'px',

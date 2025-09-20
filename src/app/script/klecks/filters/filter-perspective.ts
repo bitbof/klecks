@@ -7,7 +7,7 @@ import { TRectanglePoints } from '../../fx-canvas/filters/perspective';
 import { applyToPoint, Matrix } from 'transformation-matrix';
 import { Preview } from '../ui/project-viewport/preview';
 import { TProjectViewportProject } from '../ui/project-viewport/project-viewport';
-import { throwIfNull, throwIfUndefined } from '../../bb/base/base';
+import { css, throwIfNull, throwIfUndefined } from '../../bb/base/base';
 import { DraggableInput } from '../ui/components/draggable-input';
 import { testIsSmall } from '../ui/utils/test-is-small';
 import { getPreviewHeight, getPreviewWidth, MEDIUM_PREVIEW } from '../ui/utils/preview-size';
@@ -138,7 +138,7 @@ export const filterPerspective = {
                 afterInputs.forEach((item) => item.setTransform(transform));
             },
         });
-        BB.css(preview.getElement(), {
+        css(preview.getElement(), {
             overflow: 'hidden',
             marginLeft: '-20px',
             marginRight: '-20px',

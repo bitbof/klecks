@@ -4,6 +4,7 @@ import { BB } from '../../../../bb/bb';
 import { LANG } from '../../../../language/language';
 import './scroll-fix';
 import cancelImg from 'url:/src/app/img/ui/cancel.svg';
+import { css } from '../../../../bb/base/base';
 
 /**
  * popup that fill whole height, with some padding.
@@ -84,7 +85,7 @@ export class DynamicModal {
             const elW = popupEl.offsetWidth;
             const elH = popupEl.offsetHeight;
 
-            BB.css(popupEl, {
+            css(popupEl, {
                 left: Math.max(0, (window.innerWidth - elW) / 2) + 'px',
                 top: Math.max(20, (window.innerHeight - elH) / 2 - elH * 0.2) + 'px',
             });

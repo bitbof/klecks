@@ -183,16 +183,31 @@ a:not([href]):hover {
 }
 
 .kl-tooldropdown-caret {
-    bottom: 1px;
-    background-size: 60%;
-    transition: all 100ms ease-out;
+    position: absolute;
+    right: 2px;
+    bottom: 2px;
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    border-radius: 5px;
+
+    background-color: #f3f3f3;
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.2);
 }
+.kl-tooldropdown-caret > div {
+    height: 100%;
+    background-image: url(../img/ui/caret-down.svg);
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 60%;
+}
+
 .toolspace-row-button-activated.kl-tool-button--hover > .kl-tooldropdown-caret {
-    bottom: -1px;
+    background-color: #fff;
 }
 
 .kl-tooldropdown-caret:hover {
-    bottom: -1px;
+    background-color: #fff;
 }
 
 .kl-tool-row-border-right {

@@ -12,6 +12,7 @@ import {
     toImageSpace,
     toTransformSpace,
 } from './free-transform-utils';
+import { css } from '../../../bb/base/base';
 
 /**
  * Free Transform UI
@@ -277,14 +278,14 @@ export class FreeTransform {
     private updateDOM(skipCallback?: boolean): void {
         this.updateScaled();
 
-        BB.css(this.transEl, {
+        css(this.transEl, {
             left: this.viewportTransform.x + this.scaled.x + 'px',
             top: this.viewportTransform.y + this.scaled.y + 'px',
             transformOrigin: '0 0',
             transform: 'rotate(' + this.value.angleDeg + 'deg)',
         });
 
-        BB.css(this.boundsEl, {
+        css(this.boundsEl, {
             width: Math.abs(this.scaled.width) + 'px',
             height: Math.abs(this.scaled.height) + 'px',
             left: Math.min(this.scaled.corners[0].x, this.scaled.corners[1].x) + 'px',
@@ -572,7 +573,7 @@ export class FreeTransform {
                             ? 10
                             : 0;
 
-                    BB.css(g.el, {
+                    css(g.el, {
                         left:
                             this.scaled.corners[g.i].x -
                             this.gripSize / 2 +
@@ -598,7 +599,7 @@ export class FreeTransform {
                         angle += 360;
                     }
                     const index = Math.round(angle / 45) % this.cornerCursors.length;
-                    BB.css(g.el, {
+                    css(g.el, {
                         cursor: this.cornerCursors[index] + '-resize',
                     });
                 };
@@ -694,7 +695,7 @@ export class FreeTransform {
                 const g = this.edges[i];
                 g.updateDOM = () => {
                     if (i === 0) {
-                        BB.css(g.el, {
+                        css(g.el, {
                             left:
                                 Math.min(this.scaled.corners[0].x, this.scaled.corners[1].x) + 'px',
                             top:
@@ -705,7 +706,7 @@ export class FreeTransform {
                             height: this.edgeSize + 'px',
                         });
                     } else if (i === 1) {
-                        BB.css(g.el, {
+                        css(g.el, {
                             left:
                                 Math.max(this.scaled.corners[0].x, this.scaled.corners[1].x) + 'px',
                             top:
@@ -714,7 +715,7 @@ export class FreeTransform {
                             height: Math.abs(this.scaled.height) + 'px',
                         });
                     } else if (i === 2) {
-                        BB.css(g.el, {
+                        css(g.el, {
                             left:
                                 Math.min(this.scaled.corners[3].x, this.scaled.corners[2].x) + 'px',
                             top:
@@ -723,7 +724,7 @@ export class FreeTransform {
                             height: this.edgeSize + 'px',
                         });
                     } else if (i === 3) {
-                        BB.css(g.el, {
+                        css(g.el, {
                             left:
                                 Math.min(this.scaled.corners[0].x, this.scaled.corners[1].x) -
                                 this.edgeSize +
@@ -841,7 +842,7 @@ export class FreeTransform {
             y: 0,
             snap: false,
             updateDOM: () => {
-                BB.css(this.angleGrip.el, {
+                css(this.angleGrip.el, {
                     left: this.angleGrip.x - this.gripSize / 2 + 'px',
                     top: this.angleGrip.y - this.gripSize / 2 + 'px',
                 });

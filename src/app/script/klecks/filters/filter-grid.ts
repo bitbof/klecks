@@ -4,7 +4,7 @@ import { LANG } from '../../language/language';
 import { input } from '../ui/components/input';
 import { ColorOptions } from '../ui/components/color-options';
 import { drawGrid } from '../image-operations/draw-grid';
-import { throwIfNull } from '../../bb/base/base';
+import { css, throwIfNull } from '../../bb/base/base';
 import { Preview } from '../ui/project-viewport/preview';
 import { testIsSmall } from '../ui/utils/test-is-small';
 import { getPreviewHeight, getPreviewWidth } from '../ui/utils/preview-size';
@@ -160,7 +160,7 @@ export const filterGrid = {
                 layers: previewLayerArr,
             },
         });
-        BB.css(preview.getElement(), {
+        css(preview.getElement(), {
             marginLeft: '-20px',
             marginRight: '-20px',
         });

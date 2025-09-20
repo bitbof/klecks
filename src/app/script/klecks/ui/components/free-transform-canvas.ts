@@ -5,6 +5,7 @@ import { TRect } from '../../../bb/bb-types';
 import { Preview } from '../project-viewport/preview';
 import { TProjectViewportProject } from '../project-viewport/project-viewport';
 import { TFreeTransform } from './free-transform-utils';
+import { css } from '../../../bb/base/base';
 
 /**
  * a basic canvas where you can transform one layer(move around, rotate, scale)
@@ -91,15 +92,17 @@ export class FreeTransformCanvas {
             },
             hasEditMode: true,
             onModeChange: (m) => {
-                this.freeTransform.getElement().style.pointerEvents = m === 'edit' ? '' : 'none';
-                this.freeTransform.getElement().style.opacity = m === 'edit' ? '' : '0.5';
+                css(this.freeTransform.getElement(), {
+                    pointerEvents: m === 'edit' ? '' : 'none',
+                    opacity: m === 'edit' ? '' : '0.5',
+                });
             },
             onTransformChange: (transform) => {
                 this.freeTransform.setViewportTransform(transform);
             },
             padding: 30,
         });
-        BB.css(this.preview.getElement(), {
+        css(this.preview.getElement(), {
             overflow: 'hidden',
             marginLeft: '-20px',
             marginRight: '-20px',
@@ -129,7 +132,7 @@ export class FreeTransformCanvas {
             });
             this.preview.getElement().append(this.freeTransform.getElement());
         }
-        BB.css(this.freeTransform.getElement(), {
+        css(this.freeTransform.getElement(), {
             position: 'absolute',
             left: '0',
             top: '0',

@@ -5,6 +5,7 @@ import { Checkbox } from '../components/checkbox';
 import { Options } from '../components/options';
 import { TGradientType } from '../../kl-types';
 import { KlColorSlider } from '../components/kl-color-slider';
+import { css } from '../../../bb/base/base';
 
 type TGradientUiSettings = {
     opacity: number;
@@ -121,7 +122,7 @@ export class GradientUi {
                 this.settings.opacity = val;
             },
         });
-        BB.css(opacitySlider.getElement(), {
+        css(opacitySlider.getElement(), {
             marginTop: '10px',
         });
         this.rootEl.append(opacitySlider.getElement());

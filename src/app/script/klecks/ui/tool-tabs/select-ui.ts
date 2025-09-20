@@ -16,6 +16,7 @@ import { Select } from '../components/select';
 import { LANG } from '../../../language/language';
 import { Checkbox } from '../components/checkbox';
 import { createImage } from '../../../bb/base/ui';
+import { css } from '../../../bb/base/base';
 
 export type TSelectUiParams = {
     onChangeMode: (mode: TSelectToolMode) => void;
@@ -130,8 +131,10 @@ export class SelectUi {
                 flexGrow: '1',
                 flexBasis: '0',
             },
+            css: {
+                marginBottom: '10px',
+            },
         });
-        this.modeOptions.getElement().style.marginBottom = '10px';
 
         // --- select ---
         const selectModeEl = BB.el();
@@ -168,8 +171,10 @@ export class SelectUi {
             onChange: (v) => {
                 p.onChangeBooleanOperation(v);
             },
+            css: {
+                marginBottom: '10px',
+            },
         });
-        this.operationOptions.getElement().style.marginBottom = '10px';
 
         const imStyle = {
             width: '32px',
@@ -178,19 +183,19 @@ export class SelectUi {
         const rectIm = new Image();
         rectIm.src = rectSvg;
         rectIm.classList.add('dark-invert');
-        BB.css(rectIm, imStyle);
+        css(rectIm, imStyle);
         const ellipseIm = new Image();
         ellipseIm.src = ellipseSvg;
         ellipseIm.classList.add('dark-invert');
-        BB.css(ellipseIm, imStyle);
+        css(ellipseIm, imStyle);
         const lassoIm = new Image();
         lassoIm.src = lassoSvg;
         lassoIm.classList.add('dark-invert');
-        BB.css(lassoIm, imStyle);
+        css(lassoIm, imStyle);
         const polyIm = new Image();
         polyIm.src = polySvg;
         polyIm.classList.add('dark-invert');
-        BB.css(polyIm, imStyle);
+        css(polyIm, imStyle);
 
         const shapeOptions = new Options<TSelectShape>({
             optionArr: [
@@ -219,8 +224,10 @@ export class SelectUi {
             onChange: (val) => {
                 p.select.onChangeShape(val);
             },
+            css: {
+                marginBottom: '10px',
+            },
         });
-        shapeOptions.getElement().style.marginBottom = '10px';
         selectModeEl.append(shapeOptions.getElement(), this.operationOptions.getElement());
 
         const actionRow = BB.el({
@@ -424,7 +431,7 @@ export class SelectUi {
             },
             name: 'enable-transparent-background',
         });
-        BB.css(this.transparentBackgroundToggle.getElement(), {
+        css(this.transparentBackgroundToggle.getElement(), {
             marginTop: '10px',
             display: 'inline-block',
         });

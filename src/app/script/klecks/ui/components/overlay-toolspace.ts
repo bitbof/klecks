@@ -5,6 +5,7 @@ import { BrushSettingService, TBrushSettingEmit } from '../../brushes-ui/brush-s
 import { LANG } from '../../../language/language';
 import { TRgb } from '../../kl-types';
 import { TVector2D } from '../../../bb/bb-types';
+import { css } from '../../../bb/base/base';
 
 /**
  * Compressed HUD toolspace. When you hold ctrl+alt.
@@ -102,7 +103,7 @@ export class OverlayToolspace {
                 }
             },
         });
-        BB.css(sizeSlider.getElement(), {
+        css(sizeSlider.getElement(), {
             marginTop: '2px',
         });
 
@@ -121,7 +122,7 @@ export class OverlayToolspace {
                 p.brushSettingService.setOpacity(v);
             },
         });
-        BB.css(opacitySlider.getElement(), {
+        css(opacitySlider.getElement(), {
             margin: '2px 0',
         });
         this.rootEl.append(sizeSlider.getElement(), opacitySlider.getElement());
@@ -170,7 +171,7 @@ export class OverlayToolspace {
 
             this.rootEl.style.display = isVisible ? 'block' : 'none';
             if (isVisible && mousePos) {
-                BB.css(this.rootEl, {
+                css(this.rootEl, {
                     left: mousePos.x - Math.round(sizeObj.width / 2) + 'px',
                     top:
                         mousePos.y -

@@ -6,6 +6,7 @@ import { LANG } from '../../../language/language';
 import { TRgb } from '../../kl-types';
 import { HSV, RGB } from '../../../bb/color/color';
 import { ERASE_COLOR } from '../../brushes/erase-color';
+import { css } from '../../../bb/base/base';
 
 /**
  * big main HS+V color slider
@@ -54,7 +55,7 @@ export class KlColorSlider {
     private updateSVPointer(): void {
         const left = (this.primaryColorHsv.s / 100) * this.width - 7;
         const top = (1 - this.primaryColorHsv.v / 100) * this.svHeight - 6;
-        BB.css(this.pointerSV, {
+        css(this.pointerSV, {
             left: left + 'px',
             top: top + 'px',
         });
@@ -71,17 +72,17 @@ export class KlColorSlider {
             ')';
 
         if (BB.testIsWhiteBestContrast(this.primaryColorRgb)) {
-            BB.css(this.pickerButton, {
+            css(this.pickerButton, {
                 filter: 'invert(1)',
             });
-            BB.css(this.hexButton, {
+            css(this.hexButton, {
                 filter: 'invert(1)',
             });
         } else {
-            BB.css(this.pickerButton, {
+            css(this.pickerButton, {
                 filter: '',
             });
-            BB.css(this.hexButton, {
+            css(this.hexButton, {
                 filter: '',
             });
         }
@@ -171,7 +172,7 @@ export class KlColorSlider {
 
         const createHueBg = (targetEl: HTMLElement) => {
             const im = new Image();
-            BB.css(im, {
+            css(im, {
                 position: 'absolute',
                 left: '0',
                 top: '0',
@@ -241,7 +242,7 @@ export class KlColorSlider {
         this.outputDiv.append(this.divPreview);
 
         //divH.className = "svSlider";
-        BB.css(this.controlH, {
+        css(this.controlH, {
             width: '2px',
             height: this.height + 'px',
             background: '#000',
@@ -526,17 +527,12 @@ export class KlColorSlider {
     }
 
     enable(e: boolean): void {
-        if (e) {
-            this.rootEl.style.pointerEvents = '';
-            this.rootEl.style.opacity = '1';
-            this.outputDiv.style.pointerEvents = '';
-            this.outputDiv.style.opacity = '1';
-        } else {
-            this.rootEl.style.pointerEvents = 'none';
-            this.rootEl.style.opacity = '0.5';
-            this.outputDiv.style.pointerEvents = 'none';
-            this.outputDiv.style.opacity = '0.5';
-        }
+        const style: Partial<CSSStyleDeclaration> = {
+            pointerEvents: e ? '' : 'none',
+            opacity: e ? '1' : '0.5',
+        };
+        css(this.rootEl, style);
+        css(this.outputDiv, style);
     }
 
     setHeight(h: number): void {
@@ -545,7 +541,7 @@ export class KlColorSlider {
             return;
         }
         this.svHeight = h;
-        BB.css(this.svGradient, {
+        css(this.svGradient, {
             width: this.width + 'px',
             height: this.svHeight + 'px',
         });

@@ -7,6 +7,7 @@ import { SplineInterpolator } from '../../../bb/math/line';
 import { PointerListener } from '../../../bb/input/pointer-listener';
 import { TPointerEvent } from '../../../bb/input/event.types';
 import { TChainElement } from '../../../bb/input/event-chain/event-chain.types';
+import { css } from '../../../bb/base/base';
 
 /**
  * Horizontal slider, can be changed by dragging anywhere on it. Has a label & value.
@@ -126,7 +127,7 @@ export class KlSlider {
 
     private updateEnable(): void {
         this.sliderWrapperEl.classList.toggle('slider-wrapper--disabled', !this.isEnabled);
-        BB.css(this.sliderWrapperEl, {
+        css(this.sliderWrapperEl, {
             opacity: this.isEnabled ? '' : '0.5',
             pointerEvents: this.isEnabled ? '' : 'none',
         });
@@ -147,7 +148,7 @@ export class KlSlider {
                 this.onChange(this.value);
             },
             () => {
-                BB.css(this.sliderWrapperEl, {
+                css(this.sliderWrapperEl, {
                     display: '',
                 });
                 if (this.manualInput) {
@@ -165,7 +166,7 @@ export class KlSlider {
         setTimeout(() => {
             this.manualInput && this.manualInput.focus();
         });
-        BB.css(this.sliderWrapperEl, {
+        css(this.sliderWrapperEl, {
             display: 'none',
         });
     }

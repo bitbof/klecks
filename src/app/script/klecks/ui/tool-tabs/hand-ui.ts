@@ -4,6 +4,7 @@ import rotateImg from 'url:/src/app/img/ui/edit-rotate.svg';
 import { LANG } from '../../../language/language';
 import { Checkbox } from '../components/checkbox';
 import { LocalStorage } from '../../../bb/base/local-storage';
+import { css } from '../../../bb/base/base';
 
 const LS_INERTIA_KEY = 'kl-inertia-scroll';
 
@@ -24,13 +25,13 @@ export class HandUi {
         this.scaleEl.innerHTML = Math.round(this.scale * 100) + '%';
         this.angleEl.innerHTML = Math.round(this.angleDeg) + '°';
 
-        this.angleIm.style.transform = 'rotate(' + this.angleDeg + 'deg)';
-        if (this.angleDeg % 90 === 0) {
-            this.angleIm.style.boxShadow =
-                'inset 0 0 0 1px rgba(255,255,255, 1), 0 0 0 1px rgba(0, 0, 0, 0.3)';
-        } else {
-            this.angleIm.style.boxShadow = '';
-        }
+        css(this.angleIm, {
+            transform: 'rotate(' + this.angleDeg + 'deg)',
+            boxShadow:
+                this.angleDeg % 90 === 0
+                    ? 'inset 0 0 0 1px rgba(255,255,255, 1), 0 0 0 1px rgba(0, 0, 0, 0.3)'
+                    : '',
+        });
     }
 
     // ----------------------------------- public -----------------------------------
@@ -82,7 +83,7 @@ export class HandUi {
 
         this.angleIm = new Image();
         this.angleIm.src = angleImg;
-        BB.css(this.angleIm, {
+        css(this.angleIm, {
             verticalAlign: 'bottom',
             width: '20px',
             height: '20px',
@@ -124,7 +125,7 @@ export class HandUi {
         leftRotateIcon.height = 20;
         leftRotateIcon.src = rotateImg;
         leftRotateIcon.alt = 'Rotate';
-        BB.css(leftRotateIcon, {
+        css(leftRotateIcon, {
             transform: 'scale(-1, 1)',
         });
         const leftRotateButton = BB.el({
@@ -173,7 +174,7 @@ export class HandUi {
         setTimeout(() => {
             p.onChangeUseInertiaScrolling(inertiaToggle.getValue());
         }, 500);
-        BB.css(inertiaToggle.getElement(), {
+        css(inertiaToggle.getElement(), {
             marginTop: '10px',
             display: 'inline-block',
         });

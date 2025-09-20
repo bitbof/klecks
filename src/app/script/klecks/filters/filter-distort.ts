@@ -6,7 +6,7 @@ import { EVENT_RES_MS } from './filters-consts';
 import { getSharedFx } from '../../fx-canvas/shared-fx';
 import { Options } from '../ui/components/options';
 import { Checkbox } from '../ui/components/checkbox';
-import { throwIfNull } from '../../bb/base/base';
+import { css, throwIfNull } from '../../bb/base/base';
 import { TFilterDistortSettings } from '../../fx-canvas/filters/distort';
 import { FxPreviewRenderer } from '../ui/project-viewport/fx-preview-renderer';
 import { TProjectViewportProject } from '../ui/project-viewport/project-viewport';
@@ -109,7 +109,7 @@ export const filterDistort = {
 
         const typeOptions = new Options({
             optionArr: thumbImgArr.map((img, index) => {
-                BB.css(img, {
+                css(img, {
                     margin: '1px',
                     borderRadius: '3px',
                     transition: 'all 0.1s ease-in-out',
@@ -319,7 +319,7 @@ export const filterDistort = {
             selection: klCanvas.getSelection(),
         });
         preview.render();
-        BB.css(preview.getElement(), {
+        css(preview.getElement(), {
             marginLeft: '-20px',
             marginRight: '-20px',
         });

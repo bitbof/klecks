@@ -17,7 +17,7 @@ import { KL } from '../kl';
 import { ColorConverter } from '../../bb/color/color';
 import { Checkbox } from '../ui/components/checkbox';
 import { TWrappedTexture } from '../../fx-canvas/fx-canvas-types';
-import { throwIfNull } from '../../bb/base/base';
+import { css, throwIfNull } from '../../bb/base/base';
 import { FxPreviewRenderer } from '../ui/project-viewport/fx-preview-renderer';
 import { Preview } from '../ui/project-viewport/preview';
 import { TProjectViewportProject } from '../ui/project-viewport/project-viewport';
@@ -278,7 +278,7 @@ export const filterNoise = {
 
         const presetOptions = new Options({
             optionArr: thumbImgArr.map((img, index) => {
-                BB.css(img, {
+                css(img, {
                     margin: '1px',
                     borderRadius: '3px',
                     transition: 'all 0.1s ease-in-out',
@@ -293,8 +293,10 @@ export const filterNoise = {
                 noiseInput.presetIndex = Number(id);
                 update();
             },
+            css: {
+                marginBottom: '10px',
+            },
         });
-        presetOptions.getElement().style.marginBottom = '10px';
         rootEl.append(presetOptions.getElement());
 
         const scaleSlider = new KlSlider({
@@ -505,7 +507,7 @@ export const filterNoise = {
             selection: klCanvas.getSelection(),
         });
         preview.render();
-        BB.css(preview.getElement(), {
+        css(preview.getElement(), {
             marginLeft: '-20px',
             marginRight: '-20px',
         });

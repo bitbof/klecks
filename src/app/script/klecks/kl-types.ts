@@ -1,7 +1,7 @@
 import { KlCanvas, TKlCanvasLayer } from './canvas/kl-canvas';
 import { TTranslationCode } from '../../languages/languages';
 import { KlHistory } from './history/kl-history';
-import { THistoryEntryLayerTile } from './history/history.types';
+import { THistoryEntryDataComposed, THistoryEntryLayerTile } from './history/history.types';
 
 export type TFilterApply<T = unknown> = {
     layer: TKlCanvasLayer; // active layer
@@ -13,6 +13,7 @@ export type TFilterApply<T = unknown> = {
 export type TFilterGetDialogParam = {
     context: CanvasRenderingContext2D; // context of selected layer
     klCanvas: KlCanvas;
+    composed: THistoryEntryDataComposed;
     maxWidth: number; // limit for klCanvas size
     maxHeight: number;
     currentColorRgb: TRgb;

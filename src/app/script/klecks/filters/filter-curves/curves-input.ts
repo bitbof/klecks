@@ -3,6 +3,7 @@ import { LANG } from '../../../language/language';
 import { BB } from '../../../bb/bb';
 import { TVector2D } from '../../../bb/bb-types';
 import { PointerListener } from '../../../bb/input/pointer-listener';
+import { css } from '../../../bb/base/base';
 
 type TCurvePoint = {
     el: HTMLElement;
@@ -140,7 +141,7 @@ export class CurvesInput {
             });
 
             const update = () => {
-                BB.css(pointEl, {
+                css(pointEl, {
                     left: x - gripSize / 2 + 'px',
                     top: y - gripSize / 2 + 'px',
                 });
@@ -177,7 +178,7 @@ export class CurvesInput {
                 y = newY;
                 internalY = y;
                 internalX = x;
-                BB.css(pointEl, {
+                css(pointEl, {
                     left: x - gripSize / 2 + 'px',
                     top: y - gripSize / 2 + 'px',
                 });

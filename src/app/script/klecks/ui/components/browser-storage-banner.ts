@@ -3,7 +3,7 @@ import * as classes from './browser-storage-banner.module.scss';
 import { LANG } from '../../../language/language';
 import { ProjectStore } from '../../storage/project-store';
 import { KlRecoveryManager } from '../../storage/kl-recovery-manager';
-import { fitInto, sleep } from '../../../bb/base/base';
+import { css, fitInto, sleep } from '../../../bb/base/base';
 import { CrossTabChannel } from '../../../bb/base/cross-tab-channel';
 import { KlHistory } from '../../history/kl-history';
 import cancelImg from 'url:/src/app/img/ui/cancel.svg';
@@ -67,7 +67,7 @@ export async function runBrowserStorageBanner(p: TBrowserStorageBannerParams): P
     }
 
     const fit = fitInto(meta.thumbnail.width, meta.thumbnail.height, 100, 100);
-    BB.css(meta.thumbnail, {
+    css(meta.thumbnail, {
         width: fit.width + 'px',
         height: fit.height + 'px',
     });
@@ -134,10 +134,10 @@ export async function runBrowserStorageBanner(p: TBrowserStorageBannerParams): P
     function close() {
         clearTimeout(timeout);
         document.removeEventListener('pointerdown', onPointerDown);
-        BB.css(rootEl, {
+        css(rootEl, {
             opacity: '0',
         });
-        BB.css(banner, {
+        css(banner, {
             pointerEvents: 'none',
         });
         setTimeout(() => {

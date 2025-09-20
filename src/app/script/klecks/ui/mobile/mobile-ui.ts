@@ -3,6 +3,7 @@ import { ToolspaceCollapser } from './toolspace-collapser';
 import { KL } from '../../kl';
 import { TUiLayout } from '../../kl-types';
 import { LocalStorage } from '../../../bb/base/local-storage';
+import { css } from '../../../bb/base/base';
 
 export type TMobileUiParams = {
     onShowToolspace: (b: boolean) => void;
@@ -59,12 +60,12 @@ export class MobileUi {
             if (this.toolspaceIsOpen) {
                 this.mobileWrapperEl.style.display = 'none';
                 if (this.orientation === 'left') {
-                    BB.css(this.rootEl, {
+                    css(this.rootEl, {
                         left: '271px',
                         right: '',
                     });
                 } else {
-                    BB.css(this.rootEl, {
+                    css(this.rootEl, {
                         left: '',
                         right: '271px',
                     });
@@ -72,12 +73,12 @@ export class MobileUi {
             } else {
                 this.mobileWrapperEl.style.display = 'flex';
                 if (this.orientation === 'left') {
-                    BB.css(this.rootEl, {
+                    css(this.rootEl, {
                         left: '0',
                         right: '',
                     });
                 } else {
-                    BB.css(this.rootEl, {
+                    css(this.rootEl, {
                         left: '',
                         right: '0',
                     });

@@ -9,7 +9,7 @@ import { PointerListener } from '../../../../bb/input/pointer-listener';
 import { TPointerEvent } from '../../../../bb/input/event.types';
 import { renameLayerDialog } from './rename-layer-dialog';
 import { mergeLayerDialog } from './merge-layer-dialog';
-import { throwIfNull } from '../../../../bb/base/base';
+import { css, throwIfNull } from '../../../../bb/base/base';
 import { HAS_POINTER_EVENTS } from '../../../../bb/base/browser';
 import { c } from '../../../../bb/base/c';
 import { DropdownMenu } from '../../components/dropdown-menu';
@@ -191,16 +191,16 @@ export class LayersUi {
             }) as HTMLElement as TLayerEl;
             this.layerElArr[index] = layer;
             layer.posY = (this.klCanvasLayerArr.length - 1) * 35 - index * 35;
-            BB.css(layer, {
+            css(layer, {
                 top: layer.posY + 'px',
             });
             const innerLayer = BB.el();
-            BB.css(innerLayer, {
+            css(innerLayer, {
                 position: 'relative',
             });
 
             const container1 = BB.el();
-            BB.css(container1, {
+            css(container1, {
                 width: '270px',
                 height: '34px',
             });
@@ -280,12 +280,12 @@ export class LayersUi {
                 }
                 thc.drawImage(layercanvas, 0, 0, layer.thumb.width, layer.thumb.height);
                 thc.restore();
-                BB.css(layer.thumb, {
+                css(layer.thumb, {
                     position: 'absolute',
                     left: (32 - layer.thumb.width) / 2 + paddingLeft + 'px',
                     top: (32 - layer.thumb.height) / 2 + 1 + 'px',
+                    background: 'var(--kl-checkerboard-background)',
                 });
-                layer.thumb.style.background = 'var(--kl-checkerboard-background)';
             }
 
             //layerlabel
@@ -296,7 +296,7 @@ export class LayersUi {
                 layer.layerName = layerName;
                 layer.label.append(layer.layerName);
 
-                BB.css(layer.label, {
+                css(layer.label, {
                     position: 'absolute',
                     left: 1 + 32 + 5 + paddingLeft + 'px',
                     top: 1 + 'px',
@@ -321,7 +321,7 @@ export class LayersUi {
                 layer.opacity = opacity;
                 layer.opacityLabel.append(parseInt('' + layer.opacity * 100) + '%');
 
-                BB.css(layer.opacityLabel, {
+                css(layer.opacityLabel, {
                     position: 'absolute',
                     left: 250 - 1 - 5 - 50 - 5 + paddingLeft + 'px',
                     top: 1 + 'px',
@@ -356,7 +356,7 @@ export class LayersUi {
                     this.onUpdateProject();
                 },
             });
-            BB.css(opacitySlider.getElement(), {
+            css(opacitySlider.getElement(), {
                 position: 'absolute',
                 left: 39 + paddingLeft + 'px',
                 top: '17px',
@@ -400,7 +400,7 @@ export class LayersUi {
                     this.largeThumbCanvas.height,
                 );
                 ctx.restore();
-                BB.css(this.largeThumbDiv, {
+                css(this.largeThumbDiv, {
                     top: e.clientY - this.largeThumbCanvas.height / 2 + 'px',
                     opacity: '0',
                 });
@@ -410,7 +410,7 @@ export class LayersUi {
                 }
                 clearTimeout(this.largeThumbInTimeout);
                 this.largeThumbInTimeout = setTimeout(() => {
-                    BB.css(this.largeThumbDiv, {
+                    css(this.largeThumbDiv, {
                         opacity: '1',
                     });
                 }, 20);
@@ -418,7 +418,7 @@ export class LayersUi {
             };
             layer.thumb.onpointerout = () => {
                 clearTimeout(this.largeThumbInTimeout);
-                BB.css(this.largeThumbDiv, {
+                css(this.largeThumbDiv, {
                     opacity: '0',
                 });
                 clearTimeout(this.largeThumbTimeout);
@@ -443,10 +443,10 @@ export class LayersUi {
             //events for moving layers up and down
             const dragEventHandler = (event: TPointerEvent) => {
                 if (event.type === 'pointerdown' && event.button === 'left') {
-                    BB.css(layer, {
+                    css(layer, {
                         transition: 'box-shadow 0.3s ease-in-out',
+                        zIndex: '1',
                     });
-                    layer.style.zIndex = '1';
                     this.lastpos = layer.spot;
                     freshSelection = false;
                     if (!layer.isSelected) {
@@ -457,7 +457,7 @@ export class LayersUi {
                 } else if (event.type === 'pointermove' && event.button === 'left') {
                     if (dragstart) {
                         dragstart = false;
-                        BB.css(layer, {
+                        css(layer, {
                             boxShadow: '1px 3px 5px rgba(0,0,0,0.4)',
                         });
                     }
@@ -470,11 +470,11 @@ export class LayersUi {
                     this.updateLayersVerticalPosition(layer.spot, this.posToSpot(layer.posY));
                 }
                 if (event.type === 'pointerup') {
-                    BB.css(layer, {
+                    css(layer, {
                         transition: 'all 0.1s linear',
                     });
                     setTimeout(() => {
-                        BB.css(layer, {
+                        css(layer, {
                             boxShadow: '',
                         });
                     }, 20);
@@ -648,32 +648,26 @@ export class LayersUi {
                 BB.makeUnfocusable(this.removeBtn);
                 BB.makeUnfocusable(renameBtn);
 
-                this.addBtn.style.cssFloat = 'left';
-                this.duplicateBtn.style.cssFloat = 'left';
-                this.mergeBtn.style.cssFloat = 'left';
-                this.removeBtn.style.cssFloat = 'left';
-                renameBtn.style.cssFloat = 'left';
+                const commonStyle = {
+                    cssFloat: 'left',
+                    paddingLeft: '5px',
+                    paddingRight: '3px',
+                };
+                css(this.addBtn, commonStyle);
+                css(this.duplicateBtn, commonStyle);
+                css(this.mergeBtn, commonStyle);
+                css(this.removeBtn, commonStyle);
+                css(renameBtn, {
+                    cssFloat: 'left',
+                    height: '30px',
+                    lineHeight: '20px',
+                });
 
                 this.addBtn.title = LANG('layers-new');
                 this.duplicateBtn.title = LANG('layers-duplicate');
                 this.removeBtn.title = LANG('layers-remove');
                 this.mergeBtn.title = LANG('layers-merge');
                 renameBtn.title = LANG('layers-rename-title');
-
-                this.addBtn.style.paddingLeft = '5px';
-                this.addBtn.style.paddingRight = '3px';
-
-                this.removeBtn.style.paddingLeft = '5px';
-                this.removeBtn.style.paddingRight = '3px';
-
-                this.duplicateBtn.style.paddingLeft = '5px';
-                this.duplicateBtn.style.paddingRight = '3px';
-
-                this.mergeBtn.style.paddingLeft = '5px';
-                this.mergeBtn.style.paddingRight = '3px';
-
-                renameBtn.style.height = '30px';
-                renameBtn.style.lineHeight = '20px';
 
                 this.addBtn.innerHTML = "<img src='" + addLayerImg + "' height='20'/>";
                 this.duplicateBtn.innerHTML = "<img src='" + duplicateLayerImg + "' height='20'/>";
@@ -867,7 +861,7 @@ export class LayersUi {
             const layer = this.layerElArr[i];
             const isSelected = this.selectedSpotIndex === layer.spot;
 
-            BB.css(layer, {
+            css(layer, {
                 boxShadow: '',
             });
             layer.classList.toggle('kl-layer--selected', isSelected);
@@ -881,12 +875,12 @@ export class LayersUi {
         this.uiState = stateStr;
 
         if (this.uiState === 'left') {
-            BB.css(this.largeThumbDiv, {
+            css(this.largeThumbDiv, {
                 left: '280px',
                 right: '',
             });
         } else {
-            BB.css(this.largeThumbDiv, {
+            css(this.largeThumbDiv, {
                 left: '',
                 right: '280px',
             });

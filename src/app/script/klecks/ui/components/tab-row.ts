@@ -1,5 +1,6 @@
 import { BB } from '../../../bb/bb';
 import { PointerListener } from '../../../bb/input/pointer-listener';
+import { css } from '../../../bb/base/base';
 
 // type all functions
 
@@ -126,7 +127,7 @@ export class TabRow {
                 });
             }
             if ('css' in pTabObj && pTabObj.css !== undefined) {
-                BB.css(result.el, pTabObj.css);
+                css(result.el, pTabObj.css);
             }
 
             result.pointerListener = new BB.PointerListener({

@@ -22,6 +22,7 @@ import { TPointerEvent, TWheelEvent } from '../../../bb/input/event.types';
 import { createMatrixFromTransform } from '../../../bb/transform/create-matrix-from-transform';
 import { MultiPolygon } from 'polygon-clipping';
 import { SelectionRenderer } from '../easel/selection-renderer';
+import { css } from '../../../bb/base/base';
 
 export type TPreviewMode = 'edit' | 'hand';
 
@@ -271,7 +272,7 @@ export class Preview {
         });
 
         this.viewport.getElement().classList.add(classes.viewport);
-        BB.css(this.viewport.getElement(), {
+        css(this.viewport.getElement(), {
             userSelect: 'none',
             touchAction: 'none',
         });
@@ -303,7 +304,7 @@ export class Preview {
         const svgRoot = BB.createSvg({
             elementType: 'svg',
         });
-        BB.css(svgRoot, {
+        css(svgRoot, {
             position: 'absolute',
             left: '0',
             top: '0',

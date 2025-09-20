@@ -13,6 +13,7 @@ import { DraggableInput } from '../ui/components/draggable-input';
 import { testIsSmall } from '../ui/utils/test-is-small';
 import { getPreviewHeight, getPreviewWidth } from '../ui/utils/preview-size';
 import { applyFxFilter } from './apply-fx-filter';
+import { css } from '../../bb/base/base';
 
 export type TFilterTiltShiftInput = {
     a: TVector2D;
@@ -154,7 +155,7 @@ export const filterTiltShift = {
         });
 
         preview.render();
-        BB.css(preview.getElement(), {
+        css(preview.getElement(), {
             overflow: 'hidden',
             marginLeft: '-20px',
             marginRight: '-20px',

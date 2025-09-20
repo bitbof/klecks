@@ -3,6 +3,7 @@ import { calcSliderFalloffFactor } from './slider-falloff';
 import { TRgb } from '../../kl-types';
 import { PointerListener } from '../../../bb/input/pointer-listener';
 import { HSV } from '../../../bb/color/color';
+import { css } from '../../../bb/base/base';
 
 /**
  * a small color slider
@@ -45,7 +46,7 @@ export class KlColorSliderSmall {
     private updateSVPointer(): void {
         const left = (this.color.s / 100) * this.width - 4;
         const top = (1 - this.color.v / 100) * this.heightSV - 4;
-        BB.css(this.pointerSV, {
+        css(this.pointerSV, {
             left: left + 'px',
             top: top + 'px',
         });
@@ -79,7 +80,7 @@ export class KlColorSliderSmall {
         this.heightSV = p.heightSV;
 
         this.canvasSV = BB.canvas(10, 10);
-        BB.css(this.canvasSV, {
+        css(this.canvasSV, {
             width: this.width + 'px',
             height: this.heightSV + 'px',
             cursor: 'crosshair',
@@ -109,7 +110,7 @@ export class KlColorSliderSmall {
             ctx.fillStyle = gradH;
             ctx.fillRect(0, 0, p.width, p.heightH);
         })();
-        BB.css(this.canvasSV, {
+        css(this.canvasSV, {
             width: p.width + 'px',
             height: p.heightSV + 'px',
             overflow: 'hidden',

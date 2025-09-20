@@ -105,6 +105,23 @@ body.kl-theme-dark {
         background: #585858;
     }
 
+    .kl-tooldropdown-caret {
+        background-color: #4a4a4a;
+        box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.2);
+    }
+
+    .toolspace-row-button-activated > .kl-tooldropdown-caret {
+        background-color: #585858;
+    }
+
+    .toolspace-row-button-activated.kl-tool-button--hover > .kl-tooldropdown-caret {
+        background-color: #666;
+    }
+
+    .kl-tooldropdown-caret:hover {
+        background-color: #666;
+    }
+
     .kl-popup {
         background: #212121a1;
     }

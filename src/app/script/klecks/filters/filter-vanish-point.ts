@@ -6,7 +6,7 @@ import { ColorOptions } from '../ui/components/color-options';
 import { drawVanishPoint } from '../image-operations/draw-vanish-point';
 import { KlSlider } from '../ui/components/kl-slider';
 import { EVENT_RES_MS } from './filters-consts';
-import { throwIfNull } from '../../bb/base/base';
+import { css, throwIfNull } from '../../bb/base/base';
 import { Preview } from '../ui/project-viewport/preview';
 import { TProjectViewportProject } from '../ui/project-viewport/project-viewport';
 import { DraggableInput } from '../ui/components/draggable-input';
@@ -226,7 +226,7 @@ export const filterVanishPoint = {
                 layers: previewLayerArr,
             },
         });
-        BB.css(preview.getElement(), {
+        css(preview.getElement(), {
             marginLeft: '-20px',
             marginRight: '-20px',
             overflow: 'hidden',

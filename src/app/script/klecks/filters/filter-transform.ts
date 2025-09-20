@@ -3,9 +3,14 @@ import { Checkbox } from '../ui/components/checkbox';
 import { FreeTransform } from '../ui/components/free-transform';
 import { TFreeTransform } from '../ui/components/free-transform-utils';
 import { Select } from '../ui/components/select';
-import { TFilterApply, TFilterGetDialogParam, TFilterGetDialogResult } from '../kl-types';
+import {
+    isLayerFill,
+    TFilterApply,
+    TFilterGetDialogParam,
+    TFilterGetDialogResult,
+} from '../kl-types';
 import { LANG } from '../../language/language';
-import { throwIfNull } from '../../bb/base/base';
+import { css, throwIfNull } from '../../bb/base/base';
 import { Preview } from '../ui/project-viewport/preview';
 import { TProjectViewportProject } from '../ui/project-viewport/project-viewport';
 import { testIsSmall } from '../ui/utils/test-is-small';
@@ -18,8 +23,74 @@ import { matrixToTuple } from '../../bb/math/matrix-to-tuple';
 import { MultiPolygon } from 'polygon-clipping';
 import { TRect } from '../../bb/bb-types';
 import { transformMultiPolygon } from '../../bb/multi-polygon/transform-multi-polygon';
+import { THistoryEntryLayerComposed } from '../history/history.types';
 
-let settingIsTransparentBg = false;
+// preference expressed by user
+let preferenceIsTransparentBg: undefined | boolean;
+
+function getIsTransparentBg(
+    isBgLayer: boolean,
+    layerHasTransparency: boolean,
+    preference: undefined | boolean,
+): boolean {
+    if (!isBgLayer) {
+        return true;
+    }
+    if (preference !== undefined) {
+        return preference;
+    }
+    return layerHasTransparency;
+}
+
+function parseCssColor(colorString: string) {
+    if (colorString.startsWith('#')) {
+        let hex = colorString.slice(1);
+        if (hex.length === 3) {
+            hex = hex
+                .split('')
+                .map((c) => c + c)
+                .join('');
+        }
+        if (hex.length === 6) {
+            // assume full alpha
+            hex += 'ff';
+        }
+        const intVal = parseInt(hex, 16);
+        return {
+            r: (intVal >> 24) & 255,
+            g: (intVal >> 16) & 255,
+            b: (intVal >> 8) & 255,
+            a: (intVal & 255) / 255,
+        };
+    }
+
+    const rgbMatch = colorString.match(/rgba?\(([^)]+)\)/);
+    if (rgbMatch) {
+        const [r, g, b, a = 1] = rgbMatch[1].split(',').map((v) => parseFloat(v.trim()));
+        return { r, g, b, a };
+    }
+
+    return undefined;
+}
+
+function testComposedLayerHasTransparency(layer: THistoryEntryLayerComposed): boolean {
+    for (const tile of layer.tiles) {
+        if (isLayerFill(tile)) {
+            const color = parseCssColor(tile.fill);
+            if (color && color.a < 1) {
+                return true;
+            }
+        } else {
+            const data = tile.data.data;
+            for (let i = 3; i < data.length; i += 4) {
+                if (data[i] < 255) {
+                    return true;
+                }
+            }
+        }
+    }
+    return false;
+}
 
 function drawTransform(
     ctx: CanvasRenderingContext2D,
@@ -127,7 +198,14 @@ export const filterTransform = {
         const isSmall = testIsSmall();
         const layers = klCanvas.getLayers();
         const selectedLayerIndex = throwIfNull(klCanvas.getLayerIndex(context.canvas));
-
+        const isBgLayer = selectedLayerIndex === 0;
+        let hasTransparency = false;
+        if (isBgLayer) {
+            const layer = Object.entries(params.composed.layerMap).find(
+                ([_, layer]) => layer.index === selectedLayerIndex,
+            )![1];
+            hasTransparency = testComposedLayerHasTransparency(layer);
+        }
         const selection = klCanvas.getSelection();
 
         // determine bounds and initial transformation
@@ -182,21 +260,30 @@ export const filterTransform = {
             },
         });
 
-        const leftWrapper = BB.el();
-        const rightWrapper = BB.el();
-        const rotWrapper = BB.el();
+        const leftWrapper = BB.el({
+            css: {
+                width: '100px',
+                height: '30px',
+                display: 'inline-block',
+            },
+        });
+        const rightWrapper = BB.el({
+            css: {
+                width: '100px',
+                height: '30px',
+                display: 'inline-block',
+            },
+        });
+        const rotWrapper = BB.el({
+            css: {
+                width: '150px',
+                height: '30px',
+                display: 'inline-block',
+            },
+        });
         const inputY = BB.el({ tagName: 'input' });
         const inputX = BB.el({ tagName: 'input' });
         const inputR = BB.el({ tagName: 'input' });
-        leftWrapper.style.width = '100px';
-        leftWrapper.style.height = '30px';
-        rightWrapper.style.width = '100px';
-        rightWrapper.style.height = '30px';
-        rightWrapper.style.display = 'inline-block';
-        leftWrapper.style.display = 'inline-block';
-        rotWrapper.style.display = 'inline-block';
-        rotWrapper.style.width = '150px';
-        rotWrapper.style.height = '30px';
         inputY.type = 'number';
         inputX.type = 'number';
         inputR.type = 'number';
@@ -358,12 +445,18 @@ export const filterTransform = {
             },
             name: 'clone-before-transforming',
         });
-        let isTransparentBg = settingIsTransparentBg;
+        let isTransparentBg = getIsTransparentBg(
+            isBgLayer,
+            hasTransparency,
+            preferenceIsTransparentBg,
+        );
+        let transparentBgCheckboxTouched = false;
         const transparentBgCheckbox = new Checkbox({
             init: isTransparentBg,
             label: LANG('brush-eraser-transparent-bg'),
             allowTab: true,
             callback: function (b) {
+                transparentBgCheckboxTouched = true;
                 isTransparentBg = b;
                 updatePreview(true);
             },
@@ -372,7 +465,10 @@ export const filterTransform = {
             },
             name: 'transparent-background',
         });
-        buttonRow.append(cloneCheckbox.getElement(), transparentBgCheckbox.getElement());
+        buttonRow.append(cloneCheckbox.getElement());
+        if (isBgLayer) {
+            buttonRow.append(transparentBgCheckbox.getElement());
+        }
 
         let isConstrained = true;
         const constrainCheckbox = new Checkbox({
@@ -475,7 +571,7 @@ export const filterTransform = {
             padding: 30,
         });
         preview.render();
-        BB.css(preview.getElement(), {
+        css(preview.getElement(), {
             overflow: 'hidden',
             marginLeft: '-20px',
             marginRight: '-20px',
@@ -524,7 +620,7 @@ export const filterTransform = {
             },
             viewportTransform: preview.getTransform(),
         });
-        BB.css(freeTransform.getElement(), {
+        css(freeTransform.getElement(), {
             position: 'absolute',
             left: '0',
             top: '0',
@@ -559,7 +655,9 @@ export const filterTransform = {
         };
         result.getInput = function (): TFilterTransformInput {
             const transform = freeTransform.getValue();
-            settingIsTransparentBg = isTransparentBg;
+            if (transparentBgCheckboxTouched) {
+                preferenceIsTransparentBg = isTransparentBg;
+            }
             const input: TFilterTransformInput = {
                 transform,
                 bounds: boundsObj,

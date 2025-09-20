@@ -7,6 +7,7 @@ import shareImg from 'url:/src/app/img/ui/share.svg';
 import helpImg from 'url:/src/app/img/ui/help.svg';
 import { LANG } from '../../../language/language';
 import { PointerListener } from '../../../bb/input/pointer-listener';
+import { css } from '../../../bb/base/base';
 
 /**
  * Topmost row of buttons in toolspace (with the app logo)
@@ -86,7 +87,7 @@ export class ToolspaceTopRow {
             darkInvert: true,
         });
         logoButton.el.classList.add('kl-tool-row-border-right');
-        BB.css(logoButton.el, {
+        css(logoButton.el, {
             width: '46px',
         });
         const newButton = createButton({

@@ -4,6 +4,7 @@ import { KlCanvas } from '../../canvas/kl-canvas';
 import { LANG } from '../../../language/language';
 import loadingImg from 'url:/src/app/img/ui/loading.gif';
 import { canvasToBlob } from '../../../bb/base/canvas';
+import { css } from '../../../bb/base/base';
 
 type TImgurUploadResponse = {
     // just a subset
@@ -39,10 +40,10 @@ async function upload(
     const gif = newTab.document.createElement('img');
     gif.src = loadingImg;
     label.append(gif);
-    BB.css(gif, {
+    css(gif, {
         filter: 'invert(1)',
     });
-    BB.css(newTab.document.body, {
+    css(newTab.document.body, {
         backgroundColor: '#121211',
         backgroundImage: 'linear-gradient(#2b2b2b 0%, #121211 50%)',
         backgroundRepeat: 'no-repeat',
@@ -54,7 +55,7 @@ async function upload(
     labelText.textContent = LANG('upload-uploading');
 
     newTab.document.body.append(label);
-    BB.css(label, {
+    css(label, {
         marginLeft: 'auto',
         marginRight: 'auto',
         marginTop: '100px',
@@ -145,7 +146,7 @@ export function imgurUpload(
         ],
         ignoreFocus: true,
     });
-    BB.css(typeRadio.getElement(), {
+    css(typeRadio.getElement(), {
         marginBottom: '10px',
     });
 
