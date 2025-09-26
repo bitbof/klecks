@@ -47,8 +47,8 @@ import { Vec2 } from './math/vec2';
 import {
     BezierLine,
     PointLine,
-    projectPointOnLine,
     powerSplineInput,
+    projectPointOnLine,
     SplineInterpolator,
 } from './math/line';
 import { CMYK, ColorConverter, HSV, RGB, testIsWhiteBestContrast } from './color/color';
@@ -58,7 +58,6 @@ import {
     destroyEl,
     el,
     isInputFocused,
-    makeUnfocusable,
     unfocusAnyInput,
 } from './base/ui';
 import {
@@ -172,7 +171,6 @@ export const BB = {
     // ---- UI ----
     appendTextDiv,
     clearSelection,
-    makeUnfocusable,
     el,
     destroyEl,
     isInputFocused,

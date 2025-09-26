@@ -20,6 +20,7 @@ import removeLayerImg from 'url:/src/app/img/ui/remove-layer.svg';
 import renameLayerImg from 'url:/src/app/img/ui/rename-layer.svg';
 import caretDownImg from 'url:/src/app/img/ui/caret-down.svg';
 import { KlHistory } from '../../../history/kl-history';
+import { makeUnfocusable } from '../../../../bb/base/ui';
 
 const paddingLeft = 25;
 
@@ -642,11 +643,11 @@ export class LayersUi {
         const createButtons = () => {
             const div = BB.el();
             const async = () => {
-                BB.makeUnfocusable(this.addBtn);
-                BB.makeUnfocusable(this.duplicateBtn);
-                BB.makeUnfocusable(this.mergeBtn);
-                BB.makeUnfocusable(this.removeBtn);
-                BB.makeUnfocusable(renameBtn);
+                makeUnfocusable(this.addBtn);
+                makeUnfocusable(this.duplicateBtn);
+                makeUnfocusable(this.mergeBtn);
+                makeUnfocusable(this.removeBtn);
+                makeUnfocusable(renameBtn);
 
                 const commonStyle = {
                     cssFloat: 'left',

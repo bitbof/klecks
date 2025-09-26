@@ -5,6 +5,7 @@ import { LANG } from '../../../language/language';
 import { Checkbox } from '../components/checkbox';
 import { LocalStorage } from '../../../bb/base/local-storage';
 import { css } from '../../../bb/base/base';
+import { makeUnfocusable } from '../../../bb/base/ui';
 
 const LS_INERTIA_KEY = 'kl-inertia-scroll';
 
@@ -108,7 +109,7 @@ export class HandUi {
             content: LANG('hand-reset'),
             onClick: p.onReset,
         });
-        BB.makeUnfocusable(resetButton);
+        makeUnfocusable(resetButton);
 
         const fitButton = BB.el({
             tagName: 'button',
@@ -118,7 +119,7 @@ export class HandUi {
             },
             onClick: p.onFit,
         });
-        BB.makeUnfocusable(fitButton);
+        makeUnfocusable(fitButton);
         row2.append(resetButton, fitButton);
 
         const leftRotateIcon = new Image();
@@ -135,7 +136,7 @@ export class HandUi {
                 p.onAngleChange(-15, true);
             },
         });
-        BB.makeUnfocusable(leftRotateButton);
+        makeUnfocusable(leftRotateButton);
 
         const resetAngleButton = BB.el({
             tagName: 'button',
@@ -147,7 +148,7 @@ export class HandUi {
                 p.onAngleChange(0);
             },
         });
-        BB.makeUnfocusable(resetAngleButton);
+        makeUnfocusable(resetAngleButton);
 
         const rightRotateButton = BB.el({
             tagName: 'button',
@@ -159,7 +160,7 @@ export class HandUi {
                 p.onAngleChange(15, true);
             },
         });
-        BB.makeUnfocusable(rightRotateButton);
+        makeUnfocusable(rightRotateButton);
         row3.append(leftRotateButton, resetAngleButton, rightRotateButton);
 
         const inertiaToggle = new Checkbox({

@@ -2216,14 +2216,16 @@ export class KlApp {
             const pinchZoomWatcher = new PinchZoomWatcher();
         }
 
-        setTimeout(() => {
-            runBrowserStorageBanner({
-                projectStore,
-                klRecoveryManager,
-                onOpenBrowserStorage,
-                klHistory: this.klHistory,
+        if (!this.embed) {
+            setTimeout(() => {
+                runBrowserStorageBanner({
+                    projectStore,
+                    klRecoveryManager,
+                    onOpenBrowserStorage,
+                    klHistory: this.klHistory,
+                });
             });
-        });
+        }
         this.saveReminder?.init();
     }
 
