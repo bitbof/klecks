@@ -1,4 +1,5 @@
 import { BB } from '../../bb/bb';
+import { KlEventRecorder } from '../history/kl-event-recorder';
 import { floodFillBits } from '../image-operations/flood-fill';
 import { drawShape } from '../image-operations/shape-tool';
 import { renderText, TRenderTextParam } from '../image-operations/render-text';
@@ -114,6 +115,8 @@ export class KlCanvas {
     private eyedropper: Eyedropper;
     private selection: undefined | MultiPolygon = undefined;
     private klHistory: KlHistory;
+    private klRecorder: KlEventRecorder | undefined;
+
     /**
      * Transforming via selection creates a selection sample, which is the area of a layer which got selected.
      * This way consecutive transformations don't resample each time.
@@ -219,8 +222,10 @@ export class KlCanvas {
     constructor(
         history: KlHistory,
         private layerNrOffset: number = 0,
+        recorder?: KlEventRecorder
     ) {
         this.klHistory = history;
+        this.klRecorder = recorder;
         this.layers = [];
         if (KL_CANVAS_DEBUGGING) {
             (window as any).getCanvasLayers = () => this.layers;
@@ -945,6 +950,11 @@ export class KlCanvas {
                     : { attributes: ['tiles'] },
             ),
             ...(this.selection ? { selection: { value: this.selection } } : {}),
+        });
+        this.klRecorder?.record('f-flip', {
+          isHorizontal,
+          isVertical,
+          layerIndex,
         });
     }
 

@@ -81,6 +81,7 @@ import { requestPersistentStorage } from '../klecks/storage/request-persistent-s
 import { CrossTabChannel } from '../bb/base/cross-tab-channel';
 import { MobileColorUi } from '../klecks/ui/mobile/mobile-color-ui';
 import { getSelectionPath2d } from '../bb/multi-polygon/get-selection-path-2d';
+import { KlEventRecorder, TRecorderConfig } from '../klecks/history/kl-event-recorder';
 
 importFilters();
 
@@ -100,6 +101,7 @@ export type TKlAppParams = {
     };
     aboutEl?: HTMLElement; // replaces info about Klecks in settings tab
     klRecoveryManager?: KlRecoveryManager; // undefined if IndexedDB fails connecting
+    eventRecorderConfig?: TRecorderConfig; // optional for timelapse recording
 };
 
 type TKlAppToolId =
@@ -145,6 +147,7 @@ export class KlApp {
     private readonly unloadWarningTrigger: UnloadWarningTrigger | undefined;
     private lastSavedHistoryIndex: number = 0;
     private readonly klHistory: KlHistory;
+    private readonly klRecorder: KlEventRecorder | undefined;
 
     private updateLastSaved(): void {
         this.lastSavedHistoryIndex = this.klHistory.getTotalIndex();
@@ -328,7 +331,14 @@ export class KlApp {
             });
         }
 
-        this.klCanvas = new KL.KlCanvas(this.klHistory, this.embed ? -1 : 1);
+        // Initialize Recorder if configuration is provided
+        if (p.eventRecorderConfig) {
+            this.klRecorder = new KlEventRecorder(this.klHistory.getComposed().projectId.value, p.eventRecorderConfig);
+        } else {
+            this.klRecorder = undefined;
+        }
+
+        this.klCanvas = new KL.KlCanvas(this.klHistory, this.embed ? -1 : 1, this.klRecorder);
         const tempHistory = new KlTempHistory();
         let mainTabRow: TabRow | undefined = undefined;
 
@@ -404,13 +414,15 @@ export class KlApp {
             },
         });
 
+        const chainRecorder = this.klRecorder?.createChainRecorder();
         const lineSmoothing = new LineSmoothing({
             smoothing: translateSmoothing(1),
         });
         this.lineSanitizer = new LineSanitizer();
 
         const drawEventChain = new BB.EventChain({
-            chainArr: [this.lineSanitizer as any, lineSmoothing as any],
+            // TODO replace any with proper type/interface. BB.EventChain needs to get a change here.
+            chainArr: [chainRecorder as any, this.lineSanitizer as any, lineSmoothing as any].filter(c => !!c),
         });
 
         drawEventChain.setChainOut(((event: TDrawEvent) => {
@@ -436,6 +448,9 @@ export class KlApp {
                 this.easel.requestRender();
             }
         }) as any);
+
+        // TODO on replay, "draw" events shall be piped into the drawEventChain here
+
 
         let textToolSettings = {
             size: 20,
@@ -511,6 +526,7 @@ export class KlApp {
                 // didn't do anything
                 return;
             }
+            this.klRecorder?.record('undo', {});
             propagateUndoRedoChanges(result.type, composedBefore);
             if (showMessage) {
                 this.statusOverlay.out(LANG('undo'), true);
@@ -524,6 +540,7 @@ export class KlApp {
                 // didn't do anything
                 return;
             }
+            this.klRecorder?.record('redo', {});
             propagateUndoRedoChanges(result.type, composedBefore);
             if (showMessage) {
                 this.statusOverlay.out(LANG('redo'), true);
@@ -1532,6 +1549,7 @@ export class KlApp {
                     },
                     replaceTop,
                 );
+                this.klRecorder?.record('l-select', { layerIndex });
             },
             parentEl: this.rootEl,
             uiState: this.uiLayout,
@@ -2287,4 +2305,12 @@ export class KlApp {
     isDrawing(): boolean {
         return this.lineSanitizer.getIsDrawing() || this.easel.getIsLocked();
     }
+
+    /**
+     * Get access to the recorder if enabled
+     */
+    getRecorder(): KlEventRecorder | undefined {
+        return this.klRecorder;
+    }
+
 }
