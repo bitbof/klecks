@@ -1,5 +1,5 @@
 // Event types for more explicit type handling
-import { TDrawDownEvent, TDrawEvent, TDrawLine, TDrawMoveEvent, TDrawUpEvent, } from '../kl-types';
+import { KlChainRecorder } from './kl-chain-recorder';
 
 export type TEventType = 'undo' | 'redo' |
     'draw' |
@@ -38,75 +38,6 @@ const TIMESPAN_ACCUMULATION_MS = 3000;
 
 const DEBUG_RECORDER = true;
 
-const r0 = Math.round;
-const r3 = (v: number) => Math.round(v * 1000) / 1000;
-
-export class KlChainRecorder {
-    private chainOut: ((event: TDrawEvent) => void) | undefined;
-    private onLineEnded: ((drawEventCache: TSanitizedDrawEvent[]) => void) | undefined;
-    private drawEventCache: TSanitizedDrawEvent[] = [];
-
-    // ----------------------------------- public -----------------------------------
-    constructor(onLineEnded?: (drawEventCache: TSanitizedDrawEvent[]) => void) {
-        this.onLineEnded = onLineEnded;
-    }
-
-    chainIn(event: TDrawEvent): TDrawEvent | null {
-        const event2 = this.sanitizeEvent(event);
-        if (event2) {
-            this.drawEventCache.push(event2);
-        }
-
-        if (event.type == 'up') {
-            // Line ended
-            this.onLineEnded && this.onLineEnded(this.drawEventCache);
-            this.drawEventCache = [];
-        } else if (event.type == 'line') {
-            // Simple line drawn
-            this.onLineEnded && this.onLineEnded(this.drawEventCache);
-            this.drawEventCache = [];
-        }
-
-        return event;
-    }
-
-    setChainOut(func: (event: TDrawEvent) => void): void {
-        this.chainOut = func;
-    }
-
-    sanitizeEvent(event: TDrawEvent): TSanitizedDrawEvent | null {
-        // Some adjustments to save memory
-
-        // Remove coalesced events because they only add minor details
-        if ('isCoalesced' in event && event.isCoalesced) {
-            return null;
-        }
-
-        if (event.type == 'down') {
-            return (event.shiftIsPressed ? 'D' : 'd') +
-                `${r0(event.x)}|${r0(event.y)}|${r3(event.pressure)}@${r3(event.scale)}`;
-        }
-        if (event.type == 'move') {
-            return (event.shiftIsPressed ? 'M' : 'm') +
-                `${r0(event.x)}|${r0(event.y)}|${r3(event.pressure)}@${r3(event.scale)}`;
-        }
-        if (event.type == 'up') {
-            return (event.shiftIsPressed ? 'U' : 'u') +
-                `@${r3(event.scale)}`;
-        }
-        if (event.type == 'line') {
-            return 'L' +
-                `${event.x0 !== null ? r0(event.x0) : 'x'}|${event.y0 !== null ? r0(event.y0) : 'x'}|${event.pressure0 !== null ? r3(event.pressure0) : 'x'}` +
-                `-${r0(event.x1)}|${r0(event.y1)}|${r3(event.pressure1)}`;
-        }
-
-        // unknown event type
-        return null;
-    }
-
-}
-
-
 /**
  * Records user events for later replay functionality
  */
@@ -118,6 +49,7 @@ export class KlEventRecorder {
     private lastTimestamp: number = 0; // ms since epoch
     private totalTimeTaken: number = 0; // ms taken drawing in this project
     private listeners: Array<TEventRecordedCallback> = [];
+    private isPaused: boolean = false;
 
     constructor(projectId: string, config: TRecorderConfig) {
         this.projectId = projectId;
@@ -172,6 +104,14 @@ export class KlEventRecorder {
      * Record event using configured callback
      */
     private recordEventInternal(event: TRecordedEvent): void {
+        // Don't record if paused
+        if (this.isPaused) {
+            if (DEBUG_RECORDER) {
+                console.log('%c[REC]', 'color: orange;', 'Ignoring event - recording paused', event);
+            }
+            return;
+        }
+
         if (DEBUG_RECORDER) {
             console.log('%c[REC]', 'color: orange;', 'Recording event', event);
         }
@@ -241,10 +181,40 @@ export class KlEventRecorder {
         this.totalTimeTaken = 0;
     }
 
+    /**
+     * Pause event recording - events will be ignored until resumed
+     */
+    pause() {
+        this.isPaused = true;
+        console.log('%c[REC]', 'color: orange;', 'Recording paused');
+    }
+
+    /**
+     * Resume event recording
+     */
+    resume() {
+        this.isPaused = false;
+        this.lastTimestamp = 0; // Reset timestamp to avoid time accumulation during pause
+        console.log('%c[REC]', 'color: orange;', 'Recording resumed');
+    }
+
+    /**
+     * Check if recording is currently paused
+     */
+    isRecordingPaused(): boolean {
+        return this.isPaused;
+    }
+
+    /**
+     * Register an event listener to be notified on new recorded events
+     */
     subscribe(callback: TEventRecordedCallback) {
         this.listeners.push(callback);
     }
 
+    /**
+     * Unregister an event listener
+     */
     unsubscribe(callback: TEventRecordedCallback) {
         this.listeners = this.listeners.filter((cb) => cb !== callback);
     }
