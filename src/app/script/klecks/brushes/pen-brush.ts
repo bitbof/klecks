@@ -19,6 +19,19 @@ const ALPHA_SQUARE = 3;
 
 const TWO_PI = 2 * Math.PI;
 
+export type TPenBrushConfig = {
+    size: number;
+    sizePressure: boolean;
+    opacity: number;
+    opacityPressure: boolean;
+    scatter: number;
+    scatterPressure: boolean;
+    spacing: number;
+    color: TRgb;
+    alphaId: number;
+    lockLayerAlpha: boolean;
+}
+
 export class PenBrush {
     private context: CanvasRenderingContext2D = {} as CanvasRenderingContext2D;
     private klHistory: KlHistory = {} as KlHistory;
@@ -83,7 +96,7 @@ export class PenBrush {
 
         let ctx;
 
-        for (let i = 0; i < instructionArr.length; i++) {
+        for (let i = 0 ; i < instructionArr.length ; i++) {
             ctx = BB.ctx(instructionArr[i][0] as any);
 
             ctx.save();
@@ -221,7 +234,8 @@ export class PenBrush {
     private continueLine(x: number | null, y: number | null, size: number, pressure: number): void {
         if (this.bezierLine === null) {
             this.bezierLine = new BB.BezierLine();
-            this.bezierLine.add(this.lastInput.x, this.lastInput.y, 0, () => {});
+            this.bezierLine.add(this.lastInput.x, this.lastInput.y, 0, () => {
+            });
         }
 
         const drawArr: [number, number, number, number, number, number | undefined][] = []; //draw instructions. will be all drawn at once
@@ -253,7 +267,7 @@ export class PenBrush {
         // execute draw instructions
         this.context.save();
         let before: (typeof drawArr)[number] | undefined = undefined;
-        for (let i = 0; i < drawArr.length; i++) {
+        for (let i = 0 ; i < drawArr.length ; i++) {
             const item = drawArr[i];
             this.drawDot(item[0], item[1], item[2], item[3], item[4], item[5], before);
             before = item;
@@ -262,7 +276,8 @@ export class PenBrush {
     }
 
     // ----------------------------------- public -----------------------------------
-    constructor() {}
+    constructor() {
+    }
 
     // ---- interface ----
 
@@ -405,7 +420,7 @@ export class PenBrush {
         this.context.save();
         this.selectionPath && this.context.clip(this.selectionPath);
         const localScatter = this.calcScatter(1);
-        for (loopDist = this.lineToolLastDot; loopDist <= mouseDist; loopDist += bdist) {
+        for (loopDist = this.lineToolLastDot ; loopDist <= mouseDist ; loopDist += bdist) {
             this.drawDot(
                 x1 + eX * loopDist,
                 y1 + eY * loopDist,
@@ -516,5 +531,69 @@ export class PenBrush {
 
     getLockAlpha(): boolean {
         return this.settingLockLayerAlpha;
+    }
+
+    getAlpha(): number {
+        return this.settingAlphaId;
+    }
+
+    getSizePressure(): boolean {
+        return this.settingHasSizePressure;
+    }
+
+    getOpacityPressure(): boolean {
+        return this.settingHasOpacityPressure;
+    }
+
+    getScatterPressure(): boolean {
+        return this.settingHasScatterPressure;
+    }
+
+    getBrushConfig(): TPenBrushConfig {
+        return {
+            size: this.settingSize,
+            opacity: this.settingOpacity,
+            scatter: this.settingScatter,
+            alphaId: this.settingAlphaId,
+            lockLayerAlpha: this.settingLockLayerAlpha,
+            sizePressure: this.settingHasSizePressure,
+            opacityPressure: this.settingHasOpacityPressure,
+            scatterPressure: this.settingHasScatterPressure,
+            spacing: this.settingSpacing,
+            color: this.settingColor
+        };
+    }
+
+    setBrushConfig(config: TPenBrushConfig): void {
+        if (config.size !== undefined) {
+            this.setSize(config.size);
+        }
+        if (config.opacity !== undefined) {
+            this.setOpacity(config.opacity);
+        }
+        if (config.scatter !== undefined) {
+            this.setScatter(config.scatter);
+        }
+        if (config.alphaId !== undefined) {
+            this.setAlpha(config.alphaId);
+        }
+        if (config.lockLayerAlpha !== undefined) {
+            this.setLockAlpha(config.lockLayerAlpha);
+        }
+        if (config.sizePressure !== undefined) {
+            this.sizePressure(config.sizePressure);
+        }
+        if (config.opacityPressure !== undefined) {
+            this.opacityPressure(config.opacityPressure);
+        }
+        if (config.scatterPressure !== undefined) {
+            this.scatterPressure(config.scatterPressure);
+        }
+        if (config.spacing !== undefined) {
+            this.setSpacing(config.spacing);
+        }
+        if (config.color !== undefined) {
+            this.setColor(config.color);
+        }
     }
 }

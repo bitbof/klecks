@@ -12,6 +12,14 @@ import { getMultiPolyBounds } from '../../bb/multi-polygon/get-multi-polygon-bou
 const sampleCanvas = BB.canvas(32, 32);
 const sampleCtx = BB.ctx(sampleCanvas);
 
+export type TSketchyBrushConfig = {
+    size: number;
+    opacity: number;
+    blending: number;
+    scale: number;
+    color: TRgb;
+}
+
 export class SketchyBrush {
     private context: CanvasRenderingContext2D = {} as CanvasRenderingContext2D;
     private settingColor: TRgb = {} as TRgb;
@@ -53,7 +61,8 @@ export class SketchyBrush {
     }
 
     // ----------------------------------- public -----------------------------------
-    constructor() {}
+    constructor() {
+    }
 
     // ---- interface ----
 
@@ -107,6 +116,34 @@ export class SketchyBrush {
 
     setContext(c: CanvasRenderingContext2D): void {
         this.context = c;
+    }
+
+    getBrushConfig(): TSketchyBrushConfig {
+        return {
+            size: this.getSize(),
+            opacity: this.settingOpacity,
+            blending: this.settingBlending,
+            scale: this.settingScale,
+            color: this.settingColor,
+        };
+    }
+
+    setBrushConfig(config: TSketchyBrushConfig): void {
+        if (config.size !== undefined) {
+            this.setSize(config.size);
+        }
+        if (config.opacity !== undefined) {
+            this.setOpacity(config.opacity);
+        }
+        if (config.blending !== undefined) {
+            this.setBlending(config.blending);
+        }
+        if (config.scale !== undefined) {
+            this.setScale(config.scale);
+        }
+        if (config.color !== undefined) {
+            this.setColor(config.color);
+        }
     }
 
     startLine(x: number, y: number, pressure: number, shift?: boolean): void {
@@ -167,7 +204,7 @@ export class SketchyBrush {
                     if (mixW > 0 && mixH > 0) {
                         const imDat = this.context.getImageData(mixX, mixY, mixW, mixH);
                         let countMix = 0;
-                        for (let i = 0; i < imDat.data.length; i += 4) {
+                        for (let i = 0 ; i < imDat.data.length ; i += 4) {
                             mixr += imDat.data[i + 0];
                             mixg += imDat.data[i + 1];
                             mixb += imDat.data[i + 2];
@@ -202,7 +239,7 @@ export class SketchyBrush {
         this.context.moveTo(this.lastX, this.lastY);
         this.context.lineTo(x, y);
 
-        for (e = 0; e < this.points.length; e++) {
+        for (e = 0 ; e < this.points.length ; e++) {
             b = this.points[e][0] - this.points[this.count][0];
             a = this.points[e][1] - this.points[this.count][1];
             g = b * b + a * a;
@@ -250,6 +287,7 @@ export class SketchyBrush {
             }
         }
     }
+
     //cheap 'n' ugly
 
     drawLineSegment(x1: number, y1: number, x2: number, y2: number): void {
@@ -300,7 +338,7 @@ export class SketchyBrush {
 
                 const imDat = sampleCtx.getImageData(mixX, mixY, mixW, mixH);
                 let countMix = 0;
-                for (let i = 0; i < imDat.data.length; i += 4) {
+                for (let i = 0 ; i < imDat.data.length ; i += 4) {
                     mixCol.r += imDat.data[i + 0];
                     mixCol.g += imDat.data[i + 1];
                     mixCol.b += imDat.data[i + 2];
@@ -314,15 +352,15 @@ export class SketchyBrush {
         const mixed = this.mixMode[0](new BB.RGB(mixCol.r, mixCol.g, mixCol.b), this.settingColor);
         mixCol.r = parseInt(
             '' +
-                (this.settingBlending * mixed.r + this.settingColor.r * (1 - this.settingBlending)),
+            (this.settingBlending * mixed.r + this.settingColor.r * (1 - this.settingBlending)),
         );
         mixCol.g = parseInt(
             '' +
-                (this.settingBlending * mixed.g + this.settingColor.g * (1 - this.settingBlending)),
+            (this.settingBlending * mixed.g + this.settingColor.g * (1 - this.settingBlending)),
         );
         mixCol.b = parseInt(
             '' +
-                (this.settingBlending * mixed.b + this.settingColor.b * (1 - this.settingBlending)),
+            (this.settingBlending * mixed.b + this.settingColor.b * (1 - this.settingBlending)),
         );
         this.context.strokeStyle =
             'rgba(' +

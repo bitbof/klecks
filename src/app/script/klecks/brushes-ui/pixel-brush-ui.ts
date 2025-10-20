@@ -7,7 +7,7 @@ import { createPenPressureToggle } from '../ui/components/create-pen-pressure-to
 import brushIconImg from 'url:/src/app/img/ui/brush-pixel.svg';
 import { TBrushUi } from '../kl-types';
 import { LANG, LANGUAGE_STRINGS } from '../../language/language';
-import { PixelBrush } from '../brushes/pixel-brush';
+import { PixelBrush, TPixelBrushConfig } from '../brushes/pixel-brush';
 
 export const pixelBrushUi = (function () {
     const brushInterface = {
@@ -38,8 +38,11 @@ export const pixelBrushUi = (function () {
         const brush = new BRUSHES.PixelBrush();
         brush.setHistory(p.klHistory);
         p.onSizeChange(brush.getSize());
+
         let sizeSlider: KlSlider;
         let opacitySlider: KlSlider;
+        let pressureSizeToggle: HTMLElement;
+        // let pressureOpacityToggle: HTMLElement; // TODO add this control?
 
         const lockAlphaToggle = new Checkbox({
             init: brush.getLockAlpha(),
@@ -113,7 +116,7 @@ export const pixelBrushUi = (function () {
                 },
             });
 
-            const pressureSizeToggle = createPenPressureToggle(true, function (b) {
+            pressureSizeToggle = createPenPressureToggle(true, function (b) {
                 brush.sizePressure(b);
             });
 
@@ -202,6 +205,32 @@ export const pixelBrushUi = (function () {
         };
         this.getElement = function () {
             return div;
+        };
+        this.getBrushConfig = function () {
+            return brush.getBrushConfig();
+        };
+        this.setBrushConfig = function (config: TPixelBrushConfig) {
+            brush.setBrushConfig(config);
+
+            // Update UI components to match brush state
+            if (config.size !== undefined) {
+                sizeSlider.setValue(config.size * 2);
+            }
+            if (config.opacity !== undefined) {
+                opacitySlider.setValue(config.opacity * 100);
+            }
+            if (config.lockAlpha !== undefined) {
+                lockAlphaToggle.setValue(config.lockAlpha);
+            }
+            if (config.isEraser !== undefined) {
+                eraserToggle.setValue(config.isEraser);
+            }
+            if (config.useDither !== undefined) {
+                ditherToggle.setValue(config.useDither);
+            }
+            // TODO: sizePressure, opacityPressure
+            // Above variable is of type `HTMLElement` and should be of type `BoxToggle`
+            // opacityPressure is missing in general.
         };
     } as TBrushUi<PixelBrush>['Ui'];
     return brushInterface;

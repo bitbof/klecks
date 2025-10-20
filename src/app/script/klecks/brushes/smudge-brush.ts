@@ -270,6 +270,15 @@ function smudge(imageData: ImageData, mask: Uint8Array | undefined, p: TSmudgePa
     //statAcc += performance.now() - start;
 }
 
+export type TSmudgeBrushConfig = {
+    color: TRgb;
+    size: number;
+    sizePressure: boolean;
+    opacity: number;
+    opacityPressure: boolean;
+    lockLayerAlpha: boolean;
+}
+
 export class SmudgeBrush {
     private context: CanvasRenderingContext2D = {} as CanvasRenderingContext2D;
     private klHistory: KlHistory = {} as KlHistory;
@@ -720,5 +729,45 @@ export class SmudgeBrush {
 
     getLockAlpha(): boolean {
         return this.settingLockLayerAlpha;
+    }
+
+    getSizePressure(): boolean {
+        return this.settingHasSizePressure;
+    }
+
+    getOpacityPressure(): boolean {
+        return this.settingHasOpacityPressure;
+    }
+
+    getBrushConfig(): TSmudgeBrushConfig {
+        return {
+            size: this.settingSize,
+            opacity: this.settingOpacity,
+            lockLayerAlpha: this.settingLockLayerAlpha,
+            sizePressure: this.settingHasSizePressure,
+            opacityPressure: this.settingHasOpacityPressure,
+            color: this.settingColor,
+        };
+    }
+
+    setBrushConfig(config: TSmudgeBrushConfig): void {
+        if (config.size !== undefined) {
+            this.setSize(config.size);
+        }
+        if (config.opacity !== undefined) {
+            this.setOpacity(config.opacity);
+        }
+        if (config.lockLayerAlpha !== undefined) {
+            this.setLockAlpha(config.lockLayerAlpha);
+        }
+        if (config.sizePressure !== undefined) {
+            this.sizePressure(config.sizePressure);
+        }
+        if (config.opacityPressure !== undefined) {
+            this.opacityPressure(config.opacityPressure);
+        }
+        if (config.color !== undefined) {
+            this.setColor(config.color);
+        }
     }
 }

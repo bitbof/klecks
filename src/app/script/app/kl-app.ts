@@ -414,11 +414,23 @@ export class KlApp {
             },
         });
 
-        const chainRecorder = this.klRecorder?.createChainRecorder();
+
+        // Draw Event Chain 1:
+        const chainRecorder = this.klRecorder?.createChainRecorder(() => {
+            return {
+                id: currentBrushId,
+                cfg: currentBrushUi.getBrushConfig()
+            }
+        });
+
+        // Event Chain 2:
+        this.lineSanitizer = new LineSanitizer();
+
+        // Event Chain 3:
         const lineSmoothing = new LineSmoothing({
             smoothing: translateSmoothing(1),
         });
-        this.lineSanitizer = new LineSanitizer();
+
 
         const drawEventChain = new BB.EventChain({
             // TODO replace any with proper type/interface. BB.EventChain needs to get a change here.
@@ -1585,6 +1597,7 @@ export class KlApp {
             },
             applyUncommitted: () => applyUncommitted(),
             klHistory: this.klHistory,
+            klRecorder: this.klRecorder,
             onCopyToClipboard: () => {
                 applyUncommitted();
                 copyToClipboard(false, false);

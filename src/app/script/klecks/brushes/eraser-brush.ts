@@ -13,6 +13,14 @@ import { getSelectionPath2d } from '../../bb/multi-polygon/get-selection-path-2d
 import { boundsOverlap, integerBounds } from '../../bb/math/math';
 import { getMultiPolyBounds } from '../../bb/multi-polygon/get-multi-polygon-bounds';
 
+export type TEraserBrushConfig = {
+    size: number;
+    sizePressure: boolean;
+    opacity: number;
+    opacityPressure: boolean;
+    transparentBg: boolean;
+}
+
 export class EraserBrush {
     private size: number = 30;
     private spacing: number = 0.4;
@@ -270,5 +278,45 @@ export class EraserBrush {
 
     getOpacity(): number {
         return this.opacity;
+    }
+
+    getSizePressure(): boolean {
+        return this.useSizePressure;
+    }
+
+    getOpacityPressure(): boolean {
+        return this.useOpacityPressure;
+    }
+
+    getTransparentBG(): boolean {
+        return this.isTransparentBG;
+    }
+
+    getBrushConfig(): TEraserBrushConfig {
+        return {
+            size: this.size,
+            sizePressure: this.useSizePressure,
+            opacity: this.opacity,
+            opacityPressure: this.useOpacityPressure,
+            transparentBg: this.isTransparentBG,
+        };
+    }
+
+    setBrushConfig(config: TEraserBrushConfig): void {
+        if (config.size !== undefined) {
+            this.setSize(config.size);
+        }
+        if (config.opacity !== undefined) {
+            this.setOpacity(config.opacity);
+        }
+        if (config.transparentBg !== undefined) {
+            this.setTransparentBG(config.transparentBg);
+        }
+        if (config.sizePressure !== undefined) {
+            this.sizePressure(config.sizePressure);
+        }
+        if (config.opacityPressure !== undefined) {
+            this.opacityPressure(config.opacityPressure);
+        }
     }
 }

@@ -7,7 +7,7 @@ import { createPenPressureToggle } from '../ui/components/create-pen-pressure-to
 import brushIconImg from 'url:/src/app/img/ui/brush-smudge.svg';
 import { TBrushUi } from '../kl-types';
 import { LANG, LANGUAGE_STRINGS } from '../../language/language';
-import { SmudgeBrush } from '../brushes/smudge-brush';
+import { SmudgeBrush, TSmudgeBrushConfig } from '../brushes/smudge-brush';
 
 export const smudgeBrushUi = (function () {
     const brushInterface = {
@@ -38,8 +38,11 @@ export const smudgeBrushUi = (function () {
         const brush = new BRUSHES.SmudgeBrush();
         brush.setHistory(p.klHistory);
         p.onSizeChange(brush.getSize());
+
         let sizeSlider: KlSlider;
         let opacitySlider: KlSlider;
+        let pressureSizeToggle: HTMLElement;
+        let pressureOpacityToggle: HTMLElement;
 
         const lockAlphaToggle = new Checkbox({
             init: brush.getLockAlpha(),
@@ -111,10 +114,10 @@ export const smudgeBrushUi = (function () {
                 },
             });
 
-            const pressureSizeToggle = createPenPressureToggle(false, function (b) {
+            pressureSizeToggle = createPenPressureToggle(false, function (b) {
                 brush.sizePressure(b);
             });
-            const pressureOpacityToggle = createPenPressureToggle(false, function (b) {
+            pressureOpacityToggle = createPenPressureToggle(false, function (b) {
                 brush.opacityPressure(b);
             });
 
@@ -198,6 +201,25 @@ export const smudgeBrushUi = (function () {
         };
         this.getElement = function () {
             return div;
+        };
+        this.getBrushConfig = function () {
+            return brush.getBrushConfig();
+        };
+        this.setBrushConfig = function (config: TSmudgeBrushConfig) {
+            brush.setBrushConfig(config);
+
+            // Update UI components to match brush state
+            if (config.size !== undefined) {
+                sizeSlider.setValue(config.size);
+            }
+            if (config.opacity !== undefined) {
+                opacitySlider.setValue(config.opacity);
+            }
+            if (config.lockLayerAlpha !== undefined) {
+                lockAlphaToggle.setValue(config.lockLayerAlpha);
+            }
+            // TODO: sizePressure, opacityPressure
+            // Above variable is of type `HTMLElement` and should be of type `BoxToggle`
         };
     } as TBrushUi<SmudgeBrush>['Ui'];
     return brushInterface;

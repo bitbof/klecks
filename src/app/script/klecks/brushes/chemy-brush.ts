@@ -12,6 +12,19 @@ import { getMultiPolyBounds } from '../../bb/multi-polygon/get-multi-polygon-bou
 
 type TChemyMode = 'fill' | 'stroke';
 
+export type TChemyBrushConfig = {
+    color: TRgb;
+    size: number;
+    opacity: number;
+    mode: TChemyMode;
+    lockAlpha: boolean;
+    isEraser: boolean;
+    xSymmetry: boolean;
+    ySymmetry: boolean;
+    gradient: boolean;
+    distort: number;
+}
+
 export class ChemyBrush {
     private context: CanvasRenderingContext2D = {} as CanvasRenderingContext2D;
     private settingColor: TRgb = {} as TRgb;
@@ -286,6 +299,54 @@ export class ChemyBrush {
 
     getIsDrawing(): boolean {
         return this.isDrawing;
+    }
+
+    getBrushConfig(): TChemyBrushConfig {
+        return {
+            size: this.getSize(),
+            opacity: this.settingOpacity,
+            mode: this.settingMode,
+            lockAlpha: this.settingLockLayerAlpha,
+            isEraser: this.settingIsEraser,
+            xSymmetry: this.settingXSymmetry,
+            ySymmetry: this.settingYSymmetry,
+            gradient: this.settingGradient,
+            color: this.settingColor,
+            distort: this.settingDistort,
+        };
+    }
+
+    setBrushConfig(config: TChemyBrushConfig): void {
+        if (config.size !== undefined) {
+            this.setSize(config.size);
+        }
+        if (config.opacity !== undefined) {
+            this.setOpacity(config.opacity);
+        }
+        if (config.mode !== undefined) {
+            this.setMode(config.mode);
+        }
+        if (config.lockAlpha !== undefined) {
+            this.setLockAlpha(config.lockAlpha);
+        }
+        if (config.isEraser !== undefined) {
+            this.setIsEraser(config.isEraser);
+        }
+        if (config.xSymmetry !== undefined) {
+            this.setXSymmetry(config.xSymmetry);
+        }
+        if (config.ySymmetry !== undefined) {
+            this.setYSymmetry(config.ySymmetry);
+        }
+        if (config.gradient !== undefined) {
+            this.setGradient(config.gradient);
+        }
+        if (config.color !== undefined) {
+            this.setColor(config.color);
+        }
+        if (config.distort !== undefined) {
+            this.setDistort(config.distort);
+        }
     }
 
     startLine(x: number, y: number): void {

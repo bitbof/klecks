@@ -7,7 +7,7 @@ import { KlSlider } from '../ui/components/kl-slider';
 import brushIconImg from 'url:/src/app/img/ui/brush-blend.svg';
 import { TBrushUi } from '../kl-types';
 import { LANG, LANGUAGE_STRINGS } from '../../language/language';
-import { BlendBrush } from '../brushes/blend-brush';
+import { BlendBrush, TBlendBrushConfig } from '../brushes/blend-brush';
 
 export const blendBrushUi = (function () {
     const brushInterface = {
@@ -36,6 +36,10 @@ export const blendBrushUi = (function () {
 
         let sizeSlider: KlSlider;
         let opacitySlider: KlSlider;
+        let blendingSlider: KlSlider;
+        let pressureSizeToggle: HTMLElement;
+        let pressureOpacityToggle: HTMLElement;
+        let lockAlphaToggle: Checkbox;
 
         function setSize(size: number): void {
             brush.setSize(size);
@@ -74,7 +78,7 @@ export const blendBrushUi = (function () {
                     p.onOpacityChange(val);
                 },
             });
-            const blendingSlider = new KlSlider({
+            blendingSlider = new KlSlider({
                 label: LANG('brush-blending'),
                 width: 225,
                 height: 30,
@@ -90,14 +94,14 @@ export const blendBrushUi = (function () {
             });
             blendingSlider.getElement().style.marginTop = '10px';
 
-            const pressureSizeToggle = createPenPressureToggle(true, function (b) {
+            pressureSizeToggle = createPenPressureToggle(true, function (b) {
                 brush.setSizePressure(b);
             });
-            const pressureOpacityToggle = createPenPressureToggle(false, function (b) {
+            pressureOpacityToggle = createPenPressureToggle(false, function (b) {
                 brush.setOpacityPressure(b);
             });
 
-            const lockAlphaToggle = new Checkbox({
+            lockAlphaToggle = new Checkbox({
                 init: brush.getLockAlpha(),
                 label: LANG('lock-alpha'),
                 callback: function (b) {
@@ -186,6 +190,28 @@ export const blendBrushUi = (function () {
         };
         this.getElement = function () {
             return div;
+        };
+        this.getBrushConfig = function () {
+            return brush.getBrushConfig();
+        };
+        this.setBrushConfig = function (config: TBlendBrushConfig) {
+            brush.setBrushConfig(config);
+
+            // Update UI components to match brush state
+            if (config.size !== undefined) {
+                sizeSlider.setValue(config.size);
+            }
+            if (config.opacity !== undefined) {
+                opacitySlider.setValue(config.opacity);
+            }
+            if (config.blending !== undefined) {
+                blendingSlider.setValue(config.blending);
+            }
+            if (config.lockLayerAlpha !== undefined) {
+                lockAlphaToggle.setValue(config.lockLayerAlpha);
+            }
+            // TODO: sizePressure, opacityPressure
+            // Above variable is of type `HTMLElement` and should be of type `BoxToggle`
         };
     } as TBrushUi<BlendBrush>['Ui'];
 

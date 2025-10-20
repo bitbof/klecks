@@ -5,7 +5,7 @@ import brushIconImg from 'url:/src/app/img/ui/brush-sketchy.png';
 import { TBrushUi } from '../kl-types';
 import { LANG, LANGUAGE_STRINGS } from '../../language/language';
 import { BB } from '../../bb/bb';
-import { SketchyBrush } from '../brushes/sketchy-brush';
+import { SketchyBrush, TSketchyBrushConfig } from '../brushes/sketchy-brush';
 
 export const sketchyBrushUi = (function () {
     const brushInterface = {
@@ -30,8 +30,11 @@ export const sketchyBrushUi = (function () {
         const brush = new BRUSHES.SketchyBrush();
         brush.setHistory(p.klHistory);
         p.onSizeChange(brush.getSize());
+
         let sizeSlider: KlSlider;
         let opacitySlider: KlSlider;
+        let blendSlider: KlSlider;
+        let scaleSlider: KlSlider;
 
         function setSize(size: number) {
             brush.setSize(size);
@@ -76,7 +79,7 @@ export const sketchyBrushUi = (function () {
                     p.onOpacityChange(val);
                 },
             });
-            const blendSlider = new KlSlider({
+            blendSlider = new KlSlider({
                 label: LANG('brush-blending'),
                 width: 250,
                 height: 30,
@@ -90,7 +93,7 @@ export const sketchyBrushUi = (function () {
                     brush.setBlending(val);
                 },
             });
-            const scaleSlider = new KlSlider({
+            scaleSlider = new KlSlider({
                 label: LANG('brush-sketchy-scale'),
                 width: 250,
                 height: 30,
@@ -168,6 +171,26 @@ export const sketchyBrushUi = (function () {
         };
         this.getElement = function () {
             return div;
+        };
+        this.getBrushConfig = function () {
+            return brush.getBrushConfig();
+        };
+        this.setBrushConfig = function (config: TSketchyBrushConfig) {
+            brush.setBrushConfig(config);
+
+            // Update UI components to match brush state
+            if (config.size !== undefined) {
+                sizeSlider.setValue(config.size);
+            }
+            if (config.opacity !== undefined) {
+                opacitySlider.setValue(config.opacity);
+            }
+            if (config.blending !== undefined) {
+                blendSlider.setValue(config.blending);
+            }
+            if (config.scale !== undefined) {
+                scaleSlider.setValue(config.scale);
+            }
         };
     } as TBrushUi<SketchyBrush>['Ui'];
 

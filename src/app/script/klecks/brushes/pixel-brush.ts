@@ -13,6 +13,17 @@ import { getSelectionPath2d } from '../../bb/multi-polygon/get-selection-path-2d
 import { boundsOverlap, boundsToRect, integerBounds, updateBounds } from '../../bb/math/math';
 import { getMultiPolyBounds } from '../../bb/multi-polygon/get-multi-polygon-bounds';
 
+export type TPixelBrushConfig = {
+    size: number;
+    sizePressure: boolean;
+    opacity: number;
+    opacityPressure: boolean;
+    lockAlpha: boolean;
+    isEraser: boolean;
+    useDither: boolean;
+    color: TRgb;
+}
+
 export class PixelBrush {
     private klHistory: KlHistory = {} as KlHistory;
     private context: CanvasRenderingContext2D = {} as CanvasRenderingContext2D;
@@ -552,5 +563,53 @@ export class PixelBrush {
 
     getUseDither(): boolean {
         return this.settingUseDither;
+    }
+
+    getSizePressure(): boolean {
+        return this.settingHasSizePressure;
+    }
+
+    getOpacityPressure(): boolean {
+        return this.settingHasOpacityPressure;
+    }
+
+    getBrushConfig(): TPixelBrushConfig {
+        return {
+            size: this.settingSize,
+            sizePressure: this.settingHasSizePressure,
+            opacity: this.settingOpacity,
+            opacityPressure: this.settingHasOpacityPressure,
+            lockAlpha: this.settingLockLayerAlpha,
+            isEraser: this.settingIsEraser,
+            useDither: this.settingUseDither,
+            color: this.settingColor
+        };
+    }
+
+    setBrushConfig(config: TPixelBrushConfig): void {
+        if (config.size !== undefined) {
+            this.setSize(config.size);
+        }
+        if (config.opacity !== undefined) {
+            this.setOpacity(config.opacity);
+        }
+        if (config.lockAlpha !== undefined) {
+            this.setLockAlpha(config.lockAlpha);
+        }
+        if (config.isEraser !== undefined) {
+            this.setIsEraser(config.isEraser);
+        }
+        if (config.useDither !== undefined) {
+            this.setUseDither(config.useDither);
+        }
+        if (config.sizePressure !== undefined) {
+            this.sizePressure(config.sizePressure);
+        }
+        if (config.opacityPressure !== undefined) {
+            this.opacityPressure(config.opacityPressure);
+        }
+        if (config.color !== undefined) {
+            this.setColor(config.color);
+        }
     }
 }

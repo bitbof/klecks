@@ -2,23 +2,26 @@
 import { KlChainRecorder } from './kl-chain-recorder';
 
 // Note: frequent words like canvas, layer, filter are omitted to save space
-export type TEventType = 'undo' | 'redo' |
-    'draw' | 'reset' | 'resize' | 'resize-c' |
+export type TEventType =
+    'undo' | 'redo' | 'draw' | 'reset' | 'resize' | 'resize-c' |
     'l-flip' | 'l-select' | 'l-fill' | 'l-add' | 'l-opac' | 'l-dupl' | 'l-rm' |
     'l-ren' | 'l-vis' | 'l-move' | 'l-merge' | 'l-merge-all' | 'l-erase' |
-    'rotate' | 'flood-fill' | 'shape' | 'grad' | 'text' |
-    'set-mixmode' | 'selection' | 'selection-transform' | 'selection-transform-clone' |
+    'rotate' | 'flood-fill' | 'shape' | 'grad' | 'text' | 'set-mixmode' |
+    'selection' | 'selection-transform' | 'selection-transform-clone' |
     'filter'
     ;
 
-// New event structure with explicit type field and flexible data
+// TODO REC Changes to these are skipped when undoing:
+// 'l-select'
+
+
+// Event structure with explicit type and flexible data
 export type TRecordedEvent = {
     projectId: string;
     sequenceNumber: number;
     timestamp: number;
     type: TEventType;
     data: any;
-    dataLength: number | null; // in KB, debug only
 };
 
 export type TEventRecordedCallback = (event: TRecordedEvent, totalTime: number) => void;
@@ -62,8 +65,6 @@ export class KlEventRecorder {
     private totalTimeTaken: number = 0; // ms taken drawing in this project
     private listeners: Array<TEventRecordedCallback> = [];
     private isPaused: boolean = false;
-    private previousEvent: TRecordedEvent | undefined;
-    private previousReplacableIdentifier: any | undefined;
 
     constructor(projectId: string, config: TRecorderConfig) {
         this.projectId = projectId;
@@ -92,23 +93,25 @@ export class KlEventRecorder {
     /**
      * Create an instance of a chain-recorder to record brush events
      */
-    createChainRecorder() {
+    createChainRecorder(getBrushData: () => any) {
         return new KlChainRecorder((drawEvents) => {
             // Line ended:
-            this.record('draw', { events: drawEvents });
+            this.record('draw', {
+                events: drawEvents,
+                brush: getBrushData()
+            });
         });
     }
 
     /**
      * Record an event with flexible data / parameters, needed to restore this action
      */
-    record(type: TEventType, data: any, isReplacable?: boolean, replacableIdentifier?: any): void {
+    record(type: TEventType, data: any): void {
         const event: TRecordedEvent = {
             projectId: this.projectId,
             timestamp: Date.now(),
             type: type,
             data: { ...data },
-            dataLength: DEBUG_RECORDER ? Math.ceil(JSON.stringify(data).length / 1024) : null,
             sequenceNumber: this.sequenceNumber++,
         };
 
@@ -121,28 +124,6 @@ export class KlEventRecorder {
                 console.log('%c[REC]', 'color: orange;', 'Ignoring event - recording paused', event);
             }
             return;
-        }
-
-        // If this is an unimportant event, save it in "previousEvent" and only emit the event on the next call with a different event
-        if (isReplacable && (this.previousReplacableIdentifier == undefined || this.previousReplacableIdentifier === replacableIdentifier)) {
-            // Replace the event, discarding the previous one.
-            this.previousEvent = event;
-            this.previousReplacableIdentifier = replacableIdentifier;
-            // Decrease the sequenceNumber
-            this.sequenceNumber--;
-            event.sequenceNumber = this.sequenceNumber;
-
-            if (DEBUG_RECORDER) {
-                console.log('%c[REC]', 'color: orange;', 'Storing unimportant event for later', event);
-            }
-            return;
-        }
-
-        if (this.previousEvent && !isReplacable) {
-            // Emit the previous unimportant event first
-            const event2 = this.previousEvent;
-            this.previousEvent = undefined;
-            this.record(event2.type, event2.data);
         }
 
         if (DEBUG_RECORDER) {
@@ -240,6 +221,9 @@ export class KlEventRecorder {
      * Register an event listener to be notified on new recorded events
      */
     subscribe(callback: TEventRecordedCallback) {
+        if (this.listeners.includes(callback)) {
+            return;
+        }
         this.listeners.push(callback);
     }
 

@@ -8,7 +8,7 @@ import { TBrushUi } from '../kl-types';
 import { Options } from '../ui/components/options';
 import { BoxToggle } from '../ui/components/box-toggle';
 import { LANG, LANGUAGE_STRINGS } from '../../language/language';
-import { ChemyBrush } from '../brushes/chemy-brush';
+import { ChemyBrush, TChemyBrushConfig } from '../brushes/chemy-brush';
 import { css } from '../../bb/base/base';
 
 export const chemyBrushUi = (function () {
@@ -39,6 +39,11 @@ export const chemyBrushUi = (function () {
 
         let sizeSlider: KlSlider;
         let opacitySlider: KlSlider;
+        let lockAlphaToggle: Checkbox;
+        let modeOptions: Options<string>;
+        let mirrorXToggle: BoxToggle;
+        let mirrorYToggle: BoxToggle;
+        let gradientToggle: BoxToggle;
 
         function setSize(size: number) {
             brush.setSize(size);
@@ -105,7 +110,7 @@ export const chemyBrushUi = (function () {
                 name: 'eraser-toggle',
             });
 
-            const lockAlphaToggle = new Checkbox({
+            lockAlphaToggle = new Checkbox({
                 init: brush.getLockAlpha(),
                 label: LANG('lock-alpha'),
                 callback: function (b) {
@@ -131,7 +136,7 @@ export const chemyBrushUi = (function () {
             const actualIconSize = iconSize - padding * 2;
             const halfSize = actualIconSize / 2;
 
-            const modeOptions = new Options({
+            modeOptions = new Options({
                 optionArr: [
                     {
                         id: 'fill',
@@ -191,7 +196,7 @@ export const chemyBrushUi = (function () {
                 },
             });
 
-            const mirrorXToggle = new BoxToggle({
+            mirrorXToggle = new BoxToggle({
                 label: BB.createSvg({
                     class: 'dark-invert',
                     elementType: 'svg',
@@ -216,7 +221,7 @@ export const chemyBrushUi = (function () {
                 },
             });
 
-            const mirrorYToggle = new BoxToggle({
+            mirrorYToggle = new BoxToggle({
                 label: BB.createSvg({
                     class: 'dark-invert',
                     elementType: 'svg',
@@ -241,7 +246,7 @@ export const chemyBrushUi = (function () {
                 },
             });
 
-            const gradientToggle = new BoxToggle({
+            gradientToggle = new BoxToggle({
                 label: BB.createSvg({
                     class: 'dark-invert',
                     elementType: 'svg',
@@ -275,7 +280,7 @@ export const chemyBrushUi = (function () {
                         },
                         {
                             elementType: 'rect',
-                            fill: "url('#gradient')",
+                            fill: 'url(\'#gradient\')',
                             x: '' + padding,
                             y: '' + padding,
                             width: '' + actualIconSize,
@@ -376,6 +381,43 @@ export const chemyBrushUi = (function () {
         };
         this.getElement = function () {
             return div;
+        };
+        this.getBrushConfig = function () {
+            return brush.getBrushConfig();
+        };
+        this.setBrushConfig = function (config: TChemyBrushConfig) {
+            brush.setBrushConfig(config);
+
+            // Update UI components to match brush state
+            if (config.size !== undefined) {
+                sizeSlider.setValue(config.size);
+            }
+            if (config.opacity !== undefined) {
+                opacitySlider.setValue(config.opacity);
+            }
+            if (config.mode !== undefined) {
+                // Update mode options
+                modeOptions.setValue(config.mode);
+                // Update size slider enabled state
+                brushInterface.sizeSlider.isDisabled = config.mode === 'fill';
+                sizeSlider.setIsEnabled(!brushInterface.sizeSlider.isDisabled);
+            }
+            if (config.lockAlpha !== undefined) {
+                lockAlphaToggle.setValue(config.lockAlpha);
+            }
+            if (config.isEraser !== undefined) {
+                eraserToggle.setValue(config.isEraser);
+            }
+            if (config.xSymmetry !== undefined) {
+                mirrorXToggle.setValue(config.xSymmetry);
+            }
+            if (config.ySymmetry !== undefined) {
+                mirrorYToggle.setValue(config.ySymmetry);
+            }
+            if (config.gradient !== undefined) {
+                gradientToggle.setValue(config.gradient);
+            }
+            // distort?
         };
     } as TBrushUi<ChemyBrush>['Ui'];
 

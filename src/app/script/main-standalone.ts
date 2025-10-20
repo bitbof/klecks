@@ -72,7 +72,7 @@ function showInitError(e: Error): void {
         const eventRecorderConfig = {
             enableMemoryStorage: true,
             onEvent: (evnt) => {
-                // TODO send to server
+                // TODO REC send to server
                 // console.log('[main-standalone] event', evnt);
             },
         } as TRecorderConfig;

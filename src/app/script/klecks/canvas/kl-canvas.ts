@@ -692,7 +692,7 @@ export class KlCanvas {
             const layerId = this.layers[layerIndex].id;
             const topEntry = this.klHistory.getEntries().at(-1)!.data;
             const replaceTop = isHistoryEntryOpacityChange(topEntry, layerId);
-            this.klRecorder?.record('l-opac', { layerIndex, opacity }, true, layerIndex);
+            this.klRecorder?.record('l-opac', { layerIndex, opacity });
             this.klHistory.push(
                 {
                     layerMap: createLayerMap(this.layers, {

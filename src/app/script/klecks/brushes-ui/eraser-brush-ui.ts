@@ -7,7 +7,7 @@ import { Checkbox } from '../ui/components/checkbox';
 import brushIconImg from 'url:/src/app/img/ui/brush-eraser.svg';
 import { TBrushUi } from '../kl-types';
 import { LANG, LANGUAGE_STRINGS } from '../../language/language';
-import { EraserBrush } from '../brushes/eraser-brush';
+import { EraserBrush, TEraserBrushConfig } from '../brushes/eraser-brush';
 
 export const eraserBrushUi = (function () {
     const brushInterface = {
@@ -37,6 +37,9 @@ export const eraserBrushUi = (function () {
         let sizeSlider: KlSlider;
         let opacitySlider: KlSlider;
         let isTransparentBg = false;
+        let transparencyToggle: Checkbox;
+        let pressureSizeToggle: HTMLElement;
+        let pressureOpacityToggle: HTMLElement;
 
         function setSize(size: number) {
             brush.setSize(size);
@@ -83,10 +86,10 @@ export const eraserBrushUi = (function () {
                 },
             });
 
-            const pressureSizeToggle = createPenPressureToggle(true, function (b) {
+            pressureSizeToggle = createPenPressureToggle(true, function (b) {
                 brush.sizePressure(b);
             });
-            const pressureOpacityToggle = createPenPressureToggle(false, function (b) {
+            pressureOpacityToggle = createPenPressureToggle(false, function (b) {
                 brush.opacityPressure(b);
             });
 
@@ -110,7 +113,7 @@ export const eraserBrushUi = (function () {
                 }),
             );
 
-            const transparencyToggle = new Checkbox({
+            transparencyToggle = new Checkbox({
                 init: false,
                 label: LANG('brush-eraser-transparent-bg'),
                 callback: function (b) {
@@ -176,6 +179,26 @@ export const eraserBrushUi = (function () {
         };
         this.getElement = function () {
             return div;
+        };
+        this.getBrushConfig = function () {
+            return brush.getBrushConfig();
+        };
+        this.setBrushConfig = function (config: TEraserBrushConfig) {
+            brush.setBrushConfig(config);
+
+            // Update UI components to match brush state
+            if (config.size !== undefined) {
+                sizeSlider.setValue(config.size);
+            }
+            if (config.opacity !== undefined) {
+                opacitySlider.setValue(config.opacity);
+            }
+            if (config.transparentBg !== undefined) {
+                isTransparentBg = config.transparentBg;
+                transparencyToggle.setValue(config.transparentBg);
+            }
+            // TODO: sizePressure, opacityPressure
+            // Above variable is of type `HTMLElement` and should be of type `BoxToggle`
         };
     } as TBrushUi<EraserBrush>['Ui'];
 

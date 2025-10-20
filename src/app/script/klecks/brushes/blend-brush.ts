@@ -26,6 +26,16 @@ type TDrawBufferItem = {
     b: number;
 };
 
+export type TBlendBrushConfig = {
+    size: number;
+    sizePressure: boolean;
+    opacity: number;
+    opacityPressure: boolean;
+    blending: number;
+    lockLayerAlpha: boolean;
+    color: TRgb;
+}
+
 export class BlendBrush {
     // testing mode - context only gets updated when line is finished
     private isTesting: boolean = false;
@@ -609,6 +619,50 @@ export class BlendBrush {
 
     setLockAlpha(b: boolean): void {
         this.settingLockLayerAlpha = b;
+    }
+
+    getSizePressure(): boolean {
+        return this.settingSizePressure;
+    }
+
+    getOpacityPressure(): boolean {
+        return this.settingOpacityPressure;
+    }
+
+    getBrushConfig(): TBlendBrushConfig {
+        return {
+            size: this.size,
+            sizePressure: this.settingSizePressure,
+            opacity: this.opacity,
+            opacityPressure: this.settingOpacityPressure,
+            blending: this.blending,
+            lockLayerAlpha: this.settingLockLayerAlpha,
+            color: this.color,
+        };
+    }
+
+    setBrushConfig(config: TBlendBrushConfig): void {
+        if (config.color !== undefined) {
+            this.setColor(config.color);
+        }
+        if (config.size !== undefined) {
+            this.setSize(config.size);
+        }
+        if (config.opacity !== undefined) {
+            this.setOpacity(config.opacity);
+        }
+        if (config.blending !== undefined) {
+            this.setBlending(config.blending);
+        }
+        if (config.lockLayerAlpha !== undefined) {
+            this.setLockAlpha(config.lockLayerAlpha);
+        }
+        if (config.sizePressure !== undefined) {
+            this.setSizePressure(config.sizePressure);
+        }
+        if (config.opacityPressure !== undefined) {
+            this.setOpacityPressure(config.opacityPressure);
+        }
     }
 
     getIsDrawing(): boolean {

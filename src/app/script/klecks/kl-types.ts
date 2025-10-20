@@ -224,6 +224,8 @@ export type TBrushUiInstance<GBrush> = {
     getSeed?: () => number;
     setSeed?: (s: number) => void;
     toggleEraser?: () => void;
+    getBrushConfig: () => any;
+    setBrushConfig: (config: any) => void;
 };
 
 export type TBrushUi<GBrush> = TSliderConfig & {

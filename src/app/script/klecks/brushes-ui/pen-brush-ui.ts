@@ -9,7 +9,7 @@ import { genBrushAlpha01, genBrushAlpha02 } from '../brushes/alphas/brush-alphas
 import { TBrushUi } from '../kl-types';
 import { LANG, LANGUAGE_STRINGS } from '../../language/language';
 import { Options } from '../ui/components/options';
-import { PenBrush } from '../brushes/pen-brush';
+import { PenBrush, TPenBrushConfig } from '../brushes/pen-brush';
 
 export const penBrushUi = (function () {
     const brushInterface = {
@@ -60,8 +60,13 @@ export const penBrushUi = (function () {
         let sizeSlider: KlSlider;
         let opacitySlider: KlSlider;
         let scatterSlider: KlSlider;
+        let lockAlphaToggle: Checkbox;
+        let alphaOptions: Options<number>;
+        let pressureSizeToggle: HTMLElement;
+        let pressureOpacityToggle: HTMLElement;
+        let pressureScatterToggle: HTMLElement;
 
-        const alphaOptions = new Options({
+        alphaOptions = new Options({
             optionArr: [0, 1, 2, 3].map((id) => {
                 const alpha = BB.el({
                     className: 'dark-invert',
@@ -102,7 +107,7 @@ export const penBrushUi = (function () {
             },
         });
 
-        const lockAlphaToggle = new Checkbox({
+        lockAlphaToggle = new Checkbox({
             init: brush.getLockAlpha(),
             label: LANG('lock-alpha'),
             callback: function (b) {
@@ -194,13 +199,13 @@ export const penBrushUi = (function () {
                 manualInputRoundDigits: 1,
             });
 
-            const pressureSizeToggle = createPenPressureToggle(true, function (b) {
+            pressureSizeToggle = createPenPressureToggle(true, function (b) {
                 brush.sizePressure(b);
             });
-            const pressureOpacityToggle = createPenPressureToggle(false, function (b) {
+            pressureOpacityToggle = createPenPressureToggle(false, function (b) {
                 brush.opacityPressure(b);
             });
-            const pressureScatterToggle = createPenPressureToggle(false, function (b) {
+            pressureScatterToggle = createPenPressureToggle(false, function (b) {
                 brush.scatterPressure(b);
             });
 
@@ -304,6 +309,31 @@ export const penBrushUi = (function () {
         };
         this.getElement = function () {
             return div;
+        };
+        this.getBrushConfig = function () {
+            return brush.getBrushConfig();
+        };
+        this.setBrushConfig = function (config: TPenBrushConfig) {
+            brush.setBrushConfig(config);
+
+            // Update UI components to match brush state
+            if (config.size !== undefined) {
+                sizeSlider.setValue(config.size);
+            }
+            if (config.opacity !== undefined) {
+                opacitySlider.setValue(config.opacity);
+            }
+            if (config.scatter !== undefined) {
+                scatterSlider.setValue(config.scatter);
+            }
+            if (config.alphaId !== undefined) {
+                alphaOptions.setValue(config.alphaId);
+            }
+            if (config.lockLayerAlpha !== undefined) {
+                lockAlphaToggle.setValue(config.lockLayerAlpha);
+            }
+            // TODO: sizePressure, opacityPressure, scatterPressure
+            // Above variable is of type `HTMLElement` and should be of type `BoxToggle`
         };
     } as TBrushUi<PenBrush>['Ui'];
     return brushInterface;
