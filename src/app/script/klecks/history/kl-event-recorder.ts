@@ -1,10 +1,14 @@
 // Event types for more explicit type handling
 import { KlChainRecorder } from './kl-chain-recorder';
 
+// Note: frequent words like canvas, layer, filter are omitted to save space
 export type TEventType = 'undo' | 'redo' |
-    'draw' |
-    'bucket' | 'text' |
-    'f-flip' | 'l-select'
+    'draw' | 'reset' | 'resize' | 'resize-c' |
+    'l-flip' | 'l-select' | 'l-fill' | 'l-add' | 'l-opac' | 'l-dupl' | 'l-rm' |
+    'l-ren' | 'l-vis' | 'l-move' | 'l-merge' | 'l-merge-all' | 'l-erase' |
+    'rotate' | 'flood-fill' | 'shape' | 'grad' | 'text' |
+    'set-mixmode' | 'selection' | 'selection-transform' | 'selection-transform-clone' |
+    'filter'
     ;
 
 // New event structure with explicit type field and flexible data
@@ -14,13 +18,21 @@ export type TRecordedEvent = {
     timestamp: number;
     type: TEventType;
     data: any;
+    dataLength: number | null; // in KB, debug only
 };
 
 export type TEventRecordedCallback = (event: TRecordedEvent, totalTime: number) => void;
 
 export type TRecorderConfig = {
+    /**
+     * I would not recommend enabling the integrated memory storage because it can easily grow in size.
+     * Rather, provide a callback (onEvent) and put the events somewhere else (server)
+     */
+    enableMemoryStorage: boolean;
+    /**
+     * Callback when a new event is received.
+     */
     onEvent?: TEventRecordedCallback;
-    enableMemoryStorage?: boolean; // Default: true
 };
 
 export type TGetEventsOptions = {
@@ -50,10 +62,12 @@ export class KlEventRecorder {
     private totalTimeTaken: number = 0; // ms taken drawing in this project
     private listeners: Array<TEventRecordedCallback> = [];
     private isPaused: boolean = false;
+    private previousEvent: TRecordedEvent | undefined;
+    private previousReplacableIdentifier: any | undefined;
 
     constructor(projectId: string, config: TRecorderConfig) {
         this.projectId = projectId;
-        this.enableMemoryStorage = config.enableMemoryStorage !== false; // Default to true
+        this.enableMemoryStorage = config.enableMemoryStorage;
         if (config.onEvent) {
             this.listeners.push(config.onEvent);
         }
@@ -88,28 +102,47 @@ export class KlEventRecorder {
     /**
      * Record an event with flexible data / parameters, needed to restore this action
      */
-    record(type: TEventType, data: any): void {
+    record(type: TEventType, data: any, isReplacable?: boolean, replacableIdentifier?: any): void {
         const event: TRecordedEvent = {
             projectId: this.projectId,
             timestamp: Date.now(),
             type: type,
             data: { ...data },
+            dataLength: DEBUG_RECORDER ? Math.ceil(JSON.stringify(data).length / 1024) : null,
             sequenceNumber: this.sequenceNumber++,
         };
 
-        this.recordEventInternal(event);
-    }
+        // Some user action is taking place, record the time!
+        this.calculateTimeTaken();
 
-    /**
-     * Record event using configured callback
-     */
-    private recordEventInternal(event: TRecordedEvent): void {
         // Don't record if paused
         if (this.isPaused) {
             if (DEBUG_RECORDER) {
                 console.log('%c[REC]', 'color: orange;', 'Ignoring event - recording paused', event);
             }
             return;
+        }
+
+        // If this is an unimportant event, save it in "previousEvent" and only emit the event on the next call with a different event
+        if (isReplacable && (this.previousReplacableIdentifier == undefined || this.previousReplacableIdentifier === replacableIdentifier)) {
+            // Replace the event, discarding the previous one.
+            this.previousEvent = event;
+            this.previousReplacableIdentifier = replacableIdentifier;
+            // Decrease the sequenceNumber
+            this.sequenceNumber--;
+            event.sequenceNumber = this.sequenceNumber;
+
+            if (DEBUG_RECORDER) {
+                console.log('%c[REC]', 'color: orange;', 'Storing unimportant event for later', event);
+            }
+            return;
+        }
+
+        if (this.previousEvent && !isReplacable) {
+            // Emit the previous unimportant event first
+            const event2 = this.previousEvent;
+            this.previousEvent = undefined;
+            this.record(event2.type, event2.data);
         }
 
         if (DEBUG_RECORDER) {
@@ -120,8 +153,6 @@ export class KlEventRecorder {
         if (this.enableMemoryStorage) {
             this.memoryEvents.push(event);
         }
-
-        this.calculateTimeTaken();
 
         // Notify listeners
         for (const cb of this.listeners) {

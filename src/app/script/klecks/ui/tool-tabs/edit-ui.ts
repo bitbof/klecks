@@ -1,4 +1,5 @@
 import { BB } from '../../../bb/bb';
+import { KlEventRecorder } from '../../history/kl-event-recorder';
 import { KL } from '../../kl';
 import { TKeyString } from '../../../bb/bb-types';
 import { StatusOverlay } from '../components/status-overlay';
@@ -27,6 +28,7 @@ export type TEditUiParams = {
     onCanvasChanged: () => void; // dimensions/orientation changed
     applyUncommitted: () => void;
     klHistory: KlHistory;
+    klRecorder: KlEventRecorder | undefined;
     onCopyToClipboard: () => void;
     onPaste: () => void;
 };
@@ -45,6 +47,7 @@ export class EditUi {
     private readonly onCanvasChanged: () => void; // dimensions/orientation changed
     private readonly applyUncommitted: () => void;
     private readonly klHistory: KlHistory;
+    private readonly klRecorder: KlEventRecorder | undefined;
     private readonly onCopyToClipboard: () => void;
     private readonly onPaste: () => void;
 
@@ -182,6 +185,11 @@ This has been reported to Google.
                     }
 
                     const applyFilter = (input: any) => {
+                        this.klRecorder?.record('filter', {
+                            layerIndex: this.getCurrentLayer().index,
+                            filterKey,
+                            input
+                        });
                         const filterResult = filters[filterKey].apply!({
                             layer: this.getCurrentLayer(),
                             klCanvas: this.klCanvas,
@@ -411,6 +419,7 @@ This has been reported to Google.
         this.onCanvasChanged = p.onCanvasChanged;
         this.applyUncommitted = p.applyUncommitted;
         this.klHistory = p.klHistory;
+        this.klRecorder = p.klRecorder;
         this.onCopyToClipboard = p.onCopyToClipboard;
         this.onPaste = p.onPaste;
 

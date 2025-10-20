@@ -335,6 +335,7 @@ export class KlCanvas {
                     attributes: 'all',
                 }) as Record<TLayerId, THistoryEntryLayerComposed>,
             };
+            this.klRecorder?.record('reset', { p });
             this.klHistory.push(historyEntryData);
         }
 
@@ -415,6 +416,7 @@ export class KlCanvas {
         this.width = w;
         this.height = h;
 
+        this.klRecorder?.record('resize', { w, h, algorithm });
         this.klHistory.push({
             size: {
                 width: this.width,
@@ -469,6 +471,8 @@ export class KlCanvas {
         if (this.selection) {
             this.selection = translateMultiPolygon(this.selection, offX, offY);
         }
+
+        this.klRecorder?.record('resize-c', { p });
         this.klHistory.push({
             size: {
                 width: this.width,
@@ -530,6 +534,7 @@ export class KlCanvas {
         this.updateIndices();
 
         if (!this.klHistory.isPaused()) {
+            this.klRecorder?.record('l-add', { selectedIndex, data });
             this.klHistory.push({
                 activeLayerId: layerId,
                 layerMap: createLayerMap(
@@ -600,6 +605,7 @@ export class KlCanvas {
         this.updateIndices();
 
         if (!this.klHistory.isPaused()) {
+            this.klRecorder?.record('l-dupl', { srcIndex });
             this.klHistory.push({
                 activeLayerId: layerId,
                 layerMap: createLayerMap(
@@ -645,6 +651,7 @@ export class KlCanvas {
         const activeLayerId = this.layers[activeLayerIndex].id;
 
         if (!this.klHistory.isPaused()) {
+            this.klRecorder?.record('l-rm', { index });
             this.klHistory.push({
                 activeLayerId,
                 layerMap: createLayerMap(this.layers, { attributes: ['index'] }),
@@ -662,6 +669,7 @@ export class KlCanvas {
         }
 
         if (!this.klHistory.isPaused()) {
+            this.klRecorder?.record('l-ren', { index, name });
             this.klHistory.push({
                 layerMap: createLayerMap(this.layers, {
                     layerId: targetLayer.id,
@@ -684,6 +692,7 @@ export class KlCanvas {
             const layerId = this.layers[layerIndex].id;
             const topEntry = this.klHistory.getEntries().at(-1)!.data;
             const replaceTop = isHistoryEntryOpacityChange(topEntry, layerId);
+            this.klRecorder?.record('l-opac', { layerIndex, opacity }, true, layerIndex);
             this.klHistory.push(
                 {
                     layerMap: createLayerMap(this.layers, {
@@ -707,6 +716,7 @@ export class KlCanvas {
             const layerId = this.layers[layerIndex].id;
             const topEntry = this.klHistory.getEntries().at(-1)!.data;
             const replaceTop = isHistoryEntryVisibilityChange(topEntry, layerId);
+            this.klRecorder?.record('l-vis', { layerIndex, isVisible });
             this.klHistory.push(
                 {
                     layerMap: createLayerMap(this.layers, {
@@ -733,6 +743,7 @@ export class KlCanvas {
         this.updateIndices();
 
         if (!this.klHistory.isPaused()) {
+            this.klRecorder?.record('l-move', { index, delta });
             this.klHistory.push({
                 activeLayerId: this.layers[targetIndex].id,
                 layerMap: createLayerMap(this.layers, { attributes: ['index'] }),
@@ -794,6 +805,7 @@ export class KlCanvas {
         this.klHistory.pause(false);
 
         if (!this.klHistory.isPaused()) {
+            this.klRecorder?.record('l-merge', { layerBottomIndex, layerTopIndex, mixModeStr });
             this.klHistory.push({
                 activeLayerId: bottomLayer.id,
                 layerMap: createLayerMap(
@@ -816,7 +828,7 @@ export class KlCanvas {
         const bottomLayer = this.layers[0];
         bottomLayer.name = LANG('layers-layer') + ' 1';
         const bottomCtx = bottomLayer.context;
-        for (let i = 1; i < this.layers.length; i++) {
+        for (let i = 1 ; i < this.layers.length ; i++) {
             const layer = this.layers[i];
             if (!layer.isVisible || layer.opacity === 0) {
                 continue;
@@ -839,6 +851,7 @@ export class KlCanvas {
 
         if (!this.klHistory.isPaused()) {
             const activeLayerId = bottomLayer.id;
+            this.klRecorder?.record('l-merge-all', {});
             this.klHistory.push({
                 activeLayerId,
                 layerMap: createLayerMap(this.layers, { attributes: ['tiles'] }),
@@ -891,6 +904,7 @@ export class KlCanvas {
             this.selection = transformMultiPolygon(this.selection, matrix);
         }
 
+        this.klRecorder?.record('rotate', { deg });
         this.klHistory.push({
             size: {
                 width: this.width,
@@ -942,6 +956,11 @@ export class KlCanvas {
         }
 
         const targetLayer = layerIndex === undefined ? undefined : this.layers[layerIndex];
+        this.klRecorder?.record('l-flip', {
+            isHorizontal,
+            isVertical,
+            layerIndex,
+        });
         this.klHistory.push({
             layerMap: createLayerMap(
                 this.layers,
@@ -950,11 +969,6 @@ export class KlCanvas {
                     : { attributes: ['tiles'] },
             ),
             ...(this.selection ? { selection: { value: this.selection } } : {}),
-        });
-        this.klRecorder?.record('f-flip', {
-          isHorizontal,
-          isVertical,
-          layerIndex,
         });
     }
 
@@ -1045,6 +1059,7 @@ export class KlCanvas {
 
         if (!this.klHistory.isPaused()) {
             const targetLayer = this.layers[layerIndex];
+            this.klRecorder?.record('l-fill', { layerIndex, colorObj, compositeOperation, doClipSelection });
             this.klHistory.push({
                 layerMap: createLayerMap(this.layers, {
                     layerId: targetLayer.id,
@@ -1192,6 +1207,17 @@ export class KlCanvas {
         // ctx.restore();
 
         if (!this.klHistory.isPaused()) {
+            this.klRecorder?.record('flood-fill', {
+                layerIndex,
+                x,
+                y,
+                rgb,
+                opacity,
+                tolerance,
+                sampleStr,
+                grow,
+                isContiguous
+            });
             this.klHistory.push({
                 layerMap: createLayerMap(this.layers, {
                     layerId: targetLayer.id,
@@ -1225,6 +1251,7 @@ export class KlCanvas {
         ctx.restore();*/
 
         if (!this.klHistory.isPaused()) {
+            this.klRecorder?.record('shape', { layerIndex, shapeObj });
             this.klHistory.push({
                 layerMap: createLayerMap(this.layers, {
                     layerId: targetLayer.id,
@@ -1242,6 +1269,7 @@ export class KlCanvas {
             : undefined;
         drawGradient(targetLayer.context, gradientObj, selectionPath);
         if (!this.klHistory.isPaused()) {
+            this.klRecorder?.record('grad', { layerIndex, gradientObj });
             this.klHistory.push({
                 layerMap: createLayerMap(this.layers, {
                     layerId: targetLayer.id,
@@ -1284,6 +1312,7 @@ export class KlCanvas {
         // ctx.restore();
 
         if (!this.klHistory.isPaused()) {
+            this.klRecorder?.record('text', { layerIndex, p });
             this.klHistory.push({
                 layerMap: createLayerMap(this.layers, {
                     layerId: targetLayer.id,
@@ -1319,6 +1348,7 @@ export class KlCanvas {
 
         const isUniformFill = !p.useAlphaLock && !(p.useSelection && this.selection);
         if (!this.klHistory.isPaused()) {
+            this.klRecorder?.record('l-erase', p);
             this.klHistory.push({
                 layerMap: createLayerMap(this.layers, {
                     layerId: targetLayer.id,
@@ -1438,6 +1468,7 @@ export class KlCanvas {
         targetLayer.mixModeStr = mixModeStr;
 
         if (!this.klHistory.isPaused()) {
+            this.klRecorder?.record('set-mixmode', { layerIndex, mixModeStr });
             this.klHistory.push({
                 layerMap: createLayerMap(this.layers, {
                     layerId: targetLayer.id,
@@ -1468,6 +1499,7 @@ export class KlCanvas {
 
         this.selection = selection;
 
+        this.klRecorder?.record('selection', { selection });
         this.klHistory.push({
             selection: {
                 value: selection,
@@ -1538,6 +1570,7 @@ export class KlCanvas {
                 p.targetLayer !== undefined && p.targetLayer !== p.sourceLayer
                     ? this.layers[p.targetLayer]
                     : undefined;
+            this.klRecorder?.record('selection-transform', { p });
             this.klHistory.push({
                 selection: {
                     value: this.selection,
@@ -1601,6 +1634,7 @@ export class KlCanvas {
 
         if (!this.klHistory.isPaused() && targetBounds) {
             const targetLayer = this.layers[p.targetLayer];
+            this.klRecorder?.record('selection-transform-clone', { p });
             this.klHistory.push({
                 selection: {
                     value: this.selection,
