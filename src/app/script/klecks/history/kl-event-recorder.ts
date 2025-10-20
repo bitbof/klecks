@@ -16,8 +16,10 @@ export type TRecordedEvent = {
     data: any;
 };
 
+export type TEventRecordedCallback = (event: TRecordedEvent, totalTime: number) => void;
+
 export type TRecorderConfig = {
-    onEvent?: (event: TRecordedEvent) => void;
+    onEvent?: TEventRecordedCallback;
     enableMemoryStorage?: boolean; // Default: true
 };
 
@@ -109,18 +111,20 @@ export class KlChainRecorder {
  * Records user events for later replay functionality
  */
 export class KlEventRecorder {
-    private readonly config: TRecorderConfig;
     private projectId: string = '';
     private sequenceNumber: number = 0;
     private memoryEvents: TRecordedEvent[] = [];
     private enableMemoryStorage: boolean;
     private lastTimestamp: number = 0; // ms since epoch
     private totalTimeTaken: number = 0; // ms taken drawing in this project
+    private listeners: Array<TEventRecordedCallback> = [];
 
     constructor(projectId: string, config: TRecorderConfig) {
         this.projectId = projectId;
-        this.config = config;
         this.enableMemoryStorage = config.enableMemoryStorage !== false; // Default to true
+        if (config.onEvent) {
+            this.listeners.push(config.onEvent);
+        }
 
         if (DEBUG_RECORDER) {
             (window as any).getRecordedEvents = () => this.getEvents();
@@ -177,16 +181,16 @@ export class KlEventRecorder {
             this.memoryEvents.push(event);
         }
 
-        // Call onEvent callback if provided
-        if (this.config.onEvent) {
+        this.calculateTimeTaken();
+
+        // Notify listeners
+        for (const cb of this.listeners) {
             try {
-                this.config.onEvent(event);
+                cb(event, this.totalTimeTaken);
             } catch (error) {
-                console.error('%c[REC]', 'color: orange;', 'Failed to record event. Error in callback:', error);
+                console.error('%c[REC]', 'color: orange;', 'Failed to notify listeners. Error:', error);
             }
         }
-
-        this.calculateTimeTaken();
     }
 
     /**
@@ -235,5 +239,13 @@ export class KlEventRecorder {
         this.sequenceNumber = 0;
         this.lastTimestamp = 0;
         this.totalTimeTaken = 0;
+    }
+
+    subscribe(callback: TEventRecordedCallback) {
+        this.listeners.push(callback);
+    }
+
+    unsubscribe(callback: TEventRecordedCallback) {
+        this.listeners = this.listeners.filter((cb) => cb !== callback);
     }
 }

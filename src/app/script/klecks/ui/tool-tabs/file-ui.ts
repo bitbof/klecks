@@ -1,4 +1,5 @@
 import { BB } from '../../../bb/bb';
+import { KlEventRecorder, TRecordedEvent } from '../../history/kl-event-recorder';
 import { KL } from '../../kl';
 import { BrowserStorageUi } from '../components/browser-storage-ui';
 import { TDropOption, TExportType, TKlProject } from '../../kl-types';
@@ -50,6 +51,7 @@ export type TFileUiParams = {
     applyUncommitted: () => void;
     onChangeShowSaveDialog: (b: boolean) => void;
     klRecoveryManager?: KlRecoveryManager;
+    klEventRecorder?: KlEventRecorder;
     onOpenBrowserStorage: () => void;
     onStoredToBrowserStorage: () => void;
 };
@@ -63,6 +65,7 @@ export class FileUi {
     private importInput: undefined | HTMLInputElement;
     private browserStorageUi: undefined | BrowserStorageUi;
     private klRecoveryManager: KlRecoveryManager | undefined;
+    private klEventRecorder: KlEventRecorder | undefined;
     private recoveryCountBubble: HTMLElement | undefined;
     private recoveryListener: TKlRecoveryListener = (metas) => {
         if (!this.recoveryCountBubble) {
@@ -75,6 +78,21 @@ export class FileUi {
             this.recoveryCountBubble.textContent = '' + count;
             this.recoveryCountBubble.style.display = 'inline-block';
         }
+    };
+
+    private recorderTimeTakenInfo: HTMLElement | undefined;
+    private recorderListener = (evnt: TRecordedEvent, timeTaken: number): void => {
+        if (!this.recorderTimeTakenInfo) {
+            return;
+        }
+        const secondsTotal = Math.floor(timeTaken / 1000);
+        const minutesTotal = Math.floor(timeTaken / 60000);
+        const hoursTotal = Math.floor(minutesTotal / 60);
+        const minutesComponent = minutesTotal - hoursTotal * 60;
+        const secondsComponent = secondsTotal - minutesTotal * 60;
+        this.recorderTimeTakenInfo.textContent =
+            LANG('file-time-taken-info') + ` ${hoursTotal > 0 ? `${hoursTotal} h` : ''} ${minutesComponent} min ${secondsComponent} s`;
+
     };
 
     // ----------------------------------- public -----------------------------------
@@ -312,6 +330,51 @@ export class FileUi {
                 },
             });
 
+            // --- time taken info and timelapse-replay button ---
+            this.klEventRecorder = p.klEventRecorder;
+            const recorderWrapper = BB.el({});
+
+            if (this.klEventRecorder === undefined) {
+                const infoText = BB.el({
+                    tagName: 'p',
+                    textContent: LANG('file-recorder-disabled-info'),
+                    css: {
+                        margin: '10px 10px 0 10px',
+                    },
+                });
+                recorderWrapper.append(infoText);
+            } else {
+                // Subscribe to changes to the "time taken"
+                this.klEventRecorder.subscribe(this.recorderListener);
+
+                this.recorderTimeTakenInfo = BB.el({
+                    tagName: 'p',
+                    textContent: LANG('file-time-taken-info') + ' 0 min',
+                    css: {
+                        margin: '10px 10px 0 10px',
+                    },
+                });
+
+                const replayTimelapseButton = BB.el({
+                    tagName: 'button',
+                    content: LANG('file-replay-timelapse'),
+                    onClick: () => {
+                        // TODO
+                        //KL.App.getInstance().showTimelapseReplay();
+                    },
+                    custom: {
+                        tabIndex: '-1',
+                    },
+                    css: {
+                        margin: '10px 0 0 10px',
+                        width: 'calc(100% - 20px)',
+                    },
+                });
+
+                recorderWrapper.append(this.recorderTimeTakenInfo, replayTimelapseButton);
+            }
+
+            // --- assemble ---
             BB.append(this.rootEl, [
                 saveNote,
                 newButton,
@@ -325,6 +388,8 @@ export class FileUi {
                 recoveryWrapper,
                 uploadImgurButton,
                 BB.canShareFiles() ? shareButton : undefined,
+                createSpacer(),
+                recorderWrapper,
                 BB.el({ css: { clear: 'both' } }),
             ]);
         };

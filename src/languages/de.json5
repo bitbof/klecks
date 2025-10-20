@@ -584,6 +584,21 @@
     original: 'Upload',
     value: 'Hochladen'
   },
+  'file-time-taken-info': {
+    hint: 'show the time drawing in this project',
+    original: 'Total time taken:',
+    value: 'Gesamtzeit:'
+  },
+  'file-recorder-disabled-info': {
+    hint: 'state information, that recording is disabled',
+    original: 'Recorder disabled',
+    value: 'Aufzeichnung ausgeschaltet'
+  },
+  'file-replay-timelapse': {
+    hint: 'verb',
+    original: 'Play timelapse',
+    value: 'Zeitraffer abspielen'
+  },
   'tab-recovery-recover-tabs': {
     hint: 'allows user to recover browser tabs (including the drawing) of this app.',
     original: 'Recover closed tabs',

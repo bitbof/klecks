@@ -404,7 +404,18 @@ Renaming a key across multiple language files:
     "hint": "verb",
     "value": "Upload"
   },
-
+  "file-time-taken-info": {
+    hint: 'show the time drawing in this project',
+    value: 'Total time taken:'
+  },
+  "file-recorder-disabled-info": {
+    hint: 'state information, that recording is disabled',
+    value: 'Recorder disabled'
+  },
+  "file-replay-timelapse": {
+    hint: 'verb',
+    value: 'Play timelapse'
+  },
   // Tab Recovery (near bottom of file tab)
 
   "tab-recovery-recover-tabs": {

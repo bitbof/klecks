@@ -1830,6 +1830,7 @@ export class KlApp {
                       this.saveToComputer.setShowSaveDialog(b);
                   },
                   klRecoveryManager,
+                  klEventRecorder: this.klRecorder,
                   onOpenBrowserStorage,
                   onStoredToBrowserStorage: () => {
                       this.updateLastSaved();
