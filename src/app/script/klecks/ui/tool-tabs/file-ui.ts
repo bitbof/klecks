@@ -359,7 +359,7 @@ export class FileUi {
                     tagName: 'button',
                     content: LANG('file-replay-timelapse'),
                     onClick: () => {
-                        // TODO
+                        // TODO REC start
                         //KL.App.getInstance().showTimelapseReplay();
                     },
                     custom: {

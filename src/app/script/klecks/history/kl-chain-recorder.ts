@@ -1,4 +1,4 @@
-import { TDrawEvent } from '../kl-types';
+import { TDrawDownEvent, TDrawEvent, TDrawLine, TDrawMoveEvent, TDrawUpEvent } from '../kl-types';
 import { TSanitizedDrawEvent } from './kl-event-recorder';
 
 
@@ -68,6 +68,81 @@ export class KlChainRecorder {
 
         // unknown event type
         return null;
+    }
+
+    unwrapEventString(str: TSanitizedDrawEvent): TDrawEvent | null {
+        const typeChar = str.charAt(0);
+        if (typeChar == 'd' || typeChar == 'D') {
+            const shiftIsPressed = typeChar == 'D';
+            const [posPart, rest] = str.slice(1).split('@');
+            const [xStr, yStr, pressureStr] = posPart.split('|');
+            const scale = parseFloat(rest);
+            return {
+                type: 'down',
+                x: parseInt(xStr),
+                y: parseInt(yStr),
+                pressure: parseFloat(pressureStr),
+                scale: scale,
+                shiftIsPressed: shiftIsPressed,
+            } as TDrawDownEvent;
+        }
+
+        if (typeChar == 'm' || typeChar == 'M') {
+            const shiftIsPressed = typeChar == 'M';
+            const [posPart, rest] = str.slice(1).split('@');
+            const [xStr, yStr, pressureStr] = posPart.split('|');
+            const scale = parseFloat(rest);
+            return {
+                type: 'move',
+                x: parseInt(xStr),
+                y: parseInt(yStr),
+                pressure: parseFloat(pressureStr),
+                scale: scale,
+                shiftIsPressed: shiftIsPressed,
+            } as TDrawMoveEvent;
+        }
+
+        if (typeChar == 'u' || typeChar == 'U') {
+            const shiftIsPressed = typeChar == 'U';
+            const rest = str.slice(1).split('@')[1];
+            const scale = parseFloat(rest);
+            return {
+                type: 'up',
+                scale: scale,
+                isCoalesced: false,
+                shiftIsPressed: shiftIsPressed,
+            } as TDrawUpEvent;
+        }
+
+        if (typeChar == 'L') {
+            const linePart = str.slice(1);
+            const [startPart, endPart] = linePart.split('-');
+            const [x0Str, y0Str, pressure0Str] = startPart.split('|');
+            const [x1Str, y1Str, pressure1Str] = endPart.split('|');
+            return {
+                type: 'line',
+                x0: x0Str != 'x' ? parseInt(x0Str) : null,
+                y0: y0Str != 'x' ? parseInt(y0Str) : null,
+                pressure0: pressure0Str != 'x' ? parseFloat(pressure0Str) : null,
+                x1: parseInt(x1Str),
+                y1: parseInt(y1Str),
+                pressure1: parseFloat(pressure1Str),
+            } as TDrawLine;
+        }
+
+        return null;
+    }
+
+    emitReplayedEvent(drawEvents: TSanitizedDrawEvent[]) {
+        if (!this.chainOut)
+            return; // Chain disabled
+
+        for (const ev of drawEvents) {
+            const event = this.unwrapEventString(ev);
+            if (event) {
+                this.chainOut(event);
+            }
+        }
     }
 
 }

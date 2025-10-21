@@ -1,3 +1,4 @@
+import { KlChainRecorder } from '../klecks/history/kl-chain-recorder';
 import { KL } from '../klecks/kl';
 import { BB } from '../bb/bb';
 import { showIframeModal } from '../klecks/ui/modals/show-iframe-modal';
@@ -81,7 +82,9 @@ import { requestPersistentStorage } from '../klecks/storage/request-persistent-s
 import { CrossTabChannel } from '../bb/base/cross-tab-channel';
 import { MobileColorUi } from '../klecks/ui/mobile/mobile-color-ui';
 import { getSelectionPath2d } from '../bb/multi-polygon/get-selection-path-2d';
-import { KlEventRecorder, TRecorderConfig } from '../klecks/history/kl-event-recorder';
+import { KlEventRecorder, TRecorderConfig, TRecordedEvent } from '../klecks/history/kl-event-recorder';
+import { KlEventReplayer } from '../klecks/history/kl-event-replayer';
+import { sample1 } from '../klecks/history/kl-event-sample';
 
 importFilters();
 
@@ -148,6 +151,8 @@ export class KlApp {
     private lastSavedHistoryIndex: number = 0;
     private readonly klHistory: KlHistory;
     private readonly klRecorder: KlEventRecorder | undefined;
+    private readonly klReplayer: KlEventReplayer | undefined;
+    private readonly chainRecorder: KlChainRecorder | undefined;
 
     private updateLastSaved(): void {
         this.lastSavedHistoryIndex = this.klHistory.getTotalIndex();
@@ -334,6 +339,31 @@ export class KlApp {
         // Initialize Recorder if configuration is provided
         if (p.eventRecorderConfig) {
             this.klRecorder = new KlEventRecorder(this.klHistory.getComposed().projectId.value, p.eventRecorderConfig);
+            this.klReplayer = new KlEventReplayer();
+
+            // DEBUG
+            // this.klRecorder.load(sample1.length, 0, sample1);
+            (window as any).replayer = this.klReplayer;
+            (window as any).replay = async () => {
+
+
+
+                // Start replay with custom timing
+                const startTime = performance.now();
+                let recData = this.klRecorder?.getEvents();
+                if (!recData || recData?.length < 2)
+                    recData = sample1;
+
+                await this.klReplayer?.startReplay(recData, {
+                    targetFps: 25,
+                    replayTimeInMs: 5000, // 5 seconds total timelapse
+                    onFrame: async (index, total) => {
+                        console.log(`Replay onFrame. Progress: ${index}/${total}`);
+                        // Here you can take a snapshot of canvas and render a video
+                    },
+                });
+                console.log('Replay completed. Took ' + (performance.now() - startTime) + ' ms');
+            };
         } else {
             this.klRecorder = undefined;
         }
@@ -416,11 +446,11 @@ export class KlApp {
 
 
         // Draw Event Chain 1:
-        const chainRecorder = this.klRecorder?.createChainRecorder(() => {
+        this.chainRecorder = this.klRecorder?.createChainRecorder(() => {
             return {
                 id: currentBrushId,
                 cfg: currentBrushUi.getBrushConfig()
-            }
+            };
         });
 
         // Event Chain 2:
@@ -434,7 +464,7 @@ export class KlApp {
 
         const drawEventChain = new BB.EventChain({
             // TODO replace any with proper type/interface. BB.EventChain needs to get a change here.
-            chainArr: [chainRecorder as any, this.lineSanitizer as any, lineSmoothing as any].filter(c => !!c),
+            chainArr: [this.chainRecorder as any, this.lineSanitizer as any, lineSmoothing as any].filter(c => !!c),
         });
 
         drawEventChain.setChainOut(((event: TDrawEvent) => {
@@ -460,8 +490,6 @@ export class KlApp {
                 this.easel.requestRender();
             }
         }) as any);
-
-        // TODO on replay, "draw" events shall be piped into the drawEventChain here
 
 
         let textToolSettings = {
@@ -1356,6 +1384,214 @@ export class KlApp {
             this.layerPreview.setLayer(currentLayer);
         };
 
+        // Register replay handlers if recorder is enabled
+        if (this.klReplayer) {
+            this.klReplayer.addReplayHandler('draw', event => {
+                // Replay drawing events
+                const drawEvents = event.data.events as string[];
+                const brushData = event.data.brush; // {id, cfg}
+
+                if (!drawEvents || drawEvents.length == 0)
+                    return;
+
+                // Set the brush configuration
+                if (brushData && brushUiMap[brushData.id]) {
+                    setCurrentBrush(brushData.id);
+                    if (brushData.cfg) {
+                        console.log("brushUiMap", brushUiMap[brushData.id], "brushConfig:", brushData.cfg);
+                        brushUiMap[brushData.id].setBrushConfig(brushData.cfg);
+                    }
+                } else {
+                    console.log("Unknown brush during replay:", brushData);
+                }
+
+                this.chainRecorder?.emitReplayedEvent(drawEvents);
+            });
+
+            this.klReplayer.addReplayHandler('undo', event => {
+                undo(false); // Don't show message during replay
+            });
+
+            this.klReplayer.addReplayHandler('redo', event => {
+                redo(false); // Don't show message during replay
+            });
+
+            this.klReplayer.addReplayHandler('l-select', (event: TRecordedEvent) => {
+                const layer = this.klCanvas.getLayer(event.data.layerIndex);
+                if (layer) {
+                    setCurrentLayer(layer);
+                    const topEntry = this.klHistory.getEntries().at(-1)!.data;
+                    const replaceTop = isHistoryEntryActiveLayerChange(topEntry);
+                    this.klHistory.push({
+                        activeLayerId: layer.id,
+                    }, replaceTop);
+                }
+            });
+
+            this.klReplayer.addReplayHandler('reset', event => {
+                const data = event.data as Parameters<typeof KlCanvas.prototype.reset>[0];
+                const layerIndex = this.klCanvas.reset(data);
+                this.layersUi.update(layerIndex);
+                setCurrentLayer(this.klCanvas.getLayer(layerIndex));
+                this.easelProjectUpdater.update();
+                this.easel.resetOrFitTransform(true);
+            });
+
+            this.klReplayer.addReplayHandler('resize', (event: TRecordedEvent) => {
+                const data = event.data as Parameters<typeof KlCanvas.prototype.resize>;
+                this.klCanvas.resize(...data);
+                this.easelProjectUpdater.update();
+                this.easel.resetOrFitTransform(true);
+            });
+
+            this.klReplayer.addReplayHandler('resize-c', event => {
+                const data = event.data as Parameters<typeof KlCanvas.prototype.resizeCanvas>[0];
+                this.klCanvas.resizeCanvas(data);
+                this.easelProjectUpdater.update();
+                this.easel.resetOrFitTransform(true);
+            });
+
+            this.klReplayer.addReplayHandler('l-add', event => {
+                const data = event.data as Parameters<typeof KlCanvas.prototype.addLayer>;
+                this.klCanvas.addLayer(...data);
+                this.layersUi.update();
+                this.easelProjectUpdater.update();
+            });
+
+            this.klReplayer.addReplayHandler('l-dupl', event => {
+                const data = event.data as Parameters<typeof KlCanvas.prototype.duplicateLayer>;
+                this.klCanvas.duplicateLayer(...data);
+                this.layersUi.update();
+                this.easelProjectUpdater.update();
+            });
+
+            this.klReplayer.addReplayHandler('l-rm', event => {
+                const data = event.data as Parameters<typeof KlCanvas.prototype.removeLayer>;
+                this.klCanvas.removeLayer(...data);
+                this.layersUi.update();
+                this.easelProjectUpdater.update();
+            });
+
+            this.klReplayer.addReplayHandler('l-ren', event => {
+                const data = event.data as Parameters<typeof KlCanvas.prototype.renameLayer>;
+                this.klCanvas.renameLayer(...data);
+                this.layersUi.update();
+            });
+
+            this.klReplayer.addReplayHandler('l-opac', event => {
+                const data = event.data as Parameters<typeof KlCanvas.prototype.setOpacity>;
+                this.klCanvas.setOpacity(...data);
+                this.easelProjectUpdater.update();
+            });
+
+            this.klReplayer.addReplayHandler('l-vis', event => {
+                const data = event.data as Parameters<typeof KlCanvas.prototype.setLayerIsVisible>;
+                this.klCanvas.setLayerIsVisible(...data);
+                this.easelProjectUpdater.update();
+            });
+
+            this.klReplayer.addReplayHandler('l-move', event => {
+                const data = event.data as Parameters<typeof KlCanvas.prototype.moveLayer>;
+                this.klCanvas.moveLayer(...data);
+                this.layersUi.update();
+                this.easelProjectUpdater.update();
+            });
+
+            this.klReplayer.addReplayHandler('l-merge', event => {
+                const data = event.data as Parameters<typeof KlCanvas.prototype.mergeLayers>;
+                this.klCanvas.mergeLayers(...data);
+                this.layersUi.update();
+                this.easelProjectUpdater.update();
+            });
+
+            this.klReplayer.addReplayHandler('l-merge-all', event => {
+                const data = event.data as Parameters<typeof KlCanvas.prototype.mergeAll>;
+                this.klCanvas.mergeAll(...data);
+                this.layersUi.update();
+                this.easelProjectUpdater.update();
+            });
+
+            this.klReplayer.addReplayHandler('rotate', (event: TRecordedEvent) => {
+                const data = event.data as Parameters<typeof KlCanvas.prototype.rotate>;
+                this.klCanvas.rotate(...data);
+                this.easelProjectUpdater.update();
+                this.easel.resetOrFitTransform(true);
+            });
+
+            this.klReplayer.addReplayHandler('l-flip', (event: TRecordedEvent) => {
+                const data = event.data as Parameters<typeof KlCanvas.prototype.flip>;
+                this.klCanvas.flip(...data);
+                this.easelProjectUpdater.update();
+            });
+
+            this.klReplayer.addReplayHandler('l-fill', event => {
+                const data = event.data as Parameters<typeof KlCanvas.prototype.layerFill>;
+                this.klCanvas.layerFill(...data);
+                this.easelProjectUpdater.update();
+            });
+
+            this.klReplayer.addReplayHandler('flood-fill', event => {
+                const data = event.data as Parameters<typeof KlCanvas.prototype.floodFill>;
+                this.klCanvas.floodFill(...data);
+                this.easelProjectUpdater.update();
+            });
+
+            this.klReplayer.addReplayHandler('shape', event => {
+                const data = event.data as Parameters<typeof KlCanvas.prototype.drawShape>;
+                this.klCanvas.drawShape(...data);
+                this.easelProjectUpdater.update();
+            });
+
+            this.klReplayer.addReplayHandler('grad', event => {
+                const data = event.data as Parameters<typeof KlCanvas.prototype.drawGradient>;
+                this.klCanvas.drawGradient(...data);
+                this.easelProjectUpdater.update();
+            });
+
+            this.klReplayer.addReplayHandler('text', event => {
+                const data = event.data as Parameters<typeof KlCanvas.prototype.text>;
+                this.klCanvas.text(...data);
+                this.easelProjectUpdater.update();
+            });
+
+            this.klReplayer.addReplayHandler('l-erase', event => {
+                const data = event.data as Parameters<typeof KlCanvas.prototype.eraseLayer>[0];
+                this.klCanvas.eraseLayer(data);
+                this.easelProjectUpdater.update();
+            });
+
+            this.klReplayer.addReplayHandler('set-mixmode', event => {
+                const data = event.data as Parameters<typeof KlCanvas.prototype.setMixMode>;
+                this.klCanvas.setMixMode(...data);
+                this.easelProjectUpdater.update();
+            });
+
+            this.klReplayer.addReplayHandler('selection', event => {
+                const data = event.data as Parameters<typeof KlCanvas.prototype.setSelection>;
+                this.klCanvas.setSelection(...data);
+                this.easelProjectUpdater.update();
+            });
+
+            this.klReplayer.addReplayHandler('selection-transform', event => {
+                const data = event.data as Parameters<typeof KlCanvas.prototype.transformViaSelection>[0];
+                this.klCanvas.transformViaSelection(data);
+                this.easelProjectUpdater.update();
+            });
+
+            this.klReplayer.addReplayHandler('selection-transform-clone', event => {
+                const data = event.data as Parameters<typeof KlCanvas.prototype.transformCloneViaSelection>[0];
+                this.klCanvas.transformCloneViaSelection(data);
+                this.easelProjectUpdater.update();
+            });
+
+            this.klReplayer.addReplayHandler('filter', event => {
+                // Handle filter events - need to apply filter to canvas
+                // This would require access to the filter library
+                // For now, we'll just update the project
+                this.easelProjectUpdater.update();
+            });
+        }
+
         const brushDiv = BB.el();
         const colorDiv = BB.el({
             css: {
@@ -1414,7 +1650,7 @@ export class KlApp {
                 };
 
                 const keyArr = Object.keys(brushUiMap);
-                for (let i = 0; i < keyArr.length; i++) {
+                for (let i = 0 ; i < keyArr.length ; i++) {
                     result.push(createTab(keyArr[i]));
                 }
                 return result;
@@ -1810,45 +2046,45 @@ export class KlApp {
         const fileUi = this.embed
             ? null
             : new KL.FileUi({
-                  klRootEl: this.rootEl,
-                  projectStore: projectStore,
-                  getProject: () => this.klCanvas.getProject(),
-                  exportType: exportType,
-                  onExportTypeChange: (type) => {
-                      exportType = type;
-                  },
-                  onFileSelect: (files, optionsStr) =>
-                      importHandler.handleFileSelect(files, optionsStr),
-                  onSaveImageToComputer: () => {
-                      applyUncommitted();
-                      this.saveToComputer.save();
-                  },
-                  onNewImage: showNewImageDialog,
-                  onShareImage: (callback) => {
-                      applyUncommitted();
-                      shareImage(callback);
-                  },
-                  onUpload: () => {
-                      // on upload
-                      applyUncommitted();
-                      KL.imgurUpload(
-                          this.klCanvas,
-                          this.rootEl,
-                          p.app && p.app.imgurKey ? p.app.imgurKey : '',
-                          () => this.updateLastSaved(),
-                      );
-                  },
-                  applyUncommitted: () => applyUncommitted(),
-                  onChangeShowSaveDialog: (b) => {
-                      this.saveToComputer.setShowSaveDialog(b);
-                  },
-                  klRecoveryManager,
-                  klEventRecorder: this.klRecorder,
-                  onOpenBrowserStorage,
-                  onStoredToBrowserStorage: () => {
-                      this.updateLastSaved();
-                  },
-              });
+                    klRootEl: this.rootEl,
+                    projectStore: projectStore,
+                    getProject: () => this.klCanvas.getProject(),
+                    exportType: exportType,
+                    onExportTypeChange: (type) => {
+                        exportType = type;
+                    },
+                    onFileSelect: (files, optionsStr) =>
+                        importHandler.handleFileSelect(files, optionsStr),
+                    onSaveImageToComputer: () => {
+                        applyUncommitted();
+                        this.saveToComputer.save();
+                    },
+                    onNewImage: showNewImageDialog,
+                    onShareImage: (callback) => {
+                        applyUncommitted();
+                        shareImage(callback);
+                    },
+                    onUpload: () => {
+                        // on upload
+                        applyUncommitted();
+                        KL.imgurUpload(
+                            this.klCanvas,
+                            this.rootEl,
+                            p.app && p.app.imgurKey ? p.app.imgurKey : '',
+                            () => this.updateLastSaved(),
+                        );
+                    },
+                    applyUncommitted: () => applyUncommitted(),
+                    onChangeShowSaveDialog: (b) => {
+                        this.saveToComputer.setShowSaveDialog(b);
+                    },
+                    klRecoveryManager,
+                    klEventRecorder: this.klRecorder,
+                    onOpenBrowserStorage,
+                    onStoredToBrowserStorage: () => {
+                        this.updateLastSaved();
+                    },
+                });
 
         if (!this.embed && projectStore) {
             this.saveReminder = new SaveReminder({
