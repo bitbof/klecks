@@ -50,11 +50,8 @@ export class KlEventReplayer {
         if (!this.eventHandlers.has(type)) {
             this.eventHandlers.set(type, []);
         }
-        this.eventHandlers.get(type)!.push(handler);
 
-        if (DEBUG_REPLAYER) {
-            console.log('%c[REPLAY]', LOG_STYLE, `Registered handler for event type: ${type}`);
-        }
+        this.eventHandlers.get(type)!.push(handler);
     }
 
     /**
@@ -241,7 +238,7 @@ export class KlEventReplayer {
             };
         }
 
-        const targetFps = Math.max(Math.max(1, config.targetFps || 25), 120); // limit 1-120 fps, default=25
+        const targetFps = Math.min(Math.max(1, config.targetFps || 25), 120); // limit 1-120 fps, default=25
         const replayTime = config.replayTimeInMs;
 
         // How many frames do we get:

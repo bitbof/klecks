@@ -84,7 +84,6 @@ import { MobileColorUi } from '../klecks/ui/mobile/mobile-color-ui';
 import { getSelectionPath2d } from '../bb/multi-polygon/get-selection-path-2d';
 import { KlEventRecorder, TRecorderConfig, TRecordedEvent } from '../klecks/history/kl-event-recorder';
 import { KlEventReplayer } from '../klecks/history/kl-event-replayer';
-import { sample1 } from '../klecks/history/kl-event-sample';
 
 importFilters();
 
@@ -341,29 +340,10 @@ export class KlApp {
             this.klRecorder = new KlEventRecorder(this.klHistory.getComposed().projectId.value, p.eventRecorderConfig);
             this.klReplayer = new KlEventReplayer();
 
-            // DEBUG
-            // this.klRecorder.load(sample1.length, 0, sample1);
-            (window as any).replayer = this.klReplayer;
-            (window as any).replay = async () => {
+            // Initial clear
+            const size = this.klHistory.getComposed().size;
+            this.klRecorder?.record('reset', [{ width: size.width, height: size.height, color: { r: 255, g: 255, b: 255 } as TRgb }]);
 
-
-
-                // Start replay with custom timing
-                const startTime = performance.now();
-                let recData = this.klRecorder?.getEvents();
-                if (!recData || recData?.length < 2)
-                    recData = sample1;
-
-                await this.klReplayer?.startReplay(recData, {
-                    targetFps: 25,
-                    replayTimeInMs: 5000, // 5 seconds total timelapse
-                    onFrame: async (index, total) => {
-                        console.log(`Replay onFrame. Progress: ${index}/${total}`);
-                        // Here you can take a snapshot of canvas and render a video
-                    },
-                });
-                console.log('Replay completed. Took ' + (performance.now() - startTime) + ' ms');
-            };
         } else {
             this.klRecorder = undefined;
         }
@@ -566,7 +546,7 @@ export class KlApp {
                 // didn't do anything
                 return;
             }
-            this.klRecorder?.record('undo', {});
+            this.klRecorder?.record('undo', []);
             propagateUndoRedoChanges(result.type, composedBefore);
             if (showMessage) {
                 this.statusOverlay.out(LANG('undo'), true);
@@ -580,7 +560,7 @@ export class KlApp {
                 // didn't do anything
                 return;
             }
-            this.klRecorder?.record('redo', {});
+            this.klRecorder?.record('redo', []);
             propagateUndoRedoChanges(result.type, composedBefore);
             if (showMessage) {
                 this.statusOverlay.out(LANG('redo'), true);
@@ -1398,7 +1378,6 @@ export class KlApp {
                 if (brushData && brushUiMap[brushData.id]) {
                     setCurrentBrush(brushData.id);
                     if (brushData.cfg) {
-                        console.log("brushUiMap", brushUiMap[brushData.id], "brushConfig:", brushData.cfg);
                         brushUiMap[brushData.id].setBrushConfig(brushData.cfg);
                     }
                 } else {
@@ -1429,8 +1408,8 @@ export class KlApp {
             });
 
             this.klReplayer.addReplayHandler('reset', event => {
-                const data = event.data as Parameters<typeof KlCanvas.prototype.reset>[0];
-                const layerIndex = this.klCanvas.reset(data);
+                const data = event.data as Parameters<typeof KlCanvas.prototype.reset>;
+                const layerIndex = this.klCanvas.reset(...data);
                 this.layersUi.update(layerIndex);
                 setCurrentLayer(this.klCanvas.getLayer(layerIndex));
                 this.easelProjectUpdater.update();
@@ -1445,8 +1424,8 @@ export class KlApp {
             });
 
             this.klReplayer.addReplayHandler('resize-c', event => {
-                const data = event.data as Parameters<typeof KlCanvas.prototype.resizeCanvas>[0];
-                this.klCanvas.resizeCanvas(data);
+                const data = event.data as Parameters<typeof KlCanvas.prototype.resizeCanvas>;
+                this.klCanvas.resizeCanvas(...data);
                 this.easelProjectUpdater.update();
                 this.easel.resetOrFitTransform(true);
             });
@@ -1555,8 +1534,8 @@ export class KlApp {
             });
 
             this.klReplayer.addReplayHandler('l-erase', event => {
-                const data = event.data as Parameters<typeof KlCanvas.prototype.eraseLayer>[0];
-                this.klCanvas.eraseLayer(data);
+                const data = event.data as Parameters<typeof KlCanvas.prototype.eraseLayer>;
+                this.klCanvas.eraseLayer(...data);
                 this.easelProjectUpdater.update();
             });
 
@@ -1573,14 +1552,14 @@ export class KlApp {
             });
 
             this.klReplayer.addReplayHandler('selection-transform', event => {
-                const data = event.data as Parameters<typeof KlCanvas.prototype.transformViaSelection>[0];
-                this.klCanvas.transformViaSelection(data);
+                const data = event.data as Parameters<typeof KlCanvas.prototype.transformViaSelection>;
+                this.klCanvas.transformViaSelection(...data);
                 this.easelProjectUpdater.update();
             });
 
             this.klReplayer.addReplayHandler('selection-transform-clone', event => {
-                const data = event.data as Parameters<typeof KlCanvas.prototype.transformCloneViaSelection>[0];
-                this.klCanvas.transformCloneViaSelection(data);
+                const data = event.data as Parameters<typeof KlCanvas.prototype.transformCloneViaSelection>;
+                this.klCanvas.transformCloneViaSelection(...data);
                 this.easelProjectUpdater.update();
             });
 
@@ -1797,7 +1776,7 @@ export class KlApp {
                     },
                     replaceTop,
                 );
-                this.klRecorder?.record('l-select', { layerIndex });
+                this.klRecorder?.record('l-select', [layerIndex]);
             },
             parentEl: this.rootEl,
             uiState: this.uiLayout,
@@ -2080,6 +2059,7 @@ export class KlApp {
                     },
                     klRecoveryManager,
                     klEventRecorder: this.klRecorder,
+                    klEventReplayer: this.klReplayer,
                     onOpenBrowserStorage,
                     onStoredToBrowserStorage: () => {
                         this.updateLastSaved();

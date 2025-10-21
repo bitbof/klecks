@@ -111,7 +111,7 @@ export class KlEventRecorder {
             projectId: this.projectId,
             timestamp: Date.now(),
             type: type,
-            data: { ...data },
+            data: data,
             sequenceNumber: this.sequenceNumber++,
         };
 
