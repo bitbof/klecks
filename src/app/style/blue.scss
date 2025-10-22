@@ -1,0 +1,633 @@
+:root {
+    --ui-bg-blue: #1e5a8e;
+    --blue-ocean-gradient: linear-gradient(to bottom, #87ceeb 0%, #1e5a8e 100%);
+}
+
+body.kl-theme-blue {
+    --kl-checkerboard-background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 2 2'><path d='M0,0h2v2H0z' fill='%234a90a4'/><path d='M0,0h1v1H0zM1,1h1v1H1z' fill='%232c5f70'/></svg>") 0 0 / 8px;
+
+    color-scheme: light;
+    color: #fff;
+    background: var(--blue-ocean-gradient);
+    background-attachment: fixed;
+
+    // Canvas background
+    --body-bg-color: var(--blue-ocean-gradient);
+
+    .kl-toolspace {
+        background: rgba(30, 90, 142, 0.9);
+        backdrop-filter: blur(5px);
+    }
+
+    .kl-toolspace--left {
+        border-right: 1px solid rgba(135, 206, 235, 0.3);
+    }
+
+    .kl-toolspace--right {
+        border-left: 1px solid rgba(135, 206, 235, 0.3);
+    }
+
+    .kl-toolspace-row {
+        background: linear-gradient(
+                        to top,
+                        rgba(255, 255, 255, 0) 20%,
+                        rgba(255, 255, 255, 0.2) 100%
+        );
+        box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
+    }
+
+    .toolspace-row-button-activated {
+        background: rgba(135, 206, 235, 0.3);
+        box-shadow: inset 0 2px 0 0 rgba(255, 255, 255, 0.4);
+    }
+
+    .toolspace-row-button-hover {
+        background: rgba(135, 206, 235, 0.25);
+    }
+
+    .toolspace-row-button:active {
+        background: rgba(135, 206, 235, 0.35);
+    }
+
+    .toolspace-svg-triangle-button-hover {
+        fill: rgba(135, 206, 235, 0.25);
+    }
+
+    .toolspace-svg-triangle-button:active {
+        fill: rgba(135, 206, 235, 0.35);
+    }
+
+    .tabrow {
+        background: linear-gradient(0deg, rgba(30, 90, 142, 0.8) 0%, rgba(30, 90, 142, 0) 90%);
+        border-bottom: 1px solid rgba(135, 206, 235, 0.3);
+    }
+
+    .tabrow__tab {
+        color: #fff;
+    }
+
+    .tabrow__tab--opened,
+    .tabrow__tab--opened-accented {
+        background-color: rgba(30, 90, 142, 0.8);
+    }
+
+    .tabrow__tab div {
+        filter: brightness(1.2);
+    }
+
+    .tabrow__tab:not(.tabrow__tab--opened, .tabrow__tab--opened-accented):hover {
+        background-color: rgba(135, 206, 235, 0.25);
+    }
+
+    .tabrow__tab:active:not(.tabrow__tab--opened-accented, .tabrow__tab--opened) {
+        box-shadow: inset 0 1px rgba(0, 0, 0, 0.2);
+    }
+
+    .tabrow__tab__rounding-left {
+        background: rgba(30, 90, 142, 0.8);
+    }
+
+    .tabrow__tab__rounding-right {
+        background: rgba(30, 90, 142, 0.8);
+    }
+
+    .kl-tool-row-border-right {
+        border-right: 1px solid rgba(135, 206, 235, 0.3);
+    }
+
+    .tool-dropdown-wrapper {
+        background-color: rgba(30, 90, 142, 0.95);
+        backdrop-filter: blur(5px);
+    }
+
+    .tool-dropdown-button:hover {
+        background: rgba(135, 206, 235, 0.3);
+    }
+
+    .tool-dropdown-button:active {
+        background: rgba(135, 206, 235, 0.4);
+    }
+
+    .kl-tooldropdown-caret {
+        background-color: rgba(30, 90, 142, 0.8);
+        box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.2);
+    }
+
+    .toolspace-row-button-activated > .kl-tooldropdown-caret {
+        background-color: rgba(30, 90, 142, 0.9);
+    }
+
+    .toolspace-row-button-activated.kl-tool-button--hover > .kl-tooldropdown-caret {
+        background-color: rgba(135, 206, 235, 0.3);
+    }
+
+    .kl-tooldropdown-caret:hover {
+        background-color: rgba(135, 206, 235, 0.3);
+    }
+
+    .kl-popup {
+        background: rgba(30, 90, 142, 0.7);
+        backdrop-filter: blur(10px);
+    }
+
+    .kl-popup-box {
+        background-color: rgba(30, 90, 142, 0.95);
+        backdrop-filter: blur(10px);
+        box-shadow: 0 0 0 1px rgba(135, 206, 235, 0.3);
+        color: #fff;
+    }
+
+    .kl-d-modal-root {
+        background: rgba(30, 90, 142, 0.7);
+        backdrop-filter: blur(10px);
+    }
+
+    .kl-d-modal {
+        background-color: rgba(30, 90, 142, 0.95);
+        backdrop-filter: blur(10px);
+        box-shadow: 0 0 0 1px rgba(135, 206, 235, 0.3);
+        color: #fff;
+    }
+
+    .kl-button-link {
+        color: #87ceeb !important;
+
+        &:hover {
+            color: #b0e0e6 !important;
+        }
+
+        &:active {
+            color: #e0f7ff !important;
+        }
+    }
+
+    button,
+    .kl-button {
+        padding: 6px 12px;
+        min-width: 30px;
+        min-height: 32px;
+        font-size: 16px;
+        line-height: 18px;
+        color: #222;
+        border: none;
+        background-color: #ffffff;
+        border-radius: 8px;
+        cursor: pointer;
+        backdrop-filter: blur(5px);
+
+        background-image: linear-gradient(
+                        to top,
+                        rgba(255, 255, 255, 0.9) 0%,
+                        rgba(255, 255, 255, 1) 60%,
+                        rgba(255, 255, 255, 1) 100%
+        );
+
+        box-shadow: 0 0 0 1px rgba(135, 206, 235, 0.5),
+        0 2px 8px rgba(0, 0, 0, 0.1),
+        0 4px 12px rgba(0, 0, 0, 0.05);
+        user-select: none;
+        transition: all 0.15s ease-in-out;
+
+        text-align: center;
+
+        & > img {
+            //margin: auto;
+            margin-right: 3px;
+        }
+    }
+
+    button:hover,
+    .kl-button:hover {
+        background-color: #f8f8f8;
+        box-shadow: 0 0 0 1px rgba(135, 206, 235, 0.8),
+        0 4px 12px rgba(0, 0, 0, 0.15),
+        0 6px 16px rgba(0, 0, 0, 0.1);
+        transform: translateY(-1px);
+    }
+
+    button:active,
+    .kl-button:active {
+        background-color: #f0f0f0;
+        box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.1),
+        0 2px 8px rgba(0, 0, 0, 0.1);
+        transform: translateY(0);
+    }
+
+    button:disabled,
+    .kl-button:disabled {
+        color: #999;
+        background-color: #f5f5f5;
+
+        background-image: none;
+        cursor: default;
+        box-shadow: 0 0 0 1px rgba(135, 206, 235, 0.3);
+        transform: none !important;
+
+        & > img {
+            filter: grayscale(1);
+            opacity: .6;
+        }
+    }
+
+    .kl-button-primary {
+        background: linear-gradient(135deg, #4a90e2 0%, #357abd 100%);
+        color: #fff;
+        box-shadow: 0 4px 12px rgba(74, 144, 226, 0.3),
+        0 0 0 1px rgba(255, 255, 255, 0.1);
+
+        &:hover {
+            background: linear-gradient(135deg, #5ba0f2 0%, #4680cd 100%);
+            box-shadow: 0 6px 16px rgba(74, 144, 226, 0.4),
+            0 0 0 1px rgba(255, 255, 255, 0.2);
+        }
+
+        &:active {
+            background: linear-gradient(135deg, #3985d1 0%, #2d6bb1 100%);
+            box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+    }
+
+    .kl-button-delete:not(:disabled) {
+        background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+        color: #fff;
+        box-shadow: 0 4px 12px rgba(231, 76, 60, 0.3),
+        0 0 0 1px rgba(255, 255, 255, 0.1);
+
+        &:hover {
+            background: linear-gradient(135deg, #f15c4d 0%, #d24434 100%);
+            box-shadow: 0 6px 16px rgba(231, 76, 60, 0.4),
+            0 0 0 1px rgba(255, 255, 255, 0.2);
+        }
+
+        &:active {
+            background: linear-gradient(135deg, #d23424 0%, #a02f22 100%);
+            box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+    }
+
+    input,
+    textarea {
+        background: rgba(30, 90, 142, 0.8);
+        color: #fff;
+        border: 1px solid rgba(135, 206, 235, 0.3);
+        backdrop-filter: blur(5px);
+    }
+
+    input:focus,
+    textarea:focus {
+        background: rgba(30, 90, 142, 0.9);
+        border: 1px solid rgba(135, 206, 235, 0.6);
+        box-shadow: 0 0 0 2px rgba(135, 206, 235, 0.2);
+    }
+
+    .kl-select {
+        background: rgba(30, 90, 142, 0.8);
+        color: #fff;
+        border: 1px solid rgba(135, 206, 235, 0.3);
+        border-radius: 8px;
+        backdrop-filter: blur(5px);
+        min-height: 28px;
+    }
+
+    .kl-checkbox__inner {
+        color: rgba(255, 255, 255, 0.8);
+
+        &:hover {
+            color: #fff;
+        }
+    }
+
+    .kl-checkbox--highlight {
+        background: rgba(135, 206, 235, 0.2);
+        box-shadow: 0 0 0 1px rgba(135, 206, 235, 0.5);
+    }
+
+    .kl-option {
+        background: rgba(30, 90, 142, 0.8);
+        color: rgba(255, 255, 255, 0.8);
+        box-shadow: inset 0 0 0 1px rgba(135, 206, 235, 0.3);
+        backdrop-filter: blur(5px);
+
+        &:not(.kl-option-selected):hover {
+            background: rgba(135, 206, 235, 0.3);
+        }
+
+        &:not(.kl-option-selected):active {
+            box-shadow: inset 0 0 0 2px rgba(135, 206, 235, 0.5);
+        }
+    }
+
+    .kl-option-selected {
+        background: rgba(135, 206, 235, 0.3);
+        color: #fff;
+        box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.5);
+    }
+
+    .kl-box-toggle {
+        background: rgba(30, 90, 142, 0.8);
+        color: rgba(255, 255, 255, 0.8);
+        box-shadow: inset 0 0 0 1px rgba(135, 206, 235, 0.3);
+        backdrop-filter: blur(5px);
+
+        &:not(.kl-box-toggle--active) {
+            &:hover {
+                background: rgba(135, 206, 235, 0.3);
+            }
+
+            &:active {
+                box-shadow: inset 0 0 0 2px rgba(135, 206, 235, 0.5);
+            }
+        }
+    }
+
+    .kl-box-toggle--active {
+        color: #fff;
+        background: rgba(135, 206, 235, 0.3);
+        box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.5);
+    }
+
+    .slider-wrapper {
+        background: rgba(30, 90, 142, 0.8);
+        box-shadow: 0 0 0 1px rgba(135, 206, 235, 0.3);
+        color: #fff;
+        text-shadow: none;
+        backdrop-filter: blur(5px);
+
+        .slider-inner {
+            background: rgba(135, 206, 235, 0.3);
+            box-shadow: 1px 0 0 rgba(135, 206, 235, 0.5);
+        }
+    }
+
+    .slider-wrapper--active {
+        box-shadow: 0 0 0 1px rgba(135, 206, 235, 0.6);
+        color: #fff;
+
+        .slider-inner {
+            box-shadow: 1px 0 0 rgba(135, 206, 235, 0.7);
+        }
+    }
+
+    .info-hint {
+        background: rgba(231, 76, 60, 0.2);
+        border: 1px solid rgba(231, 76, 60, 0.5);
+        color: #ffcccc;
+    }
+
+    .kl-2-tabs {
+        .kl-2-tabs__left,
+        .kl-2-tabs__right {
+            border: 1px solid rgba(135, 206, 235, 0.3);
+            color: rgba(255, 255, 255, 0.8);
+            border-bottom: none;
+            background: rgba(30, 90, 142, 0.8);
+            backdrop-filter: blur(5px);
+
+            &:hover {
+                background: rgba(135, 206, 235, 0.3);
+            }
+        }
+
+        .kl-2-tabs--active {
+            color: #fff;
+            background: rgba(135, 206, 235, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            border-bottom: none;
+
+            &:hover {
+                background: rgba(135, 206, 235, 0.4);
+            }
+        }
+    }
+
+    .popup-x {
+        color: rgba(255, 255, 255, 0.7);
+        filter: none;
+    }
+
+    .popup-x:hover {
+        color: #fff;
+        filter: brightness(1.2);
+    }
+
+    .kl-preview-wrapper {
+        background: rgba(30, 90, 142, 0.8);
+        box-shadow: inset 0 1px rgba(135, 206, 235, 0.3),
+        inset 0 -1px rgba(135, 206, 235, 0.3);
+        backdrop-filter: blur(5px);
+
+        .kl-preview-wrapper__canvas {
+            box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.3);
+        }
+    }
+
+    .kl-edit-crop-preview {
+        border-top: 1px solid rgba(135, 206, 235, 0.3);
+        border-bottom: 1px solid rgba(135, 206, 235, 0.3);
+    }
+
+    .kl-transparent-preview {
+        box-shadow: inset 0 1px rgba(135, 206, 235, 0.3),
+        inset 0 -1px rgba(135, 206, 235, 0.3);
+
+        .kl-transparent-preview__canvas {
+            box-shadow: 0 0 0 1px rgba(135, 206, 235, 0.5);
+        }
+    }
+
+    .kl-merge-preview {
+        box-shadow: 0 0 0 1px rgba(135, 206, 235, 0.3);
+    }
+
+    a:link,
+    a:not([href]),
+    a:visited {
+        color: #87ceeb;
+
+        &:hover {
+            color: #b0e0e6;
+        }
+    }
+
+    .kl-color-picker__h,
+    .kl-color-picker__sv,
+    .kl-color-picker__preview {
+        box-shadow: 0 0 0 1px rgba(135, 206, 235, 0.3);
+    }
+
+    .kl-color-picker--active {
+        box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.5);
+    }
+
+    .kl-color-picker__secondary {
+        box-shadow: 0 0 0 1px rgba(135, 206, 235, 0.5);
+    }
+
+    .kl-stabilizer {
+        color: rgba(255, 255, 255, 0.8);
+    }
+
+    .brush-alpha,
+    .brush-alpha--selected {
+        filter: none;
+    }
+
+    .kl-layer-preview {
+        color: rgba(255, 255, 255, 0.8);
+
+        canvas {
+            box-shadow: 0 0 0 1px rgba(135, 206, 235, 0.3);
+        }
+    }
+
+    .kl-import-note,
+    .kl-toolspace-note {
+        background: rgba(135, 206, 235, 0.2);
+        color: #fff;
+        border: 1px solid rgba(135, 206, 235, 0.4);
+    }
+
+    .kl-curves-graph {
+        canvas {
+            background: rgba(30, 90, 142, 0.8);
+            filter: none;
+        }
+    }
+
+    .kl-curves-graph__grip {
+        background: #fff;
+        box-shadow: none;
+    }
+
+    .kl-storage-preview {
+        background: rgba(30, 90, 142, 0.8);
+        box-shadow: 0 0 0 1px rgba(135, 206, 235, 0.3);
+        color: rgba(255, 255, 255, 0.8);
+        backdrop-filter: blur(5px);
+
+        &:hover {
+            box-shadow: 0 0 0 1px rgba(135, 206, 235, 0.6);
+        }
+    }
+
+    .kl-storage-preview__im {
+        box-shadow: 0 0 0 1px rgba(135, 206, 235, 0.3);
+    }
+
+    .kl-info-btn {
+        background: rgba(135, 206, 235, 0.3);
+        color: #fff;
+        box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.3);
+    }
+
+    .kl-layer {
+        background: rgba(30, 90, 142, 0.6);
+        border: 1px solid rgba(135, 206, 235, 0.3);
+        backdrop-filter: blur(5px);
+
+        .kl-layer__label,
+        .kl-layer__opacity-label {
+            color: rgba(255, 255, 255, 0.8);
+        }
+    }
+
+    .kl-layer--selected {
+        background: rgba(135, 206, 235, 0.3);
+        border: 1px solid rgba(255, 255, 255, 0.5);
+
+        .kl-layer__label {
+            color: #fff;
+        }
+    }
+
+    .kl-point-slider__line {
+        background: rgba(135, 206, 235, 0.5);
+    }
+
+    .kl-point-slider__point {
+        background: rgba(135, 206, 235, 0.8);
+        box-shadow: 0 0 3px rgba(0, 0, 0, 0.3);
+
+        &:active {
+            box-shadow: 0 0 6px rgba(0, 0, 0, 0.5);
+        }
+    }
+
+    .kl-overlay-toolspace {
+        background: rgba(30, 90, 142, 0.95);
+        border: 1px solid rgba(135, 206, 235, 0.3);
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+        backdrop-filter: blur(10px);
+    }
+
+    .kl-overlay-toolspace__color {
+        box-shadow: 0 0 0 1px rgba(135, 206, 235, 0.5);
+    }
+
+    .image-toggle {
+        &:not(.image-toggle-active) {
+            &:hover {
+                background: rgba(135, 206, 235, 0.3);
+            }
+
+            &:active {
+                box-shadow: rgba(135, 206, 235, 0.6) 0 0 0 2px;
+            }
+        }
+    }
+
+    .image-toggle:not(.image-toggle-active) {
+        box-shadow: rgba(135, 206, 235, 0.4) 0 0 0 1px;
+    }
+
+    .image-toggle-active {
+        background: rgba(135, 206, 235, 0.3);
+        box-shadow: rgba(255, 255, 255, 0.5) 0 0 0 2px;
+    }
+
+    .hr {
+        border-top: 1px solid rgba(135, 206, 235, 0.3);
+    }
+
+    .grid-hr {
+        border-top: 1px solid rgba(135, 206, 235, 0.3);
+    }
+
+    .kl-color-option {
+        box-shadow: 0 0 0 1px rgba(135, 206, 235, 0.3);
+        color: rgba(255, 255, 255, 0.7);
+
+        &:not(.kl-color-option--active):active {
+            box-shadow: 0 0 0 2px rgba(135, 206, 235, 0.5);
+        }
+    }
+
+    .kl-color-option--active {
+        box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.5),
+        0 0 8px 0 rgba(135, 206, 235, 0.6);
+    }
+
+    .kl-text-error {
+        color: #ff6b6b;
+    }
+
+    .kl-dropdown-menu {
+        background: rgba(30, 90, 142, 0.95);
+        backdrop-filter: blur(10px);
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+    }
+
+    .kl-pinch-overlay {
+        background: rgba(30, 90, 142, 0.7);
+        backdrop-filter: blur(5px);
+    }
+
+    .kl-floating-window-header {
+        background: rgba(30, 90, 142, 0.95);
+        backdrop-filter: blur(10px);
+    }
+
+    .dark-invert {
+        filter: invert(1) brightness(2);
+    }
+}

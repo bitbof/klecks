@@ -1,6 +1,7 @@
 /* --- entrypoint for app ---*/
 @use 'vars';
 @use './dark';
+@use './blue';
 
 :root {
     --active-highlight-color: #{vars.$activeHighlightColor};

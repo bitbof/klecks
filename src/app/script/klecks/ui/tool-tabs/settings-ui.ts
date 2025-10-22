@@ -93,13 +93,19 @@ export class SettingsUi {
 
         // ---- theme ----
         function themeToLabel(theme: TTheme): string {
-            return theme === 'dark' ? '⬛ ' + LANG('theme-dark') : '⬜ ' + LANG('theme-light');
+            if (theme === 'dark') {
+                return '⬛ ' + LANG('theme-dark');
+            } else if (theme === 'blue') {
+                return '🌊 ' + LANG('theme-blue');
+            }
+            return '⬜ ' + LANG('theme-light');
         }
         const themeSelect = new KL.Select({
             optionArr: [
                 ['auto', LANG('auto') + ' → ' + themeToLabel(THEME.getMediaQueryTheme())],
                 ['light', themeToLabel('light')],
                 ['dark', themeToLabel('dark')],
+                ['blue', themeToLabel('blue')],
             ],
             initValue: THEME.getStoredTheme() || 'auto',
             onChange: (val): void => {

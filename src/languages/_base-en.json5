@@ -1006,6 +1006,7 @@ Renaming a key across multiple language files:
   "settings-save-reminder-confirm-disable": 'Disable',
   "theme-dark": 'Dark',
   "theme-light": 'Light',
+  "theme-blue": 'Blue Ocean',
   "terms-of-service": {
     value: "Terms of Service",
   },

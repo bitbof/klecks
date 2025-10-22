@@ -3,7 +3,7 @@ import { LocalStorage } from '../bb/base/local-storage';
 
 const LS_THEME_KEY = 'klecks-theme';
 
-export type TTheme = 'dark' | 'light';
+export type TTheme = 'dark' | 'light' | 'blue';
 type TThemeListener = () => void;
 
 class Theme {
@@ -21,12 +21,13 @@ class Theme {
             return;
         }
         document.body.classList.toggle('kl-theme-dark', this.theme === 'dark');
+        document.body.classList.toggle('kl-theme-blue', this.theme === 'blue');
         this.listeners.forEach((item) => item());
     }
 
     private readLocalStorage(): TTheme | undefined {
         let result = LocalStorage.getItem(LS_THEME_KEY) as unknown;
-        if (!result || (typeof result === 'string' && !['dark', 'light'].includes(result))) {
+        if (!result || (typeof result === 'string' && !['dark', 'light', 'blue'].includes(result))) {
             result = undefined;
             LocalStorage.removeItem(LS_THEME_KEY); // reset because invalid
         }
