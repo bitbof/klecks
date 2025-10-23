@@ -367,9 +367,11 @@ export class FileUi {
 
                         // TODO add a modal to adjust fps and time (and maybe webm export)
 
+                        // For testing purposes, events are stored in the localStorage.
+                        // This function relies on that
                         await this.klEventRecorder?.startReplayFromRecorderStorage({
                             targetFps: 25,
-                            replayTimeInMs: 3000, // 5 seconds total timelapse
+                            replayTimeInMs: 4500, // 5 seconds total timelapse
                             onFrame: async (index, total) => {
                                 console.log(`onFrame. Progress: ${index}/${total}`);
                                 // Here you can take a snapshot of canvas and render a video

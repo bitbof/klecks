@@ -294,15 +294,14 @@ export class KlApp {
         );
         const initialHeight = Math.max(10, Math.min(maxCanvasSize, this.uiHeight));
 
-        console.log("project", p.project);
-
-        const composed1 = projectToComposed(
-                p.project ?? getDefaultProjectOptions(randomUuid(), initialWidth, initialHeight),
-            );
+        const oldestComposed = projectToComposed(
+            p.project ?? getDefaultProjectOptions(randomUuid(), initialWidth, initialHeight),
+        );
 
         this.klHistory = new KlHistory({
-            oldest: composed1
+            oldest: oldestComposed
         });
+
         const klRecoveryManager = p.klRecoveryManager;
         if (klRecoveryManager) {
             klRecoveryManager.setKlHistory(this.klHistory);
@@ -322,14 +321,17 @@ export class KlApp {
 
         // Initialize Recorder if configuration is provided
         if (p.eventRecorderConfig) {
-            const composed = this.klHistory.getComposed();
-            const projectId = composed.projectId.value;
+            const projectId = oldestComposed.projectId.value;
             this.klRecorder = new KlEventRecorder(projectId, p.eventRecorderConfig);
             // Register the replayer on the klHistory, so that they can have special handling, when a "replay" is ongoing
             this.klHistory.setReplayer(this.klRecorder.getReplayer());
 
             // Initial clear
-            this.klRecorder.record('reset', [{ width: composed.size.width, height: composed.size.height, color: { r: 255, g: 255, b: 255 } as TRgb }]);
+            this.klRecorder.record('reset', [{
+                width: oldestComposed.size.width,
+                height: oldestComposed.size.height,
+                color: { r: 255, g: 255, b: 255 } as TRgb
+            }]);
         }
 
         this.klCanvas = new KL.KlCanvas(this.klHistory, this.embed ? -1 : 1, this.klRecorder);
@@ -1556,14 +1558,40 @@ export class KlApp {
                     klCanvas: this.klCanvas,
                     klHistory: this.klHistory,
                     input: filterInput
-                })
+                });
                 if (!filterResult) {
-                    console.log("Failed to apply filter during replay:", filterKey);
+                    console.log('Failed to apply filter during replay:', filterKey);
                     return;
                 }
                 KL.FILTER_LIB[filterKey].updatePos && this.easelProjectUpdater.update();
                 this.easel.resetOrFitTransform(true);
             });
+
+            /*replayer.setLifecycleCallbacks(async () => {
+                const composedBefore = this.klHistory.getComposed();
+                return composedBefore;
+
+            }, async (composedBefore) => {
+                const composedAfter = this.klHistory.getComposed();
+
+                this.klCanvas.updateViaComposed(composedBefore!, composedAfter);
+
+                setCurrentLayer(
+                    this.klCanvas.getLayer(
+                        composedAfter.layerMap[composedAfter.activeLayerId].index,
+                    ),
+                );
+                this.easelProjectUpdater.update(); // triggers render
+
+                const dimensionChanged =
+                    composedBefore.size.width !== composedAfter.size.width ||
+                    composedBefore.size.height !== composedAfter.size.height;
+                if (dimensionChanged) {
+                    this.easel.resetOrFitTransform(true);
+                }
+                this.easelBrush.setLastDrawEvent();
+                this.layersUi.update(currentLayer.index);
+            })*/
         }
 
         const brushDiv = BB.el();
@@ -2020,45 +2048,45 @@ export class KlApp {
         const fileUi = this.embed
             ? null
             : new KL.FileUi({
-                    klRootEl: this.rootEl,
-                    projectStore: projectStore,
-                    getProject: () => this.klCanvas.getProject(),
-                    exportType: exportType,
-                    onExportTypeChange: (type) => {
-                        exportType = type;
-                    },
-                    onFileSelect: (files, optionsStr) =>
-                        importHandler.handleFileSelect(files, optionsStr),
-                    onSaveImageToComputer: () => {
-                        applyUncommitted();
-                        this.saveToComputer.save();
-                    },
-                    onNewImage: showNewImageDialog,
-                    onShareImage: (callback) => {
-                        applyUncommitted();
-                        shareImage(callback);
-                    },
-                    onUpload: () => {
-                        // on upload
-                        applyUncommitted();
-                        KL.imgurUpload(
-                            this.klCanvas,
-                            this.rootEl,
-                            p.app && p.app.imgurKey ? p.app.imgurKey : '',
-                            () => this.updateLastSaved(),
-                        );
-                    },
-                    applyUncommitted: () => applyUncommitted(),
-                    onChangeShowSaveDialog: (b) => {
-                        this.saveToComputer.setShowSaveDialog(b);
-                    },
-                    klRecoveryManager,
-                    klEventRecorder: this.klRecorder,
-                    onOpenBrowserStorage,
-                    onStoredToBrowserStorage: () => {
-                        this.updateLastSaved();
-                    },
-                });
+                klRootEl: this.rootEl,
+                projectStore: projectStore,
+                getProject: () => this.klCanvas.getProject(),
+                exportType: exportType,
+                onExportTypeChange: (type) => {
+                    exportType = type;
+                },
+                onFileSelect: (files, optionsStr) =>
+                    importHandler.handleFileSelect(files, optionsStr),
+                onSaveImageToComputer: () => {
+                    applyUncommitted();
+                    this.saveToComputer.save();
+                },
+                onNewImage: showNewImageDialog,
+                onShareImage: (callback) => {
+                    applyUncommitted();
+                    shareImage(callback);
+                },
+                onUpload: () => {
+                    // on upload
+                    applyUncommitted();
+                    KL.imgurUpload(
+                        this.klCanvas,
+                        this.rootEl,
+                        p.app && p.app.imgurKey ? p.app.imgurKey : '',
+                        () => this.updateLastSaved(),
+                    );
+                },
+                applyUncommitted: () => applyUncommitted(),
+                onChangeShowSaveDialog: (b) => {
+                    this.saveToComputer.setShowSaveDialog(b);
+                },
+                klRecoveryManager,
+                klEventRecorder: this.klRecorder,
+                onOpenBrowserStorage,
+                onStoredToBrowserStorage: () => {
+                    this.updateLastSaved();
+                },
+            });
 
         if (!this.embed && projectStore) {
             this.saveReminder = new SaveReminder({
@@ -2537,8 +2565,13 @@ export class KlApp {
         if (!this.klRecorder) {
             return;
         }
-        this.klRecorder.clearEvents();
+        const lastEvent = events[events.length - 1];
+        if (!lastEvent) {
+            return;
+        }
+
         await this.klRecorder.getReplayer().startReplay(events);
+        this.klRecorder.load(lastEvent.sequenceNumber, lastEvent.timestamp);
         this.klCanvas.fixHistoryState();
     }
 

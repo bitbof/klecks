@@ -6,8 +6,8 @@ import { LANG } from '../language/language';
 export const getDefaultProjectOptions = (projectId: string, width?: number, height?: number) => {
     return {
         projectId: projectId,
-        width: width ?? 1,
-        height: height ?? 1,
+        width: width ?? 100,
+        height: height ?? 100,
         layers: [
             {
                 name: LANG('layers-layer') + ' 1', // not ideal

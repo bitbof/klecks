@@ -112,9 +112,9 @@ export class KlHistory {
     }
 
     push(entryData: THistoryEntryData, replaceTop?: boolean): void {
-        if (this.eventReplayer?.isCurrentlyReplaying()) {
+        /*if (this.eventReplayer?.isCurrentlyReplaying()) {
             return;
-        }
+        }*/
 
         if (this.pauseStack > 0) {
             return;

@@ -19,9 +19,6 @@ import {
 export class KlEventRecorder {
     private projectId: string = '';
     private sequenceNumber: number = 0;
-    private memoryEvents: TRecordedEvent[] = [];
-    private enableMemoryStorage: boolean;
-    private enableBrowserStorage: boolean;
     private lastTimestamp: number = 0; // ms since epoch
     private totalTimeTaken: number = 0; // ms taken drawing in this project
     private listeners: Array<TEventRecordedCallback> = [];
@@ -30,19 +27,13 @@ export class KlEventRecorder {
 
     constructor(projectId: string, config: TRecorderConfig) {
         this.projectId = projectId;
-        this.enableMemoryStorage = config.enableMemoryStorage || false;
-        this.enableBrowserStorage = config.enableBrowserStorage || false;
         if (config.onEvent) {
             this.listeners.push(config.onEvent);
         }
 
         this.replayer = new KlEventReplayer();
 
-        // If enabled, load data from browser storage
-        this.loadFromBrowserStorage();
-
         if (DEBUG_RECORDER) {
-            (window as any).getRecordedEvents = () => this.getEvents();
             (window as any).getTimeTaken = () => this.getTimeTaken();
         }
     }
@@ -50,31 +41,9 @@ export class KlEventRecorder {
     /**
      * Allow resuming a drawing. Provide these parameters, so that this class is in sync
      */
-    load(sequenceNumber: number, totalTimeTaken: number, events?: TRecordedEvent[]) {
+    load(sequenceNumber: number, totalTimeTaken: number) {
         this.sequenceNumber = sequenceNumber;
         this.totalTimeTaken = totalTimeTaken;
-        if (events) {
-            this.saveToMemoryStorage(events);
-            this.saveToBrowserStorage(events);
-        }
-    }
-
-    loadFromBrowserStorage() {
-        if (!this.enableBrowserStorage) {
-            return;
-        }
-
-        try {
-            const readEvents = localStorage.getItem(`kl-rec-${this.projectId}`);
-            let parsed: TRecordedEvent[] = [];
-            if (readEvents) {
-                parsed = JSON.parse(readEvents) as TRecordedEvent[];
-            }
-            this.saveToMemoryStorage(parsed);
-            return parsed;
-        } catch (error) {
-            console.error('%c[REC]', LOG_STYLE_RECORDER, 'Failed to load events from browser storage. Error:', error);
-        }
     }
 
     /**
@@ -107,19 +76,15 @@ export class KlEventRecorder {
 
         // Don't record if paused
         if (this.isPaused || this.replayer?.isCurrentlyReplaying()) {
-            if (DEBUG_RECORDER) {
-                console.log('%c[REC]', LOG_STYLE_RECORDER, 'Ignoring event - recording paused', event);
-            }
+            // if (DEBUG_RECORDER) {
+            //     console.log('%c[REC]', LOG_STYLE_RECORDER, `Ignoring event (${type}) - recording paused`);
+            // }
             return;
         }
 
         if (DEBUG_RECORDER) {
             console.log('%c[REC]', LOG_STYLE_RECORDER, 'Recording event', event);
         }
-
-        // Store (if enabled)
-        this.saveToMemoryStorage([event]);
-        this.saveToBrowserStorage([event]);
 
         // Notify listeners
         for (const cb of this.listeners) {
@@ -129,26 +94,6 @@ export class KlEventRecorder {
                 console.error('%c[REC]', LOG_STYLE_RECORDER, 'Failed to notify listeners. Error:', error);
             }
         }
-    }
-
-    /**
-     * Get events from memory (always available if enabled)
-     */
-    getEvents(options: TGetEventsOptions = {}): TRecordedEvent[] {
-        const events = this.enableMemoryStorage
-            ? this.memoryEvents
-            : this.enableBrowserStorage
-                ? JSON.parse(localStorage.getItem(`kl-rec-${this.projectId}`) || '[]') as TRecordedEvent[]
-                : [];
-
-        const { fromSequence = 0, toSequence = Infinity, includeTypes } = options;
-        return events
-            .filter(event =>
-                event.sequenceNumber >= fromSequence &&
-                event.sequenceNumber <= toSequence &&
-                (!includeTypes || includeTypes.includes(event.type))
-            )
-            .sort((a, b) => a.sequenceNumber - b.sequenceNumber);
     }
 
     /**
@@ -175,7 +120,6 @@ export class KlEventRecorder {
      * Cleanup
      */
     destroy() {
-        this.memoryEvents = [];
         this.sequenceNumber = 0;
         this.lastTimestamp = 0;
         this.totalTimeTaken = 0;
@@ -222,48 +166,6 @@ export class KlEventRecorder {
         this.listeners = this.listeners.filter((cb) => cb !== callback);
     }
 
-    private saveToBrowserStorage(events: TRecordedEvent[] | null) {
-        if (events === null) {
-            localStorage.removeItem(`kl-rec-${this.projectId}`);
-            return;
-        }
-
-        if (!this.enableBrowserStorage) {
-            return;
-        }
-
-        try {
-            let allEvents: TRecordedEvent[] = [];
-            const lsEvents = localStorage.getItem(`kl-rec-${this.projectId}`);
-            if (lsEvents) {
-                allEvents = JSON.parse(lsEvents) as TRecordedEvent[];
-            }
-            allEvents.push(...events);
-            localStorage.setItem(`kl-rec-${this.projectId}`, JSON.stringify(allEvents));
-        } catch (error) {
-            console.error('%c[REC]', LOG_STYLE_RECORDER, 'Failed to save events to browser storage. Error:', error);
-        }
-    }
-
-    private saveToMemoryStorage(events: TRecordedEvent[] | null) {
-        if (events === null) {
-            this.memoryEvents = [];
-            return;
-        }
-
-        if (!this.enableMemoryStorage) {
-            return;
-        }
-
-        this.memoryEvents.push(...events);
-    }
-
-    clearEvents() {
-        this.sequenceNumber = 0;
-        this.totalTimeTaken = 0;
-        this.lastTimestamp = 0;
-    }
-
     /**
      * Set an event replayer to avoid recording events while replaying
      */
@@ -275,6 +177,21 @@ export class KlEventRecorder {
      * In a real world example, the recorder should not contain the events, but get it from a server.
      */
     async startReplayFromRecorderStorage(config: TReplayConfig = {}): Promise<TReplayStats> {
-        return await this.replayer.startReplay(this.getEvents(), config);
+        return await this.replayer.startReplay(this.getEventsFromBrowserStorage(), config);
     }
+
+    // For testing only
+    private getEventsFromBrowserStorage() {
+        const storageKey = `kl-rec-${this.projectId}`;
+        const readEvents = localStorage.getItem(storageKey);
+        if (readEvents) {
+            try {
+                return JSON.parse(readEvents) as TRecordedEvent[];
+            } catch (e) {
+                console.error('%c[REC]', LOG_STYLE_RECORDER, 'Failed to parse recorded events from browser storage', e);
+            }
+        }
+        return [];
+    }
+
 }

@@ -3,16 +3,7 @@
  */
 export type TRecorderConfig = {
     /**
-     * I would not recommend enabling the integrated memory storage because it can easily grow in size.
-     * Rather, provide a callback (onEvent) and put the events somewhere else (server)
-     */
-    enableMemoryStorage?: boolean;
-    /**
-     * Enable saving events to browser local storage. Not recommended for larger projects.
-     */
-    enableBrowserStorage?: boolean;
-    /**
-     * Callback when a new event is received.
+     * Callback when a new event is recorded.
      */
     onEvent?: TEventRecordedCallback;
 };

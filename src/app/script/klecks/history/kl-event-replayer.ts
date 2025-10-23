@@ -16,6 +16,16 @@ export class KlEventReplayer {
     private eventHandlers: Map<TEventType, TEventReplayingHandler[]> = new Map();
     private isReplaying: boolean = false;
     private currentReplayAbortController: AbortController | null = null;
+    private onFrame: ((currentIndex: number, totalEvents: number) => Promise<void>) | null = null;
+
+    /**
+     * Set a callback to be called on each frame (after event was invoked).
+     * The last pass can be indicated with (currentIndex >= totalEvents).
+     * currentIndex is not a frame-count, but an event count and will probably not be consecutive.
+     */
+    setOnFrameCallback(callback: ((currentIndex: number, totalEvents: number) => Promise<void>) | null): void {
+        this.onFrame = callback;
+    }
 
     /**
      * Register a handler for a specific event type
@@ -263,9 +273,12 @@ export class KlEventReplayer {
 
             currentIndex += eventsToProcess;
 
+            // Call frame callback
             if (onFrame) {
-                // Call frame callback
                 await onFrame(currentIndex, events.length);
+            }
+            if (this.onFrame) {
+                await this.onFrame(currentIndex, events.length);
             }
 
             if (frameTime <= 0) {
@@ -280,23 +293,29 @@ export class KlEventReplayer {
 
             // Calculate timing for next frame
             let sleepTime = 0;
-            const frameRealDuration = performance.now() - frameStartTime;
+            const thisFrameRealDuration = performance.now() - frameStartTime;
+            const thisFrameDelay = frameTime - thisFrameRealDuration; // positive=good
 
             // Calculate delay for next frame, compensating for any overrun
-            const frameOverrunTime = frameTime - frameRealDuration - accumulatedDelay;
-            if (frameOverrunTime < 0) {
+            const totalFrameDelay = -thisFrameDelay + accumulatedDelay;
+            if (totalFrameDelay > 0) {
                 // We're behind schedule
-                accumulatedDelay += -frameOverrunTime;
-                sleepTime = 1; // Try to keep up, sleep as little as possible
+                // Try to keep up, sleep as little as possible
+                sleepTime = 1;
+                // And it's still getting worse:
+                accumulatedDelay += -thisFrameDelay;
+
                 if (DEBUG_REPLAYER) {
-                    console.warn('%c[REPLAY]', LOG_STYLE_REPLAYER, `Trying to keep up. Overrun by ${-frameOverrunTime.toFixed(1)}ms, accumulated delay: ${accumulatedDelay.toFixed(1)}ms`);
+                    console.warn('%c[REPLAY]', LOG_STYLE_REPLAYER, `Trying to keep up. Overrun by ${-totalFrameDelay.toFixed(1)}ms, accumulated delay: ${accumulatedDelay.toFixed(1)}ms`);
                 }
             } else {
-                sleepTime = frameOverrunTime; // Sleep till the next frame should happen
+                // Sleep till the next frame should happen
+                // floor and "-10" is a precaution: Be faster early on, so that we have more time later
+                sleepTime = Math.max(0, Math.floor(thisFrameDelay - 10));
                 accumulatedDelay = 0;
             }
 
-            if (sleepTime > 1) {
+            if (sleepTime > 0) {
                 // Wait for next frame
                 await this.sleep(sleepTime);
             }
