@@ -1,5 +1,5 @@
 import { TDrawDownEvent, TDrawEvent, TDrawLine, TDrawMoveEvent, TDrawUpEvent } from '../kl-types';
-import { TSanitizedDrawEvent } from './kl-event-recorder';
+import { TSanitizedDrawEvent } from './kl-event-types';
 
 
 // Draw-points are rounded to an integer in order to save memory and bandwidth, and also because you

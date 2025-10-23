@@ -186,7 +186,6 @@ This has been reported to Google.
 
                     const applyFilter = (input: any) => {
                         this.klRecorder?.record('filter', {
-                            layerIndex: this.getCurrentLayer().index,
                             filterKey,
                             input
                         });

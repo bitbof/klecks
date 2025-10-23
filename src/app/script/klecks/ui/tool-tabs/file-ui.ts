@@ -1,7 +1,4 @@
 import { BB } from '../../../bb/bb';
-import { KlEventRecorder, TRecordedEvent } from '../../history/kl-event-recorder';
-import { KlEventReplayer } from '../../history/kl-event-replayer';
-import { sample1 } from '../../history/kl-event-sample';
 import { KL } from '../../kl';
 import { BrowserStorageUi } from '../components/browser-storage-ui';
 import { TDropOption, TExportType, TKlProject } from '../../kl-types';
@@ -19,6 +16,8 @@ import { showRecoveryManagerPanel } from '../modals/recovery-manager-panel/show-
 import * as classes from './file-ui.module.scss';
 import { BrowserStorageHeaderUi } from '../components/browser-storage-header-ui';
 import { css } from '../../../bb/base/base';
+import { KlEventRecorder } from '../../history/kl-event-recorder';
+import { TRecordedEvent } from '../../history/kl-event-types';
 
 const LS_SHOW_SAVE_DIALOG = 'kl-save-dialog';
 
@@ -54,7 +53,6 @@ export type TFileUiParams = {
     onChangeShowSaveDialog: (b: boolean) => void;
     klRecoveryManager?: KlRecoveryManager;
     klEventRecorder?: KlEventRecorder;
-    klEventReplayer?: KlEventReplayer;
     onOpenBrowserStorage: () => void;
     onStoredToBrowserStorage: () => void;
 };
@@ -69,7 +67,6 @@ export class FileUi {
     private browserStorageUi: undefined | BrowserStorageUi;
     private klRecoveryManager: KlRecoveryManager | undefined;
     private klEventRecorder: KlEventRecorder | undefined;
-    private klEventReplayer: KlEventReplayer | undefined;
     private recoveryCountBubble: HTMLElement | undefined;
     private recoveryListener: TKlRecoveryListener = (metas) => {
         if (!this.recoveryCountBubble) {
@@ -336,7 +333,6 @@ export class FileUi {
 
             // --- time taken info and timelapse-replay button ---
             this.klEventRecorder = p.klEventRecorder;
-            this.klEventReplayer = p.klEventReplayer;
             const recorderWrapper = BB.el({});
 
             if (this.klEventRecorder === undefined) {
@@ -366,15 +362,14 @@ export class FileUi {
                     onClick: async () => {
                         // Start replay with custom timing
                         const startTime = performance.now();
-                        let recData = this.klEventRecorder?.getEvents();
-                        if (!recData || recData?.length < 2)
-                            recData = sample1;
+                        if (!this.klEventRecorder)
+                            return;
 
                         // TODO add a modal to adjust fps and time (and maybe webm export)
 
-                        await this.klEventReplayer?.startReplay(recData, {
+                        await this.klEventRecorder?.startReplayFromRecorderStorage({
                             targetFps: 25,
-                            replayTimeInMs: 5000, // 5 seconds total timelapse
+                            replayTimeInMs: 3000, // 5 seconds total timelapse
                             onFrame: async (index, total) => {
                                 console.log(`onFrame. Progress: ${index}/${total}`);
                                 // Here you can take a snapshot of canvas and render a video

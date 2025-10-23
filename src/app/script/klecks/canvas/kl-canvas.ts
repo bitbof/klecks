@@ -1691,4 +1691,22 @@ export class KlCanvas {
         this.layers = [];
         this.isDestroyed = true;
     }
+
+    fixHistoryState() {
+        const historyEntryData: THistoryEntryDataComposed = {
+            projectId: {
+                value: this.klHistory.getComposed().projectId.value,
+            },
+            size: {
+                width: this.width,
+                height: this.height,
+            },
+            selection: { value: this.selection },
+            activeLayerId: this.layers[this.layers.length - 1].id,
+            layerMap: createLayerMap(this.layers, {
+                attributes: 'all',
+            }) as Record<TLayerId, THistoryEntryLayerComposed>,
+        };
+        this.klHistory.push(historyEntryData);
+    }
 }

@@ -2,6 +2,7 @@ import { THistoryEntry, THistoryEntryData, THistoryEntryDataComposed } from './h
 import { composeHistoryStateData } from './compose-history-state-data';
 import { estimateBytes } from './estimate-bytes';
 import { entryCausesChange } from './entry-causes-change';
+import { KlEventReplayer } from './kl-event-replayer';
 
 /*
 todo memory could be better limited.
@@ -57,6 +58,8 @@ export class KlHistory {
     private pauseStack: number = 0; // how often paused without unpause. push does nothing when paused.
     private readonly listeners: TKlHistoryListener[] = []; // broadcasts on undo, redo, push
 
+    private eventReplayer: KlEventReplayer | undefined;
+
     private broadcast(): void {
         this.changeCount++;
         setTimeout(() => {
@@ -109,6 +112,10 @@ export class KlHistory {
     }
 
     push(entryData: THistoryEntryData, replaceTop?: boolean): void {
+        if (this.eventReplayer?.isCurrentlyReplaying()) {
+            return;
+        }
+
         if (this.pauseStack > 0) {
             return;
         }
@@ -242,5 +249,9 @@ export class KlHistory {
 
     isPaused(): boolean {
         return this.pauseStack > 0;
+    }
+
+    setReplayer(klReplayer: KlEventReplayer | undefined) {
+        this.eventReplayer = klReplayer;
     }
 }

@@ -1,43 +1,19 @@
-import { TEventType, TRecordedEvent } from './kl-event-recorder';
-
-/**
- * Configuration options for replay behavior
- */
-export type TReplayConfig = {
-    /** Target frames per second for the replay animation */
-    targetFps?: number;
-    /** Total time in milliseconds for the complete replay */
-    replayTimeInMs?: number;
-    /** Callback called on each frame during replay */
-    onFrame?: (currentIndex: number, totalEvents: number) => Promise<void>;
-};
-
-/**
- * Event handler for replaying specific event types
- */
-export type TEventHandler = (event: TRecordedEvent) => void | Promise<void>;
-
-/**
- * Statistics about the replay process
- */
-export type TReplayStats = {
-    totalEvents: number;
-    processedEvents: number;
-    skippedEvents: number;
-    actualDuration: number;
-    targetDuration?: number;
-    averageFps: number;
-};
-
-const DEBUG_REPLAYER = true;
-const UNDO_IGNORED_EVENTS: TEventType[] = ['l-select'];
-const LOG_STYLE = 'color: #6AA6FF; font-weight: bold;';
+import {
+    DEBUG_REPLAYER,
+    LOG_STYLE_REPLAYER,
+    UNDO_IGNORED_EVENTS,
+    TEventReplayingHandler,
+    TEventType,
+    TRecordedEvent,
+    TReplayConfig,
+    TReplayStats,
+} from './kl-event-types';
 
 /**
  * Replays recorded events with proper timing and undo/redo resolution
  */
 export class KlEventReplayer {
-    private eventHandlers: Map<TEventType, TEventHandler[]> = new Map();
+    private eventHandlers: Map<TEventType, TEventReplayingHandler[]> = new Map();
     private isReplaying: boolean = false;
     private currentReplayAbortController: AbortController | null = null;
 
@@ -46,7 +22,7 @@ export class KlEventReplayer {
      * @param type The event type to handle
      * @param handler Function to execute when this event type is encountered
      */
-    addReplayHandler(type: TEventType, handler: TEventHandler): void {
+    addReplayHandler(type: TEventType, handler: TEventReplayingHandler): void {
         if (!this.eventHandlers.has(type)) {
             this.eventHandlers.set(type, []);
         }
@@ -59,7 +35,7 @@ export class KlEventReplayer {
      * @param type The event type
      * @param handler The handler function to remove
      */
-    removeReplayHandler(type: TEventType, handler: TEventHandler): void {
+    removeReplayHandler(type: TEventType, handler: TEventReplayingHandler): void {
         const handlers = this.eventHandlers.get(type);
         if (handlers) {
             const index = handlers.indexOf(handler);
@@ -89,7 +65,7 @@ export class KlEventReplayer {
         try {
             const startTime = performance.now();
 
-            console.log('%c[REPLAY]', LOG_STYLE, `Starting replay with ${events.length} events`);
+            console.log('%c[REPLAY]', LOG_STYLE_REPLAYER, `Starting replay with ${events.length} events`);
 
             // Step 1: Validate and sort events by sequence number
             const sortedEvents = this.validateAndSortEvents(events);
@@ -110,7 +86,7 @@ export class KlEventReplayer {
             const actualDuration = performance.now() - startTime;
             const stats = this.createStats(sortedEvents, processedEvents, actualDuration, startTime, config.replayTimeInMs);
 
-            console.log('%c[REPLAY]', LOG_STYLE, 'Replay completed:', stats);
+            console.log('%c[REPLAY]', LOG_STYLE_REPLAYER, 'Replay completed:', stats);
 
             return stats;
         } finally {
@@ -120,12 +96,13 @@ export class KlEventReplayer {
     }
 
     /**
-     * Stop the current replay if one is in progress
+     * Stop the current replay if one is in progress.
+     * Would not recommend it.
      */
     stopReplay(): void {
         if (this.currentReplayAbortController) {
             this.currentReplayAbortController.abort();
-            console.log('%c[REPLAY]', LOG_STYLE, 'Replay stopped by user');
+            console.log('%c[REPLAY]', LOG_STYLE_REPLAYER, 'Replay stopped by user');
         }
     }
 
@@ -230,7 +207,7 @@ export class KlEventReplayer {
         if (!config.replayTimeInMs || config.replayTimeInMs <= 0) {
             // Replay instantly
             if (DEBUG_REPLAYER) {
-                console.log('%c[REPLAY]', LOG_STYLE, `Timings: instant`);
+                console.log('%c[REPLAY]', LOG_STYLE_REPLAYER, `Timings: instant`);
             }
             return {
                 frameTime: 0,
@@ -247,7 +224,7 @@ export class KlEventReplayer {
         const eventsPerFrame = Math.max(1, Math.ceil(eventCount / totalFrameCount));
 
         if (DEBUG_REPLAYER) {
-            console.log('%c[REPLAY]', LOG_STYLE, `Timings: targetFps=${targetFps}, replayTime=${replayTime}ms, totalFrames=${totalFrameCount}, eventsPerFrame=${eventsPerFrame}, timePerFrame=${timePerFrame.toFixed(2)}ms`);
+            console.log('%c[REPLAY]', LOG_STYLE_REPLAYER, `Timings: targetFps=${targetFps}, replayTime=${replayTime}ms, totalFrames=${totalFrameCount}, eventsPerFrame=${eventsPerFrame}, timePerFrame=${timePerFrame.toFixed(2)}ms`);
         }
 
         return {
@@ -310,31 +287,27 @@ export class KlEventReplayer {
             if (frameOverrunTime < 0) {
                 // We're behind schedule
                 accumulatedDelay += -frameOverrunTime;
-                sleepTime = 0; // Try to keep up
+                sleepTime = 1; // Try to keep up, sleep as little as possible
                 if (DEBUG_REPLAYER) {
-                    console.warn('%c[REPLAY]', LOG_STYLE, `Trying to keep up. Overrun by ${-frameOverrunTime.toFixed(1)}ms, accumulated delay: ${accumulatedDelay.toFixed(1)}ms`);
+                    console.warn('%c[REPLAY]', LOG_STYLE_REPLAYER, `Trying to keep up. Overrun by ${-frameOverrunTime.toFixed(1)}ms, accumulated delay: ${accumulatedDelay.toFixed(1)}ms`);
                 }
             } else {
                 sleepTime = frameOverrunTime; // Sleep till the next frame should happen
                 accumulatedDelay = 0;
             }
 
-            if (sleepTime > 0) {
+            if (sleepTime > 1) {
                 // Wait for next frame
                 await this.sleep(sleepTime);
             }
         }
     }
 
-    /**
-     * Execute all registered handlers for an event
-     * @private
-     */
     private async executeEventHandlers(event: TRecordedEvent): Promise<void> {
         const handlers = this.eventHandlers.get(event.type);
         if (!handlers || handlers.length === 0) {
             if (DEBUG_REPLAYER) {
-                console.warn('%c[REPLAY]', LOG_STYLE, `No handlers registered for event type: ${event.type}`);
+                console.warn('%c[REPLAY]', LOG_STYLE_REPLAYER, `No handlers registered for event type: ${event.type}`);
             }
             return;
         }
@@ -344,7 +317,7 @@ export class KlEventReplayer {
             try {
                 await handler(event);
             } catch (error) {
-                console.error('%c[REPLAY]', LOG_STYLE, `Error executing handler for event ${event.type}:`, error);
+                console.error('%c[REPLAY]', LOG_STYLE_REPLAYER, `Error executing handler for event ${event.type}:`, error);
                 // Continue with other handlers even if one fails
             }
         }

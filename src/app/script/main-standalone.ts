@@ -7,7 +7,6 @@ import { KlApp } from './app/kl-app';
 import { TDeserializedKlStorageProject, TKlProject } from './klecks/kl-types';
 import { initLANG, LANG } from './language/language';
 import '../script/theme/theme';
-import { TRecorderConfig } from './klecks/history/kl-event-recorder';
 import {
     getKlIndexedDbName,
     KL_INDEXED_DB,
@@ -68,20 +67,7 @@ function showInitError(e: Error): void {
         const loadingScreenEl = document.getElementById('loading-screen');
         loadingScreenEl?.remove();
 
-        // Create history recorder configuration
-        const eventRecorderConfig = {
-            enableMemoryStorage: true,
-            onEvent: (evnt) => {
-                // TODO REC send to server
-                // console.log('[main-standalone] event', evnt);
-            },
-        } as TRecorderConfig;
-
-        const klApp = new KlApp({
-            project,
-            klRecoveryManager,
-            eventRecorderConfig
-        });
+        const klApp = new KlApp({ project, klRecoveryManager });
         document.body.append(klApp.getElement());
 
         setTimeout(() => {
