@@ -1378,14 +1378,12 @@ export class KlApp {
             });
 
             replayer.addReplayHandler('l-select', (event) => {
-                const layer = this.klCanvas.getLayer(event.data.layerIndex);
+                const layer = this.klCanvas.getLayer((event.data as number[])[0]);
                 if (layer) {
                     setCurrentLayer(layer);
-                    const topEntry = this.klHistory.getEntries().at(-1)!.data;
-                    const replaceTop = isHistoryEntryActiveLayerChange(topEntry);
                     this.klHistory.push({
                         activeLayerId: layer.id,
-                    }, replaceTop);
+                    }, false);
                 }
             });
 
