@@ -16,7 +16,6 @@ import {
 } from './klecks/storage/kl-indexed-db';
 import { initLANG, LANG } from './language/language';
 import '../script/theme/theme';
-import { TRecorderConfig } from './klecks/history/kl-event-types';
 import { BrowserEventStorageProvider } from './klecks/history/kl-event-storage-provider';
 
 function showInitError(e: Error): void {
@@ -91,28 +90,7 @@ async function getEventsFromBrowserStorage(projectId: string) {
         // Create storage provider for event recording
         const storageProvider = new BrowserEventStorageProvider(projectId);
 
-        // Create history recorder configuration
-        const eventRecorderConfig = {
-            onEvent: (evnt) => {
-                // TODO REC  send to server
-                // Or, provide a StorageProvider
-
-                // console.log('[main-standalone] event', evnt);
-            },
-        } as TRecorderConfig;
-
-        /* TODO
-         * Bei meinem 500 Linien langen Test gab es jetzt ein Bug mit den Chunks.
-         * Die Animation wurde korrekt gemacht, aber die History-Chunks hatten noch
-         * alte Daten (etwa von dem Stand index=100)
-         *
-         *
-         * l-select wird scheinbar nicht angewandt.
-         *
-         * http://localhost:1234/?project=c4167054-f6f4-410d-a021-c3cc4a4a59b7
-         */
-
-        const klApp = new KlApp({ project, eventRecorderConfig, storageProvider });
+        const klApp = new KlApp({ project, storageProvider });
         document.body.append(klApp.getElement());
 
         setTimeout(() => {
