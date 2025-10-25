@@ -591,13 +591,21 @@
   },
   'file-recorder-disabled-info': {
     hint: 'state information, that recording is disabled',
-    original: 'Recorder disabled',
+    original: 'Aufzeichnung deaktiviert',
     value: 'Aufzeichnung ausgeschaltet'
   },
   'file-replay-timelapse': {
     hint: 'verb',
-    original: 'Play timelapse',
+    original: 'Zeitraffer abspielen',
     value: 'Zeitraffer abspielen'
+  },
+  "file-replay-clear": {
+    hint: 'verb',
+    value: 'Zeitraffer-Aufnahme leeren'
+  },
+  "file-replay-clear-confirm": {
+    hint: 'confirm',
+    value: 'Bist du sicher, dass du die Zeitraffer-Aufnahme löschen möchtest? Dies kann nicht rückgängig gemacht werden.'
   },
   'tab-recovery-recover-tabs': {
     hint: 'allows user to recover browser tabs (including the drawing) of this app.',

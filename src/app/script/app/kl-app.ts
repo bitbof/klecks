@@ -325,8 +325,6 @@ export class KlApp {
         if (p.eventRecorderConfig) {
             const projectId = oldestComposed.projectId.value;
             this.klRecorder = new KlEventRecorder(projectId, p.eventRecorderConfig, p.storageProvider);
-            // Register the replayer on the klHistory, so that they can have special handling, when a "replay" is ongoing
-            this.klHistory.setReplayer(this.klRecorder.getReplayer());
         }
 
         this.klCanvas = new KL.KlCanvas(this.klHistory, this.embed ? -1 : 1, this.klRecorder);

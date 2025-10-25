@@ -416,6 +416,14 @@ Renaming a key across multiple language files:
     hint: 'verb',
     value: 'Play timelapse'
   },
+  "file-replay-clear": {
+    hint: 'verb',
+    value: 'Clear Events'
+  },
+  "file-replay-clear-confirm": {
+    hint: 'verb',
+    value: 'Are you sure to clear the event storage of this drawing?'
+  },
   // Tab Recovery (near bottom of file tab)
 
   "tab-recovery-recover-tabs": {

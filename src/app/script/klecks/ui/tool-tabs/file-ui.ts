@@ -387,6 +387,34 @@ export class FileUi {
                 });
 
                 recorderWrapper.append(this.recorderTimeTakenInfo, replayTimelapseButton);
+
+                const replayClearButton = BB.el({
+                    tagName: 'button',
+                    content: LANG('file-replay-clear'),
+                    onClick: async () => {
+                        if (!this.klEventRecorder)
+                            return;
+
+                        // ask to be sure
+                        if (!confirm(LANG('file-replay-clear-confirm'))) {
+                            return;
+                        }
+
+                        await this.klEventRecorder?.clearEvents();
+                        // Clear canvas (aka reload)
+                        window.location.reload();
+                        console.log('Recorded events cleared');
+                    },
+                    custom: {
+                        tabIndex: '-1',
+                    },
+                    css: {
+                        margin: '10px 0 0 10px',
+                        width: 'calc(100% - 20px)',
+                    },
+                });
+
+                recorderWrapper.append(this.recorderTimeTakenInfo, replayClearButton);
             }
 
             // --- assemble ---
