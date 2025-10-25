@@ -85,6 +85,7 @@ import { MobileColorUi } from '../klecks/ui/mobile/mobile-color-ui';
 import { getSelectionPath2d } from '../bb/multi-polygon/get-selection-path-2d';
 import { KlChainRecorder } from '../klecks/history/kl-chain-recorder';
 import { TRecordedEvent, TRecorderConfig } from '../klecks/history/kl-event-types';
+import { IEventStorageProvider } from '../klecks/history/kl-event-storage-provider';
 
 importFilters();
 
@@ -105,6 +106,7 @@ export type TKlAppParams = {
     aboutEl?: HTMLElement; // replaces info about Klecks in settings tab
     klRecoveryManager?: KlRecoveryManager; // undefined if IndexedDB fails connecting
     eventRecorderConfig?: TRecorderConfig; // optional for timelapse recording
+    storageProvider?: IEventStorageProvider; // optional custom storage provider
 };
 
 type TKlAppToolId =
@@ -322,16 +324,9 @@ export class KlApp {
         // Initialize Recorder if configuration is provided
         if (p.eventRecorderConfig) {
             const projectId = oldestComposed.projectId.value;
-            this.klRecorder = new KlEventRecorder(projectId, p.eventRecorderConfig);
+            this.klRecorder = new KlEventRecorder(projectId, p.eventRecorderConfig, p.storageProvider);
             // Register the replayer on the klHistory, so that they can have special handling, when a "replay" is ongoing
             this.klHistory.setReplayer(this.klRecorder.getReplayer());
-
-            // Initial clear
-            this.klRecorder.record('reset', [{
-                width: oldestComposed.size.width,
-                height: oldestComposed.size.height,
-                color: { r: 255, g: 255, b: 255 } as TRgb
-            }]);
         }
 
         this.klCanvas = new KL.KlCanvas(this.klHistory, this.embed ? -1 : 1, this.klRecorder);
@@ -2497,7 +2492,24 @@ export class KlApp {
             });
         }
         this.saveReminder?.init();
-    }
+
+        // Load the drawing from the storage provider, or start a new one.
+        this.klRecorder?.loadFromStorage()
+            .then(x => {
+                if (x === 'empty-storage') {
+                    // Initial clear
+                    this.klRecorder?.record('reset', [{
+                        width: oldestComposed.size.width,
+                        height: oldestComposed.size.height,
+                        color: { r: 255, g: 255, b: 255 } as TRgb
+                    }]);
+                }
+                // Finalise
+                this.klCanvas.fixHistoryState();
+                this.klRecorder?.start();
+            });
+
+    } // end of constructor
 
     // -------- interface --------
 
@@ -2556,23 +2568,6 @@ export class KlApp {
 
     isDrawing(): boolean {
         return this.lineSanitizer.getIsDrawing() || this.easel.getIsLocked();
-    }
-
-    /**
-     * Get access to the replayer if enabled
-     */
-    async loadProjectFromEvents(events: TRecordedEvent[]) {
-        if (!this.klRecorder) {
-            return;
-        }
-        const lastEvent = events[events.length - 1];
-        if (!lastEvent) {
-            return;
-        }
-
-        await this.klRecorder.getReplayer().startReplay(events);
-        this.klRecorder.load(lastEvent.sequenceNumber, lastEvent.timestamp);
-        this.klCanvas.fixHistoryState();
     }
 
 }

@@ -16,7 +16,8 @@ import {
 } from './klecks/storage/kl-indexed-db';
 import { initLANG, LANG } from './language/language';
 import '../script/theme/theme';
-import { LOG_STYLE_RECORDER, TRecordedEvent, TRecorderConfig } from './klecks/history/kl-event-types';
+import { TRecorderConfig } from './klecks/history/kl-event-types';
+import { BrowserEventStorageProvider } from './klecks/history/kl-event-storage-provider';
 
 function showInitError(e: Error): void {
     const el = document.createElement('div');
@@ -32,32 +33,13 @@ function showInitError(e: Error): void {
 }
 
 
-function loadFromBrowserStorage(projectId: string) {
-    const readEvents = localStorage.getItem(`kl-rec-${projectId}`);
-    if (readEvents) {
-        return JSON.parse(readEvents) as TRecordedEvent[];
+async function getEventsFromBrowserStorage(projectId: string) {
+    const storageProvider = new BrowserEventStorageProvider(projectId);
+    const hasEvents = await storageProvider.getEvents();
+    if (hasEvents && hasEvents.length > 0) {
+        return hasEvents;
     } else {
         return null;
-    }
-}
-
-function appendToBrowserStorage(projectId: string, newEvents: TRecordedEvent[] | null) {
-    if (newEvents === null) {
-        localStorage.removeItem(`kl-rec-${projectId}`);
-        return;
-    }
-
-    try {
-        let allEvents: TRecordedEvent[] = [];
-        const lsEvents = localStorage.getItem(`kl-rec-${projectId}`);
-        if (lsEvents) {
-            allEvents = JSON.parse(lsEvents) as TRecordedEvent[];
-        }
-        allEvents.push(...newEvents);
-        localStorage.setItem(`kl-rec-${projectId}`, JSON.stringify(allEvents));
-        console.log('Event Storage: ', allEvents.length, ' - ', (new Blob([JSON.stringify(allEvents)]).size / 1024).toFixed(3), 'KB');
-    } catch (error) {
-        console.error('%c[REC]', LOG_STYLE_RECORDER, 'Failed to save events to browser storage. Error:', error);
     }
 }
 
@@ -77,8 +59,6 @@ function appendToBrowserStorage(projectId: string, newEvents: TRecordedEvent[] |
         }
 
         let project: TKlProject | undefined = undefined;
-        let eventsToReplay: TRecordedEvent[] | null = null;
-        let isLoaded = false;
 
         // Get project id from query
         const queryParams = new URLSearchParams(window.location.search);
@@ -87,8 +67,8 @@ function appendToBrowserStorage(projectId: string, newEvents: TRecordedEvent[] |
             projectId = queryParams.get('project') as string;
 
             // Try event-recorder-specific browserstorage
-            eventsToReplay = loadFromBrowserStorage(projectId);
-            if (eventsToReplay) {
+            const hasEvents = await getEventsFromBrowserStorage(projectId);
+            if (hasEvents) {
                 project = getDefaultProjectOptions(projectId);
                 outQueue.push('LOAD FROM BROWSER STORAGE');
             }
@@ -101,7 +81,6 @@ function appendToBrowserStorage(projectId: string, newEvents: TRecordedEvent[] |
             // New
             project = getDefaultProjectOptions(projectId, 500, 500);
             outQueue.push('NEU');
-            isLoaded = true; // no need to wait for the events to restore
         }
 
 
@@ -109,18 +88,16 @@ function appendToBrowserStorage(projectId: string, newEvents: TRecordedEvent[] |
         const loadingScreenEl = document.getElementById('loading-screen');
         loadingScreenEl?.remove();
 
+        // Create storage provider for event recording
+        const storageProvider = new BrowserEventStorageProvider(projectId);
+
         // Create history recorder configuration
         const eventRecorderConfig = {
             onEvent: (evnt) => {
-                if (!isLoaded)
-                    return; // Not yet finished loading
-
-                // TODO REC send to server
+                // TODO REC  send to server
+                // Or, provide a StorageProvider
 
                 // console.log('[main-standalone] event', evnt);
-
-
-                appendToBrowserStorage(projectId, [evnt]);
             },
         } as TRecorderConfig;
 
@@ -135,22 +112,13 @@ function appendToBrowserStorage(projectId: string, newEvents: TRecordedEvent[] |
          * http://localhost:1234/?project=c4167054-f6f4-410d-a021-c3cc4a4a59b7
          */
 
-        const klApp = new KlApp({ project, eventRecorderConfig });
+        const klApp = new KlApp({ project, eventRecorderConfig, storageProvider });
         document.body.append(klApp.getElement());
 
         setTimeout(() => {
             outQueue.forEach((msg) => {
                 klApp.out(msg);
             });
-
-            // Load all events instantly
-            if (!!eventsToReplay) {
-                klApp.loadProjectFromEvents(eventsToReplay)
-                     .then(() => {
-                         isLoaded = true;
-                     });
-            }
-
         }, 100);
     } catch (e) {
         showInitError(e as Error);
