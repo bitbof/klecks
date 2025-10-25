@@ -28,9 +28,9 @@ export class KlEventRecorder {
     private storageProvider: IEventStorageProvider | undefined;
     private isStoringInProgress: boolean = false;
 
-    constructor(projectId: string, config: TRecorderConfig, storageProvider?: IEventStorageProvider) {
+    constructor(projectId: string, config?: TRecorderConfig, storageProvider?: IEventStorageProvider) {
         this.projectId = projectId;
-        if (config.onEvent) {
+        if (config?.onEvent) {
             this.listeners.push(config.onEvent);
         }
 

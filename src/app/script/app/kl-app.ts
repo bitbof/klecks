@@ -322,7 +322,7 @@ export class KlApp {
         }
 
         // Initialize Recorder if configuration is provided
-        if (p.eventRecorderConfig) {
+        if (p.eventRecorderConfig || p.storageProvider) {
             const projectId = oldestComposed.projectId.value;
             this.klRecorder = new KlEventRecorder(projectId, p.eventRecorderConfig, p.storageProvider);
         }
