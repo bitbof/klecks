@@ -7,10 +7,18 @@ import { TSanitizedDrawEvent } from './kl-event-types';
 const r0 = Math.round;
 const r3 = (v: number) => Math.round(v * 1000) / 1000;
 
+/**
+ * This Recorder-class lives in the Draw-Event Chain. It records all events that gets
+ * passed through and also is able to re-emit previously recorded events onto the chain again.
+ * Recorded events are translated into a memory-efficient string representation.
+ *
+ * An instance of this class should be created with KlEventRecorder.createChainRecorder()
+ */
 export class KlChainRecorder {
     private chainOut: ((event: TDrawEvent) => void) | undefined;
     private onLineEnded: ((drawEventCache: TSanitizedDrawEvent[]) => void) | undefined;
     private drawEventCache: TSanitizedDrawEvent[] = [];
+    private isChainDisabled: boolean = false;
 
     // ----------------------------------- public -----------------------------------
     constructor(onLineEnded?: (drawEventCache: TSanitizedDrawEvent[]) => void) {
@@ -18,7 +26,10 @@ export class KlChainRecorder {
     }
 
     chainIn(event: TDrawEvent): TDrawEvent | null {
-        const event2 = this.sanitizeEvent(event);
+        if (this.isChainDisabled)
+            return null; // While replaying animation is active, do not process new events
+
+        const event2 = this.translateToStringRepresentation(event);
         if (event2) {
             this.drawEventCache.push(event2);
         }
@@ -40,8 +51,8 @@ export class KlChainRecorder {
         this.chainOut = func;
     }
 
-    sanitizeEvent(event: TDrawEvent): TSanitizedDrawEvent | null {
-        // Some adjustments to save memory
+    private translateToStringRepresentation(event: TDrawEvent): TSanitizedDrawEvent | null {
+        // Adjustments to save memory and bandwidth
 
         // Remove coalesced events because they only add minor details
         if ('isCoalesced' in event && event.isCoalesced) {
@@ -70,7 +81,7 @@ export class KlChainRecorder {
         return null;
     }
 
-    unwrapEventString(str: TSanitizedDrawEvent): TDrawEvent | null {
+    private translateStringToEvent(str: TSanitizedDrawEvent): TDrawEvent | null {
         const typeChar = str.charAt(0);
         if (typeChar == 'd' || typeChar == 'D') {
             const shiftIsPressed = typeChar == 'D';
@@ -138,11 +149,19 @@ export class KlChainRecorder {
             return; // Chain disabled
 
         for (const ev of drawEvents) {
-            const event = this.unwrapEventString(ev);
+            const event = this.translateStringToEvent(ev);
             if (event) {
                 this.chainOut(event);
             }
         }
+    }
+
+    /**
+     * Disables chain processing, swallowing all incoming events and do not record anything.
+     * Set this, while a replay animation is ongoing.
+     */
+    setChainDisabled(isDisabled: boolean) {
+        this.isChainDisabled = isDisabled;
     }
 
 }
