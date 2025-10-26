@@ -50,22 +50,12 @@ It is then accessible through: http://localhost:5050
 # Contributing
 
 How you can contribute to this project:
-- Bug reporting:
-  - Creating detailed bug reports that are reproducible
-  - Making hard to reproduce bugs easier to reproduce
-  - Reporting bugs to browsers vendors if the cause for a bug in Klecks is actually a browser bug.
-- Reviewing / optimization / refactoring of codebase
-  - Feel free to go over the existing codebase and share your concerns with constructive improvement suggestions
-  - Optimize performance of critical operations - e.g. optimizing the flood fill algorithm
-  - Improve stability or decrease memory footprint
-- Adding new features
-  - Check Kleki's roadmap to avoid conflicts
-- Contribute to translations (see below)
+- Bug reporting (detailed bug reports that are reproducible)
+- Contribute to a translation (see below)
 - Donate to this project (Klecks, Kleki) [Donate](https://kleki.com/donate/)
 
 # Translations
-Are you a native speaker or have advanced skills in a language with no translation yet?
-Any contribution by you is highly encouraged and appreciated!
+Are you a native speaker or have advanced skills in a language? Any contribution by you is highly encouraged and appreciated!
 
 ### Where are translation files?
 Translations are located in `src/languages` where each translation is its own JSON5 file, e.g. `de.json5` for German.
