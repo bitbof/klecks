@@ -56,16 +56,6 @@ export function snapToPixel(transform: TFreeTransform): void {
             : Math.round(transform.y - 0.5) + 0.5;
 }
 
-export function copyTransform(transform: TFreeTransform): TFreeTransform {
-    return {
-        x: transform.x,
-        y: transform.y,
-        width: transform.width,
-        height: transform.height,
-        angleDeg: transform.angleDeg,
-    };
-}
-
 /**
  * image space to transform space
  * - origin of transform space is at center of transform bounds.

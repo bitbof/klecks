@@ -1223,6 +1223,10 @@ clip-path seems the cleanest.
     display: flex;
     flex-direction: column;
     z-index: 1;
+
+    button {
+        text-align: left;
+    }
 }
 
 .kl-pinch-overlay {

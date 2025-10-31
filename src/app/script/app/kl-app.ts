@@ -1519,19 +1519,21 @@ export class KlApp {
 
         this.layersUi = new KL.LayersUi({
             klCanvas: this.klCanvas,
-            onSelect: (layerIndex) => {
+            onSelect: (layerIndex, pushHistory) => {
                 const activeLayer = this.klCanvas.getLayer(layerIndex);
                 setCurrentLayer(activeLayer);
 
-                const topEntry = this.klHistory.getEntries().at(-1)!.data;
-                const replaceTop = isHistoryEntryActiveLayerChange(topEntry);
+                if (pushHistory) {
+                    const topEntry = this.klHistory.getEntries().at(-1)!.data;
+                    const replaceTop = isHistoryEntryActiveLayerChange(topEntry);
 
-                this.klHistory.push(
-                    {
-                        activeLayerId: activeLayer.id,
-                    },
-                    replaceTop,
-                );
+                    this.klHistory.push(
+                        {
+                            activeLayerId: activeLayer.id,
+                        },
+                        replaceTop,
+                    );
+                }
             },
             parentEl: this.rootEl,
             uiState: this.uiLayout,

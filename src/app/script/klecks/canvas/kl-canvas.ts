@@ -6,6 +6,7 @@ import {
     isLayerFill,
     TFillSampling,
     TGradient,
+    TInterpolationAlgorithm,
     TKlProject,
     TLayerFromKlCanvas,
     TMixMode,
@@ -36,7 +37,6 @@ import { updateLayersViaComposed } from './update-layers-via-composed';
 import { isHistoryEntryOpacityChange } from '../history/push-helpers/is-history-entry-opacity-change';
 import { isHistoryEntryVisibilityChange } from '../history/push-helpers/is-history-entry-visibility-change';
 import { transformBounds } from '../../bb/transform/transform-bounds';
-import { getSelectionSampleBounds } from './get-selection-sample-bounds';
 import { createLayerMap } from '../history/push-helpers/create-layer-map';
 import { Eyedropper } from './eyedropper';
 import { copyImageDataTile } from '../history/image-data-tile';
@@ -56,25 +56,6 @@ function workaroundForChromium1281185(ctx: CanvasRenderingContext2D): void {
     ctx.restore();
 }
 
-const allowedMixModes = [
-    'source-over',
-    'darken',
-    'multiply',
-    'color-burn',
-    'lighten',
-    'screen',
-    'color-dodge',
-    'overlay',
-    'soft-light',
-    'hard-light',
-    'difference',
-    'exclusion',
-    'hue',
-    'saturation',
-    'color',
-    'luminosity',
-] as const;
-
 export const MAX_LAYERS = 16;
 
 export type TKlCanvasLayer = {
@@ -87,11 +68,6 @@ export type TKlCanvasLayer = {
     compositeObj?: TLayerComposite;
     canvas: HTMLCanvasElement;
     context: CanvasRenderingContext2D;
-};
-
-export type TSelectionSample = {
-    image: HTMLCanvasElement | undefined; // undefined if all pixels transparent
-    transformation: Matrix;
 };
 
 export type TLayerComposite = {
@@ -113,105 +89,12 @@ export class KlCanvas {
     private layers: TKlCanvasLayer[];
     private eyedropper: Eyedropper;
     private selection: undefined | MultiPolygon = undefined;
-    private klHistory: KlHistory;
-    /**
-     * Transforming via selection creates a selection sample, which is the area of a layer which got selected.
-     * This way consecutive transformations don't resample each time.
-     * The selection is not yet applied in the sample, so it can be sharp when drawing it. (e.g. when upscaling)
-     */
-    private selectionSample: undefined | TSelectionSample = undefined;
+    private readonly klHistory: KlHistory;
 
     private updateIndices(): void {
         this.layers.forEach((item, index) => {
             item.index = index;
         });
-    }
-
-    private getSelectionOrFallback(): MultiPolygon {
-        return (
-            this.selection ?? [
-                [
-                    [
-                        [0, 0],
-                        [this.width, 0],
-                        [this.width, this.height],
-                        [0, this.height],
-                        [0, 0],
-                    ],
-                ],
-            ]
-        );
-    }
-
-    /**
-     * Create selection sample from the current selection. If none, will create of entire layer.
-     */
-    private createSelectionSample(layerIndex: number): void {
-        const sampleBounds = this.getSelectionArea(layerIndex);
-
-        // empty
-        if (!sampleBounds) {
-            this.selectionSample = {
-                image: undefined,
-                transformation: identity(),
-            };
-            return;
-        }
-
-        const srcLayer = this.layers[layerIndex];
-        const sampleCanvas = BB.canvas(sampleBounds.width, sampleBounds.height);
-        const sampleCtx = BB.ctx(sampleCanvas);
-        sampleCtx.save();
-        sampleCtx.translate(-sampleBounds.x, -sampleBounds.y);
-        sampleCtx.drawImage(srcLayer.canvas, 0, 0);
-        sampleCtx.restore();
-
-        this.selectionSample = {
-            image: sampleCanvas,
-            transformation: translate(sampleBounds.x, sampleBounds.y),
-        };
-    }
-
-    /**
-     * transforms selection and selectionSample
-     */
-    private transformSelectionAndSample(transformation: Matrix): void {
-        if (!this.selectionSample) {
-            throw new Error('no selection sample');
-        }
-        if (this.selection) {
-            this.selection = transformMultiPolygon(this.selection, transformation);
-        }
-        this.selectionSample.transformation = compose([
-            transformation,
-            this.selectionSample.transformation,
-        ]);
-    }
-
-    private drawSelectionSample(layerIndex: number, isPixelated: boolean): void {
-        if (!this.selectionSample) {
-            throw new Error('no selection sample');
-        }
-
-        if (!this.selectionSample.image) {
-            // selection sample, but it's empty. noop
-            return;
-        }
-
-        const targetLayer = this.layers[layerIndex];
-        const targetCtx = BB.ctx(targetLayer.canvas);
-
-        const selection = this.getSelectionOrFallback();
-        const selectionPath = getSelectionPath2d(selection);
-
-        targetCtx.save();
-        targetCtx.clip(selectionPath);
-        targetCtx.setTransform(...matrixToTuple(this.selectionSample.transformation));
-        if (isPixelated) {
-            targetCtx.imageSmoothingEnabled = false;
-        }
-        targetCtx.drawImage(this.selectionSample.image, 0, 0);
-        targetCtx.restore();
     }
 
     // ----------------------------------- public -----------------------------------
@@ -237,6 +120,22 @@ export class KlCanvas {
                 layerMap: {},
             },
             this.klHistory.getComposed(),
+        );
+    }
+
+    getSelectionOrFallback(): MultiPolygon {
+        return (
+            this.selection ?? [
+                [
+                    [
+                        [0, 0],
+                        [this.width, 0],
+                        [this.width, this.height],
+                        [0, this.height],
+                        [0, 0],
+                    ],
+                ],
+            ]
         );
     }
 
@@ -277,7 +176,6 @@ export class KlCanvas {
         this.width = p.width;
         this.height = p.height;
         this.selection = undefined;
-        this.clearSelectionSample();
 
         this.layers.splice(1, Math.max(0, this.layers.length - 1));
 
@@ -360,7 +258,7 @@ export class KlCanvas {
         return this.layers.length;
     }
 
-    resize(w: number, h: number, algorithm: 'smooth' | 'pixelated' = 'smooth'): boolean {
+    resize(w: number, h: number, algorithm: TInterpolationAlgorithm = 'smooth'): boolean {
         if (
             !w ||
             !h ||
@@ -1322,6 +1220,14 @@ export class KlCanvas {
         }
     }
 
+    getKlHistory(): KlHistory {
+        return this.klHistory;
+    }
+
+    getLayersRaw(): TKlCanvasLayer[] {
+        return this.layers;
+    }
+
     getLayers(): {
         id: string;
         canvas: HTMLCanvasElement;
@@ -1469,158 +1375,10 @@ export class KlCanvas {
         return this.selection;
     }
 
-    /**
-     * Transforms (move, not clone) the selected region (or the entire canvas if no selection).
-     * Also transforms the selection, unless there is no selection.
-     * Creates a new selection sample.
-     */
-    transformViaSelection(p: {
-        sourceLayer: number;
-        targetLayer?: number;
-        transformation: Matrix; // relative to (0,0) of canvas
-        isPixelated?: boolean; // default false
-        backgroundIsTransparent?: boolean;
-    }): void {
-        this.klHistory.pause(true);
-        this.createSelectionSample(p.sourceLayer);
-        const srcBounds = getSelectionSampleBounds(this.selectionSample!);
-        this.eraseLayer({
-            layerIndex: p.sourceLayer,
-            useSelection: true,
-            useAlphaLock: p.sourceLayer === 0 && !p.backgroundIsTransparent,
-        });
-        this.transformSelectionAndSample(p.transformation);
-        const targetBounds = getSelectionSampleBounds(this.selectionSample!);
-        this.drawSelectionSample(p.targetLayer ?? p.sourceLayer, p.isPixelated ?? false);
-        this.klHistory.pause(false);
-
-        const srcAndTargetEqual = !p.targetLayer || p.sourceLayer === p.targetLayer;
-
-        // if (srcBounds) {
-        //     const layerCtx = this.layers[p.sourceLayer].context;
-        //     layerCtx.save();
-        //     layerCtx.fillStyle = 'rgba(255,0,0,0.2)';
-        //     layerCtx.fillRect(
-        //         srcBounds.x1,
-        //         srcBounds.y1,
-        //         srcBounds.x2 - srcBounds.x1,
-        //         srcBounds.y2 - srcBounds.y1,
-        //     );
-        //     layerCtx.restore();
-        // }
-
-        // if (targetBounds) {
-        //     const layerCtx = this.layers[p.targetLayer ?? p.sourceLayer].context;
-        //     layerCtx.save();
-        //     layerCtx.fillStyle = 'rgba(0,0,255,0.2)';
-        //     layerCtx.fillRect(
-        //         targetBounds.x1,
-        //         targetBounds.y1,
-        //         targetBounds.x2 - targetBounds.x1,
-        //         targetBounds.y2 - targetBounds.y1,
-        //     );
-        //     layerCtx.restore();
-        // }
-
-        if (!this.klHistory.isPaused()) {
-            const srcLayer = this.layers[p.sourceLayer];
-            const targetLayer =
-                p.targetLayer !== undefined && p.targetLayer !== p.sourceLayer
-                    ? this.layers[p.targetLayer]
-                    : undefined;
-            this.klHistory.push({
-                selection: {
-                    value: this.selection,
-                },
-                layerMap: createLayerMap(
-                    this.layers,
-                    {
-                        layerId: srcLayer.id,
-                        attributes: ['tiles'],
-                        bounds: srcAndTargetEqual
-                            ? BB.updateBounds(srcBounds, targetBounds)
-                            : srcBounds,
-                    },
-                    targetLayer
-                        ? {
-                              layerId: targetLayer.id,
-                              attributes: ['tiles'],
-                              bounds: targetBounds,
-                          }
-                        : undefined,
-                ),
-            });
-        }
-    }
-
-    /**
-     * Transforms the selection sample (creates one if there's none, same way as in transformViaSelection)
-     * and draws a clone on target layer.
-     * Also transforms the selection, unless there is no selection.
-     */
-    transformCloneViaSelection(p: {
-        sourceLayer?: number;
-        targetLayer: number;
-        transformation: Matrix; // relative to (0,0) of canvas
-        isPixelated?: boolean; // default false
-    }): void {
-        this.klHistory.pause(true);
-        if (!this.selectionSample) {
-            if (p.sourceLayer === undefined) {
-                throw new Error('no source layer');
-            }
-            this.createSelectionSample(p.sourceLayer);
-        }
-        this.transformSelectionAndSample(p.transformation);
-        this.drawSelectionSample(p.targetLayer, p.isPixelated ?? false);
-        const targetBounds = getSelectionSampleBounds(this.selectionSample!);
-        this.klHistory.pause(false);
-
-        // if (targetBounds) {
-        //     const layerCtx = this.layers[p.targetLayer ?? p.sourceLayer].context;
-        //     layerCtx.save();
-        //     layerCtx.fillStyle = 'rgba(0,0,255,0.2)';
-        //     layerCtx.fillRect(
-        //         targetBounds.x1,
-        //         targetBounds.y1,
-        //         targetBounds.x2 - targetBounds.x1,
-        //         targetBounds.y2 - targetBounds.y1,
-        //     );
-        //     layerCtx.restore();
-        // }
-
-        if (!this.klHistory.isPaused() && targetBounds) {
-            const targetLayer = this.layers[p.targetLayer];
-            this.klHistory.push({
-                selection: {
-                    value: this.selection,
-                },
-                layerMap: createLayerMap(this.layers, {
-                    layerId: targetLayer.id,
-                    attributes: ['tiles'],
-                    bounds: targetBounds,
-                }),
-            });
-        }
-    }
-
-    // todo remove - requires rewrite of transform via selection, though
-    clearSelectionSample(): void {
-        if (!this.selectionSample) {
-            return;
-        }
-        this.selectionSample.image && BB.freeCanvas(this.selectionSample.image);
-        this.selectionSample = undefined;
-    }
-
     getSelectionArea(layerIndex: number): TRect | undefined {
         const srcLayer = this.layers[layerIndex];
         const selection = this.getSelectionOrFallback();
         return getSelectionBounds(selection, srcLayer.context);
-    }
-
-    getSelectionSample(): TSelectionSample | undefined {
-        return this.selectionSample;
     }
 
     /**

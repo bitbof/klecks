@@ -283,6 +283,10 @@
     original: 'Clear layer',
     value: 'Ebene leeren'
   },
+  'layers-merge-advanced': {
+    original: 'Advanced merge',
+    value: 'Erweitertes Vereinen'
+  },
   'layers-merge-all': {
     original: 'Merge all',
     value: 'Alle Ebenen vereinen'

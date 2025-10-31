@@ -230,6 +230,7 @@ Renaming a key across multiple language files:
     "hint": "to make a layer empty",
     "value": "Clear layer",
   },
+  "layers-merge-advanced": 'Advanced merge',
   "layers-merge-all": 'Merge all',
   "layers-rename": {
     "hint": "action",

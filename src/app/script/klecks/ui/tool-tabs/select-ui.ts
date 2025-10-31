@@ -12,11 +12,15 @@ import ellipseSvg from 'url:/src/app/img/ui/select-shape-ellipse.svg';
 import lassoSvg from 'url:/src/app/img/ui/select-shape-lasso.svg';
 import polySvg from 'url:/src/app/img/ui/select-shape-poly.svg';
 import removeLayerImg from 'url:/src/app/img/ui/remove-layer.svg';
+import duplicateLayerImg from 'url:/src/app/img/ui/duplicate-layer.svg';
 import { Select } from '../components/select';
 import { LANG } from '../../../language/language';
 import { Checkbox } from '../components/checkbox';
 import { createImage } from '../../../bb/base/ui';
 import { css } from '../../../bb/base/base';
+import { TInterpolationAlgorithm } from '../../kl-types';
+import { Icon } from '../components/icon';
+import { TFreeTransform } from '../components/free-transform-utils';
 
 export type TSelectUiParams = {
     onChangeMode: (mode: TSelectToolMode) => void;
@@ -34,8 +38,13 @@ export type TSelectUiParams = {
         onFlipY: () => void;
         onRotateDeg: (deg: number) => void;
         onClone: () => void;
+        onScale: (factor: number) => void;
+        onCenter: () => void;
         onMoveToLayer: (index: number) => void;
         onChangeTransparentBackground: (b: boolean) => void;
+        onChangeAlgorithm: (algorithm: TInterpolationAlgorithm) => void;
+        onChangeConstrain: (isConstrained: boolean) => void;
+        onChangeSnapping: (isSnapping: boolean) => void;
     };
     onErase: () => void;
     onFill: () => void;
@@ -53,9 +62,12 @@ export class SelectUi {
     private readonly modeOptions: Options<TSelectToolMode>;
     private hasSelection: boolean = false;
     private selectResetBtn: HTMLButtonElement;
-    private transformDuplicateBtn: HTMLButtonElement;
+    private positionOutput: HTMLElement;
     private moveToLayerSelect: Select<string>;
     private transparentBackgroundToggle: Checkbox;
+    private algorithmSelect: Select<TInterpolationAlgorithm>;
+    private constrainCheckbox: Checkbox;
+    private snappingCheckbox: Checkbox;
     private operationOptions: Options<TBooleanOperation>;
 
     private update(): void {
@@ -333,7 +345,17 @@ export class SelectUi {
         });
 
         // --- transform ---
-        const transformModeEl = BB.el();
+        const transformModeEl = BB.el({
+            css: {
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '10px',
+            },
+        });
+
+        this.positionOutput = BB.el({});
+        transformModeEl.append(this.positionOutput);
+
         const transformFlipXBtn = BB.el({
             tagName: 'button',
             content: LANG('filter-transform-flip') + ' X',
@@ -376,25 +398,71 @@ export class SelectUi {
             },
         });
 
-        this.transformDuplicateBtn = BB.el({
+        const duplicateIcon = new Icon({
+            imageUrl: duplicateLayerImg,
+            width: 20,
+            height: 20,
+            darkInvert: true,
+        });
+        const transformDuplicateBtn = BB.el({
             tagName: 'button',
-            content: LANG('select-transform-clone'),
+            content: [duplicateIcon.getElement(), LANG('select-transform-clone')],
             onClick: () => {
                 p.transform.onClone();
+            },
+            css: {
+                display: 'flex',
+                gap: '5px',
             },
             custom: {
                 tabindex: '-1',
             },
         });
 
-        const actionsRow = BB.el({
+        const scaleDoubleBtn = BB.el({
+            tagName: 'button',
+            content: '2&times;',
+            onClick: () => {
+                p.transform.onScale(2);
+            },
+            custom: {
+                tabindex: '-1',
+            },
+        });
+
+        const scaleHalfBtn = BB.el({
+            tagName: 'button',
+            content: '&frac12;&times;',
+            onClick: () => {
+                p.transform.onScale(1 / 2);
+            },
+            custom: {
+                tabindex: '-1',
+            },
+        });
+
+        const centerBtn = BB.el({
+            tagName: 'button',
+            content: LANG('center'),
+            onClick: () => {
+                p.transform.onCenter();
+            },
+            custom: {
+                tabindex: '-1',
+            },
+        });
+
+        BB.el({
             parent: transformModeEl,
             content: [
+                transformDuplicateBtn,
                 transformFlipXBtn,
                 transformFlipYBtn,
                 rotateNegativeBtn,
                 rotatePositiveBtn,
-                this.transformDuplicateBtn,
+                scaleDoubleBtn,
+                scaleHalfBtn,
+                centerBtn,
             ],
             css: {
                 display: 'flex',
@@ -402,6 +470,57 @@ export class SelectUi {
                 gap: '5px',
             },
         });
+
+        this.constrainCheckbox = new Checkbox({
+            init: true,
+            label: LANG('filter-transform-constrain'),
+            title: LANG('constrain-proportions'),
+            callback: function (b) {
+                p.transform.onChangeConstrain(b);
+            },
+            css: {
+                display: 'inline-block',
+            },
+            name: 'constrain-proportions',
+        });
+        this.snappingCheckbox = new Checkbox({
+            init: true,
+            label: LANG('filter-transform-snap'),
+            title: LANG('filter-transform-snap-title'),
+            callback: function (b) {
+                p.transform.onChangeSnapping(b);
+            },
+            css: {
+                display: 'inline-block',
+                marginLeft: '10px',
+            },
+            name: 'enable-snapping',
+        });
+        const checkboxWrapper = BB.el();
+        checkboxWrapper.append(
+            this.constrainCheckbox.getElement(),
+            this.snappingCheckbox.getElement(),
+        );
+        transformModeEl.append(checkboxWrapper);
+
+        this.algorithmSelect = new Select({
+            optionArr: [
+                ['smooth', LANG('algorithm-smooth')],
+                ['pixelated', LANG('algorithm-pixelated')],
+            ],
+            initValue: 'smooth',
+            onChange: (algorithm): void => {
+                p.transform.onChangeAlgorithm(algorithm);
+            },
+            name: 'interpolation-algorithm',
+        });
+
+        transformModeEl.append(
+            c(',flex,items-center,gap-5,flexWrap', [
+                LANG('scaling-algorithm') + ':',
+                this.algorithmSelect.getElement(),
+            ]),
+        );
 
         this.moveToLayerSelect = new Select({
             optionArr: [
@@ -418,7 +537,7 @@ export class SelectUi {
         });
 
         transformModeEl.append(
-            c(',flex,items-center,gap-5,mt-10,flexWrap', [
+            c(',flex,items-center,gap-5,flexWrap', [
                 LANG('select-transform-move-to-layer'),
                 this.moveToLayerSelect.getElement(),
             ]),
@@ -432,7 +551,6 @@ export class SelectUi {
             name: 'enable-transparent-background',
         });
         css(this.transparentBackgroundToggle.getElement(), {
-            marginTop: '10px',
             display: 'inline-block',
         });
 
@@ -490,6 +608,21 @@ export class SelectUi {
 
     setBackgroundIsTransparent(b: boolean): void {
         this.transparentBackgroundToggle.setValue(b);
+    }
+
+    setAlgorithm(algorithm: TInterpolationAlgorithm): void {
+        this.algorithmSelect.setValue(algorithm);
+    }
+
+    setFreeTransformTransformation(transform: TFreeTransform): void {
+        const x = BB.round(transform.x, 0);
+        const y = BB.round(transform.y, 0);
+        const rotation = BB.round(transform.angleDeg, 0);
+        this.positionOutput.innerText = `X: ${x}; Y: ${y}; ${LANG('filter-transform-rotation')}: ${rotation}°`;
+    }
+
+    setShowTransparentBackgroundToggle(show: boolean): void {
+        this.transparentBackgroundToggle.getElement().style.display = show ? 'block' : 'none';
     }
 
     getElement(): HTMLElement {

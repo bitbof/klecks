@@ -283,6 +283,10 @@
     original: 'Clear layer',
     value: 'Notīrīt slāni'
   },
+  'layers-merge-advanced': {
+    original: 'Advanced merge',
+    value: ''
+  },
   'layers-merge-all': {
     original: 'Merge all',
     value: 'Apvienot visus'

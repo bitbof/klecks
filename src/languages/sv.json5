@@ -283,6 +283,10 @@
     original: 'Clear layer',
     value: 'Rensa lager'
   },
+  'layers-merge-advanced': {
+    original: 'Advanced merge',
+    value: ''
+  },
   'layers-merge-all': {
     original: 'Merge all',
     value: 'Slå ihop alla lager'

@@ -73,7 +73,7 @@ function parseCssColor(colorString: string) {
     return undefined;
 }
 
-function testComposedLayerHasTransparency(layer: THistoryEntryLayerComposed): boolean {
+export function testComposedLayerHasTransparency(layer: THistoryEntryLayerComposed): boolean {
     for (const tile of layer.tiles) {
         if (isLayerFill(tile)) {
             const color = parseCssColor(tile.fill);
@@ -394,7 +394,7 @@ export const filterTransform = {
         const scaleDoubleBtn = BB.el({
             parent: buttonRow,
             tagName: 'button',
-            content: '2x',
+            content: '2&times;',
             onClick: () => {
                 const t = freeTransform.getValue();
                 if (constrainCheckbox.getValue()) {
@@ -410,7 +410,7 @@ export const filterTransform = {
         const scaleHalfBtn = BB.el({
             parent: buttonRow,
             tagName: 'button',
-            content: '1/2x',
+            content: '&frac12;&times;',
             onClick: () => {
                 const t = freeTransform.getValue();
                 freeTransform.setSize(Math.round(t.width / 2), Math.round(t.height / 2));
