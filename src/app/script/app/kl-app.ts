@@ -257,8 +257,8 @@ export class KlApp {
             this.embed
                 ? 'left'
                 : LocalStorage.getItem('uiState')
-                  ? LocalStorage.getItem('uiState')
-                  : 'right'
+                    ? LocalStorage.getItem('uiState')
+                    : 'right'
         ) as TUiLayout;
         const projectStore = KL_INDEXED_DB.getIsAvailable() ? new ProjectStore() : undefined;
         this.rootEl = BB.el({
@@ -706,20 +706,20 @@ export class KlApp {
                                 angleRad: angleRad,
                                 fill: textToolSettings.fill
                                     ? {
-                                          color: {
-                                              ...this.klColorSlider.getColor(),
-                                              a: textToolSettings.fill.color.a,
-                                          },
-                                      }
+                                        color: {
+                                            ...this.klColorSlider.getColor(),
+                                            a: textToolSettings.fill.color.a,
+                                        },
+                                    }
                                     : undefined,
                                 stroke: textToolSettings.stroke
                                     ? {
-                                          ...textToolSettings.stroke,
-                                          color: {
-                                              ...this.klColorSlider.getSecondaryRGB(),
-                                              a: textToolSettings.stroke.color.a,
-                                          },
-                                      }
+                                        ...textToolSettings.stroke,
+                                        color: {
+                                            ...this.klColorSlider.getSecondaryRGB(),
+                                            a: textToolSettings.stroke.color.a,
+                                        },
+                                    }
                                     : undefined,
                             },
 
@@ -889,7 +889,7 @@ export class KlApp {
                                     setTimeout(() => {
                                         throw new Error(
                                             'keyboard-shortcut: failed to store browser storage, ' +
-                                                e,
+                                            e,
                                         );
                                     }, 0);
                                     this.statusOverlay.out(
@@ -1011,7 +1011,7 @@ export class KlApp {
                     this.klColorSlider.swapColors();
                 }
             },
-            onUp: (keyStr, event) => {},
+            onUp: (keyStr, event) => { },
         });
 
         const brushUiMap: {
@@ -1610,7 +1610,7 @@ export class KlApp {
                     this.easelProjectUpdater.update();
                     this.easel.resetOrFitTransform(true);
                 },
-                onCancel: () => {},
+                onCancel: () => { },
             });
         };
 
@@ -1620,7 +1620,7 @@ export class KlApp {
                 canvas: this.klCanvas.getCompleteCanvas(1),
                 fileName: BB.getDate() + KL_CONFIG.filenameBase + '.png',
                 title: BB.getDate() + KL_CONFIG.filenameBase + '.png',
-                callback: callback ? callback : () => {},
+                callback: callback ? callback : () => { },
             });
         };
 
@@ -1781,44 +1781,44 @@ export class KlApp {
         const fileUi = this.embed
             ? null
             : new KL.FileUi({
-                  klRootEl: this.rootEl,
-                  projectStore: projectStore,
-                  getProject: () => this.klCanvas.getProject(),
-                  exportType: exportType,
-                  onExportTypeChange: (type) => {
-                      exportType = type;
-                  },
-                  onFileSelect: (files, optionsStr) =>
-                      importHandler.handleFileSelect(files, optionsStr),
-                  onSaveImageToComputer: () => {
-                      applyUncommitted();
-                      this.saveToComputer.save();
-                  },
-                  onNewImage: showNewImageDialog,
-                  onShareImage: (callback) => {
-                      applyUncommitted();
-                      shareImage(callback);
-                  },
-                  onUpload: () => {
-                      // on upload
-                      applyUncommitted();
-                      KL.imgurUpload(
-                          this.klCanvas,
-                          this.rootEl,
-                          p.app && p.app.imgurKey ? p.app.imgurKey : '',
-                          () => this.updateLastSaved(),
-                      );
-                  },
-                  applyUncommitted: () => applyUncommitted(),
-                  onChangeShowSaveDialog: (b) => {
-                      this.saveToComputer.setShowSaveDialog(b);
-                  },
-                  klRecoveryManager,
-                  onOpenBrowserStorage,
-                  onStoredToBrowserStorage: () => {
-                      this.updateLastSaved();
-                  },
-              });
+                klRootEl: this.rootEl,
+                projectStore: projectStore,
+                getProject: () => this.klCanvas.getProject(),
+                exportType: exportType,
+                onExportTypeChange: (type) => {
+                    exportType = type;
+                },
+                onFileSelect: (files, optionsStr) =>
+                    importHandler.handleFileSelect(files, optionsStr),
+                onSaveImageToComputer: () => {
+                    applyUncommitted();
+                    this.saveToComputer.save();
+                },
+                onNewImage: showNewImageDialog,
+                onShareImage: (callback) => {
+                    applyUncommitted();
+                    shareImage(callback);
+                },
+                onUpload: () => {
+                    // on upload
+                    applyUncommitted();
+                    KL.imgurUpload(
+                        this.klCanvas,
+                        this.rootEl,
+                        p.app && p.app.imgurKey ? p.app.imgurKey : '',
+                        () => this.updateLastSaved(),
+                    );
+                },
+                applyUncommitted: () => applyUncommitted(),
+                onChangeShowSaveDialog: (b) => {
+                    this.saveToComputer.setShowSaveDialog(b);
+                },
+                klRecoveryManager,
+                onOpenBrowserStorage,
+                onStoredToBrowserStorage: () => {
+                    this.updateLastSaved();
+                },
+            });
 
         if (!this.embed && projectStore) {
             this.saveReminder = new SaveReminder({
@@ -2102,6 +2102,9 @@ export class KlApp {
                             }
                         });
                         currentBrushUi.endLine();
+                    },
+                    onSetPenBrushSize: (size: number): void => {
+                        currentBrushUi.setSize(size);
                     },
                 }),
                 writable: false,

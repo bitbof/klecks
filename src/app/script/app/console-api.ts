@@ -3,9 +3,13 @@ import { TVector2D } from '../bb/bb-types';
 export type TConsoleApi = {
     readonly draw: (path: TVector2D[]) => void;
     readonly help: () => void;
+    readonly setPenBrushSize?: (size: number) => void;
 };
 
-export function createConsoleApi(p: { onDraw: (path: TVector2D[]) => void }): TConsoleApi {
+export function createConsoleApi(p: {
+    onDraw: (path: TVector2D[]) => void;
+    onSetPenBrushSize?: (size: number) => void;
+}): TConsoleApi {
     const output = [
         'Draw via the console! Learn more: %cKL.help()',
         'background: #000; color: #0f0;',
@@ -17,9 +21,15 @@ export function createConsoleApi(p: { onDraw: (path: TVector2D[]) => void }): TC
             p.onDraw(path);
         },
         help: (): void => {
-            console.log(`KL.draw({x: number; y: number}[]) // draw a line
-KL.help() // print help
-`);
+            const helpText = `KL.draw({x: number; y: number}[]) // draw a line
+KL.help() // print help${p.onSetPenBrushSize ? '\nKL.setPenBrushSize(size: number) // set pen brush size (0.5-100)' : ''}
+`;
+            console.log(helpText);
         },
+        ...(p.onSetPenBrushSize ? {
+            setPenBrushSize: (size: number): void => {
+                p.onSetPenBrushSize!(size);
+            }
+        } : {}),
     });
 }
