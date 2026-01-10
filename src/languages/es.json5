@@ -2,7 +2,7 @@
   'switch-ui-left-right': {
     hint: 'Button that switches layout from left to right, to accommodate left handed & right handed visitors.',
     original: 'Switch left/right UI',
-    value: 'Cambia UI a izquierda/derecha'
+    value: 'Cambiar UI a izquierda/derecha'
   },
   'toggle-show-tools': {
     hint: 'Button that hides/shows the toolbar.',
@@ -77,11 +77,11 @@
   'tool-more-tools': {
     hint: 'when hovering the caret on the tool button',
     original: 'More Tools',
-    value: ''
+    value: 'Más Herramientas'
   },
   'tool-more-tools-click-again': {
     original: 'Click again for more tools',
-    value: ''
+    value: 'Clic de nuevo para más herramientas'
   },
   undo: {
     original: 'Undo',
@@ -104,7 +104,7 @@
   'brush-sketchy': {
     hint: 'Made up brush name. Pictures drawn with this brush often look like sketches.',
     original: 'Sketchy',
-    value: 'Esbozo'
+    value: 'Boceto'
   },
   'brush-pixel': {
     original: 'Pixel',
@@ -132,7 +132,7 @@
   'brush-toggle-pressure': {
     hint: 'google "pressure sensitivity". Feature of Wacom tablets, Apple Pencil, XP Pen, etc.',
     original: 'Toggle Pressure Sensitivity',
-    value: 'Alternar sensibilidad a la presión'
+    value: 'Alternar sensibilidad de presión'
   },
   'brush-pen-circle': {
     hint: 'as in circle shape',
@@ -175,11 +175,11 @@
   },
   'brush-chemy-mirror-x': {
     original: 'Horizontal Symmetry',
-    value: 'Horizontal simetría'
+    value: 'Simetría Horizontal'
   },
   'brush-chemy-mirror-y': {
     original: 'Vertical Symmetry',
-    value: 'Vertical simetría'
+    value: 'Simetría Vertical'
   },
   'brush-chemy-gradient': {
     hint: 'as in color gradient',
@@ -271,38 +271,38 @@
   'layers-duplicate': {
     hint: 'action',
     original: 'Duplicate Layer',
-    value: 'Duplicar capa'
+    value: 'Duplicar Capa'
   },
   'layers-merge': {
     hint: 'action',
     original: 'Merge with layer below',
-    value: 'Combinar hacia abajo'
+    value: 'Fusionar con la capa inferior'
   },
   'layers-clear': {
     hint: 'to make a layer empty',
     original: 'Clear layer',
-    value: ''
+    value: 'Limpiar capa'
   },
   'layers-merge-advanced': {
     original: 'Advanced merge',
-    value: ''
+    value: 'Fusión avanzada'
   },
   'layers-merge-all': {
     original: 'Merge all',
-    value: 'Combinar todas'
+    value: 'Fusionar todas'
   },
   'layers-rename': {
     hint: 'action',
     original: 'Rename',
-    value: 'Nuevo Nombre'
+    value: 'Renombrar'
   },
   'layers-active-layer-visible': {
     original: 'Active layer is visible',
-    value: 'Capa activa es visible'
+    value: 'La capa activa es visible'
   },
   'layers-active-layer-hidden': {
     original: 'Active layer is hidden',
-    value: 'Capa activa está escondida'
+    value: 'La capa activa está oculta'
   },
   'layers-visibility-toggle': {
     original: 'Layer Visibility',
@@ -330,7 +330,7 @@
   },
   'layers-blend-screen': {
     original: 'screen',
-    value: 'trama'
+    value: 'pantalla'
   },
   'layers-blend-color-dodge': {
     original: 'color dodge',
@@ -375,7 +375,7 @@
   'layers-rename-title': {
     hint: '-title in code usually means it shows up in a tooltip, or it’s the header of a dialog box, so it can be a little bit longer.',
     original: 'Rename Layer',
-    value: 'Nuevo nombre de capa'
+    value: 'Renombrar capa'
   },
   'layers-rename-name': {
     hint: 'noun',
@@ -390,7 +390,7 @@
   'layers-rename-sketch': {
     hint: 'noun. Name suggestion for a layer',
     original: 'Sketch',
-    value: 'Bosquejo'
+    value: 'Boceto'
   },
   'layers-rename-colors': {
     hint: 'noun. Name suggestion for a layer',
@@ -419,7 +419,7 @@
   },
   'layers-merge-modal-title': {
     original: 'Merge/Mix Layers',
-    value: 'Unir/Mezclar Capas'
+    value: 'Fusionar/Mezclar Capas'
   },
   'layers-merge-description': {
     hint: 'After ":" a list of mix/blend modes is shown.',
@@ -429,7 +429,7 @@
   'file-no-autosave': {
     hint: "let user know they can't autosave, and there's no cloud storage. Keep short so fits on one line",
     original: 'No autosave, no cloud storage',
-    value: 'No autoguarda, no almacenamiento en la nube'
+    value: 'No autoguardado, no almacenamiento en la nube'
   },
   'file-new': {
     hint: 'action',
@@ -453,7 +453,7 @@
   'file-show-save-dialog': {
     hint: 'setting for showing/not showing a dialog where user picks folder and filename',
     original: 'Show save dialog',
-    value: ''
+    value: 'Mostrar diálogo de guardado'
   },
   'file-copy': {
     hint: 'verb',
@@ -462,11 +462,11 @@
   },
   'file-copy-title': {
     original: 'Copy To Clipboard',
-    value: 'Copiar a portapapeles'
+    value: 'Copiar al portapapeles'
   },
   'file-paste': {
     original: 'Paste',
-    value: ''
+    value: 'Pegar'
   },
   'file-share': {
     hint: 'Common feature on phones. Pressing share button allows to send data to a different app, e.g. as a text message to someone.',
@@ -486,7 +486,7 @@
   'file-storage-cant-access': {
     hint: 'an error. Can’t access the storage.',
     original: "Can't access storage.",
-    value: 'No puedo acceder al almacenamiento.'
+    value: 'No se puede acceder al almacenamiento.'
   },
   'file-storage-empty': {
     hint: 'nothing stored',
@@ -496,20 +496,20 @@
   'file-storage-store': {
     hint: 'verb',
     original: 'Store',
-    value: 'Almacenar'
+    value: 'Guardar'
   },
   'file-storage-open': {
     hint: 'verb. to open, or to load',
     original: 'Open',
-    value: ''
+    value: 'Abrir'
   },
   'file-storage-open-confirmation': {
     original: 'This image is already open in another tab. Open it here too?',
-    value: ''
+    value: 'Esta imagen ya está abierta en otra pestaña. ¿Abrirla aquí también?'
   },
   'file-storage-open-failed': {
     original: 'Failed to load.',
-    value: ''
+    value: 'Error al cargar'
   },
   'file-storage-clear': {
     original: 'Clear',
@@ -517,7 +517,7 @@
   },
   'file-storage-clear-prompt': {
     original: 'Clear Browser Storage? Clearing can not be undone.',
-    value: ''
+    value: '¿Borrar almacenamiento del navegador? Esta acción no se puede revertir'
   },
   'file-storage-storing': {
     hint: 'while it is in the process of storing',
@@ -531,7 +531,7 @@
   },
   'file-storage-overwrite-confirm': {
     original: 'Overwrite Browser Storage? Overwritten data will be permanently deleted.',
-    value: ''
+    value: '¿Sobreescribir el almacenamiento del navegador? Los datos sobreescritos serán eliminados permanentemente'
   },
   'file-storage-min-ago': {
     hint: "{x} <- needs to stay, it's a placeholder.",
@@ -560,15 +560,15 @@
   },
   'file-storage-failed': {
     original: 'Failed to store to Browser Storage',
-    value: 'No se pudo almacenar en el almacenamiento del navegador'
+    value: 'No se pudo guardar en el almacenamiento del navegador'
   },
   'file-storage-failed-1': {
     original: 'Failed to store. Possible causes:',
-    value: 'No se pudo almacenar. Causas Posibles:'
+    value: 'No se pudo guardar. Posibles causas:'
   },
   'file-storage-failed-2': {
     original: 'Out of disk space',
-    value: 'No espacio en el disco'
+    value: 'No hay suficiente espacio en el disco'
   },
   'file-storage-failed-3': {
     original: 'Storage disabled in incognito tab',
@@ -591,39 +591,39 @@
   'tab-recovery-recover-tabs': {
     hint: 'allows user to recover browser tabs (including the drawing) of this app.',
     original: 'Recover closed tabs',
-    value: ''
+    value: 'Recuperar pestañas cerradas'
   },
   'tab-recovery-explanation': {
     original: 'Recovery data is only kept for a little while. Save to ensure your work is not lost.',
-    value: ''
+    value: 'Los datos de recuperación solo se mantienen por un tiempo. Guarda tu trabajo para evitar perdidas.'
   },
   'tab-recovery-total-quota-label': {
     original: 'Total:',
-    value: ''
+    value: 'Total:'
   },
   'tab-recovery-empty': {
     original: 'Nothing to recover.',
-    value: ''
+    value: 'Nada que recuperar'
   },
   'tab-recovery-recover': {
     original: 'Recover',
-    value: ''
+    value: 'Recuperar'
   },
   'tab-recovery-delete': {
     original: 'Delete',
-    value: ''
+    value: 'Eliminar'
   },
   'tab-recovery-delete-confirmation': {
     original: 'Delete this recovery? Deletion can not be undone.',
-    value: ''
+    value: '¿Borrar esta recuperación? ESta acción no se puede revertir '
   },
   'tab-recovery-failed-to-recover': {
     original: 'Failed to recover tab.',
-    value: ''
+    value: 'Error al recuperar la pestaña.'
   },
   'tab-recovery-recovered': {
     original: 'Tab recovered.',
-    value: ''
+    value: 'Pestaña recuperada.'
   },
   'cleared-layer': {
     hint: 'the layer has been cleared. It is now empty',
@@ -632,7 +632,7 @@
   },
   'cleared-selected-area': {
     original: 'Cleared selected area',
-    value: 'área seleccionada borrada'
+    value: 'Área seleccionada borrada'
   },
   filled: {
     hint: 'layer got filled with a color',
@@ -641,7 +641,7 @@
   },
   'filled-selected-area': {
     original: 'Filled selection',
-    value: 'área seleccionada llena'
+    value: 'Área seleccionada llena'
   },
   'new-title': {
     original: 'New Image',
@@ -650,7 +650,7 @@
   'new-current': {
     hint: 'as in "reuse the current image resolution"',
     original: 'Current',
-    value: 'Presente'
+    value: 'Actual'
   },
   'new-fit': {
     hint: 'make dimensions of image fit your window size',
@@ -660,7 +660,7 @@
   'new-oversize': {
     hint: 'like oversized clothes.',
     original: 'Oversize',
-    value: 'Descomunal'
+    value: 'Sobredimensionado'
   },
   'new-square': {
     hint: 'square image format',
@@ -709,7 +709,7 @@
   'upload-link-notice': {
     hint: 'Explaining to user even though their upload is unlisted, they should be careful who they share the link with. No password protection.',
     original: 'Anyone with the link to your uploaded image will be able to view it.',
-    value: 'Cualquiera que tenga el enlace a la imagen cargada podrá verla.'
+    value: 'Cualquiera que tenga el enlace de la imagen cargada podrá verla.'
   },
   'upload-name': {
     hint: 'noun',
@@ -749,16 +749,16 @@
   },
   'cropcopy-title-copy': {
     original: 'Copy To Clipboard',
-    value: 'Copiar a portapapeles'
+    value: 'Copiar al portapapeles'
   },
   'cropcopy-title-crop': {
     hint: 'Cropping is a common feature in image editing.',
     original: 'Crop',
-    value: 'Cortar'
+    value: 'Recortar'
   },
   'cropcopy-mask': {
     original: 'Mask unselected',
-    value: ''
+    value: 'Mascara sin seleccionar'
   },
   'cropcopy-click-hold': {
     original: 'Right-click or press hold to copy.',
@@ -776,12 +776,12 @@
   'cropcopy-btn-crop': {
     hint: 'confirmation button. Should be short.',
     original: 'Apply Crop',
-    value: 'Aplicar Cortar'
+    value: 'Aplicar Recorte'
   },
   'crop-drag-to-crop': {
     hint: 'drag the mouse to adjust cropping',
     original: 'Drag to crop',
-    value: 'Arrastrar para cortar'
+    value: 'Arrastrar para recortar'
   },
   'filter-crop-extend': {
     original: 'Crop/Extend',
@@ -856,7 +856,7 @@
   'filter-crop-description': {
     hint: 'descriptions explain the "filter" a tiny bit. Most importantly it says if it’s applied to a single layer, or the entire image (all layer)',
     original: 'Crop or extend the image.',
-    value: 'Recorta o amplía la imagen.'
+    value: 'Recortar o amplíar la imagen.'
   },
   'filter-crop-left': {
     original: 'Left',
@@ -944,7 +944,7 @@
   'filter-transform-empty-selection': {
     hint: 'nothing on the layer, in selected area (via select tool), just transparency',
     original: 'Layer is empty in selected area.',
-    value: ''
+    value: 'La capa está vacia en el área seleccionada'
   },
   'filter-transform-title': {
     hint: 'same as the button, but can be longer',
@@ -983,7 +983,7 @@
   'filter-transform-snap-title': {
     hint: 'same as above, but as a tooltip',
     original: 'Snap Rotation And Position',
-    value: 'Chasquido Rotación y Posición'
+    value: 'Ajustar Rotación y Posición'
   },
   'filter-bright-contrast-title': {
     hint: 'same as the button, but can be longer',
@@ -992,7 +992,7 @@
   },
   'filter-bright-contrast-description': {
     original: 'Change brightness and contrast for the selected layer.',
-    value: 'Cambie brillo y contraste de la capa seleccionada.'
+    value: 'Cambiar brillo y contraste de la capa seleccionada.'
   },
   'filter-bright-contrast-brightness': {
     original: 'Brightness',
@@ -1100,7 +1100,7 @@
   },
   'filter-unsharp-mask-strength': {
     original: 'Strength',
-    value: 'Fortaleza'
+    value: 'Intensidad'
   },
   'filter-grid': {
     original: 'Grid',
@@ -1132,7 +1132,7 @@
   },
   'filter-pattern-description': {
     original: 'Generates pattern on selected layer. Drag the preview for further controls.',
-    value: 'Genera patrón en la capa seleccionada. Arrastre la vista previa para obtener más controles.'
+    value: 'Genera un patrón en la capa seleccionada. Arrastre la vista previa para obtener más controles.'
   },
   'filter-distort': {
     original: 'Distort',
@@ -1164,7 +1164,7 @@
   },
   'filter-vanish-point-description': {
     original: 'Adds vanishing point to selected layer. Drag preview to move.',
-    value: 'Agrega un punto de fuga a la capa seleccionada. Arrastra la vista previa para moverla.'
+    value: 'Agrega un punto de fuga en la capa seleccionada. Arrastra la vista previa para moverla.'
   },
   'filter-vanish-point-lines': {
     hint: 'As in: the number of lines',
@@ -1174,15 +1174,15 @@
   'dropper-drop': {
     hint: 'as in, drag and drop a file',
     original: 'Drop to import',
-    value: ''
+    value: 'Soltar para importar'
   },
   'dropper-as-image': {
     original: 'As New Image',
-    value: ''
+    value: 'Como Nueva Imagen'
   },
   'dropper-as-layer': {
     original: 'As Layer',
-    value: ''
+    value: 'Como Capa'
   },
   'import-opening': {
     hint: 'in the process of opening a large file',
@@ -1260,11 +1260,11 @@
   },
   'clipboard-read-fail': {
     original: 'Failed to read from clipboard.',
-    value: ''
+    value: 'Error al leer del portapapeles'
   },
   'clipboard-no-image': {
     original: 'No image found in clipboard.',
-    value: ''
+    value: 'Imagen no encontrada en el portapapeles'
   },
   'hand-reset': {
     hint: 'resets zoom (to 100%) and rotation (to 0°)',
@@ -1274,12 +1274,12 @@
   'hand-fit': {
     hint: 'makes canvas cover whole working area',
     original: 'Fit',
-    value: 'Caber'
+    value: 'Encajar'
   },
   'hand-inertia-scrolling': {
     hint: 'Canvas will continue to move even after releasing pointer.',
     original: 'Inertia Scrolling',
-    value: 'Desplazamiento por incercia'
+    value: 'Desplazamiento por inercia'
   },
   'bucket-tolerance': {
     hint: 'a common feature for paint bucket',
@@ -1293,7 +1293,7 @@
   },
   'bucket-sample-title': {
     original: 'Which layers to sample color from',
-    value: 'De qué capas tomar muestras de color'
+    value: 'De cuáles capas tomar muestras de color'
   },
   'bucket-sample-all': {
     hint: 'all layers',
@@ -1313,11 +1313,11 @@
   'bucket-grow': {
     hint: 'verb. Or expand.',
     original: 'Grow',
-    value: 'Crecer'
+    value: 'Ampliar'
   },
   'bucket-grow-title': {
     original: 'Grow filled area (in pixels)',
-    value: 'Área llena de crecimiento (en píxeles)'
+    value: 'Ampliar área rellena (en píxeles)'
   },
   'bucket-contiguous': {
     hint: 'common setting for paint bucket in image editing software',
@@ -1327,7 +1327,7 @@
   'bucket-contiguous-title': {
     hint: 'tooltip explaining Contiguous',
     original: 'Only fill connected areas',
-    value: 'Llene solo áreas conectadas'
+    value: 'Solo llenar áreas conectadas'
   },
   'gradient-linear': {
     original: 'Linear',
@@ -1383,7 +1383,7 @@
   },
   'shape-auto-pan-title': {
     original: 'Automatically moves as you draw',
-    value: ''
+    value: 'Mover automaticamente mientras se dibuja'
   },
   'text-instruction': {
     original: 'Click canvas to place text',
@@ -1399,7 +1399,7 @@
   },
   'text-font': {
     original: 'Font',
-    value: 'Tipo de letra'
+    value: 'Fuente'
   },
   'text-placeholder': {
     hint: 'placeholder in text input.',
@@ -1420,7 +1420,7 @@
   },
   'text-letter-spacing': {
     original: 'Letter Spacing',
-    value: 'Espaciado de letras'
+    value: 'Espaciado'
   },
   'text-left': {
     hint: 'left, center, right text formatting like in Word',
@@ -1445,11 +1445,11 @@
   },
   'text-failed-import': {
     original: 'Failed to import the following files:',
-    value: ''
+    value: 'Error al importar los siguientes archivos:'
   },
   'text-supported-formats': {
     original: 'Supported formats:',
-    value: ''
+    value: 'Formatos soportados:'
   },
   'select-select': {
     original: 'Select',
@@ -1517,12 +1517,12 @@
   },
   'select-transform-empty': {
     original: 'Selected area on active layer is empty.',
-    value: 'área seleccionada en la capa activa está vacía.'
-  },
+    value: 'El área seleccionada en la capa activa está vacía.' 
+  }, 
   'save-reminder-title': {
     hint: 'Save Reminder is a popup that shows up after 20 minutes of not saving. Allows user to save on the spot.',
     original: 'Unsaved Work',
-    value: 'Trabajo no esta guardado'
+    value: 'El trabajo no está guardado'
   },
   'save-reminder-text': {
     hint: 'turns into: "...saved in <strong>12 minutes</strong>. Save..."',
@@ -1544,22 +1544,22 @@
   },
   submit: {
     original: 'Submit',
-    value: 'Entregar'
+    value: 'Subir'
   },
   'submit-title': {
     hint: 'tooltip when hovering "Submit" button',
     original: 'Submit Drawing',
-    value: 'Entrega Dibujo'
+    value: 'Subir Dibujo'
   },
   'submit-prompt': {
     hint: 'Dialog asking for confirmation',
     original: 'Submit drawing?',
-    value: 'Entrega dibujo?'
+    value: '¿Subir dibujo?'
   },
   'submit-submitting': {
     hint: 'in the process of uploading',
     original: 'Submitting',
-    value: 'Sumisión...'
+    value: 'Subiendo...'
   },
   'embed-init-loading': {
     hint: 'when opening the app',
@@ -1595,7 +1595,7 @@
   },
   'settings-save-reminder-label': {
     original: 'Save Reminder',
-    value: 'Requerda Guardar'
+    value: 'Recordatorio de Guardado'
   },
   'settings-save-reminder-disabled': {
     original: 'disabled',
@@ -1603,11 +1603,11 @@
   },
   'settings-save-reminder-confirm-title': {
     original: 'Turn off Save Reminder?',
-    value: 'Apagar a Requerda Guardar?'
+    value: '¿Desactivar Recordatorio de Guardado?'
   },
   'settings-save-reminder-confirm-a': {
     original: "There is no autosave and browser tabs don't last forever. If you don't periodically save you will likely lose work.",
-    value: 'No hay guardado automático y las pestañas no duran para siempre. Si no guardas periódicamente, probablemente perderá trabajo.'
+    value: 'No hay guardado automático y las pestañas no duran para siempre. Si no guarda periódicamente, probablemente perderá trabajo.'
   },
   'settings-save-reminder-confirm-b': {
     original: 'Disable at your own risk?',
