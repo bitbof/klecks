@@ -285,7 +285,7 @@
   },
   'layers-merge-advanced': {
     original: 'Advanced merge',
-    value: ''
+    value: 'Расширенное слияние'
   },
   'layers-merge-all': {
     original: 'Merge all',
@@ -1445,11 +1445,11 @@
   },
   'text-failed-import': {
     original: 'Failed to import the following files:',
-    value: ''
+    value: 'Не удалось импортировать следующие файлы:'
   },
   'text-supported-formats': {
     original: 'Supported formats:',
-    value: ''
+    value: 'Поддерживаемые форматы:'
   },
   'select-select': {
     original: 'Select',
