@@ -13,6 +13,7 @@ import { OnePointerLimiter } from '../../../bb/input/event-chain/one-pointer-lim
 import { TChainElement } from '../../../bb/input/event-chain/event-chain.types';
 import { canvasToBlob } from '../../../bb/base/canvas';
 import { TProjectViewportProject } from '../project-viewport/project-viewport';
+import { css } from '../../../bb/base/base';
 
 export type TCropCopyParams = {
     // size of dom element
@@ -98,7 +99,7 @@ export class CropCopy {
     private updateSelectionRect(): void {
         const rect = this.getViewportSelectionRect();
 
-        BB.css(this.selectionRectEl, {
+        css(this.selectionRectEl, {
             left: rect.x + 'px',
             top: rect.y + 'px',
             width: rect.width + 'px',
@@ -153,7 +154,7 @@ export class CropCopy {
             this.croppedImageElement = new Image();
             this.eventTarget = this.croppedImageElement;
         }
-        BB.css(this.eventTarget, {
+        css(this.eventTarget, {
             height: p.height + 'px',
             width: p.width + 'px',
         });
@@ -186,7 +187,7 @@ export class CropCopy {
             hasBorder: false,
             editIcon: editCropImg,
         });
-        BB.css(this.preview.getElement(), {
+        css(this.preview.getElement(), {
             position: 'absolute',
             left: '0',
             top: '0',

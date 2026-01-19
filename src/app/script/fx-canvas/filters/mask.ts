@@ -8,14 +8,16 @@ import { TFxCanvas, TWrappedTexture } from '../fx-canvas-types';
  * @description Blends with an unfiltered image using a mask.
  * @param maskTexture mask (grayscale). 0 - unfiltered, 255 - filtered
  * @param originalTexture original/unfiltered image. undefined -> empty original
+ * @param premultiplyOriginal multiply the original by original's alpha channel. False is default.
  */
 export type TFilterMask = (
     this: TFxCanvas,
     maskTexture: TWrappedTexture,
     originalTexture?: TWrappedTexture,
+    premultiplyOriginal?: boolean,
 ) => TFxCanvas;
 
-export const mask: TFilterMask = function (maskTexture, originalTexture) {
+export const mask: TFilterMask = function (maskTexture, originalTexture, premultiplyOriginal) {
     maskTexture._.use(1);
 
     if (originalTexture) {
@@ -34,11 +36,15 @@ export const mask: TFilterMask = function (maskTexture, originalTexture) {
         uniform sampler2D texture;
         uniform sampler2D mask;
         uniform sampler2D original;
+        uniform bool premultiplyOriginal;
         varying vec2 texCoord;
 
         void main() {
             vec4 filteredCol = texture2D(texture, texCoord);
             vec4 originalCol = texture2D(original, texCoord);
+            if (premultiplyOriginal) {
+                originalCol.rgb *= originalCol.a;
+            }
             float maskStrength = texture2D(mask, texCoord).r;
             gl_FragColor = mix(originalCol, filteredCol, maskStrength);
         }
@@ -51,7 +57,7 @@ export const mask: TFilterMask = function (maskTexture, originalTexture) {
         original: 2,
     });
 
-    simpleShader.call(this, gl.mask, {});
+    simpleShader.call(this, gl.mask, { premultiplyOriginal: premultiplyOriginal ? 1 : 0 });
 
     return this;
 };

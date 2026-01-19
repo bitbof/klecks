@@ -7,7 +7,7 @@ import { TFilterApply, TFilterGetDialogParam, TFilterGetDialogResult, TRgba } fr
 import { LANG } from '../../language/language';
 import { TRect } from '../../bb/bb-types';
 import { SMALL_PREVIEW } from '../ui/utils/preview-size';
-import { integerBounds } from '../../bb/math/math';
+import { intBoundsWithinArea } from '../../bb/math/math';
 import { getMultiPolyBounds } from '../../bb/multi-polygon/get-multi-polygon-bounds';
 
 export type TFilterCropExtendInput = {
@@ -53,7 +53,13 @@ export const filterCropExtend = {
         let scale: number = 1;
 
         const selection = klCanvas.getSelection();
-        let selectionBounds = selection ? integerBounds(getMultiPolyBounds(selection)) : undefined;
+        let selectionBounds = selection
+            ? intBoundsWithinArea(
+                  getMultiPolyBounds(selection),
+                  klCanvas.getWidth(),
+                  klCanvas.getHeight(),
+              )
+            : undefined;
         if (selectionBounds) {
             const boundsWidth = selectionBounds.x2 - selectionBounds.x1;
             const boundsHeight = selectionBounds.y2 - selectionBounds.y1;

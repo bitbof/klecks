@@ -27,6 +27,7 @@ export class ColorOptions {
         label?: string;
         initialIndex?: number; // index before duplicates were removed
         title?: string;
+        css?: Partial<CSSStyleDeclaration>;
     }) {
         this.rootEl = BB.el({
             content: p.label ? p.label : '',
@@ -36,6 +37,7 @@ export class ColorOptions {
                 alignItems: 'center',
                 gap: '7px',
                 position: 'relative',
+                ...p.css,
             },
         });
 

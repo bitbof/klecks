@@ -81,7 +81,7 @@
   },
   'tool-more-tools-click-again': {
     original: 'Click again for more tools',
-    value: ''
+    value: 'Pencét deui kanggo langkung seueur alat'
   },
   undo: {
     original: 'Undo',
@@ -282,6 +282,10 @@
     hint: 'to make a layer empty',
     original: 'Clear layer',
     value: 'Lapisan jelas'
+  },
+  'layers-merge-advanced': {
+    original: 'Advanced merge',
+    value: 'Maju ngahiji'
   },
   'layers-merge-all': {
     original: 'Merge all',
@@ -754,7 +758,7 @@
   },
   'cropcopy-mask': {
     original: 'Mask unselected',
-    value: ''
+    value: 'Topeng teu dipilih'
   },
   'cropcopy-click-hold': {
     original: 'Right-click or press hold to copy.',
@@ -940,7 +944,7 @@
   'filter-transform-empty-selection': {
     hint: 'nothing on the layer, in selected area (via select tool), just transparency',
     original: 'Layer is empty in selected area.',
-    value: ''
+    value: 'Lapisan kosong di daérah anu dipilih.'
   },
   'filter-transform-title': {
     hint: 'same as the button, but can be longer',
@@ -1439,6 +1443,14 @@
     original: 'Bold',
     value: 'Kandel'
   },
+  'text-failed-import': {
+    original: 'Failed to import the following files:',
+    value: 'Gagal ngimpor file ieu:'
+  },
+  'text-supported-formats': {
+    original: 'Supported formats:',
+    value: 'Format anu dirojong:'
+  },
   'select-select': {
     original: 'Select',
     value: 'Pilih'
@@ -1510,7 +1522,7 @@
   'save-reminder-title': {
     hint: 'Save Reminder is a popup that shows up after 20 minutes of not saving. Allows user to save on the spot.',
     original: 'Unsaved Work',
-    value: 'Gawé teu disimpen'
+    value: 'Gawé teu Disimpen'
   },
   'save-reminder-text': {
     hint: 'turns into: "...saved in <strong>12 minutes</strong>. Save..."',

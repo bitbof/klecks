@@ -10,7 +10,7 @@
     overflow: hidden;
 }
 
-:global(body.kl-theme-dark) {
+:global(.kl-theme-dark) {
     .viewportWrapper {
         box-shadow:
             0 1px #636363,

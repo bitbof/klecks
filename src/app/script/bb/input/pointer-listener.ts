@@ -161,7 +161,7 @@ function correctPointerEvent(
         movementX: event.movementX,
         movementY: event.movementY,
         timeStamp: event.timeStamp + timeStampOffset,
-        pressure: pressureNormalizer.normalize(event.pressure),
+        pressure: pressureNormalizer.normalize(event.pressure, event.type, event.pointerType),
         buttons: determineButtons(),
         button: event.button,
         coalescedArr: [],

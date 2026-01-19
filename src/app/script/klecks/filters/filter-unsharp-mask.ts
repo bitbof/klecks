@@ -8,6 +8,7 @@ import { BB } from '../../bb/bb';
 import { testIsSmall } from '../ui/utils/test-is-small';
 import { getPreviewHeight, getPreviewWidth } from '../ui/utils/preview-size';
 import { applyFxFilter } from './apply-fx-filter';
+import { css } from '../../bb/base/base';
 
 export type TFilterUnsharpMaskInput = {
     radius: number;
@@ -118,7 +119,7 @@ export const filterUnsharpMask = {
             selection: klCanvas.getSelection(),
         });
         update();
-        BB.css(preview.getElement(), {
+        css(preview.getElement(), {
             marginLeft: '-20px',
             marginRight: '-20px',
         });

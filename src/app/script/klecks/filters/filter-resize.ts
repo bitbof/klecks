@@ -6,6 +6,7 @@ import { TFilterApply, TFilterGetDialogParam, TFilterGetDialogResult } from '../
 import { LANG } from '../../language/language';
 import { table } from '../ui/components/table';
 import { SMALL_PREVIEW } from '../ui/utils/preview-size';
+import { css } from '../../bb/base/base';
 
 export type TFilterResizeInput = {
     width: number;
@@ -119,7 +120,7 @@ export const filterResize = {
                 '0.2': { rowspan: 3 },
             },
         );
-        BB.css(sizeTable, {
+        css(sizeTable, {
             marginBottom: '10px',
         });
 

@@ -1,4 +1,5 @@
 import { BB } from '../../../bb/bb';
+import { css } from '../../../bb/base/base';
 
 /**
  * Checkbox - with label
@@ -75,7 +76,7 @@ export class Checkbox {
             }, 0);
         };
         if (p.css) {
-            BB.css(this.rootEl, p.css);
+            css(this.rootEl, p.css);
         }
     }
 

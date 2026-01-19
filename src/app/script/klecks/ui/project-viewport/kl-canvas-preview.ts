@@ -1,5 +1,6 @@
 import { BB } from '../../../bb/bb';
 import { TKlBasicLayer } from '../../kl-types';
+import { css } from '../../../bb/base/base';
 
 /**
  * preview of image with layers. can do mix modes and opacity.
@@ -25,7 +26,7 @@ export class KlCanvasPreview {
         this.canvas = BB.canvas(width, height);
         this.ctx = BB.ctx(this.canvas);
 
-        BB.css(this.canvas, {
+        css(this.canvas, {
             width: '100%',
             height: '100%',
             imageRendering: scale > 1 ? 'pixelated' : undefined,

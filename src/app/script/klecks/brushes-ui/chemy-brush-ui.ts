@@ -9,6 +9,7 @@ import { Options } from '../ui/components/options';
 import { BoxToggle } from '../ui/components/box-toggle';
 import { LANG, LANGUAGE_STRINGS } from '../../language/language';
 import { ChemyBrush } from '../brushes/chemy-brush';
+import { css } from '../../bb/base/base';
 
 export const chemyBrushUi = (function () {
     const brushInterface = {
@@ -87,7 +88,7 @@ export const chemyBrushUi = (function () {
                 },
             });
 
-            BB.css(opacitySlider.getElement(), {
+            css(opacitySlider.getElement(), {
                 marginTop: '10px',
             });
 
@@ -289,15 +290,15 @@ export const chemyBrushUi = (function () {
                 },
             });
 
-            BB.css(mirrorXToggle.getElement(), {
+            css(mirrorXToggle.getElement(), {
                 marginLeft: '10px',
             });
             {
                 const margin = {
                     marginLeft: '4px',
                 };
-                BB.css(mirrorYToggle.getElement(), margin);
-                BB.css(gradientToggle.getElement(), margin);
+                css(mirrorYToggle.getElement(), margin);
+                css(gradientToggle.getElement(), margin);
             }
 
             toggleRow.append(

@@ -1,10 +1,10 @@
 import { c } from '../../../bb/base/c';
-import { makeUnfocusable } from '../../../bb/base/ui';
+import { el, makeUnfocusable } from '../../../bb/base/ui';
 
 export type TDropdownMenuParams<IdType extends string> = {
     button: string | HTMLElement;
     buttonTitle?: string;
-    items: [IdType, string][]; // id, label
+    items: ([IdType, string] | [IdType, string, string])[]; // id, label, shortcut
     onItemClick: (id: IdType) => void;
 };
 
@@ -27,7 +27,21 @@ export class DropdownMenu<IdType extends string> {
         const items: HTMLButtonElement[] = [];
         const itemMap: Record<IdType, HTMLButtonElement> = {} as Record<IdType, HTMLButtonElement>;
         p.items.forEach((item) => {
-            const itemButton = c('button', item[1]) as HTMLButtonElement;
+            const itemButton = el({
+                tagName: 'button',
+                css: {
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'baseline',
+                    gap: '10px',
+                },
+            });
+            itemButton.append(el({ content: item[1] }));
+            if (item[2]) {
+                itemButton.append(
+                    el({ content: item[2], css: { fontSize: '0.8em', opacity: '0.8' } }),
+                );
+            }
             makeUnfocusable(itemButton);
             itemButton.onclick = () => {
                 toggle(false);

@@ -167,10 +167,10 @@ function floodFill(
         for (let y = 0, i = 0; y < height; y++) {
             for (let x = 0; x < width; x++, i++) {
                 if (
-                    view.getUint32(i * 4, true) === init ||
-                    (selectionMaskTest(selectionMaskArr, i) &&
-                        tolerance > 0 &&
-                        toleranceTest(srcArr, initR, initG, initB, initA, toleranceSquared, i))
+                    selectionMaskTest(selectionMaskArr, i) &&
+                    (view.getUint32(i * 4, true) === init ||
+                        (tolerance > 0 &&
+                            toleranceTest(srcArr, initR, initG, initB, initA, toleranceSquared, i)))
                 ) {
                     targetArr[i] = 255;
                     if (x < bounds.x1) {

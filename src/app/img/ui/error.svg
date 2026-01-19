@@ -1,5 +1,1 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<svg version="1.1" viewBox="0 0 85.333 85.333" xmlns="http://www.w3.org/2000/svg">
-<path d="m21.527 64.413 43.428-43.428" fill="none" stroke="#ed2218" stroke-linecap="round" stroke-width="17"/>
-<path d="m21.527 20.985 43.428 43.428" fill="none" stroke="#ed2218" stroke-linecap="round" stroke-width="17"/>
-</svg>
+<svg viewBox="0 0 85.3 85.3" xmlns="http://www.w3.org/2000/svg"><path d="M21.5 64.4 65 21M21.5 21 65 64.4" fill="none" stroke="#ed2218" stroke-linecap="round" stroke-width="17"/></svg>

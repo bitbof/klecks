@@ -7,7 +7,7 @@ import klecksLogoImg from 'url:/src/app/img/klecks-logo.png';
 import uiSwapImg from 'url:/src/app/img/ui/ui-swap-lr.svg';
 import { LocalStorage } from '../../../bb/base/local-storage';
 import { THEME, TTheme } from '../../../theme/theme';
-import { addIsDarkListener, nullToUndefined } from '../../../bb/base/base';
+import { addIsDarkListener, css, nullToUndefined } from '../../../bb/base/base';
 import { showLicensesDialog } from '../modals/licenses-dialog/show-licenses-dialog';
 import { c } from '../../../bb/base/c';
 import { SaveReminder } from '../components/save-reminder';
@@ -76,7 +76,7 @@ export class SettingsUi {
             },
             name: 'language',
         });
-        BB.css(languageSelect.getElement(), {
+        css(languageSelect.getElement(), {
             flexGrow: '1',
         });
         const languageHint = BB.el({
@@ -107,7 +107,7 @@ export class SettingsUi {
             },
             name: 'ui-theme',
         });
-        BB.css(themeSelect.getElement(), {
+        css(themeSelect.getElement(), {
             flexGrow: '1',
         });
         addIsDarkListener(() => {

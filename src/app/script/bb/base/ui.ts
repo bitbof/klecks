@@ -135,7 +135,10 @@ export function el<GTag extends keyof HTMLElementTagNameMap = 'div'>(params?: {
     tagName?: GTag;
     onClick?: (e: Event) => void;
     onChange?: (e: Event) => void;
-    noRef?: boolean; // don't keep references of listeners
+    // Don't keep references of listeners.
+    // If false and has onClick/onChange handler, must call destroyEl.
+    // default = false
+    noRef?: boolean;
 }) {
     if (!params) {
         return document.createElement('div') as HTMLElementTagNameMap[GTag];

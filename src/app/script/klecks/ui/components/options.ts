@@ -1,4 +1,5 @@
 import { BB } from '../../../bb/bb';
+import { css } from '../../../bb/base/base';
 
 /**
  * selectable options
@@ -45,8 +46,9 @@ export class Options<IdType> {
         isSmall?: boolean;
         optionCss?: Partial<CSSStyleDeclaration>;
         isColumn?: boolean; // displayed as column. default row
+        css?: Partial<CSSStyleDeclaration>;
     }) {
-        this.rootEl = BB.el();
+        this.rootEl = BB.el({ css: p.css });
 
         const wrapperEl = BB.el({
             parent: this.rootEl,
@@ -74,7 +76,7 @@ export class Options<IdType> {
             }
             if (typeof o.label !== 'string') {
                 classArr.push('kl-option--custom-el');
-                BB.css(o.label, {
+                css(o.label, {
                     display: 'block',
                     pointerEvents: 'none',
                 });

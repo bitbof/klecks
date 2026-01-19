@@ -1,6 +1,7 @@
 import { BB } from '../../../bb/bb';
 import { LANG } from '../../../language/language';
 import { DIALOG_COUNTER } from '../modals/modal-count';
+import { css } from '../../../bb/base/base';
 
 /**
  * Scroll buttons at the top and bottom of toolspace
@@ -129,11 +130,11 @@ export class ToolspaceScroller {
     }
 
     updateUiState(uiState: 'left' | 'right'): void {
-        BB.css(this.upBtn, {
+        css(this.upBtn, {
             left: uiState === 'left' ? '0' : '',
             right: uiState === 'right' ? '0' : '',
         });
-        BB.css(this.downBtn, {
+        css(this.downBtn, {
             left: uiState === 'left' ? '0' : '',
             right: uiState === 'right' ? '0' : '',
         });

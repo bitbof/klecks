@@ -226,6 +226,7 @@ This has been reported to Google.
                                     g: secondaryColorRGB.g,
                                     b: secondaryColorRGB.b,
                                 },
+                                composed: this.klHistory.getComposed(),
                             } as TFilterGetDialogParam) as TFilterGetDialogResult;
                         } catch (e) {
                             setTimeout(() => {

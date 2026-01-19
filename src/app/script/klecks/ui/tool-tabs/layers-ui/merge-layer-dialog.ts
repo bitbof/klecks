@@ -34,8 +34,10 @@ export function mergeLayerDialog(
             update();
         },
         isSmall: true,
+        css: {
+            marginTop: '5px',
+        },
     });
-    options.getElement().style.marginTop = '5px';
     div.append(options.getElement());
 
     const thumbDimensions = BB.fitInto(p.topCanvas.width, p.topCanvas.height, 200, 200, 1);

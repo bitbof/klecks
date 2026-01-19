@@ -15,6 +15,7 @@ import { KlRecoveryManager, TKlRecoveryListener } from '../../storage/kl-recover
 import { showRecoveryManagerPanel } from '../modals/recovery-manager-panel/show-recovery-manager-panel';
 import * as classes from './file-ui.module.scss';
 import { BrowserStorageHeaderUi } from '../components/browser-storage-header-ui';
+import { css } from '../../../bb/base/base';
 
 const LS_SHOW_SAVE_DIALOG = 'kl-save-dialog';
 
@@ -25,7 +26,7 @@ const createSpacer = (): HTMLElement => {
         className: 'grid-hr',
     });
     el.append(clearer, line);
-    BB.css(clearer, {
+    css(clearer, {
         clear: 'both',
     });
     return el;
@@ -190,7 +191,7 @@ export class FileUi {
                 title: LANG('file-format'),
                 name: 'export-type',
             });
-            BB.css(exportTypeSelect.getElement(), {
+            css(exportTypeSelect.getElement(), {
                 height: '30px',
                 width: 'calc(50% - 10px)',
                 flex: '1 0 0',
@@ -207,7 +208,7 @@ export class FileUi {
                     onOpen: p.onOpenBrowserStorage,
                     onStored: () => p.onStoredToBrowserStorage(),
                 });
-                BB.css(this.browserStorageUi.getElement(), {
+                css(this.browserStorageUi.getElement(), {
                     margin: '10px',
                 });
             } else {

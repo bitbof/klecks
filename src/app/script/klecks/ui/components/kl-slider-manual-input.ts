@@ -1,5 +1,6 @@
 import { BB } from '../../../bb/bb';
 import { input } from './input';
+import { css } from '../../../bb/base/base';
 
 /**
  * Used by KlSlider. Allows user to type in value in input (type=number) field, instead of dragging with mouse.
@@ -87,7 +88,7 @@ export class KlSliderManualInput {
         this.lastValue = currentValue;
         this.input.value = '' + currentValue;
 
-        BB.css(this.input, {
+        css(this.input, {
             width: rect.width + 'px',
             height: rect.height + 'px',
         });

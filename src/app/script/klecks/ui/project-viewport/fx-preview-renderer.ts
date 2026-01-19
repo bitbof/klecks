@@ -226,7 +226,11 @@ export class FxPreviewRenderer {
         if (this.maskTexture) {
             this.fxCanvas
                 .multiplyAlpha()
-                .mask(this.maskTexture, this.isMaskingWithEmptyOriginal ? undefined : this.texture)
+                .mask(
+                    this.maskTexture,
+                    this.isMaskingWithEmptyOriginal ? undefined : this.texture,
+                    true,
+                )
                 .unmultiplyAlpha();
         }
         this.fxCanvas.update();

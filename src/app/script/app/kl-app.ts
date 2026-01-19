@@ -72,7 +72,7 @@ import { projectToComposed } from '../klecks/history/push-helpers/project-to-com
 import { ERASE_COLOR } from '../klecks/brushes/erase-color';
 import { KlRecoveryManager } from '../klecks/storage/kl-recovery-manager';
 import { drawProject } from '../klecks/canvas/draw-project';
-import { randomUuid, sleep } from '../bb/base/base';
+import { css, randomUuid, sleep } from '../bb/base/base';
 import { UnloadWarningTrigger } from '../klecks/ui/components/unload-warning-trigger';
 import { KL_INDEXED_DB } from '../klecks/storage/kl-indexed-db';
 import { showModal } from '../klecks/ui/modals/base/showModal';
@@ -164,11 +164,11 @@ export class KlApp {
             this.mobileUi.setIsVisible(true);
             if (this.mobileUi.getToolspaceIsOpen()) {
                 if (this.uiLayout === 'left') {
-                    BB.css(this.easel.getElement(), {
+                    css(this.easel.getElement(), {
                         left: '271px',
                     });
                 } else {
-                    BB.css(this.easel.getElement(), {
+                    css(this.easel.getElement(), {
                         left: '0',
                     });
                 }
@@ -177,11 +177,11 @@ export class KlApp {
                 this.statusOverlay.setWide(false);
             } else {
                 if (this.uiLayout === 'left') {
-                    BB.css(this.easel.getElement(), {
+                    css(this.easel.getElement(), {
                         left: '0',
                     });
                 } else {
-                    BB.css(this.easel.getElement(), {
+                    css(this.easel.getElement(), {
                         left: '0',
                     });
                 }
@@ -193,7 +193,7 @@ export class KlApp {
             this.mobileColorUi.closeColorPicker();
             this.mobileUi.setIsVisible(false);
             if (this.uiLayout === 'left') {
-                BB.css(this.easel.getElement(), {
+                css(this.easel.getElement(), {
                     left: '271px',
                 });
             }
@@ -220,19 +220,19 @@ export class KlApp {
         this.toolspace.classList.toggle('kl-toolspace--left', this.uiLayout === 'left');
         this.toolspace.classList.toggle('kl-toolspace--right', this.uiLayout === 'right');
         if (this.uiLayout === 'left') {
-            BB.css(this.toolspace, {
+            css(this.toolspace, {
                 left: '0',
                 right: '',
             });
-            BB.css(this.easel.getElement(), {
+            css(this.easel.getElement(), {
                 left: '271px',
             });
         } else {
-            BB.css(this.toolspace, {
+            css(this.toolspace, {
                 left: '',
                 right: '0',
             });
-            BB.css(this.easel.getElement(), {
+            css(this.easel.getElement(), {
                 left: '0',
             });
         }
@@ -765,7 +765,7 @@ export class KlApp {
                 redo(true);
             },
         });
-        BB.css(this.easel.getElement(), {
+        css(this.easel.getElement(), {
             position: 'absolute',
             left: '0',
             top: '0',
@@ -949,6 +949,10 @@ export class KlApp {
                 }
                 if (['delete', 'backspace'].includes(comboStr)) {
                     clearLayer(true);
+                }
+                if (comboStr === 'ctrl+shift+e' || comboStr === 'shift+ctrl+e') {
+                    event.preventDefault();
+                    this.layersUi.advancedMergeDialog();
                 }
                 if (comboStr === 'shift+e') {
                     event.preventDefault();
@@ -1519,19 +1523,21 @@ export class KlApp {
 
         this.layersUi = new KL.LayersUi({
             klCanvas: this.klCanvas,
-            onSelect: (layerIndex) => {
+            onSelect: (layerIndex, pushHistory) => {
                 const activeLayer = this.klCanvas.getLayer(layerIndex);
                 setCurrentLayer(activeLayer);
 
-                const topEntry = this.klHistory.getEntries().at(-1)!.data;
-                const replaceTop = isHistoryEntryActiveLayerChange(topEntry);
+                if (pushHistory) {
+                    const topEntry = this.klHistory.getEntries().at(-1)!.data;
+                    const replaceTop = isHistoryEntryActiveLayerChange(topEntry);
 
-                this.klHistory.push(
-                    {
-                        activeLayerId: activeLayer.id,
-                    },
-                    replaceTop,
-                );
+                    this.klHistory.push(
+                        {
+                            activeLayerId: activeLayer.id,
+                        },
+                        replaceTop,
+                    );
+                }
             },
             parentEl: this.rootEl,
             uiState: this.uiLayout,
@@ -2216,14 +2222,16 @@ export class KlApp {
             const pinchZoomWatcher = new PinchZoomWatcher();
         }
 
-        setTimeout(() => {
-            runBrowserStorageBanner({
-                projectStore,
-                klRecoveryManager,
-                onOpenBrowserStorage,
-                klHistory: this.klHistory,
+        if (!this.embed) {
+            setTimeout(() => {
+                runBrowserStorageBanner({
+                    projectStore,
+                    klRecoveryManager,
+                    onOpenBrowserStorage,
+                    klHistory: this.klHistory,
+                });
             });
-        });
+        }
         this.saveReminder?.init();
     }
 

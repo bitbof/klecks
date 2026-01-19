@@ -7,6 +7,7 @@ import { applyToPoint, inverse } from 'transformation-matrix';
 import { createTransform } from '../../../../bb/transform/create-transform';
 import { TEaselInterface, TEaselTool, TEaselToolTrigger } from '../easel.types';
 import { minimizeAngleDeg } from '../../../../bb/math/math';
+import { css } from '../../../../bb/base/base';
 
 export type TEaselRotateParams = object;
 
@@ -38,7 +39,7 @@ export class EaselRotate implements TEaselTool {
         this.compass = BB.createSvg({
             elementType: 'g',
         });
-        BB.css(this.compass, {
+        css(this.compass, {
             transition: 'opacity 0.25s ease-in-out',
         });
         this.compassInner = BB.createSvg({
@@ -61,7 +62,7 @@ export class EaselRotate implements TEaselTool {
             cy: '0',
             r: '' + this.compassSize * 0.9,
         });
-        BB.css(this.compassLineCircle, {
+        css(this.compassLineCircle, {
             transition: 'opacity 0.1s ease-in-out',
         });
         this.needleWrapper = BB.createSvg({

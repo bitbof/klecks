@@ -32,7 +32,7 @@ export function applyFxFilter(
     fxCanvas.draw(originalTexture);
     applyFn(fxCanvas);
     if (maskTexture) {
-        fxCanvas.multiplyAlpha().mask(maskTexture, originalTexture).unmultiplyAlpha();
+        fxCanvas.multiplyAlpha().mask(maskTexture, originalTexture, true).unmultiplyAlpha();
         maskTexture.destroy();
     }
     originalTexture.destroy();

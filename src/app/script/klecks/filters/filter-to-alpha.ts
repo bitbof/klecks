@@ -9,6 +9,7 @@ import { BB } from '../../bb/bb';
 import { testIsSmall } from '../ui/utils/test-is-small';
 import { getPreviewHeight, getPreviewWidth } from '../ui/utils/preview-size';
 import { applyFxFilter } from './apply-fx-filter';
+import { css } from '../../bb/base/base';
 
 export type TFilterToAlphaInput = {
     sourceId: string;
@@ -92,9 +93,10 @@ export const filterToAlpha = {
                 selectedRgbaObj = rgbaObj;
                 preview.render();
             },
+            css: {
+                margin: '10px 0',
+            },
         });
-        colorOptions.getElement().style.marginTop = '10px';
-        colorOptions.getElement().style.marginBottom = '10px';
         rootEl.append(colorOptions.getElement());
 
         const previewLayerArr: TProjectViewportProject['layers'] = [];
@@ -124,7 +126,7 @@ export const filterToAlpha = {
             selection: klCanvas.getSelection(),
         });
         preview.render();
-        BB.css(preview.getElement(), {
+        css(preview.getElement(), {
             marginLeft: '-20px',
             marginRight: '-20px',
         });

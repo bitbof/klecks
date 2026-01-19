@@ -10,6 +10,16 @@ import { StatusOverlay } from '../klecks/ui/components/status-overlay';
 import { showModal } from '../klecks/ui/modals/base/showModal';
 import { LANG } from '../language/language';
 import { KlHistory } from '../klecks/history/kl-history';
+import { integerBounds } from '../bb/math/math';
+import { getMultiPolyBounds } from '../bb/multi-polygon/get-multi-polygon-bounds';
+import { TInterpolationAlgorithm } from '../klecks/kl-types';
+import {
+    klCanvasTransformCloneViaSelection,
+    klCanvasTransformViaSelection,
+    TSelectionSample,
+} from '../klecks/canvas/kl-canvas-transform';
+import { BB } from '../bb/bb';
+import { testComposedLayerHasTransparency } from '../klecks/filters/filter-transform';
 
 export type TSelectTransformTempEntry = {
     type: 'select-transform';
@@ -18,6 +28,7 @@ export type TSelectTransformTempEntry = {
         doClone: boolean;
         targetLayerIndex: number;
         backgroundIsTransparent: boolean;
+        algorithm: TInterpolationAlgorithm;
     };
 };
 
@@ -68,8 +79,10 @@ export class KlAppSelect {
         targetLayerIndex: 0,
         // Needs to be kept up to date.
         backgroundIsTransparent: false,
+        algorithm: 'smooth',
     };
     private backgroundIsTransparent: boolean = false;
+    private selectionSample: TSelectionSample | undefined = undefined;
 
     private isSourceLayerBackgroundTransparent(): boolean {
         const srcLayerCtx = this.getCurrentLayerCtx();
@@ -135,6 +148,7 @@ export class KlAppSelect {
                 doClone: this.transformTool.getDoClone(),
                 targetLayerIndex: this.targetLayerIndex,
                 backgroundIsTransparent: this.backgroundIsTransparent,
+                algorithm: this.transformTool.getAlgorithm(),
             },
         } satisfies TSelectTransformTempEntry);
     }
@@ -145,8 +159,16 @@ export class KlAppSelect {
         this.easelSelect.setRenderedSelection(selection);
         this.updateComposites();
         this.onUpdateProject();
+        this.updateSelectUi();
 
         this.tempHistoryReplaceTop();
+    }
+
+    private updateSelectUi() {
+        const transform = this.easelSelect.getFreeTransformTransformation();
+        if (transform) {
+            this.selectUi.setFreeTransformTransformation(transform);
+        }
     }
 
     // ----------------------------------- public -----------------------------------
@@ -210,11 +232,11 @@ export class KlAppSelect {
                 this.klCanvas.setSelection(selection);
                 this.selectUi.setHasSelection(!!selection);
             },
-            onTranslateTransform: (d) => {
-                this.transformTool.translate(d);
+            onResetSelection: () => this.resetSelection(),
+            onFreeTransform: (matrix) => {
+                this.transformTool.setTransform(matrix);
                 this.propagateTransformationChange();
             },
-            onResetSelection: () => this.resetSelection(),
         });
 
         this.selectUi = new SelectUi({
@@ -233,22 +255,30 @@ export class KlAppSelect {
                     ) {
                         // something changed -> apply
                         if (this.transformTool.getDoClone()) {
-                            this.klCanvas.transformCloneViaSelection({
+                            // can discard returned selectionSample
+                            klCanvasTransformCloneViaSelection({
+                                klCanvas: this.klCanvas,
+                                selectionSample: this.selectionSample,
                                 sourceLayer: layerIndex,
                                 targetLayer: this.targetLayerIndex,
                                 transformation: this.transformTool.getTransform(),
+                                isPixelated: this.transformTool.getAlgorithm() === 'pixelated',
                             });
                         } else {
-                            this.klCanvas.transformViaSelection({
+                            // can discard returned selectionSample
+                            klCanvasTransformViaSelection({
+                                klCanvas: this.klCanvas,
                                 sourceLayer: layerIndex,
                                 targetLayer: this.targetLayerIndex,
                                 transformation: this.transformTool.getTransform(),
                                 backgroundIsTransparent: this.backgroundIsTransparent,
+                                isPixelated: this.transformTool.getAlgorithm() === 'pixelated',
                             });
                         }
                         p.statusOverlay.out(LANG('select-transform-applied'), true);
                     }
-                    this.klCanvas.clearSelectionSample();
+                    this.selectionSample = undefined;
+                    this.transformTool.setSelectionSample(this.selectionSample);
                     this.klCanvas.setComposite(layerIndex, undefined);
                     this.klCanvas.setComposite(this.targetLayerIndex, undefined);
                     this.easelSelect.clearRenderedSelection(true);
@@ -256,21 +286,21 @@ export class KlAppSelect {
                     this.selectTool.setSelection(selection);
                     this.selectUi.setHasSelection(!!selection);
                     this.onUpdateProject();
+                    this.easelSelect.setMode(this.selectMode);
                 } else {
                     // -> transform
                     this.tempHistory.setIsActive(true);
                     let selection = this.selectTool.getSelection() || [];
                     if (selection.length === 0) {
-                        const width = this.klCanvas.getWidth();
-                        const height = this.klCanvas.getHeight();
+                        const bounds = BB.canvasBounds(this.getCurrentLayerCtx())!;
                         selection = [
                             [
                                 [
-                                    [0, 0],
-                                    [width, 0],
-                                    [width, height],
-                                    [0, height],
-                                    [0, 0],
+                                    [bounds.x, bounds.y],
+                                    [bounds.x + bounds.width, bounds.y],
+                                    [bounds.x + bounds.width, bounds.height + bounds.y],
+                                    [bounds.x, bounds.height + bounds.y],
+                                    [bounds.x, bounds.y],
                                 ],
                             ],
                         ];
@@ -278,24 +308,41 @@ export class KlAppSelect {
 
                     this.transformTool.setSelection(selection);
                     this.transformTool.setDoClone(false);
-                    this.transformTool.setSelectionSample(this.klCanvas.getSelectionSample());
+                    this.transformTool.setSelectionSample(this.selectionSample);
                     const currentLayerCanvas = this.getCurrentLayerCtx().canvas;
                     const layerIndex = throwIfNull(this.klCanvas.getLayerIndex(currentLayerCanvas));
                     this.initialTransform.targetLayerIndex = layerIndex;
                     this.initialTransform.backgroundIsTransparent = this.backgroundIsTransparent;
+                    this.initialTransform.algorithm = this.transformTool.getAlgorithm();
                     this.targetLayerIndex = layerIndex;
+                    const isBgLayer = layerIndex === 0;
+                    this.selectUi.setShowTransparentBackgroundToggle(isBgLayer);
+                    let isTransparent = false;
+                    if (isBgLayer) {
+                        const layer = Object.entries(this.klHistory.getComposed().layerMap).find(
+                            ([_, layer]) => layer.index === layerIndex,
+                        )![1];
+                        isTransparent = testComposedLayerHasTransparency(layer);
+                        this.selectUi.setBackgroundIsTransparent(isTransparent);
+                    }
+                    this.backgroundIsTransparent = isTransparent;
+                    this.initialTransform.backgroundIsTransparent = isTransparent;
                     this.transformTool.setBackgroundIsTransparent(
                         this.isSourceLayerBackgroundTransparent(),
                     );
                     this.updateComposites();
-                    const transformedSelection = this.transformTool.getTransformedSelection();
-                    this.easelSelect.setRenderedSelection(transformedSelection);
                     this.selectUi.setHasSelection(!!selection);
                     this.updateUiLayerList();
                     this.selectUi.setMoveToLayer(undefined);
                     this.onUpdateProject();
+                    this.easelSelect.setMode(this.selectMode);
+                    const transformedSelection = this.transformTool.getTransformedSelection();
+                    this.easelSelect.setRenderedSelection(transformedSelection);
+                    this.easelSelect.initialiseTransform(
+                        integerBounds(getMultiPolyBounds(selection)),
+                    );
+                    this.updateSelectUi();
                 }
-                this.easelSelect.setMode(this.selectMode);
             },
             onChangeBooleanOperation: (operation) => {
                 this.easelSelect.setBooleanOperation(operation);
@@ -340,14 +387,15 @@ export class KlAppSelect {
                 onFlipY: () => {
                     this.transformTool.flip('y');
                     this.propagateTransformationChange();
+                    this.easelSelect.setTransform(this.transformTool.getTransform());
                 },
                 onFlipX: () => {
                     this.transformTool.flip('x');
                     this.propagateTransformationChange();
+                    this.easelSelect.setTransform(this.transformTool.getTransform());
                 },
                 onRotateDeg: (deg) => {
-                    this.transformTool.rotateDeg(deg);
-                    this.propagateTransformationChange();
+                    this.easelSelect.rotateFreeTransform(deg);
                 },
                 onClone: () => {
                     // commit
@@ -358,17 +406,22 @@ export class KlAppSelect {
                     // apply
                     // should always apply. user might want to make something more opaque.
                     if (this.transformTool.getDoClone()) {
-                        this.klCanvas.transformCloneViaSelection({
+                        this.selectionSample = klCanvasTransformCloneViaSelection({
+                            klCanvas: this.klCanvas,
+                            selectionSample: this.selectionSample,
                             sourceLayer: layerIndex,
                             targetLayer: this.targetLayerIndex,
                             transformation: this.transformTool.getTransform(),
+                            isPixelated: this.transformTool.getAlgorithm() === 'pixelated',
                         });
                     } else if (this.transformTool.isTransformationChanged()) {
-                        this.klCanvas.transformViaSelection({
+                        this.selectionSample = klCanvasTransformViaSelection({
+                            klCanvas: this.klCanvas,
                             sourceLayer: layerIndex,
                             targetLayer: this.targetLayerIndex,
                             transformation: this.transformTool.getTransform(),
                             backgroundIsTransparent: this.backgroundIsTransparent,
+                            isPixelated: this.transformTool.getAlgorithm() === 'pixelated',
                         });
                     }
                     const oldSelection = this.transformTool.getTransformedSelection();
@@ -378,15 +431,29 @@ export class KlAppSelect {
                     this.initialTransform.backgroundIsTransparent = this.backgroundIsTransparent;
                     this.transformTool.setSelection(selection);
                     this.transformTool.setDoClone(true);
-                    this.transformTool.setSelectionSample(this.klCanvas.getSelectionSample());
+                    this.transformTool.setSelectionSample(this.selectionSample);
                     this.updateComposites();
                     this.easelSelect.setRenderedSelection(
                         this.transformTool.getTransformedSelection(),
                     );
+                    this.easelSelect.updateInitialTransformMatrix();
                     this.selectUi.setHasSelection(!!selection);
                     this.onUpdateProject();
 
                     this.statusOverlay.out(LANG('select-transform-clone-applied'), true);
+                },
+                onScale: (factor) => {
+                    this.transformTool.scale(factor);
+                    this.propagateTransformationChange();
+                    this.easelSelect.setTransform(this.transformTool.getTransform());
+                },
+                onCenter: () => {
+                    this.transformTool.center(
+                        this.klCanvas.getWidth() / 2,
+                        this.klCanvas.getHeight() / 2,
+                    );
+                    this.propagateTransformationChange();
+                    this.easelSelect.setTransform(this.transformTool.getTransform());
                 },
                 onMoveToLayer: (index) => {
                     this.resetComposites();
@@ -406,6 +473,19 @@ export class KlAppSelect {
                     this.onUpdateProject();
 
                     this.tempHistoryReplaceTop();
+                },
+                onChangeAlgorithm: (algorithm) => {
+                    this.transformTool.setAlgorithm(algorithm);
+                    this.updateComposites();
+                    this.onUpdateProject();
+
+                    this.tempHistoryReplaceTop();
+                },
+                onChangeConstrain: (isConstrained) => {
+                    this.easelSelect.setIsConstrained(isConstrained);
+                },
+                onChangeSnapping: (isSnapping) => {
+                    this.easelSelect.setIsSnapping(isSnapping);
                 },
             },
             onErase: () => {
@@ -490,9 +570,12 @@ export class KlAppSelect {
             this.transformTool.setBackgroundIsTransparent(
                 this.isSourceLayerBackgroundTransparent(),
             );
+            this.selectUi.setAlgorithm(state.algorithm);
+            this.transformTool.setAlgorithm(state.algorithm);
 
             const selection = this.transformTool.getTransformedSelection();
             this.easelSelect.setRenderedSelection(selection);
+            this.easelSelect.setTransform(this.transformTool.getTransform());
             this.selectUi.setMoveToLayer(
                 this.klCanvas.getLayerIndex(this.getCurrentLayerCtx().canvas) ===
                     state.targetLayerIndex

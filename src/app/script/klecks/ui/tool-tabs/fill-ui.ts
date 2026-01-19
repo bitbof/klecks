@@ -5,6 +5,7 @@ import { Checkbox } from '../components/checkbox';
 import { LANG } from '../../../language/language';
 import { TFillSampling } from '../../kl-types';
 import { KlColorSlider } from '../components/kl-color-slider';
+import { css } from '../../../bb/base/base';
 
 /**
  * Paint Bucket tab contents (color slider, opacity slider, etc)
@@ -64,7 +65,7 @@ export class FillUi {
             toValue: (displayValue) => displayValue * (255 / 100),
             toDisplayValue: (value) => value / (255 / 100),
         });
-        BB.css(this.toleranceSlider.getElement(), {
+        css(this.toleranceSlider.getElement(), {
             marginTop: '10px',
         });
         this.rootEl.append(this.toleranceSlider.getElement());

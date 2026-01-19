@@ -283,6 +283,10 @@
     original: 'Clear layer',
     value: 'Effacer le calque'
   },
+  'layers-merge-advanced': {
+    original: 'Advanced merge',
+    value: ''
+  },
   'layers-merge-all': {
     original: 'Merge all',
     value: 'Tout fusionner'
@@ -1438,6 +1442,14 @@
   'text-bold': {
     original: 'Bold',
     value: 'Gras'
+  },
+  'text-failed-import': {
+    original: 'Failed to import the following files:',
+    value: ''
+  },
+  'text-supported-formats': {
+    original: 'Supported formats:',
+    value: ''
   },
   'select-select': {
     original: 'Select',

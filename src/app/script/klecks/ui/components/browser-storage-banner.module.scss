@@ -104,7 +104,7 @@
     box-shadow: none !important;
 }
 
-:global(body.kl-theme-dark) {
+:global(.kl-theme-dark) {
     @media (max-width: 767px) {
         .root {
             background: linear-gradient(180deg, rgba(0, 0, 0, 0.45) 100px, rgba(0, 0, 0, 0) 100%);

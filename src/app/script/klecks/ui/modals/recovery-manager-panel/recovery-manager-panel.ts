@@ -12,6 +12,7 @@ import { copyCanvas } from '../../../../bb/base/canvas';
 import * as classes from './recovery-manager-panel.module.scss';
 import { LANG } from '../../../../language/language';
 import removeLayerImg from 'url:/src/app/img/ui/remove-layer.svg';
+import { css } from '../../../../bb/base/base';
 
 export type TRecoveryManagerPanelParams = {
     klRecoveryManager: KlRecoveryManager;
@@ -56,7 +57,7 @@ export class RecoveryManagerPanel {
                     onClick: () => {
                         deleteBtn.blur();
                         const thumbnail2 = copyCanvas(meta.thumbnail!);
-                        BB.css(thumbnail2, {
+                        css(thumbnail2, {
                             alignSelf: 'start',
                             background: 'var(--kl-checkerboard-background)',
                             maxWidth: '100%',

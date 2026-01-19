@@ -1,6 +1,6 @@
 import { TMixMode } from '../../kl-types';
 import { BB } from '../../../bb/bb';
-import { throwIfNull } from '../../../bb/base/base';
+import { css, throwIfNull } from '../../../bb/base/base';
 import { THEME } from '../../../theme/theme';
 import { Matrix, inverse, compose } from 'transformation-matrix';
 import { createMatrixFromTransform } from '../../../bb/transform/create-matrix-from-transform';
@@ -119,7 +119,7 @@ export class ProjectViewport {
         this.resFactor = this.useNativeResolution ? devicePixelRatio : 1;
         this.canvas = BB.canvas(this.width * this.resFactor, this.height * this.resFactor);
         this.ctx = BB.ctx(this.canvas);
-        BB.css(this.canvas, {
+        css(this.canvas, {
             width: this.doFillParent ? '100%' : this.width + 'px',
             height: this.doFillParent ? '100%' : this.height + 'px',
             imageRendering:
@@ -262,7 +262,7 @@ export class ProjectViewport {
         this.width = width;
         this.height = height;
 
-        BB.css(this.canvas, {
+        css(this.canvas, {
             width: this.doFillParent ? '100%' : this.width + 'px',
             height: this.doFillParent ? '100%' : this.height + 'px',
         });

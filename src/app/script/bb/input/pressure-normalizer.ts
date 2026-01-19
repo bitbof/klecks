@@ -1,39 +1,57 @@
-import { mix } from '../math/math';
-
 /**
- * different devices/browsers have different pressure curves
- * pressure normalize attempts to achieve similar mapping
+ * Apple Pencil on iPad in Safari has two problems:
+ * - You need to press the stylus very strong to reach 1.0 pressure, to the point where the screen starts discoloring
+ * - Always fires the same pressure value on pointerdown
+ *
+ * This normalizer tries to fix that with a workaround.
  *
  * pressure range [0, 1]
  */
 export class PressureNormalizer {
-    private count: number = 0;
-    private avgPressure: number = 0; // float [0, 1]
-    private normalizeIsComplete: boolean = false;
-    private normalizeFactor: number = 1;
+    private detectionComplete = false;
+    private isApplePencil = false;
+
+    // detection
+    private initialPointerDownPressure = -1;
+    private pointerDownPressureRepeatCount = 0;
+    private pointerMoveHasDifferentPressure = false;
 
     // ----------------------------------- public -----------------------------------
-    normalize(pressure: number): number {
-        if (pressure === 0 || pressure === 1) {
+    normalize(pressure: number, eventType?: string, pointerType?: string): number {
+        if (pointerType === 'pen') {
+            if (!this.detectionComplete) {
+                if (eventType === 'pointerdown') {
+                    if (this.initialPointerDownPressure === -1) {
+                        this.initialPointerDownPressure = pressure;
+                    } else if (this.initialPointerDownPressure === pressure) {
+                        this.pointerDownPressureRepeatCount++;
+                        if (
+                            this.pointerDownPressureRepeatCount > 1 &&
+                            this.pointerMoveHasDifferentPressure
+                        ) {
+                            this.detectionComplete = true;
+                            this.isApplePencil = true;
+                        }
+                    } else {
+                        this.detectionComplete = true;
+                        this.isApplePencil = false;
+                    }
+                } else if (eventType === 'pointermove') {
+                    if (this.initialPointerDownPressure !== pressure) {
+                        this.pointerMoveHasDifferentPressure = true;
+                    }
+                }
+            }
+
+            if (this.detectionComplete && this.isApplePencil) {
+                if (this.initialPointerDownPressure === pressure) {
+                    return 0;
+                }
+                pressure = Math.min(2, pressure * 2);
+            }
+            return pressure;
+        } else {
             return pressure;
         }
-
-        if (this.count < 60) {
-            if (this.count === 0 || this.count === null) {
-                this.avgPressure = pressure;
-            } else {
-                this.avgPressure = mix(pressure, this.avgPressure, 0.95);
-            }
-            this.count++;
-        } else if (!this.normalizeIsComplete) {
-            this.normalizeIsComplete = true;
-            //BB.throwOut('avg pressure decision!' + this.avgPressure);
-            if (this.avgPressure < 0.13) {
-                // absurd pressure needed
-                this.normalizeFactor = 2.3;
-            }
-        }
-
-        return Math.pow(pressure, 1 / this.normalizeFactor);
     }
 }

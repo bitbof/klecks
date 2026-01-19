@@ -12,7 +12,7 @@ import { EVENT_RES_MS } from './filters-consts';
 import { KlCanvasPreview } from '../ui/project-viewport/kl-canvas-preview';
 import { TwoTabs } from '../ui/components/two-tabs';
 import { TVector2D } from '../../bb/bb-types';
-import { throwIfNull } from '../../bb/base/base';
+import { css, throwIfNull } from '../../bb/base/base';
 import { testIsSmall } from '../ui/utils/test-is-small';
 import { getPreviewHeight, getPreviewWidth, MEDIUM_PREVIEW } from '../ui/utils/preview-size';
 import { canvasToLayerTiles } from '../history/push-helpers/canvas-to-layer-tiles';
@@ -279,7 +279,7 @@ export const filterPattern = {
             },
             manualInputRoundDigits: 2,
         });
-        BB.css(blendSlider.getElement(), {
+        css(blendSlider.getElement(), {
             margin: '10px 0',
         });
 
@@ -353,7 +353,7 @@ export const filterPattern = {
         });
 
         const overlayCanvas = BB.canvas(w, h);
-        BB.css(overlayCanvas, {
+        css(overlayCanvas, {
             position: 'absolute',
             left: '0',
             top: '0',

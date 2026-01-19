@@ -1,5 +1,6 @@
 import { BB } from '../../../bb/bb';
 import angleSvg from 'url:/src/app/img/ui/angle.svg';
+import { css } from '../../../bb/base/base';
 
 type TUiState = 'left' | 'right';
 
@@ -42,7 +43,7 @@ export class StatusOverlay {
 
         this.angleIm = new Image();
         this.angleIm.src = angleSvg;
-        BB.css(this.angleIm, {
+        css(this.angleIm, {
             verticalAlign: 'bottom',
             width: '20px',
             height: '20px',

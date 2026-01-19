@@ -1,4 +1,5 @@
 import { BB } from '../../../bb/bb';
+import { css } from '../../../bb/base/base';
 
 export class BoxToggle {
     el: HTMLElement;
@@ -33,7 +34,7 @@ export class BoxToggle {
             },
         });
         if (typeof p.label !== 'string') {
-            BB.css(p.label, {
+            css(p.label, {
                 display: 'block',
                 pointerEvents: 'none',
             });

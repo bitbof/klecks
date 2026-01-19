@@ -5,9 +5,10 @@ import { LANG } from '../../../language/language';
 import { StatusOverlay } from '../components/status-overlay';
 import { TCropRect, TRect } from '../../../bb/bb-types';
 import { MultiPolygon } from 'polygon-clipping';
-import { boundsToRect, intBoundsWithinArea, integerBounds } from '../../../bb/math/math';
+import { boundsToRect, intBoundsWithinArea } from '../../../bb/math/math';
 import { getMultiPolyBounds } from '../../../bb/multi-polygon/get-multi-polygon-bounds';
 import { Checkbox } from '../components/checkbox';
+import { css } from '../../../bb/base/base';
 
 let maskSelection = false;
 
@@ -70,7 +71,7 @@ export function clipboardDialog(
         enableRightClickCopy: true,
         init,
     });
-    BB.css(cropCopy.getElement(), {
+    css(cropCopy.getElement(), {
         marginTop: '10px',
         marginLeft: '-20px',
     });

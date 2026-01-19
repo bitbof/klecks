@@ -11,7 +11,7 @@
     color: var(--kl-note-3);
 }
 
-:global(body.kl-theme-dark) {
+:global(.kl-theme-dark) {
     .recoveryBubble {
         background: unset;
         box-shadow: 0 0 0 1px var(--kl-note-1);

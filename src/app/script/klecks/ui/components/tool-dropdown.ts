@@ -6,10 +6,11 @@ import toolGradientImg from 'url:/src/app/img/ui/tool-gradient.svg';
 import toolTextImg from 'url:/src/app/img/ui/tool-text.svg';
 import toolShapeImg from 'url:/src/app/img/ui/tool-shape.svg';
 import toolSelectImg from 'url:/src/app/img/ui/tool-select.svg';
-import caretDownImg from 'url:/src/app/img/ui/caret-down.svg';
 import { LANG } from '../../../language/language';
 import { TToolType } from '../../kl-types';
 import { PointerListener } from '../../../bb/input/pointer-listener';
+import { c } from '../../../bb/base/c';
+import { css } from '../../../bb/base/base';
 
 type TDropdownButton = {
     wrapper: HTMLElement;
@@ -182,18 +183,8 @@ export class ToolDropdown {
 
         this.arrowButton = BB.el({
             parent: this.activeButton,
-            className: 'kl-tooldropdown-caret dark-invert',
-            css: {
-                position: 'absolute',
-                right: '1px',
-                width: '18px',
-                height: '18px',
-                cursor: 'pointer',
-
-                backgroundImage: "url('" + caretDownImg + "')",
-                backgroundRepeat: 'no-repeat',
-                backgroundPosition: 'center',
-            },
+            className: 'kl-tooldropdown-caret',
+            content: c('.dark-invert'),
             title: LANG('tool-more-tools'),
             onClick: (e) => {
                 e.preventDefault();
@@ -356,13 +347,10 @@ export class ToolDropdown {
         for (let i = 0; i < this.optionArr.length; i++) {
             this.dropdownBtnArr[i].setIsSmall(b);
         }
-        if (b) {
-            this.arrowButton.style.width = '14px';
-            this.arrowButton.style.height = '14px';
-        } else {
-            this.arrowButton.style.width = '18px';
-            this.arrowButton.style.height = '18px';
-        }
+        css(this.arrowButton, {
+            width: b ? '14px' : '18px',
+            height: b ? '14px' : '18px',
+        });
     }
 
     setActive(activeStr: TToolType): void {

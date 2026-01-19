@@ -1,12 +1,11 @@
-:root {
-    --ui-bg-dark: #333;
-}
+// :root.kl-theme-dark is more specific just .kl-theme-dark
+:root.kl-theme-dark {
+    color-scheme: dark;
 
-body.kl-theme-dark {
+    --ui-bg-dark: #333;
     --kl-checkerboard-background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 2 2'><path d='M0,0h2v2H0z' fill='%235a5a5a'/><path d='M0,0h1v1H0zM1,1h1v1H1z' fill='%233f3f3f'/></svg>")
         0 0 / 8px;
 
-    color-scheme: dark;
     color: #ccc;
     background: rgb(33, 33, 33);
 
@@ -103,6 +102,23 @@ body.kl-theme-dark {
 
     .tool-dropdown-button:active {
         background: #585858;
+    }
+
+    .kl-tooldropdown-caret {
+        background-color: #4a4a4a;
+        box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.2);
+    }
+
+    .toolspace-row-button-activated > .kl-tooldropdown-caret {
+        background-color: #585858;
+    }
+
+    .toolspace-row-button-activated.kl-tool-button--hover > .kl-tooldropdown-caret {
+        background-color: #666;
+    }
+
+    .kl-tooldropdown-caret:hover {
+        background-color: #666;
     }
 
     .kl-popup {

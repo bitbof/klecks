@@ -63,16 +63,7 @@ export class ChemyBrush {
         bounds.x2 = Math.ceil(bounds.x2 + buffer);
         bounds.y2 = Math.ceil(bounds.y2 + buffer);
 
-        const boundsWithinSelection = this.selectionBounds
-            ? boundsOverlap(bounds, this.selectionBounds)
-            : bounds;
-        if (!boundsWithinSelection) {
-            return;
-        }
-        this.completeRedrawBounds = BB.updateBounds(
-            this.completeRedrawBounds,
-            boundsWithinSelection,
-        );
+        this.completeRedrawBounds = BB.updateBounds(this.completeRedrawBounds, bounds);
     }
 
     private drawShape(): void {
@@ -329,6 +320,12 @@ export class ChemyBrush {
             this.copyCanvas.width,
             this.copyCanvas.height,
         );
+        if (this.selectionBounds) {
+            this.completeRedrawBounds = boundsOverlap(
+                this.completeRedrawBounds,
+                this.selectionBounds,
+            );
+        }
         if (this.path.length > 1 && this.completeRedrawBounds) {
             const layerData = canvasToLayerTiles(this.context.canvas, this.completeRedrawBounds);
             this.klHistory.push(getPushableLayerChange(this.klHistory.getComposed(), layerData));

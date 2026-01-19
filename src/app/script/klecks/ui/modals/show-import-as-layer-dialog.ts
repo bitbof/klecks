@@ -7,6 +7,7 @@ import { LANG } from '../../../language/language';
 import { testIsSmall } from '../utils/test-is-small';
 import { getPreviewHeight, getPreviewWidth } from '../utils/preview-size';
 import { Select } from '../components/select';
+import { css } from '../../../bb/base/base';
 
 export function showImportAsLayerDialog(params: {
     target: HTMLElement;
@@ -118,7 +119,7 @@ export function showImportAsLayerDialog(params: {
         layers: layers,
         transformIndex: layers.length - 1,
     });
-    BB.css(freeTransformCanvas.getElement(), {
+    css(freeTransformCanvas.getElement(), {
         marginTop: '10px',
         marginLeft: '-20px',
     });

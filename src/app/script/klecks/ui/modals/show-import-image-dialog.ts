@@ -5,6 +5,7 @@ import { showModal } from './base/showModal';
 import { LANG } from '../../../language/language';
 import { TKeyString, TRect } from '../../../bb/bb-types';
 import { TKlPsd, TKlPsdError } from '../../kl-types';
+import { css } from '../../../bb/base/base';
 
 /**
  * Shows first dialog when importing an image.
@@ -62,7 +63,7 @@ export function showImportImageDialog(p: {
             updateResolution(width, height);
         },
     });
-    BB.css(cropCopy.getElement(), {
+    css(cropCopy.getElement(), {
         marginLeft: '-20px',
     });
     cropCopy.getElement().title = LANG('crop-drag-to-crop');

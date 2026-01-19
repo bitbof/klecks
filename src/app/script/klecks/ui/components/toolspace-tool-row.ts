@@ -7,6 +7,7 @@ import toolUndoImg from 'url:/src/app/img/ui/tool-undo.svg';
 import { LANG } from '../../../language/language';
 import { PointerListener } from '../../../bb/input/pointer-listener';
 import { TToolType } from '../../kl-types';
+import { css } from '../../../bb/base/base';
 
 type TBaseToolRowButton = {
     el: HTMLElement;
@@ -133,7 +134,7 @@ export class ToolspaceToolRow {
                 viewBox: '0 0 100 100',
                 preserveAspectRatio: 'none',
             });
-            BB.css(svg, {
+            css(svg, {
                 position: 'absolute',
                 left: '0',
                 top: '0',
@@ -417,7 +418,7 @@ export class ToolspaceToolRow {
     }
 
     setIsSmall(b: boolean): void {
-        BB.css(this.rootEl, {
+        css(this.rootEl, {
             height: b ? '36px' : '54px',
         });
 

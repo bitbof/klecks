@@ -20,7 +20,7 @@ class Theme {
         if (this.theme === oldTheme) {
             return;
         }
-        document.body.classList.toggle('kl-theme-dark', this.theme === 'dark');
+        document.documentElement.classList.toggle('kl-theme-dark', this.theme === 'dark');
         this.listeners.forEach((item) => item());
     }
 

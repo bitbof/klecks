@@ -1,6 +1,7 @@
 import { BB } from '../../../bb/bb';
 import { TKeyString } from '../../../bb/bb-types';
 import { KeyListener } from '../../../bb/input/key-listener';
+import { css } from '../../../bb/base/base';
 
 type TInputType = 'button' | 'checkbox' | 'number' | 'text' | 'color';
 
@@ -116,7 +117,7 @@ export class Input {
             };
         }
         if (p.css) {
-            BB.css(this.input, p.css);
+            css(this.input, p.css);
         }
 
         if (p.doScrollWithoutFocus && p.type === 'number' && p.onChange) {
@@ -188,7 +189,7 @@ export const input = function (params: {
         };
     }
     if (params.css) {
-        BB.css(result, params.css);
+        css(result, params.css);
     }
 
     return result;

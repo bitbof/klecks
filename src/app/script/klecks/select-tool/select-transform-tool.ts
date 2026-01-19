@@ -4,7 +4,6 @@ import { getSelectionPath2d } from '../../bb/multi-polygon/get-selection-path-2d
 import {
     applyToPoint,
     compose,
-    decomposeTSR,
     identity,
     Matrix,
     rotate,
@@ -13,56 +12,15 @@ import {
 } from 'transformation-matrix';
 import { transformMultiPolygon } from '../../bb/multi-polygon/transform-multi-polygon';
 import { getMultiPolyBounds } from '../../bb/multi-polygon/get-multi-polygon-bounds';
-import { TLayerComposite, TSelectionSample } from '../canvas/kl-canvas';
-import { BB } from '../../bb/bb';
-import { snapToPixel, TFreeTransform } from '../ui/components/free-transform-utils';
+import { TLayerComposite } from '../canvas/kl-canvas';
+import { TFreeTransform } from '../ui/components/free-transform-utils';
 import { integerBounds } from '../../bb/math/math';
 import { matrixToTuple } from '../../bb/math/matrix-to-tuple';
+import { TInterpolationAlgorithm } from '../kl-types';
+import { setContextAlgorithm } from '../utils/set-context-algorithm';
+import { TSelectionSample } from '../canvas/kl-canvas-transform';
 
-function matrixToFreeTransform(transform: Matrix, bounds: TBounds): TFreeTransform {
-    const centerBefore = {
-        x: bounds.x1 + (bounds.x2 - bounds.x1) / 2,
-        y: bounds.y1 + (bounds.y2 - bounds.y1) / 2,
-    };
-    const centerAfter = applyToPoint(transform, centerBefore);
-    const decomposed = decomposeTSR(transform);
-    const angleDeg = BB.round((decomposed.rotation.angle / Math.PI) * 180, 7);
-
-    const tlBefore = {
-        x: bounds.x1,
-        y: bounds.y1,
-    };
-    const trBefore = {
-        x: bounds.x2,
-        y: bounds.y1,
-    };
-    const blBefore = {
-        x: bounds.x1,
-        y: bounds.y2,
-    };
-
-    const [tlAfter, trAfter, blAfter] = [tlBefore, trBefore, blBefore].map((p) => {
-        return applyToPoint(transform, p);
-    });
-    let width = BB.Vec2.dist(trAfter, tlAfter);
-    let height = BB.Vec2.dist(blAfter, tlAfter);
-
-    if (decomposed.scale.sx < 0) {
-        width = -width;
-    }
-    if (decomposed.scale.sy < 0) {
-        height = -height;
-    }
-
-    return {
-        ...centerAfter,
-        width,
-        height,
-        angleDeg,
-    };
-}
-
-function freeTransformToMatrix(transform: TFreeTransform, bounds: TBounds): Matrix {
+export function freeTransformToMatrix(transform: TFreeTransform, bounds: TBounds): Matrix {
     const centerBefore = {
         x: bounds.x1 + (bounds.x2 - bounds.x1) / 2,
         y: bounds.y1 + (bounds.y2 - bounds.y1) / 2,
@@ -85,7 +43,7 @@ function freeTransformToMatrix(transform: TFreeTransform, bounds: TBounds): Matr
 }
 
 /**
- * to facilitate KlCanvas.transformViaSelection and provide a preview (composite)
+ * hold transformation state and provide a preview
  */
 export class SelectTransformTool {
     private selection: MultiPolygon = [];
@@ -94,8 +52,10 @@ export class SelectTransformTool {
     private doClone: boolean = false; // true -> draw selected area twice (original position, and transformed position)
     private selectionSample: TSelectionSample | undefined;
     private backgroundIsTransparent: boolean = false;
+    private algorithm: TInterpolationAlgorithm = 'smooth';
 
     // ----------------------------------- public -----------------------------------
+
     constructor() {}
 
     setBackgroundIsTransparent(isTransparent: boolean): void {
@@ -137,6 +97,18 @@ export class SelectTransformTool {
         this.transform = compose(translate(d.x, d.y), this.transform);
     }
 
+    center(centerX: number, centerY: number): void {
+        const freeTransformCenter = {
+            x: (this.selectionBounds.x1 + this.selectionBounds.x2) / 2,
+            y: (this.selectionBounds.y1 + this.selectionBounds.y2) / 2,
+        };
+        const transformedCenter = applyToPoint(this.transform, freeTransformCenter);
+        this.transform = compose(
+            translate(centerX - transformedCenter.x, centerY - transformedCenter.y),
+            this.transform,
+        );
+    }
+
     flip(axis: 'x' | 'y'): void {
         const center = {
             x: (this.selectionBounds.x1 + this.selectionBounds.x2) / 2,
@@ -151,7 +123,7 @@ export class SelectTransformTool {
         );
     }
 
-    rotateDeg(deg: number): void {
+    scale(factor: number): void {
         const center = {
             x: (this.selectionBounds.x1 + this.selectionBounds.x2) / 2,
             y: (this.selectionBounds.y1 + this.selectionBounds.y2) / 2,
@@ -159,7 +131,7 @@ export class SelectTransformTool {
         const transformedCenter = applyToPoint(this.transform, center);
         this.transform = compose(
             translate(transformedCenter.x, transformedCenter.y),
-            rotate((deg / 180) * Math.PI),
+            scale(factor),
             translate(-transformedCenter.x, -transformedCenter.y),
             this.transform,
         );
@@ -176,9 +148,7 @@ export class SelectTransformTool {
     }
 
     getTransform(): Matrix {
-        const freeTransform = matrixToFreeTransform(this.transform, this.selectionBounds);
-        snapToPixel(freeTransform);
-        return freeTransformToMatrix(freeTransform, this.selectionBounds);
+        return this.transform;
     }
 
     setTransform(transform: Matrix): void {
@@ -193,6 +163,14 @@ export class SelectTransformTool {
         this.selectionSample = selectionSample;
     }
 
+    setAlgorithm(algorithm: TInterpolationAlgorithm) {
+        this.algorithm = algorithm;
+    }
+
+    getAlgorithm(): TInterpolationAlgorithm {
+        return this.algorithm;
+    }
+
     /**
      * creates composite for KlCanvas layer
      * if source === target
@@ -204,6 +182,7 @@ export class SelectTransformTool {
         return {
             draw: (ctx: CanvasRenderingContext2D) => {
                 ctx.save();
+                setContextAlgorithm(ctx, this.algorithm);
 
                 if (this.selectionSample && this.doClone) {
                     if (this.selectionSample.image) {
@@ -256,6 +235,8 @@ export class SelectTransformTool {
             draw: (ctx: CanvasRenderingContext2D) => {
                 //draw original with inverted selection before transformation
                 ctx.save();
+                setContextAlgorithm(ctx, this.algorithm);
+
                 ctx.clip(selectionPath);
                 if (this.backgroundIsTransparent) {
                     ctx.clearRect(0, 0, originalSrcCanvas.width, originalSrcCanvas.height);
@@ -280,6 +261,7 @@ export class SelectTransformTool {
         return {
             draw: (ctx: CanvasRenderingContext2D) => {
                 ctx.save();
+                setContextAlgorithm(ctx, this.algorithm);
 
                 if (this.selectionSample && this.doClone) {
                     if (this.selectionSample.image) {

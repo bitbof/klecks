@@ -1,5 +1,6 @@
 import { BB } from '../../../bb/bb';
 import { PointerListener } from '../../../bb/input/pointer-listener';
+import { css } from '../../../bb/base/base';
 
 /**
  * A slider that looks like this
@@ -50,7 +51,7 @@ export class PointSlider {
         });
 
         const redrawPoint = () => {
-            BB.css(this.sliderPoint, {
+            css(this.sliderPoint, {
                 left: sliderPos + 'px',
             });
         };
@@ -61,7 +62,7 @@ export class PointSlider {
         {
             let isFirst: boolean;
             sliderPos = BB.clamp(p.init * (p.width - p.pointSize), 0, p.width - p.pointSize);
-            BB.css(this.sliderPoint, {
+            css(this.sliderPoint, {
                 width: p.pointSize + 'px',
                 height: p.pointSize + 'px',
                 borderRadius: p.pointSize + 'px',

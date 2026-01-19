@@ -8,12 +8,22 @@
             name="viewport"
             content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"
         />
+        <meta name="color-scheme" content="dark light" />
         <link rel="icon" type="image/png" href="app/img/klecks-icon.png" />
+        <script>
+            // reduce flickering
+            const theme = localStorage.getItem('klecks-theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+            if (theme === 'dark') {
+                document.documentElement.classList.add('kl-theme-dark');
+            }
+        </script>
         <style>
-            body {
-                margin: 0;
+            :root {
                 font-family: system-ui, sans-serif;
                 background: #999;
+            }
+            body {
+                margin: 0;
             }
             #loading-screen {
                 color: #eee;

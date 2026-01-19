@@ -1,5 +1,5 @@
-import { BB } from '../bb';
 import { el } from './ui';
+import { css } from './base';
 
 function decomposeElString(el: string) {
     if (el === '') {
@@ -169,7 +169,7 @@ function applyStyleNames(el: HTMLElement, styleNames: string[]) {
         const operation = params.shift()!;
         operations[operation](params);
     });
-    BB.css(el, style);
+    css(el, style);
 }
 
 /**
