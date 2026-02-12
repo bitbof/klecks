@@ -6,37 +6,293 @@
         <base href="/" />
         <meta
             name="viewport"
-            content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"
+            content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover"
         />
         <meta name="color-scheme" content="dark light" />
+        <meta name="theme-color" content="#1a1a1a" media="(prefers-color-scheme: dark)" />
+        <meta name="theme-color" content="#f5f5f5" media="(prefers-color-scheme: light)" />
+        <meta name="description" content="A powerful, browser-based painting and drawing application" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-title" content="Klecks" />
+        
+        <!-- Favicons -->
         <link rel="icon" type="image/png" href="app/img/klecks-icon.png" />
+        <link rel="apple-touch-icon" href="app/img/klecks-icon.png" />
+        
+        <!-- Preload critical assets -->
+        <link rel="preload" as="style" href="app/style/style.scss" />
+        <link rel="preload" as="script" href="app/script/main-standalone.ts" />
+        <link rel="preload" as="font" href="app/fonts/your-critical-font.woff2" crossorigin />
+        
         <script>
-            // reduce flickering
-            const theme = localStorage.getItem('klecks-theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-            if (theme === 'dark') {
-                document.documentElement.classList.add('kl-theme-dark');
-            }
+            // Reduce flickering - optimized theme detection
+            (function() {
+                try {
+                    const storedTheme = localStorage.getItem('klecks-theme');
+                    const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                    const theme = storedTheme || (systemPrefersDark ? 'dark' : 'light');
+                    
+                    if (theme === 'dark') {
+                        document.documentElement.classList.add('kl-theme-dark');
+                    }
+                    
+                    // Store the initial theme for analytics/error tracking
+                    window.__KLCKS_THEME = theme;
+                } catch (e) {
+                    // Silently fail - theme is non-critical
+                    console.debug('Theme initialization failed:', e);
+                }
+            })();
         </script>
+        
         <style>
+            /* Critical CSS inlined for fastest First Contentful Paint */
             :root {
-                font-family: system-ui, sans-serif;
-                background: #999;
+                font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+                background: #2a2a2a;
+                color-scheme: dark light;
             }
+            
             body {
                 margin: 0;
+                min-height: 100vh;
+                display: flex;
+                flex-direction: column;
             }
+            
+            /* Enhanced loading screen with animation */
             #loading-screen {
-                color: #eee;
-                margin-top: 100px;
-                text-align: center;
-                width: 100vw;
-                font-size: 25px;
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                background: linear-gradient(145deg, #2a2a2a 0%, #1a1a1a 100%);
+                color: #fff;
+                font-size: clamp(20px, 5vw, 28px);
+                font-weight: 300;
+                letter-spacing: 2px;
+                z-index: 1000;
+                transition: opacity 0.3s ease-out;
+            }
+            
+            .loading-content {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 24px;
+            }
+            
+            .loading-logo {
+                width: 80px;
+                height: 80px;
+                background: url('app/img/klecks-icon.png') no-repeat center/contain;
+                animation: pulse 1.5s ease-in-out infinite;
+            }
+            
+            .loading-text {
+                display: flex;
+                gap: 8px;
+            }
+            
+            .loading-dots {
+                display: inline-flex;
+                gap: 4px;
+            }
+            
+            .loading-dots span {
+                width: 8px;
+                height: 8px;
+                background: #fff;
+                border-radius: 50%;
+                display: inline-block;
+                animation: dotPulse 1.4s ease-in-out infinite;
+            }
+            
+            .loading-dots span:nth-child(2) { animation-delay: 0.2s; }
+            .loading-dots span:nth-child(3) { animation-delay: 0.4s; }
+            
+            .loading-progress {
+                width: 200px;
+                height: 4px;
+                background: rgba(255, 255, 255, 0.2);
+                border-radius: 4px;
+                overflow: hidden;
+                margin-top: 8px;
+            }
+            
+            .loading-progress-bar {
+                width: 0%;
+                height: 100%;
+                background: #4CAF50;
+                animation: progress 2s ease-out forwards;
+            }
+            
+            @keyframes pulse {
+                0%, 100% { opacity: 0.8; transform: scale(1); }
+                50% { opacity: 1; transform: scale(1.05); }
+            }
+            
+            @keyframes dotPulse {
+                0%, 100% { opacity: 0.4; transform: scale(1); }
+                50% { opacity: 1; transform: scale(1.2); }
+            }
+            
+            @keyframes progress {
+                0% { width: 0%; }
+                70% { width: 70%; }
+                90% { width: 85%; }
+                100% { width: 90%; }
+            }
+            
+            /* Light theme support */
+            @media (prefers-color-scheme: light) {
+                :root {
+                    background: #e0e0e0;
+                }
+                
+                #loading-screen {
+                    background: linear-gradient(145deg, #f5f5f5 0%, #e8e8e8 100%);
+                    color: #333;
+                }
+                
+                .loading-dots span {
+                    background: #333;
+                }
+                
+                .loading-progress {
+                    background: rgba(0, 0, 0, 0.1);
+                }
+            }
+            
+            /* Dark theme override */
+            .kl-theme-dark #loading-screen {
+                background: linear-gradient(145deg, #2a2a2a 0%, #1a1a1a 100%);
+                color: #fff;
+            }
+            
+            .kl-theme-dark .loading-dots span {
+                background: #fff;
+            }
+            
+            /* Fallback for when image fails to load */
+            .loading-logo {
+                background-color: currentColor;
+                mask: url('app/img/klecks-icon.png') no-repeat center/contain;
+                -webkit-mask: url('app/img/klecks-icon.png') no-repeat center/contain;
+            }
+            
+            /* Hide loading screen when app is ready */
+            .kl-app-ready #loading-screen {
+                opacity: 0;
+                pointer-events: none;
+            }
+            
+            /* Reduced motion preferences */
+            @media (prefers-reduced-motion: reduce) {
+                .loading-logo,
+                .loading-dots span,
+                .loading-progress-bar {
+                    animation: none;
+                }
             }
         </style>
     </head>
     <body>
-        <div id="loading-screen">Loading Klecks</div>
-        <link rel="stylesheet" href="app/style/style.scss" />
-        <script type="module" src="app/script/main-standalone.ts"></script>
+        <div id="loading-screen">
+            <div class="loading-content">
+                <div class="loading-logo" role="presentation"></div>
+                <div class="loading-text">
+                    <span>Loading Klecks</span>
+                    <span class="loading-dots">
+                        <span>.</span>
+                        <span>.</span>
+                        <span>.</span>
+                    </span>
+                </div>
+                <div class="loading-progress" aria-hidden="true">
+                    <div class="loading-progress-bar"></div>
+                </div>
+                <div class="loading-version" aria-hidden="true" style="font-size: 12px; opacity: 0.7;">
+                    v1.0.0
+                </div>
+            </div>
+        </div>
+
+        <!-- Defer non-critical CSS -->
+        <link rel="stylesheet" href="app/style/style.scss" media="print" onload="this.media='all'" />
+        
+        <!-- Preconnect to required origins -->
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        
+        <!-- Module script with enhanced error handling -->
+        <script type="module">
+            (async function() {
+                try {
+                    // Load the main app
+                    await import('app/script/main-standalone.ts');
+                    
+                    // Mark app as ready after a short delay to ensure smooth transition
+                    setTimeout(() => {
+                        document.documentElement.classList.add('kl-app-ready');
+                    }, 100);
+                } catch (error) {
+                    console.error('Failed to load Klecks:', error);
+                    
+                    // Show user-friendly error message
+                    const loadingScreen = document.getElementById('loading-screen');
+                    if (loadingScreen) {
+                        loadingScreen.innerHTML = `
+                            <div class="loading-content">
+                                <div style="font-size: 48px; margin-bottom: 16px;">⚠️</div>
+                                <div style="font-size: 20px; margin-bottom: 8px;">Failed to load Klecks</div>
+                                <div style="font-size: 14px; opacity: 0.8; max-width: 300px; text-align: center;">
+                                    Please check your internet connection and try refreshing the page.
+                                </div>
+                                <button onclick="location.reload()" style="
+                                    margin-top: 24px;
+                                    padding: 12px 24px;
+                                    background: #4CAF50;
+                                    color: white;
+                                    border: none;
+                                    border-radius: 4px;
+                                    font-size: 16px;
+                                    cursor: pointer;
+                                ">Reload Page</button>
+                            </div>
+                        `;
+                    }
+                }
+            })();
+        </script>
+        
+        <!-- Fallback for users without JavaScript -->
+        <noscript>
+            <div style="
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: #fff;
+                color: #000;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                text-align: center;
+                padding: 20px;
+                z-index: 9999;
+            ">
+                <div>
+                    <h2>JavaScript Required</h2>
+                    <p>Klecks requires JavaScript to run. Please enable JavaScript in your browser settings.</p>
+                </div>
+            </div>
+        </noscript>
     </body>
 </html>
