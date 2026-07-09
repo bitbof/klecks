@@ -494,7 +494,7 @@ export class Easel<GToolId extends string> {
 
         this.keyListener = new KeyListener({
             onDown: (keyStr, e, comboStr, isRepeat) => {
-                if (this.isFrozen) {
+                if (this.isFrozen || BB.isInputFocused(true)) {
                     return;
                 }
 
