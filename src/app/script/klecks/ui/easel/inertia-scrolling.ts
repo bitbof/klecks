@@ -111,14 +111,14 @@ export class InertiaScrolling {
             x: BB.mix(this.momentum.x, dX, 0.6),
             y: BB.mix(this.momentum.y, dY, 0.6),
         };
-        this.lastDragTimestamp = new Date().getTime();
+        this.lastDragTimestamp = Date.now();
     }
 
     dragEnd(): void {
         if (!this.isEnabled) {
             return;
         }
-        if (new Date().getTime() - this.lastDragTimestamp > 80) {
+        if (Date.now() - this.lastDragTimestamp > 80) {
             this.momentum.x = 0;
             this.momentum.y = 0;
         } else {

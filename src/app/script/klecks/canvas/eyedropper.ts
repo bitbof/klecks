@@ -36,12 +36,8 @@ export class Eyedropper {
                 if (isLayerFill(tile)) {
                     fillStyle = tile.fill;
                 } else {
-                    let tileWidth = HISTORY_TILE_SIZE;
-                    if (composed.size.width % HISTORY_TILE_SIZE !== 0 && tileCol === tilesX - 1) {
-                        tileWidth = composed.size.width % HISTORY_TILE_SIZE;
-                    }
                     const pixelIndex =
-                        (y % HISTORY_TILE_SIZE) * tileWidth + (x % HISTORY_TILE_SIZE);
+                        (y % HISTORY_TILE_SIZE) * tile.data.width + (x % HISTORY_TILE_SIZE);
 
                     if (tile.data.data[pixelIndex * 4 + 3] === 0) {
                         return;

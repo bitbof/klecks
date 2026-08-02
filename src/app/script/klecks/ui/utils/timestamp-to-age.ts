@@ -1,7 +1,7 @@
 import { LANG } from '../../../language/language';
 
 export function timestampToAge(timestamp: number): string {
-    let age = new Date().getTime() - timestamp;
+    let age = Date.now() - timestamp;
     let ageStr;
     age = Math.floor(age / 1000 / 60);
     ageStr = LANG('file-storage-min-ago').replace('{x}', '' + age);

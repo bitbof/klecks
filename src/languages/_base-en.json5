@@ -420,6 +420,7 @@ Renaming a key across multiple language files:
   "tab-recovery-delete-confirmation": "Delete this recovery? Deletion can not be undone.",
   "tab-recovery-failed-to-recover": "Failed to recover tab.",
   "tab-recovery-recovered": "Tab recovered.",
+  "tab-recovery-restoring-session": "Restoring your previous session...",
 
   "cleared-layer": {
     "hint": "the layer has been cleared. It is now empty",
@@ -1078,4 +1079,6 @@ Renaming a key across multiple language files:
   "wip": 'Work in progress',
   "browser-zoom-help": "Double-tap or pinch-out to reset browser zoom.",
   "dismiss": "Dismiss",
+  "error": "Error",
+  "retry": "Retry",
 }

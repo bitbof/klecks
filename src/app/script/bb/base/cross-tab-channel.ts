@@ -15,13 +15,13 @@ const originId = randomUuid();
  */
 export class CrossTabChannel {
     private readonly broadcastChannel: BroadcastChannel | undefined;
-    private readonly broadcastChannelListeners: {
-        preListener: (message: MessageEvent) => void; // extracts message.data
+    private readonly broadcastChannelListeners: Set<{
+        nativeListener: (message: MessageEvent) => void; // passes message.data to the external listener
         listener: TCrossTabChannelListener;
-    }[] = [];
+    }> = new Set();
 
     // for fallback
-    private lastReadTimestamp: number = new Date().getTime();
+    private lastReadTimestamp: number = Date.now();
     private readonly maxAgeMs = 1000 * 10;
     private readonly localStoragePrefix = 'cross-tab-channel--';
     private readonly localStorageListeners: Set<TCrossTabChannelListener> = new Set();
@@ -64,7 +64,7 @@ export class CrossTabChannel {
         if (this.broadcastChannel) {
             this.broadcastChannel.postMessage(message);
         } else {
-            const now = new Date().getTime();
+            const now = Date.now();
             let raw: string | null = null;
             try {
                 raw = LocalStorage.getItem(this.getLsKey());
@@ -87,12 +87,12 @@ export class CrossTabChannel {
 
     subscribe(listener: TCrossTabChannelListener): void {
         if (this.broadcastChannel) {
-            const preListener = (message: MessageEvent) => listener(message.data);
-            this.broadcastChannelListeners.push({
-                preListener,
+            const nativeListener = (message: MessageEvent) => listener(message.data);
+            this.broadcastChannelListeners.add({
+                nativeListener,
                 listener,
             });
-            this.broadcastChannel.addEventListener('message', preListener);
+            this.broadcastChannel.addEventListener('message', nativeListener);
         } else {
             if (this.localStorageListeners.size === 0) {
                 window.addEventListener('storage', this.onLocalStorageChange);
@@ -103,9 +103,12 @@ export class CrossTabChannel {
 
     unsubscribe(listener: TCrossTabChannelListener): void {
         if (this.broadcastChannel) {
-            const match = this.broadcastChannelListeners.find((item) => item.listener === listener);
+            const match = [...this.broadcastChannelListeners].find(
+                (item) => item.listener === listener,
+            );
             if (match) {
-                this.broadcastChannel.removeEventListener('message', match.preListener);
+                this.broadcastChannel.removeEventListener('message', match.nativeListener);
+                this.broadcastChannelListeners.delete(match);
             }
         } else {
             this.localStorageListeners.delete(listener);

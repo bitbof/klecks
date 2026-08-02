@@ -7,10 +7,11 @@ import { HISTORY_TILE_SIZE, KlHistory } from '../history/kl-history';
 import { getPushableLayerChange } from '../history/push-helpers/get-pushable-layer-change';
 import { copyImageData } from '../utils/copy-image-data';
 import { createArray } from '../../bb/base/base';
-import { createImageDataTile } from '../history/image-data-tile';
+import { createImageDataTile, getTileSizeFromIndex } from '../history/image-data-tile';
 import { getBinaryMask } from '../select-tool/get-binary-mask';
 import { getMultiPolyBounds } from '../../bb/multi-polygon/get-multi-polygon-bounds';
 import { getChangedTiles } from '../history/push-helpers/changed-tiles';
+import { freeCanvas } from '../../bb/base/canvas';
 
 type TDrawBufferItem = {
     x: number;
@@ -182,6 +183,7 @@ export class BlendBrush {
         const touchedCells = this.getTouchedCells(bounds);
         const composedLayer = this.klHistory.getComposed().layerMap[this.layerId];
 
+        let canvas: HTMLCanvasElement | undefined;
         touchedCells.forEach((item, i) => {
             if (!item || this.cells[i]) {
                 // not touched, or already copied
@@ -190,16 +192,26 @@ export class BlendBrush {
             // Uncaught TypeError: Cannot read properties of undefined (reading 'tiles')
             const composedTile = composedLayer.tiles[i];
             if (isLayerFill(composedTile)) {
-                const canvas = BB.canvas(HISTORY_TILE_SIZE, HISTORY_TILE_SIZE);
+                const { width, height } = getTileSizeFromIndex(i, this.context.canvas);
+                if (!canvas) {
+                    canvas = BB.canvas(width, height);
+                } else {
+                    // update and clear
+                    canvas.width = width;
+                    canvas.height = height;
+                }
                 const ctx = BB.ctx(canvas);
                 ctx.fillStyle = composedTile.fill;
-                ctx.fillRect(0, 0, HISTORY_TILE_SIZE, HISTORY_TILE_SIZE);
+                ctx.fillRect(0, 0, width, height);
                 // InvalidStateError: The object is in an invalid state.
-                this.cells[i] = ctx.getImageData(0, 0, HISTORY_TILE_SIZE, HISTORY_TILE_SIZE);
+                this.cells[i] = ctx.getImageData(0, 0, width, height);
             } else {
                 this.cells[i] = copyImageData(composedTile.data);
             }
         });
+        if (canvas) {
+            freeCanvas(canvas);
+        }
     }
 
     private getAverage(x: number, y: number, size: number): TRgba {

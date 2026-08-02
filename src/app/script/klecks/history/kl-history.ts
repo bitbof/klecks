@@ -3,6 +3,7 @@ import { composeHistoryStateData } from './compose-history-state-data';
 import { estimateBytes } from './estimate-bytes';
 import { entryCausesChange } from './entry-causes-change';
 import { getTotalMemoryBytes, trimOldestEntries } from './trim-oldest-entries';
+import { validateHistoryEntry } from './validate-history-entry';
 
 /*
 todo memory could be better limited.
@@ -49,9 +50,10 @@ export class KlHistory {
 
     // ----------------------------------- public -----------------------------------
     constructor(p: TKlHistoryParams) {
+        validateHistoryEntry(p.oldest, p.oldest.size);
         this.entries = [
             {
-                timestamp: new Date().getTime(),
+                timestamp: Date.now(),
                 memoryEstimateBytes: estimateBytes(p.oldest),
                 data: p.oldest,
             },
@@ -92,8 +94,9 @@ export class KlHistory {
             // no change -> noop
             return;
         }
+        validateHistoryEntry(entryData, this.composed.size);
         const entry: THistoryEntry = {
-            timestamp: new Date().getTime(),
+            timestamp: Date.now(),
             memoryEstimateBytes: estimateBytes(entryData),
             data: entryData,
         };

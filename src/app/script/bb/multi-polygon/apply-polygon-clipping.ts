@@ -1,5 +1,4 @@
-import polygonClipping from 'polygon-clipping';
-import { Geom, MultiPolygon, Ring } from 'polygon-clipping';
+import polygonClipping, { Geom, MultiPolygon, Ring } from 'polygon-clipping';
 
 // wrapper to catch errors, and offer fallback
 export function applyPolygonClipping(

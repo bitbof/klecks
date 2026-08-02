@@ -13,6 +13,7 @@ import * as classes from './recovery-manager-panel.module.scss';
 import { LANG } from '../../../../language/language';
 import removeLayerImg from 'url:/src/app/img/ui/remove-layer.svg';
 import { css } from '../../../../bb/base/base';
+import loadingImg from 'url:/src/app/img/ui/loading.gif';
 
 export type TRecoveryManagerPanelParams = {
     klRecoveryManager: KlRecoveryManager;
@@ -56,7 +57,7 @@ export class RecoveryManagerPanel {
                     content: `<img src="${removeLayerImg}" height="20"/>${LANG('tab-recovery-delete')}`,
                     onClick: () => {
                         deleteBtn.blur();
-                        const thumbnail2 = copyCanvas(meta.thumbnail!);
+                        const thumbnail2 = copyCanvas(meta.thumbnail);
                         css(thumbnail2, {
                             alignSelf: 'start',
                             background: 'var(--kl-checkerboard-background)',
@@ -85,7 +86,7 @@ export class RecoveryManagerPanel {
                     noRef: true,
                 });
 
-                const preview = meta.thumbnail!;
+                const preview = meta.thumbnail;
 
                 const previewWrapper = BB.el({
                     tagName: 'a',
@@ -170,16 +171,53 @@ export class RecoveryManagerPanel {
         this.klRecoveryManager = p.klRecoveryManager;
         this.rootEl = BB.el({ content: LANG('loading') });
         this.klRecoveryManager.subscribe(this.recoveryListener);
-        setTimeout(async () => {
+
+        const refresh = async () => {
             try {
+                this.rootEl.innerHTML = '';
+                this.rootEl.append(
+                    BB.el({
+                        tagName: 'img',
+                        custom: {
+                            src: loadingImg,
+                            alt: '',
+                        },
+                    }),
+                );
                 await this.klRecoveryManager.update();
-            } catch (e) {
+            } catch (error) {
                 setTimeout(() => {
-                    throw e;
+                    throw error;
                 });
-                this.rootEl.innerHTML = 'error';
+                const errorText =
+                    error instanceof Error ? `${error.name}: ${error.message}` : String(error);
+                this.rootEl.innerHTML = '';
+                this.rootEl.append(
+                    BB.el({
+                        textContent: LANG('error'),
+                    }),
+                    BB.el({
+                        className: 'info-hint',
+                        textContent: errorText,
+                        css: {
+                            marginTop: '5px',
+                            fontFamily: 'monospace',
+                            overflowWrap: 'anywhere',
+                        },
+                    }),
+                    BB.el({
+                        tagName: 'button',
+                        textContent: LANG('retry'),
+                        onClick: (e) => {
+                            (e.target as HTMLButtonElement).disabled = true;
+                            refresh();
+                        },
+                        noRef: true,
+                    }),
+                );
             }
-        });
+        };
+        setTimeout(refresh);
     }
 
     getElement(): HTMLElement {

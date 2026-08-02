@@ -2,7 +2,7 @@ import './polyfills-nomodule';
 
 /*
  * ---- Below ----------------------
- * features that didn't have support until *after* browsers supported the modules script tag:
+ * Polyfills for features that didn't have support until *after* browsers supported the modules script tag:
  * Chrome 61
  * Edge 16
  * Safari 11
@@ -10,7 +10,7 @@ import './polyfills-nomodule';
  * https://caniuse.com/es6-module
  */
 
-// chrome 61, edge 79, safari 16, firefox 107
+// Chrome 61, Edge 79, safari 16, firefox 107
 if (!('scrollTo' in Element.prototype)) {
     Object.defineProperty(Element.prototype, 'scrollTo', {
         value: function (x: number, y: number) {
@@ -20,7 +20,7 @@ if (!('scrollTo' in Element.prototype)) {
     });
 }
 
-// chrome 61, edge 79, safari 16, firefox 107
+// Chrome 61, Edge 79, safari 16, firefox 107
 if (!('scrollBy' in Element.prototype)) {
     Object.defineProperty(Element.prototype, 'scrollBy', {
         value: function (x: number, y: number) {
@@ -30,7 +30,7 @@ if (!('scrollBy' in Element.prototype)) {
     });
 }
 
-// chrome 69, edge 79, safari 12, firefox 62
+// Chrome 69, Edge 79, safari 12, firefox 62
 if (!Array.prototype.flat) {
     Object.defineProperty(Array.prototype, 'flat', {
         configurable: true,
@@ -58,7 +58,7 @@ if (!Array.prototype.flat) {
     });
 }
 
-// chrome 69, edge 79, safari 12, firefox 62
+// Chrome 69, Edge 79, safari 12, firefox 62
 if (!Array.prototype.flatMap) {
     Object.defineProperty(Array.prototype, 'flatMap', {
         configurable: true,
@@ -109,6 +109,23 @@ if (!('at' in Array.prototype)) {
             if (index < 0) {
                 return this[index + this.length];
             }
+        },
+    });
+}
+
+// Chrome 122, Firefox 127, Safari 17
+if (!Set.prototype.difference) {
+    Object.defineProperty(Set.prototype, 'difference', {
+        configurable: true,
+        writable: true,
+        value: function <T>(this: Set<T>, other: ReadonlySetLike<unknown>): Set<T> {
+            const result = new Set<T>();
+            for (const value of this) {
+                if (!other.has(value)) {
+                    result.add(value);
+                }
+            }
+            return result;
         },
     });
 }

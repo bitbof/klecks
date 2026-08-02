@@ -6,18 +6,15 @@ import {
     TKlStorageProjectWrite,
 } from './project-converter';
 import { LocalStorage } from '../../bb/base/local-storage';
-import { BROWSER_STORAGE_STORE, IMAGE_DATA_STORE, KL_INDEXED_DB } from './kl-indexed-db';
+import { IMAGE_DATA_STORE, KL_INDEXED_DB, PROJECT_STORE } from './kl-indexed-db';
 import { isBlob, randomUuid } from '../../bb/base/base';
 import { TIdb } from './kl-indexed-db.types';
 import { BB } from '../../bb/bb';
 import { canvasToBlob } from '../../bb/base/canvas';
 
-export type TImageDataReference = {
-    id: string; // id of imageDataStore entry
-    //sizeBytes: number;
-};
-
-export function isTImageDataReference(input: unknown): input is TImageDataReference {
+export function isImageDataReference(
+    input: unknown,
+): input is TIdb['V2']['ProjectStore']['ImageDataRef'] {
     return (
         typeof input === 'object' &&
         input !== null &&
@@ -38,6 +35,13 @@ export type TProjectStoreListener = {
     onUpdate: (meta?: TKlProjectMeta) => void;
 };
 
+export function getProjectImageDataIds(raw: TIdb['V2']['ProjectStore']['Read']): string[] {
+    return [
+        ...(isImageDataReference(raw.thumbnail) ? [raw.thumbnail.id] : []),
+        ...raw.layers.flatMap((layer) => (isImageDataReference(layer.blob) ? [layer.blob.id] : [])),
+    ];
+}
+
 /**
  * simplified interface for storing projects into browser storage
  */
@@ -47,23 +51,6 @@ export class ProjectStore {
     private currentMeta: TKlProjectMeta | undefined;
 
     private async lowLevelStore(project: TKlStorageProjectWrite): Promise<void> {
-        // get image data ids
-        const rawOld = (await KL_INDEXED_DB.get(BROWSER_STORAGE_STORE, 1)) as
-            | TKlStorageProjectWrite
-            | undefined;
-        const deleteIds: string[] = [];
-        if (rawOld) {
-            if (isTImageDataReference(rawOld.thumbnail)) {
-                deleteIds.push(rawOld.thumbnail.id);
-            }
-            for (const layer of rawOld.layers) {
-                if (isTImageDataReference(layer.blob)) {
-                    deleteIds.push(layer.blob.id);
-                }
-            }
-        }
-
-        // prepare for storing
         const imageDataList: { id: string; data: Blob }[] = [];
         const thumbnail = {
             id: randomUuid(),
@@ -92,40 +79,53 @@ export class ProjectStore {
             layers,
         };
 
-        // store first. so nothing will be lost if something goes wrong
-        for (const imageData of imageDataList) {
-            await KL_INDEXED_DB.set(IMAGE_DATA_STORE, imageData.id, imageData.data);
-        }
-
-        await KL_INDEXED_DB.set(BROWSER_STORAGE_STORE, undefined, raw);
-
-        // remove obsolete imageData
-        for (const id of deleteIds) {
-            await KL_INDEXED_DB.remove(IMAGE_DATA_STORE, id);
-        }
+        await KL_INDEXED_DB.runTransaction(
+            [PROJECT_STORE, IMAGE_DATA_STORE],
+            'readwrite',
+            async (transaction) => {
+                // remove old
+                const rawOld = await transaction.get(PROJECT_STORE, 1);
+                if (rawOld) {
+                    await transaction.bulkRemove(IMAGE_DATA_STORE, getProjectImageDataIds(rawOld));
+                }
+                // save new
+                await transaction.bulkSet(
+                    IMAGE_DATA_STORE,
+                    imageDataList.map(({ id, data }) => ({
+                        key: id,
+                        value: data,
+                    })),
+                );
+                await transaction.set(PROJECT_STORE, undefined, raw);
+            },
+            { durability: 'strict' },
+        );
     }
 
     private async lowLevelReadMeta(): Promise<TRawMeta | undefined> {
-        const raw = (await KL_INDEXED_DB.get(
-            BROWSER_STORAGE_STORE,
-            1,
-        )) as TIdb['V2']['ProjectStore']['Read'];
+        const raw = await KL_INDEXED_DB.runTransaction(
+            [PROJECT_STORE, IMAGE_DATA_STORE],
+            'readonly',
+            async (transaction) => {
+                const raw = await transaction.get(PROJECT_STORE, 1);
+                if (!raw) {
+                    return undefined;
+                }
+                return {
+                    projectId: raw.projectId,
+                    timestamp: raw.timestamp,
+                    thumbnail: isImageDataReference(raw.thumbnail)
+                        ? await transaction.get(IMAGE_DATA_STORE, raw.thumbnail.id)
+                        : raw.thumbnail,
+                };
+            },
+        );
         if (!raw) {
             return undefined;
         }
 
-        let thumbnail: Blob | undefined;
-        if (isTImageDataReference(raw.thumbnail)) {
-            const thumbnailReadResult = (await KL_INDEXED_DB.get(
-                IMAGE_DATA_STORE,
-                raw.thumbnail.id,
-            )) as TIdb['V2']['ImageDataStore']['Read'] | undefined;
-            if (isBlob(thumbnailReadResult)) {
-                thumbnail = thumbnailReadResult;
-            }
-        } else {
-            thumbnail = raw.thumbnail;
-        }
+        // for now ignores the ImageData case because we only write blobs for browser storage projects
+        let thumbnail = isBlob(raw.thumbnail) ? raw.thumbnail : undefined;
         thumbnail = thumbnail ?? (await createFallbackThumbnail());
 
         return {
@@ -136,77 +136,66 @@ export class ProjectStore {
     }
 
     private async lowLevelRead(): Promise<TKlStorageProjectRead | undefined> {
-        const raw = (await KL_INDEXED_DB.get(
-            BROWSER_STORAGE_STORE,
-            1,
-        )) as TIdb['V2']['ProjectStore']['Read'];
-        if (!raw) {
+        const transactionResult = await KL_INDEXED_DB.runTransaction(
+            [PROJECT_STORE, IMAGE_DATA_STORE],
+            'readonly',
+            async (transaction) => {
+                const raw = await transaction.get(PROJECT_STORE, 1);
+                if (!raw) {
+                    return undefined;
+                }
+                const imageDataIds = [...new Set(getProjectImageDataIds(raw))];
+                return {
+                    imageDataById: await transaction.bulkGet(IMAGE_DATA_STORE, imageDataIds),
+                    raw,
+                };
+            },
+        );
+        if (!transactionResult) {
             return undefined;
         }
 
-        let thumbnail: Blob | undefined;
-        if (isTImageDataReference(raw.thumbnail)) {
-            const thumbnailReadResult = (await KL_INDEXED_DB.get(
-                IMAGE_DATA_STORE,
-                raw.thumbnail.id,
-            )) as TIdb['V2']['ImageDataStore']['Read'] | undefined;
-            if (isBlob(thumbnailReadResult)) {
-                thumbnail = thumbnailReadResult;
-            }
-        } else {
-            thumbnail = raw.thumbnail;
-        }
+        let thumbnail = isImageDataReference(transactionResult.raw.thumbnail)
+            ? transactionResult.imageDataById.get(transactionResult.raw.thumbnail.id)
+            : transactionResult.raw.thumbnail;
+        // for now ignores the ImageData case because we only write blobs for browser storage projects
+        thumbnail = isBlob(thumbnail) ? thumbnail : undefined;
         thumbnail = thumbnail ?? (await createFallbackThumbnail());
 
-        const layers: TKlStorageProjectRead['layers'] = [];
-        for (const layer of raw.layers) {
-            let blob: Blob | undefined;
-            if (isTImageDataReference(layer.blob)) {
-                const readResult = (await KL_INDEXED_DB.get(IMAGE_DATA_STORE, layer.blob.id)) as
-                    | TIdb['V2']['ImageDataStore']['Read']
-                    | undefined;
-                if (isBlob(readResult)) {
-                    blob = readResult;
-                }
-            } else {
-                blob = layer.blob;
-            }
-            layers.push({
-                ...layer,
-                isVisible: layer.isVisible ?? true,
-                mixModeStr: layer.mixModeStr ?? 'source-over',
-                blob,
-            });
-        }
+        const layers: TKlStorageProjectRead['layers'] = transactionResult.raw.layers.map(
+            (layer) => {
+                const storedBlob = isImageDataReference(layer.blob)
+                    ? transactionResult.imageDataById.get(layer.blob.id)
+                    : layer.blob;
+                return {
+                    ...layer,
+                    isVisible: layer.isVisible ?? true,
+                    mixModeStr: layer.mixModeStr ?? 'source-over',
+                    // for now ignores the ImageData case because we only write blobs for browser storage projects
+                    blob: isBlob(storedBlob) ? storedBlob : undefined,
+                };
+            },
+        );
         return {
-            ...raw,
-            projectId: raw.projectId ?? randomUuid(),
+            ...transactionResult.raw,
+            projectId: transactionResult.raw.projectId ?? randomUuid(),
             thumbnail,
             layers,
         };
     }
 
     private async lowLevelClear(): Promise<void> {
-        // get image data ids
-        const rawOld = (await KL_INDEXED_DB.get(BROWSER_STORAGE_STORE, 1)) as
-            | TIdb['V2']['ProjectStore']['Read']
-            | undefined;
-        const deleteIds: string[] = [];
-        if (rawOld) {
-            if (isTImageDataReference(rawOld.thumbnail)) {
-                deleteIds.push(rawOld.thumbnail.id);
-            }
-            for (const layer of rawOld.layers) {
-                if (isTImageDataReference(layer.blob)) {
-                    deleteIds.push(layer.blob.id);
+        await KL_INDEXED_DB.runTransaction(
+            [PROJECT_STORE, IMAGE_DATA_STORE],
+            'readwrite',
+            async (transaction) => {
+                const rawOld = await transaction.get(PROJECT_STORE, 1);
+                await transaction.remove(PROJECT_STORE, 1);
+                if (rawOld) {
+                    await transaction.bulkRemove(IMAGE_DATA_STORE, getProjectImageDataIds(rawOld));
                 }
-            }
-        }
-
-        await KL_INDEXED_DB.remove(BROWSER_STORAGE_STORE, 1);
-        for (const id of deleteIds) {
-            await KL_INDEXED_DB.remove(IMAGE_DATA_STORE, id);
-        }
+            },
+        );
     }
 
     private emit(meta?: TKlProjectMeta): void {
@@ -217,7 +206,7 @@ export class ProjectStore {
     }
 
     private updateTimestamp(): void {
-        LocalStorage.setItem('indexedDbUpdatedAt', '' + new Date().getTime());
+        LocalStorage.setItem('indexedDbUpdatedAt', '' + Date.now());
     }
 
     // ----------------------------------- public -----------------------------------

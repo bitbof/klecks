@@ -1,6 +1,140 @@
-import { timeoutWrapper } from './base';
+import { getAbortError, timeoutWrapper } from './base';
 
-export type TIndexedDbUpgrader = (event: IDBVersionChangeEvent) => void;
+function requestToPromise<G>(request: IDBRequest<G>): Promise<G> {
+    return new Promise((resolve, reject) => {
+        request.onsuccess = () => resolve(request.result);
+        request.onerror = () => reject(request.error);
+    });
+}
+
+export type TIndexedDbRecord<GValue, GKey extends IDBValidKey> = {
+    // The index key for index reads; identical to primaryKey for object-store reads.
+    key: GKey;
+    // The key of the record in its object store.
+    primaryKey: GKey;
+    value: GValue;
+};
+
+// todo remove when typescript api is updated
+type TIdbObjectStoreWithGetAllRecords = IDBObjectStore & {
+    getAllRecords?: () => IDBRequest<TIndexedDbRecord<unknown, IDBValidKey>[]>;
+};
+
+export type TIdbSchema = {
+    [K in string]: {
+        Key: IDBValidKey;
+        Read: any;
+        Write: any;
+    };
+};
+export type TIdbSchemaStoreName<G extends TIdbSchema> = keyof G & string;
+
+export class IndexedDbTransaction<
+    GSchema extends TIdbSchema,
+    GStoreName extends TIdbSchemaStoreName<GSchema>,
+> {
+    // A trick to ensure store names must exactly match when passing an instance of this class,
+    // because parameters of function-valued properties are type checked contravariantly.
+    // https://www.typescriptlang.org/docs/handbook/release-notes/typescript-2-6.html#strict-function-types
+    declare private readonly enforceStoreNames: (storeName: GStoreName) => void;
+
+    constructor(private transaction: IDBTransaction) {}
+
+    private getObjectStore(store: TIdbSchemaStoreName<GSchema>): IDBObjectStore {
+        return this.transaction.objectStore(store);
+    }
+
+    async get<G extends GStoreName>(
+        store: G,
+        key: GSchema[G]['Key'],
+    ): Promise<GSchema[G]['Read'] | undefined> {
+        return requestToPromise(this.getObjectStore(store).get(key));
+    }
+
+    async getAll<G extends GStoreName>(store: G): Promise<GSchema[G]['Read'][]> {
+        return requestToPromise(this.getObjectStore(store).getAll());
+    }
+
+    async getAllKeys<G extends GStoreName>(store: G): Promise<GSchema[G]['Key'][]> {
+        return requestToPromise(this.getObjectStore(store).getAllKeys()) as Promise<
+            GSchema[G]['Key'][]
+        >;
+    }
+
+    async getAllRecords<G extends GStoreName>(
+        store: G,
+    ): Promise<TIndexedDbRecord<GSchema[G]['Read'], GSchema[G]['Key']>[]> {
+        const objectStore = this.getObjectStore(store) as TIdbObjectStoreWithGetAllRecords;
+        if (objectStore.getAllRecords) {
+            return requestToPromise(objectStore.getAllRecords()) as Promise<
+                TIndexedDbRecord<GSchema[G]['Read'], GSchema[G]['Key']>[]
+            >;
+        }
+        // getAllRecords was added to browsers 2025/2026. So we have a fallback.
+
+        // same ordering
+        const [keys, values] = await Promise.all([
+            requestToPromise(objectStore.getAllKeys()),
+            requestToPromise(objectStore.getAll()) as Promise<GSchema[G]['Read'][]>,
+        ]);
+        return keys.map((key, index) => ({
+            key,
+            primaryKey: key,
+            value: values[index],
+        }));
+    }
+
+    async set<G extends GStoreName>(
+        store: G,
+        key: GSchema[G]['Key'] | undefined,
+        value: GSchema[G]['Write'],
+    ): Promise<void> {
+        await requestToPromise(this.getObjectStore(store).put(value, key));
+    }
+
+    async remove<G extends GStoreName>(store: G, key: GSchema[G]['Key']): Promise<void> {
+        await requestToPromise(this.getObjectStore(store).delete(key));
+    }
+
+    async bulkGet<G extends GStoreName>(
+        store: G,
+        keys: GSchema[G]['Key'][],
+    ): Promise<Map<GSchema[G]['Key'], GSchema[G]['Read'] | undefined>> {
+        const objectStore = this.getObjectStore(store);
+        const entries = await Promise.all(
+            [...new Set(keys)].map(
+                async (key) =>
+                    [
+                        key,
+                        await requestToPromise<GSchema[G]['Read'] | undefined>(
+                            objectStore.get(key),
+                        ),
+                    ] as const,
+            ),
+        );
+        return new Map(entries);
+    }
+
+    async bulkSet<G extends GStoreName>(
+        store: G,
+        entries: {
+            key: GSchema[G]['Key'] | undefined;
+            value: GSchema[G]['Write'];
+        }[],
+    ): Promise<void> {
+        const objectStore = this.getObjectStore(store);
+        await Promise.all(
+            entries.map(({ key, value }) => requestToPromise(objectStore.put(value, key))),
+        );
+    }
+
+    async bulkRemove<G extends GStoreName>(store: G, keys: GSchema[G]['Key'][]): Promise<void> {
+        const objectStore = this.getObjectStore(store);
+        await Promise.all(
+            [...new Set(keys)].map((key) => requestToPromise(objectStore.delete(key))),
+        );
+    }
+}
 
 // 2025-05-20
 // Blobs not supported on iPad in private tabs.
@@ -27,10 +161,9 @@ const areBlobUrlsSupported = async function (): Promise<boolean> {
             new Promise<void>((resolve, reject) => {
                 const transaction = db.transaction('testStore', 'readwrite');
                 const store = transaction.objectStore('testStore');
-                const request = store.put(blob, 'testStore');
-                transaction.onabort = () => resolve();
-                request.onsuccess = () => resolve();
-                request.onerror = () => reject(request.error);
+                transaction.onabort = () => reject(transaction.error);
+                transaction.oncomplete = () => resolve();
+                store.put(blob, 'testStore');
             }),
             'areBlobUrlsSupported.storeBlob',
         );
@@ -48,19 +181,22 @@ const areBlobUrlsSupported = async function (): Promise<boolean> {
     return result;
 };
 
-// todo would it make sense that a single failure causes a complete failure?
-type TGetResultItem = {
-    status: 'success' | 'error';
+export type TIndexedDbUpgrader = (event: IDBVersionChangeEvent) => void;
+
+export type TIndexedDbParams<GSchema extends TIdbSchema> = {
+    objectStoreNames: TIdbSchemaStoreName<GSchema>[];
+    version: number;
+    upgrader: TIndexedDbUpgrader;
 };
 
-export type TIndexedDbParams = object;
+export class IndexedDb<GSchema extends TIdbSchema> {
+    private storeNames: TIdbSchemaStoreName<GSchema>[];
+    private dbVersion: number;
+    private upgrader: TIndexedDbUpgrader;
 
-export class IndexedDb {
-    private dbVersion: number = -1;
     private dbName: string = '';
-    private storeNames: string[] = [];
     private db: IDBDatabase | undefined;
-    private upgrader: TIndexedDbUpgrader = () => {};
+    private openingPromise: Promise<IDBDatabase> | undefined;
     private isAvailable: boolean = true;
     private disconnectTimeout: ReturnType<typeof setTimeout> | undefined;
     private openTransactionCount: number = 0;
@@ -70,7 +206,7 @@ export class IndexedDb {
         this.db = undefined;
     }
 
-    private async autoDisconnectWrapper<G>(activity: () => Promise<G>): Promise<G> {
+    private async disconnectAfterwardsWrapper<G>(activity: () => Promise<G>): Promise<G> {
         try {
             this.openTransactionCount++;
             clearTimeout(this.disconnectTimeout);
@@ -87,66 +223,85 @@ export class IndexedDb {
         }
     }
 
-    private async openDb(): Promise<void> {
+    private openDb(): Promise<IDBDatabase> {
         if (this.db) {
-            return;
+            return Promise.resolve(this.db);
         }
-        return new Promise((resolve, reject) => {
-            const request = indexedDB.open(this.dbName, this.dbVersion);
+        if (this.openingPromise) {
+            return this.openingPromise;
+        }
 
-            request.onupgradeneeded = (event) => {
+        // ensure only one db connection
+        const openingPromise = new Promise<IDBDatabase>((resolve, reject) => {
+            const openDbRequest = indexedDB.open(this.dbName, this.dbVersion);
+
+            openDbRequest.onupgradeneeded = (event) => {
                 this.upgrader(event);
             };
 
-            request.onsuccess = (event) => {
-                this.db = (event.target as IDBOpenDBRequest).result;
-                this.db.onversionchange = () => {
+            openDbRequest.onsuccess = () => {
+                const db = openDbRequest.result;
+
+                // a different tab wants to upgrade the database (most likely a newer version of the app)
+                db.onversionchange = () => {
+                    // this tab can't work with the upgraded database. disable indexed db for this tab.
                     this.isAvailable = false;
-                    this.disconnect();
-                    throw new Error('idb onversionchange');
+
+                    // close connection so other tab can upgrade the db
+                    db.close();
+                    if (this.db === db) {
+                        this.db = undefined;
+                    }
+                    throw new Error('IndexedDB onversionchange');
                 };
-                resolve();
+                // when the database connection is unexpectedly closed
+                db.onclose = () => {
+                    if (this.db === db) {
+                        this.db = undefined;
+                    }
+                    throw new Error('IndexedDB closed');
+                };
+
+                this.db = db;
+                resolve(db);
             };
 
-            request.onerror = (event) => {
+            openDbRequest.onerror = () => {
                 this.isAvailable = false;
-                reject((event.target as IDBOpenDBRequest).error);
+                reject(
+                    openDbRequest.error ?? new Error(`Could not open IndexedDB "${this.dbName}"`),
+                );
+            };
+
+            openDbRequest.onblocked = () => {
+                throw new Error('IndexedDB blocked');
             };
         });
-    }
 
-    private getTransaction(
-        storeName: string,
-        mode: IDBTransactionMode,
-    ): { transaction: IDBTransaction; objectStore: IDBObjectStore } {
-        if (!this.storeNames.includes(storeName)) {
-            throw new Error(`indexedDb store "${storeName}" not found in "${this.dbName}"`);
-        }
-
-        const transaction = this.db!.transaction(storeName, mode);
-        return {
-            transaction,
-            objectStore: transaction.objectStore(storeName),
+        this.openingPromise = openingPromise;
+        const clearOpeningPromise = () => {
+            if (this.openingPromise === openingPromise) {
+                this.openingPromise = undefined;
+            }
         };
+        openingPromise.then(clearOpeningPromise, clearOpeningPromise);
+
+        return openingPromise;
     }
 
     // ----------------------------------- public -----------------------------------
-    constructor(p: TIndexedDbParams) {}
+    constructor(p: TIndexedDbParams<GSchema>) {
+        this.storeNames = [...p.objectStoreNames];
+        this.dbVersion = p.version;
+        this.upgrader = p.upgrader;
+    }
 
-    init(
-        dbName: string,
-        objectStoreNames: string[],
-        version: number,
-        upgrader: TIndexedDbUpgrader,
-    ) {
+    init(dbName: string) {
         if (this.dbName !== '') {
             throw new Error('IndexedDb already initialized');
         }
 
         this.dbName = dbName;
-        this.storeNames = [...objectStoreNames];
-        this.dbVersion = version;
-        this.upgrader = upgrader;
     }
 
     async testConnection(): Promise<boolean> {
@@ -156,138 +311,106 @@ export class IndexedDb {
         }
         try {
             for (const name of this.storeNames) {
-                await timeoutWrapper(this.openDb(), 'indexed-db.testConnection.openDb');
-                const { transaction } = this.getTransaction(name, 'readonly');
+                const db = await timeoutWrapper(this.openDb(), 'indexed-db.testConnection.openDb');
+                const transaction = db.transaction(name, 'readonly');
                 transaction.abort();
             }
         } catch (e) {
             this.isAvailable = false;
+        } finally {
+            this.disconnect();
         }
         return this.isAvailable;
     }
 
-    async set(store: string, key: IDBValidKey | undefined, value: unknown): Promise<void> {
-        return this.autoDisconnectWrapper(async () => {
-            await this.openDb();
-            return await new Promise((resolve, reject) => {
-                const { transaction, objectStore } = this.getTransaction(store, 'readwrite');
-                transaction.onabort = () => reject(transaction.error);
-                const request = objectStore.put(value, key);
-                request.onsuccess = () => {
-                    resolve();
-                };
-                request.onerror = () => reject(request.error);
-            });
-        });
-    }
+    /**
+     * Runs requests within a single native IndexedDB transaction. If the transaction aborts,
+     * IndexedDB rolls back all changes made by it, preventing partial updates.
+     */
+    async runTransaction<GStoreName extends TIdbSchemaStoreName<GSchema>, GReturnValue>(
+        storeNames: GStoreName[],
+        mode: IDBTransactionMode,
+        // Throw inside activity to abort the transaction.
+        // Do not await async work unrelated to IndexedDB, or the transaction will commit early.
+        activity: (transaction: IndexedDbTransaction<GSchema, GStoreName>) => Promise<GReturnValue>,
+        options?: {
+            // Chrome defaults to "relaxed", which is much faster and typically good enough.
+            durability?: IDBTransactionDurability;
+            // Aborting the signal aborts and rolls back the native transaction while it is active.
+            signal?: AbortSignal;
+        },
+    ): Promise<GReturnValue> {
+        return this.disconnectAfterwardsWrapper(async () => {
+            const { durability, signal } = options ?? {};
+            if (signal?.aborted) {
+                throw getAbortError(signal);
+            }
 
-    async get(store: string, key: IDBValidKey): Promise<unknown> {
-        return this.autoDisconnectWrapper(async () => {
-            await this.openDb();
-            return await new Promise((resolve, reject) => {
-                const { transaction, objectStore } = this.getTransaction(store, 'readonly');
-                transaction.onabort = () => reject(transaction.error);
-                const request = objectStore.get(key);
-                request.onsuccess = () => resolve(request.result);
-                request.onerror = () => reject(request.error);
-            });
-        });
-    }
+            const db = await this.openDb();
+            if (signal?.aborted) {
+                throw getAbortError(signal);
+            }
 
-    async has(store: string, key: IDBValidKey): Promise<boolean> {
-        return this.autoDisconnectWrapper(async () => {
-            await this.openDb();
-            return await new Promise((resolve, reject) => {
-                const { transaction, objectStore } = this.getTransaction(store, 'readonly');
-                transaction.onabort = () => reject(transaction.error);
-                const request = objectStore.getKey(key);
-                request.onsuccess = () => resolve(!!request.result);
-                request.onerror = () => reject(request.error);
-            });
-        });
-    }
-
-    async getKeys(store: string): Promise<string[]> {
-        return this.autoDisconnectWrapper(async () => {
-            await this.openDb();
-            return await new Promise((resolve, reject) => {
-                const { transaction, objectStore } = this.getTransaction(store, 'readonly');
-                transaction.onabort = () => reject(transaction.error);
-                const request = objectStore.getAllKeys();
-                request.onsuccess = () => resolve(request.result.map((key) => key.toString()));
-                request.onerror = () => reject(request.error);
-            });
-        });
-    }
-
-    async remove(store: string, key: IDBValidKey): Promise<void> {
-        return this.autoDisconnectWrapper(async () => {
-            await this.openDb();
-            return await new Promise((resolve, reject) => {
-                const { transaction, objectStore } = this.getTransaction(store, 'readwrite');
-                transaction.onabort = () => reject(transaction.error);
-                const request = objectStore.delete(key);
-                request.onsuccess = () => {
-                    resolve();
-                };
-                request.onerror = () => reject(request.error);
-            });
-        });
-    }
-
-    async bulkSet(
-        store: string,
-        entries: { key: IDBValidKey | undefined; value: unknown }[],
-    ): Promise<void> {
-        return this.autoDisconnectWrapper(async () => {
-            await this.openDb();
-            return new Promise((resolve, reject) => {
-                const { transaction, objectStore } = this.getTransaction(store, 'readwrite');
-                transaction.onabort = () => reject(transaction.error);
-                transaction.onerror = () => reject(transaction.error);
-                transaction.oncomplete = () => resolve();
-
-                for (const { key, value } of entries) {
-                    const request = objectStore.put(value, key);
-                    request.onerror = () => reject(request.error);
+            for (const storeName of storeNames) {
+                if (!this.storeNames.includes(storeName)) {
+                    throw new Error(`indexedDb store "${storeName}" not found in "${this.dbName}"`);
                 }
+            }
+
+            const transaction = db.transaction(
+                [...storeNames],
+                mode,
+                durability ? { durability } : undefined,
+            );
+            const transactionResultPromise = new Promise<
+                { status: 'complete' } | { status: 'abort'; error: unknown }
+            >((resolve) => {
+                transaction.oncomplete = () => resolve({ status: 'complete' });
+                transaction.onabort = () =>
+                    resolve({
+                        status: 'abort',
+                        error:
+                            transaction.error ??
+                            new Error('IndexedDB transaction aborted for unknown reason'),
+                    });
             });
-        });
-    }
-
-    async bulkGet(store: string, keys: IDBValidKey[]): Promise<Record<string, unknown>> {
-        return this.autoDisconnectWrapper(async () => {
-            await this.openDb();
-            return new Promise((resolve, reject) => {
-                const results: Record<string, unknown> = {};
-                const { transaction, objectStore } = this.getTransaction(store, 'readonly');
-                transaction.onabort = () => reject(transaction.error);
-                transaction.onerror = () => reject(transaction.error);
-                transaction.oncomplete = () => resolve(results);
-
-                keys.forEach((key, idx) => {
-                    const request = objectStore.get(key);
-                    request.onsuccess = () => (results['' + key] = request.result);
-                    request.onerror = () => reject(request.error);
-                });
-            });
-        });
-    }
-
-    async bulkRemove(store: string, keys: IDBValidKey[]): Promise<void> {
-        return this.autoDisconnectWrapper(async () => {
-            await this.openDb();
-            return new Promise((resolve, reject) => {
-                const { transaction, objectStore } = this.getTransaction(store, 'readwrite');
-                transaction.onabort = () => reject(transaction.error);
-                transaction.onerror = () => reject(transaction.error);
-                transaction.oncomplete = () => resolve();
-
-                for (const key of keys) {
-                    const request = objectStore.delete(key);
-                    request.onerror = () => reject(request.error);
+            const wrappedTransaction = new IndexedDbTransaction<GSchema, GStoreName>(transaction);
+            const abortTransaction = () => {
+                try {
+                    transaction.abort();
+                } catch {
+                    // The transaction already completed.
                 }
-            });
+            };
+            signal?.addEventListener('abort', abortTransaction, { once: true });
+
+            try {
+                let result: GReturnValue;
+                try {
+                    result = await activity(wrappedTransaction);
+                } catch (error) {
+                    if (!signal?.aborted) {
+                        abortTransaction();
+                    }
+                    const transactionResult = await transactionResultPromise;
+                    if (transactionResult.status === 'complete') {
+                        // a strange case you might want to know about
+                        console.error(
+                            'IndexedDB transaction completed, but its activity threw an error.',
+                            error,
+                        );
+                    }
+                    throw signal?.aborted ? getAbortError(signal) : error;
+                }
+
+                const transactionResult = await transactionResultPromise;
+                if (transactionResult.status === 'abort') {
+                    throw signal?.aborted ? getAbortError(signal) : transactionResult.error;
+                }
+                return result;
+            } finally {
+                signal?.removeEventListener('abort', abortTransaction);
+            }
         });
     }
 

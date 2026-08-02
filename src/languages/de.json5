@@ -625,6 +625,10 @@
     original: 'Tab recovered.',
     value: 'Tab wiederhergestellt.'
   },
+  'tab-recovery-restoring-session': {
+    original: 'Restoring your previous session...',
+    value: 'Letzte Sitzung wird wiederhergestellt...'
+  },
   'cleared-layer': {
     hint: 'the layer has been cleared. It is now empty',
     original: 'Cleared layer',
@@ -1786,5 +1790,13 @@
   dismiss: {
     original: 'Dismiss',
     value: 'Schließen'
+  },
+  error: {
+    original: 'Error',
+    value: 'Fehler'
+  },
+  retry: {
+    original: 'Retry',
+    value: 'Erneut versuchen'
   }
 }

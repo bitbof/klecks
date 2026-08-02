@@ -1,18 +1,18 @@
 import { KlHistory } from '../history/kl-history';
 import { TDeserializedKlStorageProject } from '../kl-types';
 import {
-    changeRecoveryId,
     clearOldRecoveries,
     deleteRecovery,
-    getIdsFromRecoveryStore,
-    getMetadata,
-    getRecovery,
+    getRecoveryAndUpdateId,
+    getRecoveryOverview,
     removeOrphans,
     storeRecovery,
 } from './kl-recovery-storage';
-import { createArray, sleep, timeoutWrapper } from '../../bb/base/base';
+import { deserializeRecovery } from './kl-recovery-serialization';
+import { css, sleep } from '../../bb/base/base';
 import { CrossTabChannel } from '../../bb/base/cross-tab-channel';
 import { KL_INDEXED_DB } from './kl-indexed-db';
+import loadingImg from 'url:/src/app/img/ui/loading.gif';
 
 export const RECOVERY_THUMB_WIDTH_PX = 300;
 export const RECOVERY_THUMB_HEIGHT_PX = 180;
@@ -24,6 +24,7 @@ const SUBSEQUENT_RECOVERY_AFTER_MS = 1000 * 60;
 const SUBSEQUENT_RECOVERY_AFTER_CHANGES = 4;
 export const DEBUG_RETURN_ALL_RECOVERIES: boolean = false;
 export const DEBUG_INSTANT_RECOVERY: boolean = false;
+export const DEBUG_SYNC: boolean = false;
 
 export function setHash(value?: string) {
     if (value === undefined) {
@@ -55,24 +56,17 @@ function hashToTabId(rawHash: string | undefined): number | undefined {
     return num;
 }
 
-function genNewId(takenIds: number[]): number {
-    const limit = 1000;
-    if (takenIds.length >= limit) {
-        throw new Error('No available IDs');
-    }
-    const idSet = new Set(takenIds);
-    const pool = createArray(limit, 0)
-        .map((_, index) => index)
-        .filter((id) => !idSet.has(id));
-    const index = Math.floor(Math.random() * pool.length);
-    if (pool[index] === undefined) {
-        throw new Error('No available IDs');
-    }
-    return pool[index];
-}
+export type TRecoveryMetaData = {
+    id: string;
+    timestamp: number;
+    thumbnail: HTMLImageElement | HTMLCanvasElement;
+    memoryEstimateBytes: number;
+};
 
 export type TKlRecoveryListener = (
+    // recoveries in closed tabs
     metas: TRecoveryMetaData[],
+    // total memory also includes opened tabs
     totalMemoryUsedBytes: number,
 ) => void;
 
@@ -92,15 +86,25 @@ export class KlRecoveryManager {
     private tabId: number | undefined; // undefined if tab without hash in URL
     private listeners: Set<TKlRecoveryListener> = new Set<TKlRecoveryListener>();
     private readonly crossTabChannel: CrossTabChannel = new CrossTabChannel('kl-tab-communication');
-    private noRecoveryReason:
-        | 'noTabIdHash'
-        | 'alreadyOpened'
-        | 'idNotFound'
-        | 'idChangeFailed'
-        | undefined;
+    private noRecoveryReason: 'noTabIdHash' | 'alreadyOpened' | 'idNotFound' | undefined;
+    private updateTimeout: ReturnType<typeof setTimeout> | undefined;
+
+    private setIsStoring(isStoring: boolean): void {
+        this.isStoring = isStoring;
+        DEBUG_SYNC && showSyncIndicator(isStoring);
+    }
 
     private announceTabId(): void {
         this.crossTabChannel.postMessage({ type: 'new-tab' });
+    }
+
+    private delayedUpdate(): void {
+        clearTimeout(this.updateTimeout);
+        // timeout makes it more likely it can register that a tab was closed
+        this.updateTimeout = setTimeout(() => {
+            this.updateTimeout = undefined;
+            this.update();
+        }, 500);
     }
 
     private initListeners(): void {
@@ -110,16 +114,13 @@ export class KlRecoveryManager {
             }
             // changes may have happened since tab last visible
 
-            // might not register a tab is closed without timeout
-            setTimeout(() => {
-                this.update();
-            }, 500);
+            this.delayedUpdate();
         });
 
         window.addEventListener('focus', () => {
-            setTimeout(() => {
-                this.update();
-            }, 500);
+            // Imagine you have two windows with the app open. You work in one, then focus the other window
+            // and work there. Changes may have happened.
+            this.delayedUpdate();
         });
 
         this.crossTabChannel.subscribe((message) => {
@@ -128,9 +129,7 @@ export class KlRecoveryManager {
                     // we'll update when tab visible. noop.
                     return;
                 }
-                setTimeout(() => {
-                    this.update();
-                }, 500);
+                this.delayedUpdate();
             }
             if (message.type === 'request-ids') {
                 if (this.tabId !== undefined) {
@@ -138,19 +137,6 @@ export class KlRecoveryManager {
                 }
             }
         });
-
-        // I think this is not needed
-        let debounceTimeout: ReturnType<typeof setTimeout> | undefined;
-        /*KL_INDEXED_DB.addListener(async () => {
-            if (document.hidden) {
-                return;
-            }
-            console.log('indexed db change!');
-            clearTimeout(debounceTimeout);
-            debounceTimeout = setTimeout(async () => {
-                this.update();
-            }, 100);
-        });*/
     }
 
     private async emitUpdate(): Promise<void> {
@@ -158,20 +144,13 @@ export class KlRecoveryManager {
             return;
         }
 
-        const ids = await getIdsFromRecoveryStore();
         const otherTabIds = await this.getIdsFromTabs();
-        const tabIds = DEBUG_RETURN_ALL_RECOVERIES
-            ? ids
-            : ids.filter((id) => !otherTabIds.includes(id) && id !== this.tabId);
-        const drawings = await Promise.all(
-            tabIds.map((id) => {
-                return getMetadata('' + id, true);
-            }),
-        );
-
-        const totalMemoryUsedBytes = await this.getTotalMemoryUsedBytes();
+        const idsToExclude = DEBUG_RETURN_ALL_RECOVERIES
+            ? []
+            : [...otherTabIds, ...(this.tabId === undefined ? [] : [this.tabId])];
+        const { metas, totalMemoryUsedBytes } = await getRecoveryOverview(idsToExclude);
         this.listeners.forEach((listener) => {
-            listener(drawings, totalMemoryUsedBytes);
+            listener(metas, totalMemoryUsedBytes);
         });
     }
 
@@ -194,22 +173,12 @@ export class KlRecoveryManager {
         return result;
     }
 
-    private async getTotalMemoryUsedBytes(): Promise<number> {
-        const ids = await getIdsFromRecoveryStore();
-        let result = 0;
-        for (const id of ids) {
-            const meta = await getMetadata('' + id);
-            result += meta.memoryEstimateBytes;
-        }
-        return result;
-    }
-
     // ----------------------------------- public -----------------------------------
     constructor(p: TKlRecoveryManagerParams) {
         this.initListeners();
     }
 
-    async getRecovery(): Promise<TDeserializedKlStorageProject | undefined> {
+    async getRecovery(signal?: AbortSignal): Promise<TDeserializedKlStorageProject | undefined> {
         try {
             // is there a tabId?
             const initialTabId: number | undefined = hashToTabId(getHash());
@@ -227,108 +196,96 @@ export class KlRecoveryManager {
                 this.setHash(undefined);
                 return undefined;
             }
-            // is id in storage?
-            const storedIds = await getIdsFromRecoveryStore();
-            if (!storedIds.includes(initialTabId)) {
+
+            const recoveryResult = await getRecoveryAndUpdateId(initialTabId, signal);
+            if (recoveryResult.status === 'not-found') {
                 this.noRecoveryReason = 'idNotFound';
-                // not found -> unset tabId and abort
                 this.setHash(undefined);
                 return undefined;
             }
 
-            // change id of drawing and tab
-            const newId = genNewId(storedIds);
-            if (!(await changeRecoveryId(initialTabId, newId))) {
-                this.noRecoveryReason = 'idChangeFailed';
-                this.setHash(undefined);
-                return undefined;
-            }
-            this.setHash(newId); // update hash
+            this.setHash(recoveryResult.newId);
+            const result = await deserializeRecovery(recoveryResult.data, signal);
 
-            const result = await getRecovery(newId);
-            if (result) {
-                this.tabId = newId;
-            }
-            setTimeout(() => {
-                // don't disrupt loading
-                removeOrphans();
-            });
+            // Everything ready at this point. So we can ignore abort signal.
+            this.tabId = recoveryResult.newId;
             return result;
         } finally {
-            setTimeout(() => {
+            if (!signal?.aborted) {
                 // don't disrupt loading
-                removeOrphans();
-            }, 2000);
+                setTimeout(() => {
+                    // Older versions of the app didn't have atomized transactions, leading to orphans sometimes.
+                    // Also, you never know if the current code has bugs, which could also create orphans.
+                    removeOrphans();
+                }, 2000);
+            }
         }
     }
 
     setKlHistory(klHistory: KlHistory) {
         this.klHistory = klHistory;
-        let startTime = new Date().getTime();
+        let startTime = Date.now();
         let lastStoredChangeCount = 0;
 
-        this.klHistory.addListener(async () => {
+        const checkAndMaybeStore = async () => {
             if (this.isStoring) {
                 return;
             }
             const changeCount = this.klHistory.getChangeCount();
             if (!DEBUG_INSTANT_RECOVERY) {
-                const deltaMs = new Date().getTime() - startTime;
-                // initial store after 5 minutes
+                const deltaMs = Date.now() - startTime;
                 if (
                     this.tabId === undefined &&
                     (deltaMs < FIRST_RECOVERY_AFTER_MS ||
                         changeCount < FIRST_RECOVERY_AFTER_CHANGES)
                 ) {
+                    // initial store threshold not reached
                     return;
                 }
-                // subsequent store after 1 minutes
                 if (
                     this.tabId !== undefined &&
                     (deltaMs < SUBSEQUENT_RECOVERY_AFTER_MS ||
                         changeCount - lastStoredChangeCount < SUBSEQUENT_RECOVERY_AFTER_CHANGES)
                 ) {
+                    // subsequent store threshold not reached
                     return;
                 }
             }
 
-            let isFreshDrawing = false;
-            if (!this.tabId) {
-                const storedIds = await timeoutWrapper(
-                    getIdsFromRecoveryStore(),
-                    'setKlHistory.getIdsFromStore',
-                );
-                this.tabId = genNewId(storedIds);
-                isFreshDrawing = true;
-            }
-            this.isStoring = true;
+            // must set isStoring here, or high frequency history events may cause multiple recovery entries
+            this.setIsStoring(true);
+            const isFreshDrawing = this.tabId === undefined;
             try {
-                await storeRecovery(this.tabId, this.klHistory.getComposed(), this.getThumbnail!);
-                startTime = new Date().getTime();
+                this.tabId = await storeRecovery(
+                    this.tabId,
+                    this.klHistory.getComposed(),
+                    this.getThumbnail!,
+                );
+                startTime = Date.now();
             } catch (e) {
                 setTimeout(() => {
                     throw e;
                 });
+                return;
             } finally {
-                this.isStoring = false;
+                this.setIsStoring(false);
             }
             if (isFreshDrawing) {
                 this.setHash(this.tabId);
                 await clearOldRecoveries();
             }
-            startTime = new Date().getTime();
+            startTime = Date.now();
             lastStoredChangeCount = changeCount;
-        });
+        };
+
+        this.klHistory.addListener(checkAndMaybeStore);
+        setInterval(checkAndMaybeStore, 1000 * 60);
     }
 
     setGetThumbnail(getThumbnail: (factor: number) => HTMLCanvasElement) {
         this.getThumbnail = getThumbnail;
     }
 
-    /**
-     * Listener will be informed about recoveries in closed tabs.
-     * totalMemoryUsesBytes includes recoveries in open tabs
-     */
     subscribe(listener: TKlRecoveryListener): void {
         this.listeners.add(listener);
     }
@@ -362,11 +319,25 @@ export class KlRecoveryManager {
     }
 }
 
-export type TRecoveryMetaData = {
-    id: string;
-    width: number;
-    height: number;
-    timestamp: number;
-    thumbnail?: HTMLImageElement | HTMLCanvasElement;
-    memoryEstimateBytes: number;
-};
+const showSyncIndicator = (() => {
+    let syncIndicator: HTMLImageElement | undefined;
+    return (isStoring: boolean): void => {
+        if (!isStoring) {
+            syncIndicator?.remove();
+            syncIndicator = undefined;
+            return;
+        }
+
+        syncIndicator = document.createElement('img');
+        syncIndicator.src = loadingImg;
+        syncIndicator.alt = '';
+        css(syncIndicator, {
+            position: 'fixed',
+            top: '8px',
+            left: '8px',
+            zIndex: '2147483647',
+            pointerEvents: 'none',
+        });
+        document.body.append(syncIndicator);
+    };
+})();

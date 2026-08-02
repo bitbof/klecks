@@ -483,7 +483,7 @@ export class Easel<GToolId extends string> {
         });
 
         this.windowPointerListener = (e: PointerEvent) => {
-            if (this.isFrozen) {
+            if (this.isFrozen || BB.isInputFocused(true)) {
                 return;
             }
             if (!(e.target instanceof Node && this.rootEl.contains(e.target))) {
@@ -494,7 +494,7 @@ export class Easel<GToolId extends string> {
 
         this.keyListener = new KeyListener({
             onDown: (keyStr, e, comboStr, isRepeat) => {
-                if (this.isFrozen || BB.isInputFocused(true)) {
+                if (this.isFrozen) {
                     return;
                 }
 

@@ -6,6 +6,7 @@
  *  Version - version of database
  *      Common - types used across stores
  *      <StoreName> - types used within a store
+ *          Key - key type of entries
  *          Read - what is returned on reading from that store
  *          Write - what is allowed to be written to that store
  *          <Other> - common types used by that store
@@ -34,17 +35,23 @@ export type TIdb = {
                 | 'luminosity';
         };
         ProjectStore: {
+            Key: number;
             Read: {
                 id: 1;
-                timestamp: number; // unix timestamp when updated
+                // unix timestamp when updated
+                timestamp: number;
                 // png - added with 0.5.1
                 thumbnail?: TIdb['V1']['Common']['PngBlob'];
-                width: number; // int
-                height: number; // int
+                // int
+                width: number;
+                // int
+                height: number;
                 layers: {
                     name: string;
-                    isVisible?: boolean; // added with 0.6.2
-                    opacity: number; // 0 - 1
+                    // added with 0.6.2
+                    isVisible?: boolean;
+                    // 0 - 1
+                    opacity: number;
                     mixModeStr?: TIdb['V1']['Common']['MixMode'];
                     blob: TIdb['V1']['Common']['PngBlob']; // png
                 }[];
@@ -74,36 +81,47 @@ export type TIdb = {
                 | 'luminosity';
         };
         ProjectStore: {
+            Key: number;
             ImageDataRef: {
-                id: TIdb['V2']['Common']['Uuid']; // id of imageDataStore entry
+                // id of imageDataStore entry
+                id: TIdb['V2']['Common']['Uuid'];
             };
             Read: {
                 id: 1;
-                projectId?: TIdb['V2']['Common']['Uuid']; // may not exist pre 0.9. not tabId.
-                timestamp: number; // unix timestamp when updated
-                // png - added with 0.5.1
+                // may not exist pre 0.9. not tabId.
+                projectId?: TIdb['V2']['Common']['Uuid'];
+                // unix timestamp when updated
+                timestamp: number;
+                // added with 0.5.1
                 thumbnail?:
-                    | TIdb['V2']['Common']['PngBlob'] // before 0.9
+                    | TIdb['V2']['Common']['PngBlob'] // <- before 0.9
                     | TIdb['V2']['ProjectStore']['ImageDataRef'];
-                width: number; // int
-                height: number; // int
+                // int
+                width: number;
+                // int
+                height: number;
                 layers: {
                     name: string;
-                    isVisible?: boolean; // added with 0.6.2
-                    opacity: number; // 0 - 1
+                    // added with 0.6.2
+                    isVisible?: boolean;
+                    // 0 - 1
+                    opacity: number;
                     mixModeStr?: TIdb['V2']['Common']['MixMode'];
                     blob:
                         | TIdb['V2']['Common']['PngBlob']
-                        | TIdb['V2']['ProjectStore']['ImageDataRef']; // png
+                        | TIdb['V2']['ProjectStore']['ImageDataRef'];
                 }[];
             };
             Write: {
                 id: 1;
                 projectId: TIdb['V2']['Common']['Uuid'];
-                timestamp: number; // unix timestamp when updated
+                // unix timestamp when updated
+                timestamp: number;
                 thumbnail: TIdb['V2']['ProjectStore']['ImageDataRef'];
-                width: number; // int
-                height: number; // int
+                // int
+                width: number;
+                // int
+                height: number;
                 layers: {
                     name: string;
                     isVisible: boolean;
@@ -114,23 +132,33 @@ export type TIdb = {
             };
         };
         RecoveryStore: {
-            LayerFill: { fill: string }; // css color string. hex, rgb, rgba, color name
+            Key: string;
+            LayerFill: {
+                // css color string. hex, rgb, rgba, color name
+                fill: string;
+            };
             ImageDataRef: {
-                id: TIdb['V2']['Common']['Uuid']; // id of imageDataStore entry
+                // id of imageDataStore entry
+                id: TIdb['V2']['Common']['Uuid'];
                 sizeBytes: number;
             };
             Read: {
-                projectId?: TIdb['V2']['Common']['Uuid']; // not the tab id. added during 0.9 beta
-                width: number; // int
-                height: number; // int
+                // not the tab id. added during 0.9 beta
+                projectId?: TIdb['V2']['Common']['Uuid'];
+                // int
+                width: number;
+                // int
+                height: number;
                 // regenerated on each change. id of imageDataStore entry
                 thumbnail: TIdb['V2']['Common']['Uuid'];
-                timestamp: number; // unix timestamp when updated
+                // unix timestamp when updated
+                timestamp: number;
                 layers: {
                     name: string;
                     isVisible: boolean;
                     opacity: number; // 0 - 1
                     mixModeStr?: TIdb['V2']['Common']['MixMode'];
+                    // Tiles can have the wrong size (always HISTORY_TILE_SIZE). Was only fixed with 0.10.2.
                     image: (
                         | TIdb['V2']['RecoveryStore']['ImageDataRef']
                         | TIdb['V2']['RecoveryStore']['LayerFill']
@@ -139,16 +167,21 @@ export type TIdb = {
                 memoryEstimateBytes: number;
             };
             Write: {
-                projectId: TIdb['V2']['Common']['Uuid']; // not the tab id.
-                width: number; // int
-                height: number; // int
+                // not the tab id.
+                projectId: TIdb['V2']['Common']['Uuid'];
+                // int
+                width: number;
+                // int
+                height: number;
                 // regenerated on each change. id of imageDataStore entry
                 thumbnail: TIdb['V2']['Common']['Uuid'];
-                timestamp: number; // unix timestamp when updated
+                // unix timestamp when updated
+                timestamp: number;
                 layers: {
                     name: string;
                     isVisible: boolean;
-                    opacity: number; // 0 - 1
+                    // 0 - 1
+                    opacity: number;
                     mixModeStr: TIdb['V2']['Common']['MixMode'];
                     image: (
                         | TIdb['V2']['RecoveryStore']['ImageDataRef']
@@ -159,8 +192,10 @@ export type TIdb = {
             };
         };
         ImageDataStore: {
+            Key: string;
             Read: ImageData | TIdb['V2']['Common']['PngBlob'];
-            Write: ImageData | TIdb['V2']['Common']['PngBlob']; // allow blob for Browser Storage
+            // allow blob for Browser Storage (ProjectStore)
+            Write: ImageData | TIdb['V2']['Common']['PngBlob'];
         };
     };
 };

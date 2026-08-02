@@ -2,7 +2,7 @@ import { THistoryEntryLayerTile } from '../history.types';
 import { HISTORY_TILE_SIZE } from '../kl-history';
 import { getTileFromCanvas } from './get-tile-from-canvas';
 import { getChangedTiles } from './changed-tiles';
-import { createImageDataTile } from '../image-data-tile';
+import { createImageDataTile, getTileSize } from '../image-data-tile';
 import { TIndexBounds } from '../../../bb/bb-types';
 import { getImageDataSafely } from '../../../bb/base/canvas';
 
@@ -18,7 +18,7 @@ export function canvasAndChangedTilesToLayerTiles(
         for (let col = 0; col < tilesX; col++) {
             result.push(
                 changedTiles[row * tilesX + col]
-                    ? createImageDataTile(getTileFromCanvas(canvas, col, row, HISTORY_TILE_SIZE))
+                    ? createImageDataTile(getTileFromCanvas(canvas, col, row))
                     : undefined,
             );
         }
@@ -55,17 +55,15 @@ export function canvasToLayerTiles(
         // manually transfer into tiles
         for (let row = 0; row < tilesY; row++) {
             for (let col = 0; col < tilesX; col++) {
+                const tileSize = getTileSize(col, row, canvas);
                 const x = col * HISTORY_TILE_SIZE;
                 const y = row * HISTORY_TILE_SIZE;
-                const tileWidth = Math.min(HISTORY_TILE_SIZE, canvas.width - x);
-                const tileHeight = Math.min(HISTORY_TILE_SIZE, canvas.height - y);
-
-                const tileData = new ImageData(tileWidth, tileHeight);
-                for (let line = 0; line < tileHeight; line++) {
+                const tileData = new ImageData(tileSize.width, tileSize.height);
+                for (let line = 0; line < tileSize.height; line++) {
                     const srcStart = ((y + line) * canvas.width + x) * 4;
-                    const destStart = line * tileWidth * 4;
+                    const destStart = line * tileSize.width * 4;
                     tileData.data.set(
-                        fullImageData.data.subarray(srcStart, srcStart + tileWidth * 4),
+                        fullImageData.data.subarray(srcStart, srcStart + tileSize.width * 4),
                         destStart,
                     );
                 }

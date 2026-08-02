@@ -112,7 +112,7 @@ export class ProjectConverter {
         return {
             id: 1,
             projectId: project.projectId,
-            timestamp: new Date().getTime(),
+            timestamp: Date.now(),
             thumbnail: await canvasToBlob(ProjectConverter.createThumbnail(project), 'image/png'),
             width: project.width,
             height: project.height,

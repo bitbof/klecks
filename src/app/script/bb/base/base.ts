@@ -1,5 +1,9 @@
 import { TKeyString, TSize2D, TSvg, TVector2D } from '../bb-types';
 
+export function getAbortError(signal: AbortSignal): unknown {
+    return signal.reason ?? new DOMException('Operation aborted', 'AbortError');
+}
+
 export function insertAfter(referenceNode: Element, newNode: Element): void {
     if (referenceNode.parentNode) {
         referenceNode.parentNode.insertBefore(newNode, referenceNode.nextSibling);
@@ -272,22 +276,24 @@ export function nullToUndefined<T>(v: T | null): T | undefined {
 }
 
 const matchMediaDark =
-    'matchMedia' in window ? window.matchMedia('(prefers-color-scheme: dark)') : false;
+    typeof window.matchMedia === 'function'
+        ? window.matchMedia('(prefers-color-scheme: dark)')
+        : false;
 
 export function isDark(): boolean {
     return matchMediaDark && matchMediaDark.matches;
 }
 
 export function addIsDarkListener(func: () => void): void {
-    matchMediaDark &&
-        'addEventListener' in matchMediaDark &&
+    if (matchMediaDark && typeof matchMediaDark.addEventListener === 'function') {
         matchMediaDark.addEventListener('change', func);
+    }
 }
 
 export function removeIsDarkListener(func: () => void): void {
-    matchMediaDark &&
-        'removeEventListener' in matchMediaDark &&
+    if (matchMediaDark && typeof matchMediaDark.removeEventListener === 'function') {
         matchMediaDark.removeEventListener('change', func);
+    }
 }
 
 export function base64ToBlob(base64Str: string): Blob {

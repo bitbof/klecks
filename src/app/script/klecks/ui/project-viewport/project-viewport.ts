@@ -191,8 +191,6 @@ export class ProjectViewport {
             this.ctx.fillRect(0, 0, this.width, this.height);
         }
 
-        // this.ctx.scale(this.resFactor, this.resFactor);
-        // same matrix as the background pattern and function-layer draws below
         this.ctx.transform(...matrixToTuple(renderedMat));
 
         if (this.drawBackground) {
