@@ -20,7 +20,6 @@
     "buffer": "6.0.3",
     "js-beautify": "1.15.4",
     "json5": "2.2.3",
-    "mdn-polyfills": "5.20.0",
     "parcel": "2.16.4",
     "polygon-clipping": "0.15.7",
     "transformation-matrix": "3.1.0"
