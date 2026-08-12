@@ -1,9 +1,10 @@
+import { getIconUrl } from '../icon/icon';
 import { BB } from '../bb/bb';
-import uiSwapImg from 'url:/src/app/img/ui/ui-swap-lr.svg';
-import helpImg from 'url:/src/app/img/ui/help.svg';
 import { LANG } from '../language/language';
 import { PointerListener } from '../bb/input/pointer-listener';
 
+const uiSwapImg = getIconUrl('ui-swap-lr');
+const helpImg = getIconUrl('help');
 /**
  * Topmost row of buttons in toolspace. (embed)
  *

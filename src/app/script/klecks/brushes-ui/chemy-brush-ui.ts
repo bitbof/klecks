@@ -1,9 +1,9 @@
+import { getIconSvg } from '../../icon/icon';
 import { BB } from '../../bb/bb';
 import { EVENT_RES_MS } from './brushes-consts';
 import { Checkbox } from '../ui/components/checkbox';
 import { BRUSHES } from '../brushes/brushes';
 import { KlSlider } from '../ui/components/kl-slider';
-import brushIconImg from 'url:/src/app/img/ui/brush-chemy.svg';
 import { TBrushUi } from '../kl-types';
 import { Options } from '../ui/components/options';
 import { BoxToggle } from '../ui/components/box-toggle';
@@ -13,7 +13,7 @@ import { css } from '../../bb/base/base';
 
 export const chemyBrushUi = (function () {
     const brushInterface = {
-        image: brushIconImg,
+        image: getIconSvg('brush-chemy'),
         tooltip: LANG('brush-chemy'),
         sizeSlider: {
             min: 0.25,

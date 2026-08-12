@@ -1,3 +1,4 @@
+import { getIconUrl } from '../icon/icon';
 import { KL } from '../klecks/kl';
 import { BB } from '../bb/bb';
 import { showIframeModal } from '../klecks/ui/modals/show-iframe-modal';
@@ -30,16 +31,6 @@ import { SaveToComputer } from '../klecks/storage/save-to-computer';
 import { ToolspaceScroller } from '../klecks/ui/components/toolspace-scroller';
 import { translateSmoothing } from '../klecks/utils/translate-smoothing';
 import { KlAppImportHandler } from './kl-app-import-handler';
-import toolPaintImg from 'url:/src/app/img/ui/tool-paint.svg';
-import toolHandImg from 'url:/src/app/img/ui/tool-hand.svg';
-import toolFillImg from 'url:/src/app/img/ui/tool-fill.svg';
-import toolGradientImg from 'url:/src/app/img/ui/tool-gradient.svg';
-import toolTextImg from 'url:/src/app/img/ui/tool-text.svg';
-import toolShapeImg from 'url:/src/app/img/ui/tool-shape.svg';
-import toolSelectImg from 'url:/src/app/img/ui/tool-select.svg';
-import tabSettingsImg from 'url:/src/app/img/ui/tab-settings.svg';
-import tabLayersImg from 'url:/src/app/img/ui/tab-layers.svg';
-import tabEditImg from 'url:/src/app/img/ui/tab-edit.svg';
 import { LayersUi } from '../klecks/ui/tool-tabs/layers-ui/layers-ui';
 import { TVector2D } from '../bb/bb-types';
 import { createConsoleApi } from './console-api';
@@ -83,6 +74,16 @@ import { MobileColorUi } from '../klecks/ui/mobile/mobile-color-ui';
 import { getSelectionPath2d } from '../bb/multi-polygon/get-selection-path-2d';
 import { ToolspaceTopRow } from '../klecks/ui/components/toolspace-top-row';
 
+const toolPaintImg = getIconUrl('tool-paint');
+const toolHandImg = getIconUrl('tool-hand');
+const toolFillImg = getIconUrl('tool-fill');
+const toolGradientImg = getIconUrl('tool-gradient');
+const toolTextImg = getIconUrl('tool-text');
+const toolShapeImg = getIconUrl('tool-shape');
+const toolSelectImg = getIconUrl('tool-select');
+const tabSettingsImg = getIconUrl('tab-settings');
+const tabLayersImg = getIconUrl('tab-layers');
+const tabEditImg = getIconUrl('tab-edit');
 importFilters();
 
 type TKlAppOptionsEmbed = {
@@ -95,6 +96,7 @@ export type TKlAppParams = {
     project?: TKlProject;
     logoImg?: string; // app logo
     bottomBar?: HTMLElement; // row at bottom of toolspace
+    helpPath?: string; // default help.html
     embed?: TKlAppOptionsEmbed;
     app?: {
         imgurKey?: string; // for imgur uploads
@@ -119,6 +121,7 @@ export class KlApp {
     private readonly rootEl: HTMLElement;
     private uiWidth: number;
     private uiHeight: number;
+    private readonly helpPath: string;
     private readonly layerPreview: LayerPreview;
     private readonly klColorSlider: KlColorSlider;
     private readonly toolspaceToolRow: ToolspaceToolRow;
@@ -249,6 +252,7 @@ export class KlApp {
 
     constructor(p: TKlAppParams) {
         this.embed = p.embed;
+        this.helpPath = p.helpPath ?? 'help.html';
         // default 2048, unless your screen is bigger than that (that computer then probably has the horsepower for that)
         // but not larger than 4096 - a fairly arbitrary decision
         const maxCanvasSize = Math.min(
@@ -390,18 +394,13 @@ export class KlApp {
             onSetOpacity: (opacity) => {
                 currentBrushUi.setOpacity(opacity);
             },
-            onSetScatter: (scatter) => {
-                currentBrushUi.setScatter(scatter);
-            },
             onGetColor: () => this.klColorSlider.getColor(),
             onGetSize: () => brushUiMap[currentBrushId].getSize(),
             onGetOpacity: () => brushUiMap[currentBrushId].getOpacity(),
-            onGetScatter: () => brushUiMap[currentBrushId].getScatter(),
             onGetSliderConfig: () => {
                 return {
                     sizeSlider: KL.BRUSHES_UI[currentBrushId].sizeSlider,
                     opacitySlider: KL.BRUSHES_UI[currentBrushId].opacitySlider,
-                    scatterSlider: KL.BRUSHES_UI[currentBrushId].scatterSlider,
                 };
             },
         });
@@ -1045,9 +1044,6 @@ export class KlApp {
             const ui = new (brushUi.Ui as any)({
                 klHistory: this.klHistory,
                 onSizeChange: sizeWatcher,
-                onScatterChange: (scatter: number) => {
-                    brushSettingService.emitScatter(scatter);
-                },
                 onOpacityChange: (opacity: number) => {
                     brushSettingService.emitOpacity(opacity);
                 },
@@ -1055,7 +1051,6 @@ export class KlApp {
                     brushSettingService.emitSliderConfig({
                         sizeSlider: KL.BRUSHES_UI[currentBrushId].sizeSlider,
                         opacitySlider: KL.BRUSHES_UI[currentBrushId].opacitySlider,
-                        scatterSlider: KL.BRUSHES_UI[currentBrushId].scatterSlider,
                     });
                 },
             });
@@ -1139,7 +1134,7 @@ export class KlApp {
         if (this.embed) {
             this.toolspaceTopRow = new EmbedToolspaceTopRow({
                 onHelp: () => {
-                    showIframeModal(this.embed!.url + '/help.html', !!this.embed);
+                    showIframeModal(this.embed!.url + this.helpPath, !!this.embed);
                 },
                 onSubmit: () => {
                     applyUncommitted();
@@ -1210,7 +1205,7 @@ export class KlApp {
             });
         } else {
             this.toolspaceTopRow = new KL.ToolspaceTopRow({
-                logoImg: p.logoImg!,
+                logoImg: p.logoImg,
                 onLogo: () => {
                     showIframeModal('./home/', !!this.embed);
                 },
@@ -1227,7 +1222,7 @@ export class KlApp {
                     shareImage();
                 },
                 onHelp: () => {
-                    showIframeModal('./help/', !!this.embed);
+                    showIframeModal(this.helpPath, !!this.embed);
                 },
             });
         }
@@ -1377,10 +1372,25 @@ export class KlApp {
             tabArr: (() => {
                 const result = [];
 
+                const commonStyle: Partial<CSSStyleDeclaration> = {
+                    height: '28px',
+                    width: '28px',
+                    color: 'var(--ui-on-bg-full-contrast)',
+                };
                 const createTab = (keyStr: string) => {
+                    const im = KL.BRUSHES_UI[keyStr].image;
+                    BB.css(im, commonStyle);
                     return {
                         id: keyStr,
-                        image: KL.BRUSHES_UI[keyStr].image,
+                        label: BB.el({
+                            content: im,
+                            css: {
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                height: '100%',
+                            },
+                        }),
                         title: KL.BRUSHES_UI[keyStr].tooltip,
                         onOpen: () => {
                             brushUiMap[keyStr].getElement().style.display = 'block';
@@ -1390,7 +1400,6 @@ export class KlApp {
                             brushSettingService.emitSliderConfig({
                                 sizeSlider: KL.BRUSHES_UI[keyStr].sizeSlider,
                                 opacitySlider: KL.BRUSHES_UI[keyStr].opacitySlider,
-                                scatterSlider: KL.BRUSHES_UI[keyStr].scatterSlider,
                             });
                             sizeWatcher(brushUiMap[keyStr].getSize());
                             brushSettingService.emitOpacity(brushUiMap[keyStr].getOpacity());
@@ -1799,6 +1808,7 @@ export class KlApp {
             ? null
             : new KL.FileUi({
                   klRootEl: this.rootEl,
+                  helpPath: this.helpPath,
                   projectStore: projectStore,
                   getProject: () => this.klCanvas.getProject(),
                   exportType: exportType,
@@ -1854,6 +1864,7 @@ export class KlApp {
                 },
                 applyUncommitted,
                 klHistory: this.klHistory,
+                helpPath: this.helpPath,
             });
         }
 
@@ -2224,7 +2235,7 @@ export class KlApp {
                 },
                 { passive: false },
             );
-            //maybe prevent zooming on safari mac os - todo still needed?
+            // prevents pinch zoom of page on macOS Safari
             const prevent = (e: Event) => {
                 e.preventDefault();
             };

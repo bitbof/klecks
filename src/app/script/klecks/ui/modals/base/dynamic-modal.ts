@@ -1,11 +1,12 @@
+import { getIconUrl } from '../../../../icon/icon';
 import { KeyListener } from '../../../../bb/input/key-listener';
 import { DIALOG_COUNTER } from '../modal-count';
 import { BB } from '../../../../bb/bb';
 import { LANG } from '../../../../language/language';
 import './scroll-fix';
-import cancelImg from 'url:/src/app/img/ui/cancel.svg';
 import { css } from '../../../../bb/base/base';
 
+const cancelImg = getIconUrl('cancel');
 /**
  * popup that fill whole height, with some padding.
  * currently only used for iframe popups.

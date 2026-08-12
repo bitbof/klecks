@@ -1,13 +1,14 @@
+import { getIconUrl } from '../../icon/icon';
 import { BB } from '../../bb/bb';
 import { Checkbox } from '../ui/components/checkbox';
 import { Select } from '../ui/components/select';
-import constrainImg from 'url:/src/app/img/ui/constrain.svg';
 import { TFilterApply, TFilterGetDialogParam, TFilterGetDialogResult } from '../kl-types';
 import { LANG } from '../../language/language';
 import { table } from '../ui/components/table';
 import { SMALL_PREVIEW } from '../ui/utils/preview-size';
 import { css } from '../../bb/base/base';
 
+const constrainImg = getIconUrl('constrain');
 export type TFilterResizeInput = {
     width: number;
     height: number;

@@ -3,6 +3,7 @@
     color-scheme: dark;
 
     --ui-bg-dark: #333;
+    --ui-on-bg-full-contrast: #fff;
     --kl-checkerboard-background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 2 2'><path d='M0,0h2v2H0z' fill='%235a5a5a'/><path d='M0,0h1v1H0zM1,1h1v1H1z' fill='%233f3f3f'/></svg>")
         0 0 / 8px;
 
@@ -68,9 +69,9 @@
         background-color: #6e6e6e;
     }
 
-    .tabrow__tab div {
+    /*.tabrow__tab div {
         filter: brightness(0.45);
-    }
+    }*/
 
     .tabrow__tab:not(.tabrow__tab--opened, .tabrow__tab--opened-accented):hover {
         background-color: #535353;
@@ -173,7 +174,7 @@
 
     button:disabled,
     .kl-button:disabled {
-        color: #999;
+        color: #777;
         background-color: transparent;
         background-image: none;
         box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.1);

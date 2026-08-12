@@ -1,8 +1,9 @@
+import { getIconUrl } from '../../../icon/icon';
 import { BB } from '../../../bb/bb';
-import collapseImg from 'url:/src/app/img/ui/ui-collapse.svg';
 import { LANG } from '../../../language/language';
 import { TUiLayout } from '../../kl-types';
 
+const collapseImg = getIconUrl('ui-collapse');
 /**
  * button that allows to collapse toolspace (for mobile)
  */

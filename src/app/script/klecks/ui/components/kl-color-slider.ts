@@ -1,7 +1,7 @@
+import { getIconUrl } from '../../../icon/icon';
 import { BB } from '../../../bb/bb';
 import { HexColorDialog } from '../modals/color-slider-hex-dialog';
 import { calcSliderFalloffFactor } from './slider-falloff';
-import eyedropperImg from 'url:/src/app/img/ui/tool-picker.svg';
 import { LANG } from '../../../language/language';
 import { TRgb } from '../../kl-types';
 import { HSV, RGB } from '../../../bb/color/color';
@@ -9,6 +9,7 @@ import { ERASE_COLOR } from '../../brushes/erase-color';
 import { css } from '../../../bb/base/base';
 import { addHueStops } from '../../utils/hue-gradient';
 
+const eyedropperImg = getIconUrl('tool-picker');
 /**
  * big main HS+V color slider
  * 2 elements: slider, and colorpreview(output) + eyedropper

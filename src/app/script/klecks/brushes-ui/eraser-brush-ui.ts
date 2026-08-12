@@ -1,17 +1,17 @@
+import { getIconSvg } from '../../icon/icon';
 import { BB } from '../../bb/bb';
 import { BRUSHES } from '../brushes/brushes';
 import { EVENT_RES_MS } from './brushes-consts';
 import { KlSlider } from '../ui/components/kl-slider';
 import { createPenPressureToggle } from '../ui/components/create-pen-pressure-toggle';
 import { Checkbox } from '../ui/components/checkbox';
-import brushIconImg from 'url:/src/app/img/ui/brush-eraser.svg';
 import { TBrushUi } from '../kl-types';
 import { LANG, LANGUAGE_STRINGS } from '../../language/language';
 import { EraserBrush } from '../brushes/eraser-brush';
 
 export const eraserBrushUi = (function () {
     const brushInterface = {
-        image: brushIconImg,
+        image: getIconSvg('brush-eraser'),
         tooltip: LANG('eraser') + ' [E]',
         sizeSlider: {
             min: 0.5,

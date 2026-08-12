@@ -1,6 +1,6 @@
+import { getIconUrl } from '../../../icon/icon';
 import { BB } from '../../../bb/bb';
 import { LANG } from '../../../language/language';
-import eyedropperImg from 'url:/src/app/img/ui/tool-picker.svg';
 import { BoxToggle } from '../components/box-toggle';
 import { Icon } from '../components/icon';
 import { TRgb } from '../../kl-types';
@@ -8,6 +8,7 @@ import { MobileFloatingWindow } from './mobile-floating-window';
 import { KlColorSliderSmall } from '../components/kl-color-slider-small';
 import { TVector2D } from '../../../bb/bb-types';
 
+const eyedropperImg = getIconUrl('tool-picker');
 export type TMobileColorUiParams = {
     onEyedropper: (isActive: boolean) => void;
     color: TRgb;

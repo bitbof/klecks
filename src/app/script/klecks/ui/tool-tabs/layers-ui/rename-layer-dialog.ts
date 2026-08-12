@@ -1,7 +1,7 @@
+import { getIconSvg } from '../../../../icon/icon';
 import { BB } from '../../../../bb/bb';
 import { LANG } from '../../../../language/language';
 import { showModal } from '../../modals/base/showModal';
-import removeLayerImg from 'url:/src/app/img/ui/remove-layer.svg';
 
 export function renameLayerDialog(
     parentEl: HTMLElement,
@@ -28,7 +28,9 @@ export function renameLayerDialog(
     input.style.flexGrow = '1';
     const clearBtn = BB.el({
         tagName: 'button',
-        content: '<img src="' + removeLayerImg + '" height="20"/>',
+        content: getIconSvg('remove-layer', {
+            height: '20px',
+        }),
         title: LANG('layers-rename-clear'),
         css: {
             marginLeft: '10px',

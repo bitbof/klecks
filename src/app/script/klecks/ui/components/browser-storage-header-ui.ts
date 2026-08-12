@@ -7,13 +7,13 @@ export class BrowserStorageHeaderUi {
     private readonly infoButton: HTMLElement;
 
     // ----------------------------------- public -----------------------------------
-    constructor() {
+    constructor(helpPath: string) {
         this.infoButton = BB.el({
             content: '?',
             className: 'kl-info-btn',
             title: LANG('file-storage-about'),
             onClick: () => {
-                showIframeModal('./help/#help-browser-storage', false);
+                showIframeModal(helpPath + '#help-browser-storage', false);
             },
         });
 

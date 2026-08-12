@@ -54,12 +54,12 @@ Created by developer/artist [bitbof](https://bitbof.com)
 
 # Commands
 - initialize via `npm ci` (requires node and npm to be installed already)
+- `npm run icon:build` - generate icon files necessary to run Klecks
 - `npm run lang:build` - generate language files necessary to run Klecks
 - `npm run lang:build -- --missing` - generate language files and list all keys with a missing translation.
-- `npm run start` - dev server (to run it locally)
-- `npm run build` - build standalone into `/dist/`
-- `npm run build:embed` - build of embed into `/dist/`
-- `npm run build:help` - build help page (when clicking the question mark) into `/dist/`
+- `npm run start` - dev server (to run `standalone` locally)
+- `npm run build` - build `standalone` into `/dist/`
+- `npm run build:embed` - build `embed` into `/dist/`
 
 # Embed
 Example usage of the embed can be found under: `/examples/embed/`

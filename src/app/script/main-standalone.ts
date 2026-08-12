@@ -10,6 +10,7 @@ import '../script/theme/theme';
 import { getKlIndexedDbName, KL_INDEXED_DB } from './klecks/storage/kl-indexed-db';
 import { KlRecoveryManager } from './klecks/storage/kl-recovery-manager';
 import { loadRecovery } from './app/recovery-loader';
+import { initIconCss } from './icon/icon';
 
 function showInitError(e: Error): void {
     const el = document.createElement('div');
@@ -26,6 +27,7 @@ function showInitError(e: Error): void {
 
 (async () => {
     try {
+        initIconCss();
         const outQueue: string[] = [];
         await initLANG();
 

@@ -6,10 +6,11 @@ import { TBrushUi } from '../kl-types';
 import { LANG, LANGUAGE_STRINGS } from '../../language/language';
 import { BB } from '../../bb/bb';
 import { SketchyBrush } from '../brushes/sketchy-brush';
+import { createImageMask } from '../../bb/base/ui';
 
 export const sketchyBrushUi = (function () {
     const brushInterface = {
-        image: brushIconImg,
+        image: createImageMask(brushIconImg),
         tooltip: LANG('brush-sketchy'),
         sizeSlider: {
             min: 0.5,
@@ -19,6 +20,7 @@ export const sketchyBrushUi = (function () {
             min: 1 / 100,
             max: 1,
         },
+        Ui: {} as TBrushUi<SketchyBrush>['Ui'],
     } as TBrushUi<SketchyBrush>;
 
     LANGUAGE_STRINGS.subscribe(() => {

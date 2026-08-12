@@ -3,7 +3,7 @@
     <head>
         <meta charset="UTF-8" />
         <title>Klecks</title>
-        <base href="/" />
+        <base href="./" />
         <meta
             name="viewport"
             content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"
@@ -38,5 +38,10 @@
         <div id="loading-screen">Loading Klecks</div>
         <link rel="stylesheet" href="app/style/style.scss" />
         <script type="module" src="app/script/main-standalone.ts"></script>
+        <!-- remove this if you don't need offline support -->
+        <script
+            type="module"
+            src="app/script/service-worker/register-service-worker.ts"
+        ></script>
     </body>
 </html>

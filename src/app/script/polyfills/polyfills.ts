@@ -1,15 +1,3 @@
-import './polyfills-nomodule';
-
-/*
- * ---- Below ----------------------
- * Polyfills for features that didn't have support until *after* browsers supported the modules script tag:
- * Chrome 61
- * Edge 16
- * Safari 11
- * Firefox 60
- * https://caniuse.com/es6-module
- */
-
 // Chrome 61, Edge 79, safari 16, firefox 107
 if (!('scrollTo' in Element.prototype)) {
     Object.defineProperty(Element.prototype, 'scrollTo', {

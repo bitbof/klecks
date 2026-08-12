@@ -200,7 +200,6 @@ export type TKlSliderConfig = {
 export type TSliderConfig = {
     sizeSlider: TKlSliderConfig;
     opacitySlider: TKlSliderConfig;
-    scatterSlider: TKlSliderConfig;
 };
 
 export type TBrushUiInstance<GBrush> = {
@@ -210,8 +209,6 @@ export type TBrushUiInstance<GBrush> = {
     setSize: (size: number) => void;
     getOpacity: () => number;
     setOpacity: (opacity: number) => void;
-    getScatter: () => number;
-    setScatter: (opacity: number) => void;
     setColor: (c: TRgb) => void;
     setLayer: (layer: TKlCanvasLayer) => void;
     startLine: (x: number, y: number, p: number) => void;
@@ -227,7 +224,7 @@ export type TBrushUiInstance<GBrush> = {
 };
 
 export type TBrushUi<GBrush> = TSliderConfig & {
-    image: string;
+    image: HTMLElement | SVGSVGElement;
     tooltip: string;
     Ui: (
         this: TBrushUiInstance<GBrush>,
@@ -235,7 +232,6 @@ export type TBrushUi<GBrush> = TSliderConfig & {
             klHistory: KlHistory;
             onSizeChange: (size: number) => void;
             onOpacityChange: (size: number) => void;
-            onScatterChange: (size: number) => void;
             onConfigChange: () => void;
         },
     ) => TBrushUiInstance<GBrush>;

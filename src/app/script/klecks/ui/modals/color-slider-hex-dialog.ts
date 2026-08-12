@@ -1,13 +1,14 @@
+import { getIconUrl } from '../../../icon/icon';
 import { BB } from '../../../bb/bb';
 import { input } from '../components/input';
 import { showModal } from './base/showModal';
 import { LANG } from '../../../language/language';
-import copyImg from 'url:/src/app/img/ui/copy.svg';
 import { TRgb } from '../../kl-types';
 import { RGB } from '../../../bb/color/color';
 import { c } from '../../../bb/base/c';
 import * as classes from './color-slider-hex-dialog.module.scss';
 
+const copyImg = getIconUrl('copy');
 type TInputRow = {
     update: () => void;
     destroy: () => void;

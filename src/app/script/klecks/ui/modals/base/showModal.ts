@@ -1,11 +1,9 @@
+import { getIconSvg, getIconUrl } from '../../../../icon/icon';
 import { TKeyString } from '../../../../bb/bb-types';
 import { DIALOG_COUNTER } from '../modal-count';
 import { BB } from '../../../../bb/bb';
 import { LANG } from '../../../../language/language';
 import './scroll-fix';
-import cancelImg from 'url:/src/app/img/ui/cancel.svg';
-import checkImg from 'url:/src/app/img/ui/check.svg';
-import removeLayerImg from 'url:/src/app/img/ui/remove-layer.svg';
 
 export function showModal(p: {
     div?: HTMLElement; // node with content
@@ -80,7 +78,7 @@ export function showModal(p: {
     const xButton = BB.el({
         tagName: 'button',
         className: 'popup-x',
-        content: `<img alt="${LANG('modal-close')}" height="20" src="${cancelImg}">`,
+        content: `<img alt="${LANG('modal-close')}" height="20" src="${getIconUrl('cancel')}">`,
         title: LANG('modal-close'),
         onClick: () => {
             close('Cancel');
@@ -194,42 +192,31 @@ export function showModal(p: {
     let clickOnEnterBtn: HTMLButtonElement | undefined;
     const btnElArr: HTMLButtonElement[] = [];
     if (p.buttons) {
+        const iconSize = '17px';
         p.buttons.forEach((buttonName) => {
-            const btnClasses = ['kl-popup__btn'];
-            if (buttonName === 'Ok' || (p.primaries && p.primaries.includes(buttonName))) {
-                btnClasses.push('kl-button-primary');
+            const btnClasses = new Set(['kl-popup__btn']);
+            if (p.primaries && p.primaries.includes(buttonName)) {
+                btnClasses.add('kl-button-primary');
             }
-            if (buttonName === p.deleteButtonName) {
-                btnClasses.push('kl-button-delete');
-            }
-            let iconUrl;
             let label = buttonName;
+            let iconImg: HTMLElement | SVGSVGElement | undefined = undefined;
+            if (buttonName === p.deleteButtonName) {
+                iconImg = getIconSvg('remove-layer', { width: iconSize, height: iconSize });
+                btnClasses.add('kl-button-delete');
+            }
             if (buttonName === 'Ok') {
+                iconImg = getIconSvg('check', { width: iconSize, height: iconSize });
+                btnClasses.add('kl-button-primary');
                 label = LANG('modal-ok');
-                iconUrl = checkImg;
             }
             if (buttonName === 'Cancel') {
+                iconImg = getIconSvg('cancel', { width: iconSize, height: iconSize });
                 label = LANG('modal-cancel');
-                iconUrl = cancelImg;
-                btnClasses.push('kl-button-cancel');
-            }
-            if (buttonName === p.deleteButtonName) {
-                iconUrl = removeLayerImg;
-            }
-            let iconImg: HTMLElement | undefined = undefined;
-            if (iconUrl) {
-                iconImg = BB.el({
-                    tagName: 'img',
-                    custom: {
-                        src: iconUrl,
-                        height: '17',
-                    },
-                });
             }
             const btn = BB.el({
                 parent: buttonRowEl,
                 tagName: 'button',
-                className: btnClasses.join(' '),
+                className: [...btnClasses].join(' '),
                 content: [
                     iconImg,
                     BB.el({

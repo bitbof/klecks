@@ -1,11 +1,12 @@
+import { getIconUrl } from '../../../icon/icon';
 import { BB } from '../../../bb/bb';
 import { TVector2D } from '../../../bb/bb-types';
 import { clamp } from '../../../bb/math/math';
 import { LANG } from '../../../language/language';
-import cancelImg from 'url:/src/app/img/ui/cancel.svg';
 import { PointerListener } from '../../../bb/input/pointer-listener';
 import { css } from '../../../bb/base/base';
 
+const cancelImg = getIconUrl('cancel');
 export type TMobileFloatingWindowParams = {
     content: HTMLElement;
     // called after window gets closed

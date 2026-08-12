@@ -1,10 +1,9 @@
+import { getIconUrl } from '../../../icon/icon';
 import { BB } from '../../../bb/bb';
 import { LANG, LANGUAGE_STRINGS, LS_LANGUAGE_KEY } from '../../../language/language';
 import { KL } from '../../kl';
 import { languages } from '../../../../languages/languages';
-import bitbofLogoImg from 'url:/src/app/img/bitbof-logo.svg';
 import klecksLogoImg from 'url:/src/app/img/klecks-logo.png';
-import uiSwapImg from 'url:/src/app/img/ui/ui-swap-lr.svg';
 import { LocalStorage } from '../../../bb/base/local-storage';
 import { THEME, TTheme } from '../../../theme/theme';
 import { addIsDarkListener, css, nullToUndefined } from '../../../bb/base/base';
@@ -14,6 +13,8 @@ import { SaveReminder } from '../components/save-reminder';
 import { showModal } from '../modals/base/showModal';
 import { createImage } from '../../../bb/base/ui';
 
+const bitbofLogoImg = getIconUrl('bitbof-logo');
+const uiSwapImg = getIconUrl('ui-swap-lr');
 export type TSettingsUiParams = {
     onLeftRight: () => void;
     saveReminder: SaveReminder | undefined;

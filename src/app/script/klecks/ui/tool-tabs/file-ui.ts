@@ -1,14 +1,10 @@
+import { getIconUrl } from '../../../icon/icon';
 import { BB } from '../../../bb/bb';
 import { KL } from '../../kl';
 import { BrowserStorageUi } from '../components/browser-storage-ui';
 import { TDropOption, TExportType, TKlProject } from '../../kl-types';
 import { ProjectStore } from '../../storage/project-store';
 import { LANG } from '../../../language/language';
-import newImageImg from 'url:/src/app/img/ui/new-image.svg';
-import exportImg from 'url:/src/app/img/ui/export.svg';
-import shareImg from 'url:/src/app/img/ui/share.svg';
-import uploadImg from 'url:/src/app/img/ui/upload.svg';
-import importImg from 'url:/src/app/img/ui/import.svg';
 import { Checkbox } from '../components/checkbox';
 import { LocalStorage } from '../../../bb/base/local-storage';
 import { KlRecoveryManager, TKlRecoveryListener } from '../../storage/kl-recovery-manager';
@@ -17,6 +13,11 @@ import * as classes from './file-ui.module.scss';
 import { BrowserStorageHeaderUi } from '../components/browser-storage-header-ui';
 import { css } from '../../../bb/base/base';
 
+const newImageImg = getIconUrl('new-image');
+const exportImg = getIconUrl('export');
+const shareImg = getIconUrl('share');
+const uploadImg = getIconUrl('upload');
+const importImg = getIconUrl('import');
 const LS_SHOW_SAVE_DIALOG = 'kl-save-dialog';
 
 const createSpacer = (): HTMLElement => {
@@ -38,6 +39,7 @@ const createButtonContent = (text: string, icon: string, noInvert?: boolean): st
 
 export type TFileUiParams = {
     klRootEl: HTMLElement;
+    helpPath: string;
     projectStore?: ProjectStore;
     getProject: () => TKlProject;
     exportType: TExportType;
@@ -202,6 +204,7 @@ export class FileUi {
             let browserStorageFallbackEl: HTMLElement | undefined;
             if (p.projectStore) {
                 this.browserStorageUi = new BrowserStorageUi({
+                    helpPath: p.helpPath,
                     projectStore: p.projectStore,
                     getProject: p.getProject,
                     applyUncommitted: this.applyUncommitted,
@@ -212,7 +215,7 @@ export class FileUi {
                     margin: '10px',
                 });
             } else {
-                const header = new BrowserStorageHeaderUi();
+                const header = new BrowserStorageHeaderUi(p.helpPath);
                 browserStorageFallbackEl = BB.el({
                     content: [
                         header.getElement(),

@@ -1,14 +1,15 @@
+import { getIconUrl } from '../../../icon/icon';
 import { BB } from '../../../bb/bb';
 import klecksLogoImg from 'url:/src/app/img/klecks-logo.png';
-import newImageImg from 'url:/src/app/img/ui/new-image.svg';
-import importImg from 'url:/src/app/img/ui/import.svg';
-import exportImg from 'url:/src/app/img/ui/export.svg';
-import shareImg from 'url:/src/app/img/ui/share.svg';
-import helpImg from 'url:/src/app/img/ui/help.svg';
 import { LANG } from '../../../language/language';
 import { PointerListener } from '../../../bb/input/pointer-listener';
 import { css } from '../../../bb/base/base';
 
+const newImageImg = getIconUrl('new-image');
+const importImg = getIconUrl('import');
+const exportImg = getIconUrl('export');
+const shareImg = getIconUrl('share');
+const helpImg = getIconUrl('help');
 /**
  * Topmost row of buttons in toolspace (with the app logo)
  */
@@ -17,7 +18,7 @@ export class ToolspaceTopRow {
 
     // ----------------------------------- public -----------------------------------
     constructor(p: {
-        logoImg: string;
+        logoImg?: string;
         onLogo: () => void;
         onNew: () => void;
         onImport: () => void;
@@ -83,7 +84,7 @@ export class ToolspaceTopRow {
         const logoButton = createButton({
             onClick: p.onLogo,
             title: LANG('home'),
-            image: p.logoImg ? p.logoImg : klecksLogoImg,
+            image: p.logoImg ?? klecksLogoImg,
             contain: true,
             darkInvert: true,
         });

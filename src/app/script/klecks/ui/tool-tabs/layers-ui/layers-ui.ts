@@ -1,3 +1,4 @@
+import { getIconSvg } from '../../../../icon/icon';
 import { BB } from '../../../../bb/bb';
 import { Select } from '../../components/select';
 import { PointSlider } from '../../components/point-slider';
@@ -13,12 +14,6 @@ import { css, throwIfNull } from '../../../../bb/base/base';
 import { HAS_POINTER_EVENTS } from '../../../../bb/base/browser';
 import { c } from '../../../../bb/base/c';
 import { DropdownMenu } from '../../components/dropdown-menu';
-import addLayerImg from 'url:/src/app/img/ui/add-layer.svg';
-import duplicateLayerImg from 'url:/src/app/img/ui/duplicate-layer.svg';
-import mergeLayerImg from 'url:/src/app/img/ui/merge-layers.svg';
-import removeLayerImg from 'url:/src/app/img/ui/remove-layer.svg';
-import renameLayerImg from 'url:/src/app/img/ui/rename-layer.svg';
-import caretDownImg from 'url:/src/app/img/ui/caret-down.svg';
 import { KlHistory } from '../../../history/kl-history';
 import { makeUnfocusable } from '../../../../bb/base/ui';
 
@@ -613,7 +608,7 @@ export class LayersUi {
         const renameBtn = BB.el({ tagName: 'button' });
         this.moreDropdown = new DropdownMenu({
             button: BB.el({
-                content: `<img src="${caretDownImg}" width="13"/>`,
+                content: getIconSvg('chevron-down', { width: '13px' }),
                 css: {
                     display: 'flex',
                     justifyContent: 'center',
@@ -682,11 +677,31 @@ export class LayersUi {
                 this.mergeBtn.title = LANG('layers-merge');
                 renameBtn.title = LANG('layers-rename-title');
 
-                this.addBtn.innerHTML = "<img src='" + addLayerImg + "' height='20'/>";
-                this.duplicateBtn.innerHTML = "<img src='" + duplicateLayerImg + "' height='20'/>";
-                this.mergeBtn.innerHTML = "<img src='" + mergeLayerImg + "' height='20'/>";
-                this.removeBtn.innerHTML = "<img src='" + removeLayerImg + "' height='20'/>";
-                renameBtn.innerHTML = "<img src='" + renameLayerImg + "' height='20'/>";
+                this.addBtn.append(
+                    getIconSvg('add-layer', {
+                        height: '20px',
+                    }),
+                );
+                this.duplicateBtn.append(
+                    getIconSvg('duplicate-layer', {
+                        height: '20px',
+                    }),
+                );
+                this.mergeBtn.append(
+                    getIconSvg('merge-layers', {
+                        height: '20px',
+                    }),
+                );
+                this.removeBtn.append(
+                    getIconSvg('remove-layer', {
+                        height: '20px',
+                    }),
+                );
+                renameBtn.append(
+                    getIconSvg('rename-layer', {
+                        height: '20px',
+                    }),
+                );
                 div.append(
                     c(',flex,gap-5,mb-10', [
                         this.addBtn,

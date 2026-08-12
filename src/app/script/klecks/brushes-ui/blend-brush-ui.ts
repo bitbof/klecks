@@ -1,17 +1,17 @@
+import { getIconSvg } from '../../icon/icon';
 import { BB } from '../../bb/bb';
 import { createPenPressureToggle } from '../ui/components/create-pen-pressure-toggle';
 import { EVENT_RES_MS } from './brushes-consts';
 import { Checkbox } from '../ui/components/checkbox';
 import { BRUSHES } from '../brushes/brushes';
 import { KlSlider } from '../ui/components/kl-slider';
-import brushIconImg from 'url:/src/app/img/ui/brush-blend.svg';
 import { TBrushUi } from '../kl-types';
 import { LANG, LANGUAGE_STRINGS } from '../../language/language';
 import { BlendBrush } from '../brushes/blend-brush';
 
 export const blendBrushUi = (function () {
     const brushInterface = {
-        image: brushIconImg,
+        image: getIconSvg('brush-blend'),
         tooltip: LANG('brush-blend'),
         sizeSlider: {
             min: 0.5,

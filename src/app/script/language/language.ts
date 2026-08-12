@@ -1,25 +1,38 @@
-import { english, languages, loadLanguage, TTranslationCode } from '../../languages/languages';
+import {
+    english,
+    languages,
+    loadLanguage,
+    translationCodeToIndex,
+    TTranslationCode,
+} from '../../languages/languages';
 import { LocalStorage } from '../bb/base/local-storage';
 
 export const LS_LANGUAGE_KEY = 'klecks-language';
 
 class LanguageStrings {
-    private data: any;
+    private data: readonly string[];
     private listeners: (() => void)[] = [];
     private code: string;
 
     // ----------------------------------- public -----------------------------------
     constructor() {
         // need to use setLanguage for a different language
-        this.data = { ...english };
+        this.data = english;
         this.code = 'en';
     }
 
     async setLanguage(langCode: string): Promise<void> {
-        if (langCode === 'en') {
-            this.data = { ...english };
-        } else {
-            this.data = { ...english, ...(await loadLanguage(langCode)) };
+        this.data = english;
+        if (langCode !== 'en') {
+            try {
+                this.data = (await loadLanguage(langCode)).map(
+                    (item, index) => item ?? this.data[index],
+                );
+            } catch (e) {
+                setTimeout(() => {
+                    throw new Error('failed to load language: ' + langCode);
+                });
+            }
         }
         this.code = langCode;
         document.documentElement.setAttribute('lang', langCode);
@@ -29,10 +42,11 @@ class LanguageStrings {
     }
 
     get(code: TTranslationCode): string {
-        if (!(code in this.data)) {
+        const index = translationCodeToIndex[code];
+        if (index === undefined) {
             throw new Error("translation code doesn't exist: " + code);
         }
-        return this.data[code];
+        return this.data[index];
     }
 
     getLanguage(): { code: string; name: string } {

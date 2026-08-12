@@ -57,6 +57,7 @@ export function buildLanguages(baseEn, translations, showMissing) {
         fs.readFileSync('./src/languages/languages.json', { encoding: 'UTF-8' }),
     );
 
+    // This is the canonical order shared by every generated language array.
     const keys = Object.keys(baseEn);
     keys.forEach((item) => {
         if (typeof baseEn[item] !== 'string') {
@@ -68,8 +69,14 @@ export function buildLanguages(baseEn, translations, showMissing) {
         fs.mkdirSync('./src/app/languages/');
     }
 
+    const writeLanguage = (code, values) =>
+        fs.writeFileSync(`./src/app/languages/${code}.json`, JSON.stringify(values));
+
     // base language
-    fs.writeFileSync('./src/app/languages/en.json', JSON.stringify(baseEn));
+    writeLanguage(
+        'en',
+        keys.map((key) => baseEn[key]),
+    );
     let langArray = [];
     let loadLanguage = '';
     translations.forEach((item) => {
@@ -93,7 +100,7 @@ export function buildLanguages(baseEn, translations, showMissing) {
 
 import dataEn from './en.json';
 
-export const english = dataEn;
+export const english: readonly string[] = dataEn;
 export const languages: {code: string; name: string}[] = [
     {
         code: 'en',
@@ -101,67 +108,69 @@ export const languages: {code: string; name: string}[] = [
     },
 ${langArray.join(',\n')},
 ];
-export const loadLanguage = async (code: string): Promise<Partial<Record<TTranslationCode, string>>> => {
+export const loadLanguage = async (code: string): Promise<readonly (string | null)[]> => {
     if (code === 'en') {
         return english;
 ${loadLanguage}    }
     throw new Error('unknown language code');
 };
 
-export type TTranslationCode = `;
+export const translationCodes = [
+`;
 
-        keys.forEach((item, index) => {
-            if (index > 0) {
-                tsStr += '    ';
-            }
-            tsStr += `'${item}'`;
-            if (index < keys.length - 1) {
-                tsStr += ' |';
-            } else {
-                tsStr += ';';
-            }
+        keys.forEach((item) => {
+            tsStr += `    '${item}',`;
             tsStr += ` // ${baseEn[item].replace('\n', '')}\n`;
         });
+        tsStr += `] as const;
+export type TTranslationCode = (typeof translationCodes)[number];
+export const translationCodeToIndex = Object.fromEntries(
+    translationCodes.map((code, index) => [code, index]),
+) as Record<TTranslationCode, number>;
+`;
         fs.writeFileSync('./src/app/languages/languages.ts', tsStr);
     }
 
     // translations
     let hasMissing = false;
     translations.forEach((translation) => {
-        const json = {};
-        const keys = Object.keys(translation.data);
-        const baseKeys = Object.keys(baseEn);
+        const values = [];
         const missingMessages = [];
-        baseKeys.forEach((key) => {
-            if (!keys.includes(key)) {
+        keys.forEach((key) => {
+            const item = translation.data[key];
+            if (item === undefined) {
                 missingMessages.push(
                     `${translation.code}: Key "${key}" not in "${translation.code}".`,
                 );
             }
-        });
-        keys.forEach((key) => {
-            const item = translation.data[key];
             if (
-                !(key in baseEn) ||
+                item === undefined ||
                 item.original !== baseEn[key] ||
                 item.value === '' ||
                 item.value === undefined ||
                 item.value === null
             ) {
-                if (!(key in baseEn)) {
-                    console.log(`${translation.code}: Key "${key}" not in base.`);
-                } else if (item.original !== baseEn[key]) {
+                if (item !== undefined && item.original !== baseEn[key]) {
                     console.log(
                         `${translation.code}: Original not matching base for key "${key}".`,
                     );
-                } else if (item.value === '' || item.value === undefined || item.value === null) {
+                } else if (
+                    item !== undefined &&
+                    (item.value === '' || item.value === undefined || item.value === null)
+                ) {
                     missingMessages.push(`${translation.code}: Value empty for key "${key}".`);
                 }
+                values.push(undefined);
                 return;
             }
-            json[key] = item.value;
+            values.push(item.value);
         });
-        fs.writeFileSync(`./src/app/languages/${translation.code}.json`, JSON.stringify(json));
+        Object.keys(translation.data).forEach((key) => {
+            if (!(key in baseEn)) {
+                console.log(`${translation.code}: Key "${key}" not in base.`);
+            }
+        });
+        writeLanguage(translation.code, values);
         if (showMissing) {
             missingMessages.forEach((message) => {
                 console.log(message);

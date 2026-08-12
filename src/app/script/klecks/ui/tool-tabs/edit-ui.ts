@@ -1,3 +1,4 @@
+import { getIconUrl } from '../../../icon/icon';
 import { BB } from '../../../bb/bb';
 import { KL } from '../../kl';
 import { TKeyString } from '../../../bb/bb-types';
@@ -11,9 +12,9 @@ import { RGB } from '../../../bb/color/color';
 import { getSharedFx } from '../../../fx-canvas/shared-fx';
 import { c } from '../../../bb/base/c';
 import { KlHistory } from '../../history/kl-history';
-import copyImg from 'url:/src/app/img/ui/copy.svg';
 import { createImage } from '../../../bb/base/ui';
 
+const copyImg = getIconUrl('copy');
 export type TEditUiParams = {
     klRootEl: HTMLElement;
     klColorSlider: KlColorSlider;

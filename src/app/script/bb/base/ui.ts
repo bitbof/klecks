@@ -127,7 +127,7 @@ export function el<GTag extends keyof HTMLElementTagNameMap = 'div'>(params?: {
     parent?: HTMLElement;
     css?: Partial<CSSStyleDeclaration>;
     custom?: { [key: string]: string };
-    content?: string | (HTMLElement | string | undefined)[] | Element;
+    content?: string | (HTMLElement | SVGSVGElement | string | undefined)[] | Element;
     textContent?: string;
     className?: string;
     title?: string;
@@ -243,5 +243,28 @@ export function createImage(p: {
         result.className = p.className;
     }
     p.css && css(result, p.css);
+    return result;
+}
+
+/**
+ * Creates a monochrome element using any image URL as its CSS mask.
+ * Transparent image pixels remain transparent; visible pixels use currentColor.
+ */
+export function createImageMask(
+    imageUrl: string,
+    styleObj?: Partial<CSSStyleDeclaration>,
+): HTMLDivElement {
+    const result = document.createElement('div');
+    const mask = `url("${imageUrl}") center / contain no-repeat`;
+    result.style.setProperty('mask', mask);
+    result.style.setProperty('-webkit-mask', mask);
+    result.setAttribute('aria-hidden', 'true');
+    css(result, {
+        display: 'inline-block',
+        width: '1em',
+        height: '1em',
+        backgroundColor: 'currentColor',
+        ...styleObj,
+    });
     return result;
 }

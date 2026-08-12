@@ -6,7 +6,7 @@ import { css } from '../../../bb/base/base';
 
 type TTabInit = {
     id: string; // e.g. 'draw',
-    label?: string;
+    label?: string | HTMLElement | SVGSVGElement;
     image?: string; // background image
     title?: string;
     isVisible?: boolean; // default is true

@@ -1,12 +1,14 @@
 /* --- entrypoint for app ---*/
 @use 'vars';
 @use './dark';
+@use '../icons/icons';
 
 :root {
     --active-highlight-color: #{vars.$activeHighlightColor};
     --body-bg-color: #{vars.$bodyBgColor};
     --kl-color: #{vars.$klColor};
     --ui-bg-color: #{vars.$uiBgColor};
+    --ui-on-bg-full-contrast: #000;
 
     --kl-note-1: #{vars.$klNote1};
     --kl-note-2: #{vars.$klNote2};
@@ -199,7 +201,7 @@ a:not([href]):hover {
 }
 .kl-tooldropdown-caret > div {
     height: 100%;
-    background-image: url(../img/ui/triangle-down.svg);
+    background-image: icons.icon('caret-down');
     background-repeat: no-repeat;
     background-position: center;
     background-size: 65%;
@@ -380,7 +382,9 @@ button:disabled img,
 }
 
 button img,
-.kl-button img {
+button svg,
+.kl-button img,
+.kl-button svg {
     float: left;
     pointer-events: none;
 }
@@ -495,16 +499,16 @@ button img,
     margin-right: 5px;
 }
 .kl-popup__icon-error {
-    background-image: url(../img/ui/error.svg);
+    background-image: icons.icon('error');
 }
 .kl-popup__icon-ok {
-    background-image: url(../img/ui/ok.svg);
+    background-image: icons.icon('ok');
 }
 .kl-popup__icon-warning {
-    background-image: url(../img/ui/warning.svg);
+    background-image: icons.icon('warning');
 }
 .kl-popup__icon-upload {
-    background-image: url(../img/ui/upload-large.svg);
+    background-image: icons.icon('upload-large');
 }
 
 .kl-d-modal-root {
@@ -982,7 +986,7 @@ clip-path seems the cleanest.
     filter: invert(1);
     width: 36px;
     height: 36px;
-    background-image: url(../img/ui/caret-down.svg);
+    background-image: icons.icon('chevron-down');
     background-size: 60%;
     background-position: center;
     background-repeat: no-repeat;

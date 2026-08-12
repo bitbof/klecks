@@ -1,7 +1,8 @@
+import { getIconUrl } from '../../../icon/icon';
 import { BB } from '../../../bb/bb';
-import angleSvg from 'url:/src/app/img/ui/angle.svg';
 import { css } from '../../../bb/base/base';
 
+const angleSvg = getIconUrl('angle');
 type TUiState = 'left' | 'right';
 
 /**

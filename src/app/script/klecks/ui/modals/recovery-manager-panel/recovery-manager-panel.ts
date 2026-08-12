@@ -1,3 +1,4 @@
+import { getIconSvg } from '../../../../icon/icon';
 import { BB } from '../../../../bb/bb';
 import {
     DEBUG_RETURN_ALL_RECOVERIES,
@@ -11,7 +12,6 @@ import { showModal } from '../base/showModal';
 import { copyCanvas } from '../../../../bb/base/canvas';
 import * as classes from './recovery-manager-panel.module.scss';
 import { LANG } from '../../../../language/language';
-import removeLayerImg from 'url:/src/app/img/ui/remove-layer.svg';
 import { css } from '../../../../bb/base/base';
 import loadingImg from 'url:/src/app/img/ui/loading.gif';
 
@@ -54,7 +54,12 @@ export class RecoveryManagerPanel {
                 const deleteBtn = BB.el({
                     tagName: 'button',
                     className: 'kl-button-delete',
-                    content: `<img src="${removeLayerImg}" height="20"/>${LANG('tab-recovery-delete')}`,
+                    content: [
+                        getIconSvg('remove-layer', {
+                            height: '20px',
+                        }),
+                        LANG('tab-recovery-delete'),
+                    ],
                     onClick: () => {
                         deleteBtn.blur();
                         const thumbnail2 = copyCanvas(meta.thumbnail);

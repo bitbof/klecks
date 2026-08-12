@@ -1,6 +1,6 @@
+import { getIconSvg } from '../../../icon/icon';
 import { BB } from '../../../bb/bb';
 
-import removeLayerImg from 'url:/src/app/img/ui/remove-layer.svg';
 import { TKlProject } from '../../kl-types';
 import { ProjectStore, TProjectStoreListener } from '../../storage/project-store';
 import { KL } from '../../kl';
@@ -14,6 +14,7 @@ import { requestPersistentStorage } from '../../storage/request-persistent-stora
 import { copyCanvas } from '../../../bb/base/canvas';
 
 export type TBrowserStorageUiParams = {
+    helpPath: string;
     projectStore: ProjectStore;
     getProject: () => TKlProject;
     applyUncommitted: () => void;
@@ -219,7 +220,7 @@ export class BrowserStorageUi {
 
         this.rootEl = BB.el({});
 
-        this.header = new BrowserStorageHeaderUi();
+        this.header = new BrowserStorageHeaderUi(p.helpPath);
         this.rootEl.append(this.header.getElement());
 
         this.contentEl = BB.el({
@@ -277,8 +278,7 @@ export class BrowserStorageUi {
         this.clearButtonEl = BB.el({
             tagName: 'button',
             className: 'grid-button kl-button-delete',
-            content:
-                '<img src="' + removeLayerImg + '" height="20"/> ' + LANG('file-storage-clear'),
+            content: [getIconSvg('remove-layer', { height: '20px' }), LANG('file-storage-clear')],
             css: {
                 margin: '0',
             },

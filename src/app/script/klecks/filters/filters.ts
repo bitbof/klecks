@@ -1,24 +1,25 @@
+import { getIconUrl } from '../../icon/icon';
 import { TFilter } from '../kl-types';
-import glBrightnessContrastImg from 'url:/src/app/img/ui/edit-brightness-contrast.svg';
-import cropExtendImg from 'url:/src/app/img/ui/edit-crop.svg';
-import glCurvesImg from 'url:/src/app/img/ui/edit-curves.svg';
-import flipImg from 'url:/src/app/img/ui/edit-flip.svg';
-import glHueSaturationImg from 'url:/src/app/img/ui/edit-hue-saturation.svg';
 import invertImg from 'url:/src/app/img/ui/edit-invert.png';
-import glPerspectiveImg from 'url:/src/app/img/ui/edit-perspective.svg';
-import resizeImg from 'url:/src/app/img/ui/edit-resize.svg';
-import rotateImg from 'url:/src/app/img/ui/edit-rotate.svg';
 import glTiltShiftImg from 'url:/src/app/img/ui/edit-tilt-shift.png';
-import toAlphaImg from 'url:/src/app/img/ui/edit-to-alpha.svg';
-import transformImg from 'url:/src/app/img/ui/edit-transform.svg';
 import glBlurImg from 'url:/src/app/img/ui/edit-triangle-blur.png';
 import glUnsharpMaskImg from 'url:/src/app/img/ui/edit-unsharp-mask.png';
-import gridImg from 'url:/src/app/img/ui/edit-grid.svg';
-import noiseImg from 'url:/src/app/img/ui/edit-noise.svg';
-import patternImg from 'url:/src/app/img/ui/edit-pattern.svg';
-import vanishPointImg from 'url:/src/app/img/ui/edit-vanish-point.svg';
-import distortImg from 'url:/src/app/img/ui/edit-distort.svg';
 
+const glBrightnessContrastImg = getIconUrl('edit-brightness-contrast');
+const cropExtendImg = getIconUrl('edit-crop');
+const glCurvesImg = getIconUrl('edit-curves');
+const flipImg = getIconUrl('edit-flip');
+const glHueSaturationImg = getIconUrl('edit-hue-saturation');
+const glPerspectiveImg = getIconUrl('edit-perspective');
+const resizeImg = getIconUrl('edit-resize');
+const rotateImg = getIconUrl('edit-rotate');
+const toAlphaImg = getIconUrl('edit-to-alpha');
+const transformImg = getIconUrl('edit-transform');
+const gridImg = getIconUrl('edit-grid');
+const noiseImg = getIconUrl('edit-noise');
+const patternImg = getIconUrl('edit-pattern');
+const vanishPointImg = getIconUrl('edit-vanish-point');
+const distortImg = getIconUrl('edit-distort');
 export const FILTER_LIB_STATUS = {
     isLoaded: false,
 };

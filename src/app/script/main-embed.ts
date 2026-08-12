@@ -6,6 +6,9 @@ import { LANG } from './language/language';
 import { loadAgPsd, TAgPsd } from './klecks/storage/load-ag-psd';
 import { KL_CONFIG } from './klecks/kl-config';
 import { randomUuid } from './bb/base/base';
+import { initIconCss } from './icon/icon';
+
+initIconCss();
 
 export type TEmbedParams = {
     project?: TKlProject;

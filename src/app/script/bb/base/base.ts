@@ -61,7 +61,10 @@ export function setAttributes(el: Element, attrObj: TKeyString): void {
 /**
  * append a list to DOM element
  */
-export function append(target: HTMLElement, els: (HTMLElement | string | undefined)[]): void {
+export function append(
+    target: HTMLElement,
+    els: (HTMLElement | SVGElement | string | undefined)[],
+): void {
     const fragment = document.createDocumentFragment();
     els.forEach((item) => item && fragment.append(item));
     target.append(fragment);

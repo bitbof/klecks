@@ -1,8 +1,9 @@
+import { getIconUrl } from '../../../icon/icon';
 import { BB } from '../../../bb/bb';
 import { LANG } from '../../../language/language';
-import iconImg from 'url:/src/app/img/ui/brush-pressure.svg';
 import { BoxToggle } from './box-toggle';
 
+const iconImg = getIconUrl('brush-pressure');
 /**
  * small toggle button with a pen icon - representing toggling pressure sensitivity
  * @param isChecked initial value

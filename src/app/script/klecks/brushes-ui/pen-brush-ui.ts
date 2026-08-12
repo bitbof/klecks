@@ -1,10 +1,10 @@
+import { getIconSvg } from '../../icon/icon';
 import { BB } from '../../bb/bb';
 import { BRUSHES } from '../brushes/brushes';
 import { EVENT_RES_MS } from './brushes-consts';
 import { Checkbox } from '../ui/components/checkbox';
 import { KlSlider } from '../ui/components/kl-slider';
 import { createPenPressureToggle } from '../ui/components/create-pen-pressure-toggle';
-import brushIconImg from 'url:/src/app/img/ui/brush-pen.svg';
 import { genBrushAlpha01, genBrushAlpha02 } from '../brushes/alphas/brush-alphas';
 import { TBrushUi } from '../kl-types';
 import { LANG, LANGUAGE_STRINGS } from '../../language/language';
@@ -13,7 +13,7 @@ import { PenBrush } from '../brushes/pen-brush';
 
 export const penBrushUi = (function () {
     const brushInterface = {
-        image: brushIconImg,
+        image: getIconSvg('brush-pen'),
         tooltip: LANG('brush-pen'),
         sizeSlider: {
             min: 0.5,
@@ -29,12 +29,13 @@ export const penBrushUi = (function () {
                 [1, 1],
             ],
         },
-        scatterSlider: {
-            min: 0,
-            max: 100,
-            curve: BB.powerSplineInput(0, 100, 0.1, 2.5),
-        },
     } as TBrushUi<PenBrush>;
+
+    const scatterSliderConfig = {
+        min: 0,
+        max: 100,
+        curve: BB.powerSplineInput(0, 100, 0.1, 2.5),
+    };
 
     let alphaNames = [
         LANG('brush-pen-circle'),
@@ -175,14 +176,13 @@ export const penBrushUi = (function () {
                 label: LANG('scatter'),
                 width: 225,
                 height: 30,
-                min: brushInterface.scatterSlider.min,
-                max: brushInterface.scatterSlider.max,
-                value: brushInterface.scatterSlider.min,
-                curve: brushInterface.scatterSlider.curve,
+                min: scatterSliderConfig.min,
+                max: scatterSliderConfig.max,
+                value: scatterSliderConfig.min,
+                curve: scatterSliderConfig.curve,
                 eventResMs: EVENT_RES_MS,
                 onChange: (val) => {
                     brush.setScatter(val);
-                    p.onScatterChange(val);
                 },
                 formatFunc: (displayValue) => {
                     if (displayValue < 10) {
@@ -272,13 +272,6 @@ export const penBrushUi = (function () {
         this.setOpacity = function (opacity) {
             brush.setOpacity(opacity);
             opacitySlider.setValue(opacity);
-        };
-        this.getScatter = function () {
-            return brush.getScatter();
-        };
-        this.setScatter = function (scatter) {
-            brush.setScatter(scatter);
-            scatterSlider.setValue(scatter);
         };
 
         this.setColor = function (c) {

@@ -1,23 +1,11 @@
+import { getIconImg, getIconSvg, getIconUrl } from '../../../icon/icon';
 import { BB } from '../../../bb/bb';
 import { Options } from '../components/options';
-import modeSelectImg from 'url:/src/app/img/ui/select-mode-select.svg';
-import modeMoveImg from 'url:/src/app/img/ui/select-mode-move.svg';
 import { c } from '../../../bb/base/c';
 import { TBooleanOperation, TSelectShape } from '../../select-tool/select-tool';
-import defaultImSvg from 'url:/src/app/img/ui/select-default.svg';
-import unionImSvg from 'url:/src/app/img/ui/select-union.svg';
-import subtractImSvg from 'url:/src/app/img/ui/select-subtract.svg';
-import rectSvg from 'url:/src/app/img/ui/select-shape-rect.svg';
-import ellipseSvg from 'url:/src/app/img/ui/select-shape-ellipse.svg';
-import lassoSvg from 'url:/src/app/img/ui/select-shape-lasso.svg';
-import polySvg from 'url:/src/app/img/ui/select-shape-poly.svg';
-import removeLayerImg from 'url:/src/app/img/ui/remove-layer.svg';
-import duplicateLayerImg from 'url:/src/app/img/ui/duplicate-layer.svg';
-import warpImg from 'url:/src/app/img/ui/select-transform-warp.svg';
 import { Select } from '../components/select';
 import { LANG } from '../../../language/language';
 import { Checkbox } from '../components/checkbox';
-import { createImage } from '../../../bb/base/ui';
 import { css } from '../../../bb/base/base';
 import { TInterpolationAlgorithm } from '../../kl-types';
 import { Icon } from '../components/icon';
@@ -25,6 +13,10 @@ import { createCanvas } from '../../../bb/base/create-canvas';
 import { TFreeTransform } from '../../transform/transform-types';
 import { webGl2IsSupported } from '../../image-operations/gpu-composite-canvas';
 
+const modeSelectImg = getIconUrl('select-mode-select');
+const modeMoveImg = getIconUrl('select-mode-move');
+const duplicateLayerImg = getIconUrl('duplicate-layer');
+const warpImg = getIconUrl('select-transform-warp');
 function getAlgorithmIconDataUrl(): string {
     const canvas = createCanvas(3, 3);
     const ctx = BB.ctx(canvas);
@@ -164,14 +156,16 @@ export class SelectUi {
         // --- select ---
         const selectModeEl = BB.el();
 
-        const defaultIm = new Image();
-        defaultIm.src = defaultImSvg;
+        const selectOptionImageStyle = {
+            width: '32px',
+            height: '32px',
+        };
+
+        const defaultIm = getIconImg('select-default', selectOptionImageStyle);
         defaultIm.classList.add('dark-invert');
-        const unionIm = new Image();
-        unionIm.src = unionImSvg;
+        const unionIm = getIconImg('select-union', selectOptionImageStyle);
         unionIm.classList.add('dark-invert');
-        const subtractIm = new Image();
-        subtractIm.src = subtractImSvg;
+        const subtractIm = getIconImg('select-subtract', selectOptionImageStyle);
         subtractIm.classList.add('dark-invert');
 
         this.operationOptions = new Options<TBooleanOperation>({
@@ -201,26 +195,14 @@ export class SelectUi {
             },
         });
 
-        const imStyle = {
-            width: '32px',
-            height: '32px',
-        };
-        const rectIm = new Image();
-        rectIm.src = rectSvg;
+        const rectIm = getIconImg('select-shape-rect', selectOptionImageStyle);
         rectIm.classList.add('dark-invert');
-        css(rectIm, imStyle);
-        const ellipseIm = new Image();
-        ellipseIm.src = ellipseSvg;
+        const ellipseIm = getIconImg('select-shape-ellipse', selectOptionImageStyle);
         ellipseIm.classList.add('dark-invert');
-        css(ellipseIm, imStyle);
-        const lassoIm = new Image();
-        lassoIm.src = lassoSvg;
+        const lassoIm = getIconImg('select-shape-lasso', selectOptionImageStyle);
         lassoIm.classList.add('dark-invert');
-        css(lassoIm, imStyle);
-        const polyIm = new Image();
-        polyIm.src = polySvg;
+        const polyIm = getIconImg('select-shape-poly', selectOptionImageStyle);
         polyIm.classList.add('dark-invert');
-        css(polyIm, imStyle);
 
         const shapeOptions = new Options<TSelectShape>({
             optionArr: [
@@ -296,14 +278,9 @@ export class SelectUi {
             parent: actionRow,
             tagName: 'button',
             content: [
-                createImage({
-                    src: removeLayerImg,
-                    alt: 'icon',
-                    height: 20,
-                    css: {
-                        marginRight: '3px',
-                        filter: 'invert(1)',
-                    },
+                getIconSvg('remove-layer', {
+                    height: '20px',
+                    marginRight: '3px',
                 }),
                 LANG('select-reset'),
             ],

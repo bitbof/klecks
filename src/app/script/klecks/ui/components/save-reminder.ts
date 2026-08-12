@@ -17,6 +17,7 @@ const UNSAVED_ACTIONS_LIMIT = DEBUG_UNSAVED_ACTIONS_LIMIT ?? 100;
 const LS_REMINDER_KEY = 'kl-save-reminder';
 
 export type TSaveReminderParams = {
+    helpPath: string;
     onSaveAsPsd: () => void;
     isDrawing: () => boolean;
     projectStore: ProjectStore; // needed if showReminder
@@ -36,6 +37,7 @@ export class SaveReminder {
     private readonly getProject: () => TKlProject;
     private readonly onStored: () => void;
     private readonly applyUncommitted: () => void;
+    private readonly helpPath: string;
     private klHistory: KlHistory = {} as KlHistory;
 
     private setting: TSaveReminderSetting;
@@ -96,6 +98,7 @@ export class SaveReminder {
         );
 
         const storageUi = new BrowserStorageUi({
+            helpPath: this.helpPath,
             projectStore: this.projectStore,
             getProject: this.getProject,
             applyUncommitted: this.applyUncommitted,
@@ -130,6 +133,7 @@ export class SaveReminder {
 
     // ----------------------------------- public -----------------------------------
     constructor(p: TSaveReminderParams) {
+        this.helpPath = p.helpPath;
         this.onSaveAsPsd = p.onSaveAsPsd;
         this.isDrawing = p.isDrawing;
         this.projectStore = p.projectStore;

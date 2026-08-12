@@ -1,3 +1,4 @@
+import { getIconUrl } from '../../../../icon/icon';
 import { BB } from '../../../../bb/bb';
 import { css, throwIfNull } from '../../../../bb/base/base';
 import { THEME } from '../../../../theme/theme';
@@ -6,13 +7,13 @@ import { KlCanvas } from '../../../canvas/kl-canvas';
 import { KlSlider } from '../../components/kl-slider';
 import { PointerListener } from '../../../../bb/input/pointer-listener';
 import { LANG } from '../../../../language/language';
-import toolZoomInImg from 'url:/src/app/img/ui/tool-zoom-in.svg';
-import toolZoomOutImg from 'url:/src/app/img/ui/tool-zoom-out.svg';
 import { c } from '../../../../bb/base/c';
 import { TVector2D } from '../../../../bb/bb-types';
 import { KeyListener } from '../../../../bb/input/key-listener';
 import { getSelectionPath2d } from '../../../../bb/multi-polygon/get-selection-path-2d';
 
+const toolZoomInImg = getIconUrl('tool-zoom-in');
+const toolZoomOutImg = getIconUrl('tool-zoom-out');
 type TViewportParams = Pick<TRenderTextParam, 'x' | 'y' | 'angleRad'>;
 
 type TViewportUIParams = {

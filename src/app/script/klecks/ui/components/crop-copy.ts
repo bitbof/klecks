@@ -1,3 +1,4 @@
+import { getIconUrl } from '../../../icon/icon';
 import { BB } from '../../../bb/bb';
 import { KeyListener } from '../../../bb/input/key-listener';
 import { PointerListener } from '../../../bb/input/pointer-listener';
@@ -7,7 +8,6 @@ import { applyToPoint, inverse } from 'transformation-matrix';
 import { createMatrixFromTransform } from '../../../bb/transform/create-matrix-from-transform';
 import { clamp } from '../../../bb/math/math';
 import { LANG } from '../../../language/language';
-import editCropImg from 'url:/src/app/img/ui/edit-crop.svg';
 import { EventChain } from '../../../bb/input/event-chain/event-chain';
 import { OnePointerLimiter } from '../../../bb/input/event-chain/one-pointer-limiter';
 import { TChainElement } from '../../../bb/input/event-chain/event-chain.types';
@@ -15,6 +15,7 @@ import { canvasToBlob } from '../../../bb/base/canvas';
 import { TProjectViewportProject } from '../project-viewport/project-viewport';
 import { css } from '../../../bb/base/base';
 
+const editCropImg = getIconUrl('edit-crop');
 export type TCropCopyParams = {
     // size of dom element
     width: number;

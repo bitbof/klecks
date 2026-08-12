@@ -1,13 +1,9 @@
+import { getIconUrl } from '../../../../icon/icon';
 import { BB } from '../../../../bb/bb';
 import { TRenderTextParam, TTextFormat } from '../../../image-operations/render-text';
 import { Input } from '../../components/input';
 import { LANG } from '../../../../language/language';
 import { ImageRadioList } from '../../components/image-radio-list';
-import alignLeftImg from 'url:/src/app/img/ui/align-left.svg';
-import alignCenterImg from 'url:/src/app/img/ui/align-center.svg';
-import alignRightImg from 'url:/src/app/img/ui/align-right.svg';
-import typoItalicImg from 'url:/src/app/img/ui/typo-italic.svg';
-import typoBoldImg from 'url:/src/app/img/ui/typo-bold.svg';
 import { ImageToggle } from '../../components/image-toggle';
 import { Select } from '../../components/select';
 import { c } from '../../../../bb/base/c';
@@ -15,6 +11,11 @@ import { PointerListener } from '../../../../bb/input/pointer-listener';
 import { FONTS } from '../../../../../fonts/fonts';
 import { showModal } from '../base/showModal';
 
+const alignLeftImg = getIconUrl('align-left');
+const alignCenterImg = getIconUrl('align-center');
+const alignRightImg = getIconUrl('align-right');
+const typoItalicImg = getIconUrl('typo-italic');
+const typoBoldImg = getIconUrl('typo-bold');
 type TFontParams = Pick<
     TRenderTextParam,
     'font' | 'size' | 'letterSpacing' | 'lineHeight' | 'align' | 'isItalic' | 'isBold'

@@ -1,24 +1,19 @@
 {
   "type": "module",
   "browserslist": [
-    "> 0.2%",
-    "last 2 versions",
-    "not dead",
-    "Firefox ESR",
-    "Chrome 61",
-    "Firefox 60",
-    "ios_saf 9"
+    "defaults and fully supports es6-module"
   ],
   "scripts": {
     "start": "parcel serve src/index.html --no-cache",
-    "build": "parcel build src/index.html",
-    "build:embed": "parcel build src/embed.ts",
-    "build:help": "parcel build src/help.html --public-url .",
+    "build": "parcel build src/index.html src/help.html --public-url .",
+    "build:embed": "parcel build src/embed.ts src/help.html --public-url .",
     "lang:add": "node src/languages/generate.js add",
     "lang:sync": "node src/languages/generate.js sync",
-    "lang:build": "node src/languages/generate.js build"
+    "lang:build": "node src/languages/generate.js build",
+    "icon:build": "node src/icons/generate.js"
   },
   "dependencies": {
+    "@parcel/service-worker": "2.16.4",
     "@parcel/transformer-glsl": "2.16.4",
     "@parcel/transformer-sass": "2.16.4",
     "ag-psd": "28.3.1",
