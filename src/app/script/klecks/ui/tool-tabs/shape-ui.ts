@@ -234,7 +234,7 @@ export class ShapeUi {
                     title: LANG('shape-ellipse') + ' ' + LANG('shape-fill'),
                 },
             ],
-            initId: this.shape + ' ' + this.mode,
+            initId: this.shape + '-' + this.mode,
             onChange: (id) => {
                 const split = id.split('-');
                 this.shape = split[0] as TShapeToolType;
