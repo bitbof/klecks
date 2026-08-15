@@ -4,7 +4,7 @@ import { LANG } from '../../../language/language';
 import { BoxToggle } from '../components/box-toggle';
 import { Icon } from '../components/icon';
 import { TRgb } from '../../kl-types';
-import { MobileFloatingWindow } from './mobile-floating-window';
+import { FloatingWindow } from '../components/floating-window';
 import { KlColorSliderSmall } from '../components/kl-color-slider-small';
 import { TVector2D } from '../../../bb/bb-types';
 
@@ -20,7 +20,7 @@ export class MobileColorUi {
     private readonly eyedropperToggle: BoxToggle;
     private readonly colorCircle: HTMLDivElement;
     private colorPicker: KlColorSliderSmall | undefined;
-    private colorWindow: MobileFloatingWindow | undefined;
+    private colorWindow: FloatingWindow | undefined;
     private colorPickerPosition: TVector2D = { x: 100, y: 100 };
     private color: TRgb = { r: 0, g: 0, b: 0 };
 
@@ -29,8 +29,8 @@ export class MobileColorUi {
         this.color = { ...p.color };
         this.colorCircle = BB.el({
             css: {
-                width: '30px',
-                height: '30px',
+                width: 30,
+                height: 30,
                 background: BB.ColorConverter.toRgbStr(p.color),
                 borderRadius: '100%',
                 boxShadow: '0 0 0 1px rgba(0,0,0,0.5), inset 0 0 0 1px rgba(255,255,255,0.5)',
@@ -50,7 +50,7 @@ export class MobileColorUi {
                     color: this.color,
                     callback: p.onColorChange,
                 });
-                this.colorWindow = new MobileFloatingWindow({
+                this.colorWindow = new FloatingWindow({
                     content: BB.el({ content: this.colorPicker.getElement() }),
                     onClose: () => {
                         this.closeColorPicker();
@@ -80,8 +80,8 @@ export class MobileColorUi {
             label: BB.el({
                 content: icon.getElement(),
                 css: {
-                    padding: '6px',
-                    height: '36px',
+                    padding: 6,
+                    height: 36,
                 },
             }),
         });
@@ -90,7 +90,7 @@ export class MobileColorUi {
             css: {
                 display: 'flex',
                 flexDirection: 'column',
-                gap: '4px',
+                gap: 4,
             },
         });
         this.rootEl.append(this.colorCircle, this.eyedropperToggle.getElement());

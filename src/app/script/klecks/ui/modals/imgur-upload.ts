@@ -58,12 +58,12 @@ async function upload(
     css(label, {
         marginLeft: 'auto',
         marginRight: 'auto',
-        marginTop: '100px',
+        marginTop: 100,
         fontFamily: 'system-ui, sans-serif',
-        fontSize: '20px',
+        fontSize: 20,
         textAlign: 'center',
         transition: 'opacity 0.3s ease-in-out',
-        opacity: '0',
+        opacity: 0,
         color: '#ccc',
     });
     setTimeout(function () {
@@ -129,7 +129,7 @@ export function imgurUpload(
     const labelDescription = BB.el({
         textContent: LANG('upload-caption') + ':',
         css: {
-            marginTop: '10px',
+            marginTop: 10,
         },
     });
 
@@ -147,7 +147,7 @@ export function imgurUpload(
         ignoreFocus: true,
     });
     css(typeRadio.getElement(), {
-        marginBottom: '10px',
+        marginBottom: 10,
     });
 
     const outDiv = BB.el();

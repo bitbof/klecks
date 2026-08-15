@@ -483,7 +483,7 @@ export class Easel<GToolId extends string> {
         });
 
         this.windowPointerListener = (e: PointerEvent) => {
-            if (this.isFrozen || BB.isInputFocused(true)) {
+            if (this.isFrozen) {
                 return;
             }
             if (!(e.target instanceof Node && this.rootEl.contains(e.target))) {
@@ -494,7 +494,7 @@ export class Easel<GToolId extends string> {
 
         this.keyListener = new KeyListener({
             onDown: (keyStr, e, comboStr, isRepeat) => {
-                if (this.isFrozen) {
+                if (this.isFrozen || BB.isInputFocused(true)) {
                     return;
                 }
 
@@ -589,8 +589,8 @@ export class Easel<GToolId extends string> {
         });
         css(this.svgEl, {
             position: 'absolute',
-            left: '0',
-            top: '0',
+            left: 0,
+            top: 0,
             pointerEvents: 'none',
         });
         this.svgEl.append(
@@ -600,8 +600,8 @@ export class Easel<GToolId extends string> {
         this.htmlOverlayEl = BB.el({
             css: {
                 position: 'absolute',
-                left: '0',
-                top: '0',
+                left: 0,
+                top: 0,
             },
         });
         this.htmlOverlayEl.append(

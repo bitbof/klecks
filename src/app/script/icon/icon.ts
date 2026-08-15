@@ -1,5 +1,6 @@
 import { type IconName, icons } from '../../icons/icons';
 import { css } from '../bb/base/base';
+import { TCss } from '../bb/bb-types';
 
 type TObjectUrl = string;
 
@@ -24,7 +25,7 @@ export function getIconUrl(icon: IconName): TObjectUrl {
 }
 
 // icon as a svg element
-export function getIconSvg(icon: IconName, styleObj?: Partial<CSSStyleDeclaration>): SVGSVGElement {
+export function getIconSvg(icon: IconName, styleObj?: TCss): SVGSVGElement {
     let template = elementTemplateByIcon.get(icon);
     if (!template) {
         const parsedDocument = new DOMParser().parseFromString(icons[icon], 'image/svg+xml');
@@ -44,10 +45,7 @@ export function getIconSvg(icon: IconName, styleObj?: Partial<CSSStyleDeclaratio
 }
 
 // icon as an image element
-export function getIconImg(
-    icon: IconName,
-    styleObj?: Partial<CSSStyleDeclaration>,
-): HTMLImageElement {
+export function getIconImg(icon: IconName, styleObj?: TCss): HTMLImageElement {
     const result = document.createElement('img');
     result.src = getIconUrl(icon);
     result.alt = '';

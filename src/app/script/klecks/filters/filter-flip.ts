@@ -51,7 +51,7 @@ export const filterFlip = {
                 updatePreview();
             },
             css: {
-                marginBottom: '10px',
+                marginBottom: 10,
             },
             name: 'flip-horizontal',
         });
@@ -64,7 +64,7 @@ export const filterFlip = {
                 updatePreview();
             },
             css: {
-                marginBottom: '10px',
+                marginBottom: 10,
             },
             name: 'flip-vertical',
         });
@@ -72,6 +72,7 @@ export const filterFlip = {
         rootEl.append(verticalCheckbox.getElement());
 
         const targetOptions = new Options<boolean>({
+            isFocusable: true,
             optionArr: [
                 {
                     id: true,
@@ -93,8 +94,8 @@ export const filterFlip = {
         const previewWrapper = BB.el({
             className: 'kl-preview-wrapper',
             css: {
-                width: SMALL_PREVIEW.width + 'px',
-                height: SMALL_PREVIEW.height + 'px',
+                width: SMALL_PREVIEW.width,
+                height: SMALL_PREVIEW.height,
             },
         });
 
@@ -113,8 +114,8 @@ export const filterFlip = {
         const previewInnerWrapper = BB.el({
             className: 'kl-preview-wrapper__canvas',
             css: {
-                width: parseInt('' + w) + 'px',
-                height: parseInt('' + h) + 'px',
+                width: parseInt('' + w),
+                height: parseInt('' + h),
             },
         });
         previewInnerWrapper.append(klCanvasPreview.getElement());

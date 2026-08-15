@@ -1,7 +1,7 @@
 import { BB } from '../../../bb/bb';
-import { TKeyString } from '../../../bb/bb-types';
 import { KeyListener } from '../../../bb/input/key-listener';
 import { css } from '../../../bb/base/base';
+import { TCss } from '../../../bb/bb-types';
 
 type TInputType = 'button' | 'checkbox' | 'number' | 'text' | 'color';
 
@@ -18,11 +18,13 @@ export type TInputParams = {
     step?: number;
 
     onChange?: (v: string) => void;
+    onInput?: (v: string) => void;
+    onBlur?: (v: string) => void;
 
     doScrollWithoutFocus?: boolean; // default: false
     doResetIfInvalid?: boolean; // default: false
 
-    css?: TKeyString;
+    css?: TCss;
 };
 
 export class Input {
@@ -30,6 +32,9 @@ export class Input {
     private readonly input: HTMLInputElement;
     private readonly type: TInputType;
     private readonly pointerListener;
+    private readonly changeListener: (() => void) | undefined;
+    private readonly inputListener: (() => void) | undefined;
+    private readonly blurListener: (() => void) | undefined;
     private readonly keyListener: KeyListener = {
         destroy: () => {},
     } as KeyListener;
@@ -42,7 +47,7 @@ export class Input {
             css: {
                 display: 'flex',
                 alignItems: 'center',
-                gap: '5px',
+                gap: 5,
             },
         });
 
@@ -110,11 +115,21 @@ export class Input {
             return oldVal !== newValue;
         };
 
-        if (p.onChange) {
-            const onChange = p.onChange;
-            this.input.onchange = () => {
-                handleChange() && onChange(this.input.value);
-            };
+        this.changeListener = p.onChange
+            ? () => {
+                  handleChange() && p.onChange?.(this.input.value);
+              }
+            : undefined;
+        if (this.changeListener) {
+            this.input.addEventListener('change', this.changeListener);
+        }
+        this.inputListener = p.onInput ? () => p.onInput?.(this.input.value) : undefined;
+        if (this.inputListener) {
+            this.input.addEventListener('input', this.inputListener);
+        }
+        this.blurListener = p.onBlur ? () => p.onBlur?.(this.input.value) : undefined;
+        if (this.blurListener) {
+            this.input.addEventListener('blur', this.blurListener);
         }
         if (p.css) {
             css(this.input, p.css);
@@ -150,7 +165,28 @@ export class Input {
         this.input.value = '' + v;
     }
 
+    getIsFocused(): boolean {
+        return document.activeElement === this.input;
+    }
+
+    focus(): void {
+        this.input.focus();
+    }
+
+    select(): void {
+        this.input.select();
+    }
+
     destroy(): void {
+        if (this.changeListener) {
+            this.input.removeEventListener('change', this.changeListener);
+        }
+        if (this.inputListener) {
+            this.input.removeEventListener('input', this.inputListener);
+        }
+        if (this.blurListener) {
+            this.input.removeEventListener('blur', this.blurListener);
+        }
         this.pointerListener && this.pointerListener.destroy();
         this.keyListener.destroy();
     }
@@ -163,7 +199,7 @@ export const input = function (params: {
     max?: number;
     callback: (val: string) => void;
     init: string | number;
-    css?: TKeyString;
+    css?: TCss;
 }) {
     const result = document.createElement('input');
     if (params.type) {

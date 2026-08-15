@@ -30,8 +30,8 @@ export function showRecoveryManagerPanel(klRecoveryManager?: KlRecoveryManager) 
         callback: onModalExit,
         style: {
             width: 'calc(100% - 50px)',
-            maxWidth: '1000px',
-            minWidth: '300px',
+            maxWidth: 1000,
+            minWidth: 300,
             boxSizing: 'border-box',
         },
         clickOnEnter: 'Ok',

@@ -48,8 +48,8 @@ export class KlColorSliderSmall {
         const left = (this.color.s / 100) * this.width - 4;
         const top = (1 - this.color.v / 100) * this.heightSV - 4;
         css(this.pointerSV, {
-            left: left + 'px',
-            top: top + 'px',
+            left: left,
+            top: top,
         });
     }
 
@@ -67,7 +67,7 @@ export class KlColorSliderSmall {
     }) {
         this.rootEl = BB.el({
             css: {
-                width: p.width + 'px',
+                width: p.width,
                 position: 'relative',
                 overflow: 'hidden',
                 userSelect: 'none',
@@ -82,8 +82,8 @@ export class KlColorSliderSmall {
 
         this.canvasSV = BB.canvas(10, 10);
         css(this.canvasSV, {
-            width: this.width + 'px',
-            height: this.heightSV + 'px',
+            width: this.width,
+            height: this.heightSV,
             cursor: 'crosshair',
         });
 
@@ -99,22 +99,22 @@ export class KlColorSliderSmall {
             ctx.fillRect(0, 0, p.width, p.heightH);
         })();
         css(this.canvasSV, {
-            width: p.width + 'px',
-            height: p.heightSV + 'px',
+            width: p.width,
+            height: p.heightSV,
             overflow: 'hidden',
             position: 'relative',
         });
-        this.canvasSV.style.cssFloat = 'left';
-        canvasH.style.cssFloat = 'left';
+        this.canvasSV.style.float = 'left';
+        canvasH.style.float = 'left';
 
         this.rootEl.append(this.canvasSV, canvasH);
 
         this.pointerSV = BB.el({
             parent: this.rootEl,
             css: {
-                width: '8px',
-                height: '8px',
-                borderRadius: '8px',
+                width: 8,
+                height: 8,
+                borderRadius: 8,
                 position: 'absolute',
                 pointerEvents: 'none',
                 boxShadow: '0 0 0 1px #000, inset 0 0 0 1px #fff',
@@ -124,12 +124,12 @@ export class KlColorSliderSmall {
         this.pointerH = BB.el({
             parent: this.rootEl,
             css: {
-                width: '0',
-                height: p.heightH + 'px',
+                width: 0,
+                height: p.heightH,
                 borderLeft: '1px solid #fff',
                 borderRight: '1px solid #000',
                 position: 'absolute',
-                top: p.heightSV + 'px',
+                top: p.heightSV,
                 pointerEvents: 'none',
             },
         });

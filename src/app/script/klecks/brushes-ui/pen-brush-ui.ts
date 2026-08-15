@@ -67,10 +67,10 @@ export const penBrushUi = (function () {
                 const alpha = BB.el({
                     className: 'dark-invert',
                     css: {
-                        width: '31px',
-                        height: '31px',
+                        width: 31,
+                        height: 31,
                         backgroundSize: 'contain',
-                        margin: '2px',
+                        margin: 2,
                     },
                 });
                 const canvas = BB.canvas(70, 70);
@@ -211,7 +211,7 @@ export const penBrushUi = (function () {
                         display: 'flex',
                         justifyContent: 'space-between',
                         alignItems: 'center',
-                        marginBottom: '10px',
+                        marginBottom: 10,
                     },
                 }),
                 BB.el({
@@ -220,7 +220,7 @@ export const penBrushUi = (function () {
                         display: 'flex',
                         justifyContent: 'space-between',
                         alignItems: 'center',
-                        marginBottom: '10px',
+                        marginBottom: 10,
                     },
                 }),
                 BB.el({
@@ -234,13 +234,13 @@ export const penBrushUi = (function () {
                 BB.el({
                     content: alphaOptions.getElement(),
                     css: {
-                        marginTop: '10px',
+                        marginTop: 10,
                     },
                 }),
                 BB.el({
                     content: lockAlphaToggle.getElement(),
                     css: {
-                        marginTop: '10px',
+                        marginTop: 10,
                     },
                 }),
             );

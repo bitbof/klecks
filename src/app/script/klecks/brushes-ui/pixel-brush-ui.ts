@@ -124,7 +124,7 @@ export const pixelBrushUi = (function () {
                         display: 'flex',
                         justifyContent: 'space-between',
                         alignItems: 'center',
-                        marginBottom: '10px',
+                        marginBottom: 10,
                     },
                 }),
                 opacitySlider.getElement(),
@@ -134,8 +134,8 @@ export const pixelBrushUi = (function () {
                 parent: div,
                 css: {
                     display: 'flex',
-                    marginTop: '10px',
-                    gap: '10px',
+                    marginTop: 10,
+                    gap: 10,
                     flexWrap: 'wrap',
                 },
             });

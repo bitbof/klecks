@@ -3,12 +3,19 @@ import { input } from '../ui/components/input';
 import { Checkbox } from '../ui/components/checkbox';
 import { ColorOptions } from '../ui/components/color-options';
 import { Cropper } from '../ui/components/cropper';
+import { Preview } from '../ui/project-viewport/preview';
 import { TFilterApply, TFilterGetDialogParam, TFilterGetDialogResult, TRgba } from '../kl-types';
 import { LANG } from '../../language/language';
-import { TRect } from '../../bb/bb-types';
-import { SMALL_PREVIEW } from '../ui/utils/preview-size';
+import { TCss, TRect } from '../../bb/bb-types';
+import { getPreviewHeight, getPreviewWidth } from '../ui/utils/preview-size';
 import { getMultiPolyBounds } from '../../bb/multi-polygon/get-multi-polygon-bounds';
 import { indexBoundsInArea } from '../../bb/math/math';
+import { testIsSmall } from '../ui/utils/test-is-small';
+import { getIconUrl } from '../../icon/icon';
+import { createTransform } from '../../bb/transform/create-transform';
+import { EASEL_MAX_SCALE } from '../ui/easel/easel.config';
+import { css } from '../../bb/base/base';
+import { TViewportTransform } from '../ui/project-viewport/project-viewport';
 
 export type TFilterCropExtendInput = {
     left: number;
@@ -25,7 +32,6 @@ export const filterCropExtend = {
             return false;
         }
         const tempCanvas = klCanvas.getCompleteCanvas(1);
-        tempCanvas.style.display = 'block';
 
         const rootEl = BB.el();
         const result: TFilterGetDialogResult<TFilterCropExtendInput> = {
@@ -39,9 +45,12 @@ export const filterCropExtend = {
             rightChanged = false,
             topChanged = false,
             bottomChanged = false;
+        const isSmall = testIsSmall();
+        if (!isSmall) {
+            result.width = getPreviewWidth(isSmall);
+        }
         const maxWidth = params.maxWidth,
             maxHeight = params.maxHeight;
-        let scale: number = 1;
 
         const selection = klCanvas.getSelection();
         let selectionBounds = selection
@@ -70,7 +79,7 @@ export const filterCropExtend = {
             type: 'number',
             min: -klCanvas.getWidth(),
             max: maxWidth,
-            css: { width: '75px' },
+            css: { width: 75 },
             callback: function () {
                 leftChanged = true;
                 updateInput();
@@ -81,7 +90,7 @@ export const filterCropExtend = {
             type: 'number',
             min: -klCanvas.getWidth(),
             max: maxWidth,
-            css: { width: '75px' },
+            css: { width: 75 },
             callback: function () {
                 rightChanged = true;
                 updateInput();
@@ -92,7 +101,7 @@ export const filterCropExtend = {
             type: 'number',
             min: -klCanvas.getHeight(),
             max: maxHeight,
-            css: { width: '75px' },
+            css: { width: 75 },
             callback: function () {
                 topChanged = true;
                 updateInput();
@@ -103,18 +112,18 @@ export const filterCropExtend = {
             type: 'number',
             min: -klCanvas.getHeight(),
             max: maxHeight,
-            css: { width: '75px' },
+            css: { width: 75 },
             callback: function () {
                 bottomChanged = true;
                 updateInput();
             },
         });
 
-        const sharedCss = {
+        const sharedCss: TCss = {
             display: 'flex',
             flexDirection: 'column',
             width: 'calc(50% - 5px)',
-            gap: '3px',
+            gap: 3,
         };
         const leftWrapper = BB.el({
             content: [LANG('filter-crop-left') + ':', leftInput],
@@ -136,7 +145,7 @@ export const filterCropExtend = {
             css: {
                 display: 'flex',
                 flexWrap: 'wrap',
-                gap: '10px',
+                gap: 10,
             },
         });
         wrapWrapper.append(leftWrapper, rightWrapper, topWrapper, bottomWrapper);
@@ -250,7 +259,11 @@ export const filterCropExtend = {
             colorArr: colorOptionsArr,
             onChange: function (rgbaObj) {
                 selectedRgbaObj = rgbaObj!;
-                updateBg();
+                preview.setBackground(
+                    selectedRgbaObj.a === 0
+                        ? 'checker'
+                        : BB.ColorConverter.toRgbStr(selectedRgbaObj),
+                );
             },
         });
 
@@ -259,32 +272,14 @@ export const filterCropExtend = {
                 display: 'flex',
                 justifyContent: 'space-between',
                 alignItems: 'center',
-                marginTop: '10px',
+                marginTop: 10,
             },
         });
         rootEl.append(flexRow);
         flexRow.append(ruleOThirdsCheckbox.getElement(), colorOptions.getElement());
 
-        // when input field changed, or dragging in preview finished
-        // adjusts the zoom
+        // When dragging in the preview finishes, update the inputs
         function update(transform: TRect): void {
-            const fit = BB.fitInto(transform.width, transform.height, 260, 180, 1);
-            scale = fit.width / transform.width;
-
-            const offset = BB.centerWithin(
-                SMALL_PREVIEW.width,
-                previewHeight,
-                fit.width,
-                fit.height,
-            );
-
-            tempCanvas.style.width = klCanvas.getWidth() * scale + 'px';
-            tempCanvas.style.height = klCanvas.getHeight() * scale + 'px';
-            tempCanvas.style.imageRendering = scale >= 1 ? 'pixelated' : '';
-
-            offsetWrapper.style.left = offset.x - transform.x * scale + 'px';
-            offsetWrapper.style.top = offset.y - transform.y * scale + 'px';
-
             left = parseInt('' + -transform.x);
             top = parseInt('' + -transform.y);
             right = parseInt('' + (transform.x + transform.width - klCanvas.getWidth()));
@@ -293,97 +288,123 @@ export const filterCropExtend = {
             topInput.value = '' + top;
             rightInput.value = '' + right;
             bottomInput.value = '' + bottom;
-
-            if (selectedRgbaObj.a !== 0) {
-                tempCanvas.style.background = 'var(--kl-checkerboard-background)';
-                tempCanvas.style.backgroundSize = 100 * scale + 'px';
-            }
-            previewWrapper.style.backgroundPosition = offset.x + 'px ' + offset.y + 'px';
-            previewWrapper.style.backgroundSize = 100 * scale + 'px';
-
-            cropper.setScale(scale);
         }
 
-        const previewHeight = SMALL_PREVIEW.height - 2; // two less because of border
-        const previewWrapper = BB.el({
-            className: 'kl-edit-crop-preview',
-            css: {
-                width: SMALL_PREVIEW.width + 'px',
-                marginTop: '10px',
-                marginLeft: '-20px',
-                height: previewHeight + 'px',
-                backgroundColor: '#9e9e9e',
-                position: 'relative',
-                borderTop: '1px solid rgb(144,144,144)',
-                borderBottom: '1px solid rgb(144,144,144)',
-                overflow: 'hidden',
-                userSelect: 'none',
-                touchAction: 'none',
-                background: 'var(--kl-checkerboard-background)',
-            },
-        });
-        previewWrapper.oncontextmenu = function () {
-            return false;
-        };
-        const bgColorOverlay = BB.el({
+        const cropperOuterWrapper = BB.el({
             css: {
                 position: 'absolute',
-                left: '0',
-                top: '0',
-                bottom: '0',
-                right: '0',
+                left: 0,
+                top: 0,
+                width: '100%',
+                height: '100%',
+                zIndex: 0,
             },
         });
-        previewWrapper.append(bgColorOverlay);
-
-        const offsetWrapper = BB.el({
-            parent: previewWrapper,
+        const cropperInnerWrapper = BB.el({
+            parent: cropperOuterWrapper,
             css: {
                 position: 'absolute',
-                left: '0',
-                top: '0',
+                left: 0,
+                top: 0,
+                background: 'rgba(255,0,0,0.5)',
             },
         });
+        function updateInnerWrapper(transform: TViewportTransform): void {
+            cropperInnerWrapper.style.left = transform.x + 'px';
+            cropperInnerWrapper.style.top = transform.y + 'px';
+        }
 
-        BB.el({
-            parent: offsetWrapper,
-            content: tempCanvas,
-            css: {
-                boxShadow: '0 0 0px 1px rgb(130,130,130)',
-                position: 'absolute',
-                left: '0px',
-                top: '0px',
+        const previewPadding = 40;
+        const previewWidth = getPreviewWidth(isSmall);
+        const previewHeight = getPreviewHeight(isSmall);
+        const preview = new Preview({
+            width: previewWidth,
+            height: previewHeight,
+            project: {
+                width: klCanvas.getWidth(),
+                height: klCanvas.getHeight(),
+                layers: [
+                    {
+                        image: tempCanvas,
+                        isVisible: true,
+                        opacity: 1,
+                        mixModeStr: 'source-over',
+                        hasClipping: false,
+                    },
+                ],
             },
+            hasEditMode: true,
+            editIcon: getIconUrl('edit-crop'),
+            onModeChange: (mode) => {
+                cropperOuterWrapper.style.pointerEvents = mode === 'edit' ? '' : 'none';
+                cropperOuterWrapper.style.opacity = mode === 'edit' ? '' : '0.5';
+            },
+            onTransformChange: (transform) => {
+                updateInnerWrapper(transform);
+                cropper.setScale(transform.scale);
+            },
+            padding: previewPadding,
+            background: 'checker',
         });
+        if (selectionBounds) {
+            const selectionWidth = selectionBounds.x2 - selectionBounds.x1 + 1;
+            const selectionHeight = selectionBounds.y2 - selectionBounds.y1 + 1;
+            const fit = BB.fitInto(
+                selectionWidth,
+                selectionHeight,
+                previewWidth - previewPadding * 2,
+                previewHeight - previewPadding * 2,
+            );
+            const scale = Math.min(EASEL_MAX_SCALE, fit.width / selectionWidth);
+            preview.setTransform(
+                createTransform(
+                    { x: previewWidth / 2, y: previewHeight / 2 },
+                    {
+                        x: selectionBounds.x1 + selectionWidth / 2,
+                        y: selectionBounds.y1 + selectionHeight / 2,
+                    },
+                    scale,
+                    0,
+                ),
+            );
+        }
+        css(preview.getElement(), {
+            overflow: 'hidden',
+            marginLeft: -20,
+            marginRight: -20,
+            marginTop: 10,
+        });
+        preview.getElement().append(cropperOuterWrapper);
+        rootEl.append(preview.getElement());
 
-        rootEl.append(previewWrapper);
+        const viewportTransform = preview.getTransform();
         const cropper = new Cropper({
             x: 0,
             y: 0,
             width: klCanvas.getWidth(),
             height: klCanvas.getHeight(),
-            scale: scale,
+            scale: viewportTransform.scale,
             callback: update,
             maxW: maxWidth,
             maxH: maxHeight,
             init: selectionBounds,
         });
         update(cropper.getTransform());
-        offsetWrapper.append(cropper.getElement());
-
-        function updateBg(): void {
-            if (selectedRgbaObj.a === 0) {
-                bgColorOverlay.style.background = '';
-                tempCanvas.style.background = '';
-            } else {
-                bgColorOverlay.style.background = BB.ColorConverter.toRgbStr(selectedRgbaObj);
-                tempCanvas.style.background = 'var(--kl-checkerboard-background)';
-                tempCanvas.style.backgroundSize = 100 * scale + 'px';
-            }
-        }
+        cropper.setScale(viewportTransform.scale);
+        cropperInnerWrapper.append(cropper.getElement());
+        updateInnerWrapper(viewportTransform);
+        const cropperWheelListener = new BB.PointerListener({
+            target: cropperOuterWrapper,
+            onWheel: preview.onWheel,
+            useDirtyWheel: true,
+        });
+        preview.render();
 
         result.destroy = (): void => {
+            cropperWheelListener.destroy();
             cropper.destroy();
+            preview.destroy();
+            BB.freeCanvas(tempCanvas);
             ruleOThirdsCheckbox.destroy();
             colorOptions.destroy();
         };

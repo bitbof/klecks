@@ -65,7 +65,18 @@ export class Cropper {
     private commit(): void {
         this.pointerRemainder.x = 0;
         this.pointerRemainder.y = 0;
-        this.callback(this.getTransform());
+        const transform = this.getTransform();
+
+        // fix origin
+        this.width = transform.width;
+        this.height = transform.height;
+        css(this.rootEl, {
+            left: this.x * this.scale,
+            top: this.y * this.scale,
+        });
+        this.update();
+
+        this.callback(transform);
     }
 
     // ----------------------------------- public -----------------------------------
@@ -96,8 +107,8 @@ export class Cropper {
 
         css(this.rootEl, {
             position: 'absolute',
-            left: this.x * this.scale + 'px',
-            top: this.y * this.scale + 'px',
+            left: this.x * this.scale,
+            top: this.y * this.scale,
         });
 
         this.outline = {
@@ -110,10 +121,10 @@ export class Cropper {
             }),
             update: () => {
                 css(this.outline.el, {
-                    left: this.grips[0].x * this.scale - 1 + 'px',
-                    top: this.grips[0].y * this.scale - 1 + 'px',
-                    width: (this.grips[2].x - this.grips[0].x) * this.scale + 'px',
-                    height: (this.grips[2].y - this.grips[0].y) * this.scale + 'px',
+                    left: this.grips[0].x * this.scale - 1,
+                    top: this.grips[0].y * this.scale - 1,
+                    width: (this.grips[2].x - this.grips[0].x) * this.scale + 2,
+                    height: (this.grips[2].y - this.grips[0].y) * this.scale + 2,
                 });
             },
         };
@@ -161,12 +172,10 @@ export class Cropper {
             }),
             update: () => {
                 css(this.thirdsHorizontal.el, {
-                    left: this.grips[0].x * this.scale + 'px',
-                    top:
-                        (this.grips[0].y + (this.grips[2].y - this.grips[0].y) / 3) * this.scale +
-                        'px',
-                    width: (this.grips[2].x - this.grips[0].x) * this.scale + 'px',
-                    height: ((this.grips[2].y - this.grips[0].y) / 3) * this.scale + 'px',
+                    left: this.grips[0].x * this.scale,
+                    top: (this.grips[0].y + (this.grips[2].y - this.grips[0].y) / 3) * this.scale,
+                    width: (this.grips[2].x - this.grips[0].x) * this.scale,
+                    height: ((this.grips[2].y - this.grips[0].y) / 3) * this.scale,
                 });
             },
         };
@@ -181,12 +190,10 @@ export class Cropper {
             }),
             update: () => {
                 css(this.thirdsVertical.el, {
-                    left:
-                        (this.grips[0].x + (this.grips[2].x - this.grips[0].x) / 3) * this.scale +
-                        'px',
-                    top: this.grips[0].y * this.scale + 'px',
-                    width: ((this.grips[2].x - this.grips[0].x) / 3) * this.scale + 'px',
-                    height: (this.grips[2].y - this.grips[0].y) * this.scale + 'px',
+                    left: (this.grips[0].x + (this.grips[2].x - this.grips[0].x) / 3) * this.scale,
+                    top: this.grips[0].y * this.scale,
+                    width: ((this.grips[2].x - this.grips[0].x) / 3) * this.scale,
+                    height: (this.grips[2].y - this.grips[0].y) * this.scale,
                 });
             },
         };
@@ -252,8 +259,8 @@ export class Cropper {
             ((i) => {
                 const el = BB.el({
                     css: {
-                        width: gripSize + 'px',
-                        height: gripSize + 'px',
+                        width: gripSize,
+                        height: gripSize,
                         //background: '#0f0',
                         position: 'absolute',
                     },
@@ -263,46 +270,38 @@ export class Cropper {
                     if (i === 0) {
                         //top
                         css(el, {
-                            left: this.grips[0].x * this.scale + gripOverlay + 'px',
-                            top: this.grips[0].y * this.scale - gripSize * 2 + gripOverlay + 'px',
+                            left: this.grips[0].x * this.scale + gripOverlay,
+                            top: this.grips[0].y * this.scale - gripSize * 2 + gripOverlay,
                             width:
-                                (this.grips[1].x - this.grips[0].x) * this.scale -
-                                gripOverlay * 2 +
-                                'px',
-                            height: gripSize * 2 + 'px',
+                                (this.grips[1].x - this.grips[0].x) * this.scale - gripOverlay * 2,
+                            height: gripSize * 2,
                         });
                     } else if (i === 1) {
                         //right
                         css(el, {
-                            left: this.grips[1].x * this.scale - gripOverlay + 'px',
-                            top: this.grips[1].y * this.scale + gripOverlay + 'px',
-                            width: gripSize * 2 + 'px',
+                            left: this.grips[1].x * this.scale - gripOverlay,
+                            top: this.grips[1].y * this.scale + gripOverlay,
+                            width: gripSize * 2,
                             height:
-                                (this.grips[2].y - this.grips[1].y) * this.scale -
-                                gripOverlay * 2 +
-                                'px',
+                                (this.grips[2].y - this.grips[1].y) * this.scale - gripOverlay * 2,
                         });
                     } else if (i === 2) {
                         //bottom
                         css(el, {
-                            left: this.grips[3].x * this.scale + gripOverlay + 'px',
-                            top: this.grips[3].y * this.scale - gripOverlay + 'px',
+                            left: this.grips[3].x * this.scale + gripOverlay,
+                            top: this.grips[3].y * this.scale - gripOverlay,
                             width:
-                                (this.grips[2].x - this.grips[3].x) * this.scale -
-                                gripOverlay * 2 +
-                                'px',
-                            height: gripSize * 2 + 'px',
+                                (this.grips[2].x - this.grips[3].x) * this.scale - gripOverlay * 2,
+                            height: gripSize * 2,
                         });
                     } else if (i === 3) {
                         //left
                         css(el, {
-                            left: this.grips[0].x * this.scale - gripSize * 2 + gripOverlay + 'px',
-                            top: this.grips[0].y * this.scale + gripOverlay + 'px',
-                            width: gripSize * 2 + 'px',
+                            left: this.grips[0].x * this.scale - gripSize * 2 + gripOverlay,
+                            top: this.grips[0].y * this.scale + gripOverlay,
+                            width: gripSize * 2,
                             height:
-                                (this.grips[3].y - this.grips[0].y) * this.scale -
-                                gripOverlay * 2 +
-                                'px',
+                                (this.grips[3].y - this.grips[0].y) * this.scale - gripOverlay * 2,
                         });
                     }
                     const angleOffset = i * 2 + 1;
@@ -323,37 +322,37 @@ export class Cropper {
                     css: {
                         position: 'absolute',
                         background: '#000',
-                        opacity: '0.5',
+                        opacity: 0.5,
                     },
                 });
                 const update = () => {
                     if (i === 0) {
                         css(g, {
-                            left: this.grips[0].x * this.scale + 'px',
-                            top: this.grips[0].y * this.scale - 8000 + 'px',
-                            width: (this.grips[1].x - this.grips[0].x) * this.scale + 'px',
-                            height: '8000px',
+                            left: this.grips[0].x * this.scale,
+                            top: this.grips[0].y * this.scale - 8000,
+                            width: (this.grips[1].x - this.grips[0].x) * this.scale,
+                            height: 8000,
                         });
                     } else if (i === 1) {
                         css(g, {
-                            left: this.grips[1].x * this.scale + 'px',
-                            top: this.grips[1].y * this.scale - 8000 + 'px',
-                            width: '8000px',
-                            height: 16000 + 'px',
+                            left: this.grips[1].x * this.scale,
+                            top: this.grips[1].y * this.scale - 8000,
+                            width: 8000,
+                            height: 16000,
                         });
                     } else if (i === 2) {
                         css(g, {
-                            left: this.grips[3].x * this.scale + 'px',
-                            top: this.grips[3].y * this.scale + 'px',
-                            width: (this.grips[2].x - this.grips[3].x) * this.scale + 'px',
-                            height: '8000px',
+                            left: this.grips[3].x * this.scale,
+                            top: this.grips[3].y * this.scale,
+                            width: (this.grips[2].x - this.grips[3].x) * this.scale,
+                            height: 8000,
                         });
                     } else if (i === 3) {
                         css(g, {
-                            left: this.grips[0].x * this.scale - 8000 + 'px',
-                            top: this.grips[0].y * this.scale - 8000 + 'px',
-                            width: '8000px',
-                            height: 16000 + 'px',
+                            left: this.grips[0].x * this.scale - 8000,
+                            top: this.grips[0].y * this.scale - 8000,
+                            width: 8000,
+                            height: 16000,
                         });
                     }
                 };
@@ -461,8 +460,8 @@ export class Cropper {
                     const g = BB.el({
                         css: {
                             //background: '#f00',
-                            width: gripSize * 2 + 'px',
-                            height: gripSize * 2 + 'px',
+                            width: gripSize * 2,
+                            height: gripSize * 2,
                             position: 'absolute',
                             cursor: ['nwse-resize', 'nesw-resize'][i % 2],
                         },
@@ -472,42 +471,26 @@ export class Cropper {
                         if (i === 0) {
                             //top left
                             css(g, {
-                                left:
-                                    this.grips[0].x * this.scale -
-                                    gripSize * 2 +
-                                    gripOverlay +
-                                    'px',
-                                top:
-                                    this.grips[0].y * this.scale -
-                                    gripSize * 2 +
-                                    gripOverlay +
-                                    'px',
+                                left: this.grips[0].x * this.scale - gripSize * 2 + gripOverlay,
+                                top: this.grips[0].y * this.scale - gripSize * 2 + gripOverlay,
                             });
                         } else if (i === 1) {
                             //top right
                             css(g, {
-                                left: this.grips[1].x * this.scale - gripOverlay + 'px',
-                                top:
-                                    this.grips[1].y * this.scale -
-                                    gripSize * 2 +
-                                    gripOverlay +
-                                    'px',
+                                left: this.grips[1].x * this.scale - gripOverlay,
+                                top: this.grips[1].y * this.scale - gripSize * 2 + gripOverlay,
                             });
                         } else if (i === 2) {
                             //bottom right
                             css(g, {
-                                left: this.grips[1].x * this.scale - gripOverlay + 'px',
-                                top: this.grips[2].y * this.scale - gripOverlay + 'px',
+                                left: this.grips[1].x * this.scale - gripOverlay,
+                                top: this.grips[2].y * this.scale - gripOverlay,
                             });
                         } else if (i === 3) {
                             //bottom left
                             css(g, {
-                                left:
-                                    this.grips[0].x * this.scale -
-                                    gripSize * 2 +
-                                    gripOverlay +
-                                    'px',
-                                top: this.grips[2].y * this.scale - gripOverlay + 'px',
+                                left: this.grips[0].x * this.scale - gripSize * 2 + gripOverlay,
+                                top: this.grips[2].y * this.scale - gripOverlay,
                             });
                         }
                     };
@@ -670,8 +653,8 @@ export class Cropper {
         this.height = p.height;
 
         css(this.rootEl, {
-            left: this.x * this.scale + 'px',
-            top: this.y * this.scale + 'px',
+            left: this.x * this.scale,
+            top: this.y * this.scale,
         });
 
         this.grips[0].x = 0;
@@ -690,8 +673,8 @@ export class Cropper {
     setScale(s: number): void {
         this.scale = s;
         css(this.rootEl, {
-            left: this.x * this.scale + 'px',
-            top: this.y * this.scale + 'px',
+            left: this.x * this.scale,
+            top: this.y * this.scale,
         });
         this.update();
     }

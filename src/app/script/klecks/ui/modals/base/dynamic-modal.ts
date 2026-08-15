@@ -42,10 +42,10 @@ export class DynamicModal {
             className: 'g-root kl-d-modal-root',
             css: {
                 position: 'fixed',
-                left: '0',
-                top: '0',
-                bottom: '0',
-                right: '0',
+                left: 0,
+                top: 0,
+                bottom: 0,
+                right: 0,
                 overflow: 'auto',
                 animationName: 'consoleIn',
                 animationDuration: '0.3s',
@@ -59,10 +59,10 @@ export class DynamicModal {
             parent: this.rootEl,
             css: {
                 position: 'absolute',
-                left: '0',
-                top: '0',
-                bottom: '0',
-                right: '0',
+                left: 0,
+                top: 0,
+                bottom: 0,
+                right: 0,
             },
             onClick: () => this.close(),
         });
@@ -75,13 +75,15 @@ export class DynamicModal {
                 position: 'absolute',
                 width: BB.isCssMinMaxSupported()
                     ? 'min(calc(100% - 40px), ' + (p.width ? p.width : 400) + 'px)'
-                    : (p.width ? p.width : 400) + 'px',
+                    : p.width
+                      ? p.width
+                      : 400,
                 height: p.height
                     ? BB.isCssMinMaxSupported()
                         ? 'min(calc(100% - 40px), ' + p.height + 'px)'
-                        : p.height + 'px'
+                        : p.height
                     : 'calc(100% - 40px)',
-                borderRadius: '10px',
+                borderRadius: 10,
                 overflow: 'hidden',
             },
         });
@@ -92,8 +94,8 @@ export class DynamicModal {
             const elH = popupEl.offsetHeight;
 
             css(popupEl, {
-                left: Math.max(0, (window.innerWidth - elW) / 2) + 'px',
-                top: Math.max(20, (window.innerHeight - elH) / 2 - elH * 0.2) + 'px',
+                left: Math.max(0, (window.innerWidth - elW) / 2),
+                top: Math.max(20, (window.innerHeight - elH) / 2 - elH * 0.2),
             });
         };
 
@@ -105,11 +107,11 @@ export class DynamicModal {
         const titleEl = BB.el({
             parent: popupEl,
             css: {
-                height: titleHeight + 'px',
+                height: titleHeight,
                 display: 'flex',
                 justifyContent: 'space-between',
                 alignItems: 'center',
-                paddingLeft: titleHeight / 2 + 'px',
+                paddingLeft: titleHeight / 2,
             },
         });
         if (p.title) {
@@ -123,8 +125,8 @@ export class DynamicModal {
             title: LANG('modal-close'),
             onClick: () => this.close(),
             css: {
-                width: titleHeight + 'px',
-                height: titleHeight + 'px',
+                width: titleHeight,
+                height: titleHeight,
                 lineHeight: titleHeight + 'px',
                 background: 'none',
                 boxShadow: 'none',

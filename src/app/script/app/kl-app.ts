@@ -32,7 +32,7 @@ import { ToolspaceScroller } from '../klecks/ui/components/toolspace-scroller';
 import { translateSmoothing } from '../klecks/utils/translate-smoothing';
 import { KlAppImportHandler } from './kl-app-import-handler';
 import { LayersUi } from '../klecks/ui/tool-tabs/layers-ui/layers-ui';
-import { TVector2D } from '../bb/bb-types';
+import { TCss, TVector2D } from '../bb/bb-types';
 import { createConsoleApi } from './console-api';
 import { KL_CONFIG } from '../klecks/kl-config';
 import { TRenderTextParam } from '../klecks/image-operations/render-text';
@@ -170,11 +170,11 @@ export class KlApp {
             if (this.mobileUi.getToolspaceIsOpen()) {
                 if (this.uiLayout === 'left') {
                     css(this.easel.getElement(), {
-                        left: '271px',
+                        left: 271,
                     });
                 } else {
                     css(this.easel.getElement(), {
-                        left: '0',
+                        left: 0,
                     });
                 }
                 this.toolspace.style.display = 'block';
@@ -183,11 +183,11 @@ export class KlApp {
             } else {
                 if (this.uiLayout === 'left') {
                     css(this.easel.getElement(), {
-                        left: '0',
+                        left: 0,
                     });
                 } else {
                     css(this.easel.getElement(), {
-                        left: '0',
+                        left: 0,
                     });
                 }
                 this.toolspace.style.display = 'none';
@@ -199,7 +199,7 @@ export class KlApp {
             this.mobileUi.setIsVisible(false);
             if (this.uiLayout === 'left') {
                 css(this.easel.getElement(), {
-                    left: '271px',
+                    left: 271,
                 });
             }
             this.toolspace.style.display = 'block';
@@ -226,19 +226,19 @@ export class KlApp {
         this.toolspace.classList.toggle('kl-toolspace--right', this.uiLayout === 'right');
         if (this.uiLayout === 'left') {
             css(this.toolspace, {
-                left: '0',
+                left: 0,
                 right: '',
             });
             css(this.easel.getElement(), {
-                left: '271px',
+                left: 271,
             });
         } else {
             css(this.toolspace, {
                 left: '',
-                right: '0',
+                right: 0,
             });
             css(this.easel.getElement(), {
-                left: '0',
+                left: 0,
             });
         }
         this.statusOverlay.setUiState(this.uiLayout);
@@ -271,10 +271,10 @@ export class KlApp {
             className: 'g-root',
             css: {
                 position: 'absolute',
-                left: '0',
-                top: '0',
-                right: '0',
-                bottom: '0',
+                left: 0,
+                top: 0,
+                right: 0,
+                bottom: 0,
             },
         });
 
@@ -771,8 +771,8 @@ export class KlApp {
         });
         css(this.easel.getElement(), {
             position: 'absolute',
-            left: '0',
-            top: '0',
+            left: 0,
+            top: 0,
         });
         this.easelProjectUpdater = new EaselProjectUpdater({
             klCanvas: this.klCanvas,
@@ -1062,10 +1062,10 @@ export class KlApp {
             className: 'kl-toolspace',
             css: {
                 position: 'absolute',
-                right: '0',
-                top: '0',
-                bottom: '0',
-                width: this.toolWidth + 'px',
+                right: 0,
+                top: 0,
+                bottom: 0,
+                width: this.toolWidth,
                 overflow: 'hidden',
                 userSelect: 'none',
                 touchAction: 'none',
@@ -1158,7 +1158,7 @@ export class KlApp {
                                     BB.el({
                                         content: LANG('backup-drawing'),
                                         css: {
-                                            marginBottom: '10px',
+                                            marginBottom: 10,
                                         },
                                     }),
                                     saveBtn,
@@ -1345,7 +1345,7 @@ export class KlApp {
         const brushDiv = BB.el();
         const colorDiv = BB.el({
             css: {
-                margin: '10px',
+                margin: 10,
                 display: 'flex',
                 flexWrap: 'wrap',
                 justifyContent: 'space-between',
@@ -1372,14 +1372,14 @@ export class KlApp {
             tabArr: (() => {
                 const result = [];
 
-                const commonStyle: Partial<CSSStyleDeclaration> = {
-                    height: '28px',
-                    width: '28px',
+                const commonStyle: TCss = {
+                    height: 28,
+                    width: 28,
                     color: 'var(--ui-on-bg-full-contrast)',
                 };
                 const createTab = (keyStr: string) => {
                     const im = KL.BRUSHES_UI[keyStr].image;
-                    BB.css(im, commonStyle);
+                    css(im, commonStyle);
                     return {
                         id: keyStr,
                         label: BB.el({
@@ -1902,7 +1902,7 @@ export class KlApp {
                         brushDiv.style.display = 'none';
                     },
                     css: {
-                        minWidth: '45px',
+                        minWidth: 45,
                     },
                 },
                 {
@@ -1917,7 +1917,7 @@ export class KlApp {
                         handUi.setIsVisible(false);
                     },
                     css: {
-                        minWidth: '45px',
+                        minWidth: 45,
                     },
                 },
                 {
@@ -1933,7 +1933,7 @@ export class KlApp {
                         fillUi.setIsVisible(false);
                     },
                     css: {
-                        minWidth: '45px',
+                        minWidth: 45,
                     },
                 },
                 {
@@ -1949,7 +1949,7 @@ export class KlApp {
                         gradientUi.setIsVisible(false);
                     },
                     css: {
-                        minWidth: '45px',
+                        minWidth: 45,
                     },
                 },
                 {
@@ -1965,7 +1965,7 @@ export class KlApp {
                         textUi.setIsVisible(false);
                     },
                     css: {
-                        minWidth: '45px',
+                        minWidth: 45,
                     },
                 },
                 {
@@ -1981,7 +1981,7 @@ export class KlApp {
                         shapeUi.setIsVisible(false);
                     },
                     css: {
-                        minWidth: '45px',
+                        minWidth: 45,
                     },
                 },
                 {
@@ -1996,7 +1996,7 @@ export class KlApp {
                         klAppSelect.getSelectUi().setIsVisible(false);
                     },
                     css: {
-                        minWidth: '45px',
+                        minWidth: 45,
                     },
                 },
                 {
@@ -2011,7 +2011,7 @@ export class KlApp {
                         this.layersUi.setIsVisible(false);
                     },
                     css: {
-                        minWidth: '45px',
+                        minWidth: 45,
                     },
                 },
                 {
@@ -2025,7 +2025,7 @@ export class KlApp {
                         editUi.hide();
                     },
                     css: {
-                        minWidth: '45px',
+                        minWidth: 45,
                     },
                 },
                 {
@@ -2063,7 +2063,7 @@ export class KlApp {
                         // settingsTab.setIsVisible(false);
                     },
                     css: {
-                        minWidth: '45px',
+                        minWidth: 45,
                     },
                 },
             ],
@@ -2071,10 +2071,10 @@ export class KlApp {
 
         this.bottomBarWrapper = BB.el({
             css: {
-                width: '270px',
+                width: 270,
                 position: 'absolute',
-                bottom: '0',
-                left: '0',
+                bottom: 0,
+                left: 0,
             },
         });
         if (p.bottomBar) {
@@ -2104,7 +2104,7 @@ export class KlApp {
             settingsUi.getElement(),
             BB.el({
                 css: {
-                    height: '10px', // a bit of spacing at the bottom
+                    height: 10, // a bit of spacing at the bottom
                 },
             }),
             this.bottomBarWrapper ? this.bottomBarWrapper : undefined,
@@ -2206,10 +2206,10 @@ export class KlApp {
                 parent: document.body,
                 css: {
                     position: 'fixed',
-                    left: '0',
-                    top: '0',
-                    right: '0',
-                    bottom: '0',
+                    left: 0,
+                    top: 0,
+                    right: 0,
+                    bottom: 0,
                     pointerEvents: 'none',
                     zIndex: '-1',
                     userSelect: 'none',

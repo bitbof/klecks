@@ -1,5 +1,6 @@
 import { el } from './ui';
 import { css } from './base';
+import { TCss } from '../bb-types';
 
 function decomposeElString(el: string) {
     if (el === '') {
@@ -49,7 +50,7 @@ function decomposeElString(el: string) {
 }
 
 function applyStyleNames(el: HTMLElement, styleNames: string[]) {
-    const style: Partial<CSSStyleDeclaration> = {};
+    const style: TCss = {};
 
     const operations: {
         [key: string]: (params: string[]) => void;
@@ -106,7 +107,7 @@ function applyStyleNames(el: HTMLElement, styleNames: string[]) {
             style.gap = params.map((item) => item + 'px').join(' ');
         },
         grow: () => {
-            style.flexGrow = '1';
+            style.flexGrow = 1;
         },
         justify: (params) => {
             style.justifyContent = params[0];
@@ -142,7 +143,7 @@ function applyStyleNames(el: HTMLElement, styleNames: string[]) {
             style.overflow = params[0];
         },
         pos: (params) => {
-            style.position = params[0];
+            style.position = params[0] as TCss['position'];
         },
         left: (params) => {
             style.left = params[0] === 'full' ? '100%' : params[0] + 'px';
@@ -160,7 +161,7 @@ function applyStyleNames(el: HTMLElement, styleNames: string[]) {
             style.fontSize = params[0] + 'px';
         },
         pointer: (params) => {
-            style.pointerEvents = params[0];
+            style.pointerEvents = params[0] as TCss['pointerEvents'];
         },
     };
 

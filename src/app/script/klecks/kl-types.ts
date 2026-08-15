@@ -20,6 +20,7 @@ export type TFilterGetDialogParam = {
     secondaryColorRgb: TRgb;
 };
 
+// we use these for creating the filter modal
 export type TFilterGetDialogResult<T = unknown> =
     | {
           element: HTMLElement; // contents of modal (excluding title, dialog buttons)

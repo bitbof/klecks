@@ -167,10 +167,14 @@ export class FxTexture {
                 throw new Error('incomplete framebuffer: context lost');
             }
             if (this.width === 0 || this.height === 0) {
-                throw new Error(`incomplete framebuffer: texture has zero dimension (${this.width}x${this.height})`);
+                throw new Error(
+                    `incomplete framebuffer: texture has zero dimension (${this.width}x${this.height})`,
+                );
             }
             if (fbStatus === gl.FRAMEBUFFER_UNSUPPORTED) {
-                throw new Error(`incomplete framebuffer: unsupported format/type combination (format=0x${this.format.toString(16)}, type=0x${this.type.toString(16)})`);
+                throw new Error(
+                    `incomplete framebuffer: unsupported format/type combination (format=0x${this.format.toString(16)}, type=0x${this.type.toString(16)})`,
+                );
             }
             throw new Error(`incomplete framebuffer: status 0x${fbStatus.toString(16)}`);
         }

@@ -19,7 +19,7 @@ export function showLicensesDialog() {
             css: {
                 height: '100%',
                 overflowY: 'auto',
-                padding: '10px',
+                padding: 10,
                 boxSizing: 'border-box',
             },
         }),

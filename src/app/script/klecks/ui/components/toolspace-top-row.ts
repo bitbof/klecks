@@ -1,4 +1,4 @@
-import { getIconUrl } from '../../../icon/icon';
+import { getIconSvg, getIconUrl } from '../../../icon/icon';
 import { BB } from '../../../bb/bb';
 import klecksLogoImg from 'url:/src/app/img/klecks-logo.png';
 import { LANG } from '../../../language/language';
@@ -9,7 +9,6 @@ const newImageImg = getIconUrl('new-image');
 const importImg = getIconUrl('import');
 const exportImg = getIconUrl('export');
 const shareImg = getIconUrl('share');
-const helpImg = getIconUrl('help');
 /**
  * Topmost row of buttons in toolspace (with the app logo)
  */
@@ -29,7 +28,7 @@ export class ToolspaceTopRow {
         this.rootEl = BB.el({
             className: 'kl-toolspace-row',
             css: {
-                height: '36px',
+                height: 36,
                 display: 'flex',
             },
         });
@@ -37,7 +36,8 @@ export class ToolspaceTopRow {
         function createButton(p: {
             onClick: () => void;
             title: string;
-            image: string;
+            image?: string;
+            content?: HTMLElement | SVGSVGElement;
             contain: boolean;
             extraPadding?: number;
             darkInvert?: boolean;
@@ -54,20 +54,24 @@ export class ToolspaceTopRow {
                     padding: p.contain ? padding + 'px 0' : '',
                 },
             });
-            const im = BB.el({
-                className: p.darkInvert ? 'dark-invert' : undefined,
-                id: 'kl-logo-button-im',
-                css: {
-                    backgroundImage: "url('" + p.image + "')",
-                    backgroundRepeat: 'no-repeat',
-                    backgroundPosition: 'center',
-                    backgroundSize: p.contain ? 'contain' : '',
-                    //filter: 'grayscale(1)',
-                    height: '100%',
-                },
-            });
-            im.style.pointerEvents = 'none';
-            el.append(im);
+            if (p.content) {
+                el.append(p.content);
+            } else {
+                const im = BB.el({
+                    className: p.darkInvert ? 'dark-invert' : undefined,
+                    id: 'kl-logo-button-im',
+                    css: {
+                        backgroundImage: "url('" + p.image + "')",
+                        backgroundRepeat: 'no-repeat',
+                        backgroundPosition: 'center',
+                        backgroundSize: p.contain ? 'contain' : '',
+                        //filter: 'grayscale(1)',
+                        height: '100%',
+                    },
+                });
+                im.style.pointerEvents = 'none';
+                el.append(im);
+            }
             const pointerListener = new BB.PointerListener({
                 // because :hover causes problems w touch
                 target: el,
@@ -90,7 +94,7 @@ export class ToolspaceTopRow {
         });
         logoButton.el.classList.add('kl-tool-row-border-right');
         css(logoButton.el, {
-            width: '46px',
+            width: 46,
         });
         const newButton = createButton({
             onClick: p.onNew,
@@ -127,10 +131,14 @@ export class ToolspaceTopRow {
         const helpButton = createButton({
             onClick: p.onHelp,
             title: LANG('help'),
-            image: helpImg,
+            content: getIconSvg('help', {
+                width: 24,
+                height: 24,
+                margin: '0 auto',
+            }),
             contain: true,
-            darkInvert: true,
         });
+        helpButton.el.style.flexBasis = '0';
 
         BB.append(this.rootEl, [
             logoButton.el,

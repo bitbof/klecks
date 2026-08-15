@@ -31,7 +31,7 @@ export class KlCanvasPreview {
             height: '100%',
             imageRendering: scale > 1 ? 'pixelated' : undefined,
             background: 'var(--kl-checkerboard-background)',
-            backgroundSize: '16px',
+            backgroundSize: 16,
         });
 
         setTimeout(() => this.render(), 0);

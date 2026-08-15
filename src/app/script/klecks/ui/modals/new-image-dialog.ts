@@ -49,8 +49,8 @@ export function newImageDialog(p: {
     const widthInput = BB.el({ tagName: 'input', custom: { name: 'image-width' } });
     const unitStyle = {
         color: '#888',
-        fontSize: '12px',
-        marginLeft: '5px',
+        fontSize: 12,
+        marginLeft: 5,
     };
     const widthUnit = BB.el({
         textContent: LANG('new-px'),
@@ -69,7 +69,7 @@ export function newImageDialog(p: {
     widthInput.min = '1';
     widthInput.max = '' + maxCanvasSize;
     css(widthInput, {
-        width: '70px',
+        width: 70,
     });
 
     heightInput.type = 'number';
@@ -89,16 +89,16 @@ export function newImageDialog(p: {
 
     const sizeTable = table([
         [LANG('width') + ':&nbsp;', widthInput, widthUnit],
-        [BB.el({ css: { height: '5px' } }), '', ''],
+        [BB.el({ css: { height: 5 } }), '', ''],
         [LANG('height') + ':&nbsp;', heightInput, heightUnit],
     ]);
     css(sizeTable, {
-        marginBottom: '10px',
+        marginBottom: 10,
     });
 
     const ratioWrapper = BB.el({
         css: {
-            marginTop: '5px',
+            marginTop: 5,
             color: '#888',
         },
     });
@@ -107,8 +107,8 @@ export function newImageDialog(p: {
         css: {
             display: 'flex',
             flexWrap: 'wrap',
-            gap: '5px',
-            marginBottom: '10px',
+            gap: 5,
+            marginBottom: 10,
         },
     });
     const presetBtnConfig = { tagName: 'button', css: { flexGrow: '1' } } as const;
@@ -222,8 +222,8 @@ export function newImageDialog(p: {
         select.setValue(undefined);
     }, 0);
     css(select.getElement(), {
-        width: '80px',
-        flexGrow: '1',
+        width: 80,
+        flexGrow: 1,
     });
     templateWrapper.append(select.getElement());
 
@@ -269,20 +269,20 @@ export function newImageDialog(p: {
         className: 'kl-transparent-preview',
         css: {
             boxSizing: 'border-box',
-            width: '340px',
-            height: '140px',
+            width: 340,
+            height: 140,
             display: 'table',
-            padding: '10px',
-            marginTop: '10px',
-            marginLeft: '-20px',
+            padding: 10,
+            marginTop: 10,
+            marginLeft: -20,
             background: 'var(--kl-checkerboard-background)',
         },
     });
     const preview = BB.el({
         className: 'kl-transparent-preview__canvas',
         css: {
-            width: 200 + 'px',
-            height: 100 + 'px',
+            width: 200,
+            height: 100,
             backgroundColor:
                 'rgba(' +
                 backgroundRgba.r +
@@ -296,7 +296,7 @@ export function newImageDialog(p: {
             marginLeft: 'auto',
             marginRight: 'auto',
             color: '#aaa',
-            fontSize: '16px',
+            fontSize: 16,
             fontWeight: 'bold',
             textAlign: 'center',
             verticalAlign: 'center',

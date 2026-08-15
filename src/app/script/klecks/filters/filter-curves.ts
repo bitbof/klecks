@@ -70,8 +70,8 @@ export const filterCurves = {
             selection: klCanvas.getSelection(),
         });
         css(preview.getElement(), {
-            marginLeft: '-20px',
-            marginRight: '-20px',
+            marginLeft: -20,
+            marginRight: -20,
         });
 
         const input = new CurvesInput({

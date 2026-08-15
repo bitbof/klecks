@@ -60,8 +60,8 @@ export class FreeTransformCanvas {
         this.rootEl = BB.el({
             className: 'kl-preview-wrapper',
             css: {
-                width: p.elementWidth + 'px',
-                height: p.elementHeight + 'px',
+                width: p.elementWidth,
+                height: p.elementHeight,
             },
         });
         this.rootEl.oncontextmenu = () => {
@@ -93,8 +93,8 @@ export class FreeTransformCanvas {
             hasEditMode: true,
             onModeChange: (m) => {
                 css(this.freeTransform.getElement(), {
-                    pointerEvents: m === 'edit' ? '' : 'none',
-                    opacity: m === 'edit' ? '' : '0.5',
+                    pointerEvents: m === 'edit' ? undefined : 'none',
+                    opacity: m === 'edit' ? undefined : 0.5,
                 });
             },
             onTransformChange: (transform) => {
@@ -104,8 +104,8 @@ export class FreeTransformCanvas {
         });
         css(this.preview.getElement(), {
             overflow: 'hidden',
-            marginLeft: '-20px',
-            marginRight: '-20px',
+            marginLeft: -20,
+            marginRight: -20,
         });
         this.rootEl.append(this.preview.getElement());
 
@@ -134,8 +134,8 @@ export class FreeTransformCanvas {
         }
         css(this.freeTransform.getElement(), {
             position: 'absolute',
-            left: '0',
-            top: '0',
+            left: 0,
+            top: 0,
         });
         setTimeout(() => this.updatePreview(), 0);
     }

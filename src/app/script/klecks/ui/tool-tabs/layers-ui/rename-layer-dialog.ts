@@ -13,7 +13,7 @@ export function renameLayerDialog(
     const label = BB.el({
         content: LANG('layers-rename-name') + ':',
         css: {
-            marginRight: '5px',
+            marginRight: 5,
         },
     });
 
@@ -29,11 +29,11 @@ export function renameLayerDialog(
     const clearBtn = BB.el({
         tagName: 'button',
         content: getIconSvg('remove-layer', {
-            height: '20px',
+            height: 20,
         }),
         title: LANG('layers-rename-clear'),
         css: {
-            marginLeft: '10px',
+            marginLeft: 10,
         },
         onClick: () => {
             input.value = '';
@@ -54,8 +54,8 @@ export function renameLayerDialog(
         css: {
             display: 'flex',
             flexWrap: 'wrap',
-            marginTop: '5px',
-            marginLeft: '-5px',
+            marginTop: 5,
+            marginLeft: -5,
         },
     });
     suggestions.forEach((item) => {

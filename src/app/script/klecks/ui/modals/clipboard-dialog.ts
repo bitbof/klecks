@@ -48,8 +48,10 @@ export function clipboardDialog(
     const topWrapper = BB.el({
         content: [
             maskToggle?.getElement(),
-            LANG('crop-drag-to-crop') +
-                (clipboardItemIsSupported ? '' : '<br>' + LANG('cropcopy-click-hold')),
+            LANG('crop-drag-to-crop'),
+            ...(clipboardItemIsSupported
+                ? []
+                : [BB.el({ tagName: 'br' }), LANG('cropcopy-click-hold')]),
         ],
         css: {
             textAlign: 'center',
@@ -72,8 +74,8 @@ export function clipboardDialog(
         init,
     });
     css(cropCopy.getElement(), {
-        marginTop: '10px',
-        marginLeft: '-20px',
+        marginTop: 10,
+        marginLeft: -20,
     });
     div.append(cropCopy.getElement());
 
@@ -131,7 +133,7 @@ export function clipboardDialog(
         style: isSmall
             ? {}
             : {
-                  width: '540px',
+                  width: 540,
               },
         buttons: buttonArr,
         primaries: [LANG('cropcopy-btn-copy')],

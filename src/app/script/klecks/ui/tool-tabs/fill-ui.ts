@@ -29,7 +29,7 @@ export class FillUi {
     }) {
         this.rootEl = BB.el({
             css: {
-                margin: '10px',
+                margin: 10,
             },
         });
         this.isVisible = true;
@@ -37,7 +37,7 @@ export class FillUi {
         this.colorDiv = BB.el({
             parent: this.rootEl,
             css: {
-                marginBottom: '10px',
+                marginBottom: 10,
             },
         });
 
@@ -66,7 +66,7 @@ export class FillUi {
             toDisplayValue: (value) => value / (255 / 100),
         });
         css(this.toleranceSlider.getElement(), {
-            marginTop: '10px',
+            marginTop: 10,
         });
         this.rootEl.append(this.toleranceSlider.getElement());
 
@@ -74,7 +74,7 @@ export class FillUi {
             parent: this.rootEl,
             css: {
                 display: 'flex',
-                marginTop: '10px',
+                marginTop: 10,
             },
         });
 
@@ -82,7 +82,7 @@ export class FillUi {
             content: LANG('bucket-sample') + '&nbsp;',
             title: LANG('bucket-sample-title'),
             css: {
-                fontSize: '15px',
+                fontSize: 15,
             },
         });
         this.modeSelect = new Select({
@@ -107,8 +107,8 @@ export class FillUi {
             content: LANG('bucket-grow') + '&nbsp;',
             title: LANG('bucket-grow-title'),
             css: {
-                fontSize: '15px',
-                marginLeft: '10px',
+                fontSize: 15,
+                marginLeft: 10,
             },
         });
         this.growSelect = new Select({
@@ -156,8 +156,8 @@ export class FillUi {
                 content: [contiguousToggle.getElement(), this.eraserToggle.getElement()],
                 css: {
                     display: 'flex',
-                    marginTop: '10px',
-                    gap: '10px',
+                    marginTop: 10,
+                    gap: 10,
                 },
             }),
         );

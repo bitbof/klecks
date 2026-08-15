@@ -56,7 +56,7 @@ export class ToolspaceToolRow {
         this.rootEl = BB.el({
             className: 'kl-toolspace-row',
             css: {
-                height: '54px',
+                height: 54,
                 display: 'flex',
             },
         });
@@ -92,7 +92,7 @@ export class ToolspaceToolRow {
                     height: '100%',
                     transform: p.doMirror ? 'scale(-1, 1)' : '',
                     pointerEvents: 'none',
-                    opacity: p.doLighten ? '0.75' : '1',
+                    opacity: p.doLighten ? 0.75 : 1,
                 },
             });
             el.append(im);
@@ -123,7 +123,7 @@ export class ToolspaceToolRow {
 
             const result = BB.el({
                 css: {
-                    flexGrow: '1',
+                    flexGrow: 1,
                     position: 'relative',
                 },
             });
@@ -137,8 +137,8 @@ export class ToolspaceToolRow {
             });
             css(svg, {
                 position: 'absolute',
-                left: '0',
-                top: '0',
+                left: 0,
+                top: 0,
             });
 
             const blurRadius = 10;
@@ -285,11 +285,11 @@ export class ToolspaceToolRow {
                     backgroundImage: "url('" + p.leftImage + "')",
                     backgroundRepeat: 'no-repeat',
                     backgroundSize: 'contain',
-                    width: '20px',
-                    height: '20px',
+                    width: 20,
+                    height: 20,
                     position: 'absolute',
-                    left: '10px',
-                    top: '8px',
+                    left: 10,
+                    top: 8,
                     //transform: p.doMirror ? 'scale(-1, 1)' : '',
                     pointerEvents: 'none',
                 },
@@ -303,11 +303,11 @@ export class ToolspaceToolRow {
                     backgroundImage: "url('" + (p.rightImage ? p.rightImage : p.leftImage) + "')",
                     backgroundRepeat: 'no-repeat',
                     backgroundSize: 'contain',
-                    width: '20px',
-                    height: '20px',
+                    width: 20,
+                    height: 20,
                     position: 'absolute',
-                    right: '10px',
-                    bottom: '8px',
+                    right: 10,
+                    bottom: 8,
                     transform: p.rightImage ? '' : 'scale(-1, 1)',
                     pointerEvents: 'none',
                 },
@@ -420,7 +420,7 @@ export class ToolspaceToolRow {
 
     setIsSmall(b: boolean): void {
         css(this.rootEl, {
-            height: b ? '36px' : '54px',
+            height: b ? 36 : 54,
         });
 
         this.toolDropdown.setIsSmall(b);

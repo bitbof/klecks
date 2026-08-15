@@ -176,7 +176,7 @@ export class FxPreviewRenderer {
             this.ctx.drawImage(this.original, 0, 0);
             this.ctx.restore();
             // debug
-            /*BB.css(this.canvas, {
+            /*css(this.canvas, {
                 position: 'absolute',
                 left: '0',
                 top: '0',

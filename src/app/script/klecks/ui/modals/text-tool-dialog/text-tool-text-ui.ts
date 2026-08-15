@@ -49,7 +49,7 @@ export class TextToolTextUI {
                 whiteSpace: 'pre',
                 overflow: 'auto',
                 width: '100%',
-                height: '70px',
+                height: 70,
                 resize: 'vertical',
             },
             onChange: () => {

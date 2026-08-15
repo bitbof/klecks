@@ -32,6 +32,9 @@ class LanguageStrings {
                 setTimeout(() => {
                     throw new Error('failed to load language: ' + langCode);
                 });
+                setTimeout(() => {
+                    throw e;
+                });
             }
         }
         this.code = langCode;

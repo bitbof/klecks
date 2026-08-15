@@ -1,3 +1,7 @@
+import type * as CSS from 'csstype';
+
+export type TCss = CSS.Properties<number>;
+
 export type TVector2D = {
     x: number;
     y: number;
@@ -29,7 +33,7 @@ export type TSvg = {
     height?: string;
     fill?: string;
     stroke?: string;
-    css?: Partial<CSSStyleDeclaration>;
+    css?: TCss;
     d?: string;
     x?: string;
     y?: string;

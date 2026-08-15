@@ -29,15 +29,15 @@ export class ToolspaceCollapser {
         this.rootEl = BB.el({
             className: 'kl-toolspace-toggle',
             css: {
-                width: '36px',
-                height: '36px',
+                width: 36,
+                height: 36,
                 background: 'rgba(100, 100, 100, 0.9)',
                 color: '#fff',
                 textAlign: 'center',
                 lineHeight: '36px',
                 cursor: 'pointer',
                 userSelect: 'none',
-                padding: '6px',
+                padding: 6,
                 boxSizing: 'border-box',
             },
             title: LANG('toggle-show-tools'),

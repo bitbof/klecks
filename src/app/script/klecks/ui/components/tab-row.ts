@@ -1,6 +1,7 @@
 import { BB } from '../../../bb/bb';
 import { PointerListener } from '../../../bb/input/pointer-listener';
 import { css } from '../../../bb/base/base';
+import { TCss } from '../../../bb/bb-types';
 
 // type all functions
 
@@ -12,7 +13,7 @@ type TTabInit = {
     isVisible?: boolean; // default is true
     onOpen: () => void;
     onClose: () => void;
-    css?: Partial<CSSStyleDeclaration>;
+    css?: TCss;
 };
 
 type TTab = {
@@ -53,7 +54,7 @@ export class TabRow {
         this.rootEl = BB.el({
             className: 'tabrow',
             css: {
-                height: height + 1 + 'px',
+                height: height + 1,
             },
         });
 
@@ -120,7 +121,7 @@ export class TabRow {
                         backgroundPosition: 'center',
                         backgroundRepeat: 'no-repeat',
                         display: 'flex',
-                        height: height - 7 + 'px',
+                        height: height - 7,
                         justifyContent: 'center',
                         margin: '4px auto',
                     },

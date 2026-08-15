@@ -39,15 +39,15 @@ export async function loadRecovery(
                           display: 'flex',
                           flexDirection: 'column',
                           alignItems: 'center',
-                          gap: '10px',
+                          gap: 10,
                       },
                       content: [
                           BB.el({
                               css: {
                                   display: 'flex',
                                   alignItems: 'center',
-                                  gap: '8px',
-                                  fontSize: '16px',
+                                  gap: 8,
+                                  fontSize: 16,
                               },
                               content: [
                                   BB.el({

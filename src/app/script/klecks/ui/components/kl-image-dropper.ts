@@ -20,32 +20,32 @@ export class KlImageDropper {
         this.rootEl = BB.el({
             content: LANG('dropper-drop'),
             css: {
-                paddingTop: '100px',
+                paddingTop: 100,
                 position: 'fixed',
-                left: '0',
-                top: '0',
+                left: 0,
+                top: 0,
                 width: '100%',
                 height: '100%',
                 background: 'rgba(50, 50, 50, 0.7)',
                 color: '#fff',
                 textShadow: '2px 2px #000',
                 textAlign: 'center',
-                fontSize: '25px',
+                fontSize: 25,
             },
         });
         const wrapperEl = BB.el({
             css: {
-                marginTop: '50px',
+                marginTop: 50,
                 display: 'flex',
                 justifyContent: 'center',
             },
         });
         const optionStyle = {
-            width: '200px',
-            padding: '50px',
-            margin: '10px',
+            width: 200,
+            padding: 50,
+            margin: 10,
             //opacity: 0.5,
-            borderRadius: '20px',
+            borderRadius: 20,
             border: '1px dashed #fff',
             background: '#00aefe',
             fontWeight: 'bold',

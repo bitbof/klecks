@@ -1,6 +1,11 @@
 import { getIconUrl } from '../../../icon/icon';
 import { c } from '../../../bb/base/c';
-import { ProjectViewport, TProjectViewportProject, TViewportTransform } from './project-viewport';
+import {
+    ProjectViewport,
+    TProjectViewportBackground,
+    TProjectViewportProject,
+    TViewportTransform,
+} from './project-viewport';
 import { BB } from '../../../bb/bb';
 import { PointerListener } from '../../../bb/input/pointer-listener';
 import { EventChain } from '../../../bb/input/event-chain/event-chain';
@@ -19,6 +24,7 @@ import { createMatrixFromTransform } from '../../../bb/transform/create-matrix-f
 import { MultiPolygon } from 'polygon-clipping';
 import { SelectionRenderer } from '../easel/selection-renderer';
 import { css } from '../../../bb/base/base';
+import { EASEL_MAX_SCALE } from '../easel/easel.config';
 
 const toolZoomInImg = getIconUrl('tool-zoom-in');
 const toolZoomOutImg = getIconUrl('tool-zoom-out');
@@ -38,6 +44,7 @@ export type TPreviewParams = {
     hasBorder?: boolean; // default true
     editIcon?: string;
     selection?: MultiPolygon;
+    background?: TProjectViewportBackground;
 };
 
 const DEFAULT_PADDING = 10;
@@ -161,7 +168,7 @@ export class Preview {
             t.vY = t.vY ?? viewportRect.height / 2;
 
             const metaTransform = toMetaTransform(old, { x: t.vX, y: t.vY });
-            metaTransform.scale *= t.fac;
+            metaTransform.scale = Math.min(EASEL_MAX_SCALE, metaTransform.scale * t.fac);
 
             this.viewport.setTransform(
                 createTransform(
@@ -204,7 +211,7 @@ export class Preview {
             ),
             project: this.project,
             useNativeResolution: false,
-            drawBackground: true,
+            background: p.background,
         });
 
         const doubleTapper = new DoubleTapper({
@@ -239,7 +246,7 @@ export class Preview {
                         x: e.downRelX,
                         y: e.downRelY,
                     });
-                    metaTransform.scale *= e.scale;
+                    metaTransform.scale = Math.min(EASEL_MAX_SCALE, metaTransform.scale * e.scale);
                     metaTransform.viewportP.x += e.relX - e.downRelX;
                     metaTransform.viewportP.y += e.relY - e.downRelY;
                     this.viewport.setTransform(
@@ -295,10 +302,8 @@ export class Preview {
                 this.pointerChain.chainIn(e);
             },
             onWheel: this.onWheel,
+            useDirtyWheel: true,
             maxPointers: 2,
-        });
-        this.viewport.getElement().addEventListener('wheel', (e) => {
-            e.preventDefault();
         });
 
         const svgRoot = BB.createSvg({
@@ -306,8 +311,8 @@ export class Preview {
         });
         css(svgRoot, {
             position: 'absolute',
-            left: '0',
-            top: '0',
+            left: 0,
+            top: 0,
             width: '100%',
             height: '100%',
             pointerEvents: 'none',
@@ -324,14 +329,15 @@ export class Preview {
 
         if (p.hasEditMode) {
             this.modeToggle = new Options<TPreviewMode>({
+                isFocusable: true,
                 optionArr: (['edit', 'hand'] as const).map((id) => {
                     const el = BB.el({
                         className: 'dark-invert',
                         css: {
-                            width: '28px',
-                            height: '28px',
+                            width: 28,
+                            height: 28,
                             backgroundSize: 'contain',
-                            margin: '5px',
+                            margin: 5,
                             backgroundImage: `url(${id === 'edit' ? (p.editIcon ?? editPencilImg) : toolHandImg})`,
                             backgroundPosition: 'center',
                             backgroundRepeat: 'no-repeat',
@@ -357,7 +363,7 @@ export class Preview {
                 className: p.hasBorder === false ? undefined : classes.preview,
                 css: {
                     position: 'relative',
-                    zIndex: '0', // prevent buttons from sitting on top of other modals
+                    zIndex: 0, // prevent buttons from sitting on top of other modals
                 },
             },
             [
@@ -424,6 +430,10 @@ export class Preview {
         this.isReset = false;
     }
 
+    setBackground(background?: TProjectViewportBackground): void {
+        this.viewport.setBackground(background);
+    }
+
     getTransform(): TViewportTransform {
         return this.viewport.getTransform();
     }
@@ -433,17 +443,15 @@ export class Preview {
     }
 
     onWheel = (e: TWheelEvent): void => {
-        const viewportRect = this.viewport.getElement().getBoundingClientRect();
-        const vX = e.pageX - viewportRect.x;
-        const vY = e.pageY - viewportRect.y;
+        e.event?.preventDefault();
 
         const oldScale = this.viewport.getTransform().scale;
-        const newScale = zoomByStep(oldScale, -e.deltaY / 2);
+        const newScale = oldScale * Math.pow(1 + 4 / 10, -e.deltaY);
 
         this.transformCanvas({
             type: 'zoom',
-            vX,
-            vY,
+            vX: e.relX,
+            vY: e.relY,
             fac: newScale / oldScale,
         });
     };

@@ -1,7 +1,7 @@
 import { getIconUrl } from '../../icon/icon';
 import { BB } from '../../bb/bb';
 import { Checkbox } from '../ui/components/checkbox';
-import { Select } from '../ui/components/select';
+import { InterpolationAlgorithmToggle } from '../ui/components/interpolation-algorithm-toggle';
 import { TFilterApply, TFilterGetDialogParam, TFilterGetDialogResult } from '../kl-types';
 import { LANG } from '../../language/language';
 import { table } from '../ui/components/table';
@@ -42,23 +42,23 @@ export const filterResize = {
 
         const widthWrapper = BB.el({
             css: {
-                width: '150px',
-                height: '35px',
+                width: 150,
+                height: 35,
                 lineHeight: '30px',
             },
         });
         const heightWrapper = BB.el({
             css: {
-                width: '150px',
-                height: '35px',
+                width: 150,
+                height: 35,
                 lineHeight: '30px',
             },
         });
         const widthInput = BB.el({
             tagName: 'input',
             css: {
-                cssFloat: 'right',
-                width: '90px',
+                float: 'right',
+                width: 90,
             },
             custom: {
                 type: 'number',
@@ -70,8 +70,8 @@ export const filterResize = {
         const heightInput = BB.el({
             tagName: 'input',
             css: {
-                cssFloat: 'right',
-                width: '90px',
+                float: 'right',
+                width: 90,
             },
             custom: {
                 type: 'number',
@@ -114,7 +114,7 @@ export const filterResize = {
         const sizeTable = table(
             [
                 [LANG('width') + ':&nbsp;', widthInput, constrainIm],
-                [BB.el({ css: { height: '5px' } }), '', ''],
+                [BB.el({ css: { height: 5 } }), '', ''],
                 [LANG('height') + ':&nbsp;', heightInput],
             ],
             {
@@ -122,7 +122,7 @@ export const filterResize = {
             },
         );
         css(sizeTable, {
-            marginBottom: '10px',
+            marginBottom: 10,
         });
 
         rootEl.append(sizeTable);
@@ -160,18 +160,12 @@ export const filterResize = {
             }),
         );
 
-        const algorithmSelect = new Select({
-            isFocusable: true,
-            optionArr: [
-                ['smooth', LANG('algorithm-smooth')],
-                ['pixelated', LANG('algorithm-pixelated')],
-            ],
-            title: LANG('scaling-algorithm'),
+        const algorithmToggle = new InterpolationAlgorithmToggle({
             initValue: 'smooth',
+            isFocusable: true,
             onChange: (): void => {
                 update();
             },
-            name: 'interpolation-algorithm',
         });
 
         const secondRowElement = BB.el({
@@ -182,7 +176,7 @@ export const filterResize = {
                 alignItems: 'center',
             },
         });
-        secondRowElement.append(constrainCheckbox.getElement(), algorithmSelect.getElement());
+        secondRowElement.append(constrainCheckbox.getElement(), algorithmToggle.getElement());
 
         const previewCanvas = BB.canvas(w, h);
         previewCanvas.style.imageRendering = 'pixelated';
@@ -190,7 +184,7 @@ export const filterResize = {
         const previewCtx = BB.ctx(previewCanvas);
 
         function draw(): void {
-            if (algorithmSelect.getValue() === 'smooth') {
+            if (algorithmToggle.getValue() === 'smooth') {
                 previewCanvas.style.imageRendering = previewFactor > 1 ? 'pixelated' : '';
 
                 previewCanvas.width = klCanvas.getWidth();
@@ -286,15 +280,15 @@ export const filterResize = {
         const previewWrapper = BB.el({
             className: 'kl-transparent-preview',
             css: {
-                width: SMALL_PREVIEW.width + 'px',
-                height: SMALL_PREVIEW.height + 'px',
-                marginLeft: '-20px',
+                width: SMALL_PREVIEW.width,
+                height: SMALL_PREVIEW.height,
+                marginLeft: -20,
                 display: 'table',
-                marginTop: '10px',
+                marginTop: 10,
                 position: 'relative',
                 userSelect: 'none',
                 background: 'var(--kl-checkerboard-background)',
-                backgroundSize: '16px',
+                backgroundSize: 16,
             },
         });
 
@@ -303,8 +297,8 @@ export const filterResize = {
             content: previewCanvas,
             className: 'kl-transparent-preview__canvas',
             css: {
-                width: w + 'px',
-                height: h + 'px',
+                width: w,
+                height: h,
                 position: 'absolute',
                 overflow: 'hidden',
             },
@@ -315,13 +309,15 @@ export const filterResize = {
 
         result.destroy = (): void => {
             constrainCheckbox.destroy();
+            algorithmToggle.destroy();
         };
         result.getInput = function (): TFilterResizeInput {
+            const algorithm = algorithmToggle.getValue();
             result.destroy!();
             return {
                 width: newWidth,
                 height: newHeight,
-                algorithm: algorithmSelect.getValue(),
+                algorithm,
             };
         };
         return result;

@@ -120,7 +120,11 @@ export class SelectTool {
 
     goSelect(pos: TVector2D, isShiftPressed: boolean = false): void {
         let p = pos;
-        if ((this.shape === 'ellipse' || this.shape === 'rect') && isShiftPressed && this.selectDragInputs.length > 0) {
+        if (
+            (this.shape === 'ellipse' || this.shape === 'rect') &&
+            isShiftPressed &&
+            this.selectDragInputs.length > 0
+        ) {
             const start = this.selectDragInputs[0];
             const dx = pos.x - start.x;
             const dy = pos.y - start.y;

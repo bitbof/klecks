@@ -106,7 +106,7 @@ export const blendBrushUi = (function () {
                 doHighlight: true,
                 title: LANG('lock-alpha-title'),
                 css: {
-                    marginTop: '10px',
+                    marginTop: 10,
                     display: 'inline-block',
                 },
                 name: 'lock-alpha',
@@ -119,7 +119,7 @@ export const blendBrushUi = (function () {
                         display: 'flex',
                         justifyContent: 'space-between',
                         alignItems: 'center',
-                        marginBottom: '10px',
+                        marginBottom: 10,
                     },
                 }),
                 BB.el({

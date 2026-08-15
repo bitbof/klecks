@@ -12,6 +12,7 @@ import { c } from '../../../bb/base/c';
 import { SaveReminder } from '../components/save-reminder';
 import { showModal } from '../modals/base/showModal';
 import { createImage } from '../../../bb/base/ui';
+import { PixelatedZoomToggle } from '../components/pixelated-zoom-toggle';
 
 const bitbofLogoImg = getIconUrl('bitbof-logo');
 const uiSwapImg = getIconUrl('ui-swap-lr');
@@ -28,7 +29,7 @@ export class SettingsUi {
     constructor({ onLeftRight, saveReminder, customAbout }: TSettingsUiParams) {
         this.rootEl = BB.el({
             css: {
-                margin: '10px',
+                margin: 10,
             },
         });
 
@@ -40,8 +41,8 @@ export class SettingsUi {
             content: BB.el({
                 content: LANG('settings-language') + ':',
                 css: {
-                    marginRight: '5px',
-                    marginBottom: '2px',
+                    marginRight: 5,
+                    marginBottom: 2,
                 },
             }),
             css: {
@@ -78,15 +79,15 @@ export class SettingsUi {
             name: 'language',
         });
         css(languageSelect.getElement(), {
-            flexGrow: '1',
+            flexGrow: 1,
         });
         const languageHint = BB.el({
             className: 'kl-toolspace-note',
             content: LANG('settings-language-reload'),
             css: {
                 display: 'none',
-                marginTop: '5px',
-                flexGrow: '1',
+                marginTop: 5,
+                flexGrow: 1,
             },
         });
 
@@ -109,7 +110,7 @@ export class SettingsUi {
             name: 'ui-theme',
         });
         css(themeSelect.getElement(), {
-            flexGrow: '1',
+            flexGrow: 1,
         });
         addIsDarkListener(() => {
             themeSelect.updateLabel(
@@ -123,19 +124,26 @@ export class SettingsUi {
                 BB.el({
                     content: LANG('settings-theme') + ':',
                     css: {
-                        marginRight: '5px',
-                        marginBottom: '2px',
+                        marginRight: 5,
+                        marginBottom: 2,
                     },
                 }),
                 themeSelect.getElement(),
             ],
             css: {
-                marginTop: '15px',
+                marginTop: 15,
                 display: 'flex',
                 alignItems: 'center',
                 flexWrap: 'wrap',
             },
         });
+
+        // ---- pixelated zoom ----
+        const pixelatedZoomToggle = new PixelatedZoomToggle();
+        css(pixelatedZoomToggle.getElement(), {
+            marginTop: 15,
+        });
+        this.rootEl.append(pixelatedZoomToggle.getElement());
 
         // ---- save reminder ----
         if (saveReminder) {
@@ -191,14 +199,14 @@ export class SettingsUi {
                     width: 18,
                     height: 20,
                     css: {
-                        marginRight: '5px',
+                        marginRight: 5,
                     },
                 }),
                 LANG('switch-ui-left-right'),
             ],
             onClick: () => onLeftRight(),
             css: {
-                marginTop: '15px',
+                marginTop: 15,
             },
             custom: {
                 tabIndex: '-1',

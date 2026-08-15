@@ -36,10 +36,7 @@ export function buildIcons(sourceDirectories) {
                 if (/\s(?:width|height)\s*=/i.test(root)) {
                     throw new Error(`Icon root cannot have width or height: "${entry.name}"`);
                 }
-                iconEntries.push([
-                    name,
-                    svg,
-                ]);
+                iconEntries.push([name, svg]);
             });
     });
 
@@ -48,9 +45,7 @@ export function buildIcons(sourceDirectories) {
         ([name, svg]) => `    ${JSON.stringify(name)}: ${JSON.stringify(svg)},`,
     );
     const tsOutput = `/* eslint-disable quotes */
-// generated from ${sourceDirectories.join(
-        ' and ',
-    )}. "npm run icon:build" to update
+// generated from ${sourceDirectories.join(' and ')}. "npm run icon:build" to update
 
 export const icons = {
 ${lines.join('\n')}
@@ -58,9 +53,7 @@ ${lines.join('\n')}
 
 export type IconName = keyof typeof icons;
 `;
-    const scssLines = iconEntries.map(
-        ([name]) => `    ${JSON.stringify(name)}: --icon-${name},`,
-    );
+    const scssLines = iconEntries.map(([name]) => `    ${JSON.stringify(name)}: --icon-${name},`);
     const scssOutput = `// generated from ${sourceDirectories.join(
         ' and ',
     )}. "npm run icon:build" to update

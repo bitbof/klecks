@@ -69,8 +69,8 @@ export async function runBrowserStorageBanner(p: TBrowserStorageBannerParams): P
 
     const fit = fitInto(meta.thumbnail.width, meta.thumbnail.height, 100, 100);
     css(meta.thumbnail, {
-        width: fit.width + 'px',
-        height: fit.height + 'px',
+        width: fit.width,
+        height: fit.height,
     });
 
     const closeButton = BB.el({
@@ -136,7 +136,7 @@ export async function runBrowserStorageBanner(p: TBrowserStorageBannerParams): P
         clearTimeout(timeout);
         document.removeEventListener('pointerdown', onPointerDown);
         css(rootEl, {
-            opacity: '0',
+            opacity: 0,
         });
         css(banner, {
             pointerEvents: 'none',

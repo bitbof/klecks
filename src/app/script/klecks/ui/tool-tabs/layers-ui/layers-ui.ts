@@ -16,6 +16,7 @@ import { c } from '../../../../bb/base/c';
 import { DropdownMenu } from '../../components/dropdown-menu';
 import { KlHistory } from '../../../history/kl-history';
 import { makeUnfocusable } from '../../../../bb/base/ui';
+import { TCss } from '../../../../bb/bb-types';
 
 const paddingLeft = 25;
 
@@ -188,7 +189,7 @@ export class LayersUi {
             this.layerElArr[index] = layer;
             layer.posY = (this.klCanvasLayerArr.length - 1) * 35 - index * 35;
             css(layer, {
-                top: layer.posY + 'px',
+                top: layer.posY,
             });
             const innerLayer = BB.el();
             css(innerLayer, {
@@ -197,8 +198,8 @@ export class LayersUi {
 
             const container1 = BB.el();
             css(container1, {
-                width: '270px',
-                height: '34px',
+                width: 270,
+                height: 34,
             });
             const container2 = BB.el();
             layer.append(innerLayer);
@@ -214,7 +215,7 @@ export class LayersUi {
                     title: LANG('layers-visibility-toggle'),
                     css: {
                         display: 'flex',
-                        width: '25px',
+                        width: 25,
                         height: '100%',
                         justifyContent: 'right',
                         alignItems: 'center',
@@ -232,8 +233,8 @@ export class LayersUi {
                     css: {
                         display: 'block',
                         cursor: 'pointer',
-                        margin: '0',
-                        marginRight: '5px',
+                        margin: 0,
+                        marginRight: 5,
                     },
                 });
                 check.checked = isVisible;
@@ -275,8 +276,8 @@ export class LayersUi {
                 thc.restore();
                 css(layer.thumb, {
                     position: 'absolute',
-                    left: (32 - layer.thumb.width) / 2 + paddingLeft + 'px',
-                    top: (32 - layer.thumb.height) / 2 + 1 + 'px',
+                    left: (32 - layer.thumb.width) / 2 + paddingLeft,
+                    top: (32 - layer.thumb.height) / 2 + 1,
                     background: 'var(--kl-checkerboard-background)',
                 });
             }
@@ -291,11 +292,11 @@ export class LayersUi {
 
                 css(layer.label, {
                     position: 'absolute',
-                    left: 1 + 32 + 5 + paddingLeft + 'px',
-                    top: 1 + 'px',
-                    fontSize: '13px',
-                    width: '165px',
-                    height: '20px',
+                    left: 1 + 32 + 5 + paddingLeft,
+                    top: 1,
+                    fontSize: 13,
+                    width: 165,
+                    height: 20,
                     overflow: 'hidden',
                     whiteSpace: 'nowrap',
                     textOverflow: 'ellipsis',
@@ -316,11 +317,11 @@ export class LayersUi {
 
                 css(layer.opacityLabel, {
                     position: 'absolute',
-                    left: 250 - 1 - 5 - 50 - 5 + paddingLeft + 'px',
-                    top: 1 + 'px',
-                    fontSize: '13px',
+                    left: 250 - 1 - 5 - 50 - 5 + paddingLeft,
+                    top: 1,
+                    fontSize: 13,
                     textAlign: 'right',
-                    width: '50px',
+                    width: 50,
                     transition: 'color 0.2s ease-in-out',
                     textDecoration: isVisible ? undefined : 'line-through',
                 });
@@ -357,8 +358,8 @@ export class LayersUi {
             });
             css(opacitySlider.getElement(), {
                 position: 'absolute',
-                left: 39 + paddingLeft + 'px',
-                top: '17px',
+                left: 39 + paddingLeft,
+                top: 17,
             });
             layer.opacitySlider = opacitySlider;
 
@@ -400,8 +401,8 @@ export class LayersUi {
                 );
                 ctx.restore();
                 css(this.largeThumbDiv, {
-                    top: e.clientY - this.largeThumbCanvas.height / 2 + 'px',
-                    opacity: '0',
+                    top: e.clientY - this.largeThumbCanvas.height / 2,
+                    opacity: 0,
                 });
                 if (!this.largeThumbInDocument) {
                     document.body.append(this.largeThumbDiv);
@@ -410,7 +411,7 @@ export class LayersUi {
                 clearTimeout(this.largeThumbInTimeout);
                 this.largeThumbInTimeout = setTimeout(() => {
                     css(this.largeThumbDiv, {
-                        opacity: '1',
+                        opacity: 1,
                     });
                 }, 20);
                 clearTimeout(this.largeThumbTimeout);
@@ -418,7 +419,7 @@ export class LayersUi {
             layer.thumb.onpointerout = () => {
                 clearTimeout(this.largeThumbInTimeout);
                 css(this.largeThumbDiv, {
-                    opacity: '0',
+                    opacity: 0,
                 });
                 clearTimeout(this.largeThumbTimeout);
                 this.largeThumbTimeout = setTimeout(() => {
@@ -449,7 +450,7 @@ export class LayersUi {
                 ) {
                     css(layer, {
                         transition: 'box-shadow 0.3s ease-in-out',
-                        zIndex: '1',
+                        zIndex: 1,
                     });
                     this.lastpos = layer.spot;
                     freshSelection = false;
@@ -558,10 +559,10 @@ export class LayersUi {
             onClick: BB.handleClick,
             css: {
                 position: 'absolute',
-                top: '500px',
+                top: 500,
                 boxShadow: '1px 1px 3px rgba(0,0,0,0.3)',
                 pointerEvents: 'none',
-                padding: '0',
+                padding: 0,
                 border: '1px solid #aaa',
                 transition: 'opacity 0.3s ease-out',
                 userSelect: 'none',
@@ -578,22 +579,22 @@ export class LayersUi {
         this.selectedSpotIndex = this.klCanvasLayerArr.length - 1;
         this.rootEl = BB.el({
             css: {
-                marginRight: '10px',
-                marginBottom: '10px',
-                marginLeft: '10px',
-                marginTop: '10px',
+                marginRight: 10,
+                marginBottom: 10,
+                marginLeft: 10,
+                marginTop: 10,
                 cursor: 'default',
                 position: 'relative',
-                zIndex: '0',
+                zIndex: 0,
             },
         });
 
         const listDiv = BB.el({
             css: {
-                width: width + 'px',
+                width: width,
                 position: 'relative',
                 margin: '0 -10px',
-                zIndex: '0',
+                zIndex: 0,
             },
         });
 
@@ -656,18 +657,18 @@ export class LayersUi {
                 makeUnfocusable(this.removeBtn);
                 makeUnfocusable(renameBtn);
 
-                const commonStyle = {
-                    cssFloat: 'left',
-                    paddingLeft: '5px',
-                    paddingRight: '3px',
+                const commonStyle: TCss = {
+                    float: 'left',
+                    paddingLeft: 5,
+                    paddingRight: 3,
                 };
                 css(this.addBtn, commonStyle);
                 css(this.duplicateBtn, commonStyle);
                 css(this.mergeBtn, commonStyle);
                 css(this.removeBtn, commonStyle);
                 css(renameBtn, {
-                    cssFloat: 'left',
-                    height: '30px',
+                    float: 'left',
+                    height: 30,
                     lineHeight: '20px',
                 });
 
@@ -679,27 +680,27 @@ export class LayersUi {
 
                 this.addBtn.append(
                     getIconSvg('add-layer', {
-                        height: '20px',
+                        height: 20,
                     }),
                 );
                 this.duplicateBtn.append(
                     getIconSvg('duplicate-layer', {
-                        height: '20px',
+                        height: 20,
                     }),
                 );
                 this.mergeBtn.append(
                     getIconSvg('merge-layers', {
-                        height: '20px',
+                        height: 20,
                     }),
                 );
                 this.removeBtn.append(
                     getIconSvg('remove-layer', {
-                        height: '20px',
+                        height: 20,
                     }),
                 );
                 renameBtn.append(
                     getIconSvg('rename-layer', {
-                        height: '20px',
+                        height: 20,
                     }),
                 );
                 div.append(
@@ -781,7 +782,7 @@ export class LayersUi {
             modeWrapper = BB.el({
                 content: LANG('layers-blending') + '&nbsp;',
                 css: {
-                    fontSize: '15px',
+                    fontSize: 15,
                 },
             });
 
@@ -816,7 +817,7 @@ export class LayersUi {
                     this.update(this.selectedSpotIndex);
                 },
                 css: {
-                    marginBottom: '10px',
+                    marginBottom: 10,
                 },
                 name: 'layer-blend-mode',
             });
@@ -880,13 +881,13 @@ export class LayersUi {
 
         if (this.uiState === 'left') {
             css(this.largeThumbDiv, {
-                left: '280px',
+                left: 280,
                 right: '',
             });
         } else {
             css(this.largeThumbDiv, {
                 left: '',
-                right: '280px',
+                right: 280,
             });
         }
     }

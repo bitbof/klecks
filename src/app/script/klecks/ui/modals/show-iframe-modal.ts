@@ -36,8 +36,8 @@ export function showIframeModal(url: string, isEmbed: boolean, options?: TIframe
         css: {
             width: options?.iframeWidth || '100%',
             height: options?.iframeHeight || '100%',
-            border: '0',
-            opacity: '0',
+            border: 0,
+            opacity: 0,
         },
     });
     setTimeout(() => {

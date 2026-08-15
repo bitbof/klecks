@@ -84,14 +84,14 @@ export const filterVanishPoint = {
             css: {
                 display: 'flex',
                 alignItems: 'center',
-                marginTop: '10px',
-                marginBottom: '10px',
+                marginTop: 10,
+                marginBottom: 10,
             },
         });
         const xInput = input({
             init: settingsObj.x,
             type: 'number',
-            css: { width: '75px', marginRight: '20px' },
+            css: { width: 75, marginRight: 20 },
             callback: function (v) {
                 settingsObj.x = parseFloat(v);
                 dragInput.setValue({
@@ -104,7 +104,7 @@ export const filterVanishPoint = {
         const yInput = input({
             init: settingsObj.y,
             type: 'number',
-            css: { width: '75px', marginRight: '20px' },
+            css: { width: 75, marginRight: 20 },
             callback: function (v) {
                 settingsObj.y = parseFloat(v);
                 dragInput.setValue({
@@ -118,7 +118,7 @@ export const filterVanishPoint = {
             init: 2,
             type: 'number',
             min: 1,
-            css: { width: '75px', marginRight: '20px' },
+            css: { width: 75, marginRight: 20 },
             callback: function (v) {
                 settingsObj.thickness = parseFloat(v);
                 update();
@@ -156,7 +156,7 @@ export const filterVanishPoint = {
 
         const labelStyle = {
             display: 'inline-block',
-            marginRight: '5px',
+            marginRight: 5,
         };
         line1.append(
             BB.el({ content: 'X:', css: labelStyle }),
@@ -167,7 +167,7 @@ export const filterVanishPoint = {
         line2.append(
             BB.el({ content: LANG('shape-line-width') + ':', css: labelStyle }),
             thicknessInput,
-            BB.el({ css: { flexGrow: '1' } }),
+            BB.el({ css: { flexGrow: 1 } }),
             colorOptions.getElement(),
         );
 
@@ -227,8 +227,8 @@ export const filterVanishPoint = {
             },
         });
         css(preview.getElement(), {
-            marginLeft: '-20px',
-            marginRight: '-20px',
+            marginLeft: -20,
+            marginRight: -20,
             overflow: 'hidden',
         });
 

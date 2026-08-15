@@ -1,6 +1,7 @@
 import { BB } from '../../../bb/bb';
 import { LANG } from '../../../language/language';
 import { showIframeModal } from '../modals/show-iframe-modal';
+import { createHelpButton } from './help-button';
 
 export class BrowserStorageHeaderUi {
     private readonly rootEl: HTMLElement;
@@ -8,10 +9,9 @@ export class BrowserStorageHeaderUi {
 
     // ----------------------------------- public -----------------------------------
     constructor(helpPath: string) {
-        this.infoButton = BB.el({
-            content: '?',
-            className: 'kl-info-btn',
+        this.infoButton = createHelpButton({
             title: LANG('file-storage-about'),
+            isFocusable: false,
             onClick: () => {
                 showIframeModal(helpPath + '#help-browser-storage', false);
             },
@@ -22,7 +22,7 @@ export class BrowserStorageHeaderUi {
             css: {
                 display: 'flex',
                 margin: '-5px 0',
-                gap: '6px',
+                gap: 6,
             },
         });
         this.rootEl.append(this.infoButton);

@@ -56,7 +56,7 @@ export class RecoveryManagerPanel {
                     className: 'kl-button-delete',
                     content: [
                         getIconSvg('remove-layer', {
-                            height: '20px',
+                            height: 20,
                         }),
                         LANG('tab-recovery-delete'),
                     ],
@@ -75,7 +75,7 @@ export class RecoveryManagerPanel {
                                 css: {
                                     display: 'flex',
                                     flexDirection: 'column',
-                                    gap: '10px',
+                                    gap: 10,
                                 },
                             }),
                             buttons: [LANG('tab-recovery-delete'), 'Cancel'],
@@ -99,7 +99,7 @@ export class RecoveryManagerPanel {
                     className: classes.preview,
                     title: LANG('tab-recovery-recover'),
                     css: {
-                        minHeight: RECOVERY_THUMB_HEIGHT_PX + 'px',
+                        minHeight: RECOVERY_THUMB_HEIGHT_PX,
                     },
                     custom: {
                         href: '#' + meta.id,
@@ -123,7 +123,7 @@ export class RecoveryManagerPanel {
                         css: {
                             display: 'flex',
                             flexDirection: 'column',
-                            gap: '5px',
+                            gap: 5,
                             maxWidth: '100%',
                         },
                     }),
@@ -205,7 +205,7 @@ export class RecoveryManagerPanel {
                         className: 'info-hint',
                         textContent: errorText,
                         css: {
-                            marginTop: '5px',
+                            marginTop: 5,
                             fontFamily: 'monospace',
                             overflowWrap: 'anywhere',
                         },

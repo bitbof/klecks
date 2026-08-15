@@ -203,7 +203,7 @@ export class BrowserStorageUi {
             parent: this.contentEl,
             content: '🔴 ' + LANG('file-storage-cant-access'),
             css: {
-                marginTop: '10px',
+                marginTop: 10,
             },
         });
     }
@@ -244,13 +244,13 @@ export class BrowserStorageUi {
         this.ageEl = BB.el({
             css: {
                 position: 'absolute',
-                right: '0',
-                bottom: '0',
+                right: 0,
+                bottom: 0,
                 width: '100%',
                 textAlign: 'center',
                 background: 'rgba(0,0,0,0.7)',
                 color: '#fff',
-                fontSize: '13px',
+                fontSize: 13,
             },
         });
         if (this.onOpen) {
@@ -259,7 +259,7 @@ export class BrowserStorageUi {
                 className: 'grid-button',
                 content: LANG('file-storage-open'),
                 css: {
-                    margin: '0',
+                    margin: 0,
                 },
                 onClick: () => this.onOpen?.(),
                 noRef: true,
@@ -270,7 +270,7 @@ export class BrowserStorageUi {
             className: 'grid-button',
             content: LANG('file-storage-store'),
             css: {
-                margin: '0',
+                margin: 0,
             },
             onClick: () => this.store(),
             noRef: true,
@@ -278,9 +278,9 @@ export class BrowserStorageUi {
         this.clearButtonEl = BB.el({
             tagName: 'button',
             className: 'grid-button kl-button-delete',
-            content: [getIconSvg('remove-layer', { height: '20px' }), LANG('file-storage-clear')],
+            content: [getIconSvg('remove-layer', { height: 20 }), LANG('file-storage-clear')],
             css: {
-                margin: '0',
+                margin: 0,
             },
             onClick: () => this.clear(),
             noRef: true,
@@ -302,22 +302,22 @@ export class BrowserStorageUi {
                         content: this.previewEl,
                         css: {
                             alignSelf: 'stretch',
-                            flexGrow: '1',
+                            flexGrow: 1,
                         },
                     }),
                     BB.el({
                         content: [this.openButtonEl, this.storeButtonEl, this.clearButtonEl],
                         css: {
                             display: 'flex',
-                            gap: '10px',
+                            gap: 10,
                             flexDirection: 'column',
                         },
                     }),
                 ],
                 css: {
-                    marginTop: '10px',
+                    marginTop: 10,
                     display: 'flex',
-                    gap: '10px',
+                    gap: 10,
                 },
             }),
         );

@@ -13,11 +13,15 @@ export type TPointerListenerParams = {
     target: HTMLElement | SVGElement;
     onPointer?: (pointerEvent: TPointerEvent) => void;
     onWheel?: (wheelEvent: TWheelEvent) => void;
-    useDirtyWheel?: boolean; // default false - use dirty wheel events - not just increments of 1
-    isWheelPassive?: boolean; // default false
-    onEnterLeave?: (isOver: boolean) => void; // optional
-    maxPointers?: number; // int [1,n] default is 1 - how many concurrent pointers to pay attention to
-    fixScribble?: boolean; // fix ipad scribble issue - TODO remove, fixed start of 2022 -> https://bugs.webkit.org/show_bug.cgi?id=217430#c2
+    // default false - use dirty wheel events - not just increments of 1
+    useDirtyWheel?: boolean;
+    // default false
+    isWheelPassive?: boolean;
+    onEnterLeave?: (isOver: boolean) => void;
+    // int [1,n] default is 1 - how many concurrent pointers to pay attention to
+    maxPointers?: number;
+    // fix ipad scribble issue - TODO remove, fixed start of 2022 -> https://bugs.webkit.org/show_bug.cgi?id=217430#c2
+    fixScribble?: boolean;
 };
 
 type TPointer = {

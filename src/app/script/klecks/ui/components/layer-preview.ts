@@ -119,7 +119,7 @@ export class LayerPreview {
 
         const bounds = this.rootEl.getBoundingClientRect();
         css(this.largeCanvasWrapper, {
-            top: Math.max(10, bounds.top + this.height / 2 - this.largeCanvas.height / 2) + 'px',
+            top: Math.max(10, bounds.top + this.height / 2 - this.largeCanvas.height / 2),
         });
     }
 
@@ -249,7 +249,7 @@ export class LayerPreview {
             css: {
                 display: 'flex',
                 alignItems: 'center',
-                height: this.height + 'px',
+                height: this.height,
             },
         });
 
@@ -258,8 +258,8 @@ export class LayerPreview {
                 display: 'flex',
                 justifyContent: 'flex-end',
                 alignItems: 'center',
-                width: '23px',
-                flexShrink: '0',
+                width: 23,
+                flexShrink: 0,
             },
         });
         this.checkEl = BB.el({
@@ -278,8 +278,8 @@ export class LayerPreview {
         const canvasWrapperEl = BB.el({
             css: {
                 //background: '#f00',
-                minWidth: this.height + 'px',
-                height: this.height + 'px',
+                minWidth: this.height,
+                height: this.height,
                 display: 'flex',
                 justifyContent: 'center',
                 alignItems: 'center',
@@ -291,9 +291,9 @@ export class LayerPreview {
         const nameWrapper = BB.el({
             css: {
                 //background: '#ff0',
-                flexGrow: '1',
-                paddingLeft: '10px',
-                fontSize: '13px',
+                flexGrow: 1,
+                paddingLeft: 10,
+                fontSize: 13,
                 overflow: 'hidden',
                 position: 'relative',
             },
@@ -301,7 +301,7 @@ export class LayerPreview {
         this.nameLabelEl = BB.el({
             content: '',
             css: {
-                cssFloat: 'left',
+                float: 'left',
                 whiteSpace: 'nowrap',
             },
         });
@@ -309,9 +309,9 @@ export class LayerPreview {
             css: {
                 // background: 'rgba(0,255,0,0.6)',
                 position: 'absolute',
-                left: '10px',
-                top: '0',
-                width: '90px',
+                left: 10,
+                top: 0,
+                width: 90,
                 height: '100%',
             },
         });
@@ -323,8 +323,8 @@ export class LayerPreview {
         this.opacityEl = BB.el({
             content: LANG('opacity') + '<br>100%',
             css: {
-                minWidth: '60px',
-                fontSize: '12px',
+                minWidth: 60,
+                fontSize: 12,
                 textAlign: 'center',
             },
         });
@@ -335,8 +335,8 @@ export class LayerPreview {
                 pointerEvents: 'none',
                 background: '#fff',
                 position: 'absolute',
-                right: '280px',
-                top: '10px',
+                right: 280,
+                top: 10,
                 border: '1px solid #aaa',
                 boxShadow: '1px 1px 3px rgba(0,0,0,0.3)',
                 transition: 'opacity ' + largeCanvasAnimationDurationMs + 'ms ease-in-out',
@@ -455,13 +455,13 @@ export class LayerPreview {
 
         if (this.uiState === 'left') {
             css(this.largeCanvasWrapper, {
-                left: '280px',
+                left: 280,
                 right: '',
             });
         } else {
             css(this.largeCanvasWrapper, {
                 left: '',
-                right: '280px',
+                right: 280,
             });
         }
     }

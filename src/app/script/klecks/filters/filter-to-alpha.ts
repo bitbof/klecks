@@ -47,6 +47,7 @@ export const filterToAlpha = {
         // source
         let sourceId = 'inverted-luminance';
         const sourceOptions = new Options({
+            isFocusable: true,
             optionArr: [
                 {
                     id: 'inverted-luminance',
@@ -127,8 +128,8 @@ export const filterToAlpha = {
         });
         preview.render();
         css(preview.getElement(), {
-            marginLeft: '-20px',
-            marginRight: '-20px',
+            marginLeft: -20,
+            marginRight: -20,
         });
         rootEl.append(preview.getElement());
 

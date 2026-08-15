@@ -101,10 +101,10 @@ export class CropCopy {
         const rect = this.getViewportSelectionRect();
 
         css(this.selectionRectEl, {
-            left: rect.x + 'px',
-            top: rect.y + 'px',
-            width: rect.width + 'px',
-            height: rect.height + 'px',
+            left: rect.x,
+            top: rect.y,
+            width: rect.width,
+            height: rect.height,
             display: this.isReset() ? 'none' : '',
         });
         this.onChange?.(Math.round(this.cropRect.width), Math.round(this.cropRect.height));
@@ -126,8 +126,8 @@ export class CropCopy {
             className: 'kl-edit-crop-preview',
             css: {
                 position: 'relative',
-                height: p.height + 'px',
-                width: p.width + 'px',
+                height: p.height,
+                width: p.width,
                 overflow: 'hidden',
             },
         });
@@ -156,8 +156,8 @@ export class CropCopy {
             this.eventTarget = this.croppedImageElement;
         }
         css(this.eventTarget, {
-            height: p.height + 'px',
-            width: p.width + 'px',
+            height: p.height,
+            width: p.width,
         });
         this.rootEl.append(this.eventTarget);
         this.updateCroppedCanvas();
@@ -190,8 +190,8 @@ export class CropCopy {
         });
         css(this.preview.getElement(), {
             position: 'absolute',
-            left: '0',
-            top: '0',
+            left: 0,
+            top: 0,
             overflow: 'hidden',
             pointerEvents: 'none',
         });
@@ -301,6 +301,7 @@ export class CropCopy {
             onWheel: (event) => {
                 this.preview.onWheel(event);
             },
+            useDirtyWheel: true,
             onPointer: (event) => {
                 if (this.mode === 'hand') {
                     event.eventPreventDefault();

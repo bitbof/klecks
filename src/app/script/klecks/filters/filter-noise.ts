@@ -276,10 +276,11 @@ export const filterNoise = {
         };
 
         const presetOptions = new Options({
+            isFocusable: true,
             optionArr: thumbImgArr.map((img, index) => {
                 css(img, {
-                    margin: '1px',
-                    borderRadius: '3px',
+                    margin: 1,
+                    borderRadius: 3,
                     transition: 'all 0.1s ease-in-out',
                 });
                 return {
@@ -293,7 +294,7 @@ export const filterNoise = {
                 update();
             },
             css: {
-                marginBottom: '10px',
+                marginBottom: 10,
             },
         });
         rootEl.append(presetOptions.getElement());
@@ -335,18 +336,19 @@ export const filterNoise = {
             css: {
                 display: 'flex',
                 alignItems: 'center',
-                marginBottom: '10px',
+                marginBottom: 10,
             },
         });
 
         const row2El = BB.el({
             css: {
                 display: 'flex',
-                marginBottom: '10px',
+                marginBottom: 10,
             },
         });
 
         const channelsOptions = new Options<TNoiseChannels>({
+            isFocusable: true,
             optionArr: [
                 { id: 'rgb', label: 'RGB' },
                 { id: 'alpha', label: LANG('filter-noise-alpha') },
@@ -418,9 +420,9 @@ export const filterNoise = {
         });
 
         const colInputStyle = {
-            width: '34px',
-            height: '34px',
-            marginRight: '5px',
+            width: 34,
+            height: 34,
+            marginRight: 5,
         };
         const colAInput = KL.input({
             type: 'color',
@@ -452,11 +454,11 @@ export const filterNoise = {
 
         row1El.append(
             channelsOptions.getElement(),
-            BB.el({ css: { flexGrow: '1' } }),
+            BB.el({ css: { flexGrow: 1 } }),
             reverseToggle.getElement(),
         );
 
-        row2El.append(blendSelect.getElement(), BB.el({ css: { flexGrow: '1' } }), colorWrapper);
+        row2El.append(blendSelect.getElement(), BB.el({ css: { flexGrow: 1 } }), colorWrapper);
 
         rootEl.append(scaleSlider.getElement(), opacitySlider.getElement(), row1El, row2El);
 
@@ -507,8 +509,8 @@ export const filterNoise = {
         });
         preview.render();
         css(preview.getElement(), {
-            marginLeft: '-20px',
-            marginRight: '-20px',
+            marginLeft: -20,
+            marginRight: -20,
         });
         rootEl.append(preview.getElement());
 

@@ -1,10 +1,9 @@
-import { getIconUrl } from '../icon/icon';
+import { getIconSvg, getIconUrl } from '../icon/icon';
 import { BB } from '../bb/bb';
 import { LANG } from '../language/language';
 import { PointerListener } from '../bb/input/pointer-listener';
 
 const uiSwapImg = getIconUrl('ui-swap-lr');
-const helpImg = getIconUrl('help');
 /**
  * Topmost row of buttons in toolspace. (embed)
  *
@@ -20,14 +19,14 @@ export class EmbedToolspaceTopRow {
         this.rootEl = BB.el({
             className: 'kl-toolspace-row',
             css: {
-                height: '36px',
+                height: 36,
                 display: 'flex',
             },
         });
 
         function createButton(p: {
             title: string;
-            content?: HTMLElement;
+            content?: HTMLElement | SVGSVGElement;
             image?: string;
             onClick: () => void;
             extraPadding?: number;
@@ -42,6 +41,9 @@ export class EmbedToolspaceTopRow {
                 title: p.title,
                 onClick: p.onClick,
                 css: {
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
                     padding: p.content ? '' : p.contain ? padding + 'px 0' : '',
                 },
             });
@@ -55,7 +57,7 @@ export class EmbedToolspaceTopRow {
                         backgroundRepeat: 'no-repeat',
                         backgroundPosition: 'center',
                         backgroundSize: p.contain ? 'contain' : '',
-                        //filter: 'grayscale(1)',
+                        width: '100%',
                         height: '100%',
                     },
                 });
@@ -97,9 +99,14 @@ export class EmbedToolspaceTopRow {
         const helpButton = createButton({
             onClick: p.onHelp,
             title: LANG('help'),
-            image: helpImg,
+            content: getIconSvg('help', {
+                width: 24,
+                height: 24,
+                opacity: 0.9,
+            }),
             contain: true,
         });
+        helpButton.el.style.flexBasis = '0';
 
         const leftRightButton = createButton({
             onClick: p.onLeftRight,

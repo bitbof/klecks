@@ -1,5 +1,10 @@
 import { BB } from '../../bb/bb';
-import { TFilterApply, TFilterGetDialogParam, TFilterGetDialogResult, TKlBasicLayer } from '../kl-types';
+import {
+    TFilterApply,
+    TFilterGetDialogParam,
+    TFilterGetDialogResult,
+    TKlBasicLayer,
+} from '../kl-types';
 import { input } from '../ui/components/input';
 import { KlSlider } from '../ui/components/kl-slider';
 import { LANG } from '../../language/language';
@@ -222,8 +227,8 @@ export const filterPattern = {
         });
 
         const inputStyle = {
-            marginLeft: '5px',
-            flex: '1',
+            marginLeft: 5,
+            flex: 1,
         };
         rootEl.append(
             BB.el({
@@ -254,7 +259,7 @@ export const filterPattern = {
                 ],
                 css: {
                     display: 'flex',
-                    marginLeft: '-5px',
+                    marginLeft: -5,
                 },
             }),
         );
@@ -319,9 +324,9 @@ export const filterPattern = {
         const previewWrapper = BB.el({
             className: 'kl-preview-wrapper',
             css: {
-                width: getPreviewWidth(isSmall) + 'px',
-                height: getPreviewHeight(isSmall) + 'px',
-                marginTop: '0',
+                width: getPreviewWidth(isSmall),
+                height: getPreviewHeight(isSmall),
+                marginTop: 0,
             },
         });
 
@@ -352,8 +357,8 @@ export const filterPattern = {
         const overlayCanvas = BB.canvas(w, h);
         css(overlayCanvas, {
             position: 'absolute',
-            left: '0',
-            top: '0',
+            left: 0,
+            top: 0,
             mixBlendMode: 'difference',
             imageRendering: 'pixelated',
         });
@@ -361,8 +366,8 @@ export const filterPattern = {
         const previewInnerWrapper = BB.el({
             className: 'kl-preview-wrapper__canvas',
             css: {
-                width: parseInt('' + w) + 'px',
-                height: parseInt('' + h) + 'px',
+                width: parseInt('' + w),
+                height: parseInt('' + h),
             },
         });
         previewInnerWrapper.append(klCanvasPreview.getElement(), overlayCanvas);

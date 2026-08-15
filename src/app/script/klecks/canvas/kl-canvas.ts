@@ -883,7 +883,7 @@ export class KlCanvas {
         /*if (!document.getElementById('testocanvas')) {
             layerCanvasArr[layerIndex].id = 'testocanvas';
             document.body.append(layerCanvasArr[layerIndex]);
-            BB.css(layerCanvasArr[layerIndex], {
+            css(layerCanvasArr[layerIndex], {
                 position: 'fixed',
                 left: '0',
                 top: '0',
@@ -900,7 +900,7 @@ export class KlCanvas {
             ctx2.drawImage(layerCanvasArr[layerIndex], 0, 0);
             c.id = 'testocanvas';
             document.body.append(c);
-            BB.css(c, {
+            css(c, {
                 position: 'fixed',
                 left: '0',
                 top: '0',

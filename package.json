@@ -23,5 +23,8 @@
     "parcel": "2.16.4",
     "polygon-clipping": "0.15.7",
     "transformation-matrix": "3.1.0"
+  },
+  "devDependencies": {
+    "csstype": "^3.2.3"
   }
 }

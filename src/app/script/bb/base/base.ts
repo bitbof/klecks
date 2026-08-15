@@ -1,4 +1,4 @@
-import { TKeyString, TSize2D, TSvg, TVector2D } from '../bb-types';
+import { TCss, TKeyString, TSize2D, TSvg, TVector2D } from '../bb-types';
 
 export function getAbortError(signal: AbortSignal): unknown {
     return signal.reason ?? new DOMException('Operation aborted', 'AbortError');
@@ -38,13 +38,26 @@ export function asyncLoadImage(src: string): Promise<HTMLImageElement> {
     });
 }
 
-export function css(el: HTMLElement | SVGElement, styleObj: Partial<CSSStyleDeclaration>): void {
+export function css(el: HTMLElement | SVGElement, cssObj: TCss): void {
     const elStyle: any = el.style;
-    Object.keys(styleObj).forEach((key) => {
-        const property = key as keyof CSSStyleDeclaration;
-        elStyle[property] = styleObj[property];
+    Object.keys(cssObj).forEach((key) => {
+        const property = key as keyof TCss;
+        const value = cssObj[property];
+
+        if (typeof value === 'number') {
+            // Let the browser distinguish unitless properties from lengths.
+            elStyle[property] = '';
+            elStyle[property] = value;
+            // e.g. width = 12 will be reset to ''
+            if (elStyle[property] === '') {
+                elStyle[property] = value + 'px';
+            }
+        } else {
+            // undefined would not assign, we must use '' instead for a reset.
+            elStyle[property] = value ?? '';
+        }
         if (property === 'userSelect') {
-            elStyle.webkitUserSelect = styleObj[property]; // Safari support
+            elStyle.webkitUserSelect = elStyle[property]; // Safari support
         }
     });
 }
@@ -251,7 +264,7 @@ export function createSvg(p: TSvg): SVGElement {
                 result.append(createSvg(child));
             });
         } else if (keyStr === 'css') {
-            css(result, item as Partial<CSSStyleDeclaration>);
+            css(result, item as TCss);
         } else if (keyStr !== 'elementType') {
             result.setAttribute(keyStr, item as string);
         }

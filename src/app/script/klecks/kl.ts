@@ -8,7 +8,6 @@ import { ImageToggle } from './ui/components/image-toggle';
 import { ImageRadioList } from './ui/components/image-radio-list';
 import { createPenPressureToggle } from './ui/components/create-pen-pressure-toggle';
 import { KlSlider } from './ui/components/kl-slider';
-import { HexColorDialog } from './ui/modals/color-slider-hex-dialog';
 import { KlColorSlider } from './ui/components/kl-color-slider';
 import { KlColorSliderSmall } from './ui/components/kl-color-slider-small';
 import { PointSlider } from './ui/components/point-slider';
@@ -102,7 +101,6 @@ export const KL = {
     RadioList,
     createPenPressureToggle,
     KlSlider,
-    HexColorDialog,
     KlColorSlider,
     KlColorSliderSmall,
     PointSlider,

@@ -1,4 +1,5 @@
 import { css } from './base';
+import { TCss } from '../bb-types';
 import { BB } from '../bb';
 
 export function appendTextDiv(target: HTMLElement, text: string): HTMLDivElement {
@@ -17,7 +18,7 @@ export function appendTextDiv(target: HTMLElement, text: string): HTMLDivElement
 export function isInputFocused(getAll: boolean = false): boolean {
     const result: boolean =
         !!document.activeElement &&
-        ['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement.tagName);
+        ['INPUT', 'TEXTAREA', 'SELECT', 'BUTTON'].includes(document.activeElement.tagName);
     if (getAll) {
         return result;
     } else {
@@ -40,9 +41,9 @@ export function unfocusAnyInput(): void {
             parent: document.body,
             tagName: 'input',
             css: {
-                opacity: '0',
-                width: '0',
-                height: '0',
+                opacity: 0,
+                width: 0,
+                height: 0,
             },
         });
         setTimeout(() => {
@@ -125,7 +126,7 @@ const els: {
  */
 export function el<GTag extends keyof HTMLElementTagNameMap = 'div'>(params?: {
     parent?: HTMLElement;
-    css?: Partial<CSSStyleDeclaration>;
+    css?: TCss;
     custom?: { [key: string]: string };
     content?: string | (HTMLElement | SVGSVGElement | string | undefined)[] | Element;
     textContent?: string;
@@ -224,7 +225,7 @@ export function createImage(p: {
     width?: number;
     height?: number;
     className?: string;
-    css?: Partial<CSSStyleDeclaration>;
+    css?: TCss;
 }): HTMLImageElement {
     const result = new Image();
     if (p.src !== undefined) {
@@ -250,10 +251,7 @@ export function createImage(p: {
  * Creates a monochrome element using any image URL as its CSS mask.
  * Transparent image pixels remain transparent; visible pixels use currentColor.
  */
-export function createImageMask(
-    imageUrl: string,
-    styleObj?: Partial<CSSStyleDeclaration>,
-): HTMLDivElement {
+export function createImageMask(imageUrl: string, styleObj?: TCss): HTMLDivElement {
     const result = document.createElement('div');
     const mask = `url("${imageUrl}") center / contain no-repeat`;
     result.style.setProperty('mask', mask);

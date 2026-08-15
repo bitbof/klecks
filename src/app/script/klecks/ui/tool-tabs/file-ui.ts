@@ -106,7 +106,7 @@ export class FileUi {
                     tabIndex: '-1',
                 },
                 css: {
-                    cssFloat: 'left',
+                    float: 'left',
                 },
                 onClick: () => p.onNewImage(),
             });
@@ -117,7 +117,7 @@ export class FileUi {
                 css: {
                     position: 'relative',
                     cursor: 'pointer',
-                    cssFloat: 'left',
+                    float: 'left',
                 },
                 custom: {
                     tabIndex: '-1',
@@ -149,9 +149,9 @@ export class FileUi {
                     tabIndex: '-1',
                 },
                 css: {
-                    cssFloat: 'left',
+                    float: 'left',
                     flex: '1 0 0',
-                    margin: '0',
+                    margin: 0,
                 },
                 onClick: () => p.onSaveImageToComputer(),
             });
@@ -195,7 +195,7 @@ export class FileUi {
                 name: 'export-type',
             });
             css(exportTypeSelect.getElement(), {
-                height: '30px',
+                height: 30,
                 width: 'calc(50% - 10px)',
                 flex: '1 0 0',
             });
@@ -212,7 +212,7 @@ export class FileUi {
                     onStored: () => p.onStoredToBrowserStorage(),
                 });
                 css(this.browserStorageUi.getElement(), {
-                    margin: '10px',
+                    margin: 10,
                 });
             } else {
                 const header = new BrowserStorageHeaderUi(p.helpPath);
@@ -222,7 +222,7 @@ export class FileUi {
                         BB.el({
                             content: '🔴 ' + LANG('file-storage-cant-access'),
                             css: {
-                                marginTop: '10px',
+                                marginTop: 10,
                             },
                         }),
                     ],
@@ -238,7 +238,7 @@ export class FileUi {
                         content: [saveButton, exportTypeSelect.getElement()],
                         css: {
                             display: 'flex',
-                            gap: '10px',
+                            gap: 10,
                         },
                     }),
                     ...(canShowSaveDialog ? [saveDialogCheckbox.getElement()] : []),
@@ -246,7 +246,7 @@ export class FileUi {
                 css: {
                     display: 'flex',
                     flexDirection: 'column',
-                    gap: '10px',
+                    gap: 10,
                     margin: '10px 10px 0 10px',
                 },
             });
@@ -291,7 +291,7 @@ export class FileUi {
                     tabIndex: '-1',
                 },
                 css: {
-                    cssFloat: 'left',
+                    float: 'left',
                 },
                 onClick: () => {
                     shareButton.disabled = true;
@@ -308,7 +308,7 @@ export class FileUi {
                     tabIndex: '-1',
                 },
                 css: {
-                    cssFloat: 'left',
+                    float: 'left',
                 },
                 onClick: () => {
                     p.onUpload();

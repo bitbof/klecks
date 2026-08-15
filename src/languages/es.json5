@@ -1601,6 +1601,10 @@
     original: 'Theme',
     value: 'Tema'
   },
+  'settings-pixelated-zoom': {
+    original: 'Always pixelated zoom',
+    value: ''
+  },
   'settings-save-reminder-label': {
     original: 'Save Reminder',
     value: 'Recordatorio de Guardado'

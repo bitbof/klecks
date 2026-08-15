@@ -60,8 +60,8 @@ export class OverlayToolspace {
         });
         const selectedColorEl = BB.el({
             css: {
-                width: sizeObj.width + 'px',
-                height: sizeObj.hHeight + 'px',
+                width: sizeObj.width,
+                height: sizeObj.hHeight,
                 pointerEvents: 'none',
             },
         });
@@ -104,7 +104,7 @@ export class OverlayToolspace {
             },
         });
         css(sizeSlider.getElement(), {
-            marginTop: '2px',
+            marginTop: 2,
         });
 
         const opacitySlider = new KlSlider({
@@ -172,11 +172,8 @@ export class OverlayToolspace {
             this.rootEl.style.display = isVisible ? 'block' : 'none';
             if (isVisible && mousePos) {
                 css(this.rootEl, {
-                    left: mousePos.x - Math.round(sizeObj.width / 2) + 'px',
-                    top:
-                        mousePos.y -
-                        Math.round(sizeObj.svHeight + (sizeObj.hHeight * 3) / 2) +
-                        'px',
+                    left: mousePos.x - Math.round(sizeObj.width / 2),
+                    top: mousePos.y - Math.round(sizeObj.svHeight + (sizeObj.hHeight * 3) / 2),
                 });
             }
         };

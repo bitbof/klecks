@@ -108,10 +108,11 @@ export const filterDistort = {
         });
 
         const typeOptions = new Options({
+            isFocusable: true,
             optionArr: thumbImgArr.map((img, index) => {
                 css(img, {
-                    margin: '1px',
-                    borderRadius: '3px',
+                    margin: 1,
+                    borderRadius: 3,
                     transition: 'all 0.1s ease-in-out',
                 });
                 return {
@@ -161,7 +162,7 @@ export const filterDistort = {
 
         topRowEl.append(
             typeOptions.getElement(),
-            BB.el({ css: { flexGrow: '1' } }),
+            BB.el({ css: { flexGrow: 1 } }),
             syncToggle.getElement(),
         );
 
@@ -175,7 +176,7 @@ export const filterDistort = {
         const leftCol = BB.el({
             parent: xyRowEl,
             css: {
-                marginRight: '10px',
+                marginRight: 10,
             },
         });
         const rightCol = BB.el({ parent: xyRowEl });
@@ -320,8 +321,8 @@ export const filterDistort = {
         });
         preview.render();
         css(preview.getElement(), {
-            marginLeft: '-20px',
-            marginRight: '-20px',
+            marginLeft: -20,
+            marginRight: -20,
         });
         rootEl.append(preview.getElement());
 

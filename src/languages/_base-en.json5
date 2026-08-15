@@ -990,6 +990,7 @@ Renaming a key across multiple language files:
     "value": "Will update after reloading."
   },
   "settings-theme": 'Theme',
+  "settings-pixelated-zoom": 'Always pixelated zoom',
   "settings-save-reminder-label": 'Save Reminder',
   "settings-save-reminder-disabled": 'disabled',
   "settings-save-reminder-confirm-title": 'Turn off Save Reminder?',

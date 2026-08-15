@@ -97,7 +97,7 @@ export const eraserBrushUi = (function () {
                         display: 'flex',
                         justifyContent: 'space-between',
                         alignItems: 'center',
-                        marginBottom: '10px',
+                        marginBottom: 10,
                     },
                 }),
                 BB.el({
@@ -118,7 +118,7 @@ export const eraserBrushUi = (function () {
                     brush.setTransparentBG(b);
                 },
                 css: {
-                    marginTop: '10px',
+                    marginTop: 10,
                 },
                 name: 'transparency-toggle',
             });

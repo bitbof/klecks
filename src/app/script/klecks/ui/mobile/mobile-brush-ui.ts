@@ -25,7 +25,7 @@ export class MobileBrushUi {
             height: 28,
             darkInvert: true,
             css: {
-                margin: '4px',
+                margin: 4,
             },
         });
 
@@ -35,7 +35,7 @@ export class MobileBrushUi {
             height: 28,
             darkInvert: true,
             css: {
-                margin: '4px',
+                margin: 4,
             },
         });
 

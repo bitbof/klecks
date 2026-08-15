@@ -125,7 +125,7 @@ export const smudgeBrushUi = (function () {
                         display: 'flex',
                         justifyContent: 'space-between',
                         alignItems: 'center',
-                        marginBottom: '10px',
+                        marginBottom: 10,
                     },
                 }),
                 BB.el({
@@ -141,7 +141,7 @@ export const smudgeBrushUi = (function () {
             const bottomRow = BB.el({
                 parent: div,
                 css: {
-                    marginTop: '10px',
+                    marginTop: 10,
                 },
             });
             bottomRow.append(lockAlphaToggle.getElement());

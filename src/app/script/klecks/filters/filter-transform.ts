@@ -1,7 +1,7 @@
 import { BB } from '../../bb/bb';
 import { Checkbox } from '../ui/components/checkbox';
 import { FreeTransform } from '../ui/components/free-transform';
-import { Select } from '../ui/components/select';
+import { InterpolationAlgorithmToggle } from '../ui/components/interpolation-algorithm-toggle';
 import {
     isLayerFill,
     TFilterApply,
@@ -270,22 +270,22 @@ export const filterTransform = {
 
         const leftWrapper = BB.el({
             css: {
-                width: '100px',
-                height: '30px',
+                width: 100,
+                height: 30,
                 display: 'inline-block',
             },
         });
         const rightWrapper = BB.el({
             css: {
-                width: '100px',
-                height: '30px',
+                width: 100,
+                height: 30,
                 display: 'inline-block',
             },
         });
         const rotWrapper = BB.el({
             css: {
-                width: '150px',
-                height: '30px',
+                width: 150,
+                height: 30,
                 display: 'inline-block',
             },
         });
@@ -338,7 +338,7 @@ export const filterTransform = {
             const inputRow = BB.el({
                 parent: rootEl,
                 css: {
-                    marginTop: '10px',
+                    marginTop: 10,
                 },
             });
             inputRow.append(leftWrapper, rightWrapper, rotWrapper);
@@ -351,8 +351,8 @@ export const filterTransform = {
                 display: 'flex',
                 flexWrap: 'wrap',
                 alignItems: 'center',
-                gap: '10px',
-                marginTop: '10px',
+                gap: 10,
+                marginTop: 10,
             },
         });
         const flipXBtn = BB.el({
@@ -538,7 +538,7 @@ export const filterTransform = {
             },
             css: {
                 display: 'inline-block',
-                marginLeft: '10px',
+                marginLeft: 10,
             },
             name: 'enable-snapping',
         });
@@ -549,7 +549,7 @@ export const filterTransform = {
             BB.el({
                 css: {
                     clear: 'both',
-                    height: '10px',
+                    height: 10,
                 },
             }),
         );
@@ -560,24 +560,18 @@ export const filterTransform = {
                 display: 'flex',
                 justifyContent: 'space-between',
                 alignItems: 'center',
-                marginBottom: '10px',
+                marginBottom: 10,
             },
         });
 
-        const algorithmSelect = new Select({
-            isFocusable: true,
-            optionArr: [
-                ['smooth', LANG('algorithm-smooth')],
-                ['pixelated', LANG('algorithm-pixelated')],
-            ],
+        const algorithmToggle = new InterpolationAlgorithmToggle({
             initValue: 'smooth',
-            title: LANG('scaling-algorithm'),
+            isFocusable: true,
             onChange: (): void => {
                 updatePreview(true);
             },
-            name: 'interpolation-algorithm',
         });
-        bottomRow.append(checkboxWrapper, algorithmSelect.getElement());
+        bottomRow.append(checkboxWrapper, algorithmToggle.getElement());
 
         const previewCanvas = BB.canvas(context.canvas.width, context.canvas.height);
         const previewLayerArr: TProjectViewportProject['layers'] = [];
@@ -614,8 +608,8 @@ export const filterTransform = {
         preview.render();
         css(preview.getElement(), {
             overflow: 'hidden',
-            marginLeft: '-20px',
-            marginRight: '-20px',
+            marginLeft: -20,
+            marginRight: -20,
         });
         rootEl.append(preview.getElement());
 
@@ -634,7 +628,7 @@ export const filterTransform = {
             drawTransform(
                 ctx,
                 layers[selectedLayerIndex].context.canvas,
-                algorithmSelect.getValue() === 'pixelated',
+                algorithmToggle.getValue() === 'pixelated',
                 transform,
                 selection,
                 boundsObj,
@@ -663,8 +657,8 @@ export const filterTransform = {
         });
         css(freeTransform.getElement(), {
             position: 'absolute',
-            left: '0',
-            top: '0',
+            left: 0,
+            top: 0,
         });
         preview.getElement().append(freeTransform.getElement());
 
@@ -684,6 +678,7 @@ export const filterTransform = {
             freeTransform.destroy();
             constrainCheckbox.destroy();
             snappingCheckbox.destroy();
+            algorithmToggle.destroy();
             BB.destroyEl(flipXBtn);
             BB.destroyEl(flipYBtn);
             BB.destroyEl(scaleRotLeftBtn);
@@ -702,7 +697,7 @@ export const filterTransform = {
             const input: TFilterTransformInput = {
                 transform,
                 bounds: boundsObj,
-                isPixelated: algorithmSelect.getValue() === 'pixelated',
+                isPixelated: algorithmToggle.getValue() === 'pixelated',
                 doClone,
                 isTransparentBg,
             };

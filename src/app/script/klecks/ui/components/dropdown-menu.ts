@@ -33,7 +33,7 @@ export class DropdownMenu<IdType extends string> {
                     display: 'flex',
                     justifyContent: 'space-between',
                     alignItems: 'baseline',
-                    gap: '10px',
+                    gap: 10,
                 },
             });
             itemButton.append(el({ content: item[1] }));

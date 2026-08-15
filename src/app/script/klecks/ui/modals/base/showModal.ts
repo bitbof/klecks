@@ -1,9 +1,9 @@
 import { getIconSvg, getIconUrl } from '../../../../icon/icon';
-import { TKeyString } from '../../../../bb/bb-types';
 import { DIALOG_COUNTER } from '../modal-count';
 import { BB } from '../../../../bb/bb';
 import { LANG } from '../../../../language/language';
 import './scroll-fix';
+import { TCss } from '../../../../bb/bb-types';
 
 export function showModal(p: {
     div?: HTMLElement; // node with content
@@ -14,7 +14,7 @@ export function showModal(p: {
     deleteButtonName?: string;
     type?: 'error' | 'warning' | 'upload' | 'ok'; // todo (...what is to be done?)
     closeFunc?: (f: () => void) => void; // returns a function you can call to close (Cancel) the dialog
-    style?: TKeyString;
+    style?: TCss;
     clickOnEnter?: string; // name of button - will be clicked if enter key pressed
     autoFocus?: false | string; // name of  to automatically focus - default 'Ok' - false -> none
     ignoreBackground?: boolean; // default false; if true clicking on background doesn't close
@@ -30,10 +30,10 @@ export function showModal(p: {
         parent: document.body,
         css: {
             position: 'absolute',
-            left: '0',
-            top: '0',
-            right: '0',
-            bottom: '0',
+            left: 0,
+            top: 0,
+            right: 0,
+            bottom: 0,
             overflow: 'hidden',
         },
     });
@@ -66,15 +66,15 @@ export function showModal(p: {
         },
         css: {
             position: 'absolute',
-            left: '0',
-            top: '0',
-            zIndex: '0',
+            left: 0,
+            top: 0,
+            zIndex: 0,
             width: '100%',
             height: '100%',
         },
     });
 
-    const titleHeight = 40;
+    const titleSize = 40;
     const xButton = BB.el({
         tagName: 'button',
         className: 'popup-x',
@@ -84,12 +84,12 @@ export function showModal(p: {
             close('Cancel');
         },
         css: {
-            width: titleHeight + 'px',
-            height: titleHeight + 'px',
-            lineHeight: titleHeight + 'px',
+            width: titleSize,
+            height: titleSize,
+            lineHeight: titleSize + 'px',
             position: 'absolute',
-            right: '0',
-            top: '0',
+            right: 0,
+            top: 0,
             background: 'none',
             boxShadow: 'none',
         },
@@ -116,8 +116,8 @@ export function showModal(p: {
             BB.el({
                 content: p.message,
                 css: {
-                    marginRight: '15px',
-                    marginBottom: p.div ? '10px' : undefined,
+                    marginRight: 15,
+                    marginBottom: p.div ? 10 : undefined,
                 },
             }),
             p.div,
@@ -129,13 +129,13 @@ export function showModal(p: {
     scrollContent.append(
         BB.el({
             css: {
-                flex: '0.5',
+                flex: 0.5,
             },
         }),
         boxEl,
         BB.el({
             css: {
-                flex: '1',
+                flex: 1,
             },
         }),
     );
@@ -184,8 +184,8 @@ export function showModal(p: {
                       display: 'flex',
                       flexWrap: 'wrap',
                       justifyContent: 'flex-end',
-                      marginTop: '12px', // 8px already via buttons
-                      marginLeft: '-8px',
+                      marginTop: 12, // 8px already via buttons
+                      marginLeft: -8,
                   },
               })
             : undefined;

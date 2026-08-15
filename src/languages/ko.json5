@@ -1601,6 +1601,10 @@
     original: 'Theme',
     value: '테마'
   },
+  'settings-pixelated-zoom': {
+    original: 'Always pixelated zoom',
+    value: ''
+  },
   'settings-save-reminder-label': {
     original: 'Save Reminder',
     value: '저장 알림'

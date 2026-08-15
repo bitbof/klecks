@@ -89,7 +89,7 @@ export const chemyBrushUi = (function () {
             });
 
             css(opacitySlider.getElement(), {
-                marginTop: '10px',
+                marginTop: 10,
             });
 
             eraserToggle = new Checkbox({
@@ -99,8 +99,8 @@ export const chemyBrushUi = (function () {
                     brush.setIsEraser(b);
                 },
                 css: {
-                    marginTop: '10px',
-                    marginLeft: '10px',
+                    marginTop: 10,
+                    marginLeft: 10,
                 },
                 name: 'eraser-toggle',
             });
@@ -114,7 +114,7 @@ export const chemyBrushUi = (function () {
                 doHighlight: true,
                 title: LANG('lock-alpha-title'),
                 css: {
-                    marginTop: '10px',
+                    marginTop: 10,
                 },
                 name: 'lock-alpha-toggle',
             });
@@ -122,7 +122,7 @@ export const chemyBrushUi = (function () {
             const toggleRow = BB.el({
                 css: {
                     display: 'flex',
-                    marginTop: '10px',
+                    marginTop: 10,
                 },
             });
 
@@ -203,7 +203,7 @@ export const chemyBrushUi = (function () {
                             fill: 'none',
                             stroke: '#000',
                             css: {
-                                strokeWidth: '1px',
+                                strokeWidth: 1,
                             },
                             d: `M ${halfSize + padding},${padding} ${halfSize + padding},${actualIconSize + padding}`,
                         },
@@ -228,7 +228,7 @@ export const chemyBrushUi = (function () {
                             fill: 'none',
                             stroke: '#000',
                             css: {
-                                strokeWidth: '1px',
+                                strokeWidth: 1,
                             },
                             d: `M ${padding},${halfSize + padding} ${actualIconSize + padding},${halfSize + padding}`,
                         },
@@ -291,11 +291,11 @@ export const chemyBrushUi = (function () {
             });
 
             css(mirrorXToggle.getElement(), {
-                marginLeft: '10px',
+                marginLeft: 10,
             });
             {
                 const margin = {
-                    marginLeft: '4px',
+                    marginLeft: 4,
                 };
                 css(mirrorYToggle.getElement(), margin);
                 css(gradientToggle.getElement(), margin);

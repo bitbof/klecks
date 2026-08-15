@@ -205,7 +205,7 @@ export class TextToolFontUI {
             }),
             isFocusable: true,
             css: {
-                width: '180px',
+                width: 180,
             },
             onChange: (v) => {
                 this.loadBundledFonts();
@@ -242,8 +242,8 @@ export class TextToolFontUI {
                 'A',
             ],
             css: {
-                width: '25px',
-                height: '25px',
+                width: 25,
+                height: 25,
                 display: 'flex',
                 justifyContent: 'center',
                 alignItems: 'center',
@@ -265,7 +265,7 @@ export class TextToolFontUI {
             doResetIfInvalid: true,
             doScrollWithoutFocus: true,
             css: {
-                width: '70px',
+                width: 70,
             },
             name: 'font-size',
         });
@@ -285,7 +285,7 @@ export class TextToolFontUI {
             doResetIfInvalid: true,
             doScrollWithoutFocus: true,
             css: {
-                width: '60px',
+                width: 60,
             },
             name: 'line-height',
         });
@@ -304,7 +304,7 @@ export class TextToolFontUI {
             doResetIfInvalid: true,
             doScrollWithoutFocus: true,
             css: {
-                width: '60px',
+                width: 60,
             },
             name: 'letter-spacing',
         });

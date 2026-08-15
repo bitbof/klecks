@@ -44,7 +44,7 @@ export function showImportImageDialog(p: {
 
     const resolutionEl = BB.el({
         css: {
-            marginTop: '10px',
+            marginTop: 10,
             textAlign: 'center',
             color: '#888',
             lineHeight: '20px',
@@ -64,7 +64,7 @@ export function showImportImageDialog(p: {
         },
     });
     css(cropCopy.getElement(), {
-        marginLeft: '-20px',
+        marginLeft: -20,
     });
     cropCopy.getElement().title = LANG('crop-drag-to-crop');
 
@@ -126,7 +126,7 @@ export function showImportImageDialog(p: {
                     parent: noteEl,
                     tagName: 'a',
                     content: 'Details',
-                    css: { marginLeft: '5px' },
+                    css: { marginLeft: 5 },
                     onClick: () => showWarnings(warnings),
                 });
                 rootEl.append(noteEl);

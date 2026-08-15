@@ -3,7 +3,6 @@ import {
     centerWithin,
     copyObj,
     createSvg,
-    css,
     dateDayDifference,
     decToFraction,
     fitInto,
@@ -97,7 +96,6 @@ export const BB = {
     // ---- base ----
     insertAfter,
     loadImage,
-    css,
     setAttributes,
     append,
     fitInto,

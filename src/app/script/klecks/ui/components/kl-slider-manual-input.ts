@@ -89,8 +89,8 @@ export class KlSliderManualInput {
         this.input.value = '' + currentValue;
 
         css(this.input, {
-            width: rect.width + 'px',
-            height: rect.height + 'px',
+            width: rect.width,
+            height: rect.height,
         });
     }
 

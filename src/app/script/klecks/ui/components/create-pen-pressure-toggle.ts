@@ -17,13 +17,13 @@ export const createPenPressureToggle = function (
         label: BB.el({
             className: 'dark-invert',
             css: {
-                width: '17px',
-                height: '17px',
+                width: 17,
+                height: 17,
                 backgroundImage: 'url("' + iconImg + '")',
                 backgroundSize: 'contain',
                 backgroundRepeat: 'no-repeat',
-                margin: '1px',
-                borderRadius: '3px',
+                margin: 1,
+                borderRadius: 3,
             },
         }),
         title: LANG('brush-toggle-pressure'),

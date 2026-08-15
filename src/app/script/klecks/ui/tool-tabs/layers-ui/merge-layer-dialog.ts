@@ -19,6 +19,7 @@ export function mergeLayerDialog(
     div.innerHTML = LANG('layers-merge-description');
 
     const options = new Options({
+        isFocusable: true,
         optionArr: [
             { id: p.mixModeStr, label: translateBlending(p.mixModeStr) },
             { id: 'source-in', label: 'source-in' },
@@ -35,7 +36,7 @@ export function mergeLayerDialog(
         },
         isSmall: true,
         css: {
-            marginTop: '5px',
+            marginTop: 5,
         },
     });
     div.append(options.getElement());

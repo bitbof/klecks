@@ -91,8 +91,8 @@ export const filterBlur = {
         });
         preview.render();
         css(preview.getElement(), {
-            marginLeft: '-20px',
-            marginRight: '-20px',
+            marginLeft: -20,
+            marginRight: -20,
         });
         rootEl.append(preview.getElement());
 

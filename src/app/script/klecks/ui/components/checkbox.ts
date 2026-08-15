@@ -1,5 +1,6 @@
 import { BB } from '../../../bb/bb';
 import { css } from '../../../bb/base/base';
+import { TCss } from '../../../bb/bb-types';
 
 /**
  * Checkbox - with label
@@ -19,7 +20,7 @@ export class Checkbox {
         allowTab?: boolean; // default false
         title?: string;
         doHighlight?: boolean; // default false
-        css?: Partial<CSSStyleDeclaration>;
+        css?: TCss;
         name: string;
     }) {
         const isEnabled = p.isEnabled ?? true;
@@ -46,8 +47,8 @@ export class Checkbox {
             css: {
                 margin: '0 5px 0 0',
                 // otherwise varies by browser
-                width: '14px',
-                height: '14px',
+                width: 14,
+                height: 14,
             },
             custom: {
                 type: 'checkbox',
@@ -71,7 +72,7 @@ export class Checkbox {
         const label = BB.el({
             parent: innerEl,
             content: p.label,
-            css: { display: 'flex', alignItems: 'center', gap: '3px' },
+            css: { display: 'flex', alignItems: 'center', gap: 3 },
         });
 
         this.check.onchange = () => {

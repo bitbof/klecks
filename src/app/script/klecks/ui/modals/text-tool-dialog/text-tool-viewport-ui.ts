@@ -129,7 +129,7 @@ export class TextToolViewportUI {
             parent: this.rootEl,
             css: {
                 position: 'relative',
-                width: this.width + 'px',
+                width: this.width,
                 cursor: 'move',
                 touchAction: 'none',
             },
@@ -223,12 +223,11 @@ export class TextToolViewportUI {
                 }
             },
             onWheel: (e) => {
+                e.event?.preventDefault();
                 this.changeZoomFac(-e.deltaY);
             },
+            useDirtyWheel: true,
         });
-
-        const wheelPrevent = (event: WheelEvent): void => event.preventDefault();
-        this.previewCanvas.addEventListener('wheel', wheelPrevent, { passive: false });
 
         this.rotationSlider = new KlSlider({
             label: LANG('filter-transform-rotation'),
@@ -270,10 +269,10 @@ export class TextToolViewportUI {
         this.eventCapture = BB.el({
             css: {
                 position: 'absolute',
-                left: '0',
-                top: '0',
-                right: '0',
-                bottom: '0',
+                left: 0,
+                top: 0,
+                right: 0,
+                bottom: 0,
                 zIndex: '999',
                 cursor: 'move',
             },

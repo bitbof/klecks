@@ -1601,6 +1601,10 @@
     original: 'Theme',
     value: 'Farbe'
   },
+  'settings-pixelated-zoom': {
+    original: 'Always pixelated zoom',
+    value: 'Immer pixelig zoomen'
+  },
   'settings-save-reminder-label': {
     original: 'Save Reminder',
     value: 'Speicher-Erinnerung'

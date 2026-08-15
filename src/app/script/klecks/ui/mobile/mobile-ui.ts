@@ -36,10 +36,10 @@ export class MobileUi {
 
         this.mobileWrapperEl = BB.el({
             css: {
-                marginTop: '4px',
+                marginTop: 4,
                 display: 'flex',
                 flexDirection: 'column',
-                gap: '4px',
+                gap: 4,
             },
         });
         this.mobileWrapperEl.append(...p.toolUis);
@@ -47,7 +47,7 @@ export class MobileUi {
         this.rootEl = BB.el({
             css: {
                 position: 'absolute',
-                top: '0',
+                top: 0,
                 userSelect: 'none',
             },
         });
@@ -61,26 +61,26 @@ export class MobileUi {
                 this.mobileWrapperEl.style.display = 'none';
                 if (this.orientation === 'left') {
                     css(this.rootEl, {
-                        left: '271px',
+                        left: 271,
                         right: '',
                     });
                 } else {
                     css(this.rootEl, {
                         left: '',
-                        right: '271px',
+                        right: 271,
                     });
                 }
             } else {
                 this.mobileWrapperEl.style.display = 'flex';
                 if (this.orientation === 'left') {
                     css(this.rootEl, {
-                        left: '0',
+                        left: 0,
                         right: '',
                     });
                 } else {
                     css(this.rootEl, {
                         left: '',
-                        right: '0',
+                        right: 0,
                     });
                 }
             }

@@ -54,7 +54,7 @@ export class GradientUi {
         this.colorSlider = p.colorSlider;
         this.rootEl = BB.el({
             css: {
-                margin: '10px',
+                margin: 10,
             },
         });
         this.isVisible = true;
@@ -62,7 +62,7 @@ export class GradientUi {
         this.colorDiv = BB.el({
             parent: this.rootEl,
             css: {
-                marginBottom: '10px',
+                marginBottom: 10,
             },
         });
 
@@ -73,10 +73,10 @@ export class GradientUi {
                 const el = BB.el({
                     className: 'dark-invert',
                     css: {
-                        width: size + 'px',
-                        height: size + 'px',
-                        borderRadius: '3px',
-                        margin: '1px',
+                        width: size,
+                        height: size,
+                        borderRadius: 3,
+                        margin: 1,
                     },
                 });
                 this.iconArr.push(el);
@@ -123,7 +123,7 @@ export class GradientUi {
             },
         });
         css(opacitySlider.getElement(), {
-            marginTop: '10px',
+            marginTop: 10,
         });
         this.rootEl.append(opacitySlider.getElement());
 
@@ -132,7 +132,7 @@ export class GradientUi {
             css: {
                 display: 'flex',
                 alignItems: 'center',
-                marginTop: '10px',
+                marginTop: 10,
             },
         });
 
@@ -169,7 +169,7 @@ export class GradientUi {
             css: {
                 display: 'flex',
                 alignItems: 'center',
-                marginTop: '10px',
+                marginTop: 10,
             },
         });
 

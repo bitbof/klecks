@@ -19,6 +19,8 @@ export type InstallServiceWorkerParams = {
     customInstall?: (context: CustomInstallContext) => Promise<void>;
     // Updates cached navigation responses after successful network requests.
     doCacheOnNavigation?: boolean;
+    // Uses the cached navigation response when the network returns one of these statuses.
+    navigationCacheFallbackStatuses?: readonly number[];
     // Maps supported navigations to their canonical Cache Storage key.
     // Return undefined for navigations this worker should not cache or intercept.
     getNavigationCacheUrl: (
@@ -33,7 +35,8 @@ A service worker that enables the app to be accessible & functional while offlin
 How?
 - We put every asset known to Parcel and the app's HTML files into the service worker's cache.
 - Known assets are served cache-first.
-- App navigations are served network-first, with the cache as an offline fallback.
+- App navigations are served network-first, with the cache as a fallback for offline requests and
+  configured response statuses.
 - Each build gets its own cache. Once a new worker activates, older caches are removed.
 */
 export function installServiceWorker({
@@ -41,6 +44,7 @@ export function installServiceWorker({
     getNavigationCacheUrl,
     customInstall,
     doCacheOnNavigation,
+    navigationCacheFallbackStatuses,
 }: InstallServiceWorkerParams): void {
     if (!version) {
         throw new Error('Service worker build version is missing');
@@ -206,6 +210,14 @@ export function installServiceWorker({
                 try {
                     const response = await fetch(request);
                     if (!response.ok) {
+                        if (navigationCacheFallbackStatuses?.includes(response.status)) {
+                            try {
+                                const cache = await caches.open(cacheName);
+                                return (await cache.match(cacheUrl)) || response;
+                            } catch {
+                                // A cache failure should not replace the network response.
+                            }
+                        }
                         return response;
                     }
                     if (!doCacheOnNavigation) {

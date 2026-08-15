@@ -13,6 +13,7 @@ import { getSharedFx } from '../../../fx-canvas/shared-fx';
 import { c } from '../../../bb/base/c';
 import { KlHistory } from '../../history/kl-history';
 import { createImage } from '../../../bb/base/ui';
+import { createHelpButton } from '../components/help-button';
 
 const copyImg = getIconUrl('copy');
 export type TEditUiParams = {
@@ -72,8 +73,8 @@ export class EditUi {
                 className: 'kl-toolspace-note',
                 content: 'Features disabled because WebGL is failing.',
                 css: {
-                    margin: '10px',
-                    marginBottom: '0',
+                    margin: 10,
+                    marginBottom: 0,
                 },
             });
             const noteButton = BB.el({
@@ -81,7 +82,7 @@ export class EditUi {
                 tagName: 'button',
                 textContent: 'Learn More',
                 css: {
-                    marginLeft: '5px',
+                    marginLeft: 5,
                 },
             });
             noteButton.onclick = () => {
@@ -115,14 +116,14 @@ This has been reported to Google.
                         height: 20,
                         className: filter.darkNoInvert ? 'dark-no-invert' : '',
                         css: {
-                            marginRight: '3px',
+                            marginRight: 3,
                         },
                     }),
                     LANG(filter.lang.button),
                 ],
                 css: {
                     lineHeight: '20px',
-                    fontSize: '12px',
+                    fontSize: 12,
                 },
                 custom: {
                     tabIndex: '-1',
@@ -261,20 +262,16 @@ This has been reported to Google.
                         {
                             const els: HTMLElement[] = [c('b', filterName)];
                             if (filter.lang.description !== undefined) {
+                                const description = LANG(filter.lang.description);
                                 els.push(
-                                    c(
-                                        {
-                                            className: 'kl-info-btn',
-                                            onClick: () => {
-                                                KL.popup({
-                                                    message: LANG(filter.lang.description!),
-                                                });
-                                            },
-                                            title: LANG(filter.lang.description!),
-                                            noRef: true,
+                                    createHelpButton({
+                                        onClick: () => {
+                                            KL.popup({
+                                                message: description,
+                                            });
                                         },
-                                        '?',
-                                    ),
+                                        title: description,
+                                    }),
                                 );
                             }
                             title = c(',flex,gap-5', els);
@@ -340,7 +337,7 @@ This has been reported to Google.
                         width: 18,
                         height: 20,
                         css: {
-                            marginRight: '3px',
+                            marginRight: 3,
                         },
                     }),
                     LANG('file-copy'),
@@ -361,8 +358,8 @@ This has been reported to Google.
                 content: [
                     BB.el({
                         css: {
-                            height: '20px',
-                            cssFloat: 'left',
+                            height: 20,
+                            float: 'left',
                         },
                     }),
                     LANG('file-paste'),

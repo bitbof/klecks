@@ -140,8 +140,8 @@ export const filterPerspective = {
         });
         css(preview.getElement(), {
             overflow: 'hidden',
-            marginLeft: '-20px',
-            marginRight: '-20px',
+            marginLeft: -20,
+            marginRight: -20,
         });
 
         preview

@@ -137,6 +137,7 @@ a:not([href]):hover {
 .toolspace-row-button {
     cursor: pointer;
     flex-grow: 1;
+    color: #727272;
 }
 
 .toolspace-triangle-button {
@@ -795,55 +796,6 @@ clip-path seems the cleanest.
     transform-origin: 1px 10px;
 }
 
-.kl-option-wrapper {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 4px;
-}
-
-.kl-option {
-    cursor: pointer;
-    padding: 6px 10px;
-    font-size: 16px;
-    border-radius: 4px;
-    // transition: all 0.1s ease-in-out;
-
-    background: var(--ui-bg-color);
-    color: rgba(0, 0, 0, 0.6);
-    box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.3);
-
-    user-select: none;
-    -webkit-user-select: none; // safari
-
-    &:not(.kl-option-selected) {
-        &:hover {
-            background: #eee;
-        }
-        &:active {
-            box-shadow: inset 0 0 0 2px rgba(0, 0, 0, 0.3);
-        }
-    }
-}
-
-.kl-option--small {
-    font-size: 14px;
-}
-
-.kl-option--custom-el {
-    padding: 0;
-}
-
-.kl-option--custom-el:not(.kl-option-selected) > * {
-    opacity: 0.6;
-}
-
-.kl-option-selected {
-    background: #fff;
-    color: #000;
-    box-shadow: inset 0 0 0 2px var(--active-highlight-color);
-    cursor: default;
-}
-
 .kl-box-toggle {
     cursor: pointer;
     padding: 6px 10px;
@@ -881,25 +833,6 @@ clip-path seems the cleanest.
 
 .kl-box-toggle--custom-el:not(.kl-box-toggle--active) > * {
     opacity: 0.5;
-}
-
-.kl-color-option {
-    box-shadow: 0 0 0 1px #aaa;
-    cursor: pointer;
-    user-select: none;
-    text-align: center;
-    color: #aaa;
-    border-radius: 4px;
-
-    &:not(.kl-color-option--active):active {
-        box-shadow: 0 0 0 2px #aaa;
-    }
-}
-
-.kl-color-option--active {
-    box-shadow:
-        0 0 0 2px var(--active-highlight-color),
-        0 0 5px 0 var(--active-highlight-color);
 }
 
 .tool-dropdown-wrapper {
@@ -1206,16 +1139,34 @@ clip-path seems the cleanest.
     background: var(--kl-checkerboard-background);
 }
 
-.kl-info-btn {
+.kl-help-btn {
+    appearance: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+    padding: 0;
+    min-width: 0;
     cursor: pointer;
     width: 19px;
     height: 19px;
-    border-radius: 100%;
-    text-align: center;
-    line-height: 19px;
-    font-weight: bold;
-    box-shadow: inset 0 0 0 1px #000;
+    border: none;
+    border-radius: 0;
+    background: none;
+    box-shadow: none;
     user-select: none;
+
+    &:hover,
+    &:active {
+        color: #333;
+        background: none;
+        box-shadow: none;
+    }
+
+    &:focus-visible {
+        outline: 2px solid var(--active-highlight-color);
+        outline-offset: 2px;
+    }
 }
 
 .kl-overlay-toolspace {
@@ -1250,11 +1201,15 @@ clip-path seems the cleanest.
     background: rgba(255, 255, 255, 0.5);
 }
 
-.kl-floating-window-header {
+.kl-floating-window {
     background: var(--ui-bg-color);
+    box-shadow:
+        0 0 0 1px #bbb,
+        0 3px 16px rgba(0, 0, 0, 0.28);
+}
+
+.kl-floating-window-header {
     display: flex;
     justify-content: flex-end;
     cursor: move;
-    border-top-left-radius: 4px;
-    border-top-right-radius: 4px;
 }

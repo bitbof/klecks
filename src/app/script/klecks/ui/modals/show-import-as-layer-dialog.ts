@@ -6,8 +6,8 @@ import { TKlBasicLayer } from '../../kl-types';
 import { LANG } from '../../../language/language';
 import { testIsSmall } from '../utils/test-is-small';
 import { getPreviewHeight, getPreviewWidth } from '../utils/preview-size';
-import { Select } from '../components/select';
 import { css } from '../../../bb/base/base';
+import { InterpolationAlgorithmToggle } from '../components/interpolation-algorithm-toggle';
 
 export function showImportAsLayerDialog(params: {
     target: HTMLElement;
@@ -44,7 +44,7 @@ export function showImportAsLayerDialog(params: {
         tagName: 'button',
         content: '1:1',
         css: {
-            marginRight: '10px',
+            marginRight: 10,
         },
         onClick: function () {
             freeTransformCanvas.reset();
@@ -54,7 +54,7 @@ export function showImportAsLayerDialog(params: {
         tagName: 'button',
         content: LANG('import-as-layer-fit'),
         css: {
-            marginRight: '10px',
+            marginRight: 10,
         },
         onClick: function () {
             freeTransformCanvas.setTransformFit();
@@ -64,31 +64,25 @@ export function showImportAsLayerDialog(params: {
         tagName: 'button',
         content: LANG('center'),
         css: {
-            marginRight: '10px',
+            marginRight: 10,
         },
         onClick: function () {
             freeTransformCanvas.setTransformCenter();
         },
     });
-    const algorithmSelect = new Select({
-        isFocusable: true,
-        optionArr: [
-            ['smooth', LANG('algorithm-smooth')],
-            ['pixelated', LANG('algorithm-pixelated')],
-        ],
+    const algorithmToggle = new InterpolationAlgorithmToggle({
         initValue: 'smooth',
-        title: LANG('scaling-algorithm'),
+        isFocusable: true,
         onChange: (val): void => {
             freeTransformCanvas.setAlgorithm(val);
         },
-        name: 'interpolation-algorithm',
     });
     buttonRowEl.append(
         originalSizeBtn,
         fitSizeBtn,
         centerBtn,
-        BB.el({ css: { flexGrow: '1' } }),
-        algorithmSelect.getElement(),
+        BB.el({ css: { flexGrow: 1 } }),
+        algorithmToggle.getElement(),
     );
     div.append(buttonRowEl);
 
@@ -120,8 +114,8 @@ export function showImportAsLayerDialog(params: {
         transformIndex: layers.length - 1,
     });
     css(freeTransformCanvas.getElement(), {
-        marginTop: '10px',
-        marginLeft: '-20px',
+        marginTop: 10,
+        marginLeft: -20,
     });
     div.append(freeTransformCanvas.getElement());
 
@@ -152,13 +146,14 @@ export function showImportAsLayerDialog(params: {
         style: isSmall
             ? undefined
             : {
-                  width: '540px',
+                  width: 540,
               },
         buttons: ['Ok', 'Cancel'],
         clickOnEnter: 'Ok',
         callback: function (buttonStr) {
             keyListener.destroy();
             freeTransformCanvas.destroy();
+            algorithmToggle.destroy();
             BB.destroyEl(originalSizeBtn);
             BB.destroyEl(fitSizeBtn);
             BB.destroyEl(centerBtn);

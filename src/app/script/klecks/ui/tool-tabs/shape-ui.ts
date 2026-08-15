@@ -34,7 +34,7 @@ export class ShapeUi {
     }) {
         this.rootEl = BB.el({
             css: {
-                margin: '10px',
+                margin: 10,
             },
         });
         this.isVisible = true;
@@ -42,7 +42,7 @@ export class ShapeUi {
         this.colorDiv = BB.el({
             parent: this.rootEl,
             css: {
-                marginBottom: '10px',
+                marginBottom: 10,
             },
         });
 
@@ -134,8 +134,7 @@ export class ShapeUi {
         });
 
         const updatePreviews = () => {
-            const strokeWidth =
-                BB.clamp(Math.round(this.lineWidthSlider.getValue() / 10), 1, 10) + 'px';
+            const strokeWidth = BB.clamp(Math.round(this.lineWidthSlider.getValue() / 10), 1, 10);
 
             const squish = 1.35;
 
@@ -253,7 +252,7 @@ export class ShapeUi {
             },
             changeOnInit: true,
             css: {
-                width: '120px',
+                width: 120,
             },
         });
         row1.append(shapeOptions.getElement());
@@ -308,7 +307,7 @@ export class ShapeUi {
             },
         });
         css(this.lineWidthSlider.getElement(), {
-            marginTop: '10px',
+            marginTop: 10,
         });
         this.rootEl.append(this.lineWidthSlider.getElement());
 
@@ -323,7 +322,7 @@ export class ShapeUi {
             toDisplayValue: (value) => value * 100,
         });
         css(this.opacitySlider.getElement(), {
-            marginTop: '10px',
+            marginTop: 10,
         });
         this.rootEl.append(this.opacitySlider.getElement());
 
@@ -332,8 +331,8 @@ export class ShapeUi {
             css: {
                 display: 'flex',
                 alignItems: 'center',
-                marginTop: '10px',
-                gap: '10px',
+                marginTop: 10,
+                gap: 10,
             },
         });
 

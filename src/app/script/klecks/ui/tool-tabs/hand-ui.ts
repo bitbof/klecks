@@ -48,7 +48,7 @@ export class HandUi {
     }) {
         this.rootEl = BB.el({
             css: {
-                margin: '10px',
+                margin: 10,
             },
         });
         this.scale = p.scale;
@@ -57,14 +57,14 @@ export class HandUi {
 
         const row1 = BB.el({
             css: {
-                marginBottom: '10px',
+                marginBottom: 10,
                 display: 'flex',
             },
         });
         const row2 = BB.el({
             css: {
                 display: 'flex',
-                marginBottom: '10px',
+                marginBottom: 10,
             },
         });
         const row3 = BB.el({
@@ -76,7 +76,7 @@ export class HandUi {
 
         this.scaleEl = BB.el({
             css: {
-                width: '65px',
+                width: 65,
                 userSelect: 'none',
                 fontFamily: 'monospace',
             },
@@ -87,10 +87,10 @@ export class HandUi {
         this.angleIm.src = angleImg;
         css(this.angleIm, {
             verticalAlign: 'bottom',
-            width: '20px',
-            height: '20px',
-            marginRight: '5px',
-            borderRadius: '10px',
+            width: 20,
+            height: 20,
+            marginRight: 5,
+            borderRadius: 10,
             background: 'rgba(0,0,0,0.2)',
             userSelect: 'none',
         });
@@ -116,7 +116,7 @@ export class HandUi {
             tagName: 'button',
             content: LANG('hand-fit'),
             css: {
-                marginLeft: '10px',
+                marginLeft: 10,
             },
             onClick: p.onFit,
         });
@@ -143,7 +143,7 @@ export class HandUi {
             tagName: 'button',
             content: '0°',
             css: {
-                marginLeft: '10px',
+                marginLeft: 10,
             },
             onClick: function () {
                 p.onAngleChange(0);
@@ -155,7 +155,7 @@ export class HandUi {
             tagName: 'button',
             content: '<img height="20" src="' + rotateImg + '" alt="Rotate"/>',
             css: {
-                marginLeft: '10px',
+                marginLeft: 10,
             },
             onClick: function () {
                 p.onAngleChange(15, true);
@@ -177,7 +177,7 @@ export class HandUi {
             p.onChangeUseInertiaScrolling(inertiaToggle.getValue());
         }, 500);
         css(inertiaToggle.getElement(), {
-            marginTop: '10px',
+            marginTop: 10,
             display: 'inline-block',
         });
         this.rootEl.append(inertiaToggle.getElement());

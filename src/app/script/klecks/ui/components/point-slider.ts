@@ -29,8 +29,8 @@ export class PointSlider {
             parent: this.rootEl,
             className: 'kl-point-slider__line',
             css: {
-                marginTop: parseInt('' + (p.pointSize / 2 - 1)) + 'px',
-                width: p.width + 'px',
+                marginTop: parseInt('' + (p.pointSize / 2 - 1)),
+                width: p.width,
             },
         });
         this.sliderPoint = BB.el({
@@ -53,7 +53,7 @@ export class PointSlider {
 
         const redrawPoint = () => {
             css(this.sliderPoint, {
-                left: sliderPos + 'px',
+                left: sliderPos,
             });
         };
         const getValue = () => {
@@ -65,9 +65,9 @@ export class PointSlider {
             let isFirst: boolean;
             sliderPos = BB.clamp(p.init * (p.width - p.pointSize), 0, p.width - p.pointSize);
             css(this.sliderPoint, {
-                width: p.pointSize + 'px',
-                height: p.pointSize + 'px',
-                borderRadius: p.pointSize + 'px',
+                width: p.pointSize,
+                height: p.pointSize,
+                borderRadius: p.pointSize,
             });
             redrawPoint();
             let imaginaryPos: number;

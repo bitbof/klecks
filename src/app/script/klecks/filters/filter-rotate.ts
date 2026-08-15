@@ -74,7 +74,7 @@ export const filterRotate = {
             },
             noRef: true,
             css: {
-                marginLeft: '5px',
+                marginLeft: 5,
             },
         });
 
@@ -83,8 +83,8 @@ export const filterRotate = {
         const previewWrapper = BB.el({
             className: 'kl-preview-wrapper',
             css: {
-                width: SMALL_PREVIEW.width + 'px',
-                height: SMALL_PREVIEW.height + 'px',
+                width: SMALL_PREVIEW.width,
+                height: SMALL_PREVIEW.height,
                 display: 'table',
             },
         });
@@ -101,13 +101,13 @@ export const filterRotate = {
             content: tempCanvas,
             className: 'kl-preview-wrapper__canvas',
             css: {
-                width: w + 'px',
-                height: h + 'px',
+                width: w,
+                height: h,
                 marginLeft: 'auto',
                 marginRight: 'auto',
                 overflow: 'hidden',
                 background: 'var(--kl-checkerboard-background)',
-                backgroundSize: '16px',
+                backgroundSize: 16,
             },
         });
 

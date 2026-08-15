@@ -333,9 +333,9 @@ const showSyncIndicator = (() => {
         syncIndicator.alt = '';
         css(syncIndicator, {
             position: 'fixed',
-            top: '8px',
-            left: '8px',
-            zIndex: '2147483647',
+            top: 8,
+            left: 8,
+            zIndex: 2147483647,
             pointerEvents: 'none',
         });
         document.body.append(syncIndicator);

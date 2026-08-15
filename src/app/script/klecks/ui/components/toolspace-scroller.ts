@@ -51,7 +51,7 @@ export class ToolspaceScroller {
             title: LANG('scroll'),
             className: 'kl-scroller',
             css: {
-                top: '0',
+                top: 0,
                 transform: 'rotate(180deg)',
             },
         });
@@ -60,7 +60,7 @@ export class ToolspaceScroller {
             title: LANG('scroll'),
             className: 'kl-scroller',
             css: {
-                bottom: '0',
+                bottom: 0,
             },
         });
         this.updateUiState(p.uiState);
@@ -131,12 +131,12 @@ export class ToolspaceScroller {
 
     updateUiState(uiState: 'left' | 'right'): void {
         css(this.upBtn, {
-            left: uiState === 'left' ? '0' : '',
-            right: uiState === 'right' ? '0' : '',
+            left: uiState === 'left' ? 0 : '',
+            right: uiState === 'right' ? 0 : '',
         });
         css(this.downBtn, {
-            left: uiState === 'left' ? '0' : '',
-            right: uiState === 'right' ? '0' : '',
+            left: uiState === 'left' ? 0 : '',
+            right: uiState === 'right' ? 0 : '',
         });
     }
 }

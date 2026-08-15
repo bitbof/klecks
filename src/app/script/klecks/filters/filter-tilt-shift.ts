@@ -157,8 +157,8 @@ export const filterTiltShift = {
         preview.render();
         css(preview.getElement(), {
             overflow: 'hidden',
-            marginLeft: '-20px',
-            marginRight: '-20px',
+            marginLeft: -20,
+            marginRight: -20,
         });
 
         preview.getElement().append(fa.getElement(), fb.getElement());

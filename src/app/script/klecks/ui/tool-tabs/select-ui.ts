@@ -9,24 +9,14 @@ import { Checkbox } from '../components/checkbox';
 import { css } from '../../../bb/base/base';
 import { TInterpolationAlgorithm } from '../../kl-types';
 import { Icon } from '../components/icon';
-import { createCanvas } from '../../../bb/base/create-canvas';
 import { TFreeTransform } from '../../transform/transform-types';
 import { webGl2IsSupported } from '../../image-operations/gpu-composite-canvas';
+import { InterpolationAlgorithmToggle } from '../components/interpolation-algorithm-toggle';
 
 const modeSelectImg = getIconUrl('select-mode-select');
 const modeMoveImg = getIconUrl('select-mode-move');
 const duplicateLayerImg = getIconUrl('duplicate-layer');
 const warpImg = getIconUrl('select-transform-warp');
-function getAlgorithmIconDataUrl(): string {
-    const canvas = createCanvas(3, 3);
-    const ctx = BB.ctx(canvas);
-    ctx.fillRect(0, 0, 1, 1);
-    ctx.fillRect(2, 0, 1, 1);
-    ctx.fillRect(1, 1, 1, 1);
-    ctx.fillRect(0, 2, 1, 1);
-    ctx.fillRect(2, 2, 1, 1);
-    return canvas.toDataURL('image/png');
-}
 
 export type TSelectUiParams = {
     // return false to reject mode-change
@@ -72,7 +62,7 @@ export class SelectUi {
     private positionOutput: HTMLElement;
     private moveToLayerSelect: Select<string>;
     private transparentBackgroundToggle: Checkbox;
-    private algorithmOptions: Options<TInterpolationAlgorithm>;
+    private algorithmOptions: InterpolationAlgorithmToggle;
     private warpCheckbox: Checkbox;
     private constrainCheckbox: Checkbox;
     private snappingCheckbox: Checkbox;
@@ -101,7 +91,7 @@ export class SelectUi {
                                 '</span>',
                             css: {
                                 display: 'flex',
-                                gap: '5px',
+                                gap: 5,
                                 alignItems: 'center',
                                 height: '100%',
                                 margin: '10px 4px',
@@ -123,7 +113,7 @@ export class SelectUi {
                                 '</span>',
                             css: {
                                 display: 'flex',
-                                gap: '5px',
+                                gap: 5,
                                 alignItems: 'center',
                                 height: '100%',
                                 margin: '10px 4px',
@@ -145,11 +135,11 @@ export class SelectUi {
                 return this.onChangeMode(val);
             },
             optionCss: {
-                flexGrow: '1',
-                flexBasis: '0',
+                flexGrow: 1,
+                flexBasis: 0,
             },
             css: {
-                marginBottom: '10px',
+                marginBottom: 10,
             },
         });
 
@@ -157,8 +147,8 @@ export class SelectUi {
         const selectModeEl = BB.el();
 
         const selectOptionImageStyle = {
-            width: '32px',
-            height: '32px',
+            width: 32,
+            height: 32,
         };
 
         const defaultIm = getIconImg('select-default', selectOptionImageStyle);
@@ -191,7 +181,7 @@ export class SelectUi {
                 p.onChangeBooleanOperation(v);
             },
             css: {
-                marginBottom: '10px',
+                marginBottom: 10,
             },
         });
 
@@ -232,7 +222,7 @@ export class SelectUi {
                 p.select.onChangeShape(val);
             },
             css: {
-                marginBottom: '10px',
+                marginBottom: 10,
             },
         });
         selectModeEl.append(shapeOptions.getElement(), this.operationOptions.getElement());
@@ -241,7 +231,7 @@ export class SelectUi {
             parent: selectModeEl,
             css: {
                 display: 'flex',
-                gap: '5px',
+                gap: 5,
                 flexWrap: 'wrap',
             },
         });
@@ -257,7 +247,7 @@ export class SelectUi {
                 tabindex: '-1',
             },
             css: {
-                minHeight: '30px',
+                minHeight: 30,
             },
         });
         const selectInvertBtn = BB.el({
@@ -271,7 +261,7 @@ export class SelectUi {
                 tabindex: '-1',
             },
             css: {
-                minHeight: '30px',
+                minHeight: 30,
             },
         });
         this.selectResetBtn = BB.el({
@@ -279,14 +269,14 @@ export class SelectUi {
             tagName: 'button',
             content: [
                 getIconSvg('remove-layer', {
-                    height: '20px',
-                    marginRight: '3px',
+                    height: 20,
+                    marginRight: 3,
                 }),
                 LANG('select-reset'),
             ],
             className: 'kl-button kl-button-primary',
             css: {
-                paddingRight: '8px',
+                paddingRight: 8,
                 display: 'none',
             },
             onClick: () => {
@@ -307,7 +297,7 @@ export class SelectUi {
             parent: selectModeEl,
             css: {
                 display: 'flex',
-                gap: '5px',
+                gap: 5,
             },
         });
         const eraseBtn = BB.el({
@@ -339,11 +329,11 @@ export class SelectUi {
             css: {
                 display: 'flex',
                 flexDirection: 'column',
-                gap: '10px',
+                gap: 10,
             },
         });
 
-        this.positionOutput = BB.el({ css: { fontFamily: 'monospace', fontSize: '13px' } });
+        this.positionOutput = BB.el({ css: { fontFamily: 'monospace', fontSize: 13 } });
         transformModeEl.append(this.positionOutput);
 
         const transformFlipXBtn = BB.el({
@@ -402,7 +392,7 @@ export class SelectUi {
             },
             css: {
                 display: 'flex',
-                gap: '5px',
+                gap: 5,
             },
             custom: {
                 tabindex: '-1',
@@ -457,7 +447,7 @@ export class SelectUi {
             css: {
                 display: 'flex',
                 flexWrap: 'wrap',
-                gap: '5px',
+                gap: 5,
             },
         });
 
@@ -482,7 +472,7 @@ export class SelectUi {
             },
             css: {
                 display: 'inline-block',
-                marginLeft: '10px',
+                marginLeft: 10,
             },
             name: 'enable-snapping',
         });
@@ -511,38 +501,7 @@ export class SelectUi {
         );
         transformModeEl.append(checkboxWrapper);
 
-        const iconSmooth = new Image();
-        iconSmooth.src = getAlgorithmIconDataUrl();
-        iconSmooth.className = 'dark-invert';
-        css(iconSmooth, {
-            width: '20px',
-            height: '20px',
-            margin: '4px',
-        });
-
-        const iconPixelated = new Image();
-        iconPixelated.src = iconSmooth.src;
-        iconPixelated.className = 'dark-invert';
-        css(iconPixelated, {
-            width: '20px',
-            height: '20px',
-            margin: '4px',
-            imageRendering: 'pixelated',
-        });
-
-        this.algorithmOptions = new Options({
-            optionArr: [
-                {
-                    id: 'smooth',
-                    label: iconSmooth,
-                    title: LANG('algorithm-smooth'),
-                },
-                {
-                    id: 'pixelated',
-                    label: iconPixelated,
-                    title: LANG('algorithm-pixelated'),
-                },
-            ],
+        this.algorithmOptions = new InterpolationAlgorithmToggle({
             onChange: (algorithm) => {
                 p.transform.onChangeAlgorithm(algorithm);
             },
@@ -596,7 +555,7 @@ export class SelectUi {
         this.rootEl = BB.el({
             content: [this.modeOptions.getElement()],
             css: {
-                margin: '10px',
+                margin: 10,
             },
         });
         updateMode();
@@ -671,6 +630,6 @@ export class SelectUi {
     }
 
     destroy(): void {
-        // ...
+        this.algorithmOptions.destroy();
     }
 }

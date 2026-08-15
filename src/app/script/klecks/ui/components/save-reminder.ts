@@ -59,7 +59,7 @@ export class SaveReminder {
                     b: '</strong>',
                 }),
                 css: {
-                    marginBottom: '20px',
+                    marginBottom: 20,
                 },
             }),
         );
@@ -70,8 +70,8 @@ export class SaveReminder {
         const storageWrapper = BB.el({
             css: {
                 margin: '0 -20px',
-                padding: '20px',
-                paddingBottom: '0',
+                padding: 20,
+                paddingBottom: 0,
             },
         });
         contentEl.append(psdWrapper, storageWrapper);
@@ -84,7 +84,7 @@ export class SaveReminder {
                 this.applyUncommitted();
                 this.onSaveAsPsd();
             },
-            css: { padding: '14px' },
+            css: { padding: 14 },
             noRef: true,
         });
         psdWrapper.append(
@@ -92,7 +92,7 @@ export class SaveReminder {
             BB.el({
                 content: '✔ ' + LANG('save-reminder-psd-layers'),
                 css: {
-                    marginTop: '10px',
+                    marginTop: 10,
                 },
             }),
         );
