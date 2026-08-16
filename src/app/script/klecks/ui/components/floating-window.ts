@@ -12,6 +12,8 @@ export type TFloatingWindowParams = {
     onClose: () => void;
     position?: TVector2D;
     closeOnOutsideClick?: boolean;
+    // will be ignored on click outside
+    triggerElement?: HTMLElement;
 };
 
 export class FloatingWindow {
@@ -20,7 +22,7 @@ export class FloatingWindow {
     private readonly position: TVector2D;
     private readonly pointerListener: PointerListener;
     private outsideClickListenerTimeout: number | undefined;
-    private readonly onDocumentClick: (event: MouseEvent) => void;
+    private readonly onDocumentPointerDown: (event: PointerEvent) => void;
     private readonly onResize: () => void;
     private readonly fractionalPosition: TVector2D = { x: 0.5, y: 0.5 };
     private doCenterInitially: boolean;
@@ -57,7 +59,10 @@ export class FloatingWindow {
     constructor(p: TFloatingWindowParams) {
         this.position = p.position ? { ...p.position } : { x: 0, y: 0 };
         this.doCenterInitially = !p.position;
-        this.onDocumentClick = (event) => {
+        this.onDocumentPointerDown = (event) => {
+            if (p.triggerElement && p.triggerElement.contains(event.target as Node | null)) {
+                return;
+            }
             if (this.rootEl.contains(event.target as Node | null)) {
                 return;
             }
@@ -137,11 +142,8 @@ export class FloatingWindow {
         window.addEventListener('resize', this.onResize);
         setTimeout(() => this.applyPosition());
         if (p.closeOnOutsideClick) {
-            // Wait until the click that opened the window has finished propagating.
-            this.outsideClickListenerTimeout = setTimeout(() => {
-                this.outsideClickListenerTimeout = undefined;
-                document.addEventListener('click', this.onDocumentClick);
-            });
+            this.outsideClickListenerTimeout = undefined;
+            document.addEventListener('pointerdown', this.onDocumentPointerDown);
         }
     }
 
@@ -158,7 +160,7 @@ export class FloatingWindow {
             clearTimeout(this.outsideClickListenerTimeout);
             this.outsideClickListenerTimeout = undefined;
         }
-        document.removeEventListener('click', this.onDocumentClick);
+        document.removeEventListener('pointerdown', this.onDocumentPointerDown);
         window.removeEventListener('resize', this.onResize);
         this.pointerListener.destroy();
     }

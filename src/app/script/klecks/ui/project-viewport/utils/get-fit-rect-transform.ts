@@ -2,9 +2,9 @@ import { TViewportTransform } from '../project-viewport';
 import { TCoordinateBounds, TRect, TSize2D } from '../../../../bb/bb-types';
 import { createTransform } from '../../../../bb/transform/create-transform';
 import { fitInto } from '../../../../bb/base/base';
-import { BB } from '../../../../bb/bb';
-import { TVec4 } from '../../../../bb/math/matrix';
+import { Matrix, TVec4 } from '../../../../bb/math/matrix';
 import { snapAngleDeg } from '../../../../bb/math/math';
+import { EASEL_MAX_SCALE } from '../../easel/easel.config';
 
 /**
  * Returns a viewport transform that fits `rect` (in canvas space) into the viewport.
@@ -13,6 +13,7 @@ import { snapAngleDeg } from '../../../../bb/math/math';
  * @param easelSize - size of the viewport DOM element
  * @param snapRotation - if true, snaps the current viewport angle to the nearest 90°
  * @param padding - viewport space padding per side (default 0)
+ * @param maxScale - maximum scale of the returned transform (default EASEL_MAX_SCALE)
  */
 export function getFitRectTransform(
     rect: TRect,
@@ -20,6 +21,7 @@ export function getFitRectTransform(
     easelSize: TSize2D,
     snapRotation: boolean,
     padding: number = 0,
+    maxScale: number = EASEL_MAX_SCALE,
 ): TViewportTransform {
     // rotate
     let newAngleDeg = viewportTransform.angleDeg;
@@ -42,16 +44,16 @@ export function getFitRectTransform(
     ];
 
     // setup transformation matrix
-    let matrix = BB.Matrix.getIdentity();
-    matrix = BB.Matrix.multiplyMatrices(
+    let matrix = Matrix.getIdentity();
+    matrix = Matrix.multiplyMatrices(
         matrix,
-        BB.Matrix.createRotationMatrix((newAngleDeg / 180) * Math.PI),
+        Matrix.createRotationMatrix((newAngleDeg / 180) * Math.PI),
     );
 
     // rotate points
     for (let i = 0; i < canvasPointsArr.length; i++) {
         let coords: TVec4 = [canvasPointsArr[i][0], canvasPointsArr[i][1], 0, 1];
-        coords = BB.Matrix.multiplyMatrixAndPoint(matrix, coords);
+        coords = Matrix.multiplyMatrixAndPoint(matrix, coords);
         canvasPointsArr[i][0] = coords[0];
         canvasPointsArr[i][1] = coords[1];
     }
@@ -84,8 +86,6 @@ export function getFitRectTransform(
     );
 
     // determine scale
-    // when bringing something into view avoid zooming in too far
-    const maxScale = Math.max(viewportTransform.scale, 1);
     const factor = Math.min(maxScale, fitWidth / boundsWidth);
 
     return createTransform(

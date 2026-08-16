@@ -626,8 +626,10 @@ export class EaselSelect implements TEaselTool {
         if (checkRectFullyVisible(rect, viewportTransform, easelSize, 0)) {
             return;
         }
+        // Don't zoom in further than we are currently. It's less annoying.
+        const maxScale = Math.max(viewportTransform.scale, 1);
         this.easel.setTransform(
-            getFitRectTransform(rect, viewportTransform, easelSize, false, padding),
+            getFitRectTransform(rect, viewportTransform, easelSize, false, padding, maxScale),
         );
     }
 

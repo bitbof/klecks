@@ -67,7 +67,8 @@ export class Options<IdType> {
         }[];
         initId?: IdType;
         onChange?: (id: IdType) => void;
-        onClickSelected?: (id: IdType) => void;
+        // element - the element that was clicked
+        onClickSelected?: (id: IdType, element: HTMLElement) => void;
         /** before the change happens, check if you allow it. true -> yes */
         onBeforeChange?: (id: IdType) => boolean;
         changeOnInit?: boolean; // trigger change on creation
@@ -131,7 +132,7 @@ export class Options<IdType> {
                     className: classArr.join(' '),
                     onClick: () => {
                         if (this.selectedId === optionObj.id) {
-                            p.onClickSelected?.(optionObj.id);
+                            p.onClickSelected?.(optionObj.id, optionObj.el);
                         } else {
                             this.selectValue(optionObj.id);
                         }

@@ -22,6 +22,8 @@ export class KlColorSliderSmall {
     private readonly pointerH: HTMLElement;
     private readonly canvasSV: HTMLCanvasElement;
 
+    readonly svCircleRadius = 6;
+
     private updateSV(): void {
         const ctx = BB.ctx(this.canvasSV);
         if (!ctx) {
@@ -45,8 +47,8 @@ export class KlColorSliderSmall {
     }
 
     private updateSVPointer(): void {
-        const left = (this.color.s / 100) * this.width - 4;
-        const top = (1 - this.color.v / 100) * this.heightSV - 4;
+        const left = (this.color.s / 100) * this.width - this.svCircleRadius;
+        const top = (1 - this.color.v / 100) * this.heightSV - this.svCircleRadius;
         css(this.pointerSV, {
             left: left,
             top: top,
@@ -112,9 +114,9 @@ export class KlColorSliderSmall {
         this.pointerSV = BB.el({
             parent: this.rootEl,
             css: {
-                width: 8,
-                height: 8,
-                borderRadius: 8,
+                width: this.svCircleRadius * 2,
+                height: this.svCircleRadius * 2,
+                borderRadius: this.svCircleRadius,
                 position: 'absolute',
                 pointerEvents: 'none',
                 boxShadow: '0 0 0 1px #000, inset 0 0 0 1px #fff',

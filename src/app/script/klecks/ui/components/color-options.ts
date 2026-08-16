@@ -31,7 +31,7 @@ export class ColorOptions {
         this.colorPicker = undefined;
     }
 
-    private toggleColorPicker(index: number): void {
+    private toggleColorPicker(index: number, triggerElement: HTMLElement): void {
         if (this.colorPicker) {
             this.closeColorPicker();
             return;
@@ -71,6 +71,7 @@ export class ColorOptions {
             onClose: () => this.closeColorPicker(),
             position: this.colorPickerPosition,
             closeOnOutsideClick: true,
+            triggerElement,
         });
         document.body.append(this.colorPickerWindow.getElement());
     }
@@ -153,8 +154,8 @@ export class ColorOptions {
                 this.closeColorPicker();
                 this.onChange(this.colorArr[index]);
             },
-            onClickSelected: (index) => {
-                this.toggleColorPicker(index);
+            onClickSelected: (index, element) => {
+                this.toggleColorPicker(index, element);
             },
         });
         this.rootEl.append(this.options.getElement());
