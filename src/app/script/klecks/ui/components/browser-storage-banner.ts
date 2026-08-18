@@ -99,7 +99,7 @@ export async function runBrowserStorageBanner(p: TBrowserStorageBannerParams): P
     const buttonClass = classes.btn;
     const openBtn = BB.el({
         tagName: 'button',
-        className: ['kl-button-primary', buttonClass].join(' '),
+        className: ['kl-button-primary', buttonClass],
         content: LANG('file-storage-open'),
         custom: {
             tabIndex: '-1',

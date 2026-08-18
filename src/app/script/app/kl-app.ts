@@ -732,6 +732,15 @@ export class KlApp {
                                     ...val,
                                     text: '',
                                 };
+                                if (val.fill) {
+                                    brushSettingService.setColor(
+                                        new BB.RGB(
+                                            val.fill.color.r,
+                                            val.fill.color.g,
+                                            val.fill.color.b,
+                                        ),
+                                    );
+                                }
                                 this.klCanvas.text(currentLayer.index, val);
                             },
                         });

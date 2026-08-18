@@ -122,7 +122,7 @@ export function showModal(p: {
             }),
             p.div,
         ],
-        className: boxClasses.join(' '),
+        className: boxClasses,
         css: p.style ? p.style : undefined,
     });
 
@@ -216,7 +216,7 @@ export function showModal(p: {
             const btn = BB.el({
                 parent: buttonRowEl,
                 tagName: 'button',
-                className: [...btnClasses].join(' '),
+                className: [...btnClasses],
                 content: [
                     iconImg,
                     BB.el({

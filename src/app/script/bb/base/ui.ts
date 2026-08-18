@@ -9,6 +9,7 @@ export function appendTextDiv(target: HTMLElement, text: string): HTMLDivElement
     return div;
 }
 
+export const focusableButtonClassName = 'kl-focusable-button';
 /**
  * Is an input element focused.
  * Set attribute "data-ignore-focus" to "true" if its focus should be ignored.
@@ -16,14 +17,14 @@ export function appendTextDiv(target: HTMLElement, text: string): HTMLDivElement
  * @param getAll - check all, even those with "data-ignore-focus" = "true"
  */
 export function isInputFocused(getAll: boolean = false): boolean {
+    const activeElement = document.activeElement;
     const result: boolean =
-        !!document.activeElement &&
-        ['INPUT', 'TEXTAREA', 'SELECT', 'BUTTON'].includes(document.activeElement.tagName);
-    if (getAll) {
-        return result;
-    } else {
-        return result && !document.activeElement?.getAttribute('data-ignore-focus');
-    }
+        !!activeElement &&
+        (['INPUT', 'TEXTAREA', 'SELECT'].includes(activeElement.tagName) ||
+            (activeElement.tagName === 'BUTTON' &&
+                activeElement.classList.contains(focusableButtonClassName)));
+
+    return result && (getAll || !activeElement?.getAttribute('data-ignore-focus'));
 }
 
 export function unfocusAnyInput(): void {
@@ -70,6 +71,7 @@ export function clearSelection(): void {
     }
 }
 
+// todo try to get rid of this
 /**
  * prevents being able to focus element.
  * warning: it creates a listener
@@ -130,7 +132,7 @@ export function el<GTag extends keyof HTMLElementTagNameMap = 'div'>(params?: {
     custom?: { [key: string]: string };
     content?: string | (HTMLElement | SVGSVGElement | string | undefined)[] | Element;
     textContent?: string;
-    className?: string;
+    className?: string | string[];
     title?: string;
     id?: string;
     tagName?: GTag;
@@ -160,7 +162,9 @@ export function el<GTag extends keyof HTMLElementTagNameMap = 'div'>(params?: {
         result.textContent = params.textContent;
     }
     if (params.className) {
-        result.className = params.className;
+        result.className = Array.isArray(params.className)
+            ? params.className.join(' ')
+            : params.className;
     }
     if (params.id) {
         result.id = params.id;
