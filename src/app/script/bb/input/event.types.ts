@@ -35,6 +35,7 @@ export type TPointerEvent = {
 
     eventPreventDefault: () => void;
     eventStopPropagation: () => void;
+    target: Node | undefined; // the target of the original DOM event
 };
 
 export type TWheelEvent = {

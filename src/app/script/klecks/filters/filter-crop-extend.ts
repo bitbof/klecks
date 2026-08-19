@@ -2,20 +2,19 @@ import { BB } from '../../bb/bb';
 import { input } from '../ui/components/input';
 import { Checkbox } from '../ui/components/checkbox';
 import { ColorOptions } from '../ui/components/color-options';
-import { Cropper } from '../ui/components/cropper';
+import { ViewportCropper } from '../ui/components/cropper/viewport-cropper';
 import { Preview } from '../ui/project-viewport/preview';
 import { TFilterApply, TFilterGetDialogParam, TFilterGetDialogResult, TRgba } from '../kl-types';
 import { LANG } from '../../language/language';
 import { TCss, TRect } from '../../bb/bb-types';
 import { getPreviewHeight, getPreviewWidth } from '../ui/utils/preview-size';
 import { getMultiPolyBounds } from '../../bb/multi-polygon/get-multi-polygon-bounds';
-import { indexBoundsInArea } from '../../bb/math/math';
+import { indexBoundsInArea, indexBoundsToRect } from '../../bb/math/math';
 import { testIsSmall } from '../ui/utils/test-is-small';
 import { getIconUrl } from '../../icon/icon';
 import { createTransform } from '../../bb/transform/create-transform';
 import { EASEL_MAX_SCALE } from '../ui/easel/easel.config';
 import { css } from '../../bb/base/base';
-import { TViewportTransform } from '../ui/project-viewport/project-viewport';
 
 export type TFilterCropExtendInput = {
     left: number;
@@ -41,10 +40,6 @@ export const filterCropExtend = {
             right = 0,
             top = 0,
             bottom = 0;
-        let leftChanged = false,
-            rightChanged = false,
-            topChanged = false,
-            bottomChanged = false;
         const isSmall = testIsSmall();
         if (!isSmall) {
             result.width = getPreviewWidth(isSmall);
@@ -81,8 +76,7 @@ export const filterCropExtend = {
             max: maxWidth,
             css: { width: 75 },
             callback: function () {
-                leftChanged = true;
-                updateInput();
+                onInputChange('left');
             },
         });
         const rightInput = input({
@@ -92,8 +86,7 @@ export const filterCropExtend = {
             max: maxWidth,
             css: { width: 75 },
             callback: function () {
-                rightChanged = true;
-                updateInput();
+                onInputChange('right');
             },
         });
         const topInput = input({
@@ -103,8 +96,7 @@ export const filterCropExtend = {
             max: maxHeight,
             css: { width: 75 },
             callback: function () {
-                topChanged = true;
-                updateInput();
+                onInputChange('top');
             },
         });
         const bottomInput = input({
@@ -114,8 +106,7 @@ export const filterCropExtend = {
             max: maxHeight,
             css: { width: 75 },
             callback: function () {
-                bottomChanged = true;
-                updateInput();
+                onInputChange('bottom');
             },
         });
 
@@ -151,7 +142,7 @@ export const filterCropExtend = {
         wrapWrapper.append(leftWrapper, rightWrapper, topWrapper, bottomWrapper);
         rootEl.append(wrapWrapper);
 
-        function updateInput(): void {
+        function onInputChange(changeType: 'top' | 'right' | 'bottom' | 'left'): void {
             left = parseInt(leftInput.value);
             right = parseInt(rightInput.value);
             top = parseInt(topInput.value);
@@ -160,60 +151,58 @@ export const filterCropExtend = {
             let newHeight = klCanvas.getHeight() + top + bottom;
 
             if (newWidth <= 0) {
-                if (leftChanged) {
+                if (changeType == 'left') {
                     left = -klCanvas.getWidth() - right + 1;
                     leftInput.value = '' + left;
                 }
-                if (rightChanged) {
+                if (changeType == 'right') {
                     right = -klCanvas.getWidth() - left + 1;
                     rightInput.value = '' + right;
                 }
                 newWidth = 1;
             }
             if (newWidth > maxWidth) {
-                if (leftChanged) {
+                if (changeType == 'left') {
                     left = -klCanvas.getWidth() - right + maxWidth;
                     leftInput.value = '' + left;
                 }
-                if (rightChanged) {
+                if (changeType == 'right') {
                     right = -klCanvas.getWidth() - left + maxWidth;
                     rightInput.value = '' + right;
                 }
                 newWidth = maxWidth;
             }
             if (newHeight <= 0) {
-                if (topChanged) {
+                if (changeType == 'top') {
                     top = -klCanvas.getHeight() - bottom + 1;
                     topInput.value = '' + top;
                 }
-                if (bottomChanged) {
+                if (changeType == 'bottom') {
                     bottom = -klCanvas.getHeight() - top + 1;
                     bottomInput.value = '' + bottom;
                 }
                 newHeight = 1;
             }
             if (newHeight > maxHeight) {
-                if (topChanged) {
+                if (changeType == 'top') {
                     top = -klCanvas.getHeight() - bottom + maxHeight;
                     topInput.value = '' + top;
                 }
-                if (bottomChanged) {
+                if (changeType == 'bottom') {
                     bottom = -klCanvas.getHeight() - top + maxHeight;
                     bottomInput.value = '' + bottom;
                 }
                 newHeight = maxHeight;
             }
-            cropper.setTransform({
+
+            const newCrop: TRect = {
                 x: -left,
                 y: -top,
                 width: newWidth,
                 height: newHeight,
-            });
-
-            leftChanged = false;
-            rightChanged = false;
-            topChanged = false;
-            bottomChanged = false;
+            };
+            updateInputValues(newCrop);
+            cropper.setValue(newCrop);
         }
 
         let useRuleOfThirds = true;
@@ -223,7 +212,7 @@ export const filterCropExtend = {
             allowTab: true,
             callback: function (b) {
                 useRuleOfThirds = b;
-                cropper.showThirds(useRuleOfThirds);
+                cropper.setShowThirds(useRuleOfThirds);
             },
             name: 'rule-of-thirds',
         });
@@ -278,40 +267,15 @@ export const filterCropExtend = {
         rootEl.append(flexRow);
         flexRow.append(ruleOThirdsCheckbox.getElement(), colorOptions.getElement());
 
-        // When dragging in the preview finishes, update the inputs
-        function update(transform: TRect): void {
-            left = parseInt('' + -transform.x);
-            top = parseInt('' + -transform.y);
-            right = parseInt('' + (transform.x + transform.width - klCanvas.getWidth()));
-            bottom = parseInt('' + (transform.y + transform.height - klCanvas.getHeight()));
+        function updateInputValues(crop: TRect): void {
+            left = -crop.x;
+            top = -crop.y;
+            right = crop.x + crop.width - klCanvas.getWidth();
+            bottom = crop.y + crop.height - klCanvas.getHeight();
             leftInput.value = '' + left;
             topInput.value = '' + top;
             rightInput.value = '' + right;
             bottomInput.value = '' + bottom;
-        }
-
-        const cropperOuterWrapper = BB.el({
-            css: {
-                position: 'absolute',
-                left: 0,
-                top: 0,
-                width: '100%',
-                height: '100%',
-                zIndex: 0,
-            },
-        });
-        const cropperInnerWrapper = BB.el({
-            parent: cropperOuterWrapper,
-            css: {
-                position: 'absolute',
-                left: 0,
-                top: 0,
-                background: 'rgba(255,0,0,0.5)',
-            },
-        });
-        function updateInnerWrapper(transform: TViewportTransform): void {
-            cropperInnerWrapper.style.left = transform.x + 'px';
-            cropperInnerWrapper.style.top = transform.y + 'px';
         }
 
         const previewPadding = 40;
@@ -336,12 +300,13 @@ export const filterCropExtend = {
             hasEditMode: true,
             editIcon: getIconUrl('edit-crop'),
             onModeChange: (mode) => {
-                cropperOuterWrapper.style.pointerEvents = mode === 'edit' ? '' : 'none';
-                cropperOuterWrapper.style.opacity = mode === 'edit' ? '' : '0.5';
+                css(cropper.getElement(), {
+                    pointerEvents: mode === 'edit' ? undefined : 'none',
+                    opacity: mode === 'edit' ? undefined : 0.5,
+                });
             },
             onTransformChange: (transform) => {
-                updateInnerWrapper(transform);
-                cropper.setScale(transform.scale);
+                cropper.setViewportTransform(transform);
             },
             padding: previewPadding,
             background: 'checker',
@@ -374,27 +339,35 @@ export const filterCropExtend = {
             marginRight: -20,
             marginTop: 10,
         });
-        preview.getElement().append(cropperOuterWrapper);
         rootEl.append(preview.getElement());
 
-        const viewportTransform = preview.getTransform();
-        const cropper = new Cropper({
-            x: 0,
-            y: 0,
-            width: klCanvas.getWidth(),
-            height: klCanvas.getHeight(),
-            scale: viewportTransform.scale,
-            callback: update,
-            maxW: maxWidth,
-            maxH: maxHeight,
-            init: selectionBounds,
+        const cropper = new ViewportCropper({
+            width: previewWidth,
+            height: previewHeight,
+            value: selectionBounds
+                ? indexBoundsToRect(selectionBounds)
+                : {
+                      x: 0,
+                      y: 0,
+                      width: klCanvas.getWidth(),
+                      height: klCanvas.getHeight(),
+                  },
+            viewportTransform: preview.getTransform(),
+            maxWidth,
+            maxHeight,
+            showThirds: useRuleOfThirds,
+            onChange: updateInputValues,
         });
-        update(cropper.getTransform());
-        cropper.setScale(viewportTransform.scale);
-        cropperInnerWrapper.append(cropper.getElement());
-        updateInnerWrapper(viewportTransform);
+        updateInputValues(cropper.getValue());
+        css(cropper.getElement(), {
+            position: 'absolute',
+            left: 0,
+            top: 0,
+            zIndex: 0,
+        });
+        preview.getElement().append(cropper.getElement());
         const cropperWheelListener = new BB.PointerListener({
-            target: cropperOuterWrapper,
+            target: cropper.getElement(),
             onWheel: preview.onWheel,
             useDirtyWheel: true,
         });

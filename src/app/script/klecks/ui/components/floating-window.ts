@@ -18,7 +18,7 @@ export type TFloatingWindowParams = {
 
 export class FloatingWindow {
     private readonly rootEl: HTMLDivElement;
-    private readonly xButton: HTMLElement;
+    private readonly closeButton: HTMLElement;
     private readonly position: TVector2D;
     private readonly pointerListener: PointerListener;
     private outsideClickListenerTimeout: number | undefined;
@@ -69,7 +69,7 @@ export class FloatingWindow {
             p.onClose();
         };
         this.onResize = () => this.applyFractionalPosition();
-        this.xButton = BB.el({
+        this.closeButton = BB.el({
             tagName: 'button',
             className: 'popup-x',
             content: `<img alt="${LANG('modal-close')}" height="20" src="${getIconUrl('cancel')}">`,
@@ -93,7 +93,7 @@ export class FloatingWindow {
         const header = BB.el({
             className: 'kl-floating-window-header',
         });
-        header.append(this.xButton);
+        header.append(this.closeButton);
 
         const body = BB.el({
             content: p.content,
@@ -108,17 +108,27 @@ export class FloatingWindow {
             x: 0,
             y: 0,
         };
+        let isDragging = false;
         this.pointerListener = new BB.PointerListener({
             target: header,
             onPointer: (event) => {
-                event.eventPreventDefault();
-                if (event.button === 'left' && event.type === 'pointerdown') {
+                if (!isDragging && event.button === 'left' && event.type === 'pointerdown') {
+                    if (event.target && this.closeButton.contains(event.target)) {
+                        // don't drag close button
+                        return;
+                    }
+                    event.eventPreventDefault();
+                    isDragging = true;
                     downPosition = { ...this.position };
                 }
-                if (event.button === 'left' && event.type === 'pointermove') {
+                if (isDragging && event.button === 'left' && event.type === 'pointermove') {
+                    event.eventPreventDefault();
                     this.position.x = downPosition.x + event.pageX - event.downPageX!;
                     this.position.y = downPosition.y + event.pageY - event.downPageY!;
                     this.applyPosition();
+                }
+                if (isDragging && event.type === 'pointerup') {
+                    isDragging = false;
                 }
             },
         });

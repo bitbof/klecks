@@ -2,7 +2,7 @@ import { BB } from '../../../bb/bb';
 import { css } from '../../../bb/base/base';
 import { TCss } from '../../../bb/bb-types';
 import * as classes from './options.module.scss';
-import { focusableButtonClassName } from '../../../bb/base/ui';
+import { focusableElementClassName } from '../../../bb/base/ui';
 
 /**
  * selectable options
@@ -126,7 +126,7 @@ export class Options<IdType> {
 
             if (this.isFocusable) {
                 // important because you change the active option via keyboard presses
-                classArr.push(focusableButtonClassName);
+                classArr.push(focusableElementClassName);
             }
 
             const optionObj = {

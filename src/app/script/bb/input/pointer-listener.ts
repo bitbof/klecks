@@ -66,6 +66,7 @@ type TCorrectedPointerEvent = {
     buttons: number;
     button: number;
     coalescedArr: TCoalescedPointerEvent[];
+    target: Node | undefined;
     eventPreventDefault: () => void;
     eventStopPropagation: () => void;
 };
@@ -170,6 +171,7 @@ function correctPointerEvent(
         buttons: determineButtons(),
         button: event.button,
         coalescedArr: [],
+        target: (event.target ?? undefined) as Node | undefined,
         eventPreventDefault: () => event.preventDefault(),
         eventStopPropagation: () => event.stopPropagation(),
     };
@@ -335,6 +337,7 @@ export class PointerListener {
     ): TPointerEvent {
         const bounds: DOMRect = this.targetElement.getBoundingClientRect();
         const result: TPointerEvent = {
+            target: correctedEvent.target,
             type: typeStr,
             pointerId: correctedEvent.pointerId,
             pointerType: correctedEvent.pointerType as TPointerType,

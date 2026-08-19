@@ -20,7 +20,7 @@ import { LayersUi } from './ui/tool-tabs/layers-ui/layers-ui';
 import { KlCanvasPreview } from './ui/project-viewport/kl-canvas-preview';
 import { FreeTransform } from './ui/components/free-transform';
 import { FreeTransformCanvas } from './ui/components/free-transform-canvas';
-import { Cropper } from './ui/components/cropper';
+import { Cropper } from './ui/components/cropper/cropper';
 import { LayerPreview } from './ui/components/layer-preview';
 import { showImportAsLayerDialog } from './ui/modals/show-import-as-layer-dialog';
 import { KlImageDropper } from './ui/components/kl-image-dropper';

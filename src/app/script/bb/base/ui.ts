@@ -9,7 +9,7 @@ export function appendTextDiv(target: HTMLElement, text: string): HTMLDivElement
     return div;
 }
 
-export const focusableButtonClassName = 'kl-focusable-button';
+export const focusableElementClassName = 'kl-focusable-element';
 /**
  * Is an input element focused.
  * Set attribute "data-ignore-focus" to "true" if its focus should be ignored.
@@ -22,7 +22,7 @@ export function isInputFocused(getAll: boolean = false): boolean {
         !!activeElement &&
         (['INPUT', 'TEXTAREA', 'SELECT'].includes(activeElement.tagName) ||
             (activeElement.tagName === 'BUTTON' &&
-                activeElement.classList.contains(focusableButtonClassName)));
+                activeElement.classList.contains(focusableElementClassName)));
 
     return result && (getAll || !activeElement?.getAttribute('data-ignore-focus'));
 }
