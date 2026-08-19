@@ -8,6 +8,11 @@ const objectUrlByIcon = new Map<IconName, TObjectUrl>();
 const elementTemplateByIcon = new Map<IconName, SVGSVGElement>();
 let isIconCssInitialized = false;
 
+// icon as a data url
+export function getIconDataUrl(icon: IconName): string {
+    return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(icons[icon])}`;
+}
+
 // icon as an object url
 export function getIconUrl(icon: IconName): TObjectUrl {
     const cachedUrl = objectUrlByIcon.get(icon);
@@ -64,8 +69,10 @@ export function initIconCss(): void {
     }
     isIconCssInitialized = true;
 
+    // Data URLs because Firefox has trouble loading object urls across domains:
+    // e.g. Security Error: Content at https://foo.com/style.css may not load data from blob:https://bar.com/e249649e-be93-4d2c-bf43-009b633b3841.
     const declarations = (Object.keys(icons) as IconName[])
-        .map((icon) => `--icon-${icon}: url("${getIconUrl(icon)}")`)
+        .map((icon) => `--icon-${icon}: url("${getIconDataUrl(icon)}")`)
         .join(';');
     const styleEl = document.createElement('style');
     styleEl.id = 'icon-urls';
