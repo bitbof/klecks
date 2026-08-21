@@ -1,7 +1,7 @@
 import { BB } from '../../../bb/bb';
-import { KeyListener } from '../../../bb/input/key-listener';
 import { css } from '../../../bb/base/base';
 import { TCss } from '../../../bb/bb-types';
+import { getDecimalDigits } from '../../../bb/math/math';
 
 type TInputType = 'button' | 'checkbox' | 'number' | 'text' | 'color';
 
@@ -15,6 +15,7 @@ export type TInputParams = {
     // for type: number
     min?: number;
     max?: number;
+    // default "any"
     step?: number;
 
     onChange?: (v: string) => void;
@@ -35,9 +36,6 @@ export class Input {
     private readonly changeListener: (() => void) | undefined;
     private readonly inputListener: (() => void) | undefined;
     private readonly blurListener: (() => void) | undefined;
-    private readonly keyListener: KeyListener = {
-        destroy: () => {},
-    } as KeyListener;
 
     // ----------------------------------- public -----------------------------------
     constructor(p: TInputParams) {
@@ -68,6 +66,7 @@ export class Input {
         }
 
         const stepSize = p.step ?? 1;
+        const stepDigits = getDecimalDigits(stepSize);
 
         if (this.type === 'number') {
             if (p.min !== undefined) {
@@ -76,9 +75,8 @@ export class Input {
             if (p.max !== undefined) {
                 this.input.max = '' + p.max;
             }
-            if (p.step !== undefined) {
-                this.input.step = '' + stepSize;
-            }
+            // undefined would default to 1 (https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Attributes/step)
+            this.input.step = p.step === undefined ? 'any' : '' + p.step;
         }
 
         this.input.value = '' + p.init;
@@ -137,16 +135,12 @@ export class Input {
 
         if (p.doScrollWithoutFocus && p.type === 'number' && p.onChange) {
             const onChange = p.onChange;
-            this.keyListener = new BB.KeyListener({});
             this.pointerListener = new BB.PointerListener({
                 target: this.input,
                 onWheel: (e) => {
-                    /*if (document.hasFocus()) { // what was the point of this?
-                        return;
-                    }*/
-                    const fac = this.keyListener.isPressed('shift') ? 4 : 1;
-                    this.input.value =
-                        '' + (parseFloat(this.input.value) - e.deltaY * stepSize * fac);
+                    const fac = e.shiftKey ? 4 : 1;
+                    const value = parseFloat(this.input.value) - e.deltaY * stepSize * fac;
+                    this.input.value = '' + BB.round(value, stepDigits);
                     handleChange() && onChange(this.input.value);
                 },
             });
@@ -187,8 +181,7 @@ export class Input {
         if (this.blurListener) {
             this.input.removeEventListener('blur', this.blurListener);
         }
-        this.pointerListener && this.pointerListener.destroy();
-        this.keyListener.destroy();
+        this.pointerListener?.destroy();
     }
 }
 

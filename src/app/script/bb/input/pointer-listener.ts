@@ -42,6 +42,10 @@ type TDragObj = {
 };
 
 type TCoalescedPointerEvent = {
+    altKey: boolean;
+    ctrlKey: boolean;
+    metaKey: boolean;
+    shiftKey: boolean;
     pageX: number;
     pageY: number;
     clientX: number;
@@ -55,6 +59,10 @@ type TCoalescedPointerEvent = {
 type TCorrectedPointerEvent = {
     pointerId: number;
     pointerType: string;
+    altKey: boolean;
+    ctrlKey: boolean;
+    metaKey: boolean;
+    shiftKey: boolean;
     pageX: number;
     pageY: number;
     clientX: number;
@@ -160,6 +168,10 @@ function correctPointerEvent(
     const correctedObj: TCorrectedPointerEvent = {
         pointerId: event.pointerId,
         pointerType: event.pointerType,
+        altKey: event.altKey,
+        ctrlKey: event.ctrlKey,
+        metaKey: event.metaKey,
+        shiftKey: event.shiftKey,
         pageX: event.pageX,
         pageY: event.pageY,
         clientX: event.clientX,
@@ -226,6 +238,10 @@ function correctPointerEvent(
         const eventItem = coalescedEventArr[i];
 
         correctedObj.coalescedArr.push({
+            altKey: eventItem.altKey,
+            ctrlKey: eventItem.ctrlKey,
+            metaKey: eventItem.metaKey,
+            shiftKey: eventItem.shiftKey,
             pageX: eventItem.pageX,
             pageY: eventItem.pageY,
             clientX: eventItem.clientX,
@@ -341,6 +357,10 @@ export class PointerListener {
             type: typeStr,
             pointerId: correctedEvent.pointerId,
             pointerType: correctedEvent.pointerType as TPointerType,
+            altKey: correctedEvent.altKey,
+            ctrlKey: correctedEvent.ctrlKey,
+            metaKey: correctedEvent.metaKey,
+            shiftKey: correctedEvent.shiftKey,
             pageX: correctedEvent.pageX,
             pageY: correctedEvent.pageY,
             clientX: correctedEvent.clientX,
@@ -362,6 +382,10 @@ export class PointerListener {
                 for (let i = 0; i < correctedEvent.coalescedArr.length; i++) {
                     coalescedItem = correctedEvent.coalescedArr[i];
                     result.coalescedArr.push({
+                        altKey: coalescedItem.altKey,
+                        ctrlKey: coalescedItem.ctrlKey,
+                        metaKey: coalescedItem.metaKey,
+                        shiftKey: coalescedItem.shiftKey,
                         pageX: coalescedItem.pageX,
                         pageY: coalescedItem.pageY,
                         clientX: coalescedItem.clientX,
@@ -419,6 +443,10 @@ export class PointerListener {
                 ...(e instanceof WheelEvent
                     ? { deltaY: e.deltaY / 120, pageX: e.pageX, pageY: e.pageY }
                     : e),
+                altKey: e.altKey,
+                ctrlKey: e.ctrlKey,
+                metaKey: e.metaKey,
+                shiftKey: e.shiftKey,
                 relX: e.clientX - bounds.left + this.targetElement.scrollLeft,
                 relY: e.clientY - bounds.top + this.targetElement.scrollTop,
                 ...(e instanceof WheelEvent ? { event: e } : {}),
@@ -631,6 +659,10 @@ export class PointerListener {
                     return {
                         pointerId: touch.identifier,
                         pointerType: 'touch',
+                        altKey: touchEvent.altKey,
+                        ctrlKey: touchEvent.ctrlKey,
+                        metaKey: touchEvent.metaKey,
+                        shiftKey: touchEvent.shiftKey,
                         pageX: touch.pageX,
                         pageY: touch.pageY,
                         clientX: touch.clientX,

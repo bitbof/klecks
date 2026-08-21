@@ -40,6 +40,7 @@ export const filterRotate = {
 
         const minusBtn = BB.el({
             tagName: 'button',
+            className: 'kl-button',
             content: [
                 BB.el({
                     tagName: 'span',
@@ -58,6 +59,7 @@ export const filterRotate = {
         });
         const plusBtn = BB.el({
             tagName: 'button',
+            className: 'kl-button',
             content: [
                 BB.el({
                     tagName: 'span',

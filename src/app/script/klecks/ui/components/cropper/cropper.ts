@@ -5,11 +5,16 @@ import { PointerListener } from '../../../../bb/input/pointer-listener';
 
 export type TResizeDirection = 'n' | 'ne' | 'e' | 'se' | 's' | 'sw' | 'w' | 'nw';
 
-export type TCropperChange =
-    | { type: 'down'; dX: 0; dY: 0 }
-    | { type: 'up'; dX: 0; dY: 0 }
+export type TCropperEvent =
+    | { type: 'start' }
     | { type: 'move'; dX: number; dY: number }
-    | { type: 'resize'; dX: number; dY: number; direction: TResizeDirection };
+    | {
+          type: 'resize';
+          dX: number;
+          dY: number;
+          direction: TResizeDirection;
+          isSymmetric: boolean;
+      };
 
 const directionToCursor: Record<TResizeDirection, string> = {
     n: 'ns-resize',
@@ -28,7 +33,7 @@ export type TCropperParams = {
     width: number;
     height: number;
     value: TRect;
-    processChange: (change: TCropperChange) => TRect;
+    processEvent: (change: TCropperEvent) => TRect;
     toRendered: (crop: TRect) => TRect;
     showThirds?: boolean;
     onChange?: (crop: TRect) => void;
@@ -42,7 +47,7 @@ export class Cropper {
     private readonly thirdsElArr: HTMLDivElement[];
     private readonly handleElMap: Record<TResizeDirection, HTMLDivElement>;
     private readonly pointerListenerArr: PointerListener[] = [];
-    private readonly processChange: (change: TCropperChange) => TRect;
+    private readonly processEvent: (change: TCropperEvent) => TRect;
     private readonly toRendered: (crop: TRect) => TRect;
     private readonly onChange: ((crop: TRect) => void) | undefined;
 
@@ -114,8 +119,8 @@ export class Cropper {
         });
     }
 
-    private applyChange(change: TCropperChange): void {
-        this.crop = this.processChange(change);
+    private processAndApply(event: TCropperEvent): void {
+        this.crop = this.processEvent(event);
         this.onChange?.({ ...this.crop });
         this.render();
     }
@@ -282,7 +287,7 @@ export class Cropper {
     constructor(p: TCropperParams) {
         this.width = p.width;
         this.height = p.height;
-        this.processChange = p.processChange;
+        this.processEvent = p.processEvent;
         this.toRendered = p.toRendered;
         this.crop = { ...p.value };
         this.showThirds = p.showThirds ?? false;
@@ -371,14 +376,13 @@ export class Cropper {
                     event.eventPreventDefault();
                     if (event.type === 'pointerdown') {
                         this.updatePointerEvents(this.moveEl);
-                        this.applyChange({ type: 'down', dX: 0, dY: 0 });
+                        this.processEvent({ type: 'start' });
                     }
                     if (event.type === 'pointermove' && event.button === 'left') {
-                        this.applyChange({ type: 'move', dX: event.dX, dY: event.dY });
+                        this.processAndApply({ type: 'move', dX: event.dX, dY: event.dY });
                     }
                     if (event.type === 'pointerup') {
                         this.updatePointerEvents(undefined);
-                        this.applyChange({ type: 'up', dX: 0, dY: 0 });
                     }
                 },
             }),
@@ -393,26 +397,24 @@ export class Cropper {
                         event.eventPreventDefault();
                         if (event.type === 'pointerdown') {
                             this.updatePointerEvents(this.handleElMap[direction]);
-                            this.applyChange({ type: 'down', dX: 0, dY: 0 });
+                            this.processEvent({ type: 'start' });
                         }
                         if (event.type === 'pointermove' && event.button === 'left') {
-                            this.applyChange({
+                            this.processAndApply({
                                 type: 'resize',
                                 direction,
                                 dX: event.dX,
                                 dY: event.dY,
+                                isSymmetric: event.shiftKey,
                             });
                         }
                         if (event.type === 'pointerup') {
                             this.updatePointerEvents(undefined);
-                            this.applyChange({ type: 'up', dX: 0, dY: 0 });
                         }
                     },
                 }),
             );
         });
-
-        this.render();
     }
 
     getElement(): HTMLElement {

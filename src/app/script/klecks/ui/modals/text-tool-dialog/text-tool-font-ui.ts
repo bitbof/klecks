@@ -224,6 +224,7 @@ export class TextToolFontUI {
 
         this.importButton = BB.el({
             tagName: 'button',
+            className: 'kl-button',
             content: LANG('file-import'),
             onClick: () => {
                 this.importFont();

@@ -53,7 +53,7 @@ export class RecoveryManagerPanel {
                 });
                 const deleteBtn = BB.el({
                     tagName: 'button',
-                    className: 'kl-button-delete',
+                    className: 'kl-button kl-button-delete',
                     content: [
                         getIconSvg('remove-layer', {
                             height: 20,
@@ -212,6 +212,7 @@ export class RecoveryManagerPanel {
                     }),
                     BB.el({
                         tagName: 'button',
+                        className: 'kl-button',
                         textContent: LANG('retry'),
                         onClick: (e) => {
                             (e.target as HTMLButtonElement).disabled = true;

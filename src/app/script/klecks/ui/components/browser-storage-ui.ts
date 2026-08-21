@@ -256,7 +256,7 @@ export class BrowserStorageUi {
         if (this.onOpen) {
             this.openButtonEl = BB.el({
                 tagName: 'button',
-                className: 'grid-button',
+                className: 'kl-button grid-button',
                 content: LANG('file-storage-open'),
                 css: {
                     margin: 0,
@@ -267,7 +267,7 @@ export class BrowserStorageUi {
         }
         this.storeButtonEl = BB.el({
             tagName: 'button',
-            className: 'grid-button',
+            className: 'kl-button grid-button',
             content: LANG('file-storage-store'),
             css: {
                 margin: 0,
@@ -277,7 +277,7 @@ export class BrowserStorageUi {
         });
         this.clearButtonEl = BB.el({
             tagName: 'button',
-            className: 'grid-button kl-button-delete',
+            className: 'kl-button grid-button kl-button-delete',
             content: [getIconSvg('remove-layer', { height: 20 }), LANG('file-storage-clear')],
             css: {
                 margin: 0,

@@ -16,7 +16,6 @@ import { c } from '../../../../bb/base/c';
 import { DropdownMenu } from '../../components/dropdown-menu';
 import { KlHistory } from '../../../history/kl-history';
 import { makeUnfocusable } from '../../../../bb/base/ui';
-import { TCss } from '../../../../bb/bb-types';
 
 const paddingLeft = 25;
 
@@ -602,11 +601,11 @@ export class LayersUi {
             parent: listDiv,
         });
 
-        this.addBtn = BB.el({ tagName: 'button' });
-        this.duplicateBtn = BB.el({ tagName: 'button' });
-        this.mergeBtn = BB.el({ tagName: 'button' });
-        this.removeBtn = BB.el({ tagName: 'button' });
-        const renameBtn = BB.el({ tagName: 'button' });
+        this.addBtn = BB.el({ tagName: 'button', className: 'kl-button' });
+        this.duplicateBtn = BB.el({ tagName: 'button', className: 'kl-button' });
+        this.mergeBtn = BB.el({ tagName: 'button', className: 'kl-button' });
+        this.removeBtn = BB.el({ tagName: 'button', className: 'kl-button' });
+        const renameBtn = BB.el({ tagName: 'button', className: 'kl-button' });
         this.moreDropdown = new DropdownMenu({
             button: BB.el({
                 content: getIconSvg('chevron-down', { width: '13px' }),
@@ -656,21 +655,6 @@ export class LayersUi {
                 makeUnfocusable(this.mergeBtn);
                 makeUnfocusable(this.removeBtn);
                 makeUnfocusable(renameBtn);
-
-                const commonStyle: TCss = {
-                    float: 'left',
-                    paddingLeft: 5,
-                    paddingRight: 3,
-                };
-                css(this.addBtn, commonStyle);
-                css(this.duplicateBtn, commonStyle);
-                css(this.mergeBtn, commonStyle);
-                css(this.removeBtn, commonStyle);
-                css(renameBtn, {
-                    float: 'left',
-                    height: 30,
-                    lineHeight: '20px',
-                });
 
                 this.addBtn.title = LANG('layers-new');
                 this.duplicateBtn.title = LANG('layers-duplicate');

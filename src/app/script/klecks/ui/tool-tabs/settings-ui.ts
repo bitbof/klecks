@@ -191,6 +191,7 @@ export class SettingsUi {
         // ---- flip ui ----
         BB.el({
             tagName: 'button',
+            className: 'kl-button',
             parent: this.rootEl,
             content: [
                 createImage({

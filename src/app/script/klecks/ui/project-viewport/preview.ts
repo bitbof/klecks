@@ -379,6 +379,7 @@ export class Preview {
                 c(',pos-absolute,right-5,bottom-5,flex,flexCol,gap-5,z-1,pointer-auto', [
                     c({
                         tagName: 'button',
+                        className: 'kl-button',
                         title: LANG('hand-reset'),
                         onClick: () => {
                             this.reset();
@@ -388,6 +389,7 @@ export class Preview {
                     }),
                     c({
                         tagName: 'button',
+                        className: 'kl-button',
                         title: LANG('zoom-in'),
                         onClick: () => {
                             const oldScale = this.viewport.getTransform().scale;
@@ -402,6 +404,7 @@ export class Preview {
                     }),
                     c({
                         tagName: 'button',
+                        className: 'kl-button',
                         title: LANG('zoom-out'),
                         onClick: () => {
                             const oldScale = this.viewport.getTransform().scale;

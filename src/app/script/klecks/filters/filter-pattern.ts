@@ -389,8 +389,6 @@ export const filterPattern = {
             heightInput.value = '' + settings.height;
         }
 
-        const keyListener = new BB.KeyListener({});
-
         previewWrapper.oncontextmenu = function () {
             return false;
         };
@@ -440,7 +438,7 @@ export const filterPattern = {
                             settings.width = Math.min(maxSize, Math.ceil(x2 - settings.x));
                             settings.height = Math.min(maxSize, Math.ceil(y2 - settings.y));
 
-                            if (keyListener.isPressed('shift')) {
+                            if (event.shiftKey) {
                                 settings.width = Math.min(settings.width, settings.height);
                                 settings.height = Math.min(settings.width, settings.height);
                             }
@@ -600,7 +598,6 @@ export const filterPattern = {
         // ----- result -------------------
         const destroy = () => {
             blendSlider.destroy();
-            keyListener.destroy();
             pointerListener.destroy();
             klCanvasPreview.destroy();
         };

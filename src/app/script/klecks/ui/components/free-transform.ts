@@ -1,6 +1,5 @@
 import { BB } from '../../../bb/bb';
 import rotateImg from 'url:/src/app/img/ui/cursor-rotate.png';
-import { KeyListener } from '../../../bb/input/key-listener';
 import { TVector2D } from '../../../bb/bb-types';
 import { PointerListener } from '../../../bb/input/pointer-listener';
 import {
@@ -15,11 +14,15 @@ import { TViewportTransform } from '../project-viewport/project-viewport';
 import { createMatrixFromTransform } from '../../../bb/transform/create-matrix-from-transform';
 import { applyToPoint, inverse } from 'transformation-matrix';
 import { pointsToAngleDeg } from '../../../bb/math/math';
-import { TWheelEvent } from '../../../bb/input/event.types';
+import { TPointerEvent, TWheelEvent } from '../../../bb/input/event.types';
 import { TFreeTransform } from '../../transform/transform-types';
 
 const gripSize = 16;
 const edgeSize = 10;
+
+function isOnlyShiftPressed(event: TPointerEvent): boolean {
+    return event.shiftKey && !event.altKey && !event.ctrlKey && !event.metaKey;
+}
 
 // 0 - east
 function angleDegToCursor(angleDeg: number): string {
@@ -88,7 +91,6 @@ export class FreeTransform {
     private readonly transEl: HTMLElement; // at middle of transform. rotates
     private readonly boundsEl: HTMLElement; // draggable bounds rectangle with outline
     private readonly corners: TFreeTransformCorner[] = [];
-    private keyListener: KeyListener;
     private boundsPointerListener: PointerListener;
     private anglePointerListener: PointerListener;
     private readonly edges: TFreeTransformEdge[] = [];
@@ -409,8 +411,6 @@ export class FreeTransform {
             pointerRemainder.x = 0;
             pointerRemainder.y = 0;
         }
-        this.keyListener = new BB.KeyListener({});
-
         let boundsStartP = {
             x: 0,
             y: 0,
@@ -496,7 +496,7 @@ export class FreeTransform {
                             }
                         }
                     }
-                    if (this.keyListener.getComboStr() === 'shift') {
+                    if (isOnlyShiftPressed(event)) {
                         let projected = BB.projectPointOnLine(
                             { x: 0, y: boundsStartP.y },
                             { x: 10, y: boundsStartP.y },
@@ -722,7 +722,7 @@ export class FreeTransform {
 
                             this.corners[indexes[0]].x = this.corners[i].x;
                             this.corners[indexes[1]].y = this.corners[i].y;
-                            if (this.keyListener.isPressed('shift')) {
+                            if (event.shiftKey) {
                                 this.corners[indexes[2]].x -= dX;
                                 this.corners[indexes[2]].y -= dY;
                                 this.corners[indexes[1]].x = this.corners[indexes[2]].x;
@@ -901,7 +901,7 @@ export class FreeTransform {
                                 this.corners[indexes[2]][dimension] += d;
                                 this.corners[indexes[3]][dimension] += d;
                             }
-                            if (this.keyListener.isPressed('shift')) {
+                            if (event.shiftKey) {
                                 if (isInverted) {
                                     this.corners[indexes[2]][dimension] -= d;
                                     this.corners[indexes[3]][dimension] -= d;
@@ -986,7 +986,7 @@ export class FreeTransform {
                         ) + 90;
                     this.value.angleDeg = a;
                     const snapDeg = Math.round((a / 360) * 8) * 45;
-                    if (this.keyListener.getComboStr() === 'shift') {
+                    if (isOnlyShiftPressed(event)) {
                         this.value.angleDeg = snapDeg;
                     } else if (this.snappingEnabled && Math.abs(snapDeg - a) < 8) {
                         this.value.angleDeg = snapDeg;
@@ -1099,7 +1099,6 @@ export class FreeTransform {
     }
 
     destroy(): void {
-        this.keyListener.destroy();
         this.boundsPointerListener.destroy();
         this.corners.forEach((item) => item.pointerListener.destroy());
         this.edges.forEach((item) => item.pointerListener.destroy());

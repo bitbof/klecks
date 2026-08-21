@@ -15,7 +15,7 @@ export class DropdownMenu<IdType extends string> {
 
     // ----------------------------------- public -----------------------------------
     constructor(p: TDropdownMenuParams<IdType>) {
-        const button = c('button,w-full,h-full', [p.button]) as HTMLButtonElement;
+        const button = c('button.kl-button,w-full,h-full', [p.button]) as HTMLButtonElement;
         button.onclick = () => {
             toggle(!this.isExpanded);
         };
@@ -29,6 +29,7 @@ export class DropdownMenu<IdType extends string> {
         p.items.forEach((item) => {
             const itemButton = el({
                 tagName: 'button',
+                className: 'kl-button',
                 css: {
                     display: 'flex',
                     justifyContent: 'space-between',

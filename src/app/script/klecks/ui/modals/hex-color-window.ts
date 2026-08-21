@@ -157,6 +157,7 @@ export class HexColorWindow {
         });
         this.copyButton = BB.el({
             tagName: 'button',
+            className: 'kl-button',
             content: getIconImg('copy', { height: 20 }),
             title: LANG('mci-copy'),
             onClick: () => {

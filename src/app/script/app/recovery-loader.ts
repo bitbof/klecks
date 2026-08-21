@@ -25,6 +25,7 @@ export async function loadRecovery(
 
                   const cancelButton = BB.el({
                       tagName: 'button',
+                      className: 'kl-button',
                       textContent: LANG('modal-cancel'),
                       onClick: () => {
                           cancelButton.disabled = true;

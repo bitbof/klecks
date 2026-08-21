@@ -239,6 +239,7 @@ export class SelectUi {
         const selectAllBtn = BB.el({
             parent: actionRow,
             tagName: 'button',
+            className: 'kl-button',
             content: LANG('select-all'),
             onClick: () => {
                 p.select.onAll();
@@ -253,6 +254,7 @@ export class SelectUi {
         const selectInvertBtn = BB.el({
             parent: actionRow,
             tagName: 'button',
+            className: 'kl-button',
             content: LANG('select-invert'),
             onClick: () => {
                 p.select.onInvert();
@@ -303,6 +305,7 @@ export class SelectUi {
         const eraseBtn = BB.el({
             parent: actionsWrapper,
             tagName: 'button',
+            className: 'kl-button',
             content: LANG('select-erase'),
             onClick: () => {
                 p.onErase();
@@ -315,6 +318,7 @@ export class SelectUi {
         const fillBtn = BB.el({
             parent: actionsWrapper,
             tagName: 'button',
+            className: 'kl-button',
             content: LANG('select-fill'),
             onClick: () => {
                 p.onFill();
@@ -349,6 +353,7 @@ export class SelectUi {
         });
         const transformFlipYBtn = BB.el({
             tagName: 'button',
+            className: 'kl-button',
             content: LANG('filter-transform-flip') + ' Y',
             onClick: () => {
                 p.transform.onFlipY();
@@ -359,6 +364,7 @@ export class SelectUi {
         });
         const rotateNegativeBtn = BB.el({
             tagName: 'button',
+            className: 'kl-button',
             content: '-90°',
             onClick: () => {
                 p.transform.onRotateDeg(-90);
@@ -369,6 +375,7 @@ export class SelectUi {
         });
         const rotatePositiveBtn = BB.el({
             tagName: 'button',
+            className: 'kl-button',
             content: '+90°',
             onClick: () => {
                 p.transform.onRotateDeg(90);
@@ -386,6 +393,7 @@ export class SelectUi {
         });
         const transformDuplicateBtn = BB.el({
             tagName: 'button',
+            className: 'kl-button',
             content: [duplicateIcon.getElement(), LANG('select-transform-clone')],
             onClick: () => {
                 p.transform.onClone();
@@ -401,6 +409,7 @@ export class SelectUi {
 
         const scaleDoubleBtn = BB.el({
             tagName: 'button',
+            className: 'kl-button',
             content: '2&times;',
             onClick: () => {
                 p.transform.onScale(2);
@@ -412,6 +421,7 @@ export class SelectUi {
 
         const scaleHalfBtn = BB.el({
             tagName: 'button',
+            className: 'kl-button',
             content: '&frac12;&times;',
             onClick: () => {
                 p.transform.onScale(1 / 2);
@@ -423,6 +433,7 @@ export class SelectUi {
 
         const centerBtn = BB.el({
             tagName: 'button',
+            className: 'kl-button',
             content: LANG('center'),
             onClick: () => {
                 p.transform.onCenter();

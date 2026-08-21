@@ -316,7 +316,6 @@ a:not([href]):hover {
     }
 }
 
-button,
 .kl-button {
     padding: 5px;
     min-width: 30px;
@@ -343,13 +342,11 @@ button,
     -webkit-user-select: none;
 }
 
-button:hover,
 .kl-button:hover {
     background-color: #fff;
     color: #777;
 }
 
-button:active,
 .kl-button:active {
     background-color: #ddd;
     box-shadow:
@@ -357,7 +354,6 @@ button:active,
         0 2px 2px #ddd;
 }
 
-button:disabled,
 .kl-button:disabled {
     padding: 5px;
     min-width: 30px;
@@ -376,14 +372,10 @@ button:disabled,
     box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.05);
 }
 
-button:disabled img,
-,
 .kl-button:disabled img {
     opacity: 0.2;
 }
 
-button img,
-button svg,
 .kl-button img,
 .kl-button svg {
     float: left;
@@ -653,6 +645,9 @@ input:focus {
 }
 
 .popup-x {
+    appearance: none;
+    border: none;
+
     display: flex;
     justify-content: center;
     align-items: center;

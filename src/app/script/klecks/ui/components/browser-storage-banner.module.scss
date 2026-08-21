@@ -48,10 +48,11 @@
 .closeArea {
     pointer-events: initial;
     position: absolute;
-    left: -150px;
-    top: -150px;
-    width: calc(100% + 300px);
-    height: calc(100% + 300px);
+    margin-left: -300px;
+    left: 50%;
+    top: 0;
+    width: 550px;
+    height: 200px;
     z-index: -1;
 }
 

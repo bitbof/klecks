@@ -111,7 +111,11 @@ export function newImageDialog(p: {
             marginBottom: 10,
         },
     });
-    const presetBtnConfig = { tagName: 'button', css: { flexGrow: '1' } } as const;
+    const presetBtnConfig = {
+        tagName: 'button',
+        className: 'kl-button',
+        css: { flexGrow: '1' },
+    } as const;
     const presetFitBtn = BB.el(presetBtnConfig);
     const presetCurrentBtn = BB.el(presetBtnConfig);
     const presetSquareBtn = BB.el(presetBtnConfig);

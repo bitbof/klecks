@@ -35,6 +35,7 @@ export class PinchZoomWatcher {
         BB.el({
             parent: rootEl,
             tagName: 'button',
+            className: 'kl-button',
             content: LANG('dismiss'),
             onClick: () => {
                 isDismissed = true;

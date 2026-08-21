@@ -141,7 +141,33 @@ export function roundUneven(f: number): number {
  */
 export function round(f: number, digits: number): number {
     const digitMult = Math.pow(10, digits);
-    return Math.round(f /* + Number.EPSILON*/ * digitMult) / digitMult;
+    // adding epsilon is not much better
+    return Math.round(f * digitMult) / digitMult;
+}
+
+const roundFormatterCache = new Map<number, Intl.NumberFormat>();
+// can be multiple orders of magnitude slower, but is correct
+export function roundSlow(f: number, digits: number): number {
+    try {
+        let formatter = roundFormatterCache.get(digits);
+        if (!formatter) {
+            formatter = new Intl.NumberFormat('en-US-u-nu-latn', {
+                useGrouping: false,
+                maximumFractionDigits: digits,
+            });
+            roundFormatterCache.set(digits, formatter);
+        }
+
+        return Number(formatter.format(f));
+    } catch {
+        return round(f, digits);
+    }
+}
+
+export function getDecimalDigits(value: number): number {
+    const [coefficient, exponent = '0'] = value.toString().toLowerCase().split('e');
+    const fractionLength = coefficient.split('.')[1]?.length ?? 0;
+    return Math.max(0, fractionLength - Number(exponent));
 }
 
 export function fixBounds<GBoundsType extends TCoordinateBounds | TIndexBounds>(

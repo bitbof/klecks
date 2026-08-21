@@ -1,8 +1,8 @@
 import { TMixMode } from '../../kl-types';
 import { BB } from '../../../bb/bb';
-import { css, throwIfNull } from '../../../bb/base/base';
+import { css } from '../../../bb/base/base';
 import { THEME } from '../../../theme/theme';
-import { compose, inverse, Matrix } from 'transformation-matrix';
+import { compose, Matrix } from 'transformation-matrix';
 import { createMatrixFromTransform } from '../../../bb/transform/create-matrix-from-transform';
 import { matrixToTuple } from '../../../bb/math/matrix-to-tuple';
 import { DEBUG_RENDER, DEBUG_RENDERER_ENABLED } from './debug-render';
@@ -85,7 +85,6 @@ export class ProjectViewport {
     private project: TProjectViewportProject;
     private useNativeResolution: boolean;
 
-    private pattern: CanvasPattern;
     private resFactor: number;
     private background: TProjectViewportParams['background'];
     private doResize: boolean = true;
@@ -94,12 +93,7 @@ export class ProjectViewport {
         | undefined
         | ((ctx: CanvasRenderingContext2D, transform: TViewportTransformXY) => void);
 
-    private onIsDark = (): void => {
-        this.pattern = throwIfNull(
-            this.ctx.createPattern(BB.createCheckerCanvas(10, THEME.isDark()), 'repeat'),
-        );
-        this.render();
-    };
+    private onIsDark = () => this.render();
 
     private onPixelatedZoomChange = (): void => {
         this.render();
@@ -137,13 +131,12 @@ export class ProjectViewport {
             imageRendering:
                 Math.round(devicePixelRatio) !== devicePixelRatio ? undefined : 'pixelated',
             display: 'block',
+            // achieves accurate mixing with all layer mix modes
+            background: 'var(--kl-checkerboard-background)',
+            backgroundSize: '20px',
         });
         window.addEventListener('resize', this.resizeListener);
 
-        this.pattern = throwIfNull(
-            // Exception: InvalidStateError: The object is in an invalid state.
-            this.ctx.createPattern(BB.createCheckerCanvas(10, THEME.isDark()), 'repeat'),
-        );
         THEME.addIsDarkListener(this.onIsDark);
         addIsPixelatedZoomListener(this.onPixelatedZoomChange);
 
@@ -196,18 +189,12 @@ export class ProjectViewport {
 
         // draw background
         if (this.background === 'checker') {
-            try {
-                // setTransform got browser support since 2018-2020. catch if fails.
-                this.pattern.setTransform();
-            } catch (e) {
-                /* */
-            }
-            this.ctx.fillStyle = this.pattern;
+            this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
         } else {
             this.ctx.fillStyle =
                 this.background ?? (isDark ? 'rgb(33, 33, 33)' : 'rgb(158,158,158)');
+            this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
         }
-        this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
 
         this.ctx.transform(...matrixToTuple(renderedMat));
         {
@@ -225,14 +212,7 @@ export class ProjectViewport {
             );
 
             // checkerboard
-            this.ctx.fillStyle = this.pattern;
-            try {
-                // setTransform got browser support since 2018-2020. catch if fails.
-                this.pattern.setTransform(inverse(renderedMat));
-            } catch (e) {
-                /* */
-            }
-            this.ctx.fillRect(0, 0, this.project.width, this.project.height);
+            this.ctx.clearRect(0, 0, this.project.width, this.project.height);
 
             this.ctx.restore();
         }

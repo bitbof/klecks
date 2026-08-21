@@ -1151,6 +1151,7 @@ export class KlApp {
                         let closeFunc: () => void;
                         const saveBtn = BB.el({
                             tagName: 'button',
+                            className: 'kl-button',
                             textContent: LANG('save-reminder-save-psd'),
                             css: {
                                 display: 'block',

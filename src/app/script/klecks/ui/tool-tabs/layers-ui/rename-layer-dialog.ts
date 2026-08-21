@@ -28,6 +28,7 @@ export function renameLayerDialog(
     input.style.flexGrow = '1';
     const clearBtn = BB.el({
         tagName: 'button',
+        className: 'kl-button',
         content: getIconSvg('remove-layer', {
             height: 20,
         }),
@@ -62,6 +63,7 @@ export function renameLayerDialog(
         const btn = BB.el({
             parent: row2,
             tagName: 'button',
+            className: 'kl-button',
             content: item,
             onClick: () => {
                 input.value = '' + btn.textContent;

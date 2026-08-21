@@ -42,6 +42,7 @@ export function showImportAsLayerDialog(params: {
     });
     const originalSizeBtn = BB.el({
         tagName: 'button',
+        className: 'kl-button',
         content: '1:1',
         css: {
             marginRight: 10,
@@ -52,6 +53,7 @@ export function showImportAsLayerDialog(params: {
     });
     const fitSizeBtn = BB.el({
         tagName: 'button',
+        className: 'kl-button',
         content: LANG('import-as-layer-fit'),
         css: {
             marginRight: 10,
@@ -62,6 +64,7 @@ export function showImportAsLayerDialog(params: {
     });
     const centerBtn = BB.el({
         tagName: 'button',
+        className: 'kl-button',
         content: LANG('center'),
         css: {
             marginRight: 10,

@@ -1,157 +1,181 @@
-import { BB } from '../../../../bb/bb';
-import { TRect } from '../../../../bb/bb-types';
+import { TRect, TVector2D } from '../../../../bb/bb-types';
 import { TViewportTransform } from '../../project-viewport/project-viewport';
-import { Cropper, TCropperChange, TCropperParams, TResizeDirection } from './cropper';
+import { Cropper, TCropperParams } from './cropper';
+import { Vec2 } from '../../../../bb/math/vec2';
+import { clamp } from '../../../../bb/math/math';
 
-function constrainAndSnap(
-    cropFloat: TRect,
-    lastCrop: TRect,
-    direction: TResizeDirection | undefined, // undefined = move
-    minWidth: number,
-    minHeight: number,
-    maxWidth: number,
-    maxHeight: number,
-): TRect {
-    const isRightEdgeFixed = direction ? direction.includes('w') : false;
-    const isLeftEdgeFixed = direction ? direction.includes('e') : false;
-    const isBottomEdgeFixed = direction ? direction.includes('n') : false;
-    const isTopEdgeFixed = direction ? direction.includes('s') : false;
+type TCorners = {
+    // top left
+    tl: TVector2D;
+    // bottom right
+    br: TVector2D;
+};
 
-    let x1 = isLeftEdgeFixed ? lastCrop.x : Math.round(cropFloat.x);
-    let y1 = isTopEdgeFixed ? lastCrop.y : Math.round(cropFloat.y);
-    let x2 = isRightEdgeFixed ? lastCrop.x + lastCrop.width : x1 + Math.round(cropFloat.width);
-    let y2 = isBottomEdgeFixed ? lastCrop.y + lastCrop.height : y1 + Math.round(cropFloat.height);
-
-    const width = BB.clamp(x2 - x1, minWidth, maxWidth);
-    const height = BB.clamp(y2 - y1, minHeight, maxHeight);
-
-    if (isRightEdgeFixed) {
-        x1 = x2 - width;
-    } else {
-        x2 = x1 + width;
-    }
-    if (isBottomEdgeFixed) {
-        y1 = y2 - height;
-    } else {
-        y2 = y1 + height;
-    }
-
+function cornersToRect({ tl, br }: TCorners): TRect {
     return {
-        x: x1,
-        y: y1,
-        width: x2 - x1,
-        height: y2 - y1,
+        x: tl.x,
+        y: tl.y,
+        width: br.x - tl.x,
+        height: br.y - tl.y,
     };
 }
 
-type TViewportCropperState = {
-    viewportTransform: TViewportTransform;
-    // raw crop in canvas coordinates, accumulates deltas, may have fractional parts
-    cropFloat: TRect;
-    // constrained, pixel grid snapped crop in canvas coordinates
-    lastCrop: TRect;
-};
+function rectToCorners(rect: TRect): TCorners {
+    return {
+        tl: { x: rect.x, y: rect.y },
+        br: { x: rect.x + rect.width, y: rect.y + rect.height },
+    };
+}
 
-export type TViewportCropperParams = Omit<TCropperParams, 'processChange' | 'toRendered'> & {
+type TSizeOptions = {
+    maxWidth: number;
+    maxHeight: number;
+};
+const minSize = 1;
+
+function resizeTop(corners: TCorners, d: TVector2D, { maxHeight }: TSizeOptions): TCorners {
+    const y = clamp(corners.tl.y + d.y, corners.br.y - maxHeight, corners.br.y - minSize);
+    return {
+        tl: { x: corners.tl.x, y },
+        br: corners.br,
+    };
+}
+
+function resizeBottom(corners: TCorners, d: TVector2D, { maxHeight }: TSizeOptions): TCorners {
+    const y = clamp(corners.br.y + d.y, corners.tl.y + minSize, corners.tl.y + maxHeight);
+    return {
+        tl: corners.tl,
+        br: { x: corners.br.x, y },
+    };
+}
+
+function resizeLeft(corners: TCorners, d: TVector2D, { maxWidth }: TSizeOptions): TCorners {
+    const x = clamp(corners.tl.x + d.x, corners.br.x - maxWidth, corners.br.x - minSize);
+    return {
+        tl: { x, y: corners.tl.y },
+        br: corners.br,
+    };
+}
+
+function resizeRight(corners: TCorners, d: TVector2D, { maxWidth }: TSizeOptions): TCorners {
+    const x = clamp(corners.br.x + d.x, corners.tl.x + minSize, corners.tl.x + maxWidth);
+    return {
+        tl: corners.tl,
+        br: { x, y: corners.br.y },
+    };
+}
+
+function resizeWidth(corners: TCorners, dWidth: number, { maxWidth }: TSizeOptions): TCorners {
+    const centerX = (corners.tl.x + corners.br.x) / 2;
+    const width = clamp(corners.br.x - corners.tl.x + dWidth, minSize, maxWidth);
+    return {
+        tl: { x: centerX - width / 2, y: corners.tl.y },
+        br: { x: centerX + width / 2, y: corners.br.y },
+    };
+}
+
+function resizeHeight(corners: TCorners, dHeight: number, { maxHeight }: TSizeOptions): TCorners {
+    const centerY = (corners.tl.y + corners.br.y) / 2;
+    const height = clamp(corners.br.y - corners.tl.y + dHeight, minSize, maxHeight);
+    return {
+        tl: { x: corners.tl.x, y: centerY - height / 2 },
+        br: { x: corners.br.x, y: centerY + height / 2 },
+    };
+}
+
+export type TViewportCropperParams = Omit<TCropperParams, 'processEvent' | 'toRendered'> & {
     viewportTransform: TViewportTransform;
-    minWidth?: number; // default 1
-    minHeight?: number; // default 1
-    maxWidth?: number; // default Infinity
-    maxHeight?: number; // default Infinity
+    maxWidth: number;
+    maxHeight: number;
 };
 
 export class ViewportCropper extends Cropper {
-    private readonly state: TViewportCropperState;
+    private cropCorners: TCorners;
+    private viewportTransform: TViewportTransform;
 
     constructor(p: TViewportCropperParams) {
-        const minWidth = Math.max(0, p.minWidth ?? 1);
-        const minHeight = Math.max(0, p.minHeight ?? 1);
-        const maxWidth = Math.max(minWidth, p.maxWidth ?? Infinity);
-        const maxHeight = Math.max(minHeight, p.maxHeight ?? Infinity);
-        const state: TViewportCropperState = {
-            viewportTransform: { ...p.viewportTransform },
-            cropFloat: { ...p.value },
-            lastCrop: { ...p.value },
-        };
-
+        const options = { maxWidth: p.maxWidth, maxHeight: p.maxHeight };
+        let wasSymmetric = false;
         super({
             ...p,
-            processChange: (change: TCropperChange): TRect => {
-                if (change.type === 'down' || change.type === 'up') {
-                    // commit: reset integer parts to the constrained crop, keep fractional remainders
-                    // so sub pixel movement can still accumulate over multiple gestures
-                    state.cropFloat = {
-                        x: state.lastCrop.x + (state.cropFloat.x - Math.round(state.cropFloat.x)),
-                        y: state.lastCrop.y + (state.cropFloat.y - Math.round(state.cropFloat.y)),
-                        width:
-                            state.lastCrop.width +
-                            (state.cropFloat.width - Math.round(state.cropFloat.width)),
-                        height:
-                            state.lastCrop.height +
-                            (state.cropFloat.height - Math.round(state.cropFloat.height)),
-                    };
-                    return { ...state.lastCrop };
+            processEvent: (change) => {
+                if (change.type === 'start') {
+                    const value = this.getValue();
+                    this.cropCorners = rectToCorners(value);
+                    return value;
                 }
-
-                const scale = state.viewportTransform.scale;
-                const dX = change.dX / scale;
-                const dY = change.dY / scale;
-
+                // no rotation for now
+                const dX = change.dX / this.viewportTransform.scale;
+                const dY = change.dY / this.viewportTransform.scale;
+                const d: TVector2D = { x: dX, y: dY };
                 if (change.type === 'move') {
-                    state.cropFloat.x += dX;
-                    state.cropFloat.y += dY;
-                } else {
-                    const rect = state.cropFloat;
-                    if (change.direction.includes('n')) {
-                        const bottom = rect.y + rect.height;
-                        rect.height = Math.max(0, rect.height - dY);
-                        rect.y = bottom - rect.height;
+                    this.cropCorners = {
+                        tl: Vec2.add(this.cropCorners.tl, d),
+                        br: Vec2.add(this.cropCorners.br, d),
+                    };
+                } else if (change.type === 'resize') {
+                    if (change.isSymmetric && !wasSymmetric) {
+                        // else they're not in sync
+                        this.cropCorners = rectToCorners(this.getValue());
                     }
-                    if (change.direction.includes('e')) {
-                        rect.width = Math.max(0, rect.width + dX);
-                    }
-                    if (change.direction.includes('s')) {
-                        rect.height = Math.max(0, rect.height + dY);
-                    }
+                    wasSymmetric = change.isSymmetric;
+
                     if (change.direction.includes('w')) {
-                        const right = rect.x + rect.width;
-                        rect.width = Math.max(0, rect.width - dX);
-                        rect.x = right - rect.width;
+                        if (change.isSymmetric) {
+                            this.cropCorners = resizeWidth(this.cropCorners, -2 * d.x, options);
+                        } else {
+                            this.cropCorners = resizeLeft(this.cropCorners, d, options);
+                        }
+                    } else if (change.direction.includes('e')) {
+                        if (change.isSymmetric) {
+                            this.cropCorners = resizeWidth(this.cropCorners, 2 * d.x, options);
+                        } else {
+                            this.cropCorners = resizeRight(this.cropCorners, d, options);
+                        }
+                    }
+                    if (change.direction.includes('n')) {
+                        if (change.isSymmetric) {
+                            this.cropCorners = resizeHeight(this.cropCorners, -2 * d.y, options);
+                        } else {
+                            this.cropCorners = resizeTop(this.cropCorners, d, options);
+                        }
+                    } else if (change.direction.includes('s')) {
+                        if (change.isSymmetric) {
+                            this.cropCorners = resizeHeight(this.cropCorners, 2 * d.y, options);
+                        } else {
+                            this.cropCorners = resizeBottom(this.cropCorners, d, options);
+                        }
                     }
                 }
-
-                state.lastCrop = constrainAndSnap(
-                    state.cropFloat,
-                    state.lastCrop,
-                    change.type === 'resize' ? change.direction : undefined,
-                    minWidth,
-                    minHeight,
-                    maxWidth,
-                    maxHeight,
-                );
-                return { ...state.lastCrop };
+                const roundedCrop: TCorners = {
+                    tl: {
+                        x: Math.round(this.cropCorners.tl.x),
+                        y: Math.round(this.cropCorners.tl.y),
+                    },
+                    br: {
+                        x: Math.round(this.cropCorners.br.x),
+                        y: Math.round(this.cropCorners.br.y),
+                    },
+                };
+                return cornersToRect(roundedCrop);
             },
             toRendered: (crop: TRect): TRect => {
+                const transform = this.viewportTransform;
                 return {
-                    x: state.viewportTransform.x + crop.x * state.viewportTransform.scale,
-                    y: state.viewportTransform.y + crop.y * state.viewportTransform.scale,
-                    width: crop.width * state.viewportTransform.scale,
-                    height: crop.height * state.viewportTransform.scale,
+                    x: transform.x + crop.x * transform.scale,
+                    y: transform.y + crop.y * transform.scale,
+                    width: crop.width * transform.scale,
+                    height: crop.height * transform.scale,
                 };
             },
         });
-
-        this.state = state;
-    }
-
-    setViewportTransform(viewportTransform: TViewportTransform): void {
-        this.state.viewportTransform = { ...viewportTransform };
+        this.viewportTransform = p.viewportTransform;
+        this.cropCorners = rectToCorners(p.value);
         this.render();
     }
 
-    setValue(value: TRect): void {
-        this.state.cropFloat = { ...value };
-        this.state.lastCrop = { ...value };
-        super.setValue(value);
+    setViewportTransform(viewportTransform: TViewportTransform): void {
+        this.viewportTransform = { ...viewportTransform };
+        this.render();
     }
 }

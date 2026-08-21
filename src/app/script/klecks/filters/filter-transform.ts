@@ -358,6 +358,7 @@ export const filterTransform = {
         const flipXBtn = BB.el({
             parent: buttonRow,
             tagName: 'button',
+            className: 'kl-button',
             content: LANG('filter-transform-flip') + ' X',
             onClick: () => {
                 const transformed = flipTransformation(
@@ -374,6 +375,7 @@ export const filterTransform = {
         const flipYBtn = BB.el({
             parent: buttonRow,
             tagName: 'button',
+            className: 'kl-button',
             content: LANG('filter-transform-flip') + ' Y',
             onClick: () => {
                 const transformed = flipTransformation(
@@ -390,6 +392,7 @@ export const filterTransform = {
         const scaleRotLeftBtn = BB.el({
             parent: buttonRow,
             tagName: 'button',
+            className: 'kl-button',
             content: '-90°',
             onClick: () => {
                 const transformed = rotateTransformation(
@@ -407,6 +410,7 @@ export const filterTransform = {
         const scaleRotRightBtn = BB.el({
             parent: buttonRow,
             tagName: 'button',
+            className: 'kl-button',
             content: '+90°',
             onClick: () => {
                 const transformed = rotateTransformation(
@@ -424,6 +428,7 @@ export const filterTransform = {
         const scaleDoubleBtn = BB.el({
             parent: buttonRow,
             tagName: 'button',
+            className: 'kl-button',
             content: '2&times;',
             onClick: () => {
                 const transformed = scaleTransformation(
@@ -440,6 +445,7 @@ export const filterTransform = {
         const scaleHalfBtn = BB.el({
             parent: buttonRow,
             tagName: 'button',
+            className: 'kl-button',
             content: '&frac12;&times;',
             onClick: () => {
                 const transformed = scaleTransformation(
@@ -456,6 +462,7 @@ export const filterTransform = {
         const centerBtn = BB.el({
             parent: buttonRow,
             tagName: 'button',
+            className: 'kl-button',
             content: LANG('center'),
             onClick: () => {
                 const transformed = centerTransformation(

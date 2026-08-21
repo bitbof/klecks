@@ -80,6 +80,7 @@ export class EditUi {
             const noteButton = BB.el({
                 parent: note,
                 tagName: 'button',
+                className: 'kl-button',
                 textContent: 'Learn More',
                 css: {
                     marginLeft: 5,
@@ -107,7 +108,7 @@ This has been reported to Google.
 
             const button = BB.el({
                 tagName: 'button',
-                className: 'grid-button grid-button--filter',
+                className: 'kl-button grid-button grid-button--filter',
                 content: [
                     createImage({
                         alt: 'icon',
@@ -329,7 +330,7 @@ This has been reported to Google.
         if (!this.isEmbed) {
             const copyBtn = BB.el({
                 tagName: 'button',
-                className: 'grid-button grid-button--filter',
+                className: 'kl-button grid-button grid-button--filter',
                 content: [
                     createImage({
                         alt: 'icon',
@@ -354,7 +355,7 @@ This has been reported to Google.
 
             const pasteBtn = BB.el({
                 tagName: 'button',
-                className: 'grid-button grid-button--filter',
+                className: 'kl-button grid-button grid-button--filter',
                 content: [
                     BB.el({
                         css: {

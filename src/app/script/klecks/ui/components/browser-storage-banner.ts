@@ -99,7 +99,7 @@ export async function runBrowserStorageBanner(p: TBrowserStorageBannerParams): P
     const buttonClass = classes.btn;
     const openBtn = BB.el({
         tagName: 'button',
-        className: ['kl-button-primary', buttonClass],
+        className: ['kl-button', 'kl-button-primary', buttonClass],
         content: LANG('file-storage-open'),
         custom: {
             tabIndex: '-1',
@@ -123,11 +123,11 @@ export async function runBrowserStorageBanner(p: TBrowserStorageBannerParams): P
     closeArea.onclick = close;
     const banner = BB.el({
         className: classes.banner,
-        content: [closeArea, mainContent, closeButton],
+        content: [mainContent, closeButton],
     });
     banner.onclick = BB.handleClick;
     const rootEl = BB.el({
-        content: [banner],
+        content: [closeArea, banner],
         className: classes.root,
     });
     document.body.append(rootEl);
@@ -146,7 +146,15 @@ export async function runBrowserStorageBanner(p: TBrowserStorageBannerParams): P
         }, 200);
     }
 
-    const timeout = setTimeout(close, 4500);
+    function checkCanClose() {
+        if (banner.matches(':hover')) {
+            timeout = setTimeout(checkCanClose, 500);
+            return;
+        }
+        close();
+    }
+
+    let timeout = setTimeout(checkCanClose, 4500);
 
     const onPointerDown = (e: PointerEvent) => {
         const target = e.target as HTMLElement | null;

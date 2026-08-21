@@ -100,7 +100,7 @@ export class FileUi {
             // --- new, import, save ---
             const newButton = BB.el({
                 tagName: 'button',
-                className: 'grid-button',
+                className: 'kl-button grid-button',
                 content: createButtonContent(LANG('file-new'), newImageImg, true),
                 custom: {
                     tabIndex: '-1',
@@ -112,7 +112,7 @@ export class FileUi {
             });
             const importButton = BB.el({
                 tagName: 'button',
-                className: 'grid-button',
+                className: 'kl-button grid-button',
                 content: createButtonContent(LANG('file-import'), importImg, true),
                 css: {
                     position: 'relative',
@@ -143,7 +143,7 @@ export class FileUi {
             this.importInput.accept = 'image/*,.psd'; // .psd needed for chrome, although it's image/vnd.adobe.photoshop
             const saveButton = BB.el({
                 tagName: 'button',
-                className: 'grid-button grid-button--filter',
+                className: 'kl-button grid-button grid-button--filter',
                 content: createButtonContent(LANG('file-save'), exportImg),
                 custom: {
                     tabIndex: '-1',
@@ -260,6 +260,7 @@ export class FileUi {
 
             const recoveryBrowserButton = BB.el({
                 tagName: 'button',
+                className: 'kl-button',
                 content: [LANG('tab-recovery-recover-tabs'), this.recoveryCountBubble],
                 onClick: () => showRecoveryManagerPanel(this.klRecoveryManager),
                 custom: {
@@ -285,7 +286,7 @@ export class FileUi {
             // --- upload, share ---
             const shareButton = BB.el({
                 tagName: 'button',
-                className: 'grid-button',
+                className: 'kl-button grid-button',
                 content: createButtonContent(LANG('file-share'), shareImg),
                 custom: {
                     tabIndex: '-1',
@@ -302,7 +303,7 @@ export class FileUi {
             });
             const uploadImgurButton = BB.el({
                 tagName: 'button',
-                className: 'grid-button',
+                className: 'kl-button grid-button',
                 content: createButtonContent(LANG('file-upload'), uploadImg),
                 custom: {
                     tabIndex: '-1',

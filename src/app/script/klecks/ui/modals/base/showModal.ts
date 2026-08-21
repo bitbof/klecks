@@ -194,7 +194,7 @@ export function showModal(p: {
     if (p.buttons) {
         const iconSize = '17px';
         p.buttons.forEach((buttonName) => {
-            const btnClasses = new Set(['kl-popup__btn']);
+            const btnClasses = new Set(['kl-button', 'kl-popup__btn']);
             if (p.primaries && p.primaries.includes(buttonName)) {
                 btnClasses.add('kl-button-primary');
             }

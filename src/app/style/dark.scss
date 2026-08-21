@@ -154,7 +154,6 @@
         }
     }
 
-    button,
     .kl-button {
         color: #ccc;
         background-color: #4a4a4a;
@@ -163,20 +162,17 @@
         user-select: none;
     }
 
-    button:hover,
     .kl-button:hover {
         background-color: #555;
         color: #eee;
     }
 
-    button:active,
     .kl-button:active {
         background-color: #555;
         color: #fff;
         box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.2);
     }
 
-    button:disabled,
     .kl-button:disabled {
         color: #777;
         background-color: transparent;
@@ -212,7 +208,6 @@
         }
     }
 
-    button:not(.kl-button-primary, .kl-button-cancel) img:not(.dark-no-invert),
     .kl-button:not(.kl-button-primary, .kl-button-cancel) img:not(.dark-no-invert) {
         filter: invert(1) hue-rotate(180deg);
     }
@@ -344,12 +339,8 @@
         }
     }
 
-    .popup-x {
-        filter: invert(1);
-    }
-
     .popup-x:hover {
-        filter: invert(1) brightness(1.4);
+        filter: brightness(1.1);
     }
 
     .kl-preview-wrapper {

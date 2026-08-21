@@ -107,6 +107,7 @@ export class HandUi {
 
         const resetButton = BB.el({
             tagName: 'button',
+            className: 'kl-button',
             content: LANG('hand-reset'),
             onClick: p.onReset,
         });
@@ -114,6 +115,7 @@ export class HandUi {
 
         const fitButton = BB.el({
             tagName: 'button',
+            className: 'kl-button',
             content: LANG('hand-fit'),
             css: {
                 marginLeft: 10,
@@ -132,6 +134,7 @@ export class HandUi {
         });
         const leftRotateButton = BB.el({
             tagName: 'button',
+            className: 'kl-button',
             content: leftRotateIcon,
             onClick: function () {
                 p.onAngleChange(-15, true);
@@ -141,6 +144,7 @@ export class HandUi {
 
         const resetAngleButton = BB.el({
             tagName: 'button',
+            className: 'kl-button',
             content: '0°',
             css: {
                 marginLeft: 10,
@@ -153,6 +157,7 @@ export class HandUi {
 
         const rightRotateButton = BB.el({
             tagName: 'button',
+            className: 'kl-button',
             content: '<img height="20" src="' + rotateImg + '" alt="Rotate"/>',
             css: {
                 marginLeft: 10,

@@ -131,9 +131,6 @@ export class KlSlider {
             opacity: this.isEnabled ? undefined : 0.5,
             pointerEvents: this.isEnabled ? undefined : 'none',
         });
-        if (this.manualInput) {
-            this.manualInput.setIsEnabled(this.isEnabled);
-        }
     }
 
     private showManualInput(): void {
@@ -161,7 +158,6 @@ export class KlSlider {
                 ? this.manualInputRoundDigits
                 : 0,
         );
-        this.manualInput.setIsEnabled(this.isEnabled);
         this.rootEl.append(this.manualInput.getElement());
         setTimeout(() => {
             this.manualInput && this.manualInput.focus();

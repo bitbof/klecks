@@ -249,6 +249,7 @@ export class TextToolViewportUI {
 
         this.zoomInBtn = BB.el({
             tagName: 'button',
+            className: 'kl-button',
             content: `<img height="20" src="${toolZoomInImg}">`,
             title: LANG('zoom-in'),
             onClick: () => this.changeZoomFac(1),
@@ -258,6 +259,7 @@ export class TextToolViewportUI {
         });
         this.zoomOutBtn = BB.el({
             tagName: 'button',
+            className: 'kl-button',
             content: `<img height="20" src="${toolZoomOutImg}">`,
             title: LANG('zoom-out'),
             onClick: () => this.changeZoomFac(-1),
