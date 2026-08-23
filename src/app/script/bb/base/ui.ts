@@ -71,36 +71,6 @@ export function clearSelection(): void {
     }
 }
 
-// todo try to get rid of this
-/**
- * prevents being able to focus element.
- * warning: it creates a listener
- *
- * @param el - dom element
- */
-export const makeUnfocusable = (function (): (el: HTMLElement) => void {
-    function preventFocus(event: FocusEvent): void {
-        event.preventDefault();
-        let didFocusRelated = false;
-        if (event.relatedTarget) {
-            try {
-                (event.relatedTarget as HTMLElement).focus();
-                didFocusRelated = true;
-            } catch (e) {
-                console.error('failed to focus');
-            }
-        }
-        if (!didFocusRelated) {
-            (event.currentTarget as HTMLElement).blur();
-        }
-    }
-
-    return function (el) {
-        el.setAttribute('tabindex', '-1');
-        el.addEventListener('focus', preventFocus);
-    };
-})();
-
 const els: {
     el: HTMLElement;
     listeners: [keyof HTMLElementEventMap, EventListener][];

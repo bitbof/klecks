@@ -8,6 +8,7 @@ import { TRect, TSize2D } from '../bb/bb-types';
 import { throwIfNull, throwIfUndefined } from '../bb/base/base';
 import { getNextLayerId } from '../klecks/history/get-next-layer-id';
 import { detectFiletype } from '../klecks/storage/file-header-detection';
+import { showModal } from '../klecks/ui/modals/base/show-modal';
 
 // todo later:
 // onImage: (project: IKlProject) => void
@@ -43,7 +44,7 @@ export class KlAppImportHandler {
             importedImage.width <= 0 ||
             importedImage.height <= 0
         ) {
-            KL.popup({
+            showModal({
                 type: 'error',
                 message: LANG('import-broken-file'),
                 buttons: ['Ok'],
@@ -315,14 +316,14 @@ export class KlAppImportHandler {
                 }
             }
             if (!hasImage) {
-                KL.popup({
+                showModal({
                     type: 'error',
                     message: LANG('clipboard-no-image'),
                     buttons: ['Ok'],
                 });
             }
         } catch (error) {
-            KL.popup({
+            showModal({
                 type: 'error',
                 message: LANG('clipboard-read-fail'),
                 buttons: ['Ok'],
@@ -343,7 +344,7 @@ export class KlAppImportHandler {
                 return;
             }
             for (let i = 0; i < items.length; i++) {
-                if (items[i].type.indexOf('image') == -1) {
+                if (items[i].type.indexOf('image') === -1) {
                     continue;
                 }
                 const file = items[i].getAsFile();
@@ -412,7 +413,7 @@ export class KlAppImportHandler {
 
     async handleFileSelect(files: FileList, optionStr: TDropOption): Promise<void> {
         const showWarningPsdFlattened = () => {
-            KL.popup({
+            showModal({
                 type: 'warning',
                 message: LANG('import-psd-unsupported') + '<br /><br />',
                 buttons: ['Ok'],
@@ -454,7 +455,7 @@ export class KlAppImportHandler {
 
                     if (f.size >= maxSizeBytes) {
                         // pretty likely to break stuff
-                        KL.popup({
+                        showModal({
                             type: 'error',
                             message: 'File too big. Unable to import.<br /><br />',
                             buttons: ['Ok'],
@@ -467,7 +468,7 @@ export class KlAppImportHandler {
                     let closeLoader: (() => void) | null;
 
                     if (doShowLoader) {
-                        KL.popup({
+                        showModal({
                             message: LANG('import-opening'),
                             callback: (result) => {
                                 loaderIsOpen = false;
@@ -502,7 +503,7 @@ export class KlAppImportHandler {
                                         if (closeLoader) {
                                             closeLoader();
                                         }
-                                        KL.popup({
+                                        showModal({
                                             type: 'error',
                                             message:
                                                 LANG('import-psd-too-large').replace(
@@ -569,7 +570,7 @@ export class KlAppImportHandler {
                                     }
                                 } catch (e) {
                                     closeLoader?.();
-                                    KL.popup({
+                                    showModal({
                                         type: 'error',
                                         message: 'Failed to load PSD.<br /><br />',
                                         buttons: ['Ok'],
@@ -592,10 +593,10 @@ export class KlAppImportHandler {
             }
         }
         if (hasUnsupportedFile) {
-            KL.popup({
+            showModal({
                 message: LANG('import-unsupported-file'),
                 type: 'error',
-                buttons: ['OK'],
+                buttons: ['Ok'],
             });
         }
     }

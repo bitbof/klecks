@@ -5,7 +5,7 @@ import {
     TFilterGetDialogResult,
     TKlBasicLayer,
 } from '../kl-types';
-import { input } from '../ui/components/input';
+import { Input } from '../ui/components/input';
 import { KlSlider } from '../ui/components/kl-slider';
 import { LANG } from '../../language/language';
 import { EVENT_RES_MS } from './filters-consts';
@@ -181,47 +181,55 @@ export const filterPattern = {
 
         // ---- controls ----
 
-        const xInput = input({
+        const xInput = new Input({
             init: settings.x,
             type: 'number',
+            name: 'pattern-x',
             min: 0,
+            step: 1,
             max: width,
             css: { width: '100%' },
-            callback: function (v) {
-                settings.x = Number(v);
+            onChange: function (v) {
+                settings.x = v;
                 updatePreview();
             },
         });
-        const yInput = input({
+        const yInput = new Input({
             init: settings.y,
             type: 'number',
+            name: 'pattern-y',
             min: 0,
+            step: 1,
             max: height,
             css: { width: '100%' },
-            callback: function (v) {
-                settings.y = Number(v);
+            onChange: function (v) {
+                settings.y = v;
                 updatePreview();
             },
         });
-        const widthInput = input({
+        const widthInput = new Input({
             init: settings.width,
             type: 'number',
+            name: 'pattern-width',
             min: 1,
+            step: 1,
             max: Math.min(maxSize, width),
             css: { width: '100%' },
-            callback: function (v) {
-                settings.width = Number(v);
+            onChange: function (v) {
+                settings.width = v;
                 updatePreview();
             },
         });
-        const heightInput = input({
+        const heightInput = new Input({
             init: settings.height,
             type: 'number',
+            name: 'pattern-height',
             min: 1,
+            step: 1,
             max: Math.min(maxSize, height),
             css: { width: '100%' },
-            callback: function (v) {
-                settings.height = Number(v);
+            onChange: function (v) {
+                settings.height = v;
                 updatePreview();
             },
         });
@@ -234,26 +242,26 @@ export const filterPattern = {
             BB.el({
                 content: [
                     BB.el({
-                        tagName: 'label',
-                        content: ['X:', xInput],
+                        tagName: 'div',
+                        content: ['X:', xInput.getElement()],
                         css: inputStyle,
                     }),
 
                     BB.el({
-                        tagName: 'label',
-                        content: ['Y:', yInput],
+                        tagName: 'div',
+                        content: ['Y:', yInput.getElement()],
                         css: inputStyle,
                     }),
 
                     BB.el({
-                        tagName: 'label',
-                        content: [LANG('width') + ':', widthInput],
+                        tagName: 'div',
+                        content: [LANG('width') + ':', widthInput.getElement()],
                         css: inputStyle,
                     }),
 
                     BB.el({
-                        tagName: 'label',
-                        content: [LANG('height') + ':', heightInput],
+                        tagName: 'div',
+                        content: [LANG('height') + ':', heightInput.getElement()],
                         css: inputStyle,
                     }),
                 ],
@@ -383,10 +391,10 @@ export const filterPattern = {
         };
 
         function syncInputs(): void {
-            xInput.value = '' + settings.x;
-            yInput.value = '' + settings.y;
-            widthInput.value = '' + settings.width;
-            heightInput.value = '' + settings.height;
+            xInput.setValue(settings.x);
+            yInput.setValue(settings.y);
+            widthInput.setValue(settings.width);
+            heightInput.setValue(settings.height);
         }
 
         previewWrapper.oncontextmenu = function () {
@@ -600,6 +608,10 @@ export const filterPattern = {
             blendSlider.destroy();
             pointerListener.destroy();
             klCanvasPreview.destroy();
+            xInput.destroy();
+            yInput.destroy();
+            widthInput.destroy();
+            heightInput.destroy();
         };
         const result: TFilterGetDialogResult<TFilterPatternInput> = {
             element: rootEl,

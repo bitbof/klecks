@@ -40,9 +40,8 @@ export function asyncLoadImage(src: string): Promise<HTMLImageElement> {
 
 export function css(el: HTMLElement | SVGElement, cssObj: TCss): void {
     const elStyle: any = el.style;
-    Object.keys(cssObj).forEach((key) => {
+    Object.entries(cssObj).forEach(([key, value]) => {
         const property = key as keyof TCss;
-        const value = cssObj[property];
 
         if (typeof value === 'number') {
             // Let the browser distinguish unitless properties from lengths.
@@ -333,7 +332,7 @@ export function createArray<T>(length: number, fillValue: T): T[] {
 }
 
 export function randomUuid(): string {
-    if ('randumUUID' in crypto) {
+    if (typeof crypto.randomUUID === 'function') {
         return crypto.randomUUID();
     }
     // fallback just for dev
@@ -349,17 +348,27 @@ export function sleep(ms: number) {
 }
 
 // if a promise takes too long
-export async function timeoutWrapper<G>(
+export function timeoutWrapper<G>(
     promise: Promise<G>,
     name: string,
     timeoutMs: number = 5000,
 ): Promise<G> {
-    return Promise.race<G>([
-        promise,
-        new Promise((_, reject) => {
-            setTimeout(() => reject(new Error(`Promise "${name}" timed out.`)), timeoutMs);
-        }),
-    ]);
+    return new Promise<G>((resolve, reject) => {
+        const timeoutId = setTimeout(
+            () => reject(new Error(`Promise "${name}" timed out.`)),
+            timeoutMs,
+        );
+        promise.then(
+            (value) => {
+                clearTimeout(timeoutId);
+                resolve(value);
+            },
+            (error) => {
+                clearTimeout(timeoutId);
+                reject(error);
+            },
+        );
+    });
 }
 
 export async function loadSvg(url: string): Promise<SVGSVGElement> {

@@ -2,21 +2,26 @@ import { getIconSvg, getIconUrl } from '../../../../icon/icon';
 import { DIALOG_COUNTER } from '../modal-count';
 import { BB } from '../../../../bb/bb';
 import { LANG } from '../../../../language/language';
-import './scroll-fix';
 import { TCss } from '../../../../bb/bb-types';
 
-export function showModal(p: {
+export type TModalButton<G extends string> = 'Ok' | 'Cancel' | { id: G; label: string };
+type TModalResult<GButton extends TModalButton<string>> =
+    | 'Cancel'
+    | Extract<GButton, 'Ok'>
+    | Extract<GButton, { id: string }>['id'];
+
+export function showModal<const GButton extends TModalButton<string> = never>(p: {
     div?: HTMLElement; // node with content
     message: string | Element; // can be html
-    callback?: (result: string) => void;
-    buttons?: string[]; // "Ok", and "Cancel" will be automatically translated
-    primaries?: string[];
-    deleteButtonName?: string;
-    type?: 'error' | 'warning' | 'upload' | 'ok'; // todo (...what is to be done?)
+    callback?: (result: NoInfer<TModalResult<GButton>>) => void;
+    buttons?: readonly GButton[]; // "Ok", and "Cancel" will be automatically translated
+    primaries?: NoInfer<TModalResult<GButton>>[];
+    deleteButton?: NoInfer<TModalResult<GButton>>; // button to style as a delete button
+    type?: 'error' | 'warning' | 'upload' | 'ok';
     closeFunc?: (f: () => void) => void; // returns a function you can call to close (Cancel) the dialog
     style?: TCss;
-    clickOnEnter?: string; // name of button - will be clicked if enter key pressed
-    autoFocus?: false | string; // name of  to automatically focus - default 'Ok' - false -> none
+    clickOnEnter?: NoInfer<TModalResult<GButton>>; // button to click when pressing Enter
+    autoFocus?: false | NoInfer<TModalResult<GButton>>; // button to automatically focus - default 'Ok' - false -> none
     ignoreBackground?: boolean; // default false; if true clicking on background doesn't close
 }): {
     setIgnoreBackground: (b: boolean) => void;
@@ -167,14 +172,18 @@ export function showModal(p: {
     rootEl.addEventListener('wheel', wheelPrevent, { passive: false });
     rootEl.onclick = BB.handleClick;
 
-    let autoFocus: string | undefined;
-    if (p.autoFocus) {
-        autoFocus = p.autoFocus;
+    let autoFocus: 'Ok' | TModalResult<GButton> | undefined;
+    if (p.autoFocus === undefined) {
+        autoFocus = 'Ok';
     } else if (p.autoFocus === false) {
         autoFocus = undefined;
     } else {
-        autoFocus = 'Ok';
+        autoFocus = p.autoFocus;
     }
+
+    const buttonToId = <B extends TModalButton<string>>(button: B): TModalResult<B> => {
+        return (button === 'Ok' || button === 'Cancel' ? button : button.id) as TModalResult<B>;
+    };
 
     const buttonRowEl =
         p.buttons && p.buttons.length > 0
@@ -193,25 +202,33 @@ export function showModal(p: {
     const btnElArr: HTMLButtonElement[] = [];
     if (p.buttons) {
         const iconSize = '17px';
-        p.buttons.forEach((buttonName) => {
+        p.buttons.forEach((button) => {
+            const buttonId = buttonToId(button);
+            const label = (() => {
+                if (button === 'Ok') {
+                    return LANG('modal-ok');
+                }
+                if (button === 'Cancel') {
+                    return LANG('modal-cancel');
+                }
+                return button.label;
+            })();
+
             const btnClasses = new Set(['kl-button', 'kl-popup__btn']);
-            if (p.primaries && p.primaries.includes(buttonName)) {
+            if (p.primaries?.includes(buttonId)) {
                 btnClasses.add('kl-button-primary');
             }
-            let label = buttonName;
             let iconImg: HTMLElement | SVGSVGElement | undefined = undefined;
-            if (buttonName === p.deleteButtonName) {
+            if (buttonId === p.deleteButton) {
                 iconImg = getIconSvg('remove-layer', { width: iconSize, height: iconSize });
                 btnClasses.add('kl-button-delete');
             }
-            if (buttonName === 'Ok') {
+            if (buttonId === 'Ok') {
                 iconImg = getIconSvg('check', { width: iconSize, height: iconSize });
                 btnClasses.add('kl-button-primary');
-                label = LANG('modal-ok');
             }
-            if (buttonName === 'Cancel') {
+            if (buttonId === 'Cancel') {
                 iconImg = getIconSvg('cancel', { width: iconSize, height: iconSize });
-                label = LANG('modal-cancel');
             }
             const btn = BB.el({
                 parent: buttonRowEl,
@@ -225,11 +242,11 @@ export function showModal(p: {
                     }),
                 ],
                 onClick: () => {
-                    close(buttonName);
+                    close(buttonId);
                 },
             });
             btnElArr.push(btn);
-            if (autoFocus === buttonName) {
+            if (autoFocus === buttonId) {
                 setTimeout(() => {
                     btn.focus();
                     rootEl.scrollTo(0, 0);
@@ -239,13 +256,13 @@ export function showModal(p: {
                     rootEl.scrollTo(0, 0);
                 }, 20);
             }
-            if (buttonName === p.clickOnEnter) {
+            if (buttonId === p.clickOnEnter) {
                 clickOnEnterBtn = btn;
             }
         });
     }
 
-    function close(value: string): void {
+    function close(buttonId: TModalResult<GButton>): void {
         if (isClosed) {
             return;
         }
@@ -265,7 +282,7 @@ export function showModal(p: {
         btnElArr.splice(0, btnElArr.length);
 
         if (p.callback) {
-            p.callback(value);
+            p.callback(buttonId);
         }
     }
 

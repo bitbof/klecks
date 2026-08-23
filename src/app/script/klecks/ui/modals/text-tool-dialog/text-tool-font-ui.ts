@@ -9,7 +9,7 @@ import { Select } from '../../components/select';
 import { c } from '../../../../bb/base/c';
 import { PointerListener } from '../../../../bb/input/pointer-listener';
 import { FONTS } from '../../../../../fonts/fonts';
-import { showModal } from '../base/showModal';
+import { showModal } from '../base/show-modal';
 
 const alignLeftImg = getIconUrl('align-left');
 const alignCenterImg = getIconUrl('align-center');
@@ -67,9 +67,9 @@ export class TextToolFontUI {
 
     private readonly importButton: HTMLButtonElement;
 
-    private readonly sizeInput: Input;
-    private readonly lineHeightInput: Input;
-    private readonly letterSpacingInput: Input;
+    private readonly sizeInput: Input<number>;
+    private readonly lineHeightInput: Input<number>;
+    private readonly letterSpacingInput: Input<number>;
 
     private readonly alignRadioList: ImageRadioList<TTextFormat>;
     private readonly italicToggle: ImageToggle;
@@ -260,11 +260,9 @@ export class TextToolFontUI {
             init: p.size,
             onChange: (v) => {
                 p.onUpdate({
-                    size: parseFloat(v),
+                    size: v,
                 });
             },
-            doResetIfInvalid: true,
-            doScrollWithoutFocus: true,
             css: {
                 width: 70,
             },
@@ -280,11 +278,9 @@ export class TextToolFontUI {
             init: p.lineHeight ?? 1,
             onChange: (v) => {
                 p.onUpdate({
-                    lineHeight: parseFloat(v),
+                    lineHeight: v,
                 });
             },
-            doResetIfInvalid: true,
-            doScrollWithoutFocus: true,
             css: {
                 width: 60,
             },
@@ -299,11 +295,9 @@ export class TextToolFontUI {
             init: p.letterSpacing ?? 0,
             onChange: (v) => {
                 p.onUpdate({
-                    letterSpacing: parseFloat(v),
+                    letterSpacing: v,
                 });
             },
-            doResetIfInvalid: true,
-            doScrollWithoutFocus: true,
             css: {
                 width: 60,
             },

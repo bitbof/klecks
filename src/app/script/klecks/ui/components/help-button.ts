@@ -1,5 +1,4 @@
 import { BB } from '../../../bb/bb';
-import { makeUnfocusable } from '../../../bb/base/ui';
 import { getIconSvg } from '../../../icon/icon';
 
 export function createHelpButton(p: {
@@ -22,9 +21,8 @@ export function createHelpButton(p: {
         onClick: p.onClick,
         noRef: true,
     });
-
     if (p.isFocusable === false) {
-        makeUnfocusable(result);
+        result.tabIndex = -1;
     }
 
     return result;

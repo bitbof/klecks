@@ -1,5 +1,5 @@
 import { BB } from '../../../bb/bb';
-import { showModal } from './base/showModal';
+import { showModal, TModalButton } from './base/show-modal';
 import { CropCopy } from '../components/crop-copy';
 import { LANG } from '../../../language/language';
 import { StatusOverlay } from '../components/status-overlay';
@@ -113,12 +113,12 @@ export function clipboardDialog(
     }
     window.addEventListener('blur', blur);
 
-    const buttonArr = [];
+    const buttonArr: Exclude<TModalButton<'copy' | 'crop'>, 'Ok'>[] = [];
     if (clipboardItemIsSupported) {
-        buttonArr.push(LANG('cropcopy-btn-copy'));
+        buttonArr.push({ id: 'copy', label: LANG('cropcopy-btn-copy') });
     }
     if (showCropButton) {
-        buttonArr.push(LANG('cropcopy-btn-crop'));
+        buttonArr.push({ id: 'crop', label: LANG('cropcopy-btn-crop') });
     }
     buttonArr.push('Cancel');
 
@@ -136,11 +136,12 @@ export function clipboardDialog(
                   width: 540,
               },
         buttons: buttonArr,
-        primaries: [LANG('cropcopy-btn-copy')],
+        primaries: ['copy'],
+        clickOnEnter: 'copy',
         callback: function (result) {
-            if (result === LANG('cropcopy-btn-copy')) {
+            if (result === 'copy') {
                 toClipboard();
-            } else if (result === LANG('cropcopy-btn-crop')) {
+            } else if (result === 'crop') {
                 const rectObj = cropCopy.getCropRect();
                 cropCallback({
                     left: Math.round(-rectObj.x),
@@ -154,7 +155,6 @@ export function clipboardDialog(
             cropCopy.destroy();
             keyListener.destroy();
         },
-        clickOnEnter: LANG('cropcopy-btn-copy'),
         closeFunc: function (func) {
             closeFunc = func;
         },

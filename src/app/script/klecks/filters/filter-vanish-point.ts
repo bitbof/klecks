@@ -1,7 +1,7 @@
 import { BB } from '../../bb/bb';
 import { TFilterApply, TFilterGetDialogParam, TFilterGetDialogResult, TRgb } from '../kl-types';
 import { LANG } from '../../language/language';
-import { input } from '../ui/components/input';
+import { Input } from '../ui/components/input';
 import { ColorOptions } from '../ui/components/color-options';
 import { drawVanishPoint } from '../image-operations/draw-vanish-point';
 import { KlSlider } from '../ui/components/kl-slider';
@@ -60,7 +60,7 @@ export const filterVanishPoint = {
             width: 300,
             height: 30,
             min: 2,
-            max: 20,
+            max: 40,
             value: settingsObj.lines,
             curve: 'quadratic',
             eventResMs: EVENT_RES_MS,
@@ -88,12 +88,13 @@ export const filterVanishPoint = {
                 marginBottom: 10,
             },
         });
-        const xInput = input({
+        const xInput = new Input({
             init: settingsObj.x,
             type: 'number',
+            name: 'vanish-point-x',
             css: { width: 75, marginRight: 20 },
-            callback: function (v) {
-                settingsObj.x = parseFloat(v);
+            onChange: function (v) {
+                settingsObj.x = v;
                 dragInput.setValue({
                     x: settingsObj.x,
                     y: settingsObj.y,
@@ -101,12 +102,13 @@ export const filterVanishPoint = {
                 update();
             },
         });
-        const yInput = input({
+        const yInput = new Input({
             init: settingsObj.y,
             type: 'number',
+            name: 'vanish-point-y',
             css: { width: 75, marginRight: 20 },
-            callback: function (v) {
-                settingsObj.y = parseFloat(v);
+            onChange: function (v) {
+                settingsObj.y = v;
                 dragInput.setValue({
                     x: settingsObj.x,
                     y: settingsObj.y,
@@ -114,13 +116,15 @@ export const filterVanishPoint = {
                 update();
             },
         });
-        const thicknessInput = input({
+        const thicknessInput = new Input({
             init: 2,
             type: 'number',
+            name: 'vanish-point-thickness',
             min: 1,
+            step: 1,
             css: { width: 75, marginRight: 20 },
-            callback: function (v) {
-                settingsObj.thickness = parseFloat(v);
+            onChange: function (v) {
+                settingsObj.thickness = v;
                 update();
             },
         });
@@ -160,21 +164,21 @@ export const filterVanishPoint = {
         };
         line1.append(
             BB.el({ content: 'X:', css: labelStyle }),
-            xInput,
+            xInput.getElement(),
             BB.el({ content: 'Y:', css: labelStyle }),
-            yInput,
+            yInput.getElement(),
         );
         line2.append(
             BB.el({ content: LANG('shape-line-width') + ':', css: labelStyle }),
-            thicknessInput,
+            thicknessInput.getElement(),
             BB.el({ css: { flexGrow: 1 } }),
             colorOptions.getElement(),
         );
 
         // ---- preview input processing ----
         function syncInputs(): void {
-            xInput.value = '' + settingsObj.x;
-            yInput.value = '' + settingsObj.y;
+            xInput.setValue(settingsObj.x);
+            yInput.setValue(settingsObj.y);
         }
 
         function update(): void {
@@ -254,6 +258,9 @@ export const filterVanishPoint = {
             linesSlider.destroy();
             colorOptions.destroy();
             preview.destroy();
+            xInput.destroy();
+            yInput.destroy();
+            thicknessInput.destroy();
         };
         result.getInput = function (): TFilterVanishPointInput {
             result.destroy!();

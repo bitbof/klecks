@@ -22,7 +22,7 @@ export class CrossTabChannel {
 
     // for fallback
     private lastReadTimestamp: number = Date.now();
-    private readonly maxAgeMs = 1000 * 10;
+    private readonly maxAgeMs = 1000 * 5;
     private readonly localStoragePrefix = 'cross-tab-channel--';
     private readonly localStorageListeners: Set<TCrossTabChannelListener> = new Set();
 
@@ -53,6 +53,23 @@ export class CrossTabChannel {
         return this.localStoragePrefix + this.name;
     }
 
+    private getEntries(): TLsEntry[] {
+        let entries: TLsEntry[] = [];
+        try {
+            const raw = LocalStorage.getItem(this.getLsKey());
+            if (raw !== null) {
+                const parsed: unknown = JSON.parse(raw);
+                if (Array.isArray(parsed)) {
+                    entries = parsed as TLsEntry[];
+                }
+            }
+        } catch (error) {
+            // invalid value -> reset
+            LocalStorage.removeItem(this.getLsKey());
+        }
+        return entries;
+    }
+
     // ----------------------------------- public ----------------------------------
     constructor(private name: string) {
         if (typeof BroadcastChannel !== 'undefined') {
@@ -65,14 +82,7 @@ export class CrossTabChannel {
             this.broadcastChannel.postMessage(message);
         } else {
             const now = Date.now();
-            let raw: string | null = null;
-            try {
-                raw = LocalStorage.getItem(this.getLsKey());
-            } catch (error) {
-                // probably invalid value -> reset
-            }
-            let entries: TLsEntry[] = raw === null ? [] : JSON.parse(raw);
-            entries = entries.filter((entry) => {
+            const entries = this.getEntries().filter((entry) => {
                 // delete old entries
                 return entry.timestamp > now - this.maxAgeMs;
             });
@@ -121,6 +131,9 @@ export class CrossTabChannel {
     close(): void {
         if (this.broadcastChannel) {
             this.broadcastChannel.close();
+        } else if (this.localStorageListeners.size > 0) {
+            window.removeEventListener('storage', this.onLocalStorageChange);
+            this.localStorageListeners.clear();
         }
     }
 }

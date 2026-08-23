@@ -241,9 +241,7 @@ export class SelectUi {
             tagName: 'button',
             className: 'kl-button',
             content: LANG('select-all'),
-            onClick: () => {
-                p.select.onAll();
-            },
+            onClick: () => p.select.onAll(),
             custom: {
                 tabindex: '-1',
             },
@@ -256,9 +254,7 @@ export class SelectUi {
             tagName: 'button',
             className: 'kl-button',
             content: LANG('select-invert'),
-            onClick: () => {
-                p.select.onInvert();
-            },
+            onClick: () => p.select.onInvert(),
             custom: {
                 tabindex: '-1',
             },
@@ -281,9 +277,7 @@ export class SelectUi {
                 paddingRight: 8,
                 display: 'none',
             },
-            onClick: () => {
-                p.select.onReset();
-            },
+            onClick: () => p.select.onReset(),
             custom: {
                 tabindex: '-1',
             },
@@ -307,9 +301,7 @@ export class SelectUi {
             tagName: 'button',
             className: 'kl-button',
             content: LANG('select-erase'),
-            onClick: () => {
-                p.onErase();
-            },
+            onClick: () => p.onErase(),
             custom: {
                 tabindex: '-1',
             },
@@ -320,9 +312,7 @@ export class SelectUi {
             tagName: 'button',
             className: 'kl-button',
             content: LANG('select-fill'),
-            onClick: () => {
-                p.onFill();
-            },
+            onClick: () => p.onFill(),
             custom: {
                 tabindex: '-1',
             },
@@ -344,9 +334,7 @@ export class SelectUi {
             tagName: 'button',
             content: LANG('filter-transform-flip') + ' X',
             className: 'kl-button',
-            onClick: () => {
-                p.transform.onFlipX();
-            },
+            onClick: () => p.transform.onFlipX(),
             custom: {
                 tabindex: '-1',
             },
@@ -355,9 +343,7 @@ export class SelectUi {
             tagName: 'button',
             className: 'kl-button',
             content: LANG('filter-transform-flip') + ' Y',
-            onClick: () => {
-                p.transform.onFlipY();
-            },
+            onClick: () => p.transform.onFlipY(),
             custom: {
                 tabindex: '-1',
             },
@@ -366,9 +352,7 @@ export class SelectUi {
             tagName: 'button',
             className: 'kl-button',
             content: '-90°',
-            onClick: () => {
-                p.transform.onRotateDeg(-90);
-            },
+            onClick: () => p.transform.onRotateDeg(-90),
             custom: {
                 tabindex: '-1',
             },
@@ -377,9 +361,7 @@ export class SelectUi {
             tagName: 'button',
             className: 'kl-button',
             content: '+90°',
-            onClick: () => {
-                p.transform.onRotateDeg(90);
-            },
+            onClick: () => p.transform.onRotateDeg(90),
             custom: {
                 tabindex: '-1',
             },
@@ -395,9 +377,7 @@ export class SelectUi {
             tagName: 'button',
             className: 'kl-button',
             content: [duplicateIcon.getElement(), LANG('select-transform-clone')],
-            onClick: () => {
-                p.transform.onClone();
-            },
+            onClick: () => p.transform.onClone(),
             css: {
                 display: 'flex',
                 gap: 5,
@@ -411,9 +391,7 @@ export class SelectUi {
             tagName: 'button',
             className: 'kl-button',
             content: '2&times;',
-            onClick: () => {
-                p.transform.onScale(2);
-            },
+            onClick: () => p.transform.onScale(2),
             custom: {
                 tabindex: '-1',
             },
@@ -423,9 +401,7 @@ export class SelectUi {
             tagName: 'button',
             className: 'kl-button',
             content: '&frac12;&times;',
-            onClick: () => {
-                p.transform.onScale(1 / 2);
-            },
+            onClick: () => p.transform.onScale(1 / 2),
             custom: {
                 tabindex: '-1',
             },
@@ -435,9 +411,7 @@ export class SelectUi {
             tagName: 'button',
             className: 'kl-button',
             content: LANG('center'),
-            onClick: () => {
-                p.transform.onCenter();
-            },
+            onClick: () => p.transform.onCenter(),
             custom: {
                 tabindex: '-1',
             },

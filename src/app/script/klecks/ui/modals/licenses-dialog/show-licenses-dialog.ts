@@ -24,7 +24,6 @@ export function showLicensesDialog() {
             },
         }),
         width: 800,
-        isMaxHeight: true,
         onClose: () => {
             if (window.location.hash === '#licenses') {
                 history.replaceState(

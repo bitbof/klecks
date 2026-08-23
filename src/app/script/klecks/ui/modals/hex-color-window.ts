@@ -8,35 +8,13 @@ import { c } from '../../../bb/base/c';
 import * as classes from './color-slider-hex-dialog.module.scss';
 import { FloatingWindow } from '../components/floating-window';
 import { TVector2D } from '../../../bb/bb-types';
-import { clamp } from '../../../bb/math/math';
 
 type TRgbChannel = 'r' | 'g' | 'b';
 
 class ChannelInputTableRow {
     private readonly rootEl: HTMLElement;
-    private readonly input: Input;
+    private readonly input: Input<number>;
     private readonly channel: TRgbChannel;
-    private readonly onChange: (channel: TRgbChannel, value: number) => void;
-    private value: number;
-
-    private updateFromInput(resetIfInvalid: boolean): void {
-        const valueStr = this.input.getValue();
-        const value = parseFloat(valueStr);
-        if (valueStr === '' || !Number.isFinite(value)) {
-            if (resetIfInvalid) {
-                this.setValue(this.value, true);
-            }
-            return;
-        }
-        if (!resetIfInvalid && (value < 0 || value > 255)) {
-            return;
-        }
-        this.value = Math.round(clamp(value, 0, 255));
-        if (resetIfInvalid) {
-            this.input.setValue(this.value);
-        }
-        this.onChange(this.channel, this.value);
-    }
 
     constructor(p: {
         channel: TRgbChannel;
@@ -44,19 +22,17 @@ class ChannelInputTableRow {
         onChange: (channel: TRgbChannel, value: number) => void;
     }) {
         this.channel = p.channel;
-        this.value = p.value;
-        this.onChange = p.onChange;
         this.input = new Input({
             name: 'manual-color-' + this.channel,
-            init: this.value,
+            init: p.value,
             min: 0,
             max: 255,
+            step: 1,
             type: 'number',
             css: {
                 width: 80,
             },
-            onBlur: () => this.updateFromInput(true),
-            onInput: () => this.updateFromInput(false),
+            onChange: (value) => p.onChange(this.channel, value),
         });
         const label = {
             r: LANG('red'),
@@ -67,7 +43,9 @@ class ChannelInputTableRow {
     }
 
     setColor(color: TRgb): void {
-        this.setValue(color[this.channel], false);
+        if (!this.input.getIsFocused()) {
+            this.input.setValue(color[this.channel]);
+        }
     }
 
     getElement(): HTMLElement {
@@ -77,13 +55,6 @@ class ChannelInputTableRow {
     destroy(): void {
         this.input.destroy();
     }
-
-    private setValue(value: number, doForce: boolean): void {
-        this.value = value;
-        if (doForce || !this.input.getIsFocused()) {
-            this.input.setValue(value);
-        }
-    }
 }
 
 /**
@@ -92,42 +63,26 @@ class ChannelInputTableRow {
 export class HexColorWindow {
     private readonly floatingWindow: FloatingWindow;
     private readonly copyButton: HTMLElement;
-    private readonly hexInput: Input;
+    private readonly hexInput: Input<string>;
     private readonly channelInputs: ChannelInputTableRow[];
     private readonly onClose: () => void;
     private readonly onChange: ((rgb: TRgb) => void) | undefined;
-    private lastValidRgb: RGB;
-    private isClosed = false;
+    private value: RGB;
+    private isDestroyed = false;
 
     private emitChange(): void {
-        this.onChange?.(new BB.RGB(this.lastValidRgb.r, this.lastValidRgb.g, this.lastValidRgb.b));
+        this.onChange?.(new BB.RGB(this.value.r, this.value.g, this.value.b));
     }
 
-    private updateFromHex(resetIfInvalid: boolean): void {
-        const rgbObj = BB.ColorConverter.hexToRGB(this.hexInput.getValue());
-        if (!rgbObj) {
-            if (resetIfInvalid) {
-                this.hexInput.setValue('#' + BB.ColorConverter.toHexString(this.lastValidRgb));
-            }
-            return;
-        }
-        const didChange =
-            rgbObj.r !== this.lastValidRgb.r ||
-            rgbObj.g !== this.lastValidRgb.g ||
-            rgbObj.b !== this.lastValidRgb.b;
-        if (didChange) {
-            this.lastValidRgb = rgbObj;
-            this.channelInputs.forEach((item) => item.setColor(this.lastValidRgb));
-            this.emitChange();
-        }
+    private updateFromHex(value: string): void {
+        this.value = BB.ColorConverter.hexToRGB(value)!;
+        this.channelInputs.forEach((item) => item.setColor(this.value));
+        this.emitChange();
     }
 
     private updateFromRgb(channel: TRgbChannel, value: number): void {
-        if (value === this.lastValidRgb[channel]) {
-            return;
-        }
-        this.lastValidRgb[channel] = value;
-        this.hexInput.setValue('#' + BB.ColorConverter.toHexString(this.lastValidRgb));
+        this.value[channel] = value;
+        this.hexInput.setValue('#' + BB.ColorConverter.toHexString(this.value));
         this.emitChange();
     }
 
@@ -136,9 +91,10 @@ export class HexColorWindow {
         color: TRgb;
         onClose: () => void;
         onChange?: (rgb: TRgb) => void;
+        onMove?: (position: TVector2D) => void;
         position?: TVector2D;
     }) {
-        this.lastValidRgb = new BB.RGB(p.color.r, p.color.g, p.color.b);
+        this.value = new BB.RGB(p.color.r, p.color.g, p.color.b);
         this.onClose = p.onClose;
         this.onChange = p.onChange;
 
@@ -148,12 +104,16 @@ export class HexColorWindow {
         });
         this.hexInput = new Input({
             name: 'manual-color-hex',
-            init: '#' + BB.ColorConverter.toHexString(this.lastValidRgb),
+            init: '#' + BB.ColorConverter.toHexString(this.value),
             css: {
                 width: 80,
             },
-            onChange: () => this.updateFromHex(true),
-            onInput: () => this.updateFromHex(false),
+            validate: (value) => BB.ColorConverter.hexToRGB(value) !== undefined,
+            constrain: (value) => {
+                const trimmedValue = value.trim();
+                return trimmedValue.startsWith('#') ? trimmedValue : '#' + trimmedValue;
+            },
+            onChange: (value) => this.updateFromHex(value),
         });
         this.copyButton = BB.el({
             tagName: 'button',
@@ -184,17 +144,17 @@ export class HexColorWindow {
         this.channelInputs = [
             new ChannelInputTableRow({
                 channel: 'r',
-                value: this.lastValidRgb.r,
+                value: this.value.r,
                 onChange: (channel, value) => this.updateFromRgb(channel, value),
             }),
             new ChannelInputTableRow({
                 channel: 'g',
-                value: this.lastValidRgb.g,
+                value: this.value.g,
                 onChange: (channel, value) => this.updateFromRgb(channel, value),
             }),
             new ChannelInputTableRow({
                 channel: 'b',
-                value: this.lastValidRgb.b,
+                value: this.value.b,
                 onChange: (channel, value) => this.updateFromRgb(channel, value),
             }),
         ];
@@ -218,13 +178,13 @@ export class HexColorWindow {
 
         this.floatingWindow = new FloatingWindow({
             content: rootEl,
-            onClose: () => this.close(),
+            onClose: () => this.destroy(),
+            onMove: p.onMove,
             position: p.position,
         });
-        document.body.append(this.floatingWindow.getElement());
 
         setTimeout(() => {
-            if (this.isClosed) {
+            if (this.isDestroyed) {
                 return;
             }
             this.hexInput.focus();
@@ -233,28 +193,23 @@ export class HexColorWindow {
     }
 
     setColor(color: TRgb): void {
-        this.lastValidRgb = new BB.RGB(color.r, color.g, color.b);
+        this.value = new BB.RGB(color.r, color.g, color.b);
         if (!this.hexInput.getIsFocused()) {
-            this.hexInput.setValue('#' + BB.ColorConverter.toHexString(this.lastValidRgb));
+            this.hexInput.setValue('#' + BB.ColorConverter.toHexString(this.value));
         }
-        this.channelInputs.forEach((item) => item.setColor(this.lastValidRgb));
+        this.channelInputs.forEach((item) => item.setColor(this.value));
     }
 
-    getPosition(): TVector2D {
-        return this.floatingWindow.getPosition();
-    }
-
-    close(): void {
-        if (this.isClosed) {
+    destroy(): void {
+        if (this.isDestroyed) {
             return;
         }
-        this.isClosed = true;
+        this.isDestroyed = true;
         BB.destroyEl(this.copyButton);
         this.hexInput.destroy();
         this.channelInputs.forEach((item) => item.destroy());
         this.channelInputs.splice(0, this.channelInputs.length);
         this.floatingWindow.destroy();
-        this.floatingWindow.getElement().remove();
         this.onClose();
     }
 }

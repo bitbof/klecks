@@ -16,10 +16,7 @@ export function isImageDataReference(
     input: unknown,
 ): input is TIdb['V2']['ProjectStore']['ImageDataRef'] {
     return (
-        typeof input === 'object' &&
-        input !== null &&
-        'id' in input &&
-        typeof (input as any).id === 'string'
+        typeof input === 'object' && input !== null && 'id' in input && typeof input.id === 'string'
     );
 }
 

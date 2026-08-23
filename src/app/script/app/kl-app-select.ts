@@ -6,7 +6,7 @@ import { SelectTool } from '../klecks/select-tool/select-tool';
 import { FfdRenderer } from '../klecks/transform/ffd-renderer';
 import { KlTempHistory, TTempHistoryEntry } from '../klecks/history/kl-temp-history';
 import { StatusOverlay } from '../klecks/ui/components/status-overlay';
-import { showModal } from '../klecks/ui/modals/base/showModal';
+import { showModal } from '../klecks/ui/modals/base/show-modal';
 import { LANG } from '../language/language';
 import { KlHistory } from '../klecks/history/kl-history';
 import { boundsToRect, rectToBounds } from '../bb/math/math';

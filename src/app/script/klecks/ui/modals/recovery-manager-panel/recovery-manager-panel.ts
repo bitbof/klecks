@@ -8,7 +8,7 @@ import {
     TRecoveryMetaData,
 } from '../../../storage/kl-recovery-manager';
 import { timestampToAge } from '../../utils/timestamp-to-age';
-import { showModal } from '../base/showModal';
+import { showModal } from '../base/show-modal';
 import { copyCanvas } from '../../../../bb/base/canvas';
 import * as classes from './recovery-manager-panel.module.scss';
 import { LANG } from '../../../../language/language';
@@ -78,8 +78,11 @@ export class RecoveryManagerPanel {
                                     gap: 10,
                                 },
                             }),
-                            buttons: [LANG('tab-recovery-delete'), 'Cancel'],
-                            deleteButtonName: LANG('tab-recovery-delete'),
+                            buttons: [
+                                { id: 'delete', label: LANG('tab-recovery-delete') },
+                                'Cancel',
+                            ],
+                            deleteButton: 'delete',
                             callback: async (result) => {
                                 if (result === 'Cancel') {
                                     return;

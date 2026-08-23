@@ -15,11 +15,12 @@ export async function detectFiletype(file: File): Promise<TSupportedFileType | u
     // photoshop is sub type of image.* - so check first
     const nameSplit = file.name.split('.');
     const extension = nameSplit[nameSplit.length - 1].toLowerCase();
-    if (file.type.match('image/vnd.adobe.photoshop') || extension === 'psd') {
+    const mimeType = file.type.toLowerCase();
+    if (mimeType.match('image/vnd.adobe.photoshop') || extension === 'psd') {
         return 'psd';
     }
 
-    if (file.type.match('image.*')) {
+    if (mimeType.startsWith('image/')) {
         return 'image';
     }
     // check for headers

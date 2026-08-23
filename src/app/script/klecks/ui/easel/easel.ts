@@ -123,10 +123,9 @@ export class Easel<GToolId extends string> {
     }
 
     private updateToolSvgs(): void {
-        const tool = this.tempToolId ?? this.toolId;
-        Object.keys(this.toolsMap).forEach((toolId) => {
-            this.toolsMap[toolId as GToolId].getSvgElement().style.display =
-                toolId === tool ? '' : 'none';
+        const targetTool = this.tempToolId ?? this.toolId;
+        getToolEntries(this.toolsMap).forEach(([toolId, tool]) => {
+            tool.getSvgElement().style.display = toolId === targetTool ? '' : 'none';
         });
     }
 
@@ -645,6 +644,12 @@ export class Easel<GToolId extends string> {
 
         this.toolsMap[this.toolId].activate?.(this.cursorPos);
         Object.values<TEaselTool>(this.toolsMap).forEach((tool) => tool.onTool?.(this.toolId));
+        {
+            // adjust the transform without triggering a render
+            const doRender = this.doRender;
+            this.resetOrFitTransform(true);
+            this.doRender = doRender;
+        }
         this.renderLoop();
     }
 

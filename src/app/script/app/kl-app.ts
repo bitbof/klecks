@@ -66,13 +66,14 @@ import { drawProject } from '../klecks/canvas/draw-project';
 import { css, randomUuid, sleep } from '../bb/base/base';
 import { UnloadWarningTrigger } from '../klecks/ui/components/unload-warning-trigger';
 import { KL_INDEXED_DB } from '../klecks/storage/kl-indexed-db';
-import { showModal } from '../klecks/ui/modals/base/showModal';
+import { showModal } from '../klecks/ui/modals/base/show-modal';
 import { runBrowserStorageBanner } from '../klecks/ui/components/browser-storage-banner';
 import { requestPersistentStorage } from '../klecks/storage/request-persistent-storage';
 import { CrossTabChannel } from '../bb/base/cross-tab-channel';
 import { MobileColorUi } from '../klecks/ui/mobile/mobile-color-ui';
 import { getSelectionPath2d } from '../bb/multi-polygon/get-selection-path-2d';
 import { ToolspaceTopRow } from '../klecks/ui/components/toolspace-top-row';
+import { setupUnfocusOnClickService } from '../klecks/ui/onfocus-on-click-service';
 
 const toolPaintImg = getIconUrl('tool-paint');
 const toolHandImg = getIconUrl('tool-hand');
@@ -251,6 +252,7 @@ export class KlApp {
     // ----------------------------------- public -----------------------------------
 
     constructor(p: TKlAppParams) {
+        setupUnfocusOnClickService();
         this.embed = p.embed;
         this.helpPath = p.helpPath ?? 'help.html';
         // default 2048, unless your screen is bigger than that (that computer then probably has the horsepower for that)
@@ -877,7 +879,13 @@ export class KlApp {
                                             showModal({
                                                 type: 'warning',
                                                 message: LANG('file-storage-overwrite-confirm'),
-                                                buttons: [LANG('file-storage-overwrite'), 'Cancel'],
+                                                buttons: [
+                                                    {
+                                                        id: 'overwrite',
+                                                        label: LANG('file-storage-overwrite'),
+                                                    },
+                                                    'Cancel',
+                                                ],
                                                 callback: async (result) => {
                                                     if (result === 'Cancel') {
                                                         resolve(false);
@@ -1161,7 +1169,7 @@ export class KlApp {
                             this.saveAsPsd();
                             closeFunc();
                         };
-                        KL.popup({
+                        showModal({
                             message: '<b>' + LANG('upload-failed') + '</b>',
                             div: BB.el({
                                 content: [
@@ -1181,11 +1189,11 @@ export class KlApp {
                         });
                     };
 
-                    KL.popup({
+                    showModal({
                         message: LANG('submit-prompt'),
-                        buttons: [LANG('submit'), 'Cancel'],
+                        buttons: [{ id: 'submit', label: LANG('submit') }, 'Cancel'],
                         callback: async (result) => {
-                            if (result !== LANG('submit')) {
+                            if (result !== 'submit') {
                                 return;
                             }
 
@@ -1706,7 +1714,7 @@ export class KlApp {
 
         const onOpenBrowserStorage = async () => {
             const showFailureMessage = () => {
-                KL.popup({
+                showModal({
                     message: LANG('file-storage-open-failed'),
                     type: 'error',
                 });
@@ -1739,7 +1747,7 @@ export class KlApp {
                     doOpen = await new Promise<boolean>((resolve, reject) => {
                         showModal({
                             message: LANG('file-storage-open-confirmation'),
-                            buttons: [LANG('file-storage-open'), 'Cancel'],
+                            buttons: [{ id: 'open', label: LANG('file-storage-open') }, 'Cancel'],
                             callback: async (result) => {
                                 if (result === 'Cancel') {
                                     resolve(false);
@@ -1758,7 +1766,7 @@ export class KlApp {
             }
 
             let closeLoader: (() => void) | undefined;
-            KL.popup({
+            showModal({
                 message: LANG('loading'),
                 callback: (result) => {
                     closeLoader = undefined;
@@ -1841,7 +1849,6 @@ export class KlApp {
                       applyUncommitted();
                       KL.imgurUpload(
                           this.klCanvas,
-                          this.rootEl,
                           p.app && p.app.imgurKey ? p.app.imgurKey : '',
                           () => this.updateLastSaved(),
                       );

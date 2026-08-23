@@ -7,6 +7,7 @@ import { KlHistory } from '../../history/kl-history';
 import { LocalStorage } from '../../../bb/base/local-storage';
 import * as classes from './save-reminder.module.scss';
 import { BrowserStorageUi } from './browser-storage-ui';
+import { showModal } from '../modals/base/show-modal';
 
 export type TSaveReminderSetting = '20min' | '40min' | 'disabled';
 
@@ -111,7 +112,7 @@ export class SaveReminder {
         storageUi.show();
         storageWrapper.append(storageUi.getElement());
 
-        KL.popup({
+        showModal({
             type: 'warning',
             message: `<b>${LANG('save-reminder-title')}</b>`,
             div: contentEl,
@@ -142,8 +143,11 @@ export class SaveReminder {
         this.applyUncommitted = p.applyUncommitted;
         this.klHistory = p.klHistory;
 
+        const storedSetting = LocalStorage.getItem(LS_REMINDER_KEY);
         this.setting =
-            (LocalStorage.getItem(LS_REMINDER_KEY) as TSaveReminderSetting | null) ?? '40min';
+            storedSetting === '20min' || storedSetting === '40min' || storedSetting === 'disabled'
+                ? storedSetting
+                : '40min';
     }
 
     init(): void {
@@ -195,6 +199,7 @@ export class SaveReminder {
         this.lastSavedHistoryIndex = this.klHistory.getTotalIndex();
         this.lastReminderShownAt = performance.now();
         this.lastSavedAt = performance.now();
+        // todo central onbeforeunload service
         window.onbeforeunload = null;
 
         if (this.closeFunc) {

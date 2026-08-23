@@ -14,6 +14,7 @@ import { c } from '../../../bb/base/c';
 import { KlHistory } from '../../history/kl-history';
 import { createImage } from '../../../bb/base/ui';
 import { createHelpButton } from '../components/help-button';
+import { showModal } from '../modals/base/show-modal';
 
 const copyImg = getIconUrl('copy');
 export type TEditUiParams = {
@@ -87,7 +88,7 @@ export class EditUi {
                 },
             });
             noteButton.onclick = () => {
-                KL.popup({
+                showModal({
                     message: '<b>WebGL is not working</b>',
                     div: BB.el({
                         content: `
@@ -175,7 +176,7 @@ This has been reported to Google.
                     };
 
                     if (!('apply' in filters[filterKey])) {
-                        KL.popup({
+                        showModal({
                             message: 'Application not fully loaded',
                             type: 'error',
                         });
@@ -190,7 +191,7 @@ This has been reported to Google.
                             input: input,
                         } as TFilterApply);
                         if (!filterResult) {
-                            KL.popup({
+                            showModal({
                                 message: "Couldn't apply the edit action",
                                 type: 'error',
                             });
@@ -232,7 +233,7 @@ This has been reported to Google.
                         }
 
                         if (!filterDialog || 'error' in filterDialog) {
-                            KL.popup({
+                            showModal({
                                 message: filterDialog
                                     ? filterDialog.error
                                     : 'Error: Could not perform action.',
@@ -244,7 +245,7 @@ This has been reported to Google.
                         let closeFunc: () => void;
                         // Todo should move into getDialogParams
                         filterDialog.errorCallback = (e) => {
-                            KL.popup({
+                            showModal({
                                 message: 'Error: Could not perform action.',
                                 type: 'error',
                             });
@@ -267,7 +268,7 @@ This has been reported to Google.
                                 els.push(
                                     createHelpButton({
                                         onClick: () => {
-                                            KL.popup({
+                                            showModal({
                                                 message: description,
                                             });
                                         },
@@ -278,7 +279,7 @@ This has been reported to Google.
                             title = c(',flex,gap-5', els);
                         }
 
-                        KL.popup({
+                        showModal({
                             message: title,
                             div: filterDialog.element,
                             style: style,

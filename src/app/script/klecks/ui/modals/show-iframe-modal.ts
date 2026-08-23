@@ -103,7 +103,6 @@ export function showIframeModal(url: string, isEmbed: boolean, options?: TIframe
         content: iframe,
         width: options?.modalWidth || 880,
         height: options?.modalHeight,
-        isMaxHeight: true,
         onClose: () => {
             if (onMessage) {
                 window.removeEventListener('message', onMessage);

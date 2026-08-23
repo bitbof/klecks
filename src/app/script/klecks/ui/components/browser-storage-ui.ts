@@ -3,13 +3,11 @@ import { BB } from '../../../bb/bb';
 
 import { TKlProject } from '../../kl-types';
 import { ProjectStore, TProjectStoreListener } from '../../storage/project-store';
-import { KL } from '../../kl';
 import { LANG } from '../../../language/language';
-import { showModal } from '../modals/base/showModal';
+import { showModal } from '../modals/base/show-modal';
 import { timestampToAge } from '../utils/timestamp-to-age';
 import { BrowserStorageHeaderUi } from './browser-storage-header-ui';
 import * as classes from './browser-storage-ui.module.scss';
-import { makeUnfocusable } from '../../../bb/base/ui';
 import { requestPersistentStorage } from '../../storage/request-persistent-storage';
 import { copyCanvas } from '../../../bb/base/canvas';
 
@@ -115,7 +113,7 @@ export class BrowserStorageUi {
                 showModal({
                     type: 'warning',
                     message: LANG('file-storage-overwrite-confirm'),
-                    buttons: [LANG('file-storage-overwrite'), 'Cancel'],
+                    buttons: [{ id: 'overwrite', label: LANG('file-storage-overwrite') }, 'Cancel'],
                     callback: async (result) => {
                         if (result === 'Cancel') {
                             resolve(false);
@@ -147,7 +145,7 @@ export class BrowserStorageUi {
             this.onStored();
         } catch (e) {
             this.resetButtons();
-            KL.popup({
+            showModal({
                 type: 'error',
                 message: [
                     `${LANG('file-storage-failed-1')}<ul>`,
@@ -168,8 +166,8 @@ export class BrowserStorageUi {
         showModal({
             type: 'warning',
             message: LANG('file-storage-clear-prompt'),
-            buttons: [LANG('file-storage-clear'), 'Cancel'],
-            deleteButtonName: LANG('file-storage-clear'),
+            buttons: [{ id: 'clear', label: LANG('file-storage-clear') }, 'Cancel'],
+            deleteButton: 'clear',
             callback: async (result) => {
                 if (result === 'Cancel') {
                     return;
@@ -184,7 +182,7 @@ export class BrowserStorageUi {
                     await this.projectStore.clear();
                 } catch (e) {
                     this.resetButtons();
-                    KL.popup({
+                    showModal({
                         type: 'error',
                         message: LANG('file-storage-failed-clear'),
                         buttons: ['Ok'],
@@ -263,6 +261,11 @@ export class BrowserStorageUi {
                 },
                 onClick: () => this.onOpen?.(),
                 noRef: true,
+                custom: !this.options?.isFocusable
+                    ? {
+                          tabIndex: '-1',
+                      }
+                    : undefined,
             });
         }
         this.storeButtonEl = BB.el({
@@ -286,9 +289,8 @@ export class BrowserStorageUi {
             noRef: true,
         });
         if (!this.options?.isFocusable) {
-            this.openButtonEl && makeUnfocusable(this.openButtonEl);
-            makeUnfocusable(this.storeButtonEl);
-            makeUnfocusable(this.clearButtonEl);
+            this.storeButtonEl.tabIndex = -1;
+            this.clearButtonEl.tabIndex = -1;
         }
 
         if (this.options?.hideClearButton) {

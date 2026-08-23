@@ -1,5 +1,5 @@
 import { BB } from '../../bb/bb';
-import { input } from '../ui/components/input';
+import { Input } from '../ui/components/input';
 import { Checkbox } from '../ui/components/checkbox';
 import { ColorOptions } from '../ui/components/color-options';
 import { ViewportCropper } from '../ui/components/cropper/viewport-cropper';
@@ -36,10 +36,12 @@ export const filterCropExtend = {
         const result: TFilterGetDialogResult<TFilterCropExtendInput> = {
             element: rootEl,
         };
-        let left = 0,
-            right = 0,
-            top = 0,
-            bottom = 0;
+        const initialCrop = {
+            top: 0,
+            right: 0,
+            bottom: 0,
+            left: 0,
+        };
         const isSmall = testIsSmall();
         if (!isSmall) {
             result.width = getPreviewWidth(isSmall);
@@ -59,56 +61,76 @@ export const filterCropExtend = {
             const boundsWidth = selectionBounds.x2 - selectionBounds.x1 + 1;
             const boundsHeight = selectionBounds.y2 - selectionBounds.y1 + 1;
             if (boundsWidth <= maxWidth && boundsHeight <= maxHeight) {
-                top = selectionBounds.y1;
-                right = selectionBounds.x2 - klCanvas.getWidth();
-                bottom = selectionBounds.y2 - klCanvas.getHeight();
-                left = selectionBounds.x1;
+                initialCrop.top = selectionBounds.y1;
+                initialCrop.right = selectionBounds.x2 - klCanvas.getWidth();
+                initialCrop.bottom = selectionBounds.y2 - klCanvas.getHeight();
+                initialCrop.left = selectionBounds.x1;
             } else {
                 selectionBounds = undefined;
             }
         }
 
         // --- input elements ---
-        const leftInput = input({
-            init: left,
+        const leftInput = new Input({
+            init: initialCrop.left,
             type: 'number',
-            min: -klCanvas.getWidth(),
-            max: maxWidth,
+            name: 'crop-left',
             css: { width: 75 },
-            callback: function () {
-                onInputChange('left');
+            step: 1,
+            onChange: function () {
+                onInputChange();
             },
         });
-        const rightInput = input({
-            init: right,
+        const rightInput = new Input({
+            init: initialCrop.right,
             type: 'number',
-            min: -klCanvas.getWidth(),
-            max: maxWidth,
+            name: 'crop-right',
             css: { width: 75 },
-            callback: function () {
-                onInputChange('right');
+            step: 1,
+            onChange: function () {
+                onInputChange();
             },
         });
-        const topInput = input({
-            init: top,
+        const topInput = new Input({
+            init: initialCrop.top,
             type: 'number',
-            min: -klCanvas.getHeight(),
-            max: maxHeight,
+            name: 'crop-top',
             css: { width: 75 },
-            callback: function () {
-                onInputChange('top');
+            step: 1,
+            onChange: function () {
+                onInputChange();
             },
         });
-        const bottomInput = input({
-            init: bottom,
+        const bottomInput = new Input({
+            init: initialCrop.bottom,
             type: 'number',
-            min: -klCanvas.getHeight(),
-            max: maxHeight,
+            name: 'crop-bottom',
             css: { width: 75 },
-            callback: function () {
-                onInputChange('bottom');
+            step: 1,
+            onChange: function () {
+                onInputChange();
             },
         });
+
+        function getValues(): { left: number; right: number; top: number; bottom: number } {
+            return {
+                left: leftInput.getValue(),
+                right: rightInput.getValue(),
+                top: topInput.getValue(),
+                bottom: bottomInput.getValue(),
+            };
+        }
+
+        function updateInputRanges() {
+            const { left, right, top, bottom } = getValues();
+            const width = klCanvas.getWidth();
+            const height = klCanvas.getHeight();
+            leftInput.setRange(-width - right + 1, -width - right + maxWidth);
+            rightInput.setRange(-width - left + 1, -width - left + maxWidth);
+            topInput.setRange(-height - bottom + 1, -height - bottom + maxHeight);
+            bottomInput.setRange(-height - top + 1, -height - top + maxHeight);
+        }
+        updateInputRanges();
 
         const sharedCss: TCss = {
             display: 'flex',
@@ -117,19 +139,19 @@ export const filterCropExtend = {
             gap: 3,
         };
         const leftWrapper = BB.el({
-            content: [LANG('filter-crop-left') + ':', leftInput],
+            content: [LANG('filter-crop-left') + ':', leftInput.getElement()],
             css: sharedCss,
         });
         const rightWrapper = BB.el({
-            content: [LANG('filter-crop-right') + ':', rightInput],
+            content: [LANG('filter-crop-right') + ':', rightInput.getElement()],
             css: sharedCss,
         });
         const topWrapper = BB.el({
-            content: [LANG('filter-crop-top') + ':', topInput],
+            content: [LANG('filter-crop-top') + ':', topInput.getElement()],
             css: sharedCss,
         });
         const bottomWrapper = BB.el({
-            content: [LANG('filter-crop-bottom') + ':', bottomInput],
+            content: [LANG('filter-crop-bottom') + ':', bottomInput.getElement()],
             css: sharedCss,
         });
         const wrapWrapper = BB.el({
@@ -142,66 +164,17 @@ export const filterCropExtend = {
         wrapWrapper.append(leftWrapper, rightWrapper, topWrapper, bottomWrapper);
         rootEl.append(wrapWrapper);
 
-        function onInputChange(changeType: 'top' | 'right' | 'bottom' | 'left'): void {
-            left = parseInt(leftInput.value);
-            right = parseInt(rightInput.value);
-            top = parseInt(topInput.value);
-            bottom = parseInt(bottomInput.value);
-            let newWidth = klCanvas.getWidth() + left + right;
-            let newHeight = klCanvas.getHeight() + top + bottom;
-
-            if (newWidth <= 0) {
-                if (changeType == 'left') {
-                    left = -klCanvas.getWidth() - right + 1;
-                    leftInput.value = '' + left;
-                }
-                if (changeType == 'right') {
-                    right = -klCanvas.getWidth() - left + 1;
-                    rightInput.value = '' + right;
-                }
-                newWidth = 1;
-            }
-            if (newWidth > maxWidth) {
-                if (changeType == 'left') {
-                    left = -klCanvas.getWidth() - right + maxWidth;
-                    leftInput.value = '' + left;
-                }
-                if (changeType == 'right') {
-                    right = -klCanvas.getWidth() - left + maxWidth;
-                    rightInput.value = '' + right;
-                }
-                newWidth = maxWidth;
-            }
-            if (newHeight <= 0) {
-                if (changeType == 'top') {
-                    top = -klCanvas.getHeight() - bottom + 1;
-                    topInput.value = '' + top;
-                }
-                if (changeType == 'bottom') {
-                    bottom = -klCanvas.getHeight() - top + 1;
-                    bottomInput.value = '' + bottom;
-                }
-                newHeight = 1;
-            }
-            if (newHeight > maxHeight) {
-                if (changeType == 'top') {
-                    top = -klCanvas.getHeight() - bottom + maxHeight;
-                    topInput.value = '' + top;
-                }
-                if (changeType == 'bottom') {
-                    bottom = -klCanvas.getHeight() - top + maxHeight;
-                    bottomInput.value = '' + bottom;
-                }
-                newHeight = maxHeight;
-            }
-
+        function onInputChange(): void {
+            const { left, right, top, bottom } = getValues();
+            const width = klCanvas.getWidth() + left + right;
+            const height = klCanvas.getHeight() + top + bottom;
             const newCrop: TRect = {
                 x: -left,
                 y: -top,
-                width: newWidth,
-                height: newHeight,
+                width: width,
+                height: height,
             };
-            updateInputValues(newCrop);
+            updateInputRanges();
             cropper.setValue(newCrop);
         }
 
@@ -268,14 +241,11 @@ export const filterCropExtend = {
         flexRow.append(ruleOThirdsCheckbox.getElement(), colorOptions.getElement());
 
         function updateInputValues(crop: TRect): void {
-            left = -crop.x;
-            top = -crop.y;
-            right = crop.x + crop.width - klCanvas.getWidth();
-            bottom = crop.y + crop.height - klCanvas.getHeight();
-            leftInput.value = '' + left;
-            topInput.value = '' + top;
-            rightInput.value = '' + right;
-            bottomInput.value = '' + bottom;
+            leftInput.setValue(-crop.x);
+            topInput.setValue(-crop.y);
+            rightInput.setValue(crop.x + crop.width - klCanvas.getWidth());
+            bottomInput.setValue(crop.y + crop.height - klCanvas.getHeight());
+            updateInputRanges();
         }
 
         const previewPadding = 40;
@@ -380,16 +350,21 @@ export const filterCropExtend = {
             BB.freeCanvas(tempCanvas);
             ruleOThirdsCheckbox.destroy();
             colorOptions.destroy();
+            leftInput.destroy();
+            rightInput.destroy();
+            topInput.destroy();
+            bottomInput.destroy();
         };
         result.getInput = function (): TFilterCropExtendInput {
-            result.destroy!();
-            return {
-                left: left,
-                right: right,
-                top: top,
-                bottom: bottom,
+            const inputs = {
+                left: leftInput.getValue(),
+                right: rightInput.getValue(),
+                top: topInput.getValue(),
+                bottom: bottomInput.getValue(),
                 fillColor: selectedRgbaObj.a === 0 ? undefined : selectedRgbaObj,
             };
+            result.destroy!();
+            return inputs;
         };
         return result;
     },

@@ -16,6 +16,9 @@
 
     --kl-checkerboard-background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 2 2'><path d='M0,0h2v2H0z' fill='%23fff'/><path d='M0,0h1v1H0zM1,1h1v1H1z' fill='%23c8c8c8'/></svg>")
         0 0 / 8px;
+
+    --modal-backdrop-background: rgba(0, 0, 0, 0.45);
+    --modal-shadow: 0 5px 30px rgba(0, 0, 0, 0.25);
 }
 
 @keyframes consoleIn {
@@ -351,7 +354,7 @@ a:not([href]):hover {
     background-color: #ddd;
     box-shadow:
         inset 2px 2px 10px rgba(0, 0, 0, 0.2),
-        0 2px 2px #ddd;
+        0 2px 2px rgba(255, 255, 255, 0.2);
 }
 
 .kl-button:disabled {
@@ -440,7 +443,7 @@ a:not([href]):hover {
     height: 100%;
     overflow: hidden;
     overflow-y: auto;
-    background: rgba(50, 50, 50, 0.5);
+    background: var(--modal-backdrop-background);
     animation-name: consoleIn;
     animation-duration: 0.3s;
     animation-timing-function: ease-out;
@@ -453,7 +456,7 @@ a:not([href]):hover {
     border-radius: 10px;
     padding: 20px;
     margin: 10px 0;
-    box-shadow: rgba(0, 0, 0, 0.45) 0 5px 60px;
+    box-shadow: var(--modal-shadow);
 }
 
 .kl-popup-box--sm {
@@ -505,12 +508,12 @@ a:not([href]):hover {
 }
 
 .kl-d-modal-root {
-    background: rgba(0, 0, 0, 0.45);
+    background: var(--modal-backdrop-background);
 }
 
 .kl-d-modal {
     background: #eee;
-    box-shadow: rgba(0, 0, 0, 0.25) 0px 5px 60px;
+    box-shadow: var(--modal-shadow);
 }
 
 @keyframes topOverlayPulse {
@@ -1149,6 +1152,7 @@ clip-path seems the cleanest.
     border-radius: 0;
     background: none;
     box-shadow: none;
+    color: #000;
     user-select: none;
 
     &:hover,

@@ -1,7 +1,7 @@
 import { BB } from '../../bb/bb';
 import { TFilterApply, TFilterGetDialogParam, TFilterGetDialogResult } from '../kl-types';
 import { LANG } from '../../language/language';
-import { input } from '../ui/components/input';
+import { Input } from '../ui/components/input';
 import { ColorOptions } from '../ui/components/color-options';
 import { drawGrid } from '../image-operations/draw-grid';
 import { css, throwIfNull } from '../../bb/base/base';
@@ -62,33 +62,39 @@ export const filterGrid = {
                 marginBottom: 10,
             },
         });
-        const xInput = input({
+        const xInput = new Input({
             init: 2,
             type: 'number',
+            name: 'grid-x',
             min: 1,
+            step: 1,
             css: { width: 75, marginRight: 20 },
-            callback: function (v) {
-                settingsObj.x = parseFloat(v);
+            onChange: function (v) {
+                settingsObj.x = v;
                 updatePreview();
             },
         });
-        const yInput = input({
+        const yInput = new Input({
             init: 2,
             type: 'number',
+            name: 'grid-y',
             min: 1,
+            step: 1,
             css: { width: 75, marginRight: 20 },
-            callback: function (v) {
-                settingsObj.y = parseFloat(v);
+            onChange: function (v) {
+                settingsObj.y = v;
                 updatePreview();
             },
         });
-        const thicknessInput = input({
+        const thicknessInput = new Input({
             init: settingsObj.thickness,
             type: 'number',
+            name: 'grid-thickness',
             min: 1,
+            step: 1,
             css: { width: 75, marginRight: 20 },
-            callback: function (v) {
-                settingsObj.thickness = parseFloat(v);
+            onChange: function (v) {
+                settingsObj.thickness = v;
                 updatePreview();
             },
         });
@@ -128,13 +134,13 @@ export const filterGrid = {
         };
         line1.append(
             BB.el({ content: 'X:', css: labelStyle }),
-            xInput,
+            xInput.getElement(),
             BB.el({ content: 'Y:', css: labelStyle }),
-            yInput,
+            yInput.getElement(),
         );
         line2.append(
             BB.el({ content: LANG('shape-line-width') + ':', css: labelStyle }),
-            thicknessInput,
+            thicknessInput.getElement(),
             BB.el({ css: { flexGrow: 1 } }),
             colorOptions.getElement(),
         );
@@ -189,6 +195,9 @@ export const filterGrid = {
             preview.destroy();
             BB.freeCanvas(previewCanvas);
             colorOptions.destroy();
+            xInput.destroy();
+            yInput.destroy();
+            thicknessInput.destroy();
         };
         result.getInput = function (): TFilterGridInput {
             result.destroy!();

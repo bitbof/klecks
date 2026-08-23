@@ -1,8 +1,6 @@
-import { showModal } from './ui/modals/base/showModal';
 import { DynamicModal } from './ui/modals/base/dynamic-modal';
 import { DIALOG_COUNTER } from './ui/modals/modal-count';
 import { Checkbox } from './ui/components/checkbox';
-import { input } from './ui/components/input';
 import { Select } from './ui/components/select';
 import { ImageToggle } from './ui/components/image-toggle';
 import { ImageRadioList } from './ui/components/image-radio-list';
@@ -94,7 +92,6 @@ export const KL = {
 
     // --- ui - components ---
     Checkbox,
-    input,
     Select,
     ImageToggle,
     ImageRadioList,
@@ -127,7 +124,6 @@ export const KL = {
 
     // --- ui - modals ---
     DIALOG_COUNTER,
-    popup: showModal,
     Popup: DynamicModal,
     clipboardDialog,
     showImportAsLayerDialog,

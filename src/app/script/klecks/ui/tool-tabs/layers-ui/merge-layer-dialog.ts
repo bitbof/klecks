@@ -2,7 +2,7 @@ import { BB } from '../../../../bb/bb';
 import { LANG } from '../../../../language/language';
 import { Options } from '../../components/options';
 import { translateBlending } from '../../../canvas/translate-blending';
-import { showModal } from '../../modals/base/showModal';
+import { showModal } from '../../modals/base/show-modal';
 import { TMixMode } from '../../../kl-types';
 
 export function mergeLayerDialog(

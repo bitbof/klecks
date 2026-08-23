@@ -10,7 +10,7 @@ import { addIsDarkListener, css, nullToUndefined } from '../../../bb/base/base';
 import { showLicensesDialog } from '../modals/licenses-dialog/show-licenses-dialog';
 import { c } from '../../../bb/base/c';
 import { SaveReminder } from '../components/save-reminder';
-import { showModal } from '../modals/base/showModal';
+import { showModal } from '../modals/base/show-modal';
 import { createImage } from '../../../bb/base/ui';
 import { PixelatedZoomToggle } from '../components/pixelated-zoom-toggle';
 
@@ -159,16 +159,21 @@ export class SettingsUi {
                         saveReminder.setSetting(val);
                         return;
                     }
-                    const disableStr = LANG('settings-save-reminder-confirm-disable');
                     showModal({
                         message: '⚠️' + LANG('settings-save-reminder-confirm-title'),
                         div: c('', [
                             c('.info-hint', LANG('settings-save-reminder-confirm-a')),
                             LANG('settings-save-reminder-confirm-b'),
                         ]),
-                        buttons: [disableStr, 'Cancel'],
+                        buttons: [
+                            {
+                                id: 'disable',
+                                label: LANG('settings-save-reminder-confirm-disable'),
+                            },
+                            'Cancel',
+                        ],
                         callback: (result) => {
-                            if (result === disableStr) {
+                            if (result === 'disable') {
                                 saveReminder.setSetting(val);
                             } else {
                                 reminderSelect.setValue(saveReminder.getSetting());
@@ -255,7 +260,7 @@ export class SettingsUi {
                                     tabIndex: '-1',
                                 },
                             }),
-                            ' © 2025',
+                            ' © 2026',
                             BB.el({ tagName: 'br' }),
                         ],
                     }),

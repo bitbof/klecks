@@ -1,6 +1,6 @@
 import { BB } from '../../../bb/bb';
 import { FreeTransformCanvas } from '../components/free-transform-canvas';
-import { showModal } from './base/showModal';
+import { showModal } from './base/show-modal';
 import { KlCanvas } from '../../canvas/kl-canvas';
 import { TKlBasicLayer } from '../../kl-types';
 import { LANG } from '../../../language/language';

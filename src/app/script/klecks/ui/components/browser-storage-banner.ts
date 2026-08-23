@@ -30,9 +30,10 @@ export async function runBrowserStorageBanner(p: TBrowserStorageBannerParams): P
     }
 
     const openedProjectIds: string[] = [];
-    const crossTabChannel = new CrossTabChannel('kl-tab-communication');
     {
-        // subscription stays up during run of application
+        const crossTabChannel = new CrossTabChannel('kl-tab-communication');
+        // This subscription stays up during run of application.
+        // It's to ensure other tabs know if the browser storage project is already opened.
         crossTabChannel.subscribe((message) => {
             if (message.type === 'request-project-ids') {
                 crossTabChannel.postMessage({
@@ -158,7 +159,7 @@ export async function runBrowserStorageBanner(p: TBrowserStorageBannerParams): P
 
     const onPointerDown = (e: PointerEvent) => {
         const target = e.target as HTMLElement | null;
-        if (banner.contains(target) || banner.contains(target)) {
+        if (banner.contains(target)) {
             return;
         }
         close();

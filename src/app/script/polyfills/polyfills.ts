@@ -82,7 +82,13 @@ if (!String.prototype.replaceAll) {
             if (typeof replaceValue === 'function') {
                 throw new Error('replaceAll polyfill does not support replaceValue: function');
             }
-            return this.replace(new RegExp(searchValue, 'g'), replaceValue);
+            if (typeof searchValue === 'string') {
+                return this.split(searchValue).join(replaceValue);
+            }
+            const flags = searchValue.flags.includes('g')
+                ? searchValue.flags
+                : searchValue.flags + 'g';
+            return this.replace(new RegExp(searchValue.source, flags), replaceValue);
         },
     });
 }
@@ -91,7 +97,7 @@ if (!String.prototype.replaceAll) {
 if (!('at' in Array.prototype)) {
     Object.defineProperty(Array.prototype, 'at', {
         value: function (index: number) {
-            if (index > 0) {
+            if (index >= 0) {
                 return this[index];
             }
             if (index < 0) {

@@ -6,7 +6,7 @@ import { Input } from './input';
  * Input goes away when losing focus, or when pressing Enter/Escape.
  */
 export class KlSliderManualInput {
-    private readonly input: Input;
+    private readonly input: Input<number>;
     private scrollBefore: { x: number; y: number } | undefined; // window scroll position on creation
     private lastValue: number; // last emitted value
     private isClosed: boolean = false;
@@ -52,9 +52,7 @@ export class KlSliderManualInput {
             max,
             name: 'slider-manual-input',
             step: roundDigits === undefined ? undefined : 10 ** -roundDigits,
-            doScrollWithoutFocus: true,
             onChange: () => this.emit(),
-            onInput: () => this.emit(),
             onBlur: () => this.privateOnClose(),
             css: {
                 width: rect.width,

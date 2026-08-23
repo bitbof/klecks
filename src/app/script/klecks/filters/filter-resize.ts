@@ -7,6 +7,7 @@ import { LANG } from '../../language/language';
 import { table } from '../ui/components/table';
 import { SMALL_PREVIEW } from '../ui/utils/preview-size';
 import { css } from '../../bb/base/base';
+import { Input } from '../ui/components/input';
 
 const constrainImg = getIconUrl('constrain');
 export type TFilterResizeInput = {
@@ -17,7 +18,6 @@ export type TFilterResizeInput = {
 
 export const filterResize = {
     getDialog(params: TFilterGetDialogParam) {
-        //BB.centerWithin
         const klCanvas = params.klCanvas;
         if (!klCanvas) {
             return false;
@@ -34,88 +34,98 @@ export const filterResize = {
         const result: TFilterGetDialogResult<TFilterResizeInput> = {
             element: rootEl,
         };
-        let newWidth = klCanvas.getWidth(),
-            newHeight = klCanvas.getHeight();
-
         const maxWidth = params.maxWidth,
             maxHeight = params.maxHeight;
+        let isConstrained = true;
+        const ratio = klCanvas.getWidth() / klCanvas.getHeight();
 
-        const widthWrapper = BB.el({
-            css: {
-                width: 150,
-                height: 35,
-                lineHeight: '30px',
+        const widthInput = new Input({
+            type: 'number',
+            init: klCanvas.getWidth(),
+            name: 'resize-width',
+            step: 1,
+            css: { width: 90 },
+            onChange: (value) => {
+                if (isConstrained) {
+                    heightInput.setValue(Math.max(1, Math.floor(value / ratio)));
+                }
+                update();
             },
         });
-        const heightWrapper = BB.el({
-            css: {
-                width: 150,
-                height: 35,
-                lineHeight: '30px',
+        const heightInput = new Input({
+            type: 'number',
+            init: klCanvas.getHeight(),
+            name: 'resize-height',
+            step: 1,
+            css: { width: 90 },
+            onChange: (value) => {
+                if (isConstrained) {
+                    widthInput.setValue(Math.max(1, Math.floor(value * ratio)));
+                }
+                update();
             },
         });
-        const widthInput = BB.el({
-            tagName: 'input',
+        function updateRanges(): void {
+            if (isConstrained) {
+                widthInput.setRange(
+                    Math.max(1, Math.ceil(ratio)),
+                    Math.max(1, Math.min(maxWidth, Math.floor(maxHeight * ratio))),
+                );
+                heightInput.setRange(
+                    Math.max(1, Math.ceil(1 / ratio)),
+                    Math.max(1, Math.min(maxHeight, Math.floor(maxWidth / ratio))),
+                );
+                return;
+            }
+            widthInput.setRange(1, maxWidth);
+            heightInput.setRange(1, maxHeight);
+        }
+        updateRanges();
+
+        function scale(factor: number): void {
+            widthInput.setValue(widthInput.getValue() * factor, true);
+            if (!isConstrained) {
+                heightInput.setValue(heightInput.getValue() * factor, true);
+            }
+        }
+
+        const buttonRow = BB.el({
+            parent: rootEl,
             css: {
-                float: 'right',
-                width: 90,
-            },
-            custom: {
-                type: 'number',
-                min: '1',
-                max: '' + maxWidth,
-                value: '' + klCanvas.getWidth(),
+                display: 'flex',
+                alignItems: 'center',
+                gap: 10,
+                marginBottom: 10,
             },
         });
-        const heightInput = BB.el({
-            tagName: 'input',
-            css: {
-                float: 'right',
-                width: 90,
-            },
-            custom: {
-                type: 'number',
-                min: '1',
-                max: '' + maxHeight,
-                value: '' + klCanvas.getHeight(),
+        BB.el({
+            parent: buttonRow,
+            tagName: 'button',
+            className: 'kl-button',
+            content: '2&times;',
+            onClick: () => {
+                scale(2);
             },
         });
-        widthInput.onclick = function () {
-            (this as any).focus();
-            widthChanged = true;
-            update();
-        };
-        heightInput.onclick = function () {
-            (this as any).focus();
-            heightChanged = true;
-            update();
-        };
-        widthInput.onchange = function () {
-            widthChanged = true;
-            update();
-        };
-        heightInput.onchange = function () {
-            heightChanged = true;
-            update();
-        };
-        widthWrapper.append(LANG('width') + ': ', widthInput);
-        heightWrapper.append(LANG('height') + ': ', heightInput);
-        const inputWrapper = BB.el({
-            css: {
-                background: 'url(' + constrainImg + ') no-repeat 140px 5px',
-                backgroundSize: '50px 52px',
+        BB.el({
+            parent: buttonRow,
+            tagName: 'button',
+            className: 'kl-button',
+            content: '&frac12;&times;',
+            onClick: () => {
+                scale(0.5);
             },
         });
-        inputWrapper.append(widthWrapper, heightWrapper);
+
         const constrainIm = new Image();
         constrainIm.src = constrainImg;
         constrainIm.height = 40;
 
         const sizeTable = table(
             [
-                [LANG('width') + ':&nbsp;', widthInput, constrainIm],
+                [LANG('width') + ':&nbsp;', widthInput.getElement(), constrainIm],
                 [BB.el({ css: { height: 5 } }), '', ''],
-                [LANG('height') + ':&nbsp;', heightInput],
+                [LANG('height') + ':&nbsp;', heightInput.getElement()],
             ],
             {
                 '0.2': { rowspan: 3 },
@@ -124,31 +134,21 @@ export const filterResize = {
         css(sizeTable, {
             marginBottom: 10,
         });
-
         rootEl.append(sizeTable);
 
-        //contrain checkbox
-        let heightChanged = false,
-            widthChanged = false;
-        const ratio = klCanvas.getWidth() / klCanvas.getHeight();
-
-        function updateConstrain(): void {
-            constrainIm.style.display = isConstrained ? '' : 'none';
-            if (isConstrained) {
-                widthInput.value = '' + klCanvas.getWidth();
-                heightInput.value = '' + klCanvas.getHeight();
-                update();
-            }
-        }
-
-        let isConstrained = true;
         const constrainCheckbox = new Checkbox({
             init: true,
             label: LANG('constrain-proportions'),
             allowTab: true,
-            callback: function (b) {
-                isConstrained = b;
-                updateConstrain();
+            callback: function (newIsConstrained) {
+                isConstrained = newIsConstrained;
+                constrainIm.style.display = isConstrained ? '' : 'none';
+                if (isConstrained) {
+                    widthInput.setValue(klCanvas.getWidth());
+                    heightInput.setValue(klCanvas.getHeight());
+                    update();
+                }
+                updateRanges();
             },
             name: 'constrain-proportions',
         });
@@ -183,82 +183,35 @@ export const filterResize = {
 
         const previewCtx = BB.ctx(previewCanvas);
 
-        function draw(): void {
+        function update(): void {
+            const width = widthInput.getValue();
+            const height = heightInput.getValue();
+
+            const preview = BB.fitInto(width, height, 280, 200, 1);
+            const previewW = Math.max(1, Math.round(preview.width)),
+                previewH = Math.max(1, Math.round(preview.height));
+            previewFactor = previewW / width;
+
+            previewCtx.save();
             if (algorithmToggle.getValue() === 'smooth') {
                 previewCanvas.style.imageRendering = previewFactor > 1 ? 'pixelated' : '';
-
                 previewCanvas.width = klCanvas.getWidth();
                 previewCanvas.height = klCanvas.getHeight();
-
-                previewCtx.save();
                 previewCtx.imageSmoothingQuality = 'high';
                 previewCtx.drawImage(tempCanvas, 0, 0);
-                BB.resizeCanvas(previewCanvas, newWidth, newHeight);
-                previewCtx.restore();
+                BB.resizeCanvas(previewCanvas, width, height);
             } else {
                 previewCanvas.style.imageRendering = 'pixelated';
-
-                previewCanvas.width = newWidth;
-                previewCanvas.height = newHeight;
-                previewCtx.save();
+                previewCanvas.width = width;
+                previewCanvas.height = height;
                 previewCtx.imageSmoothingEnabled = false;
                 previewCtx.drawImage(tempCanvas, 0, 0, previewCanvas.width, previewCanvas.height);
-                previewCtx.restore();
             }
-        }
-
-        function update(): void {
-            if (
-                (widthInput.value.length === 0 && widthChanged) ||
-                (heightInput.value.length === 0 && heightChanged)
-            ) {
-                heightChanged = false;
-                widthChanged = false;
-                return;
-            }
-            widthInput.value = '' + Math.max(1, parseInt(widthInput.value));
-            heightInput.value = '' + Math.max(1, parseInt(heightInput.value));
-            if (isConstrained) {
-                if (heightChanged) {
-                    widthInput.value = '' + parseInt('' + parseInt(heightInput.value) * ratio);
-                }
-                if (widthChanged) {
-                    heightInput.value = '' + parseInt('' + parseInt(widthInput.value) / ratio);
-                }
-
-                if (
-                    parseInt(widthInput.value) > maxWidth ||
-                    parseInt(heightInput.value) > maxHeight
-                ) {
-                    const fit = BB.fitInto(
-                        parseInt(widthInput.value),
-                        parseInt(heightInput.value),
-                        maxWidth,
-                        maxHeight,
-                        1,
-                    );
-                    widthInput.value = '' + parseInt('' + fit.width);
-                    heightInput.value = '' + parseInt('' + fit.height);
-                }
-            }
-
-            if (parseInt(widthInput.value) > maxWidth) {
-                widthInput.value = '' + maxWidth;
-            }
-            if (parseInt(heightInput.value) > maxHeight) {
-                heightInput.value = '' + maxHeight;
-            }
-
-            heightChanged = false;
-            widthChanged = false;
-
-            newWidth = parseInt(widthInput.value);
-            newHeight = parseInt(heightInput.value);
-
-            const preview = BB.fitInto(newWidth, newHeight, 280, 200, 1);
-            const previewW = parseInt('' + preview.width),
-                previewH = parseInt('' + preview.height);
-            previewFactor = previewW / newWidth;
+            previewCtx.restore();
+            css(previewCanvas, {
+                width: previewW,
+                height: previewH,
+            });
 
             const offset = BB.centerWithin(
                 SMALL_PREVIEW.width,
@@ -266,15 +219,12 @@ export const filterResize = {
                 previewW,
                 previewH,
             );
-
-            draw();
-
-            previewCanvas.style.width = Math.max(1, previewW) + 'px';
-            previewCanvas.style.height = Math.max(1, previewH) + 'px';
-            canvasWrapper.style.left = offset.x + 'px';
-            canvasWrapper.style.top = offset.y + 'px';
-            canvasWrapper.style.width = Math.max(1, previewW) + 'px';
-            canvasWrapper.style.height = Math.max(1, previewH) + 'px';
+            css(canvasWrapper, {
+                left: offset.x,
+                top: offset.y,
+                width: previewW,
+                height: previewH,
+            });
         }
 
         const previewWrapper = BB.el({
@@ -308,15 +258,19 @@ export const filterResize = {
         update();
 
         result.destroy = (): void => {
+            widthInput.destroy();
+            heightInput.destroy();
             constrainCheckbox.destroy();
             algorithmToggle.destroy();
         };
         result.getInput = function (): TFilterResizeInput {
             const algorithm = algorithmToggle.getValue();
+            const width = widthInput.getValue();
+            const height = heightInput.getValue();
             result.destroy!();
             return {
-                width: newWidth,
-                height: newHeight,
+                width,
+                height,
                 algorithm,
             };
         };

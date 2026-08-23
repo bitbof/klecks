@@ -297,11 +297,12 @@ export class KlColorSlider {
             },
             onClick: () => {
                 if (this.hexColorWindow) {
-                    this.hexColorWindow.close();
+                    this.hexColorWindow.destroy();
+                    this.hexColorWindow = undefined;
                     return;
                 }
 
-                const colorWindow = new HexColorWindow({
+                this.hexColorWindow = new HexColorWindow({
                     color: new BB.RGB(
                         this.primaryColorRgb.r,
                         this.primaryColorRgb.g,
@@ -319,13 +320,12 @@ export class KlColorSlider {
                         );
                     },
                     onClose: () => {
-                        this.hexColorWindowPosition = colorWindow.getPosition();
-                        if (this.hexColorWindow === colorWindow) {
-                            this.hexColorWindow = undefined;
-                        }
+                        this.hexColorWindow = undefined;
+                    },
+                    onMove: (position) => {
+                        this.hexColorWindowPosition = position;
                     },
                 });
-                this.hexColorWindow = colorWindow;
             },
         });
         const hexButtonPointerListener = new BB.PointerListener({

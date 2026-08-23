@@ -13,8 +13,6 @@ import { Options } from '../ui/components/options';
 import { EVENT_RES_MS } from './filters-consts';
 import { Select } from '../ui/components/select';
 import { translateBlending } from '../canvas/translate-blending';
-import { KL } from '../kl';
-import { ColorConverter } from '../../bb/color/color';
 import { Checkbox } from '../ui/components/checkbox';
 import { TWrappedTexture } from '../../fx-canvas/fx-canvas-types';
 import { css, throwIfNull } from '../../bb/base/base';
@@ -28,6 +26,7 @@ import { noise } from '../../fx-canvas/filters/noise';
 import { drawSelectionMask } from '../../bb/base/canvas';
 import { getPushableLayerChange } from '../history/push-helpers/get-pushable-layer-change';
 import { getMultiPolyBounds } from '../../bb/multi-polygon/get-multi-polygon-bounds';
+import { ColorInput } from '../ui/components/color-input';
 
 // see noise(...) in fx-canvas
 type TNoisePreset = {
@@ -424,33 +423,29 @@ export const filterNoise = {
             height: 34,
             marginRight: 5,
         };
-        const colAInput = KL.input({
-            type: 'color',
-            init: '#' + ColorConverter.toHexString(noiseInput.colA),
-            callback: (val) => {
-                const newColor = ColorConverter.hexToRGB(val);
-                if (newColor) {
-                    noiseInput.colA = newColor;
-                    update();
-                }
+        const colAInput = new ColorInput({
+            init: noiseInput.colA,
+            name: 'noise-color-a',
+            ariaLabel: 'Color A',
+            onChange: (color) => {
+                noiseInput.colA = color;
+                update();
             },
             css: colInputStyle,
         });
 
-        const colBInput = KL.input({
-            type: 'color',
-            init: '#' + ColorConverter.toHexString(noiseInput.colB),
-            callback: (val) => {
-                const newColor = ColorConverter.hexToRGB(val);
-                if (newColor) {
-                    noiseInput.colB = newColor;
-                    update();
-                }
+        const colBInput = new ColorInput({
+            init: noiseInput.colB,
+            name: 'noise-color-b',
+            ariaLabel: 'Color B',
+            onChange: (color) => {
+                noiseInput.colB = color;
+                update();
             },
             css: colInputStyle,
         });
 
-        colorWrapper.append(colAInput, colBInput);
+        colorWrapper.append(colAInput.getElement(), colBInput.getElement());
 
         row1El.append(
             channelsOptions.getElement(),
@@ -532,6 +527,8 @@ export const filterNoise = {
             blendSelect.destroy();
             preview.destroy();
             fxPreviewRenderer.destroy();
+            colAInput.destroy();
+            colBInput.destroy();
         };
         result.getInput = function (): TFilterNoiseInput {
             result.destroy!();

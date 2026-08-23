@@ -15,7 +15,6 @@ import { HAS_POINTER_EVENTS } from '../../../../bb/base/browser';
 import { c } from '../../../../bb/base/c';
 import { DropdownMenu } from '../../components/dropdown-menu';
 import { KlHistory } from '../../../history/kl-history';
-import { makeUnfocusable } from '../../../../bb/base/ui';
 
 const paddingLeft = 25;
 
@@ -650,11 +649,11 @@ export class LayersUi {
         const createButtons = () => {
             const div = BB.el();
             const async = () => {
-                makeUnfocusable(this.addBtn);
-                makeUnfocusable(this.duplicateBtn);
-                makeUnfocusable(this.mergeBtn);
-                makeUnfocusable(this.removeBtn);
-                makeUnfocusable(renameBtn);
+                this.addBtn.tabIndex = -1;
+                this.duplicateBtn.tabIndex = -1;
+                this.mergeBtn.tabIndex = -1;
+                this.removeBtn.tabIndex = -1;
+                renameBtn.tabIndex = -1;
 
                 this.addBtn.title = LANG('layers-new');
                 this.duplicateBtn.title = LANG('layers-duplicate');

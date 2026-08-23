@@ -66,10 +66,7 @@ export class InertiaScrolling {
         const transform = this.getTransform();
         if (
             this.lastTransform &&
-            (this.lastTransform.x !== transform.x ||
-                this.lastTransform.y !== transform.y ||
-                this.lastTransform.x !== transform.x ||
-                this.lastTransform.x !== transform.x)
+            (this.lastTransform.x !== transform.x || this.lastTransform.y !== transform.y)
         ) {
             this.momentum.x = 0;
             this.momentum.y = 0;

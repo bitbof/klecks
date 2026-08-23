@@ -2,9 +2,8 @@ import { BB } from '../../../bb/bb';
 import { TRgba } from '../../kl-types';
 import { Options } from './options';
 import * as classes from './color-options.module.scss';
-import { KlColorSliderSmall } from './kl-color-slider-small';
-import { FloatingWindow } from './floating-window';
 import { TCss, TVector2D } from '../../../bb/bb-types';
+import { ColorPickerWindow } from './color-picker-window';
 
 /**
  * UI to pick between colors in colorArr. can display full transparent (checkerboard).
@@ -16,23 +15,18 @@ export class ColorOptions {
     private readonly options: Options<number>;
     private readonly colorArr: (TRgba | null)[] = [];
     private readonly onChange: (color: TRgba | null) => void;
-    private colorPicker: KlColorSliderSmall | undefined;
-    private colorPickerWindow: FloatingWindow | undefined;
+    private colorPickerWindow: ColorPickerWindow | undefined;
     private colorPickerPosition: TVector2D | undefined;
 
     private closeColorPicker(): void {
         if (this.colorPickerWindow) {
-            this.colorPickerPosition = this.colorPickerWindow.getPosition();
             this.colorPickerWindow.destroy();
-            this.colorPickerWindow.getElement().remove();
             this.colorPickerWindow = undefined;
         }
-        this.colorPicker?.destroy();
-        this.colorPicker = undefined;
     }
 
     private toggleColorPicker(index: number, triggerElement: HTMLElement): void {
-        if (this.colorPicker) {
+        if (this.colorPickerWindow) {
             this.closeColorPicker();
             return;
         }
@@ -50,12 +44,9 @@ export class ColorOptions {
             };
         }
 
-        this.colorPicker = new KlColorSliderSmall({
-            width: 200,
-            heightSV: 200,
-            heightH: 30,
+        this.colorPickerWindow = new ColorPickerWindow({
             color,
-            callback: (newColor) => {
+            onChange: (newColor) => {
                 const rgba = { ...newColor, a: 1 };
                 const colorStr = BB.ColorConverter.toRgbaStr(rgba);
                 this.colorArr[index] = rgba;
@@ -65,15 +56,14 @@ export class ColorOptions {
                 });
                 this.onChange(rgba);
             },
-        });
-        this.colorPickerWindow = new FloatingWindow({
-            content: BB.el({ content: this.colorPicker.getElement() }),
+            onMove: (position) => {
+                this.colorPickerPosition = position;
+            },
             onClose: () => this.closeColorPicker(),
             position: this.colorPickerPosition,
             closeOnOutsideClick: true,
             triggerElement,
         });
-        document.body.append(this.colorPickerWindow.getElement());
     }
 
     // ----------------------------------- public -----------------------------------

@@ -1,14 +1,13 @@
-import { showModal } from '../base/showModal';
+import { showModal } from '../base/show-modal';
 import { BB } from '../../../../bb/bb';
 import { RecoveryManagerPanel } from './recovery-manager-panel';
 import { KlRecoveryManager } from '../../../storage/kl-recovery-manager';
 import { KL_INDEXED_DB } from '../../../storage/kl-indexed-db';
-import { KL } from '../../../kl';
 import { LANG } from '../../../../language/language';
 
 export function showRecoveryManagerPanel(klRecoveryManager?: KlRecoveryManager) {
     if (!klRecoveryManager || !KL_INDEXED_DB.getIsAvailable()) {
-        KL.popup({
+        showModal({
             type: 'error',
             message: LANG('file-storage-cant-access'),
             buttons: ['Ok'],
@@ -20,20 +19,18 @@ export function showRecoveryManagerPanel(klRecoveryManager?: KlRecoveryManager) 
 
     const rootEl = BB.el({ content: [recoveryManager.getElement()] });
 
-    const onModalExit = (val: string) => {
-        recoveryManager.destroy();
-    };
     const modal = showModal({
         message: `<b>${LANG('tab-recovery-recover-tabs')}</b>`,
         div: rootEl,
-        buttons: [LANG('modal-close')],
-        callback: onModalExit,
+        buttons: [{ id: 'close', label: LANG('modal-close') }],
+        callback: () => {
+            recoveryManager.destroy();
+        },
         style: {
             width: 'calc(100% - 50px)',
             maxWidth: 1000,
             minWidth: 300,
             boxSizing: 'border-box',
         },
-        clickOnEnter: 'Ok',
     });
 }

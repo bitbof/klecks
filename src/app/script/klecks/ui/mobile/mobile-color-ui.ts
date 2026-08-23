@@ -4,9 +4,8 @@ import { LANG } from '../../../language/language';
 import { BoxToggle } from '../components/box-toggle';
 import { Icon } from '../components/icon';
 import { TRgb } from '../../kl-types';
-import { FloatingWindow } from '../components/floating-window';
-import { KlColorSliderSmall } from '../components/kl-color-slider-small';
 import { TVector2D } from '../../../bb/bb-types';
+import { ColorPickerWindow } from '../components/color-picker-window';
 
 const eyedropperImg = getIconUrl('tool-picker');
 export type TMobileColorUiParams = {
@@ -19,8 +18,7 @@ export class MobileColorUi {
     private readonly rootEl: HTMLElement;
     private readonly eyedropperToggle: BoxToggle;
     private readonly colorCircle: HTMLDivElement;
-    private colorPicker: KlColorSliderSmall | undefined;
-    private colorWindow: FloatingWindow | undefined;
+    private colorPickerWindow: ColorPickerWindow | undefined;
     private colorPickerPosition: TVector2D = { x: 100, y: 100 };
     private color: TRgb = { r: 0, g: 0, b: 0 };
 
@@ -39,25 +37,19 @@ export class MobileColorUi {
             },
             noRef: true,
             onClick: () => {
-                if (this.colorPicker) {
+                if (this.colorPickerWindow) {
                     this.closeColorPicker();
                     return;
                 }
-                this.colorPicker = new KlColorSliderSmall({
-                    width: 200,
-                    heightSV: 200,
-                    heightH: 30,
+                this.colorPickerWindow = new ColorPickerWindow({
                     color: this.color,
-                    callback: p.onColorChange,
-                });
-                this.colorWindow = new FloatingWindow({
-                    content: BB.el({ content: this.colorPicker.getElement() }),
-                    onClose: () => {
-                        this.closeColorPicker();
+                    onChange: p.onColorChange,
+                    onClose: () => this.closeColorPicker(),
+                    onMove: (position) => {
+                        this.colorPickerPosition = position;
                     },
                     position: this.colorPickerPosition,
                 });
-                document.body.append(this.colorWindow.getElement());
             },
         });
 
@@ -107,18 +99,14 @@ export class MobileColorUi {
     setColor(color: TRgb): void {
         this.color = { ...color };
         this.colorCircle.style.backgroundColor = BB.ColorConverter.toRgbStr(color);
-        this.colorPicker?.setColor(color);
+        this.colorPickerWindow?.setColor(color);
     }
 
     closeColorPicker(): void {
-        if (this.colorWindow) {
-            this.colorPickerPosition = this.colorWindow.getPosition();
-            this.colorWindow?.destroy();
-            this.colorWindow?.getElement().remove();
-            this.colorWindow = undefined;
+        if (this.colorPickerWindow) {
+            this.colorPickerWindow.destroy();
+            this.colorPickerWindow = undefined;
         }
-        this.colorPicker?.destroy();
-        this.colorPicker = undefined;
     }
 
     setIsVisible(b: boolean): void {

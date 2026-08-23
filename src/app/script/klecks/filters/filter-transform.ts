@@ -32,6 +32,7 @@ import {
     scaleTransformation,
     TComposedFree,
 } from '../transform/composed-transformation';
+import { Input } from '../ui/components/input';
 
 // preference expressed by user
 let preferenceIsTransparentBg: undefined | boolean;
@@ -250,19 +251,19 @@ export const filterTransform = {
                 }
 
                 if (keyStr === 'left') {
-                    inputX.value = '' + (parseFloat(inputX.value) - 1);
+                    inputX.setValue(inputX.getValue() - 1);
                     onInputsChanged();
                 }
                 if (keyStr === 'right') {
-                    inputX.value = '' + (parseFloat(inputX.value) + 1);
+                    inputX.setValue(inputX.getValue() + 1);
                     onInputsChanged();
                 }
                 if (keyStr === 'up') {
-                    inputY.value = '' + (parseFloat(inputY.value) - 1);
+                    inputY.setValue(inputY.getValue() - 1);
                     onInputsChanged();
                 }
                 if (keyStr === 'down') {
-                    inputY.value = '' + (parseFloat(inputY.value) + 1);
+                    inputY.setValue(inputY.getValue() + 1);
                     onInputsChanged();
                 }
             },
@@ -289,51 +290,36 @@ export const filterTransform = {
                 display: 'inline-block',
             },
         });
-        const inputY = BB.el({ tagName: 'input' });
-        const inputX = BB.el({ tagName: 'input' });
-        const inputR = BB.el({ tagName: 'input' });
-        inputY.type = 'number';
-        inputX.type = 'number';
-        inputR.type = 'number';
-        inputX.style.width = 70 + 'px';
-        inputY.style.width = 70 + 'px';
-        inputR.style.width = 70 + 'px';
-        inputY.value = '0';
-        inputX.value = '0';
-        inputR.value = '0';
-        inputY.onclick = function () {
-            inputY.focus();
-            onInputsChanged();
-        };
-        inputX.onclick = function () {
-            inputX.focus();
-            onInputsChanged();
-        };
-        inputR.onclick = function () {
-            inputR.focus();
-            onInputsChanged();
-        };
-        inputY.onchange = function () {
-            onInputsChanged();
-        };
-        inputX.onchange = function () {
-            onInputsChanged();
-        };
-        inputR.onchange = function () {
-            onInputsChanged();
-        };
-        inputY.onkeyup = function () {
-            onInputsChanged();
-        };
-        inputX.onkeyup = function () {
-            onInputsChanged();
-        };
-        inputR.onkeyup = function () {
-            onInputsChanged();
-        };
-        leftWrapper.append('X: ', inputX);
-        rightWrapper.append('Y: ', inputY);
-        rotWrapper.append(LANG('filter-transform-rotation') + ': ', inputR);
+        const inputX = new Input<number>({
+            type: 'number',
+            init: 0,
+            step: 1,
+            name: 'transform-x',
+            label: 'X:',
+            css: { width: 70 },
+            onChange: () => onInputsChanged(),
+        });
+        const inputY = new Input<number>({
+            type: 'number',
+            init: 0,
+            step: 1,
+            name: 'transform-y',
+            label: 'Y:',
+            css: { width: 70 },
+            onChange: () => onInputsChanged(),
+        });
+        const inputR = new Input<number>({
+            type: 'number',
+            init: 0,
+            step: 1,
+            name: 'transform-rotation',
+            label: LANG('filter-transform-rotation') + ':',
+            css: { width: 70 },
+            onChange: () => onInputsChanged(),
+        });
+        leftWrapper.append(inputX.getElement());
+        rightWrapper.append(inputY.getElement());
+        rotWrapper.append(inputR.getElement());
         if (!isSmall) {
             const inputRow = BB.el({
                 parent: rootEl,
@@ -403,7 +389,7 @@ export const filterTransform = {
                     -90,
                 ) as TComposedFree;
                 freeTransform.initialise(transformed.freeTransform);
-                inputR.value = '' + Math.round(transformed.freeTransform.angleDeg);
+                inputR.setValue(Math.round(transformed.freeTransform.angleDeg));
                 updatePreview();
             },
         });
@@ -421,7 +407,7 @@ export const filterTransform = {
                     90,
                 ) as TComposedFree;
                 freeTransform.initialise(transformed.freeTransform);
-                inputR.value = '' + Math.round(transformed.freeTransform.angleDeg);
+                inputR.setValue(Math.round(transformed.freeTransform.angleDeg));
                 updatePreview();
             },
         });
@@ -473,8 +459,8 @@ export const filterTransform = {
                     { x: context.canvas.width / 2, y: context.canvas.height / 2 },
                 ) as TComposedFree;
                 freeTransform.initialise(transformed.freeTransform);
-                inputX.value = '' + Math.round(transformed.freeTransform.x - initTransform.x);
-                inputY.value = '' + Math.round(transformed.freeTransform.y - initTransform.y);
+                inputX.setValue(Math.round(transformed.freeTransform.x - initTransform.x));
+                inputY.setValue(Math.round(transformed.freeTransform.y - initTransform.y));
                 updatePreview();
             },
         });
@@ -655,9 +641,9 @@ export const filterTransform = {
             snapX: [0, context.canvas.width],
             snapY: [0, context.canvas.height],
             callback: function (t) {
-                inputX.value = '' + Math.round(t.x - initTransform.x);
-                inputY.value = '' + Math.round(t.y - initTransform.y);
-                inputR.value = '' + Math.round(t.angleDeg);
+                inputX.setValue(Math.round(t.x - initTransform.x));
+                inputY.setValue(Math.round(t.y - initTransform.y));
+                inputR.setValue(Math.round(t.angleDeg));
                 updatePreview();
             },
             viewportTransform: preview.getTransform(),
@@ -671,10 +657,10 @@ export const filterTransform = {
 
         function onInputsChanged() {
             freeTransform.setPos({
-                x: parseInt(inputX.value) + initTransform.x,
-                y: parseInt(inputY.value) + initTransform.y,
+                x: inputX.getValue() + initTransform.x,
+                y: inputY.getValue() + initTransform.y,
             });
-            freeTransform.setAngleDeg(parseInt(inputR.value));
+            freeTransform.setAngleDeg(inputR.getValue());
             updatePreview();
         }
 
@@ -686,6 +672,9 @@ export const filterTransform = {
             constrainCheckbox.destroy();
             snappingCheckbox.destroy();
             algorithmToggle.destroy();
+            inputX.destroy();
+            inputY.destroy();
+            inputR.destroy();
             BB.destroyEl(flipXBtn);
             BB.destroyEl(flipYBtn);
             BB.destroyEl(scaleRotLeftBtn);

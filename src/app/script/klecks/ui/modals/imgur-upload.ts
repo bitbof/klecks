@@ -5,6 +5,8 @@ import { LANG } from '../../../language/language';
 import loadingImg from 'url:/src/app/img/ui/loading.gif';
 import { canvasToBlob } from '../../../bb/base/canvas';
 import { css } from '../../../bb/base/base';
+import { Input } from '../components/input';
+import { showModal } from './base/show-modal';
 
 type TImgurUploadResponse = {
     // just a subset
@@ -100,7 +102,6 @@ async function upload(
 
 export function imgurUpload(
     klCanvas: KlCanvas,
-    klRootEl: HTMLElement,
     imgurKey: string, // API key
     onUploaded: () => void,
 ): void {
@@ -108,10 +109,11 @@ export function imgurUpload(
         throw new Error('imgur key missing');
     }
 
-    const inputTitle = BB.el({ tagName: 'input', custom: { name: 'image-title' } });
-    inputTitle.type = 'text';
-    inputTitle.value = LANG('upload-title-untitled');
-    const inputDescription = BB.el({
+    const tileInput = new Input({
+        init: LANG('upload-title-untitled'),
+        name: 'image-title',
+    });
+    const descriptionInput = BB.el({
         tagName: 'textarea',
         custom: {
             rows: '2',
@@ -123,10 +125,10 @@ export function imgurUpload(
         },
     });
 
-    const labelTitle = BB.el({
+    const titleLabel = BB.el({
         textContent: LANG('upload-name') + ':',
     });
-    const labelDescription = BB.el({
+    const descriptionLabel = BB.el({
         textContent: LANG('upload-caption') + ':',
         css: {
             marginTop: 10,
@@ -158,39 +160,41 @@ export function imgurUpload(
     outDiv.append(
         infoHint,
         typeRadio.getElement(),
-        labelTitle,
-        inputTitle,
-        labelDescription,
-        inputDescription,
+        titleLabel,
+        tileInput.getElement(),
+        descriptionLabel,
+        descriptionInput,
         tos,
     );
-    KL.popup({
+    showModal({
         message: `<b>${LANG('upload-title')}</b>`,
         type: 'upload',
         div: outDiv,
-        buttons: [LANG('upload-submit'), 'Cancel'],
-        clickOnEnter: LANG('upload-submit'),
-        primaries: [LANG('upload-submit')],
-        autoFocus: LANG('upload-submit'),
+        buttons: [{ id: 'submit', label: LANG('upload-submit') }, 'Cancel'],
+        clickOnEnter: 'submit',
+        primaries: ['submit'],
+        autoFocus: 'submit',
         callback: async function (val) {
-            if (val === LANG('upload-submit') || val === 'Yes' || val === 'Ok') {
+            const title = tileInput.getValue();
+            tileInput.destroy();
+            if (val === 'submit') {
                 try {
                     const result = await upload(
                         klCanvas.getCompleteCanvas(1),
-                        inputTitle.value,
-                        inputDescription.value,
+                        title,
+                        descriptionInput.value,
                         typeRadio.getValue() as 'png' | 'jpeg',
                         imgurKey,
                     );
 
-                    KL.popup({
+                    showModal({
                         type: 'ok',
                         message: `<h3>${LANG('upload-success')}</h3><br>${LANG('upload-delete')}<br><a target='_blank' rel="noopener noreferrer" href='https://imgur.com/delete/${result.deletehash}'>imgur.com/delete/${result.deletehash}</a><br><br>`,
                         buttons: ['Ok'],
                     });
                     onUploaded();
                 } catch (e) {
-                    KL.popup({
+                    showModal({
                         type: 'error',
                         message: LANG('upload-failed'),
                         buttons: ['Ok'],

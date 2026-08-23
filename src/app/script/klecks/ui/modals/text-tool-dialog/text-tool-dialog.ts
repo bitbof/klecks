@@ -1,6 +1,6 @@
 import { BB } from '../../../../bb/bb';
 import { TRenderTextParam } from '../../../image-operations/render-text';
-import { showModal } from '../base/showModal';
+import { showModal } from '../base/show-modal';
 import { TRgb } from '../../../kl-types';
 import { KlCanvas } from '../../../canvas/kl-canvas';
 import { LANG } from '../../../../language/language';

@@ -4,7 +4,6 @@ import { LANG } from '../../../language/language';
 import { Checkbox } from '../components/checkbox';
 import { LocalStorage } from '../../../bb/base/local-storage';
 import { css } from '../../../bb/base/base';
-import { makeUnfocusable } from '../../../bb/base/ui';
 
 const angleImg = getIconUrl('angle');
 const rotateImg = getIconUrl('edit-rotate');
@@ -15,7 +14,6 @@ const LS_INERTIA_KEY = 'kl-inertia-scroll';
  */
 export class HandUi {
     private readonly rootEl: HTMLElement;
-    private readonly onAngleChange: (angleDeg: number, isRelative?: boolean) => void;
     private isVisible: boolean = true;
     private scale: number;
     private angleDeg: number;
@@ -53,7 +51,6 @@ export class HandUi {
         });
         this.scale = p.scale;
         this.angleDeg = p.angleDeg;
-        this.onAngleChange = p.onAngleChange;
 
         const row1 = BB.el({
             css: {
@@ -111,7 +108,7 @@ export class HandUi {
             content: LANG('hand-reset'),
             onClick: p.onReset,
         });
-        makeUnfocusable(resetButton);
+        resetButton.tabIndex = -1;
 
         const fitButton = BB.el({
             tagName: 'button',
@@ -122,7 +119,7 @@ export class HandUi {
             },
             onClick: p.onFit,
         });
-        makeUnfocusable(fitButton);
+        fitButton.tabIndex = -1;
         row2.append(resetButton, fitButton);
 
         const leftRotateIcon = new Image();
@@ -140,7 +137,7 @@ export class HandUi {
                 p.onAngleChange(-15, true);
             },
         });
-        makeUnfocusable(leftRotateButton);
+        leftRotateButton.tabIndex = -1;
 
         const resetAngleButton = BB.el({
             tagName: 'button',
@@ -153,7 +150,7 @@ export class HandUi {
                 p.onAngleChange(0);
             },
         });
-        makeUnfocusable(resetAngleButton);
+        resetAngleButton.tabIndex = -1;
 
         const rightRotateButton = BB.el({
             tagName: 'button',
@@ -166,7 +163,7 @@ export class HandUi {
                 p.onAngleChange(15, true);
             },
         });
-        makeUnfocusable(rightRotateButton);
+        rightRotateButton.tabIndex = -1;
         row3.append(leftRotateButton, resetAngleButton, rightRotateButton);
 
         const inertiaToggle = new Checkbox({

@@ -9,7 +9,8 @@ import { css } from '../../../bb/base/base';
 export type TFloatingWindowParams = {
     content: HTMLElement;
     // called after window gets closed
-    onClose: () => void;
+    onClose?: () => void;
+    onMove?: (position: TVector2D) => void;
     position?: TVector2D;
     closeOnOutsideClick?: boolean;
     // will be ignored on click outside
@@ -26,6 +27,7 @@ export class FloatingWindow {
     private readonly onResize: () => void;
     private readonly fractionalPosition: TVector2D = { x: 0.5, y: 0.5 };
     private doCenterInitially: boolean;
+    private isDestroyed = false;
 
     private applyPosition(): void {
         const rect = this.rootEl.getBoundingClientRect();
@@ -66,7 +68,8 @@ export class FloatingWindow {
             if (this.rootEl.contains(event.target as Node | null)) {
                 return;
             }
-            p.onClose();
+            this.destroy();
+            p.onClose?.();
         };
         this.onResize = () => this.applyFractionalPosition();
         this.closeButton = BB.el({
@@ -76,7 +79,8 @@ export class FloatingWindow {
             title: LANG('modal-close'),
             noRef: true,
             onClick: () => {
-                p.onClose();
+                this.destroy();
+                p.onClose?.();
             },
             css: {
                 width: 32,
@@ -128,6 +132,7 @@ export class FloatingWindow {
                     this.applyPosition();
                 }
                 if (isDragging && event.type === 'pointerup') {
+                    p.onMove?.({ ...this.position });
                     isDragging = false;
                 }
             },
@@ -149,6 +154,7 @@ export class FloatingWindow {
             },
         });
         this.rootEl.append(header, body);
+        document.body.append(this.rootEl);
         window.addEventListener('resize', this.onResize);
         setTimeout(() => this.applyPosition());
         if (p.closeOnOutsideClick) {
@@ -157,15 +163,13 @@ export class FloatingWindow {
         }
     }
 
-    getElement(): HTMLDivElement {
-        return this.rootEl;
-    }
-
-    getPosition(): TVector2D {
-        return { ...this.position };
-    }
-
     destroy(): void {
+        if (this.isDestroyed) {
+            return;
+        }
+        this.isDestroyed = true;
+
+        this.rootEl.remove();
         if (this.outsideClickListenerTimeout !== undefined) {
             clearTimeout(this.outsideClickListenerTimeout);
             this.outsideClickListenerTimeout = undefined;

@@ -3,7 +3,6 @@ import { KeyListener } from '../../../../bb/input/key-listener';
 import { DIALOG_COUNTER } from '../modal-count';
 import { BB } from '../../../../bb/bb';
 import { LANG } from '../../../../language/language';
-import './scroll-fix';
 import { css } from '../../../../bb/base/base';
 
 const cancelImg = getIconUrl('cancel');
@@ -24,15 +23,11 @@ export class DynamicModal {
     constructor(p: {
         title?: HTMLElement;
         content?: HTMLElement;
-        buttonArr?: string[];
-        autoFocus?: string | false; // todo - not implemented
-        clickOnEnter?: string; // button name - todo not implemented
         onClose?: (result?: string) => void;
 
         //size and position
         width: number;
         height?: number;
-        isMaxHeight: boolean; // todo - not implemented
     }) {
         DIALOG_COUNTER.increase();
         this.onClose = p.onClose;

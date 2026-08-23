@@ -1,5 +1,5 @@
 import { c } from '../../../bb/base/c';
-import { el, makeUnfocusable } from '../../../bb/base/ui';
+import { el } from '../../../bb/base/ui';
 
 export type TDropdownMenuParams<IdType extends string> = {
     button: string | HTMLElement;
@@ -16,13 +16,13 @@ export class DropdownMenu<IdType extends string> {
     // ----------------------------------- public -----------------------------------
     constructor(p: TDropdownMenuParams<IdType>) {
         const button = c('button.kl-button,w-full,h-full', [p.button]) as HTMLButtonElement;
+        button.tabIndex = -1;
         button.onclick = () => {
             toggle(!this.isExpanded);
         };
         if (p.buttonTitle) {
             button.title = p.buttonTitle;
         }
-        makeUnfocusable(button);
 
         const items: HTMLButtonElement[] = [];
         const itemMap: Record<IdType, HTMLButtonElement> = {} as Record<IdType, HTMLButtonElement>;
@@ -37,13 +37,13 @@ export class DropdownMenu<IdType extends string> {
                     gap: 10,
                 },
             });
+            itemButton.tabIndex = -1;
             itemButton.append(el({ content: item[1] }));
             if (item[2]) {
                 itemButton.append(
                     el({ content: item[2], css: { fontSize: '0.8em', opacity: '0.8' } }),
                 );
             }
-            makeUnfocusable(itemButton);
             itemButton.onclick = () => {
                 toggle(false);
                 p.onItemClick(item[0]);

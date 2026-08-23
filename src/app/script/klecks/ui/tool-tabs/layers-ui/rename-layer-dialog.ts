@@ -1,7 +1,9 @@
 import { getIconSvg } from '../../../../icon/icon';
 import { BB } from '../../../../bb/bb';
 import { LANG } from '../../../../language/language';
-import { showModal } from '../../modals/base/showModal';
+import { showModal } from '../../modals/base/show-modal';
+import { Input } from '../../components/input';
+import { css } from '../../../../bb/base/base';
 
 export function renameLayerDialog(
     parentEl: HTMLElement,
@@ -22,10 +24,13 @@ export function renameLayerDialog(
             display: 'flex',
         },
     });
-    const input = BB.el({ tagName: 'input' });
-    input.value = currentName;
-    input.setAttribute('data-ignore-focus', 'true');
-    input.style.flexGrow = '1';
+    const input = new Input({
+        init: currentName,
+        name: 'layer-name',
+        isFocusIgnored: true,
+        css: { width: '100%' },
+    });
+    css(input.getElement(), { flexGrow: 1 });
     const clearBtn = BB.el({
         tagName: 'button',
         className: 'kl-button',
@@ -37,7 +42,7 @@ export function renameLayerDialog(
             marginLeft: 10,
         },
         onClick: () => {
-            input.value = '';
+            input.setValue('');
             input.focus();
         },
     });
@@ -66,7 +71,7 @@ export function renameLayerDialog(
             className: 'kl-button',
             content: item,
             onClick: () => {
-                input.value = '' + btn.textContent;
+                input.setValue(btn.textContent ?? '');
             },
             css: {
                 margin: '5px 0 0 5px',
@@ -77,7 +82,7 @@ export function renameLayerDialog(
 
     div.append(label);
     label.append(row, row2);
-    row.append(input, clearBtn);
+    row.append(input.getElement(), clearBtn);
 
     setTimeout(() => {
         input.focus();
@@ -87,20 +92,18 @@ export function renameLayerDialog(
     showModal({
         message: `<b>${LANG('layers-rename-title')}</b>`,
         div: div,
-        buttons: [LANG('layers-rename'), 'Cancel'],
-        primaries: [LANG('layers-rename')],
+        buttons: [{ id: 'rename', label: LANG('layers-rename') }, 'Cancel'],
+        primaries: ['rename'],
         callback: (val) => {
+            const newName = val === 'rename' ? input.getValue() : undefined;
+            input.destroy();
             BB.destroyEl(clearBtn);
             suggestionBtns.forEach((item) => {
                 BB.destroyEl(item);
             });
             suggestionBtns.splice(0, suggestionBtns.length);
-            if (val === LANG('layers-rename')) {
-                callback(input.value);
-            } else {
-                callback(undefined);
-            }
+            callback(newName);
         },
-        clickOnEnter: LANG('layers-rename'),
+        clickOnEnter: 'rename',
     });
 }

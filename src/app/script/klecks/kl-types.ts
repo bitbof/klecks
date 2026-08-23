@@ -77,12 +77,7 @@ export type TMixMode =
 export type TLayerFill = { fill: string }; // css color string. hex, rgb, rgba, color name
 
 export function isLayerFill(obj: unknown): obj is TLayerFill {
-    return (
-        typeof obj === 'object' &&
-        obj !== null &&
-        'fill' in obj &&
-        typeof (obj as any).fill === 'string'
-    );
+    return typeof obj === 'object' && obj !== null && 'fill' in obj && typeof obj.fill === 'string';
 }
 
 export type TKlBasicLayer = {
