@@ -30,13 +30,23 @@ async function upload(
     type: 'png' | 'jpeg',
     imgurKey: string,
 ): Promise<TImgurUploadResponse | undefined> {
-    const imageBlob = await canvasToBlob(canvas, 'image/' + type);
-
-    // Keep the redirected Imgur tab from accessing the app through window.opener.
-    const newTab = window.open('', '_blank', 'noopener');
+    // open tab before any awaits
+    const newTab = window.open('', '_blank');
 
     if (!newTab) {
         asyncThrow(new Error('could not create new tab'));
+        return undefined;
+    }
+
+    // Keep the redirected Imgur tab from accessing the app through window.opener.
+    newTab.opener = null;
+
+    let imageBlob: Blob;
+    try {
+        imageBlob = await canvasToBlob(canvas, 'image/' + type);
+    } catch (e) {
+        newTab.close();
+        asyncThrow(e);
         return undefined;
     }
 
