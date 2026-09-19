@@ -308,6 +308,11 @@
     original: 'Layer Visibility',
     value: 'Ebenensichtbarkeit'
   },
+  'layers-clipping': {
+    hint: 'tooltip for toggling whether the active layer is clipped to the layer below',
+    original: 'Clipping Mask',
+    value: 'Schnittmaske'
+  },
   'layers-blend-normal': {
     original: 'normal',
     value: 'Normal'
@@ -1192,6 +1197,14 @@
     hint: 'in the process of opening a large file',
     original: 'Opening file...',
     value: 'Öffne Datei...'
+  },
+  'import-many-files-warning': {
+    original: 'You are about to import {x} files. Importing many files at once can cause instability.',
+    value: 'Du importierst {x} Dateien. Viele Dateien auf einmal können zu Instabilität führen.'
+  },
+  'import-many-files-confirm': {
+    original: 'Import {x} files',
+    value: '{x} Dateien importieren'
   },
   'import-title': {
     original: 'Import Image',

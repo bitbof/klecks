@@ -1,4 +1,22 @@
-// Chrome 61, Edge 79, safari 16, firefox 107
+// try no to import anything here
+
+// sometimes Android WebView has no localStorage
+if (!('localStorage' in window)) {
+    try {
+        (window as any).localStorage = {
+            getItem: () => null,
+            setItem: () => {},
+            removeItem: () => {},
+        };
+    } catch (e) {
+        // maybe it fails?
+    }
+}
+
+// ---------------- polyfills for roughly pre-module era (2017-18) ----------------------------
+// sorted by first Chrome version with support
+
+// Chrome 61, Edge 79, Safari 16, Firefox 107
 if (!('scrollTo' in Element.prototype)) {
     Object.defineProperty(Element.prototype, 'scrollTo', {
         value: function (x: number, y: number) {
@@ -8,7 +26,7 @@ if (!('scrollTo' in Element.prototype)) {
     });
 }
 
-// Chrome 61, Edge 79, safari 16, firefox 107
+// Chrome 61, Edge 79, Safari 16, Firefox 107
 if (!('scrollBy' in Element.prototype)) {
     Object.defineProperty(Element.prototype, 'scrollBy', {
         value: function (x: number, y: number) {
@@ -18,7 +36,7 @@ if (!('scrollBy' in Element.prototype)) {
     });
 }
 
-// Chrome 69, Edge 79, safari 12, firefox 62
+// Chrome 69, Edge 79, Safari 12, Firefox 62
 if (!Array.prototype.flat) {
     Object.defineProperty(Array.prototype, 'flat', {
         configurable: true,
@@ -46,7 +64,7 @@ if (!Array.prototype.flat) {
     });
 }
 
-// Chrome 69, Edge 79, safari 12, firefox 62
+// Chrome 69, Edge 79, Safari 12, Firefox 62
 if (!Array.prototype.flatMap) {
     Object.defineProperty(Array.prototype, 'flatMap', {
         configurable: true,
@@ -74,6 +92,44 @@ if (!Array.prototype.flatMap) {
     });
 }
 
+/*
+    Copyright 2018  Alfredo Mungo <alfredo.mungo@protonmail.ch>
+
+    Permission is hereby granted, free of charge, to any person obtaining a copy
+    of this software and associated documentation files (the "Software"), to
+    deal in the Software without restriction, including without limitation the
+    rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
+    sell copies of the Software, and to permit persons to whom the Software is
+    furnished to do so, subject to the following conditions:
+
+    The above copyright notice and this permission notice shall be included in
+    all copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+    FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+    IN THE SOFTWARE.
+*/
+// Chrome 73, Firefox 63, Safari 26.6
+if (!Object.fromEntries) {
+    Object.defineProperty(Object, 'fromEntries', {
+        value(entries: any) {
+            if (!entries || !entries[Symbol.iterator]) {
+                throw new Error('Object.fromEntries() requires a single iterable argument');
+            }
+            const o: any = {};
+            Object.keys(entries).forEach((key) => {
+                const [k, v] = entries[key];
+                o[k] = v;
+            });
+            return o;
+        },
+    });
+}
+
 // Chrome 85, Firefox 77, Safari 13.1
 // if there are problems, maybe use core-js
 if (!String.prototype.replaceAll) {
@@ -89,6 +145,16 @@ if (!String.prototype.replaceAll) {
                 ? searchValue.flags
                 : searchValue.flags + 'g';
             return this.replace(new RegExp(searchValue.source, flags), replaceValue);
+        },
+    });
+}
+
+// Chrome 86, Edge 86, Safari 14, Firefox 78
+if (!('replaceChildren' in Element.prototype)) {
+    Object.defineProperty(Element.prototype, 'replaceChildren', {
+        value: function (this: Element, ...children: (Node | string)[]) {
+            this.innerHTML = '';
+            this.append(...children);
         },
     });
 }
@@ -122,54 +188,4 @@ if (!Set.prototype.difference) {
             return result;
         },
     });
-}
-
-/*
-    Copyright 2018  Alfredo Mungo <alfredo.mungo@protonmail.ch>
-
-    Permission is hereby granted, free of charge, to any person obtaining a copy
-    of this software and associated documentation files (the "Software"), to
-    deal in the Software without restriction, including without limitation the
-    rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
-    sell copies of the Software, and to permit persons to whom the Software is
-    furnished to do so, subject to the following conditions:
-
-    The above copyright notice and this permission notice shall be included in
-    all copies or substantial portions of the Software.
-
-    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-    FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
-    IN THE SOFTWARE.
-*/
-if (!Object.fromEntries) {
-    Object.defineProperty(Object, 'fromEntries', {
-        value(entries: any) {
-            if (!entries || !entries[Symbol.iterator]) {
-                throw new Error('Object.fromEntries() requires a single iterable argument');
-            }
-            const o: any = {};
-            Object.keys(entries).forEach((key) => {
-                const [k, v] = entries[key];
-                o[k] = v;
-            });
-            return o;
-        },
-    });
-}
-
-// sometimes Android WebView has no localStorage
-if (!('localStorage' in window)) {
-    try {
-        (window as any).localStorage = {
-            getItem: () => null,
-            setItem: () => {},
-            removeItem: () => {},
-        };
-    } catch (e) {
-        // maybe it fails?
-    }
 }

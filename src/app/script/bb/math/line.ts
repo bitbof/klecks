@@ -159,15 +159,15 @@ export class BezierLine {
             t = i / resolution;
             curvePoints[curvePoints.length] = {
                 x:
-                    Math.pow(1 - t, 3) * p1.x +
-                    3 * Math.pow(1 - t, 2) * t * p2.x +
-                    3 * (1 - t) * Math.pow(t, 2) * p3.x +
-                    Math.pow(t, 3) * p4.x,
+                    (1 - t) ** 3 * p1.x +
+                    3 * (1 - t) ** 2 * t * p2.x +
+                    3 * (1 - t) * t ** 2 * p3.x +
+                    t ** 3 * p4.x,
                 y:
-                    Math.pow(1 - t, 3) * p1.y +
-                    3 * Math.pow(1 - t, 2) * t * p2.y +
-                    3 * (1 - t) * Math.pow(t, 2) * p3.y +
-                    Math.pow(t, 3) * p4.y,
+                    (1 - t) ** 3 * p1.y +
+                    3 * (1 - t) ** 2 * t * p2.y +
+                    3 * (1 - t) * t ** 2 * p3.y +
+                    t ** 3 * p4.y,
             };
         }
         return curvePoints;
@@ -216,9 +216,9 @@ export class BezierLine {
             this.lastSpacing = spacing;
             return;
         } else {
-            const pointM1 = this.pointArr[this.pointArr.length - 1];
-            const pointM2 = this.pointArr[this.pointArr.length - 2];
-            const pointM3 = this.pointArr[this.pointArr.length - 3];
+            const pointM1 = this.pointArr.at(-1)!;
+            const pointM2 = this.pointArr.at(-2)!;
+            const pointM3 = this.pointArr.at(-3)!;
             pointM2.dir = Vec2.nor(Vec2.sub(pointM1, pointM3));
             if (isNaN(pointM2.dir.x) || isNaN(pointM2.dir.y)) {
                 //when xy -3 == -1
@@ -227,8 +227,8 @@ export class BezierLine {
         }
 
         //get bezier curve
-        const a = this.pointArr[this.pointArr.length - 3];
-        const b = this.pointArr[this.pointArr.length - 2];
+        const a = this.pointArr.at(-3)!;
+        const b = this.pointArr.at(-2)!;
         const p1 = a;
         const p2 = Vec2.add(a, Vec2.mul(a.dir, Vec2.dist(a, b) / 4));
         const p3 = Vec2.sub(b, Vec2.mul(b.dir, Vec2.dist(a, b) / 4));
@@ -284,8 +284,8 @@ export class BezierLine {
             return;
         }
 
-        const p1 = this.pointArr[this.pointArr.length - 2];
-        const p2 = this.pointArr[this.pointArr.length - 1];
+        const p1 = this.pointArr.at(-2)!;
+        const p2 = this.pointArr.at(-1)!;
 
         const newP = Vec2.add(p2, Vec2.sub(p2, p1));
 
@@ -309,23 +309,18 @@ export class SplineInterpolator {
     // ----------------------------------- public -----------------------------------
     constructor(points: TSplineInputPoints) {
         const n = points.length;
-        this.xa = [];
-        this.ya = [];
         this.u = [];
         this.y2 = [];
         let i;
 
         this.first = points[0][0];
-        this.last = points[points.length - 1][0];
+        this.last = points.at(-1)![0];
 
         points.sort(function (a, b) {
             return a[0] - b[0];
         });
-        for (i = 0; i < n; i++) {
-            this.xa.push(points[i][0]);
-            this.ya.push(points[i][1]);
-        }
-
+        this.xa = points.map((point) => point[0]);
+        this.ya = points.map((point) => point[1]);
         this.u[0] = 0;
         this.y2[0] = 0;
 
@@ -436,15 +431,12 @@ export function powerSplineInput(
     exponent: number = 2,
 ): TSplineInputPoints {
     function round(v: number, dec: number): number {
-        return Math.round(v * Math.pow(10, dec)) / Math.pow(10, dec);
+        return Math.round(v * 10 ** dec) / 10 ** dec;
     }
 
     const resultArr: TSplineInputPoints = [];
     for (let i = 0; i <= 1; i += stepSize) {
-        resultArr.push([
-            round(i, 4),
-            round(startVal + Math.pow(i, exponent) * (endVal - startVal), 4),
-        ]);
+        resultArr.push([round(i, 4), round(startVal + i ** exponent * (endVal - startVal), 4)]);
     }
     return resultArr;
 }

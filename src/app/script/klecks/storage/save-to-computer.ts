@@ -1,11 +1,11 @@
-import { BB } from '../../bb/bb';
-import { KL } from '../kl';
 import { KlCanvas } from '../canvas/kl-canvas';
 import { TExportType } from '../kl-types';
-import { saveAs } from '../../bb/base/save-as';
-import { Psd } from 'ag-psd/dist/psd';
+import { saveAs, TFileSaveResult } from '../../bb/base/save-as';
 import { KL_CONFIG } from '../kl-config';
 import { canvasToBlob } from '../../bb/base/canvas';
+import { asyncThrow, attempt, AttemptError, getFilenameDate } from '../../bb/base/base';
+import { showError } from '../ui/modals/base/show-modal';
+import { klCanvasToPsdBlob } from './kl-canvas-to-psd-blob';
 
 export class SaveToComputer {
     private showSaveDialog: boolean = true;
@@ -15,9 +15,9 @@ export class SaveToComputer {
         filename: string,
         mimeType: string,
         showDialog: boolean = false,
-    ): Promise<void> {
+    ): Promise<TFileSaveResult> {
         const blob = await canvasToBlob(canvas, mimeType);
-        await saveAs(blob, filename, showDialog);
+        return await saveAs(blob, filename, showDialog);
     }
 
     // ----------------------------------- public -----------------------------------
@@ -27,7 +27,7 @@ export class SaveToComputer {
         private onSaved: () => void,
     ) {}
 
-    async save(format?: 'psd' | 'layers' | 'png' | 'jpg'): Promise<void> {
+    async save(format?: 'psd' | 'layers' | 'png' | 'jpg'): Promise<TFileSaveResult> {
         if (!format) {
             format = this.getExportType();
         }
@@ -35,37 +35,48 @@ export class SaveToComputer {
         if (format === 'png') {
             const extension = 'png';
             const mimeType = 'image/png';
-            const filename = BB.getDate() + KL_CONFIG.filenameBase + '.' + extension;
-            const fullCanvas = this.klCanvas.getCompleteCanvas(1);
-            try {
-                await this.saveImage(fullCanvas, filename, mimeType, this.showSaveDialog);
-            } catch (error) {
-                //fallback for old browsers
-                alert('could not save');
-                throw new Error('failed png export');
+            const filename = getFilenameDate() + KL_CONFIG.filenameBase + '.' + extension;
+            const fullCanvas = this.klCanvas.getCanvas();
+            const result = await this.saveImage(
+                fullCanvas,
+                filename,
+                mimeType,
+                this.showSaveDialog,
+            );
+            if (result === 'error') {
+                // todo localise
+                showError('failed PNG export');
             }
+            result === 'saved' && this.onSaved();
+            return result;
         } else if (format === 'jpg') {
             const extension = 'jpg';
             const mimeType = 'image/jpeg';
-            const filename = BB.getDate() + KL_CONFIG.filenameBase + '.' + extension;
-            const fullCanvas = this.klCanvas.getCompleteCanvas(1);
-            try {
-                await this.saveImage(fullCanvas, filename, mimeType, this.showSaveDialog);
-            } catch (error) {
-                alert('could not save');
-                throw new Error('failed jpg export');
+            const filename = getFilenameDate() + KL_CONFIG.filenameBase + '.' + extension;
+            const fullCanvas = this.klCanvas.getCanvas();
+            const result = await this.saveImage(
+                fullCanvas,
+                filename,
+                mimeType,
+                this.showSaveDialog,
+            );
+            if (result === 'error') {
+                // todo localise
+                showError('failed JPG export');
             }
+            result === 'saved' && this.onSaved();
+            return result;
         } else if (format === 'layers') {
             const extension = 'png';
             const mimeType = 'image/png';
-            const fileBase = BB.getDate() + KL_CONFIG.filenameBase;
-            const layerArr = this.klCanvas.getLayersFast();
+            const fileBase = getFilenameDate() + KL_CONFIG.filenameBase;
+            const layerArr = this.klCanvas.getLayers();
             for (let i = 0; i < layerArr.length; i++) {
                 const item = layerArr[i];
                 const fnameArr = [
                     fileBase,
                     '_',
-                    ('' + (i + 1)).padStart(2, '0'),
+                    (i + 1).toString().padStart(2, '0'),
                     '_',
                     item.name,
                     '.',
@@ -73,45 +84,28 @@ export class SaveToComputer {
                 ];
                 await this.saveImage(item.canvas, fnameArr.join(''), mimeType);
             }
+            this.onSaved();
+            return 'saved';
         } else if (format === 'psd') {
-            const layerArr = this.klCanvas.getLayersFast();
-
-            const psdConfig: Psd = {
-                width: this.klCanvas.getWidth(),
-                height: this.klCanvas.getHeight(),
-                children: [],
-                canvas: this.klCanvas.getCompleteCanvas(1),
-            };
-            for (let i = 0; i < layerArr.length; i++) {
-                const item = layerArr[i];
-                psdConfig.children!.push({
-                    name: item.name,
-                    hidden: !item.isVisible,
-                    opacity: item.opacity,
-                    canvas: item.canvas,
-                    blendMode: KL.PSD.blendKlToPsd(item.mixModeStr),
-                    left: 0,
-                    top: 0,
-                });
+            const blob = await attempt(() => klCanvasToPsdBlob(this.klCanvas, true));
+            if (blob instanceof AttemptError) {
+                showError('failed PSD export');
+                asyncThrow(blob.error);
+                return 'error';
             }
-
-            KL.loadAgPsd()
-                .then((agPsdLazy) => {
-                    const buffer = agPsdLazy.writePsdBuffer(psdConfig);
-                    const blob = new Blob([buffer], {
-                        type: 'image/vnd.adobe.photoshop',
-                    });
-                    saveAs(
-                        blob,
-                        BB.getDate() + KL_CONFIG.filenameBase + '.psd',
-                        this.showSaveDialog,
-                    );
-                })
-                .catch(() => {
-                    alert('Error: failed to load PSD library');
-                });
+            const result = await saveAs(
+                blob,
+                getFilenameDate() + KL_CONFIG.filenameBase + '.psd',
+                this.showSaveDialog,
+            );
+            if (result === 'error') {
+                // todo localise
+                showError('failed PSD export');
+            }
+            result === 'saved' && this.onSaved();
+            return result;
         }
-        this.onSaved();
+        return 'error';
     }
 
     setShowSaveDialog(b: boolean) {

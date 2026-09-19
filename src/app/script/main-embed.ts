@@ -1,21 +1,21 @@
-import './polyfills/polyfills';
+import './bb/base/polyfills';
 import { KlApp } from './app/kl-app';
-import { TKlProject, TKlProjectWithOptionalId } from './klecks/kl-types';
-import { klPsdToKlProject, readPsd } from './klecks/storage/psd';
+import { TKlEmbedProject, TKlProject } from './klecks/kl-types';
+import { klPsdToKlProject, psdToKlPsd } from './klecks/storage/psd';
 import { LANG } from './language/language';
 import { loadAgPsd, TAgPsd } from './klecks/storage/load-ag-psd';
 import { KL_CONFIG } from './klecks/kl-config';
-import { randomUuid } from './bb/base/base';
+import { asyncThrow, randomUuid } from './bb/base/base';
 import { initIconCss } from './icon/icon';
+import { getMixModeStr } from './klecks/canvas/get-mix-mode';
 
 initIconCss();
 
 export type TEmbedParams = {
-    project?: TKlProject;
-    psdBlob?: Blob;
+    project?: TKlEmbedProject;
     onSubmit: (onSuccess: () => void, onError: () => void) => void;
-    embedUrl: string;
-    logoImg?: any;
+    embedUrl?: string;
+    logoImg?: string;
     bottomBar?: HTMLElement;
     aboutEl?: HTMLElement;
     disableAutoFit?: boolean; // disable automatic Fit to View for small canvases
@@ -23,9 +23,22 @@ export type TEmbedParams = {
 };
 
 export type TReadPSD = {
-    blob: Blob;
+    blob: Blob | ArrayBuffer;
     callback: (k: TKlProject | null) => void;
 };
+
+export function processEmbedProject(embedProject: TKlEmbedProject): TKlProject {
+    return {
+        ...embedProject,
+        projectId: embedProject.projectId ?? randomUuid(),
+        layers: embedProject.layers.map((layer) => ({
+            ...layer,
+            isVisible: layer.isVisible ?? true,
+            hasClipping: layer.hasClipping ?? false,
+            mixModeStr: getMixModeStr(layer.mixModeStr),
+        })),
+    };
+}
 
 /**
  * Note: Wrapped by EmbedWrapper, which quickly provides feedback for the user without having loaded everything.
@@ -39,19 +52,17 @@ export class Embed {
     private loadingScreenEl: HTMLElement | null;
     private loadingScreenTextEl: HTMLElement | null;
 
-    onProjectReady(project: TKlProjectWithOptionalId) {
-        try {
-            if (this.isInitialized) {
-                throw new Error('Already called openProject');
-            }
-            this.isInitialized = true;
+    onProjectReady(embedProject: TKlEmbedProject) {
+        if (this.isInitialized) {
+            asyncThrow(new Error('Already called openProject'));
+            return;
+        }
 
-            const projectWithId = {
-                ...project,
-                projectId: project.projectId ?? randomUuid(),
-            };
+        try {
+            this.isInitialized = true;
+            const project = processEmbedProject(embedProject);
             this.klApp = new KlApp({
-                project: projectWithId,
+                project,
                 bottomBar: this.p.bottomBar,
                 aboutEl: this.p.aboutEl,
                 embed: {
@@ -67,18 +78,13 @@ export class Embed {
 
             document.body.append(this.klApp.getElement());
         } catch (e) {
-            if (this.loadingScreenTextEl) {
-                this.loadingScreenTextEl.textContent = '❌ ' + e;
-            }
-            if (this.loadingScreenEl) {
-                this.loadingScreenEl.className += 'loading-screen-error';
-            }
+            this.initError('' + e);
             console.error(e);
         }
     }
 
     // ----------------------------------- public -----------------------------------
-    constructor(private p: TEmbedParams) {
+    constructor(private p: TEmbedParams & { embedUrl: string }) {
         this.loadingScreenEl = document.getElementById('loading-screen');
         this.loadingScreenTextEl = document.getElementById('loading-screen-text');
         if (this.loadingScreenTextEl) {
@@ -93,8 +99,8 @@ export class Embed {
         }
     }
 
-    openProject = (project: TKlProjectWithOptionalId) => {
-        this.onProjectReady(project);
+    openProject = (embedProject: TKlEmbedProject) => {
+        this.onProjectReady(embedProject);
     };
 
     initError(error: string) {
@@ -128,7 +134,7 @@ export class Embed {
         const readItem = (item: TReadPSD) => {
             try {
                 const psd = (this.agPsd as any).readPsd(item.blob as any);
-                const project = klPsdToKlProject(readPsd(psd));
+                const project = klPsdToKlProject(psdToKlPsd(psd));
                 item.callback(project);
             } catch (e) {
                 console.error('failed to read psd', e);
@@ -136,17 +142,16 @@ export class Embed {
             }
         };
 
-        // library not loaded yet
+        // library is not loaded yet
         if (!this.agPsd) {
             if (this.psdQueue.length === 0) {
-                // load ag-psd
                 (async () => {
                     try {
                         this.agPsd = await loadAgPsd();
                     } catch (e) {
                         this.agPsd = 'error';
                     }
-                    while (this.psdQueue.length) {
+                    while (this.psdQueue.length > 0) {
                         readItem(this.psdQueue.shift()!);
                     }
                 })();

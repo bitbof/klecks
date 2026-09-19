@@ -1,20 +1,24 @@
 import { getIconSvg } from '../../../../icon/icon';
 import { BB } from '../../../../bb/bb';
-import { Select } from '../../components/select';
+import { changeCanvasDimensions } from '../../../../bb/base/change-canvas-dimensions';
+import { SelectCustom } from '../../components/select-custom';
 import { PointSlider } from '../../components/point-slider';
 import { KlCanvas, MAX_LAYERS } from '../../../canvas/kl-canvas';
-import { TMixMode, TUiLayout } from '../../../kl-types';
+import { TMixMode } from '../../../kl-types';
 import { LANG } from '../../../../language/language';
 import { translateBlending } from '../../../canvas/translate-blending';
 import { PointerListener } from '../../../../bb/input/pointer-listener';
 import { TPointerEvent } from '../../../../bb/input/event.types';
 import { renameLayerDialog } from './rename-layer-dialog';
 import { mergeLayerDialog } from './merge-layer-dialog';
-import { css, throwIfNull } from '../../../../bb/base/base';
+import { css } from '../../../../bb/base/base';
 import { HAS_POINTER_EVENTS } from '../../../../bb/base/browser';
 import { c } from '../../../../bb/base/c';
 import { DropdownMenu } from '../../components/dropdown-menu';
 import { KlHistory } from '../../../history/kl-history';
+import * as classes from './layers-ui.module.scss';
+import { BoxToggle } from '../../components/box-toggle';
+import { FloatingLayerPreview } from '../../components/floating-layer-preview';
 
 const paddingLeft = 25;
 
@@ -36,7 +40,7 @@ export type TLayersUiParams = {
     klCanvas: KlCanvas;
     onSelect: (layerIndex: number, pushHistory: boolean) => void;
     parentEl: HTMLElement;
-    uiState: TUiLayout;
+    floatingLayerPreview: FloatingLayerPreview;
     applyUncommitted: () => void;
     klHistory: KlHistory;
     onUpdateProject: () => void; // triggers update of easel
@@ -48,7 +52,7 @@ export class LayersUi {
     private klCanvas: KlCanvas;
     private readonly onSelect: (layerIndex: number, pushHistory: boolean) => void;
     private readonly parentEl: HTMLElement;
-    private uiState: TUiLayout;
+    private readonly floatingLayerPreview: FloatingLayerPreview;
     private readonly applyUncommitted: () => void;
     private klHistory: KlHistory;
     private readonly onUpdateProject: () => void;
@@ -61,6 +65,7 @@ export class LayersUi {
         opacity: number;
         name: string;
         mixModeStr: TMixMode;
+        hasClipping: boolean;
     }[];
     private readonly layerListEl: HTMLElement;
     private layerElArr: TLayerEl[];
@@ -70,15 +75,12 @@ export class LayersUi {
     private readonly duplicateBtn: HTMLButtonElement;
     private readonly mergeBtn: HTMLButtonElement;
     private readonly moreDropdown: DropdownMenu<'clear-layer' | 'advanced-merge' | 'merge-all'>;
-    private readonly modeSelect: Select<TMixMode>;
-    private readonly largeThumbDiv: HTMLElement;
+    private readonly modeSelect: SelectCustom<TMixMode>;
+    private readonly clippingToggle: BoxToggle;
     private oldHistoryState: number | undefined;
     private isManipulating: boolean = false;
 
     private readonly largeThumbCanvas: HTMLCanvasElement;
-    private largeThumbInDocument: boolean;
-    private largeThumbInTimeout: undefined | ReturnType<typeof setTimeout>;
-    private largeThumbTimeout: undefined | ReturnType<typeof setTimeout>;
     private lastpos: number = 0;
 
     private readonly layerHeight: number = 35;
@@ -152,8 +154,8 @@ export class LayersUi {
     }
 
     private renameLayer(layerSpot: number): void {
-        renameLayerDialog(this.parentEl, this.klCanvas.getLayerOld(layerSpot)!.name, (newName) => {
-            if (newName === undefined || newName === this.klCanvas.getLayerOld(layerSpot)!.name) {
+        renameLayerDialog(this.parentEl, this.klCanvas.getLayer(layerSpot).name, (newName) => {
+            if (newName === undefined || newName === this.klCanvas.getLayer(layerSpot).name) {
                 return;
             }
             this.klCanvas.renameLayer(layerSpot, newName);
@@ -175,11 +177,13 @@ export class LayersUi {
         this.klCanvasLayerArr = this.klCanvas.getLayers();
 
         const createLayerEntry = (index: number): void => {
-            const klLayer = throwIfNull(this.klCanvas.getLayerOld(index));
+            const klLayer = this.klCanvas.getLayer(index);
             const layerName = klLayer.name;
             const opacity = this.klCanvasLayerArr[index].opacity;
             const isVisible = klLayer.isVisible;
             const layercanvas = this.klCanvasLayerArr[index].context.canvas;
+            const hasClipping = this.klCanvasLayerArr[index].hasClipping;
+            const clippingOffset = hasClipping ? 15 : 0;
 
             const layer: TLayerEl = BB.el({
                 className: 'kl-layer',
@@ -223,9 +227,9 @@ export class LayersUi {
                 const check = BB.el({
                     tagName: 'input',
                     parent: checkWrapper,
-                    custom: {
+                    props: {
                         type: 'checkbox',
-                        tabindex: '-1',
+                        tabIndex: -1,
                         name: 'layer-visibility',
                     },
                     css: {
@@ -262,6 +266,7 @@ export class LayersUi {
                     30,
                     30,
                     1,
+                    true,
                 );
                 layer.thumb = BB.canvas(thumbDimensions.width, thumbDimensions.height);
 
@@ -280,6 +285,19 @@ export class LayersUi {
                 });
             }
 
+            //clipping indicator
+            const clippingIcon = hasClipping
+                ? getIconSvg('layer-clipping', {
+                      position: 'absolute',
+                      left: paddingLeft + 32,
+                      top: 9,
+                      width: 16,
+                      height: 16,
+                      pointerEvents: 'none',
+                  })
+                : undefined;
+            clippingIcon?.classList.add(classes.clippingIndicator);
+
             //layerlabel
             {
                 layer.label = BB.el({
@@ -290,10 +308,10 @@ export class LayersUi {
 
                 css(layer.label, {
                     position: 'absolute',
-                    left: 1 + 32 + 5 + paddingLeft,
+                    left: 1 + 32 + 5 + paddingLeft + clippingOffset,
                     top: 1,
                     fontSize: 13,
-                    width: 165,
+                    width: 165 - clippingOffset,
                     height: 20,
                     overflow: 'hidden',
                     whiteSpace: 'nowrap',
@@ -328,12 +346,12 @@ export class LayersUi {
             let oldOpacity: number;
             const opacitySlider = new PointSlider({
                 init: layer.opacity,
-                width: 200,
+                width: 200 - clippingOffset,
                 pointSize: 14,
                 callback: (sliderValue, isFirst, isLast) => {
                     if (isFirst) {
                         this.isManipulating = true;
-                        oldOpacity = this.klCanvas.getLayerOld(layer.spot)!.opacity;
+                        oldOpacity = this.klCanvas.getLayer(layer.spot).opacity;
                         return;
                     }
                     if (isLast) {
@@ -356,7 +374,7 @@ export class LayersUi {
             });
             css(opacitySlider.getElement(), {
                 position: 'absolute',
-                left: 39 + paddingLeft,
+                left: 39 + paddingLeft + clippingOffset,
                 top: 17,
             });
             layer.opacitySlider = opacitySlider;
@@ -374,22 +392,21 @@ export class LayersUi {
                     250,
                     250,
                     1,
+                    true,
                 );
 
-                if (
-                    this.largeThumbCanvas.width !== thumbDimensions.width ||
-                    this.largeThumbCanvas.height !== thumbDimensions.height
-                ) {
-                    this.largeThumbCanvas.width = thumbDimensions.width;
-                    this.largeThumbCanvas.height = thumbDimensions.height;
-                }
+                changeCanvasDimensions(
+                    this.largeThumbCanvas,
+                    thumbDimensions.width,
+                    thumbDimensions.height,
+                    { ensureCleared: true },
+                );
                 const ctx = BB.ctx(this.largeThumbCanvas);
                 ctx.save();
                 if (this.largeThumbCanvas.width > layercanvas.width) {
                     ctx.imageSmoothingEnabled = false;
                 }
                 ctx.imageSmoothingQuality = 'high';
-                ctx.clearRect(0, 0, this.largeThumbCanvas.width, this.largeThumbCanvas.height);
                 ctx.drawImage(
                     layercanvas,
                     0,
@@ -398,43 +415,18 @@ export class LayersUi {
                     this.largeThumbCanvas.height,
                 );
                 ctx.restore();
-                css(this.largeThumbDiv, {
-                    top: e.clientY - this.largeThumbCanvas.height / 2,
-                    opacity: 0,
-                });
-                if (!this.largeThumbInDocument) {
-                    document.body.append(this.largeThumbDiv);
-                    this.largeThumbInDocument = true;
-                }
-                clearTimeout(this.largeThumbInTimeout);
-                this.largeThumbInTimeout = setTimeout(() => {
-                    css(this.largeThumbDiv, {
-                        opacity: 1,
-                    });
-                }, 20);
-                clearTimeout(this.largeThumbTimeout);
+                this.floatingLayerPreview.show(this.largeThumbCanvas, e.clientY);
             };
+            // Won't fire when element is removed from DOM. To fix when rewriting layers-ui.
             layer.thumb.onpointerout = () => {
-                clearTimeout(this.largeThumbInTimeout);
-                css(this.largeThumbDiv, {
-                    opacity: 0,
-                });
-                clearTimeout(this.largeThumbTimeout);
-                this.largeThumbTimeout = setTimeout(() => {
-                    if (!this.largeThumbInDocument) {
-                        return;
-                    }
-                    this.largeThumbDiv.remove();
-                    this.largeThumbInDocument = false;
-                }, 300);
+                this.floatingLayerPreview.hide();
             };
 
-            container1.append(
-                layer.thumb,
-                layer.label,
-                layer.opacityLabel,
-                opacitySlider.getElement(),
-            );
+            container1.append(layer.thumb);
+            if (clippingIcon) {
+                container1.append(clippingIcon);
+            }
+            container1.append(layer.label, layer.opacityLabel, opacitySlider.getElement());
             let dragstart = false;
             let freshSelection = false;
 
@@ -492,7 +484,7 @@ export class LayersUi {
                     const newSpot = this.posToSpot(layer.posY);
                     const oldSpot = layer.spot;
                     this.move(layer.spot, newSpot);
-                    if (oldSpot != newSpot) {
+                    if (oldSpot !== newSpot) {
                         this.onSelect(this.selectedSpotIndex, false);
                     }
                     if (oldSpot === newSpot && freshSelection) {
@@ -537,12 +529,21 @@ export class LayersUi {
         this.moreDropdown.setEnabled('merge-all', !oneLayer);
     }
 
+    private mergeLayer(mixModeStr?: TMixMode): void {
+        const layerIndex = this.klCanvas.mergeLayer(this.selectedSpotIndex, mixModeStr);
+        if (layerIndex === undefined) {
+            return;
+        }
+        this.update(layerIndex);
+        this.onSelect(layerIndex, false);
+    }
+
     // ----------------------------------- public -----------------------------------
     constructor(p: TLayersUiParams) {
         this.klCanvas = p.klCanvas;
         this.onSelect = p.onSelect;
         this.parentEl = p.parentEl;
-        this.uiState = p.uiState;
+        this.floatingLayerPreview = p.floatingLayerPreview;
         this.applyUncommitted = p.applyUncommitted;
         this.klHistory = p.klHistory;
         this.onUpdateProject = p.onUpdateProject;
@@ -553,25 +554,7 @@ export class LayersUi {
         this.layerSpacing = 0;
         const width = 270;
 
-        this.largeThumbDiv = BB.el({
-            onClick: BB.handleClick,
-            css: {
-                position: 'absolute',
-                top: 500,
-                boxShadow: '1px 1px 3px rgba(0,0,0,0.3)',
-                pointerEvents: 'none',
-                padding: 0,
-                border: '1px solid #aaa',
-                transition: 'opacity 0.3s ease-out',
-                userSelect: 'none',
-                background: 'var(--kl-checkerboard-background)',
-            },
-        });
-        this.setUiState(this.uiState);
-        this.largeThumbCanvas = BB.canvas(200, 200);
-        this.largeThumbCanvas.style.display = 'block';
-        this.largeThumbDiv.append(this.largeThumbCanvas);
-        this.largeThumbInDocument = false;
+        this.largeThumbCanvas = BB.canvas();
 
         this.klCanvasLayerArr = this.klCanvas.getLayers();
         this.selectedSpotIndex = this.klCanvasLayerArr.length - 1;
@@ -605,6 +588,30 @@ export class LayersUi {
         this.mergeBtn = BB.el({ tagName: 'button', className: 'kl-button' });
         this.removeBtn = BB.el({ tagName: 'button', className: 'kl-button' });
         const renameBtn = BB.el({ tagName: 'button', className: 'kl-button' });
+
+        const iconSize = 20;
+        this.clippingToggle = new BoxToggle({
+            keepOriginalLabel: true,
+            label: (() => {
+                const icon = getIconSvg('layer-clipping', {
+                    width: iconSize,
+                    height: iconSize,
+                });
+                icon.classList.add(classes.clippingIcon);
+                return BB.el({
+                    content: icon,
+                    className: classes.clippingIconWrapper,
+                });
+            })(),
+            title: LANG('layers-clipping'),
+            init: this.klCanvasLayerArr[this.selectedSpotIndex].hasClipping,
+            onChange: (hasClipping) => {
+                this.klCanvas.setLayerHasClipping(this.selectedSpotIndex, hasClipping);
+                this.update(this.selectedSpotIndex);
+            },
+        });
+        this.clippingToggle.getElement().classList.add(classes.clippingToggle);
+
         this.moreDropdown = new DropdownMenu({
             button: BB.el({
                 content: getIconSvg('chevron-down', { width: '13px' }),
@@ -622,7 +629,6 @@ export class LayersUi {
             ],
             onItemClick: (id) => {
                 if (id === 'clear-layer') {
-                    this.applyUncommitted();
                     this.onClearLayer();
                 }
                 if (id === 'advanced-merge') {
@@ -634,12 +640,8 @@ export class LayersUi {
                     if (newIndex === false) {
                         return;
                     }
-                    this.klCanvasLayerArr = this.klCanvas.getLayers();
-                    this.selectedSpotIndex = newIndex;
-
-                    this.onSelect(this.selectedSpotIndex, false);
-
-                    this.updateButtons();
+                    this.update(newIndex);
+                    this.onSelect(newIndex, false);
                 }
             },
         });
@@ -693,6 +695,7 @@ export class LayersUi {
                         this.duplicateBtn,
                         this.mergeBtn,
                         renameBtn,
+                        this.clippingToggle.getElement(),
                         c(',grow-1'),
                         this.moreDropdown.getElement(),
                     ]),
@@ -738,16 +741,8 @@ export class LayersUi {
                     this.updateButtons();
                 };
                 this.mergeBtn.onclick = () => {
-                    // fast merge
                     this.applyUncommitted();
-                    if (this.selectedSpotIndex <= 0) {
-                        return;
-                    }
-                    this.klCanvas.mergeLayers(this.selectedSpotIndex, this.selectedSpotIndex - 1);
-                    this.klCanvasLayerArr = this.klCanvas.getLayers();
-                    this.selectedSpotIndex--;
-                    this.onSelect(this.selectedSpotIndex, false);
-                    this.updateButtons();
+                    this.mergeLayer();
                 };
 
                 renameBtn.onclick = () => {
@@ -769,7 +764,7 @@ export class LayersUi {
                 },
             });
 
-            this.modeSelect = new Select<TMixMode>({
+            this.modeSelect = new SelectCustom<TMixMode>({
                 optionArr: [
                     'source-over',
                     undefined,
@@ -845,6 +840,7 @@ export class LayersUi {
         }
         this.selectedSpotIndex = spotIndex;
         this.modeSelect.setValue(this.klCanvasLayerArr[this.selectedSpotIndex].mixModeStr);
+        this.clippingToggle.setValue(this.klCanvasLayerArr[this.selectedSpotIndex].hasClipping);
         for (let i = 0; i < this.layerElArr.length; i++) {
             const layer = this.layerElArr[i];
             const isSelected = this.selectedSpotIndex === layer.spot;
@@ -859,22 +855,6 @@ export class LayersUi {
         this.mergeBtn.disabled = this.selectedSpotIndex === 0;
     }
 
-    setUiState(stateStr: TUiLayout): void {
-        this.uiState = stateStr;
-
-        if (this.uiState === 'left') {
-            css(this.largeThumbDiv, {
-                left: 280,
-                right: '',
-            });
-        } else {
-            css(this.largeThumbDiv, {
-                left: '',
-                right: 280,
-            });
-        }
-    }
-
     getElement(): HTMLElement {
         return this.rootEl;
     }
@@ -887,22 +867,9 @@ export class LayersUi {
         mergeLayerDialog(this.parentEl, {
             topCanvas: this.klCanvasLayerArr[this.selectedSpotIndex].context.canvas,
             bottomCanvas: this.klCanvasLayerArr[this.selectedSpotIndex - 1].context.canvas,
-            topOpacity: this.klCanvas.getLayerOld(this.selectedSpotIndex)!.opacity,
+            topOpacity: this.klCanvas.getLayer(this.selectedSpotIndex).opacity,
             mixModeStr: this.klCanvasLayerArr[this.selectedSpotIndex].mixModeStr,
-            callback: (mode) => {
-                this.klCanvas.mergeLayers(
-                    this.selectedSpotIndex,
-                    this.selectedSpotIndex - 1,
-                    mode as TMixMode | 'as-alpha',
-                );
-                this.klCanvasLayerArr = this.klCanvas.getLayers();
-                this.selectedSpotIndex--;
-
-                //this.createLayerList();
-                this.onSelect(this.selectedSpotIndex, false);
-
-                this.updateButtons();
-            },
+            callback: (mode) => this.mergeLayer(mode as TMixMode),
         });
     }
 

@@ -1,6 +1,6 @@
+import { SelectCustom } from '../components/select-custom';
 import { getIconUrl } from '../../../icon/icon';
 import { BB } from '../../../bb/bb';
-import { KL } from '../../kl';
 import { BrowserStorageUi } from '../components/browser-storage-ui';
 import { TDropOption, TExportType, TKlProject } from '../../kl-types';
 import { ProjectStore } from '../../storage/project-store';
@@ -102,8 +102,8 @@ export class FileUi {
                 tagName: 'button',
                 className: 'kl-button grid-button',
                 content: createButtonContent(LANG('file-new'), newImageImg, true),
-                custom: {
-                    tabIndex: '-1',
+                props: {
+                    tabIndex: -1,
                 },
                 css: {
                     float: 'left',
@@ -119,8 +119,8 @@ export class FileUi {
                     cursor: 'pointer',
                     float: 'left',
                 },
-                custom: {
-                    tabIndex: '-1',
+                props: {
+                    tabIndex: -1,
                 },
                 onClick: () => this.importInput!.click(),
             });
@@ -134,8 +134,8 @@ export class FileUi {
                     this.importInput!.files && p.onFileSelect(this.importInput!.files, 'default');
                     this.importInput!.value = '';
                 },
-                custom: {
-                    tabIndex: '-1',
+                props: {
+                    tabIndex: -1,
                 },
             });
             this.importInput.type = 'file';
@@ -143,15 +143,10 @@ export class FileUi {
             this.importInput.accept = 'image/*,.psd'; // .psd needed for chrome, although it's image/vnd.adobe.photoshop
             const saveButton = BB.el({
                 tagName: 'button',
-                className: 'kl-button grid-button grid-button--filter',
+                className: 'kl-button',
                 content: createButtonContent(LANG('file-save'), exportImg),
-                custom: {
-                    tabIndex: '-1',
-                },
-                css: {
-                    float: 'left',
-                    flex: '1 0 0',
-                    margin: 0,
+                props: {
+                    tabIndex: -1,
                 },
                 onClick: () => p.onSaveImageToComputer(),
             });
@@ -178,7 +173,7 @@ export class FileUi {
             p.onChangeShowSaveDialog(initialShowSaveDialog);
 
             // export filetype dropdown
-            const exportTypeSelect = new KL.Select({
+            const exportTypeSelect = new SelectCustom({
                 optionArr: [
                     ['png', 'PNG'],
                     ['jpg', 'JPG'],
@@ -193,11 +188,6 @@ export class FileUi {
                 },
                 title: LANG('file-format'),
                 name: 'export-type',
-            });
-            css(exportTypeSelect.getElement(), {
-                height: 30,
-                width: 'calc(50% - 10px)',
-                flex: '1 0 0',
             });
 
             // --- browser storage ---
@@ -237,7 +227,8 @@ export class FileUi {
                     BB.el({
                         content: [saveButton, exportTypeSelect.getElement()],
                         css: {
-                            display: 'flex',
+                            display: 'grid',
+                            gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
                             gap: 10,
                         },
                     }),
@@ -263,8 +254,8 @@ export class FileUi {
                 className: 'kl-button',
                 content: [LANG('tab-recovery-recover-tabs'), this.recoveryCountBubble],
                 onClick: () => showRecoveryManagerPanel(this.klRecoveryManager),
-                custom: {
-                    tabIndex: '-1',
+                props: {
+                    tabIndex: -1,
                 },
                 css: {
                     margin: '10px 0 0 10px',
@@ -288,8 +279,8 @@ export class FileUi {
                 tagName: 'button',
                 className: 'kl-button grid-button',
                 content: createButtonContent(LANG('file-share'), shareImg),
-                custom: {
-                    tabIndex: '-1',
+                props: {
+                    tabIndex: -1,
                 },
                 css: {
                     float: 'left',
@@ -305,8 +296,8 @@ export class FileUi {
                 tagName: 'button',
                 className: 'kl-button grid-button',
                 content: createButtonContent(LANG('file-upload'), uploadImg),
-                custom: {
-                    tabIndex: '-1',
+                props: {
+                    tabIndex: -1,
                 },
                 css: {
                     float: 'left',

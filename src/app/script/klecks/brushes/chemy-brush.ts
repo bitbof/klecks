@@ -108,7 +108,7 @@ export class ChemyBrush {
                 a: this.settingOpacity,
             });
             if (this.settingGradient) {
-                const startAtTop = this.path[0].x > this.path[this.path.length - 1].x;
+                const startAtTop = this.path[0].x > this.path.at(-1)!.x;
                 const gradient = this.context.createLinearGradient(
                     0,
                     startAtTop ? this.minY : this.maxY,

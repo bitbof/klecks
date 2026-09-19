@@ -1,4 +1,4 @@
-import { gl } from '../core/gl';
+import { fxGl } from '../core/gl';
 import { FxShader } from '../core/fx-shader';
 import { simpleShader } from '../core/simple-shader';
 import { TFxCanvas, TWrappedTexture } from '../fx-canvas-types';
@@ -24,12 +24,13 @@ export const mask: TFilterMask = function (maskTexture, originalTexture, premult
         originalTexture._.use(2);
     } else {
         // should be faster than introducing a conditional in the shader
-        this._.extraTexture.use(2);
-        this._.extraTexture.initFromBytes(1, 1, [0, 0, 0, 0]);
+        const extraTexture = this._.extraTexture!;
+        extraTexture.use(2);
+        extraTexture.initFromBytes(1, 1, [0, 0, 0, 0]);
     }
 
-    gl.mask =
-        gl.mask ||
+    fxGl.mask =
+        fxGl.mask ||
         new FxShader(
             null,
             `
@@ -52,12 +53,12 @@ export const mask: TFilterMask = function (maskTexture, originalTexture, premult
             'mask',
         );
 
-    gl.mask.textures({
+    fxGl.mask.textures({
         mask: 1,
         original: 2,
     });
 
-    simpleShader.call(this, gl.mask, { premultiplyOriginal: premultiplyOriginal ? 1 : 0 });
+    simpleShader.call(this, fxGl.mask, { premultiplyOriginal: premultiplyOriginal ? 1 : 0 });
 
     return this;
 };

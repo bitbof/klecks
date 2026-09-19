@@ -2,14 +2,9 @@ import { BB } from '../../bb/bb';
 import { Checkbox } from '../ui/components/checkbox';
 import { FreeTransform } from '../ui/components/free-transform';
 import { InterpolationAlgorithmToggle } from '../ui/components/interpolation-algorithm-toggle';
-import {
-    isLayerFill,
-    TFilterApply,
-    TFilterGetDialogParam,
-    TFilterGetDialogResult,
-} from '../kl-types';
+import { TFilterApply, TFilterGetDialogParam, TFilterGetDialogResult } from '../kl-types';
 import { LANG } from '../../language/language';
-import { css, throwIfNull } from '../../bb/base/base';
+import { css, Destroyer } from '../../bb/base/base';
 import { Preview } from '../ui/project-viewport/preview';
 import { TProjectViewportProject } from '../ui/project-viewport/project-viewport';
 import { testIsSmall } from '../ui/utils/test-is-small';
@@ -22,7 +17,6 @@ import { matrixToTuple } from '../../bb/math/matrix-to-tuple';
 import { MultiPolygon } from 'polygon-clipping';
 import { TRect } from '../../bb/bb-types';
 import { transformMultiPolygon } from '../../bb/multi-polygon/transform-multi-polygon';
-import { THistoryEntryLayerComposed } from '../history/history.types';
 import { getCanvasBounds } from '../../bb/base/canvas';
 import { TFreeTransform } from '../transform/transform-types';
 import {
@@ -33,6 +27,7 @@ import {
     TComposedFree,
 } from '../transform/composed-transformation';
 import { Input } from '../ui/components/input';
+import { composedLayerHasTransparency } from '../utils/composed-layer-has-transparency';
 
 // preference expressed by user
 let preferenceIsTransparentBg: undefined | boolean;
@@ -49,56 +44,6 @@ function getIsTransparentBg(
         return preference;
     }
     return layerHasTransparency;
-}
-
-function parseCssColor(colorString: string) {
-    if (colorString.startsWith('#')) {
-        let hex = colorString.slice(1);
-        if (hex.length === 3) {
-            hex = hex
-                .split('')
-                .map((c) => c + c)
-                .join('');
-        }
-        if (hex.length === 6) {
-            // assume full alpha
-            hex += 'ff';
-        }
-        const intVal = parseInt(hex, 16);
-        return {
-            r: (intVal >> 24) & 255,
-            g: (intVal >> 16) & 255,
-            b: (intVal >> 8) & 255,
-            a: (intVal & 255) / 255,
-        };
-    }
-
-    const rgbMatch = colorString.match(/rgba?\(([^)]+)\)/);
-    if (rgbMatch) {
-        const [r, g, b, a = 1] = rgbMatch[1].split(',').map((v) => parseFloat(v.trim()));
-        return { r, g, b, a };
-    }
-
-    return undefined;
-}
-
-export function testComposedLayerHasTransparency(layer: THistoryEntryLayerComposed): boolean {
-    for (const tile of layer.tiles) {
-        if (isLayerFill(tile)) {
-            const color = parseCssColor(tile.fill);
-            if (color && color.a < 1) {
-                return true;
-            }
-        } else {
-            const data = tile.data.data;
-            for (let i = 3; i < data.length; i += 4) {
-                if (data[i] < 255) {
-                    return true;
-                }
-            }
-        }
-    }
-    return false;
 }
 
 function drawTransform(
@@ -198,22 +143,19 @@ export type TFilterTransformInput = {
 
 export const filterTransform = {
     getDialog(params: TFilterGetDialogParam) {
-        const context = params.context;
         const klCanvas = params.klCanvas;
-        if (!context || !klCanvas) {
-            return false;
-        }
-
+        const selectedLayerIndex = params.selectedLayerIndex;
+        const layer = klCanvas.getLayer(selectedLayerIndex);
+        const context = layer.context;
         const isSmall = testIsSmall();
         const layers = klCanvas.getLayers();
-        const selectedLayerIndex = throwIfNull(klCanvas.getLayerIndex(context.canvas));
         const isBgLayer = selectedLayerIndex === 0;
         let hasTransparency = false;
         if (isBgLayer) {
             const layer = Object.entries(params.composed.layerMap).find(
                 ([_, layer]) => layer.index === selectedLayerIndex,
             )![1];
-            hasTransparency = testComposedLayerHasTransparency(layer);
+            hasTransparency = composedLayerHasTransparency(layer);
         }
         const selection = klCanvas.getSelection();
 
@@ -237,6 +179,7 @@ export const filterTransform = {
         };
 
         const rootEl = BB.el();
+        const destroyer = new Destroyer();
         const result: TFilterGetDialogResult<TFilterTransformInput> = {
             element: rootEl,
         };
@@ -346,6 +289,7 @@ export const filterTransform = {
             tagName: 'button',
             className: 'kl-button',
             content: LANG('filter-transform-flip') + ' X',
+            destroyer,
             onClick: () => {
                 const transformed = flipTransformation(
                     {
@@ -363,6 +307,7 @@ export const filterTransform = {
             tagName: 'button',
             className: 'kl-button',
             content: LANG('filter-transform-flip') + ' Y',
+            destroyer,
             onClick: () => {
                 const transformed = flipTransformation(
                     {
@@ -380,6 +325,7 @@ export const filterTransform = {
             tagName: 'button',
             className: 'kl-button',
             content: '-90°',
+            destroyer,
             onClick: () => {
                 const transformed = rotateTransformation(
                     {
@@ -398,6 +344,7 @@ export const filterTransform = {
             tagName: 'button',
             className: 'kl-button',
             content: '+90°',
+            destroyer,
             onClick: () => {
                 const transformed = rotateTransformation(
                     {
@@ -416,6 +363,7 @@ export const filterTransform = {
             tagName: 'button',
             className: 'kl-button',
             content: '2&times;',
+            destroyer,
             onClick: () => {
                 const transformed = scaleTransformation(
                     {
@@ -433,6 +381,7 @@ export const filterTransform = {
             tagName: 'button',
             className: 'kl-button',
             content: '&frac12;&times;',
+            destroyer,
             onClick: () => {
                 const transformed = scaleTransformation(
                     {
@@ -450,6 +399,7 @@ export const filterTransform = {
             tagName: 'button',
             className: 'kl-button',
             content: LANG('center'),
+            destroyer,
             onClick: () => {
                 const transformed = centerTransformation(
                     {
@@ -571,11 +521,11 @@ export const filterTransform = {
         {
             for (let i = 0; i < layers.length; i++) {
                 previewLayerArr.push({
-                    image: i === selectedLayerIndex ? previewCanvas : layers[i].context.canvas,
+                    image: i === selectedLayerIndex ? previewCanvas : layers[i].canvas,
                     isVisible: layers[i].isVisible,
                     opacity: layers[i].opacity,
                     mixModeStr: layers[i].mixModeStr,
-                    hasClipping: false,
+                    hasClipping: layers[i].hasClipping,
                 });
             }
         }
@@ -620,7 +570,7 @@ export const filterTransform = {
             const ctx = BB.ctx(previewCanvas);
             drawTransform(
                 ctx,
-                layers[selectedLayerIndex].context.canvas,
+                layers[selectedLayerIndex].canvas,
                 algorithmToggle.getValue() === 'pixelated',
                 transform,
                 selection,
@@ -675,13 +625,7 @@ export const filterTransform = {
             inputX.destroy();
             inputY.destroy();
             inputR.destroy();
-            BB.destroyEl(flipXBtn);
-            BB.destroyEl(flipYBtn);
-            BB.destroyEl(scaleRotLeftBtn);
-            BB.destroyEl(scaleRotRightBtn);
-            BB.destroyEl(scaleDoubleBtn);
-            BB.destroyEl(scaleHalfBtn);
-            BB.destroyEl(centerBtn);
+            destroyer.destroy();
             preview.destroy();
             BB.freeCanvas(previewCanvas);
         };
@@ -710,9 +654,9 @@ export const filterTransform = {
             return false;
         }
         const input = params.input;
-        const selectedLayerIndex = params.klCanvas.getLayerIndex(context.canvas)!;
+        const selectedLayerIndex = params.layer.index;
 
-        const copyCanvas = BB.copyCanvas(context.canvas);
+        const copyCanvas = BB.copyToCanvas(context.canvas);
         let selection = params.klCanvas.getSelection();
         const matrix = drawTransform(
             context,

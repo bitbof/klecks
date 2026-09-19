@@ -59,15 +59,15 @@ export class EaselShape implements TEaselTool {
         const p = applyToPoint(inverse(m), { x: e.relX, y: e.relY });
 
         if (e.type === 'pointerdown' && e.button === 'left') {
-            this.onDown(p, (vTransform.angleDeg / 180) * Math.PI);
             this.isDragging = true;
+            this.onDown(p, (vTransform.angleDeg / 180) * Math.PI);
         }
         if (e.type === 'pointermove' && e.button === 'left') {
             this.onMove(p);
         }
         if (e.type === 'pointerup' && e.button === undefined && this.isDragging) {
-            this.onUp(p);
             this.isDragging = false;
+            this.onUp(p);
         }
     }
 

@@ -1,25 +1,14 @@
 import { Embed, TEmbedParams, TReadPSD } from '../../main-embed';
-import { TKlProject, TKlProjectWithOptionalId } from '../../klecks/kl-types';
+import { TKlEmbedProject, TKlProject } from '../../klecks/kl-types';
 import logoImg from 'url:/src/app/img/klecks-logo.png';
 import { getEmbedUrl } from './get-embed-url';
 import { initLANG, LANG } from '../../language/language';
 import { THEME } from '../../theme/theme';
 import { loadAgPsd } from '../../klecks/storage/load-ag-psd';
-import { randomUuid } from '../../bb/base/base';
 import { createImage } from '../../bb/base/ui';
 
 // only one instance can exist
 let wrapperCreated = false;
-
-// add missing props. modifies project object
-function processProject(project: TKlProject | undefined): void {
-    if (!project) {
-        return;
-    }
-    project.layers.forEach((layer) => {
-        layer.isVisible = layer.isVisible === undefined ? true : layer.isVisible;
-    });
-}
 
 /**
  * Starting point for the Embed. Quickly available due to lazy loading.
@@ -28,11 +17,11 @@ function processProject(project: TKlProject | undefined): void {
  * Lazy loads rest of library, shows a loading screen, exposes Embed interface
  */
 export class EmbedWrapper {
-    private project: TKlProject | undefined;
+    private project: TKlEmbedProject | undefined;
     private errorStr: string | undefined;
     private psds: TReadPSD[] = []; // if instance not loaded yet, these are psds to be read
 
-    private instance: Embed | undefined; // instance of loaded Embed
+    private embed: Embed | undefined; // instance of loaded Embed
 
     // ----------------------------------- public -----------------------------------
     constructor(p: TEmbedParams) {
@@ -41,10 +30,9 @@ export class EmbedWrapper {
         }
         wrapperCreated = true;
 
-        processProject(p.project);
-        p = {
+        const embedParams: TEmbedParams & { embedUrl: string } = {
             ...p,
-            embedUrl: p.embedUrl ? p.embedUrl : getEmbedUrl(),
+            embedUrl: p.embedUrl ?? getEmbedUrl(),
         };
 
         (async () => {
@@ -94,20 +82,29 @@ export class EmbedWrapper {
                 '</div>';
             document.body.appendChild(loadingScreen);
 
-            const mainEmbed = await import('../../main-embed');
-            this.instance = new mainEmbed.Embed(p);
-
-            this.getPNG = () => this.instance!.getPNG();
-            this.getPSD = () => this.instance!.getPSD();
-
+            try {
+                const mainEmbed = await import('../../main-embed');
+                this.embed = new mainEmbed.Embed(embedParams);
+            } catch (e) {
+                // this.embed.initError() not available yet
+                const loadingScreenEl = document.getElementById('loading-screen');
+                const loadingScreenTextEl = document.getElementById('loading-screen-text');
+                if (loadingScreenTextEl && loadingScreenEl) {
+                    loadingScreenTextEl.textContent = '❌ ' + e;
+                    loadingScreenEl.className += 'loading-screen-error';
+                } else {
+                    alert('❌ ' + e);
+                }
+                return;
+            }
             if (this.project) {
-                this.instance.openProject(this.project);
+                this.embed.openProject(this.project);
             }
             if (this.errorStr) {
-                this.instance.initError(this.errorStr);
+                this.embed.initError(this.errorStr);
             }
             if (this.psds.length) {
-                this.instance.readPSDs(this.psds);
+                this.embed.readPSDs(this.psds);
             }
         })();
 
@@ -115,32 +112,27 @@ export class EmbedWrapper {
         loadAgPsd();
     }
 
-    openProject(project: TKlProjectWithOptionalId) {
-        const projectWithId = {
-            ...project,
-            projectId: project.projectId ?? randomUuid(),
-        };
-        processProject(projectWithId);
-        if (this.instance) {
-            this.instance.openProject(projectWithId);
+    openProject(project: TKlEmbedProject) {
+        if (this.embed) {
+            this.embed.openProject(project);
         } else {
             if (this.project) {
                 throw new Error('Already called openProject');
             }
-            this.project = projectWithId;
+            this.project = project;
         }
     }
 
     initError(error: string) {
-        if (this.instance) {
-            this.instance.initError(error);
+        if (this.embed) {
+            this.embed.initError(error);
         } else {
             this.errorStr = error;
         }
     }
 
-    async readPSD(blob: Blob) {
-        return new Promise((resolve, reject) => {
+    async readPSD(blob: Blob | ArrayBuffer) {
+        return new Promise<TKlProject>((resolve, reject) => {
             const item: TReadPSD = {
                 blob,
                 callback: (loadedProject: TKlProject | null) => {
@@ -152,14 +144,25 @@ export class EmbedWrapper {
                     }
                 },
             };
-            if (this.instance) {
-                this.instance.readPSDs([item]);
+            if (this.embed) {
+                this.embed.readPSDs([item]);
             } else {
                 this.psds.push(item);
             }
         });
     }
 
-    getPNG: (() => Promise<Blob>) | undefined = undefined;
-    getPSD: (() => Promise<Blob>) | undefined = undefined;
+    getPNG = async (): Promise<Blob> => {
+        if (!this.embed) {
+            throw new Error('Embed not initialized');
+        }
+        return await this.embed.getPNG();
+    };
+
+    getPSD = async (): Promise<Blob> => {
+        if (!this.embed) {
+            throw new Error('Embed not initialized');
+        }
+        return await this.embed.getPSD();
+    };
 }

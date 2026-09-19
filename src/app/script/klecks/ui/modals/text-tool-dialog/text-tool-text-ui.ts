@@ -2,6 +2,7 @@ import { TRenderTextParam } from '../../../image-operations/render-text';
 import { BB } from '../../../../bb/bb';
 import { LANG } from '../../../../language/language';
 import { c } from '../../../../bb/base/c';
+import { Destroyer } from '../../../../bb/base/base';
 
 type TTextParams = Pick<TRenderTextParam, 'text'>;
 
@@ -13,6 +14,7 @@ export class TextToolTextUI {
     private readonly rootEl: HTMLElement;
 
     private readonly textInput: HTMLTextAreaElement;
+    private readonly destroyer = new Destroyer();
     private lastEmittedText: string;
     private readonly onUpdate: (v: Partial<TTextParams>) => void;
 
@@ -42,7 +44,8 @@ export class TextToolTextUI {
             tagName: 'textarea',
             parent: this.rootEl,
             content: p.text,
-            custom: {
+            destroyer: this.destroyer,
+            props: {
                 placeholder: LANG('text-placeholder'),
             },
             css: {
@@ -75,7 +78,7 @@ export class TextToolTextUI {
     }
 
     destroy(): void {
-        BB.destroyEl(this.textInput);
+        this.destroyer.destroy();
         this.textInput.removeEventListener('input', this.onInput);
     }
 }

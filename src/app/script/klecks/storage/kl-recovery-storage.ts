@@ -19,7 +19,6 @@ import {
 import type { TIdb } from './kl-indexed-db.types';
 import { getProjectImageDataIds } from './project-store';
 import {
-    deserializeRecoveryThumbnail,
     getRecoveryImageDataIds,
     serializeRecovery,
     TRecoveryBundle,
@@ -145,9 +144,10 @@ export async function getRecoveryOverview(excludedRecoveryIds: number[]): Promis
     const metas: TRecoveryMetaData[] = await Promise.all(
         readResult.entriesWithThumbnail.map(async ({ id, recovery }) => ({
             id,
-            thumbnail: await deserializeRecoveryThumbnail(
+            thumbnail: readResult.thumbnailDataById.get(recovery.thumbnail),
+            /*thumbnail: await deserializeRecoveryThumbnail(
                 readResult.thumbnailDataById.get(recovery.thumbnail),
-            ),
+            ),*/
             timestamp: recovery.timestamp,
             memoryEstimateBytes: recovery.memoryEstimateBytes,
         })),
@@ -207,6 +207,10 @@ export async function getRecoveryAndUpdateId(
             const updatedRecovery: TIdb['V2']['RecoveryStore']['Read'] = {
                 ...recovery,
                 timestamp: Date.now(),
+                layers: recovery.layers.map((layer) => ({
+                    ...layer,
+                    hasClipping: layer.hasClipping ?? false,
+                })),
             };
             // We lazily write in the same format we just read, otherwise this would be more effort. Should be fine.
             await transaction.set(

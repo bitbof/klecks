@@ -1,6 +1,6 @@
 import { BB } from '../../../bb/bb';
 import { KlSlider } from '../components/kl-slider';
-import { Select } from '../components/select';
+import { SelectCustom } from '../components/select-custom';
 import { Checkbox } from '../components/checkbox';
 import { LANG } from '../../../language/language';
 import { TFillSampling } from '../../kl-types';
@@ -17,8 +17,8 @@ export class FillUi {
     private readonly colorSlider: KlColorSlider;
     private readonly toleranceSlider: KlSlider;
     private readonly opacitySlider: KlSlider;
-    private readonly modeSelect: Select<string>;
-    private readonly growSelect: Select<string>;
+    private readonly modeSelect: SelectCustom<string>;
+    private readonly growSelect: SelectCustom<string>;
     private isContiguous: boolean;
     private readonly eraserToggle: Checkbox;
 
@@ -85,7 +85,7 @@ export class FillUi {
                 fontSize: 15,
             },
         });
-        this.modeSelect = new Select({
+        this.modeSelect = new SelectCustom({
             optionArr: [
                 ['all', LANG('bucket-sample-all')],
                 ['current', LANG('bucket-sample-active')],
@@ -111,7 +111,7 @@ export class FillUi {
                 marginLeft: 10,
             },
         });
-        this.growSelect = new Select({
+        this.growSelect = new SelectCustom({
             optionArr: [
                 ['0', '0'],
                 ['1', '1'],

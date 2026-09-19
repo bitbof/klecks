@@ -1,7 +1,7 @@
 import { BB } from '../../bb/bb';
 import { ALPHA_IM_ARR } from './brushes-common';
 import { TPressureInput, TRgb } from '../kl-types';
-import { BezierLine } from '../../bb/math/line';
+import { BezierLine, TBezierLineCallback } from '../../bb/math/line';
 import { KlHistory } from '../history/kl-history';
 import { getPushableLayerChange } from '../history/push-helpers/get-pushable-layer-change';
 import { canvasAndChangedTilesToLayerTiles } from '../history/push-helpers/canvas-to-layer-tiles';
@@ -227,13 +227,7 @@ export class PenBrush {
 
         const drawArr: [number, number, number, number, number, number | undefined][] = []; //draw instructions. will be all drawn at once
 
-        const dotCallback = (val: {
-            x: number;
-            y: number;
-            t: number;
-            angle?: number;
-            dAngle: number;
-        }): void => {
+        const dotCallback: TBezierLineCallback = (val): void => {
             const localPressure = BB.mix(this.lastInput2.pressure, pressure, val.t);
             const localOpacity = this.calcOpacity(localPressure);
             const localSize = Math.max(
@@ -397,7 +391,7 @@ export class PenBrush {
         }
 
         const angle = BB.pointsToAngleDeg({ x: x1, y: y1 }, { x: x2, y: y2 });
-        const mouseDist = Math.sqrt(Math.pow(x2 - x1, 2.0) + Math.pow(y2 - y1, 2.0));
+        const mouseDist = Math.sqrt((x2 - x1) ** 2.0 + (y2 - y1) ** 2.0);
         const eX = (x2 - x1) / mouseDist;
         const eY = (y2 - y1) / mouseDist;
         let loopDist;

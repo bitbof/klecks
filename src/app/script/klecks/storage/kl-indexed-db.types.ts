@@ -107,6 +107,8 @@ export type TIdb = {
                     // 0 - 1
                     opacity: number;
                     mixModeStr?: TIdb['V2']['Common']['MixMode'];
+                    // added with 0.11
+                    hasClipping?: boolean;
                     blob:
                         | TIdb['V2']['Common']['PngBlob']
                         | TIdb['V2']['ProjectStore']['ImageDataRef'];
@@ -127,6 +129,7 @@ export type TIdb = {
                     isVisible: boolean;
                     opacity: number; // 0 - 1
                     mixModeStr: TIdb['V2']['Common']['MixMode'];
+                    hasClipping: boolean;
                     blob: TIdb['V2']['ProjectStore']['ImageDataRef'];
                 }[];
             };
@@ -158,6 +161,8 @@ export type TIdb = {
                     isVisible: boolean;
                     opacity: number; // 0 - 1
                     mixModeStr?: TIdb['V2']['Common']['MixMode'];
+                    // added with 0.11
+                    hasClipping?: boolean;
                     // Tiles can have the wrong size (always HISTORY_TILE_SIZE). Was only fixed with 0.10.2.
                     image: (
                         | TIdb['V2']['RecoveryStore']['ImageDataRef']
@@ -183,6 +188,7 @@ export type TIdb = {
                     // 0 - 1
                     opacity: number;
                     mixModeStr: TIdb['V2']['Common']['MixMode'];
+                    hasClipping: boolean;
                     image: (
                         | TIdb['V2']['RecoveryStore']['ImageDataRef']
                         | TIdb['V2']['RecoveryStore']['LayerFill']

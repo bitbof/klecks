@@ -1,22 +1,13 @@
-/*window['canvases'] = [];
+import { CANVAS_DEBUG_HOOKS } from './canvas-debug-hooks';
 
-window['printCanvases'] = () => {
-    let total = 0;
-
-    console.log(window['canvases'].map(item => {
-        total += item.width * item.height;
-        return {w: item.width, h: item.height};
-    }));
-
-    console.log('total: ' + (total * 4 / 1000 / 1000) + 'mb');
-};*/
-
+export function createCanvas(): HTMLCanvasElement;
+export function createCanvas(w: number, h: number): HTMLCanvasElement;
 export function createCanvas(w?: number, h?: number): HTMLCanvasElement {
     const result = document.createElement('canvas');
-    if (w && h) {
+    if (w !== undefined && h !== undefined) {
         result.width = w;
         result.height = h;
     }
-    // window['canvases'].push(result);
+    CANVAS_DEBUG_HOOKS.onCreate?.(result);
     return result;
 }

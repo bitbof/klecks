@@ -3,7 +3,7 @@ import { BB } from '../../../bb/bb';
 import { Options } from '../components/options';
 import { c } from '../../../bb/base/c';
 import { TBooleanOperation, TSelectShape } from '../../select-tool/select-tool';
-import { Select } from '../components/select';
+import { SelectCustom } from '../components/select-custom';
 import { LANG } from '../../../language/language';
 import { Checkbox } from '../components/checkbox';
 import { css } from '../../../bb/base/base';
@@ -60,7 +60,7 @@ export class SelectUi {
     private hasSelection: boolean = false;
     private selectResetBtn: HTMLButtonElement;
     private positionOutput: HTMLElement;
-    private moveToLayerSelect: Select<string>;
+    private moveToLayerSelect: SelectCustom<string>;
     private transparentBackgroundToggle: Checkbox;
     private algorithmOptions: InterpolationAlgorithmToggle;
     private warpCheckbox: Checkbox;
@@ -242,8 +242,8 @@ export class SelectUi {
             className: 'kl-button',
             content: LANG('select-all'),
             onClick: () => p.select.onAll(),
-            custom: {
-                tabindex: '-1',
+            props: {
+                tabIndex: -1,
             },
             css: {
                 minHeight: 30,
@@ -255,8 +255,8 @@ export class SelectUi {
             className: 'kl-button',
             content: LANG('select-invert'),
             onClick: () => p.select.onInvert(),
-            custom: {
-                tabindex: '-1',
+            props: {
+                tabIndex: -1,
             },
             css: {
                 minHeight: 30,
@@ -278,8 +278,8 @@ export class SelectUi {
                 display: 'none',
             },
             onClick: () => p.select.onReset(),
-            custom: {
-                tabindex: '-1',
+            props: {
+                tabIndex: -1,
             },
         });
 
@@ -302,8 +302,8 @@ export class SelectUi {
             className: 'kl-button',
             content: LANG('select-erase'),
             onClick: () => p.onErase(),
-            custom: {
-                tabindex: '-1',
+            props: {
+                tabIndex: -1,
             },
         });
 
@@ -313,8 +313,8 @@ export class SelectUi {
             className: 'kl-button',
             content: LANG('select-fill'),
             onClick: () => p.onFill(),
-            custom: {
-                tabindex: '-1',
+            props: {
+                tabIndex: -1,
             },
         });
 
@@ -335,8 +335,8 @@ export class SelectUi {
             content: LANG('filter-transform-flip') + ' X',
             className: 'kl-button',
             onClick: () => p.transform.onFlipX(),
-            custom: {
-                tabindex: '-1',
+            props: {
+                tabIndex: -1,
             },
         });
         const transformFlipYBtn = BB.el({
@@ -344,8 +344,8 @@ export class SelectUi {
             className: 'kl-button',
             content: LANG('filter-transform-flip') + ' Y',
             onClick: () => p.transform.onFlipY(),
-            custom: {
-                tabindex: '-1',
+            props: {
+                tabIndex: -1,
             },
         });
         const rotateNegativeBtn = BB.el({
@@ -353,8 +353,8 @@ export class SelectUi {
             className: 'kl-button',
             content: '-90°',
             onClick: () => p.transform.onRotateDeg(-90),
-            custom: {
-                tabindex: '-1',
+            props: {
+                tabIndex: -1,
             },
         });
         const rotatePositiveBtn = BB.el({
@@ -362,8 +362,8 @@ export class SelectUi {
             className: 'kl-button',
             content: '+90°',
             onClick: () => p.transform.onRotateDeg(90),
-            custom: {
-                tabindex: '-1',
+            props: {
+                tabIndex: -1,
             },
         });
 
@@ -382,8 +382,8 @@ export class SelectUi {
                 display: 'flex',
                 gap: 5,
             },
-            custom: {
-                tabindex: '-1',
+            props: {
+                tabIndex: -1,
             },
         });
 
@@ -392,8 +392,8 @@ export class SelectUi {
             className: 'kl-button',
             content: '2&times;',
             onClick: () => p.transform.onScale(2),
-            custom: {
-                tabindex: '-1',
+            props: {
+                tabIndex: -1,
             },
         });
 
@@ -402,8 +402,8 @@ export class SelectUi {
             className: 'kl-button',
             content: '&frac12;&times;',
             onClick: () => p.transform.onScale(1 / 2),
-            custom: {
-                tabindex: '-1',
+            props: {
+                tabIndex: -1,
             },
         });
 
@@ -412,8 +412,8 @@ export class SelectUi {
             className: 'kl-button',
             content: LANG('center'),
             onClick: () => p.transform.onCenter(),
-            custom: {
-                tabindex: '-1',
+            props: {
+                tabIndex: -1,
             },
         });
 
@@ -493,7 +493,7 @@ export class SelectUi {
         });
         transformModeEl.append(this.algorithmOptions.getElement());
 
-        this.moveToLayerSelect = new Select({
+        this.moveToLayerSelect = new SelectCustom({
             optionArr: [
                 ['1', 'Layer 2'],
                 ['0', 'Layer 1'],

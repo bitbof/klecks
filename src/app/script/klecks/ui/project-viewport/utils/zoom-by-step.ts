@@ -6,5 +6,5 @@ export function zoomByStep(oldScale: number, stepNum: number): number {
     newStep = Math.round(newStep);
     newStep *= Math.abs(stepNum);
 
-    return Math.pow(2, newStep);
+    return 2 ** newStep;
 }

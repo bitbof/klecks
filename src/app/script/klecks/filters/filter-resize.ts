@@ -1,5 +1,6 @@
 import { getIconUrl } from '../../icon/icon';
 import { BB } from '../../bb/bb';
+import { changeCanvasDimensions } from '../../bb/base/change-canvas-dimensions';
 import { Checkbox } from '../ui/components/checkbox';
 import { InterpolationAlgorithmToggle } from '../ui/components/interpolation-algorithm-toggle';
 import { TFilterApply, TFilterGetDialogParam, TFilterGetDialogResult } from '../kl-types';
@@ -8,6 +9,7 @@ import { table } from '../ui/components/table';
 import { SMALL_PREVIEW } from '../ui/utils/preview-size';
 import { css } from '../../bb/base/base';
 import { Input } from '../ui/components/input';
+import { freeCanvas } from '../../bb/base/canvas';
 
 const constrainImg = getIconUrl('constrain');
 export type TFilterResizeInput = {
@@ -28,7 +30,7 @@ export const filterResize = {
             h = parseInt('' + fit.height);
 
         let previewFactor = w / klCanvas.getWidth();
-        const tempCanvas = klCanvas.getCompleteCanvas(1);
+        const tempCanvas = klCanvas.getCanvas();
 
         const rootEl = BB.el();
         const result: TFilterGetDialogResult<TFilterResizeInput> = {
@@ -195,15 +197,15 @@ export const filterResize = {
             previewCtx.save();
             if (algorithmToggle.getValue() === 'smooth') {
                 previewCanvas.style.imageRendering = previewFactor > 1 ? 'pixelated' : '';
-                previewCanvas.width = klCanvas.getWidth();
-                previewCanvas.height = klCanvas.getHeight();
+                changeCanvasDimensions(previewCanvas, klCanvas.getWidth(), klCanvas.getHeight(), {
+                    ensureCleared: true,
+                });
                 previewCtx.imageSmoothingQuality = 'high';
                 previewCtx.drawImage(tempCanvas, 0, 0);
                 BB.resizeCanvas(previewCanvas, width, height);
             } else {
                 previewCanvas.style.imageRendering = 'pixelated';
-                previewCanvas.width = width;
-                previewCanvas.height = height;
+                changeCanvasDimensions(previewCanvas, width, height, { ensureCleared: true });
                 previewCtx.imageSmoothingEnabled = false;
                 previewCtx.drawImage(tempCanvas, 0, 0, previewCanvas.width, previewCanvas.height);
             }
@@ -262,6 +264,8 @@ export const filterResize = {
             heightInput.destroy();
             constrainCheckbox.destroy();
             algorithmToggle.destroy();
+            freeCanvas(previewCanvas);
+            freeCanvas(tempCanvas);
         };
         result.getInput = function (): TFilterResizeInput {
             const algorithm = algorithmToggle.getValue();

@@ -1,4 +1,4 @@
-import { gl } from '../core/gl';
+import { fxGl } from '../core/gl';
 import { FxShader } from '../core/fx-shader';
 import { randomShaderFunc } from '../shaders/random-shader-func';
 import { simpleShader } from '../core/simple-shader';
@@ -41,8 +41,8 @@ export const tiltShift: TFilterTiltShift = function (
     blurRadius,
     gradientRadius,
 ) {
-    gl.tiltShift =
-        gl.tiltShift ||
+    fxGl.tiltShift =
+        fxGl.tiltShift ||
         new FxShader(
             null,
             '\
@@ -84,21 +84,21 @@ export const tiltShift: TFilterTiltShift = function (
     const dx = endX - startX;
     const dy = endY - startY;
     const d = Math.sqrt(dx * dx + dy * dy);
-    simpleShader.call(this, gl.tiltShift, {
+    simpleShader.call(this, fxGl.tiltShift, {
         blurRadius: blurRadius,
         gradientRadius: gradientRadius,
         start: [startX, startY],
         end: [endX, endY],
         delta: [dx / d, dy / d],
-        texSize: [this.width, this.height],
+        texSize: [this.canvas.width, this.canvas.height],
     });
-    simpleShader.call(this, gl.tiltShift, {
+    simpleShader.call(this, fxGl.tiltShift, {
         blurRadius: blurRadius,
         gradientRadius: gradientRadius,
         start: [startX, startY],
         end: [endX, endY],
         delta: [-dy / d, dx / d],
-        texSize: [this.width, this.height],
+        texSize: [this.canvas.width, this.canvas.height],
     });
 
     return this;

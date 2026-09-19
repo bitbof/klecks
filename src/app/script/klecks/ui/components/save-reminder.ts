@@ -8,6 +8,7 @@ import { LocalStorage } from '../../../bb/base/local-storage';
 import * as classes from './save-reminder.module.scss';
 import { BrowserStorageUi } from './browser-storage-ui';
 import { showModal } from '../modals/base/show-modal';
+import { Destroyer } from '../../../bb/base/base';
 
 export type TSaveReminderSetting = '20min' | '40min' | 'disabled';
 
@@ -77,16 +78,17 @@ export class SaveReminder {
         });
         contentEl.append(psdWrapper, storageWrapper);
 
+        const destroyer = new Destroyer();
         const psdBtn = BB.el({
             tagName: 'button',
             className: 'kl-button kl-button-primary kl-button--extra-focus',
             content: LANG('save-reminder-save-psd'),
+            destroyer,
             onClick: () => {
                 this.applyUncommitted();
                 this.onSaveAsPsd();
             },
             css: { padding: 14 },
-            noRef: true,
         });
         psdWrapper.append(
             psdBtn,
@@ -119,7 +121,7 @@ export class SaveReminder {
             ignoreBackground: true,
             callback: () => {
                 storageUi.destroy();
-                BB.destroyEl(psdBtn);
+                destroyer.destroy();
                 this.closeFunc = undefined;
                 this.lastReminderShownAt = performance.now();
             },

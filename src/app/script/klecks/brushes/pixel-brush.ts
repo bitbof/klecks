@@ -1,7 +1,7 @@
 import { BB } from '../../bb/bb';
 import { TPressureInput, TRgb } from '../kl-types';
 import { TIndexBounds, TRect, TVector2D } from '../../bb/bb-types';
-import { BezierLine } from '../../bb/math/line';
+import { BezierLine, TBezierLineCallback } from '../../bb/math/line';
 import { ERASE_COLOR } from './erase-color';
 import { throwIfNull } from '../../bb/base/base';
 import { KlHistory } from '../history/kl-history';
@@ -199,10 +199,10 @@ export class PixelBrush {
         const pointArr = [];
         for (let i = 0; i <= n; i++) {
             const t = i / n;
-            const a = Math.pow(1 - t, 3);
-            const b = 3 * t * Math.pow(1 - t, 2);
-            const c = 3 * Math.pow(t, 2) * (1 - t);
-            const d = Math.pow(t, 3);
+            const a = (1 - t) ** 3;
+            const b = 3 * t * (1 - t) ** 2;
+            const c = 3 * t ** 2 * (1 - t);
+            const d = t ** 3;
             pointArr.push({
                 x: a * p1.x + b * p2.x + c * p3.x + d * p4.x,
                 y: a * p1.y + b * p2.y + c * p3.y + d * p4.y,
@@ -260,13 +260,7 @@ export class PixelBrush {
         this.ctxClone.save();
         this.selectionPath && this.ctxClone.clip(this.selectionPath);
 
-        const dotCallback = (val: {
-            x: number;
-            y: number;
-            t: number;
-            angle?: number;
-            dAngle: number;
-        }): void => {
+        const dotCallback: TBezierLineCallback = (val): void => {
             const localPressure = BB.mix(this.lastInput2.pressure, pressure, val.t);
             const localOpacity =
                 this.settingOpacity *

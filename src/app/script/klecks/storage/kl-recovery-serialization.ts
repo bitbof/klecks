@@ -1,4 +1,4 @@
-import { loadImage } from './project-converter';
+import { loadImageFromBlob } from '../../bb/base/load-image';
 import { isLayerFill, TDeserializedKlStorageProject, TKlProjectLayer } from '../kl-types';
 import { BB } from '../../bb/bb';
 import { HISTORY_TILE_SIZE } from '../history/kl-history';
@@ -8,10 +8,12 @@ import {
     TImageDataTile,
 } from '../history/history.types';
 import { sortLayerMap } from '../history/sort-layer-map';
-import { getAbortError, isBlob, randomUuid } from '../../bb/base/base';
+import { attempt, getSignalAbortError, isBlob, randomUuid } from '../../bb/base/base';
 import { TIdb } from './kl-indexed-db.types';
 import { getFillBytes, getImageDataBytes } from '../history/estimate-bytes';
 import { getTileSizeFromIndex } from '../history/image-data-tile';
+import { changeCanvasDimensions } from '../../bb/base/change-canvas-dimensions';
+import { getMixModeStr } from '../canvas/get-mix-mode';
 
 type TImageDataRead = TIdb['V2']['ImageDataStore']['Read'];
 
@@ -67,6 +69,7 @@ export function serializeRecovery(
             isVisible: composedLayer.isVisible,
             opacity: composedLayer.opacity,
             mixModeStr: composedLayer.mixModeStr,
+            hasClipping: composedLayer.hasClipping,
             image,
         });
     }
@@ -94,7 +97,7 @@ export function serializeRecovery(
 
 function throwIfAborted(signal?: AbortSignal): void {
     if (signal?.aborted) {
-        throw getAbortError(signal);
+        throw getSignalAbortError(signal);
     }
 }
 
@@ -111,14 +114,16 @@ async function deserializeImageDataTile(
 ): Promise<TImageDataTile> {
     let imageData: ImageData | undefined;
     if (isBlob(readResult)) {
-        try {
-            const image = await loadImage(readResult);
-            commonCtx.canvas.width = image.width;
-            commonCtx.canvas.height = image.height;
+        const result = await attempt(async () => {
+            const image = await loadImageFromBlob(readResult);
+            changeCanvasDimensions(commonCtx.canvas, image.width, image.height, {
+                ensureCleared: true,
+            });
             commonCtx.drawImage(image, 0, 0);
-            imageData = commonCtx.getImageData(0, 0, image.width, image.height);
-        } catch {
-            // handled by empty fallback below
+            return commonCtx.getImageData(0, 0, image.width, image.height);
+        });
+        if (result instanceof ImageData) {
+            imageData = result;
         }
     } else {
         imageData = readResult;
@@ -132,8 +137,9 @@ async function deserializeImageDataTile(
 
     // Before 0.10.2 it was possible that the blend brush created tiles of the wrong size (always HISTORY_TILE_SIZE).
     // We fix those here, so nothing breaks.
-    commonCtx.canvas.width = expectedSize.width;
-    commonCtx.canvas.height = expectedSize.height;
+    changeCanvasDimensions(commonCtx.canvas, expectedSize.width, expectedSize.height, {
+        ensureCleared: true,
+    });
     if (imageData) {
         // fixing tile with wrong size
         commonCtx.putImageData(imageData, 0, 0);
@@ -174,6 +180,8 @@ export async function deserializeRecovery(
         }
         layers.push({
             ...layer,
+            mixModeStr: getMixModeStr(layer.mixModeStr),
+            hasClipping: layer.hasClipping ?? false,
             image: deserializedTiles,
         });
     }
@@ -204,18 +212,14 @@ export async function deserializeRecoveryThumbnail(
         return canvas;
     }
     if (isBlob(readResult)) {
-        try {
-            const image = await loadImage(readResult);
-            canvas.width = image.width;
-            canvas.height = image.height;
+        await attempt(async () => {
+            const image = await loadImageFromBlob(readResult);
+            changeCanvasDimensions(canvas, image.width, image.height);
             ctx.drawImage(image, 0, 0);
-        } catch (e) {
-            // noop
-        }
+        });
         return canvas;
     }
-    canvas.width = readResult.width;
-    canvas.height = readResult.height;
+    changeCanvasDimensions(canvas, readResult.width, readResult.height);
     ctx.putImageData(readResult, 0, 0);
     return canvas;
 }

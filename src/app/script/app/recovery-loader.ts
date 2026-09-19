@@ -4,6 +4,7 @@ import { TDeserializedKlStorageProject } from '../klecks/kl-types';
 import { KlRecoveryManager } from '../klecks/storage/kl-recovery-manager';
 import { LANG } from '../language/language';
 import * as classes from './recovery-loader.module.scss';
+import { Destroyer } from '../bb/base/base';
 
 const showCancelAfterMs = 3000;
 
@@ -17,6 +18,7 @@ export async function loadRecovery(
 
     const abortController =
         typeof AbortController === 'undefined' ? undefined : new AbortController();
+    const destroyer = new Destroyer();
     let recoveryLoadingEl: HTMLElement | undefined;
     const showCancelRecoveryTimeout =
         abortController && loadingScreenEl
@@ -27,11 +29,11 @@ export async function loadRecovery(
                       tagName: 'button',
                       className: 'kl-button',
                       textContent: LANG('modal-cancel'),
+                      destroyer,
                       onClick: () => {
                           cancelButton.disabled = true;
                           abortController.abort();
                       },
-                      noRef: true,
                   });
 
                   recoveryLoadingEl = BB.el({
@@ -53,7 +55,7 @@ export async function loadRecovery(
                               content: [
                                   BB.el({
                                       tagName: 'img',
-                                      custom: {
+                                      props: {
                                           src: loadingImg,
                                           alt: '',
                                       },
@@ -79,6 +81,7 @@ export async function loadRecovery(
         throw error;
     } finally {
         clearTimeout(showCancelRecoveryTimeout);
+        destroyer.destroy();
         recoveryLoadingEl?.remove();
         loadingScreenEl?.classList.remove(classes.loadingScreen);
     }

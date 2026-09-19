@@ -1,4 +1,4 @@
-import { gl } from '../core/gl';
+import { fxGl } from '../core/gl';
 import { FxShader } from '../core/fx-shader';
 import { simpleShader } from '../core/simple-shader';
 import { TFxCanvas } from '../fx-canvas-types';
@@ -17,8 +17,8 @@ export type TFilterToAlpha = (
 ) => TFxCanvas;
 
 export const toAlpha: TFilterToAlpha = function (isInverted, replaceRGBA) {
-    gl.toAlpha =
-        gl.toAlpha ||
+    fxGl.toAlpha =
+        fxGl.toAlpha ||
         new FxShader(
             null,
             '\
@@ -40,12 +40,12 @@ export const toAlpha: TFilterToAlpha = function (isInverted, replaceRGBA) {
             'toAlpha',
         );
 
-    simpleShader.call(this, gl.toAlpha, {
+    simpleShader.call(this, fxGl.toAlpha, {
         isInverted: isInverted ? 1 : 0,
         replace: replaceRGBA
             ? [replaceRGBA.r / 255, replaceRGBA.g / 255, replaceRGBA.b / 255, replaceRGBA.a]
             : [0, 0, 0, 0],
-        texSize: [this.width, this.height],
+        texSize: [this.canvas.width, this.canvas.height],
     });
 
     return this;

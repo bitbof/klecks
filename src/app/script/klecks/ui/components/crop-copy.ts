@@ -1,5 +1,6 @@
 import { getIconUrl } from '../../../icon/icon';
 import { BB } from '../../../bb/bb';
+import { changeCanvasDimensions } from '../../../bb/base/change-canvas-dimensions';
 import { KeyListener } from '../../../bb/input/key-listener';
 import { PointerListener } from '../../../bb/input/pointer-listener';
 import { TRect, TVector2D } from '../../../bb/bb-types';
@@ -12,7 +13,7 @@ import { EventChain } from '../../../bb/input/event-chain/event-chain';
 import { OnePointerLimiter } from '../../../bb/input/event-chain/one-pointer-limiter';
 import { TChainElement } from '../../../bb/input/event-chain/event-chain.types';
 import { canvasToBlob } from '../../../bb/base/canvas';
-import { TProjectViewportProject } from '../project-viewport/project-viewport';
+import { TProjectViewportLayer } from '../project-viewport/project-viewport';
 import { css } from '../../../bb/base/base';
 
 const editCropImg = getIconUrl('edit-crop');
@@ -57,7 +58,7 @@ export class CropCopy {
     private readonly selectionRectEl: HTMLElement;
     private readonly preview: Preview;
     private mode: TPreviewMode = 'edit';
-    private previewLayer: TProjectViewportProject['layers'][number];
+    private previewLayer: TProjectViewportLayer;
 
     private resetCrop(): void {
         this.cropRect = {
@@ -81,8 +82,12 @@ export class CropCopy {
     }
 
     private async updateCroppedCanvas(): Promise<void> {
-        this.croppedCanvas.width = Math.round(this.cropRect.width);
-        this.croppedCanvas.height = Math.round(this.cropRect.height);
+        changeCanvasDimensions(
+            this.croppedCanvas,
+            Math.round(this.cropRect.width),
+            Math.round(this.cropRect.height),
+            { ensureCleared: true },
+        );
         const ctx = BB.ctx(this.croppedCanvas);
         ctx.drawImage(this.canvas, Math.round(-this.cropRect.x), Math.round(-this.cropRect.y));
 

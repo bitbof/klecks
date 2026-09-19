@@ -8,11 +8,11 @@ export const Vec2 = {
         return { x: p1.x - p2.x, y: p1.y - p2.y };
     },
     nor: function (p: TVector2D): TVector2D {
-        const len = Math.sqrt(Math.pow(p.x, 2) + Math.pow(p.y, 2));
+        const len = Math.sqrt(p.x ** 2 + p.y ** 2);
         return { x: p.x / len, y: p.y / len };
     },
     len: function (p: TVector2D): number {
-        return Math.sqrt(Math.pow(p.x, 2) + Math.pow(p.y, 2));
+        return Math.sqrt(p.x ** 2 + p.y ** 2);
     },
     dist: function (p1: TVector2D, p2: TVector2D): number {
         return Vec2.len(Vec2.sub(p1, p2));

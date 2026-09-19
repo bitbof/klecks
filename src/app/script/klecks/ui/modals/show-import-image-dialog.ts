@@ -6,6 +6,7 @@ import { LANG } from '../../../language/language';
 import { TKeyString, TRect } from '../../../bb/bb-types';
 import { TKlPsd, TKlPsdError } from '../../kl-types';
 import { css } from '../../../bb/base/base';
+import { Destroyer } from '../../../bb/base/base';
 
 /**
  * Shows first dialog when importing an image.
@@ -39,6 +40,7 @@ export function showImportImageDialog(p: {
     ) => void;
 }): void {
     const rootEl = BB.el();
+    const destroyer = new Destroyer();
     const isSmall = window.innerWidth < 550 || window.innerHeight < 550;
     const style: TKeyString = isSmall ? {} : { width: '540px' };
 
@@ -85,10 +87,8 @@ export function showImportImageDialog(p: {
 
     let doFlatten = false;
     function showWarnings(psdWarningArr: TKlPsdError[]): void {
-        const contentArr = [];
         const warningMap = {
             mask: 'Masks not supported. Mask was applied.',
-            clipping: 'Clipping not supported. Clipping layers were merged.',
             group: 'Groups not supported. Layers were ungrouped.',
             adjustment: 'Adjustment layers not supported.',
             'layer-effect': 'Layer effects not supported.',
@@ -96,9 +96,7 @@ export function showImportImageDialog(p: {
             'blend-mode': 'Unsupported layer blend mode.',
             'bits-per-channel': 'Unsupported color depth. Only 8bit per channel supported.',
         };
-        for (let i = 0; i < psdWarningArr.length; i++) {
-            contentArr.push('- ' + warningMap[psdWarningArr[i]]);
-        }
+        const contentArr = psdWarningArr.map((warning) => '- ' + warningMap[warning]);
         alert(contentArr.join('\n'));
     }
 
@@ -125,6 +123,7 @@ export function showImportImageDialog(p: {
                 warningsEl = BB.el({
                     parent: noteEl,
                     tagName: 'a',
+                    destroyer,
                     content: 'Details',
                     css: { marginLeft: 5 },
                     onClick: () => showWarnings(warnings),
@@ -156,7 +155,7 @@ export function showImportImageDialog(p: {
             const isCropped =
                 p.image.width !== cropRect.width || p.image.height !== cropRect.height;
             cropCopy.destroy();
-            BB.destroyEl(warningsEl);
+            destroyer.destroy();
             if (flattenCheckbox) {
                 flattenCheckbox.destroy();
             }

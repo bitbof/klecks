@@ -2,13 +2,15 @@ import { TDropOption, TKlPsd, TRgb } from '../klecks/kl-types';
 import { KL } from '../klecks/kl';
 import { LANG } from '../language/language';
 import { BB } from '../bb/bb';
-import { KlCanvas, TKlCanvasLayer } from '../klecks/canvas/kl-canvas';
+import { changeCanvasDimensions } from '../bb/base/change-canvas-dimensions';
+import { KlCanvas } from '../klecks/canvas/kl-canvas';
 import { LayersUi } from '../klecks/ui/tool-tabs/layers-ui/layers-ui';
 import { TRect, TSize2D } from '../bb/bb-types';
-import { throwIfNull, throwIfUndefined } from '../bb/base/base';
+import { asyncThrow, attempt, AttemptError, throwIfNull, throwIfUndefined } from '../bb/base/base';
+import { loadImage, loadImageFromBlob } from '../bb/base/load-image';
 import { getNextLayerId } from '../klecks/history/get-next-layer-id';
 import { detectFiletype } from '../klecks/storage/file-header-detection';
-import { showModal } from '../klecks/ui/modals/base/show-modal';
+import { showError, showModal } from '../klecks/ui/modals/base/show-modal';
 
 // todo later:
 // onImage: (project: IKlProject) => void
@@ -18,7 +20,7 @@ export class KlAppImportHandler {
     private readonly klRootEl: HTMLElement;
     private readonly klMaxCanvasSize: number;
     private readonly layersUi: LayersUi;
-    private readonly setCurrentLayer: (layer: TKlCanvasLayer) => void;
+    private readonly setCurrentLayer: (index: number) => void;
     private readonly klCanvas: KlCanvas;
     private readonly onImportConfirm: () => void;
     private readonly applyUncommitted: () => void;
@@ -44,11 +46,7 @@ export class KlAppImportHandler {
             importedImage.width <= 0 ||
             importedImage.height <= 0
         ) {
-            showModal({
-                type: 'error',
-                message: LANG('import-broken-file'),
-                buttons: ['Ok'],
-            });
+            showError(LANG('import-broken-file'));
             return;
         }
 
@@ -90,7 +88,7 @@ export class KlAppImportHandler {
             });
 
             this.layersUi.update(0);
-            this.setCurrentLayer(this.klCanvas.getLayer(0));
+            this.setCurrentLayer(0);
             this.onImportConfirm();
         };
 
@@ -105,11 +103,12 @@ export class KlAppImportHandler {
                 cropCanvas: HTMLCanvasElement,
                 cropObj: TRect,
             ): void => {
-                // eslint-disable-next-line no-self-assign
-                cropCanvas.width = cropCanvas.width;
-                BB.ctx(cropCanvas).drawImage(targetCanvas, -cropObj.x, -cropObj.y);
-                targetCanvas.width = cropObj.width;
-                targetCanvas.height = cropObj.height;
+                const cropCtx = BB.ctx(cropCanvas);
+                cropCtx.clearRect(0, 0, cropCanvas.width, cropCanvas.height);
+                cropCtx.drawImage(targetCanvas, -cropObj.x, -cropObj.y);
+                changeCanvasDimensions(targetCanvas, cropObj.width, cropObj.height, {
+                    ensureCleared: true,
+                });
                 BB.ctx(targetCanvas).drawImage(cropCanvas, 0, 0);
             };
             if (
@@ -165,6 +164,7 @@ export class KlAppImportHandler {
                             isVisible: layer.isVisible,
                             opacity: layer.opacity,
                             mixModeStr: layer.mixModeStr,
+                            hasClipping: layer.hasClipping,
                             image: layer.image,
                         };
                     }),
@@ -177,7 +177,7 @@ export class KlAppImportHandler {
                 });
             }
             this.layersUi.update(layerIndex);
-            this.setCurrentLayer(this.klCanvas.getLayer(layerIndex));
+            this.setCurrentLayer(layerIndex);
             this.onImportConfirm();
         };
 
@@ -203,6 +203,7 @@ export class KlAppImportHandler {
                     if (
                         !this.klCanvas.addLayer(undefined, {
                             name: filename,
+                            mixModeStr: 'source-over',
                             isVisible: true,
                             opacity: 1,
                             image: operation,
@@ -215,7 +216,7 @@ export class KlAppImportHandler {
                     }
                     const layers = this.klCanvas.getLayers();
                     const activeLayerIndex = layers.length - 1;
-                    this.setCurrentLayer(this.klCanvas.getLayer(activeLayerIndex));
+                    this.setCurrentLayer(activeLayerIndex);
                     this.layersUi.update(activeLayerIndex);
                 },
             });
@@ -258,7 +259,7 @@ export class KlAppImportHandler {
             klRootEl: HTMLElement;
             maxCanvasSize: number;
             layersUi: LayersUi;
-            setCurrentLayer: (layer: TKlCanvasLayer) => void;
+            setCurrentLayer: (index: number) => void;
             klCanvas: KlCanvas;
             onImportConfirm: () => void;
             applyUncommitted: () => void;
@@ -282,9 +283,6 @@ export class KlAppImportHandler {
 
     async readClipboard(): Promise<void> {
         try {
-            /*if (Math.random() > 0.001) {
-                throw new Error('haha');
-            }*/
             // May freeze the app until it read the clipboard
             // But if you show a loading indicator on this line, it will show up too early.
             const clipboardItems = await navigator.clipboard.read();
@@ -296,43 +294,31 @@ export class KlAppImportHandler {
                     if (type.startsWith('image')) {
                         hasImage = true;
                         const blob = await item.getType(type);
-                        const img = new Image();
-                        img.onload = () => {
-                            URL.revokeObjectURL(img.src);
-                            this.importFinishedLoading(
-                                {
-                                    type: 'image',
-                                    width: img.width,
-                                    height: img.height,
-                                    canvas: img,
-                                },
-                                undefined,
-                                'default',
-                            );
-                        };
-                        img.src = URL.createObjectURL(blob);
+                        const img = await loadImageFromBlob(blob);
+                        this.importFinishedLoading(
+                            {
+                                type: 'image',
+                                width: img.width,
+                                height: img.height,
+                                canvas: img,
+                            },
+                            undefined,
+                            'default',
+                        );
                         return;
                     }
                 }
             }
             if (!hasImage) {
-                showModal({
-                    type: 'error',
-                    message: LANG('clipboard-no-image'),
-                    buttons: ['Ok'],
-                });
+                showError(LANG('clipboard-no-image'));
             }
         } catch (error) {
-            showModal({
-                type: 'error',
-                message: LANG('clipboard-read-fail'),
-                buttons: ['Ok'],
-            });
+            showError(LANG('clipboard-read-fail'));
         }
     }
 
     onPaste(e: ClipboardEvent): void {
-        if (KL.DIALOG_COUNTER.get() > 0) {
+        if (KL.DIALOG_COUNTER.get() > 0 || BB.isInputFocused(true)) {
             return;
         }
 
@@ -344,7 +330,7 @@ export class KlAppImportHandler {
                 return;
             }
             for (let i = 0; i < items.length; i++) {
-                if (items[i].type.indexOf('image') === -1) {
+                if (!items[i].type.includes('image')) {
                     continue;
                 }
                 const file = items[i].getAsFile();
@@ -361,31 +347,8 @@ export class KlAppImportHandler {
 
         if (e.clipboardData.files[0]) {
             retrieveImageFromClipboardAsBlob(e.clipboardData.items, (imageBlob) => {
-                // If there's an image, display it in the canvas
-                const img = new Image();
-                img.onload = () => {
-                    URL.revokeObjectURL(img.src);
-                    this.importFinishedLoading(
-                        {
-                            type: 'image',
-                            width: img.width,
-                            height: img.height,
-                            canvas: img,
-                        },
-                        undefined,
-                        'default',
-                    );
-                };
-                const URLObj = window.URL || window.webkitURL;
-                img.src = URLObj.createObjectURL(imageBlob);
-            });
-        } else if (e.clipboardData.items[0]) {
-            e.clipboardData.items[0].getAsString((pasteStr) => {
-                pasteStr = pasteStr.trim();
-                if (pasteStr.match(/^https?/)) {
-                    // url
-                    const img = new Image();
-                    img.onload = () => {
+                void loadImageFromBlob(imageBlob)
+                    .then((img) => {
                         this.importFinishedLoading(
                             {
                                 type: 'image',
@@ -396,12 +359,28 @@ export class KlAppImportHandler {
                             undefined,
                             'default',
                         );
-                    };
-                    img.onerror = (e) => {
-                        console.log('error loading', e);
-                    };
-                    img.crossOrigin = 'Anonymous';
-                    img.src = pasteStr;
+                    })
+                    .catch(() => showError(LANG('clipboard-read-fail')));
+            });
+        } else if (e.clipboardData.items[0]) {
+            e.clipboardData.items[0].getAsString((pasteStr) => {
+                pasteStr = pasteStr.trim();
+                if (pasteStr.match(/^https?/)) {
+                    // url
+                    void loadImage(pasteStr, { crossOrigin: 'anonymous' })
+                        .then((img) => {
+                            this.importFinishedLoading(
+                                {
+                                    type: 'image',
+                                    width: img.width,
+                                    height: img.height,
+                                    canvas: img,
+                                },
+                                undefined,
+                                'default',
+                            );
+                        })
+                        .catch((error) => console.log('error loading', error));
                 } else if (pasteStr.match(/^#?([a-fA-F0-9]{6}|[a-fA-F0-9]{3})$/)) {
                     // url
                     const rgbObj = BB.ColorConverter.hexToRGB(pasteStr.replace('#', ''));
@@ -420,184 +399,183 @@ export class KlAppImportHandler {
             });
         };
 
-        let hasUnsupportedFile = false;
         // files need to be copied, because the input is reset
         const fileArr = [...files];
+        if (fileArr.length > 1) {
+            const shouldImport = await new Promise<boolean>((resolve) => {
+                showModal({
+                    type: 'warning',
+                    message: LANG('import-many-files-warning', {
+                        x: '' + fileArr.length,
+                    }),
+                    buttons: [
+                        {
+                            id: 'import',
+                            label: LANG('import-many-files-confirm', {
+                                x: '' + fileArr.length,
+                            }),
+                        },
+                        'Cancel',
+                    ],
+                    callback: (result) => {
+                        resolve(result === 'import');
+                    },
+                });
+            });
+            if (!shouldImport) {
+                return;
+            }
+        }
+
+        let hasUnsupportedFile = false;
 
         for (let i = 0; i < fileArr.length; i++) {
             const file = fileArr[i];
             const fileType = await detectFiletype(file);
             if (fileType === 'image') {
-                ((f) => {
-                    window.URL = window.URL || window.webkitURL;
-                    const url = window.URL.createObjectURL(f);
-                    const im = new Image();
-                    im.src = url;
-                    BB.loadImage(im, () => {
-                        URL.revokeObjectURL(url);
+                loadImageFromBlob(file)
+                    .then((image) => {
                         this.importFinishedLoading(
                             {
                                 type: 'image',
-                                width: im.width,
-                                height: im.height,
-                                canvas: im,
+                                width: image.width,
+                                height: image.height,
+                                canvas: image,
                             },
-                            f.name,
+                            file.name,
                             optionStr,
                         );
-                    });
-                })(file);
+                    })
+                    .catch(() => showError(LANG('import-broken-file')));
             } else if (fileType === 'psd') {
-                ((f) => {
-                    const loaderSizeBytes = 1024 * 1024 * 25; // 25mb
-                    const maxSizeBytes = 1024 * 1024 * 1024; // 1gb
-                    const maxResolution = 4096;
+                const loaderSizeBytes = 1024 * 1024 * 25; // 25mb
+                const maxSizeBytes = 1024 * 1024 * 1024; // 1gb
+                const maxResolution = 4096;
 
-                    if (f.size >= maxSizeBytes) {
-                        // pretty likely to break stuff
-                        showModal({
-                            type: 'error',
-                            message: 'File too big. Unable to import.<br /><br />',
-                            buttons: ['Ok'],
-                        });
-                        return;
-                    }
+                if (file.size >= maxSizeBytes) {
+                    // pretty likely to break stuff
+                    showError('File too big. Unable to import.');
+                    return;
+                }
 
-                    const doShowLoader = fileArr.length === 1 && f.size >= loaderSizeBytes;
-                    let loaderIsOpen = true;
-                    let closeLoader: (() => void) | null;
+                const doShowLoader = fileArr.length === 1 && file.size >= loaderSizeBytes;
+                let loaderIsOpen = true;
+                let closeLoader: (() => void) | null;
 
-                    if (doShowLoader) {
-                        showModal({
-                            message: LANG('import-opening'),
-                            callback: (result) => {
-                                loaderIsOpen = false;
-                                closeLoader = null;
-                            },
-                            closeFunc: (f) => {
-                                closeLoader = f;
-                            },
-                        });
-                    }
+                if (doShowLoader) {
+                    showModal({
+                        message: LANG('import-opening'),
+                        callback: (result) => {
+                            loaderIsOpen = false;
+                            closeLoader = null;
+                        },
+                        closeFunc: (f) => {
+                            closeLoader = f;
+                        },
+                    });
+                }
 
-                    const reader = new FileReader();
-                    reader.onload = (readerResult) => {
-                        const target = throwIfNull(readerResult.target);
+                const reader = new FileReader();
+                reader.onload = (readerResult) => {
+                    const target = throwIfNull(readerResult.target);
 
-                        KL.loadAgPsd()
-                            .then((agPsdLazy) => {
-                                if (doShowLoader && !loaderIsOpen) {
+                    KL.loadAgPsd()
+                        .then((agPsdLazy) => {
+                            if (doShowLoader && !loaderIsOpen) {
+                                return;
+                            }
+
+                            try {
+                                let psd;
+
+                                // first pass, only read metadata
+                                psd = agPsdLazy.readPsd(target.result as any, {
+                                    skipLayerImageData: true,
+                                    skipThumbnail: true,
+                                    skipCompositeImageData: true,
+                                });
+                                if (psd.width > maxResolution || psd.height > maxResolution) {
+                                    if (closeLoader) {
+                                        closeLoader();
+                                    }
+                                    showError(
+                                        LANG('import-psd-too-large').replace(
+                                            /{x}/g,
+                                            '' + maxResolution,
+                                        ) +
+                                            '<br /><br />' +
+                                            LANG('import-psd-size') +
+                                            ': ' +
+                                            psd.width +
+                                            ' x ' +
+                                            psd.height +
+                                            ' pixels',
+                                    );
                                     return;
                                 }
 
-                                try {
-                                    let psd;
+                                // second pass, now load actual data.
+                                psd = null;
 
-                                    // first pass, only read metadata
+                                const parsed = attempt(() =>
+                                    agPsdLazy.readPsd(target.result as any),
+                                );
+                                psd = parsed instanceof AttemptError ? undefined : parsed;
+                                if (psd) {
+                                    //console.log('psd', psd);
+                                    const convertedPsd = KL.PSD.psdToKlPsd(psd);
+                                    //console.log('converted', convertedPsd);
+                                    if (optionStr === 'image' && convertedPsd.error) {
+                                        showWarningPsdFlattened();
+                                    }
+
+                                    if (closeLoader) {
+                                        closeLoader();
+                                    }
+                                    this.importFinishedLoading(convertedPsd, file.name, optionStr);
+                                } else {
                                     psd = agPsdLazy.readPsd(target.result as any, {
                                         skipLayerImageData: true,
                                         skipThumbnail: true,
-                                        skipCompositeImageData: true,
                                     });
-                                    if (psd.width > maxResolution || psd.height > maxResolution) {
-                                        if (closeLoader) {
-                                            closeLoader();
-                                        }
-                                        showModal({
-                                            type: 'error',
-                                            message:
-                                                LANG('import-psd-too-large').replace(
-                                                    /{x}/g,
-                                                    '' + maxResolution,
-                                                ) +
-                                                '<br /><br />' +
-                                                LANG('import-psd-size') +
-                                                ': ' +
-                                                psd.width +
-                                                ' x ' +
-                                                psd.height +
-                                                ' pixels' +
-                                                '<br /><br />',
-                                            buttons: ['Ok'],
-                                        });
-                                        return;
+
+                                    if (optionStr === 'image') {
+                                        showWarningPsdFlattened();
                                     }
 
-                                    // second pass, now load actual data.
-                                    psd = null;
-
-                                    try {
-                                        psd = agPsdLazy.readPsd(target.result as any);
-                                    } catch (e) {
-                                        //console.log('failed regular psd import', e);
+                                    if (closeLoader) {
+                                        closeLoader();
                                     }
-                                    if (psd) {
-                                        //console.log('psd', psd);
-                                        const convertedPsd = KL.PSD.readPsd(psd);
-                                        //console.log('converted', convertedPsd);
-                                        if (optionStr === 'image' && convertedPsd.error) {
-                                            showWarningPsdFlattened();
-                                        }
-
-                                        if (closeLoader) {
-                                            closeLoader();
-                                        }
-                                        this.importFinishedLoading(convertedPsd, f.name, optionStr);
-                                    } else {
-                                        psd = agPsdLazy.readPsd(target.result as any, {
-                                            skipLayerImageData: true,
-                                            skipThumbnail: true,
-                                        });
-
-                                        if (optionStr === 'image') {
-                                            showWarningPsdFlattened();
-                                        }
-
-                                        if (closeLoader) {
-                                            closeLoader();
-                                        }
-                                        this.importFinishedLoading(
-                                            {
-                                                type: 'psd',
-                                                width: psd.width,
-                                                height: psd.height,
-                                                canvas: throwIfUndefined(psd.canvas),
-                                                error: true,
-                                            },
-                                            f.name,
-                                            optionStr,
-                                        );
-                                    }
-                                } catch (e) {
-                                    closeLoader?.();
-                                    showModal({
-                                        type: 'error',
-                                        message: 'Failed to load PSD.<br /><br />',
-                                        buttons: ['Ok'],
-                                    });
-                                    console.log(e);
-                                    setTimeout(() => {
-                                        throw new Error('psd load error');
-                                    });
+                                    this.importFinishedLoading(
+                                        {
+                                            type: 'psd',
+                                            width: psd.width,
+                                            height: psd.height,
+                                            canvas: throwIfUndefined(psd.canvas),
+                                            error: true,
+                                        },
+                                        file.name,
+                                        optionStr,
+                                    );
                                 }
-                            })
-                            .catch((e) => {
+                            } catch (e) {
                                 closeLoader?.();
-                                alert('Error: failed to load PSD library');
-                            });
-                    };
-                    reader.readAsArrayBuffer(f);
-                })(file);
+                                showError('Failed to load PSD.');
+                                asyncThrow(e);
+                            }
+                        })
+                        .catch((e) => {
+                            closeLoader?.();
+                            showError('Error: failed to load PSD library');
+                        });
+                };
+                reader.readAsArrayBuffer(file);
             } else {
                 hasUnsupportedFile = true;
             }
         }
         if (hasUnsupportedFile) {
-            showModal({
-                message: LANG('import-unsupported-file'),
-                type: 'error',
-                buttons: ['Ok'],
-            });
+            showError(LANG('import-unsupported-file'));
         }
     }
 }

@@ -1,4 +1,5 @@
 import { BB } from '../../bb/bb';
+import { changeCanvasDimensions } from '../../bb/base/change-canvas-dimensions';
 import { isLayerFill, TRgb, TRgba } from '../kl-types';
 import { TIndexBounds, TPressureInput } from '../../bb/bb-types';
 import { clamp, intersectBounds } from '../../bb/math/math';
@@ -196,9 +197,7 @@ export class BlendBrush {
                 if (!canvas) {
                     canvas = BB.canvas(width, height);
                 } else {
-                    // update and clear
-                    canvas.width = width;
-                    canvas.height = height;
+                    changeCanvasDimensions(canvas, width, height, { ensureCleared: true });
                 }
                 const ctx = BB.ctx(canvas);
                 ctx.fillStyle = composedTile.fill;
@@ -311,7 +310,7 @@ export class BlendBrush {
             }
         }
 
-        const sharpness = Math.pow(params.opacity, 2) * 0.8;
+        const sharpness = params.opacity ** 2 * 0.8;
         // to optimize calculations
         const invSharpness = 1 - sharpness;
         const sharpnessSubtrahend = sharpness / invSharpness;
@@ -383,7 +382,7 @@ export class BlendBrush {
                         alphaO /= samplesSquared;
                     } else {
                         // technically needs + 0.5 offset, but not noticeable with large brush
-                        const dist = Math.pow(re, 2) + Math.pow(ri, 2);
+                        const dist = re ** 2 + ri ** 2;
                         if (dist >= sizeSquared) {
                             continue;
                         }
@@ -519,7 +518,7 @@ export class BlendBrush {
             }
         }
 
-        const bezierCallback: TBezierLineCallback = (val) => {
+        const dotCallback: TBezierLineCallback = (val) => {
             if (this.blending >= 1 && this.blendCol.a <= 0) {
                 return;
             }
@@ -531,7 +530,7 @@ export class BlendBrush {
             localSize = this.settingSizePressure
                 ? Math.max(0.1, localPressure * this.size)
                 : Math.max(0.1, this.size);
-            if (this.blending != 0) {
+            if (this.blending !== 0) {
                 this.mixCol.r = BB.mix(this.localColOld.r, localColNew.r, factor);
                 this.mixCol.g = BB.mix(this.localColOld.g, localColNew.g, factor);
                 this.mixCol.b = BB.mix(this.localColOld.b, localColNew.b, factor);
@@ -561,9 +560,9 @@ export class BlendBrush {
         };
 
         if (x === undefined || y === undefined) {
-            this.bezierLine!.addFinal(bDist, bezierCallback);
+            this.bezierLine!.addFinal(bDist, dotCallback);
         } else {
-            this.bezierLine!.add(x, y, bDist, bezierCallback);
+            this.bezierLine!.add(x, y, bDist, dotCallback);
         }
 
         this.copyFromCanvas(this.redrawBounds);

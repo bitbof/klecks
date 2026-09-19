@@ -8,6 +8,7 @@ import { c } from '../../../bb/base/c';
 import * as classes from './color-slider-hex-dialog.module.scss';
 import { FloatingWindow } from '../components/floating-window';
 import { TVector2D } from '../../../bb/bb-types';
+import { Destroyer } from '../../../bb/base/base';
 
 type TRgbChannel = 'r' | 'g' | 'b';
 
@@ -67,6 +68,7 @@ export class HexColorWindow {
     private readonly channelInputs: ChannelInputTableRow[];
     private readonly onClose: () => void;
     private readonly onChange: ((rgb: TRgb) => void) | undefined;
+    private readonly destroyer = new Destroyer();
     private value: RGB;
     private isDestroyed = false;
 
@@ -118,6 +120,7 @@ export class HexColorWindow {
         this.copyButton = BB.el({
             tagName: 'button',
             className: 'kl-button',
+            destroyer: this.destroyer,
             content: getIconImg('copy', { height: 20 }),
             title: LANG('mci-copy'),
             onClick: () => {
@@ -205,7 +208,7 @@ export class HexColorWindow {
             return;
         }
         this.isDestroyed = true;
-        BB.destroyEl(this.copyButton);
+        this.destroyer.destroy();
         this.hexInput.destroy();
         this.channelInputs.forEach((item) => item.destroy());
         this.channelInputs.splice(0, this.channelInputs.length);

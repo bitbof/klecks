@@ -124,7 +124,9 @@ function getButtonStr(buttons: number): TPointerButton | undefined {
 }
 
 const pressureNormalizer = new PressureNormalizer();
-const timeStampOffset = EVENT_USES_HIGH_RES_TIMESTAMP() ? 0 : -performance.timing.navigationStart;
+const timeStampOffset = EVENT_USES_HIGH_RES_TIMESTAMP()
+    ? 0
+    : -(performance.timing?.navigationStart ?? performance.timeOrigin);
 
 const pointerDownEvt = (HAS_POINTER_EVENTS ? 'pointerdown' : 'mousedown') as 'pointerdown';
 const pointerMoveEvt = (HAS_POINTER_EVENTS ? 'pointermove' : 'mousemove') as 'pointermove';
@@ -213,7 +215,7 @@ function correctPointerEvent(
 
     if (
         IS_FIREFOX &&
-        event.pointerType != 'mouse' &&
+        event.pointerType !== 'mouse' &&
         event.type === 'pointermove' &&
         event.buttons === 0
     ) {

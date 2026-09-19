@@ -11,7 +11,7 @@ import { KlSlider } from '../ui/components/kl-slider';
 import { getSharedFx } from '../../fx-canvas/shared-fx';
 import { Options } from '../ui/components/options';
 import { EVENT_RES_MS } from './filters-consts';
-import { Select } from '../ui/components/select';
+import { SelectCustom } from '../ui/components/select-custom';
 import { translateBlending } from '../canvas/translate-blending';
 import { Checkbox } from '../ui/components/checkbox';
 import { TWrappedTexture } from '../../fx-canvas/fx-canvas-types';
@@ -220,14 +220,10 @@ function createNoiseParameters(settings: TNoiseSettings): Parameters<typeof nois
 
 export const filterNoise = {
     getDialog(params: TFilterGetDialogParam) {
-        const context = params.context;
         const klCanvas = params.klCanvas;
-        if (!context || !klCanvas) {
-            return false;
-        }
-
+        const selectedLayerIndex = params.selectedLayerIndex;
+        const layer = klCanvas.getLayer(selectedLayerIndex);
         const layers = klCanvas.getLayers();
-        const selectedLayerIndex = throwIfNull(klCanvas.getLayerIndex(context.canvas));
 
         const thumbImgArr: HTMLImageElement[] = [];
         const thumbSize = 32;
@@ -245,7 +241,7 @@ export const filterNoise = {
                 settings.scaleX /= 10;
                 settings.scaleY /= 10;
                 fxCanvas.noise(...createNoiseParameters(settings)).update();
-                ctx.drawImage(fxCanvas, 0, 0);
+                ctx.drawImage(fxCanvas.canvas, 0, 0);
                 thumbImg.src = canvas.toDataURL('image/png');
                 thumbImgArr.push(thumbImg);
             });
@@ -398,7 +394,7 @@ export const filterNoise = {
             'luminosity',
         ];
 
-        const blendSelect = new Select({
+        const blendSelect = new SelectCustom({
             isFocusable: true,
             optionArr: mixModes.map((item) => {
                 return item ? ([item, translateBlending(item)] as [TMixMode, string]) : undefined;
@@ -458,13 +454,13 @@ export const filterNoise = {
         rootEl.append(scaleSlider.getElement(), opacitySlider.getElement(), row1El, row2El);
 
         const fxPreviewRenderer = new FxPreviewRenderer({
-            original: context.canvas,
+            original: layer.canvas,
             onUpdate: (fxCanvas, transform) => {
                 const settings = createNoiseSettings(noiseInput);
                 settings.scaleX *= transform.scaleX;
                 settings.scaleY *= transform.scaleY;
-                settings.offsetX = (context.canvas.width / 2) * transform.scaleX + transform.x;
-                settings.offsetY = (context.canvas.height / 2) * transform.scaleY + transform.y;
+                settings.offsetX = (layer.canvas.width / 2) * transform.scaleX + transform.x;
+                settings.offsetY = (layer.canvas.height / 2) * transform.scaleY + transform.y;
                 return fxCanvas.noise(...createNoiseParameters(settings));
             },
             postMix: {
@@ -483,11 +479,11 @@ export const filterNoise = {
                     image:
                         i === selectedLayerIndex
                             ? fxPreviewRenderer.render
-                            : layers[i].context.canvas,
+                            : layers[i].canvas,
                     isVisible: layers[i].isVisible,
                     opacity: layers[i].opacity,
                     mixModeStr: layers[i].mixModeStr,
-                    hasClipping: false,
+                    hasClipping: layers[i].hasClipping,
                 });
             }
         }
@@ -496,8 +492,8 @@ export const filterNoise = {
             width: getPreviewWidth(isSmall),
             height: getPreviewHeight(isSmall),
             project: {
-                width: context.canvas.width,
-                height: context.canvas.height,
+                width: layer.canvas.width,
+                height: layer.canvas.height,
                 layers: previewLayerArr,
             },
             selection: klCanvas.getSelection(),
@@ -581,7 +577,7 @@ export const filterNoise = {
         } else {
             context.globalCompositeOperation = input.mixModeStr;
         }
-        context.drawImage(fxCanvas, 0, 0);
+        context.drawImage(fxCanvas.canvas, 0, 0);
         context.restore();
 
         klHistory.push(

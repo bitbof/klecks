@@ -1,4 +1,4 @@
-import { css } from './base';
+import { css, Destroyer } from './base';
 import { TCss } from '../bb-types';
 import { BB } from '../bb';
 
@@ -9,6 +9,7 @@ export function appendTextDiv(target: HTMLElement, text: string): HTMLDivElement
     return div;
 }
 
+// if you want a button to be registered by isInputFocused()
 export const focusableElementClassName = 'kl-focusable-element';
 /**
  * Is an input element focused.
@@ -71,35 +72,10 @@ export function clearSelection(): void {
     }
 }
 
-const els: {
-    el: HTMLElement;
-    listeners: [keyof HTMLElementEventMap, EventListener][];
-}[] = [];
-// window['els'] = els;
-
-/**
- *
- * Create DOM element - div by default
- * params = {
- * 	    parent: someOtherDiv,
- * 	    css: {
- * 		    width: "500px",
- * 		    backgroundColor: "#fff"
- * 	    },
- * 	    content: "test", //or  content: [divA, divB, divC]   or content: someDiv
- * 	    className: "bla",
- *      id: "bla"
- * }
- *
- *  If onClick or onChange is used, then BB.destroyEl MUST be called
- *  to prevent a memory leak.
- *
- * @param params
- */
 export function el<GTag extends keyof HTMLElementTagNameMap = 'div'>(params?: {
     parent?: HTMLElement;
     css?: TCss;
-    custom?: { [key: string]: string };
+    props?: Partial<HTMLElementTagNameMap[GTag]>;
     content?: string | (HTMLElement | SVGSVGElement | string | undefined)[] | Element;
     textContent?: string;
     className?: string | string[];
@@ -108,10 +84,7 @@ export function el<GTag extends keyof HTMLElementTagNameMap = 'div'>(params?: {
     tagName?: GTag;
     onClick?: (e: Event) => void;
     onChange?: (e: Event) => void;
-    // Don't keep references of listeners.
-    // If false and has onClick/onChange handler, must call destroyEl.
-    // default = false
-    noRef?: boolean;
+    destroyer?: Destroyer;
 }) {
     if (!params) {
         return document.createElement('div') as HTMLElementTagNameMap[GTag];
@@ -145,52 +118,20 @@ export function el<GTag extends keyof HTMLElementTagNameMap = 'div'>(params?: {
     if ('title' in params && params.title !== undefined) {
         result.title = params.title;
     }
-    const listeners: [keyof HTMLElementEventMap, EventListener][] = [];
-    if (params.onClick !== undefined) {
-        result.addEventListener('click', params.onClick);
-        !params.noRef && listeners.push(['click', params.onClick as EventListener]);
+    if (params.onClick) {
+        const onClick = params.onClick as EventListener;
+        result.addEventListener('click', onClick);
+        params.destroyer?.add(() => result.removeEventListener('click', onClick));
     }
-    if (params.onChange !== undefined) {
-        result.addEventListener('change', params.onChange);
-        !params.noRef && listeners.push(['change', params.onChange]);
+    if (params.onChange) {
+        const onChange = params.onChange;
+        result.addEventListener('change', onChange);
+        params.destroyer?.add(() => result.removeEventListener('change', onChange));
     }
-    if (listeners.length > 0) {
-        els.push({
-            el: result,
-            listeners,
-        });
-        /*div.style.backgroundColor = '#ff0';
-        div.style.border = '1px solid #ff0';*/
-    }
-    if ('custom' in params && params.custom) {
-        const customKeyArr = Object.keys(params.custom);
-        for (let i = 0; i < customKeyArr.length; i++) {
-            result.setAttribute(customKeyArr[i], params.custom[customKeyArr[i]]);
-        }
+    if (params.props) {
+        Object.assign(result, params.props);
     }
     return result as HTMLElementTagNameMap[GTag];
-}
-
-/**
- * removes event listeners for Elements created via el()
- * @param el
- */
-export function destroyEl(el?: HTMLElement): void {
-    if (!el) {
-        return;
-    }
-    for (let i = 0; i < els.length; i++) {
-        const item = els[i];
-        if (item.el === el) {
-            item.listeners.forEach((item) => {
-                el.removeEventListener(item[0], item[1]);
-            });
-            els.splice(i, 1);
-            return;
-        }
-    }
-    // not found
-    return;
 }
 
 export function createImage(p: {

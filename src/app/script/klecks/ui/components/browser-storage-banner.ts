@@ -79,8 +79,8 @@ export async function runBrowserStorageBanner(p: TBrowserStorageBannerParams): P
         className: classes.closeButton + ' popup-x',
         content: `<img alt="${LANG('modal-close')}" height="20" src="${cancelImg}">`,
         title: LANG('modal-close'),
-        custom: {
-            tabindex: '0',
+        props: {
+            tabIndex: 0,
         },
     });
     closeButton.onclick = close;
@@ -102,8 +102,8 @@ export async function runBrowserStorageBanner(p: TBrowserStorageBannerParams): P
         tagName: 'button',
         className: ['kl-button', 'kl-button-primary', buttonClass],
         content: LANG('file-storage-open'),
-        custom: {
-            tabIndex: '-1',
+        props: {
+            tabIndex: -1,
         },
     });
     openBtn.onclick = () => {

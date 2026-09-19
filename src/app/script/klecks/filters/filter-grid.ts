@@ -4,7 +4,7 @@ import { LANG } from '../../language/language';
 import { Input } from '../ui/components/input';
 import { ColorOptions } from '../ui/components/color-options';
 import { drawGrid } from '../image-operations/draw-grid';
-import { css, throwIfNull } from '../../bb/base/base';
+import { css } from '../../bb/base/base';
 import { Preview } from '../ui/project-viewport/preview';
 import { testIsSmall } from '../ui/utils/test-is-small';
 import { getPreviewHeight, getPreviewWidth } from '../ui/utils/preview-size';
@@ -20,14 +20,10 @@ export type TFilterGridInput = {
 
 export const filterGrid = {
     getDialog(params: TFilterGetDialogParam) {
-        const context = params.context;
         const klCanvas = params.klCanvas;
-        if (!context || !klCanvas) {
-            return false;
-        }
-
+        const selectedLayerIndex = params.selectedLayerIndex;
+        const layer = klCanvas.getLayer(selectedLayerIndex);
         const layers = klCanvas.getLayers();
-        const selectedLayerIndex = throwIfNull(klCanvas.getLayerIndex(context.canvas));
 
         const rootEl = BB.el();
         const result: TFilterGetDialogResult<TFilterGridInput> = {
@@ -145,15 +141,15 @@ export const filterGrid = {
             colorOptions.getElement(),
         );
 
-        const previewCanvas = BB.canvas(context.canvas.width, context.canvas.height);
+        const previewCanvas = BB.canvas(layer.canvas.width, layer.canvas.height);
         const previewCtx = BB.ctx(previewCanvas);
         const previewLayerArr = layers.map((item, i) => {
             return {
-                image: i === selectedLayerIndex ? previewCanvas : item.context.canvas,
+                image: i === selectedLayerIndex ? previewCanvas : item.canvas,
                 isVisible: item.isVisible,
                 opacity: item.opacity,
                 mixModeStr: item.mixModeStr,
-                hasClipping: false,
+                hasClipping: item.hasClipping,
             };
         });
 
@@ -161,8 +157,8 @@ export const filterGrid = {
             width: getPreviewWidth(isSmall),
             height: getPreviewHeight(isSmall),
             project: {
-                width: context.canvas.width,
-                height: context.canvas.height,
+                width: layer.canvas.width,
+                height: layer.canvas.height,
                 layers: previewLayerArr,
             },
         });
@@ -176,7 +172,7 @@ export const filterGrid = {
             const ctx = previewCtx;
             ctx.save();
             ctx.clearRect(0, 0, previewCanvas.width, previewCanvas.height);
-            ctx.drawImage(context.canvas, 0, 0);
+            ctx.drawImage(layer.canvas, 0, 0);
             drawGrid(
                 ctx,
                 settingsObj.x,

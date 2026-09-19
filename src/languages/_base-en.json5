@@ -245,6 +245,10 @@ Renaming a key across multiple language files:
   "layers-visibility-toggle": {
     "value": "Layer Visibility"
   },
+  "layers-clipping": {
+    "hint": "tooltip for toggling whether the active layer is clipped to the layer below",
+    "value": "Clipping Mask"
+  },
 
   // Layer blend modes as seen in Photoshop and other image editing software
 
@@ -772,6 +776,8 @@ Renaming a key across multiple language files:
     "hint": "in the process of opening a large file",
     "value": "Opening file..."
   },
+  "import-many-files-warning": "You are about to import {x} files. Importing many files at once can cause instability.",
+  "import-many-files-confirm": "Import {x} files",
   "import-title": "Import Image",
   "import-too-large": "Image too large, will be downscaled.",
   "import-btn-as-layer": {

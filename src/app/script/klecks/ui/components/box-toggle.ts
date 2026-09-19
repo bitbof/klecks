@@ -1,9 +1,11 @@
 import { BB } from '../../../bb/bb';
 import { css } from '../../../bb/base/base';
+import { Destroyer } from '../../../bb/base/base';
 
 export class BoxToggle {
     el: HTMLElement;
     value: boolean;
+    private readonly destroyer = new Destroyer();
 
     update(): void {
         this.el.classList.toggle('kl-box-toggle--active', this.value);
@@ -15,6 +17,7 @@ export class BoxToggle {
         title?: string;
         init?: boolean;
         onChange: (b: boolean) => void;
+        keepOriginalLabel?: boolean;
     }) {
         this.value = !!p.init;
         this.el = BB.el({
@@ -24,6 +27,7 @@ export class BoxToggle {
                 typeof p.label === 'string'
                     ? 'kl-box-toggle'
                     : 'kl-box-toggle kl-box-toggle--custom-el',
+            destroyer: this.destroyer,
             onClick: () => {
                 this.value = !this.value;
                 this.update();
@@ -33,7 +37,7 @@ export class BoxToggle {
                 cursor: 'pointer',
             },
         });
-        if (typeof p.label !== 'string') {
+        if (typeof p.label !== 'string' && !p.keepOriginalLabel) {
             css(p.label, {
                 display: 'block',
                 pointerEvents: 'none',
@@ -56,6 +60,6 @@ export class BoxToggle {
     }
 
     destroy(): void {
-        BB.destroyEl(this.el);
+        this.destroyer.destroy();
     }
 }

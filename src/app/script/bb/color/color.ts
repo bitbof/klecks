@@ -49,7 +49,7 @@ export const ColorConverter = {
 
         result.v = maxVal;
 
-        if (delta == 0) {
+        if (delta === 0) {
             result.h = 0;
             result.s = 0;
         } else {
@@ -58,11 +58,11 @@ export const ColorConverter = {
             const del_G = ((maxVal - g) / 6 + delta / 2) / delta;
             const del_B = ((maxVal - b) / 6 + delta / 2) / delta;
 
-            if (r == maxVal) {
+            if (r === maxVal) {
                 result.h = del_B - del_G;
-            } else if (g == maxVal) {
+            } else if (g === maxVal) {
                 result.h = 1 / 3 + del_R - del_B;
-            } else if (b == maxVal) {
+            } else if (b === maxVal) {
                 result.h = 2 / 3 + del_G - del_R;
             }
 
@@ -90,7 +90,7 @@ export const ColorConverter = {
         const s = HSV.s / 100;
         const v = HSV.v / 100;
 
-        if (s == 0) {
+        if (s === 0) {
             result.r = v * 255;
             result.g = v * 255;
             result.b = v * 255;
@@ -101,23 +101,23 @@ export const ColorConverter = {
             var_2 = v * (1 - s * (var_h - var_i));
             var_3 = v * (1 - s * (1 - (var_h - var_i)));
 
-            if (var_i == 0) {
+            if (var_i === 0) {
                 var_r = v;
                 var_g = var_3;
                 var_b = var_1;
-            } else if (var_i == 1) {
+            } else if (var_i === 1) {
                 var_r = var_2;
                 var_g = v;
                 var_b = var_1;
-            } else if (var_i == 2) {
+            } else if (var_i === 2) {
                 var_r = var_1;
                 var_g = v;
                 var_b = var_3;
-            } else if (var_i == 3) {
+            } else if (var_i === 3) {
                 var_r = var_1;
                 var_g = var_2;
                 var_b = v;
-            } else if (var_i == 4) {
+            } else if (var_i === 4) {
                 var_r = var_3;
                 var_g = var_1;
                 var_b = v;
@@ -221,13 +221,13 @@ export const ColorConverter = {
             let ha = parseInt('' + o.r).toString(16);
             let hb = parseInt('' + o.g).toString(16);
             let hc = parseInt('' + o.b).toString(16);
-            if (ha.length == 1) {
+            if (ha.length === 1) {
                 ha = '0' + ha;
             }
-            if (hb.length == 1) {
+            if (hb.length === 1) {
                 hb = '0' + hb;
             }
-            if (hc.length == 1) {
+            if (hc.length === 1) {
                 hc = '0' + hc;
             }
             return ha + hb + hc;

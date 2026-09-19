@@ -284,7 +284,7 @@ export class Easel<GToolId extends string> {
         const mat = createMatrixFromTransform(transform);
         const canvasPoint = applyToPoint(inverse(mat), viewportPoint);
         const newScale = BB.clamp(
-            transform.scale * Math.pow(1 + 4 / 10, -e.deltaY),
+            transform.scale * (1 + 4 / 10) ** -e.deltaY,
             EASEL_MIN_SCALE,
             EASEL_MAX_SCALE,
         );
@@ -653,7 +653,7 @@ export class Easel<GToolId extends string> {
         this.renderLoop();
     }
 
-    /** update and render */
+    // update and render
     setProject(project: TEaselProject): void {
         this.project = project;
         this.viewport.setProject({
@@ -666,7 +666,7 @@ export class Easel<GToolId extends string> {
         this.requestRender();
     }
 
-    /** update and render */
+    // update and render
     setSize(width: number, height: number): void {
         const m = createMatrixFromTransform(this.viewport.getTransform());
         const canvasCenterPoint = applyToPoint(inverse(m), {

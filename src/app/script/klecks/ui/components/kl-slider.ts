@@ -195,7 +195,7 @@ export class KlSlider {
         if (!p.label) {
             throw new Error('KlSlider missing params');
         }
-        if (p.min != 0 && p.max != 0 && p.value != 0) {
+        if (p.min !== 0 && p.max !== 0 && p.value !== 0) {
             if (!p.min || !p.max || !p.value) {
                 throw new Error('KlSlider broken params');
             }

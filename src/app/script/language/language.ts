@@ -6,6 +6,7 @@ import {
     TTranslationCode,
 } from '../../languages/languages';
 import { LocalStorage } from '../bb/base/local-storage';
+import { asyncThrow } from '../bb/base/base';
 
 export const LS_LANGUAGE_KEY = 'klecks-language';
 
@@ -29,12 +30,8 @@ class LanguageStrings {
                     (item, index) => item ?? this.data[index],
                 );
             } catch (e) {
-                setTimeout(() => {
-                    throw new Error('failed to load language: ' + langCode);
-                });
-                setTimeout(() => {
-                    throw e;
-                });
+                asyncThrow(new Error('failed to load language: ' + langCode));
+                asyncThrow(e);
             }
         }
         this.code = langCode;

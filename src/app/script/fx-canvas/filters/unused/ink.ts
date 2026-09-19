@@ -52,7 +52,7 @@ export function ink(strength) {
 
     simpleShader.call(this, gl.ink, {
         strength: strength * strength * strength * strength * strength,
-        texSize: [this.width, this.height],
+        texSize: [this.canvas.width, this.canvas.height],
     });
 
     return this;

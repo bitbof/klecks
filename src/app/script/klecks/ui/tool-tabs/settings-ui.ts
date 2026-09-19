@@ -1,7 +1,7 @@
+import { SelectCustom } from '../components/select-custom';
 import { getIconUrl } from '../../../icon/icon';
 import { BB } from '../../../bb/bb';
 import { LANG, LANGUAGE_STRINGS, LS_LANGUAGE_KEY } from '../../../language/language';
-import { KL } from '../../kl';
 import { languages } from '../../../../languages/languages';
 import klecksLogoImg from 'url:/src/app/img/klecks-logo.png';
 import { LocalStorage } from '../../../bb/base/local-storage';
@@ -61,7 +61,7 @@ export class SettingsUi {
                 return [item.code, item.name + ` (${item.code})`] as [string, string];
             }),
         ];
-        const languageSelect = new KL.Select({
+        const languageSelect = new SelectCustom({
             initValue: nullToUndefined(
                 LocalStorage.getItem(LS_LANGUAGE_KEY)
                     ? LocalStorage.getItem(LS_LANGUAGE_KEY)
@@ -97,7 +97,7 @@ export class SettingsUi {
         function themeToLabel(theme: TTheme): string {
             return theme === 'dark' ? '⬛ ' + LANG('theme-dark') : '⬜ ' + LANG('theme-light');
         }
-        const themeSelect = new KL.Select({
+        const themeSelect = new SelectCustom({
             optionArr: [
                 ['auto', LANG('auto') + ' → ' + themeToLabel(THEME.getMediaQueryTheme())],
                 ['light', themeToLabel('light')],
@@ -147,7 +147,7 @@ export class SettingsUi {
 
         // ---- save reminder ----
         if (saveReminder) {
-            const reminderSelect = new KL.Select({
+            const reminderSelect = new SelectCustom({
                 optionArr: [
                     ['20min', LANG('x-minutes', { x: '20' })],
                     ['40min', LANG('x-minutes', { x: '40' })],
@@ -214,8 +214,8 @@ export class SettingsUi {
             css: {
                 marginTop: 15,
             },
-            custom: {
-                tabIndex: '-1',
+            props: {
+                tabIndex: -1,
             },
         });
 
@@ -254,10 +254,10 @@ export class SettingsUi {
                             BB.el({
                                 tagName: 'a',
                                 content: 'bitbof',
-                                custom: {
+                                props: {
                                     href: 'https://bitbof.com',
                                     target: '_blank',
-                                    tabIndex: '-1',
+                                    tabIndex: -1,
                                 },
                             }),
                             ' © 2026',
@@ -293,10 +293,10 @@ export class SettingsUi {
                     BB.el({
                         tagName: 'a',
                         content: 'bitbof',
-                        custom: {
+                        props: {
                             href: 'https://bitbof.com',
                             target: '_blank',
-                            tabIndex: '-1',
+                            tabIndex: -1,
                         },
                     }),
                     ' © 2025',
@@ -310,7 +310,7 @@ export class SettingsUi {
                 BB.el({
                     tagName: 'a',
                     content: LANG('donate'),
-                    custom: {
+                    props: {
                         href: 'https://kleki.com/donate/',
                         target: '_blank',
                     },
@@ -319,7 +319,7 @@ export class SettingsUi {
                 BB.el({
                     tagName: 'a',
                     content: LANG('source-code'),
-                    custom: {
+                    props: {
                         href: 'https://klecks.org',
                         target: '_blank',
                     },

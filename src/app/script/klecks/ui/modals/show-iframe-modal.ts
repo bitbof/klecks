@@ -1,4 +1,5 @@
 import { BB } from '../../../bb/bb';
+import { Destroyer } from '../../../bb/base/base';
 import { DynamicModal } from './base/dynamic-modal';
 import { LANG } from '../../../language/language';
 
@@ -27,9 +28,10 @@ export function showIframeModal(url: string, isEmbed: boolean, options?: TIframe
         return;
     }
 
+    const destroyer = new Destroyer();
     const iframe = BB.el({
         tagName: 'iframe',
-        custom: {
+        props: {
             src: url,
             title: options?.iframeTitle || 'Iframe Content',
         },
@@ -53,8 +55,9 @@ export function showIframeModal(url: string, isEmbed: boolean, options?: TIframe
         linkEl = BB.el({
             tagName: 'a',
             parent: titleEl,
+            destroyer,
             content: LANG('modal-new-tab'),
-            custom: {
+            props: {
                 href: url,
                 target: '_blank',
             },
@@ -109,7 +112,7 @@ export function showIframeModal(url: string, isEmbed: boolean, options?: TIframe
             }
             iframe.src = 'about:blank';
             if (linkEl) {
-                BB.destroyEl(linkEl);
+                destroyer.destroy();
                 linkEl = undefined;
             }
         },

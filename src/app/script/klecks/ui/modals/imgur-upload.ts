@@ -4,9 +4,10 @@ import { KlCanvas } from '../../canvas/kl-canvas';
 import { LANG } from '../../../language/language';
 import loadingImg from 'url:/src/app/img/ui/loading.gif';
 import { canvasToBlob } from '../../../bb/base/canvas';
-import { css } from '../../../bb/base/base';
+import { asyncThrow, css } from '../../../bb/base/base';
+import { c } from '../../../bb/base/c';
 import { Input } from '../components/input';
-import { showModal } from './base/show-modal';
+import { showError, showModal } from './base/show-modal';
 
 type TImgurUploadResponse = {
     // just a subset
@@ -20,22 +21,23 @@ type TImgurUploadResponse = {
     link: string;
 };
 
-/**
- * uploads canvas, opens new tab with the upload progress & then opens the image page.
- */
+// uploads canvas, opens new tab with the upload progress & then opens the image page.
+// returns undefined if upload fails
 async function upload(
     canvas: HTMLCanvasElement,
     title: string,
     description: string,
     type: 'png' | 'jpeg',
     imgurKey: string,
-): Promise<TImgurUploadResponse> {
+): Promise<TImgurUploadResponse | undefined> {
     const imageBlob = await canvasToBlob(canvas, 'image/' + type);
 
-    const newTab = window.open();
+    // Keep the redirected Imgur tab from accessing the app through window.opener.
+    const newTab = window.open('', '_blank', 'noopener');
 
     if (!newTab) {
-        throw new Error('could not create new tab');
+        asyncThrow(new Error('could not create new tab'));
+        return undefined;
     }
 
     const label = newTab.document.createElement('div');
@@ -87,14 +89,27 @@ async function upload(
         });
     } catch (e) {
         newTab.close();
-        throw e;
+        asyncThrow(e);
+        return undefined;
     }
     if (!response.ok) {
         newTab.close();
-        throw new Error();
+        asyncThrow('imgur upload failed');
+        return undefined;
     }
-    const data: TImgurUploadResponse = (await response.json()).data;
-
+    let data: TImgurUploadResponse | undefined;
+    try {
+        data = (await response.json()).data;
+    } catch (e) {
+        newTab.close();
+        asyncThrow('failed to parse imgur response');
+        return undefined;
+    }
+    if (!data) {
+        newTab.close();
+        asyncThrow('imgur response is missing data');
+        return undefined;
+    }
     newTab.location.href = data.link.replace(/\.(jpg|png)/, '');
 
     return data;
@@ -115,8 +130,8 @@ export function imgurUpload(
     });
     const descriptionInput = BB.el({
         tagName: 'textarea',
-        custom: {
-            rows: '2',
+        props: {
+            rows: 2,
             name: 'image-description',
         },
         css: {
@@ -178,28 +193,41 @@ export function imgurUpload(
             const title = tileInput.getValue();
             tileInput.destroy();
             if (val === 'submit') {
-                try {
-                    const result = await upload(
-                        klCanvas.getCompleteCanvas(1),
-                        title,
-                        descriptionInput.value,
-                        typeRadio.getValue() as 'png' | 'jpeg',
-                        imgurKey,
-                    );
-
-                    showModal({
-                        type: 'ok',
-                        message: `<h3>${LANG('upload-success')}</h3><br>${LANG('upload-delete')}<br><a target='_blank' rel="noopener noreferrer" href='https://imgur.com/delete/${result.deletehash}'>imgur.com/delete/${result.deletehash}</a><br><br>`,
-                        buttons: ['Ok'],
-                    });
-                    onUploaded();
-                } catch (e) {
-                    showModal({
-                        type: 'error',
-                        message: LANG('upload-failed'),
-                        buttons: ['Ok'],
-                    });
+                const result = await upload(
+                    klCanvas.getCanvas(),
+                    title,
+                    descriptionInput.value,
+                    typeRadio.getValue() as 'png' | 'jpeg',
+                    imgurKey,
+                );
+                if (result === undefined) {
+                    showError(LANG('upload-failed'));
+                    return;
                 }
+                const deletePath = 'imgur.com/delete/' + result.deletehash;
+                const deleteUrl = 'https://' + deletePath;
+                showModal({
+                    type: 'ok',
+                    message: c('', [
+                        c('strong', [LANG('upload-success')]),
+                        c('br'),
+                        LANG('upload-delete'),
+                        c('br'),
+                        c(
+                            {
+                                tagName: 'a',
+                                props: {
+                                    target: '_blank',
+                                    rel: 'noopener noreferrer',
+                                    href: deleteUrl,
+                                },
+                            },
+                            [deletePath],
+                        ),
+                    ]),
+                    buttons: ['Ok'],
+                });
+                onUploaded();
             }
         },
     });

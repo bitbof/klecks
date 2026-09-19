@@ -35,7 +35,6 @@ export class MobileColorUi {
                 alignSelf: 'center',
                 cursor: 'pointer',
             },
-            noRef: true,
             onClick: () => {
                 if (this.colorPickerWindow) {
                     this.closeColorPicker();

@@ -300,16 +300,19 @@ export class Cropper {
                 userSelect: 'none',
             },
         });
+        this.rootEl.oncontextmenu = () => false;
 
-        this.maskElArr = Array.from({ length: 4 }, () => {
-            return BB.el({
-                parent: this.rootEl,
-                css: {
-                    position: 'absolute',
-                    background: 'rgba(0, 0, 0, 0.5)',
-                },
+        this.maskElArr = Array(4)
+            .fill(0)
+            .map(() => {
+                return BB.el({
+                    parent: this.rootEl,
+                    css: {
+                        position: 'absolute',
+                        background: 'rgba(0, 0, 0, 0.5)',
+                    },
+                });
             });
-        });
 
         this.moveEl = BB.el({
             parent: this.rootEl,
@@ -345,17 +348,19 @@ export class Cropper {
             });
         });
 
-        this.thirdsElArr = Array.from({ length: 4 }, () => {
-            return BB.el({
-                parent: this.rootEl,
-                css: {
-                    position: 'absolute',
-                    background: '#0ff',
-                    pointerEvents: 'none',
-                    zIndex: '1',
-                },
+        this.thirdsElArr = Array(4)
+            .fill(0)
+            .map(() => {
+                return BB.el({
+                    parent: this.rootEl,
+                    css: {
+                        position: 'absolute',
+                        background: '#0ff',
+                        pointerEvents: 'none',
+                        zIndex: '1',
+                    },
+                });
             });
-        });
 
         this.handleElMap = {} as Record<TResizeDirection, HTMLDivElement>;
         resizeDirectionArr.forEach((direction) => {

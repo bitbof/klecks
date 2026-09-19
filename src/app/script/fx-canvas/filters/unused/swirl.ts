@@ -43,7 +43,7 @@ export function swirl(centerX, centerY, radius, angle) {
         radius: radius,
         center: [centerX, centerY],
         angle: angle,
-        texSize: [this.width, this.height],
+        texSize: [this.canvas.width, this.canvas.height],
     });
 
     return this;

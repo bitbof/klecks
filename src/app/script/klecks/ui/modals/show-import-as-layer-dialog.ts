@@ -8,6 +8,7 @@ import { testIsSmall } from '../utils/test-is-small';
 import { getPreviewHeight, getPreviewWidth } from '../utils/preview-size';
 import { css } from '../../../bb/base/base';
 import { InterpolationAlgorithmToggle } from '../components/interpolation-algorithm-toggle';
+import { Destroyer } from '../../../bb/base/base';
 
 export function showImportAsLayerDialog(params: {
     target: HTMLElement;
@@ -34,6 +35,7 @@ export function showImportAsLayerDialog(params: {
         div.append(noteEl);
     }
     const isSmall = testIsSmall();
+    const destroyer = new Destroyer();
 
     const buttonRowEl = BB.el({
         css: {
@@ -44,6 +46,7 @@ export function showImportAsLayerDialog(params: {
         tagName: 'button',
         className: 'kl-button',
         content: '1:1',
+        destroyer,
         css: {
             marginRight: 10,
         },
@@ -55,6 +58,7 @@ export function showImportAsLayerDialog(params: {
         tagName: 'button',
         className: 'kl-button',
         content: LANG('import-as-layer-fit'),
+        destroyer,
         css: {
             marginRight: 10,
         },
@@ -66,6 +70,7 @@ export function showImportAsLayerDialog(params: {
         tagName: 'button',
         className: 'kl-button',
         content: LANG('center'),
+        destroyer,
         css: {
             marginRight: 10,
         },
@@ -98,6 +103,7 @@ export function showImportAsLayerDialog(params: {
                 isVisible: klCanvasLayerArr[i].isVisible,
                 opacity: klCanvasLayerArr[i].opacity,
                 mixModeStr: klCanvasLayerArr[i].mixModeStr,
+                hasClipping: klCanvasLayerArr[i].hasClipping,
             });
         }
     }
@@ -106,6 +112,7 @@ export function showImportAsLayerDialog(params: {
         isVisible: true,
         opacity: 1,
         mixModeStr: 'source-over',
+        hasClipping: false,
     });
 
     const freeTransformCanvas = new FreeTransformCanvas({
@@ -157,9 +164,7 @@ export function showImportAsLayerDialog(params: {
             keyListener.destroy();
             freeTransformCanvas.destroy();
             algorithmToggle.destroy();
-            BB.destroyEl(originalSizeBtn);
-            BB.destroyEl(fitSizeBtn);
-            BB.destroyEl(centerBtn);
+            destroyer.destroy();
             if (buttonStr === 'Ok') {
                 params.callback(
                     freeTransformCanvas.getTransformation(),

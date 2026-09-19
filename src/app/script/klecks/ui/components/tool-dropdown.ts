@@ -322,8 +322,10 @@ export class ToolDropdown {
                 this.dropdownBtnArr[i].show(this.currentActiveIndex !== i);
             }
 
-            this.arrowButton.style.setProperty('opacity', '0');
-            this.arrowButton.style.setProperty('pointer-events', 'none');
+            css(this.arrowButton, {
+                opacity: 0,
+                pointerEvents: 'none',
+            });
             this.rootEl.style.zIndex = '1';
             document.body.append(overlay);
             this.rootEl.append(dropdownWrapper);
@@ -332,8 +334,10 @@ export class ToolDropdown {
         const closeDropdown = () => {
             DIALOG_COUNTER.decrease(0.5);
             isOpen = false;
-            this.arrowButton.style.removeProperty('opacity');
-            this.arrowButton.style.removeProperty('pointer-events');
+            css(this.arrowButton, {
+                opacity: undefined,
+                pointerEvents: undefined,
+            });
             this.rootEl.style.removeProperty('z-index');
             overlay.remove();
             dropdownWrapper.remove();

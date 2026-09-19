@@ -1,5 +1,5 @@
 import { splineInterpolate } from '../math/spline-interpolate';
-import { gl } from '../core/gl';
+import { fxGl } from '../core/gl';
 import { FxShader } from '../core/fx-shader';
 import { simpleShader } from '../core/simple-shader';
 import { TFxCanvas } from '../fx-canvas-types';
@@ -37,11 +37,12 @@ export const curves: TFilterCurves = function (red, green, blue) {
     for (let i = 0; i < 256; i++) {
         array.splice(array.length, 0, redRamp[i], greenRamp[i], blueRamp[i], 255);
     }
-    this._.extraTexture.initFromBytes(256, 1, array);
-    this._.extraTexture.use(1);
+    const extraTexture = this._.extraTexture!;
+    extraTexture.initFromBytes(256, 1, array);
+    extraTexture.use(1);
 
-    gl.curves =
-        gl.curves ||
+    fxGl.curves =
+        fxGl.curves ||
         new FxShader(
             null,
             '\
@@ -59,10 +60,10 @@ export const curves: TFilterCurves = function (red, green, blue) {
             'curves',
         );
 
-    gl.curves.textures({
+    fxGl.curves.textures({
         map: 1,
     });
-    simpleShader.call(this, gl.curves, {});
+    simpleShader.call(this, fxGl.curves, {});
 
     return this;
 };

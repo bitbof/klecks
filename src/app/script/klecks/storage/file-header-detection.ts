@@ -14,7 +14,7 @@ function isBufferMatch(buffer: Uint8Array, bytes: (number | undefined)[]) {
 export async function detectFiletype(file: File): Promise<TSupportedFileType | undefined> {
     // photoshop is sub type of image.* - so check first
     const nameSplit = file.name.split('.');
-    const extension = nameSplit[nameSplit.length - 1].toLowerCase();
+    const extension = nameSplit.at(-1)!.toLowerCase();
     const mimeType = file.type.toLowerCase();
     if (mimeType.match('image/vnd.adobe.photoshop') || extension === 'psd') {
         return 'psd';

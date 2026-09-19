@@ -2,15 +2,16 @@
  * by bitbof (bitbof.com)
  */
 
-import './polyfills/polyfills';
+import './bb/base/polyfills';
 import { KlApp } from './app/kl-app';
 import { TKlProject } from './klecks/kl-types';
 import { initLANG, LANG } from './language/language';
-import '../script/theme/theme';
+import './theme/theme';
 import { getKlIndexedDbName, KL_INDEXED_DB } from './klecks/storage/kl-indexed-db';
 import { KlRecoveryManager } from './klecks/storage/kl-recovery-manager';
 import { loadRecovery } from './app/recovery-loader';
 import { initIconCss } from './icon/icon';
+import { asyncThrow } from './bb/base/base';
 
 function showInitError(e: Error): void {
     const el = document.createElement('div');
@@ -48,9 +49,7 @@ function showInitError(e: Error): void {
                 outQueue.push(LANG('tab-recovery-recovered'));
             }
         } catch (e) {
-            setTimeout(() => {
-                throw e;
-            });
+            asyncThrow(e);
             outQueue.push(LANG('tab-recovery-failed-to-recover'));
         }
 

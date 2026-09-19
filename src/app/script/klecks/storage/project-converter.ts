@@ -1,13 +1,14 @@
-import { TKlProject, TKlProjectMeta, TMixMode, TRawMeta } from '../kl-types';
+import {
+    TDeserializedKlStorageProject,
+    TKlProject,
+    TKlProjectMeta,
+    TMixMode,
+    TRawMeta,
+} from '../kl-types';
 import { BB } from '../../bb/bb';
 import { drawProject } from '../canvas/draw-project';
 import { canvasToBlob } from '../../bb/base/canvas';
-
-export type TReadStorageProjectResult = {
-    project: TKlProject;
-    timestamp: number;
-    thumbnail: HTMLImageElement | HTMLCanvasElement;
-};
+import { loadImageFromBlob } from '../../bb/base/load-image';
 
 /**
  * project after being read from "browser storage" via "low level" methods
@@ -24,6 +25,7 @@ export type TKlStorageProjectRead = {
         isVisible: boolean;
         opacity: number; // 0 - 1
         mixModeStr: TMixMode;
+        hasClipping?: boolean;
         blob?: Blob; // png
     }[];
 };
@@ -42,36 +44,12 @@ export type TKlStorageProjectWrite = {
         isVisible: boolean;
         opacity: number; // 0 - 1
         mixModeStr: TMixMode;
+        hasClipping: boolean;
         blob: Blob; // png
     }[];
 };
 
 export const PROJECT_STORE_THUMBNAIL_SIZE_PX = 240;
-
-export function loadImage(blob: Blob): Promise<HTMLImageElement> {
-    return new Promise<HTMLImageElement>((resolve, reject) => {
-        const im = new Image();
-        try {
-            im.src = BB.imageBlobToUrl(blob);
-        } catch (e) {
-            reject('imageBlobToUrl, ' + (e instanceof Error ? e.message : ''));
-            return;
-        }
-        im.onload = (): void => {
-            URL.revokeObjectURL(im.src);
-            resolve(im);
-        };
-        im.onabort = (): void => {
-            URL.revokeObjectURL(im.src);
-            reject('layer image failed loading (abort)');
-        };
-        // This does occur. Maybe decoder runs of memory or storage corruption.
-        im.onerror = (): void => {
-            URL.revokeObjectURL(im.src);
-            reject('layer image failed loading (error)');
-        };
-    });
-}
 
 /**
  * for:
@@ -104,7 +82,8 @@ export class ProjectConverter {
                 name: item.name,
                 isVisible: item.isVisible,
                 opacity: item.opacity,
-                mixModeStr: item.mixModeStr ?? 'source-over',
+                mixModeStr: item.mixModeStr,
+                hasClipping: item.hasClipping,
                 blob,
             });
         }
@@ -122,7 +101,7 @@ export class ProjectConverter {
 
     static async readStorageProject(
         storageProject: TKlStorageProjectRead,
-    ): Promise<TReadStorageProjectResult> {
+    ): Promise<TDeserializedKlStorageProject> {
         if (
             !storageProject.width ||
             !storageProject.height ||
@@ -146,7 +125,7 @@ export class ProjectConverter {
                 await Promise.all(
                     storageProject.layers.map((layer) => {
                         if (layer.blob) {
-                            return loadImage(layer.blob).catch(
+                            return loadImageFromBlob(layer.blob).catch(
                                 () => new Image(storageProject.width, storageProject.height),
                             );
                         }
@@ -160,6 +139,7 @@ export class ProjectConverter {
                     isVisible: storageLayer.isVisible,
                     opacity: storageLayer.opacity,
                     mixModeStr: storageLayer.mixModeStr,
+                    hasClipping: storageLayer.hasClipping ?? false,
                     image,
                 };
             }),
@@ -168,7 +148,7 @@ export class ProjectConverter {
         return {
             project: project,
             timestamp: storageProject.timestamp,
-            thumbnail: await loadImage(storageProject.thumbnail).catch(
+            thumbnail: await loadImageFromBlob(storageProject.thumbnail).catch(
                 () => new Image(PROJECT_STORE_THUMBNAIL_SIZE_PX, PROJECT_STORE_THUMBNAIL_SIZE_PX),
             ),
         };
@@ -179,7 +159,7 @@ export class ProjectConverter {
             projectId: rawMeta.projectId,
             timestamp: rawMeta.timestamp,
             thumbnail: rawMeta.thumbnail
-                ? await loadImage(rawMeta.thumbnail).catch(
+                ? await loadImageFromBlob(rawMeta.thumbnail).catch(
                       () =>
                           new Image(
                               PROJECT_STORE_THUMBNAIL_SIZE_PX,

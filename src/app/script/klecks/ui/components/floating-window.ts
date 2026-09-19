@@ -4,7 +4,7 @@ import { TVector2D } from '../../../bb/bb-types';
 import { clamp } from '../../../bb/math/math';
 import { LANG } from '../../../language/language';
 import { PointerListener } from '../../../bb/input/pointer-listener';
-import { css } from '../../../bb/base/base';
+import { css, Destroyer } from '../../../bb/base/base';
 
 export type TFloatingWindowParams = {
     content: HTMLElement;
@@ -28,6 +28,7 @@ export class FloatingWindow {
     private readonly fractionalPosition: TVector2D = { x: 0.5, y: 0.5 };
     private doCenterInitially: boolean;
     private isDestroyed = false;
+    private readonly destroyer = new Destroyer();
 
     private applyPosition(): void {
         const rect = this.rootEl.getBoundingClientRect();
@@ -77,7 +78,7 @@ export class FloatingWindow {
             className: 'popup-x',
             content: `<img alt="${LANG('modal-close')}" height="20" src="${getIconUrl('cancel')}">`,
             title: LANG('modal-close'),
-            noRef: true,
+            destroyer: this.destroyer,
             onClick: () => {
                 this.destroy();
                 p.onClose?.();
@@ -89,8 +90,8 @@ export class FloatingWindow {
                 background: 'none',
                 boxShadow: 'none',
             },
-            custom: {
-                tabindex: '0',
+            props: {
+                tabIndex: 0,
             },
         });
 
@@ -177,5 +178,6 @@ export class FloatingWindow {
         document.removeEventListener('pointerdown', this.onDocumentPointerDown);
         window.removeEventListener('resize', this.onResize);
         this.pointerListener.destroy();
+        this.destroyer.destroy();
     }
 }

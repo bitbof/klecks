@@ -1,5 +1,5 @@
 import { BB } from '../../../bb/bb';
-import { Select } from './select';
+import { SelectCustom } from './select-custom';
 import { LANG } from '../../../language/language';
 import { PointerListener } from '../../../bb/input/pointer-listener';
 
@@ -22,7 +22,7 @@ export class ToolspaceStabilizerRow {
             title: LANG('stabilizer-title'),
         });
 
-        const strengthSelect = new Select({
+        const strengthSelect = new SelectCustom({
             optionArr: [
                 ['0', '0'],
                 ['1', '1'],

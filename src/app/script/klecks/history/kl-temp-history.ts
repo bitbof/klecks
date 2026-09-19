@@ -48,7 +48,7 @@ export class KlTempHistory {
         return this.currentIndex < this.entries.length - 1;
     }
 
-    /** aka undo */
+    // aka undo
     decreaseIndex(): void {
         if (!this.canDecreaseIndex()) {
             return;
@@ -57,7 +57,7 @@ export class KlTempHistory {
         setTimeout(() => this.emit('decrease'));
     }
 
-    /** aka redo */
+    // aka redo
     increaseIndex(): void {
         if (!this.canIncreaseIndex()) {
             return;
@@ -66,9 +66,7 @@ export class KlTempHistory {
         setTimeout(() => this.emit('increase'));
     }
 
-    /**
-     * all entries up to currentIndex
-     */
+    // all entries up to currentIndex
     getEntries(): TTempHistoryEntry[] {
         return this.entries.slice(0, this.currentIndex + 1);
     }
@@ -79,9 +77,7 @@ export class KlTempHistory {
         setTimeout(() => this.emit('clear'));
     }
 
-    /**
-     * emits on push, decrease, increase, clear, or toggle active
-     */
+    // emits on push, decrease, increase, clear, or toggle active
     addListener(listener: TTempHistoryListener): void {
         if (this.listeners.includes(listener)) {
             return;

@@ -5,11 +5,12 @@ import { Input } from '../../components/input';
 import { LANG } from '../../../../language/language';
 import { ImageRadioList } from '../../components/image-radio-list';
 import { ImageToggle } from '../../components/image-toggle';
-import { Select } from '../../components/select';
+import { SelectCustom } from '../../components/select-custom';
 import { c } from '../../../../bb/base/c';
 import { PointerListener } from '../../../../bb/input/pointer-listener';
+import { Destroyer } from '../../../../bb/base/base';
 import { FONTS } from '../../../../../fonts/fonts';
-import { showModal } from '../base/show-modal';
+import { showError } from '../base/show-modal';
 
 const alignLeftImg = getIconUrl('align-left');
 const alignCenterImg = getIconUrl('align-center');
@@ -62,10 +63,11 @@ async function loadBundledFonts(): Promise<void> {
 export class TextToolFontUI {
     private readonly rootEl: HTMLElement;
 
-    private readonly fontSelect: Select<string>;
+    private readonly fontSelect: SelectCustom<string>;
     private readonly fontPointerListener: PointerListener;
 
     private readonly importButton: HTMLButtonElement;
+    private readonly destroyer = new Destroyer();
 
     private readonly sizeInput: Input<number>;
     private readonly lineHeightInput: Input<number>;
@@ -136,8 +138,8 @@ export class TextToolFontUI {
             }
 
             if (failedToLoadFilenames.length > 0) {
-                showModal({
-                    message: BB.el({
+                showError(
+                    BB.el({
                         content: [
                             LANG('text-failed-import'),
                             c('br'),
@@ -149,8 +151,7 @@ export class TextToolFontUI {
                             acceptedExtensions.join(', '),
                         ],
                     }),
-                    type: 'error',
-                });
+                );
             }
 
             if (!acceptedAtLeastOne) {
@@ -189,7 +190,7 @@ export class TextToolFontUI {
     constructor(p: TFontUIParams) {
         this.onUpdate = p.onUpdate;
 
-        this.fontSelect = new Select<string>({
+        this.fontSelect = new SelectCustom<string>({
             initValue: p.font,
             optionArr: importedFonts.map((i) => {
                 return [
@@ -226,6 +227,7 @@ export class TextToolFontUI {
             tagName: 'button',
             className: 'kl-button',
             content: LANG('file-import'),
+            destroyer: this.destroyer,
             onClick: () => {
                 this.importFont();
             },
@@ -387,7 +389,7 @@ export class TextToolFontUI {
         this.fontPointerListener.destroy();
         this.fontSelect.getElement().removeEventListener('focus', this.onFocus);
         this.fontSelect.destroy();
-        BB.destroyEl(this.importButton);
+        this.destroyer.destroy();
         this.sizeInput.destroy();
         this.lineHeightInput.destroy();
         this.letterSpacingInput.destroy();

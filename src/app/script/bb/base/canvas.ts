@@ -1,17 +1,20 @@
 import { TIndexBounds, TKeyString, TRect } from '../bb-types';
 import { createCanvas } from './create-canvas';
-import { asyncLoadImage, base64ToBlob, copyObj } from './base';
+import { attempt, AttemptError, base64ToBlob } from './base';
+import { loadImage } from './load-image';
 import { MultiPolygon } from 'polygon-clipping';
 import { getSelectionPath2d } from '../multi-polygon/get-selection-path-2d';
 import { boundsToRect } from '../math/math';
+import { changeCanvasDimensions } from './change-canvas-dimensions';
+import { BB } from '../bb';
 
-export function copyCanvas(canvas: HTMLCanvasElement | HTMLImageElement): HTMLCanvasElement {
-    const resultCanvas = createCanvas(canvas.width, canvas.height);
+export function copyToCanvas(image: HTMLCanvasElement | HTMLImageElement): HTMLCanvasElement {
+    const resultCanvas = createCanvas(image.width, image.height);
     const ctx = resultCanvas.getContext('2d');
     if (!ctx) {
         throw new Error('2d context not supported or canvas already initialized');
     }
-    ctx.drawImage(canvas, 0, 0);
+    ctx.drawImage(image, 0, 0);
     return resultCanvas;
 }
 
@@ -27,7 +30,7 @@ export function ctx(
 }
 
 export async function loadToCanvas(path: string): Promise<HTMLCanvasElement> {
-    const im = await asyncLoadImage(path);
+    const im = await loadImage(path);
     const canvas = createCanvas(im.width, im.height);
     const ctx = canvas.getContext('2d')!;
     ctx.drawImage(im, 0, 0);
@@ -89,14 +92,12 @@ export function drawTransformedImageWithBounds(
     bounds?: { x: number; y: number; width: number; height: number },
     pixelated?: boolean,
 ): void {
-    if (!bounds) {
-        bounds = {
-            x: 0,
-            y: 0,
-            width: transformImage.width,
-            height: transformImage.height,
-        };
-    }
+    bounds ??= {
+        x: 0,
+        y: 0,
+        width: transformImage.width,
+        height: transformImage.height,
+    };
 
     destCtx.save();
     if (pixelated) {
@@ -124,92 +125,13 @@ export function drawTransformedImageWithBounds(
     destCtx.restore();
 }
 
-/**
- * all transformations are optional
- * center is the point around which will be scaled and rotated
- *
- * @param baseCanvas canvas - the canvas that will be drawn on
- * @param transformImage image|canvas - image that will be drawn on canvas
- * @param transformObj {center: {x, y}, scale: {x, y}, translate: {x, y}, angleDegree}
- */
-export function drawTransformedImageOnCanvas(
-    baseCanvas: HTMLCanvasElement,
-    transformImage: HTMLImageElement | HTMLCanvasElement,
-    transformObj: {
-        center: { x: number; y: number };
-        scale: { x: number; y: number };
-        translate: { x: number; y: number };
-        angleDegree: number;
-    },
-): void {
-    transformObj = copyObj(transformObj);
-    if (!transformObj.center) {
-        transformObj.center = {
-            x: transformImage.width / 2,
-            y: transformImage.height / 2,
-        };
-    }
-    if (!transformObj.scale) {
-        transformObj.scale = {
-            x: 1,
-            y: 1,
-        };
-    }
-    if (!transformObj.angleDegree) {
-        transformObj.angleDegree = 0;
-    }
-    if (!transformObj.translate) {
-        transformObj.translate = {
-            x: 0,
-            y: 0,
-        };
-    }
-
-    const ctx = baseCanvas.getContext('2d');
-    if (!ctx) {
-        throw new Error('2d context not supported or canvas already initialized');
-    }
-    ctx.save();
-    if (
-        Math.abs(transformObj.scale.x - 1) > 0.000001 ||
-        Math.abs(transformObj.scale.y - 1) > 0.000001 ||
-        Math.abs(transformObj.angleDegree % 90) > 0.000001
-    ) {
-        ctx.imageSmoothingEnabled = true;
-        ctx.imageSmoothingQuality = 'high';
-    } else {
-        ctx.imageSmoothingEnabled = false;
-    }
-
-    ctx.translate(transformObj.translate.x, transformObj.translate.y);
-    ctx.translate(transformObj.center.x, transformObj.center.y);
-    ctx.rotate((transformObj.angleDegree / 180) * Math.PI);
-    ctx.scale(transformObj.scale.x, transformObj.scale.y);
-    ctx.translate(-transformObj.center.x, -transformObj.center.y);
-    ctx.drawImage(transformImage, 0, 0, transformImage.width, transformImage.height);
-
-    ctx.restore();
-}
-
 export const createCheckerCanvas = function (size: number, isDark?: boolean): HTMLCanvasElement {
-    const canvas = createCanvas();
-    let ctx;
+    const canvas = size < 1 ? createCanvas(1, 1) : createCanvas(size * 2, size * 2);
+    const ctx = BB.ctx(canvas);
     if (size < 1) {
-        canvas.width = 1;
-        canvas.height = 1;
-        ctx = canvas.getContext('2d');
-        if (!ctx) {
-            throw new Error('2d context not supported or canvas already initialized');
-        }
         ctx.fillStyle = 'rgb(128, 128, 128)';
         ctx.fillRect(0, 0, 1, 1);
     } else {
-        canvas.width = size * 2;
-        canvas.height = size * 2;
-        ctx = canvas.getContext('2d');
-        if (!ctx) {
-            throw new Error('2d context not supported or canvas already initialized');
-        }
         ctx.fillStyle = isDark ? 'rgb(90, 90, 90)' : 'rgb(255, 255, 255)';
         ctx.fillRect(0, 0, size * 2, size * 2);
         ctx.fillStyle = isDark ? 'rgb(63, 63, 63)' : 'rgb(200, 200, 200)';
@@ -293,8 +215,11 @@ export function resizeCanvas(
         const base2 = getBase2Obj(canvas.width, canvas.height, w, h);
 
         //initially scale to a base of 2. unless new size is too close to old. e.g. sizing from 900 to 600
-        tmp2.width = base2.oldWidthEx > base2.newWidthEx ? Math.pow(2, base2.oldWidthEx) : w;
-        tmp2.height = base2.oldHeightEx > base2.newHeightEx ? Math.pow(2, base2.oldHeightEx) : h;
+        changeCanvasDimensions(
+            tmp2,
+            base2.oldWidthEx > base2.newWidthEx ? 2 ** base2.oldWidthEx : w,
+            base2.oldHeightEx > base2.newHeightEx ? 2 ** base2.oldHeightEx : h,
+        );
         tmp1.getContext('2d')!.save();
         tmp2.getContext('2d')!.save();
 
@@ -325,8 +250,7 @@ export function resizeCanvas(
             const newHeight = eh > base2.newHeightEx ? currentHeight / 2 : currentHeight;
 
             //buffer also needs to be properly sized, unfortunately
-            buffer1.width = newWidth;
-            buffer1.height = newHeight;
+            changeCanvasDimensions(buffer1, newWidth, newHeight, { ensureCleared: true });
 
             bufferCtx.drawImage(
                 buffer2,
@@ -349,8 +273,7 @@ export function resizeCanvas(
         }
 
         //when no longer can be halved, bring to target size
-        canvas.width = w;
-        canvas.height = h;
+        changeCanvasDimensions(canvas, w, h, { ensureCleared: true });
         const canvasCtx = canvas.getContext('2d')!;
         canvasCtx.save();
         canvasCtx.imageSmoothingEnabled = true;
@@ -361,8 +284,7 @@ export function resizeCanvas(
         tmp2.getContext('2d')!.restore();
     } else if (w >= canvas.width && h >= canvas.height) {
         tmp1 = !tmp1 ? createCanvas() : tmp1;
-        tmp1.width = w;
-        tmp1.height = h;
+        changeCanvasDimensions(tmp1, w, h, { ensureCleared: true });
         const tmp1Ctx = tmp1.getContext('2d')!;
         tmp1Ctx.save();
         tmp1Ctx.imageSmoothingEnabled = true;
@@ -370,31 +292,12 @@ export function resizeCanvas(
         tmp1Ctx.drawImage(canvas, 0, 0, w, h);
         tmp1Ctx.restore();
 
-        canvas.width = w;
-        canvas.height = h;
+        changeCanvasDimensions(canvas, w, h);
         canvas.getContext('2d')!.drawImage(tmp1, 0, 0);
     } else {
         resizeCanvas(canvas, w, canvas.height, tmp1, tmp2);
         resizeCanvas(canvas, w, h, tmp1, tmp2);
     }
-}
-
-/**
- * puts naive greyscale version of image into alpha channel.
- * only writes a, doesn't write rgb
- * @param canvas
- */
-export function convertToAlphaChannelCanvas(canvas: HTMLCanvasElement): void {
-    const imdat = canvas.getContext('2d')!.getImageData(0, 0, canvas.width, canvas.height);
-    for (let i = 0; i < imdat.data.length; i += 4) {
-        if (imdat.data[i + 3] === 0) {
-            continue;
-        }
-        imdat.data[i + 3] =
-            ((imdat.data[i] + imdat.data[i + 1] + imdat.data[i + 2]) / 3) *
-            (imdat.data[i + 3] / 255);
-    }
-    canvas.getContext('2d')!.putImageData(imdat, 0, 0);
 }
 
 /**
@@ -437,7 +340,7 @@ export function getCanvasBounds(
     );
 
     // top-left and bottom-right are non-transparent.
-    if (imdat.data[3] > 0 && imdat.data[imdat.data.length - 1] > 0) {
+    if (imdat.data[3] > 0 && imdat.data.at(-1)! > 0) {
         return searchRect;
     }
 
@@ -486,11 +389,8 @@ export function getImageDataSafely(
     width: number,
     height: number,
 ): ImageData {
-    try {
-        return ctx.getImageData(x, y, width, height);
-    } catch (e) {
-        return new ImageData(width, height);
-    }
+    const result = attempt(() => ctx.getImageData(x, y, width, height));
+    return result instanceof AttemptError ? new ImageData(width, height) : result;
 }
 
 export function htmlCanvasToBlobAsync(canvas: HTMLCanvasElement, mimeType: string): Promise<Blob> {
@@ -527,3 +427,5 @@ export function drawSelectionMask(
     context.fillRect(0, 0, canvas.width, canvas.height);
     context.restore();
 }
+
+export const identityTransform = Object.freeze([1, 0, 0, 1, 0, 0] as const);

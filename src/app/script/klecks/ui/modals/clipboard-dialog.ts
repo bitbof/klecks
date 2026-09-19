@@ -8,7 +8,7 @@ import { MultiPolygon } from 'polygon-clipping';
 import { boundsToRect, indexBoundsInArea } from '../../../bb/math/math';
 import { getMultiPolyBounds } from '../../../bb/multi-polygon/get-multi-polygon-bounds';
 import { Checkbox } from '../components/checkbox';
-import { css } from '../../../bb/base/base';
+import { attempt, AttemptError, css } from '../../../bb/base/base';
 
 let maskSelection = false;
 
@@ -80,20 +80,21 @@ export function clipboardDialog(
     div.append(cropCopy.getElement());
 
     async function toClipboard() {
-        try {
+        const result = await attempt(async () => {
             const blob = cropCopy.getCroppedBlob();
             await (navigator.clipboard as any).write([
                 new ClipboardItem({
                     [blob.type]: blob,
                 }),
             ]);
-            setTimeout(function () {
-                output.out(LANG('cropcopy-copied'), true);
-            }, 200);
-        } catch (err) {
-            console.error((err as Error).name, (err as Error).message);
+        });
+        if (result instanceof AttemptError) {
+            console.error(result.error);
             return;
         }
+        setTimeout(function () {
+            output.out(LANG('cropcopy-copied'), true);
+        }, 200);
     }
 
     const keyListener = new BB.KeyListener({

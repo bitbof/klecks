@@ -1,15 +1,28 @@
-import { KL } from '../kl';
 import { KlCanvas } from '../canvas/kl-canvas';
-import { Psd } from 'ag-psd/dist/psd';
-import { loadAgPsd } from './load-ag-psd';
+import type { Psd } from 'ag-psd/dist/psd';
+import { blendKlToPsd } from './psd';
+import { psdToBlob } from './psd-to-blob';
+import { attempt, AttemptError } from '../../bb/base/base';
 
-export async function klCanvasToPsdBlob(klCanvas: KlCanvas): Promise<Blob> {
-    const layerArr = klCanvas.getLayersFast();
+export async function klCanvasToPsdBlob(
+    klCanvas: KlCanvas,
+    isPreviewIncluded: boolean = false,
+): Promise<Blob> {
+    const layerArr = klCanvas.getLayers();
+
+    let canvas: HTMLCanvasElement | undefined;
+    if (isPreviewIncluded) {
+        // makes saving less likely to fail
+        const c = attempt(klCanvas.getCanvas);
+        if (!(c instanceof AttemptError)) {
+            canvas = c;
+        }
+    }
 
     const psdConfig: Psd = {
         width: klCanvas.getWidth(),
         height: klCanvas.getHeight(),
-        //canvas: klCanvas.getCompleteCanvas(1), // preview, can be skipped
+        canvas,
         children: layerArr.map((item) => {
             // todo - can be optimized if layer mostly empty
             return {
@@ -17,14 +30,13 @@ export async function klCanvasToPsdBlob(klCanvas: KlCanvas): Promise<Blob> {
                 hidden: !item.isVisible,
                 opacity: item.opacity,
                 canvas: item.canvas,
-                blendMode: KL.PSD.blendKlToPsd(item.mixModeStr),
+                blendMode: blendKlToPsd(item.mixModeStr),
+                clipping: item.hasClipping,
                 left: 0,
                 top: 0,
             };
         }),
     };
 
-    const agPsd = await loadAgPsd();
-    const buffer = agPsd.writePsdBuffer(psdConfig);
-    return new Blob([buffer], { type: 'application/octet-stream' });
+    return await psdToBlob(psdConfig);
 }

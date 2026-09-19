@@ -81,7 +81,7 @@
   },
   'tool-more-tools-click-again': {
     original: 'Click again for more tools',
-    value: ''
+    value: 'Klikkaa uudelleen näyttääksesi lisää työkaluja'
   },
   undo: {
     original: 'Undo',
@@ -285,7 +285,7 @@
   },
   'layers-merge-advanced': {
     original: 'Advanced merge',
-    value: ''
+    value: 'Edistynyt yhdistäminen'
   },
   'layers-merge-all': {
     original: 'Merge all',
@@ -298,15 +298,20 @@
   },
   'layers-active-layer-visible': {
     original: 'Active layer is visible',
-    value: 'Aktiivinen taso näkyy'
+    value: 'Aktiivinen taso on näkyvissä'
   },
   'layers-active-layer-hidden': {
     original: 'Active layer is hidden',
-    value: 'Aktiivinen taso ei näy'
+    value: 'Aktiivinen taso on piilotettu'
   },
   'layers-visibility-toggle': {
     original: 'Layer Visibility',
-    value: 'Taso näkyvyys'
+    value: 'Tason näkyvyys'
+  },
+  'layers-clipping': {
+    hint: 'tooltip for toggling whether the active layer is clipped to the layer below',
+    original: 'Clipping Mask',
+    value: ''
   },
   'layers-blend-normal': {
     original: 'normal',
@@ -429,7 +434,7 @@
   'file-no-autosave': {
     hint: "let user know they can't autosave, and there's no cloud storage. Keep short so fits on one line",
     original: 'No autosave, no cloud storage',
-    value: 'Ei automaattitallennusta, pilvitallennustila puuttuu'
+    value: 'Ei automaattitallennusta, ei pilvitallennusta'
   },
   'file-new': {
     hint: 'action',
@@ -486,7 +491,7 @@
   'file-storage-cant-access': {
     hint: 'an error. Can’t access the storage.',
     original: "Can't access storage.",
-    value: ''
+    value: 'Tallennustilaa ei voida saavuttaa.'
   },
   'file-storage-empty': {
     hint: 'nothing stored',
@@ -501,15 +506,15 @@
   'file-storage-open': {
     hint: 'verb. to open, or to load',
     original: 'Open',
-    value: ''
+    value: 'Avaa'
   },
   'file-storage-open-confirmation': {
     original: 'This image is already open in another tab. Open it here too?',
-    value: ''
+    value: 'Tämä kuva on jo auki toisessa välilehdessä. Avataanko se tässäkin?'
   },
   'file-storage-open-failed': {
     original: 'Failed to load.',
-    value: ''
+    value: 'Lataus epäonnistui.'
   },
   'file-storage-clear': {
     original: 'Clear',
@@ -531,7 +536,7 @@
   },
   'file-storage-overwrite-confirm': {
     original: 'Overwrite Browser Storage? Overwritten data will be permanently deleted.',
-    value: ''
+    value: 'Korvataanko selaimen tallennustila? Korvattu data poistetaan pysyvästi.'
   },
   'file-storage-min-ago': {
     hint: "{x} <- needs to stay, it's a placeholder.",
@@ -591,43 +596,43 @@
   'tab-recovery-recover-tabs': {
     hint: 'allows user to recover browser tabs (including the drawing) of this app.',
     original: 'Recover closed tabs',
-    value: ''
+    value: 'Palauta suljetut välilehdet'
   },
   'tab-recovery-explanation': {
     original: 'Recovery data is only kept for a little while. Save to ensure your work is not lost.',
-    value: ''
+    value: 'Palautustietoja säilytetään vain lyhyen aikaa. Tallenna työsi, jotta se ei katoa.'
   },
   'tab-recovery-total-quota-label': {
     original: 'Total:',
-    value: ''
+    value: 'Yhteensä:'
   },
   'tab-recovery-empty': {
     original: 'Nothing to recover.',
-    value: ''
+    value: 'Ei palautettavaa.'
   },
   'tab-recovery-recover': {
     original: 'Recover',
-    value: ''
+    value: 'Palauta'
   },
   'tab-recovery-delete': {
     original: 'Delete',
-    value: ''
+    value: 'Poista'
   },
   'tab-recovery-delete-confirmation': {
     original: 'Delete this recovery? Deletion can not be undone.',
-    value: ''
+    value: 'Haluatko poistaa tämän palautuksen? Tätä ei voi perua.'
   },
   'tab-recovery-failed-to-recover': {
     original: 'Failed to recover tab.',
-    value: ''
+    value: 'Välilehden palauttaminen epäonnistui.'
   },
   'tab-recovery-recovered': {
     original: 'Tab recovered.',
-    value: ''
+    value: 'Välilehti palautettiin'
   },
   'tab-recovery-restoring-session': {
     original: 'Restoring your previous session...',
-    value: ''
+    value: 'Palautetaan edellistä istuntoa...'
   },
   'cleared-layer': {
     hint: 'the layer has been cleared. It is now empty',
@@ -703,17 +708,17 @@
   'new-ratio': {
     hint: 'aspect ratio',
     original: 'Ratio',
-    value: 'suhde'
+    value: 'Suhde'
   },
   'upload-title': {
     hint: '"Imgur" is a website name.',
     original: 'Upload to Imgur',
-    value: 'Siirrä Imgur-palveluun'
+    value: 'Lähetä Imgur-palveluun'
   },
   'upload-link-notice': {
     hint: 'Explaining to user even though their upload is unlisted, they should be careful who they share the link with. No password protection.',
     original: 'Anyone with the link to your uploaded image will be able to view it.',
-    value: 'Kuka tahansa voi nähdä siirtämäsi kuvan, jos hänellä on linkki siihen.'
+    value: 'Kuka tahansa voi nähdä lähettämäsi kuvan, jos hänellä on linkki siihen.'
   },
   'upload-name': {
     hint: 'noun',
@@ -762,7 +767,7 @@
   },
   'cropcopy-mask': {
     original: 'Mask unselected',
-    value: ''
+    value: 'Maskeeraa valitsematon'
   },
   'cropcopy-click-hold': {
     original: 'Right-click or press hold to copy.',
@@ -881,7 +886,7 @@
   'filter-crop-rule-thirds': {
     hint: 'https://en.wikipedia.org/wiki/Rule_of_thirds',
     original: 'Rule of Thirds',
-    value: 'Kolmanneksen sääntö'
+    value: 'Kolmannesten sääntö'
   },
   'filter-crop-fill': {
     hint: 'If image gets extended, what color to fill that new area with',
@@ -958,7 +963,7 @@
   'filter-transform-description': {
     hint: 'as in the Shift key.',
     original: 'Transforms selected layer. Hold Shift for additional behavior.',
-    value: 'Muuntaa valitun tason. Paina Shift-nappia nähdäksesi lisätoiminnot.'
+    value: 'Muuntaa valitun tason. Pidä pohjassa Shift-nappia nähdäksesi lisätoiminnot.'
   },
   'filter-transform-rotation': {
     hint: 'or Angle',
@@ -1199,17 +1204,17 @@
   },
   'import-too-large': {
     original: 'Image too large, will be downscaled.',
-    value: 'Kuva on liian suuri, sitä pienennetään.'
+    value: 'Kuva on liian suuri, ja se pienennetään.'
   },
   'import-btn-as-layer': {
     hint: 'import as layer. Button label, should be short',
     original: 'As Layer',
-    value: 'Tasoksi'
+    value: 'Tasona'
   },
   'import-btn-as-image': {
     hint: 'import as image. Button label, should be short',
     original: 'As Image',
-    value: 'Kuvaksi'
+    value: 'Kuvana'
   },
   'import-as-layer-title': {
     original: 'Import Image as New Layer',
@@ -1403,7 +1408,7 @@
   },
   'text-font': {
     original: 'Font',
-    value: 'Kirjastin'
+    value: 'Fontti'
   },
   'text-placeholder': {
     hint: 'placeholder in text input.',
@@ -1453,7 +1458,7 @@
   },
   'text-supported-formats': {
     original: 'Supported formats:',
-    value: ''
+    value: 'Tuetut formaatit:'
   },
   'select-select': {
     original: 'Select',
@@ -1603,7 +1608,7 @@
   },
   'settings-pixelated-zoom': {
     original: 'Always pixelated zoom',
-    value: ''
+    value: 'Zoomaa aina pikselöitynä'
   },
   'settings-save-reminder-label': {
     original: 'Save Reminder',
@@ -1797,10 +1802,10 @@
   },
   error: {
     original: 'Error',
-    value: ''
+    value: 'Virhe'
   },
   retry: {
     original: 'Retry',
-    value: ''
+    value: 'Yritä uudelleen'
   }
 }

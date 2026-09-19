@@ -9,10 +9,11 @@ import {
     storeRecovery,
 } from './kl-recovery-storage';
 import { deserializeRecovery } from './kl-recovery-serialization';
-import { css, sleep } from '../../bb/base/base';
+import { asyncThrow, css, sleep } from '../../bb/base/base';
 import { CrossTabChannel } from '../../bb/base/cross-tab-channel';
 import { KL_INDEXED_DB } from './kl-indexed-db';
 import loadingImg from 'url:/src/app/img/ui/loading.gif';
+import { TIdb } from './kl-indexed-db.types';
 
 export const RECOVERY_THUMB_WIDTH_PX = 300;
 export const RECOVERY_THUMB_HEIGHT_PX = 180;
@@ -59,7 +60,7 @@ function hashToTabId(rawHash: string | undefined): number | undefined {
 export type TRecoveryMetaData = {
     id: string;
     timestamp: number;
-    thumbnail: HTMLImageElement | HTMLCanvasElement;
+    thumbnail?: TIdb['V2']['ImageDataStore']['Read'];
     memoryEstimateBytes: number;
 };
 
@@ -263,9 +264,7 @@ export class KlRecoveryManager {
                 );
                 startTime = Date.now();
             } catch (e) {
-                setTimeout(() => {
-                    throw e;
-                });
+                asyncThrow(e);
                 return;
             } finally {
                 this.setIsStoring(false);

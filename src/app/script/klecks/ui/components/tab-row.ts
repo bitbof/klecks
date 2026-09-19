@@ -2,6 +2,7 @@ import { BB } from '../../../bb/bb';
 import { PointerListener } from '../../../bb/input/pointer-listener';
 import { css } from '../../../bb/base/base';
 import { TCss } from '../../../bb/bb-types';
+import { Destroyer } from '../../../bb/base/base';
 
 // type all functions
 
@@ -35,6 +36,7 @@ export class TabRow {
     private activeTab: TTab;
     private readonly roundRight: HTMLElement;
     private readonly roundLeft: HTMLElement;
+    private readonly destroyer = new Destroyer();
 
     // update
     update(): void {
@@ -101,6 +103,7 @@ export class TabRow {
                         lineHeight: height + 'px',
                         display: isVisible ? 'block' : 'none',
                     },
+                    destroyer: this.destroyer,
                     onClick: () => {
                         if (this.activeTab === result) {
                             return;
@@ -204,8 +207,8 @@ export class TabRow {
 
     destroy(): void {
         this.tabArr.forEach((item) => {
-            BB.destroyEl(item.el);
             item.pointerListener.destroy();
         });
+        this.destroyer.destroy();
     }
 }

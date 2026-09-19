@@ -1,4 +1,4 @@
-import { showModal } from '../base/show-modal';
+import { showModal, showError } from '../base/show-modal';
 import { BB } from '../../../../bb/bb';
 import { RecoveryManagerPanel } from './recovery-manager-panel';
 import { KlRecoveryManager } from '../../../storage/kl-recovery-manager';
@@ -7,11 +7,7 @@ import { LANG } from '../../../../language/language';
 
 export function showRecoveryManagerPanel(klRecoveryManager?: KlRecoveryManager) {
     if (!klRecoveryManager || !KL_INDEXED_DB.getIsAvailable()) {
-        showModal({
-            type: 'error',
-            message: LANG('file-storage-cant-access'),
-            buttons: ['Ok'],
-        });
+        showError(LANG('file-storage-cant-access'));
         return;
     }
 

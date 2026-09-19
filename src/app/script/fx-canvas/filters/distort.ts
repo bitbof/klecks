@@ -1,4 +1,4 @@
-import { gl } from '../core/gl';
+import { fxGl } from '../core/gl';
 import { warpShader } from '../shaders/warp-shader';
 import { simpleShader } from '../core/simple-shader';
 import { TFxCanvas } from '../fx-canvas-types';
@@ -24,8 +24,8 @@ export type TFilterDistort = (this: TFxCanvas, settings: TFilterDistortSettings)
  *                Note: Requires alpha to be premultiplied.
  */
 export const distort: TFilterDistort = function (settings) {
-    gl.distort =
-        gl.distort ||
+    fxGl.distort =
+        fxGl.distort ||
         warpShader(
             `
     uniform float stepSize;
@@ -63,14 +63,14 @@ export const distort: TFilterDistort = function (settings) {
 `,
         );
 
-    simpleShader.call(this, gl.distort, {
+    simpleShader.call(this, fxGl.distort, {
         stepSize: settings.stepSize,
         type: settings.distortType,
         scale: [settings.scale.x, settings.scale.y],
         strength: [settings.strength.x, settings.strength.y],
         phase: [settings.phase.x, settings.phase.y],
         offset: [settings.offset.x, settings.offset.y],
-        texSize: [this.width, this.height],
+        texSize: [this.canvas.width, this.canvas.height],
     });
 
     return this;

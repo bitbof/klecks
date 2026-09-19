@@ -1,5 +1,5 @@
 import { BB } from '../../../bb/bb';
-import { Select } from '../components/select';
+import { SelectCustom } from '../components/select-custom';
 import { ColorOptions } from '../components/color-options';
 import { showModal } from './base/show-modal';
 import { LANG } from '../../../language/language';
@@ -8,6 +8,7 @@ import { TSize2D } from '../../../bb/bb-types';
 import { table } from '../components/table';
 import { css } from '../../../bb/base/base';
 import { Input } from '../components/input';
+import { Destroyer } from '../../../bb/base/base';
 
 export function newImageDialog(p: {
     currentColor: TRgb; // current color
@@ -112,19 +113,88 @@ export function newImageDialog(p: {
         className: 'kl-button',
         css: { flexGrow: '1' },
     } as const;
-    const presetFitBtn = BB.el(presetBtnConfig);
-    const presetCurrentBtn = BB.el(presetBtnConfig);
-    const presetSquareBtn = BB.el(presetBtnConfig);
-    const presetLandscapeBtn = BB.el(presetBtnConfig);
-    const presetPortraitBtn = BB.el(presetBtnConfig);
-    const presetOversizeBtn = BB.el(presetBtnConfig);
-
-    presetCurrentBtn.textContent = LANG('new-current');
-    presetFitBtn.textContent = LANG('new-fit');
-    presetOversizeBtn.textContent = LANG('new-oversize');
-    presetLandscapeBtn.textContent = LANG('new-landscape');
-    presetPortraitBtn.textContent = LANG('new-portrait');
-    presetSquareBtn.textContent = LANG('new-square');
+    const destroyer = new Destroyer();
+    const presetFitBtn = BB.el({
+        ...presetBtnConfig,
+        textContent: LANG('new-fit'),
+        destroyer,
+        onClick: () => {
+            widthInput.setValue(workspaceWidth, true);
+            heightInput.setValue(workspaceHeight, true);
+            updateRatio();
+        },
+    });
+    const presetCurrentBtn = BB.el({
+        ...presetBtnConfig,
+        textContent: LANG('new-current'),
+        destroyer,
+        onClick: () => {
+            widthInput.setValue(canvasWidth, true);
+            heightInput.setValue(canvasHeight, true);
+            updateRatio();
+        },
+    });
+    const presetSquareBtn = BB.el({
+        ...presetBtnConfig,
+        textContent: LANG('new-square'),
+        destroyer,
+        onClick: () => {
+            const { width, height } = createRatioSize(
+                1,
+                1,
+                workspaceWidth,
+                workspaceHeight,
+                templatePadding,
+            );
+            widthInput.setValue(width, true);
+            heightInput.setValue(height, true);
+            updateRatio();
+        },
+    });
+    const presetLandscapeBtn = BB.el({
+        ...presetBtnConfig,
+        textContent: LANG('new-landscape'),
+        destroyer,
+        onClick: () => {
+            const { width, height } = createRatioSize(
+                4,
+                3,
+                workspaceWidth,
+                workspaceHeight,
+                templatePadding,
+            );
+            widthInput.setValue(width, true);
+            heightInput.setValue(height, true);
+            updateRatio();
+        },
+    });
+    const presetPortraitBtn = BB.el({
+        ...presetBtnConfig,
+        textContent: LANG('new-portrait'),
+        destroyer,
+        onClick: () => {
+            const { width, height } = createRatioSize(
+                3,
+                4,
+                workspaceWidth,
+                workspaceHeight,
+                templatePadding,
+            );
+            widthInput.setValue(width, true);
+            heightInput.setValue(height, true);
+            updateRatio();
+        },
+    });
+    const presetOversizeBtn = BB.el({
+        ...presetBtnConfig,
+        textContent: LANG('new-oversize'),
+        destroyer,
+        onClick: () => {
+            widthInput.setValue(workspaceWidth + 500, true);
+            heightInput.setValue(workspaceHeight + 500, true);
+            updateRatio();
+        },
+    });
 
     templateWrapper.append(
         presetCurrentBtn,
@@ -137,59 +207,7 @@ export function newImageDialog(p: {
 
     const templatePadding = 0;
 
-    presetCurrentBtn.onclick = function (): void {
-        widthInput.setValue(canvasWidth, true);
-        heightInput.setValue(canvasHeight, true);
-        updateRatio();
-    };
-    presetFitBtn.onclick = function (): void {
-        widthInput.setValue(workspaceWidth, true);
-        heightInput.setValue(workspaceHeight, true);
-        updateRatio();
-    };
-    presetOversizeBtn.onclick = function (): void {
-        widthInput.setValue(workspaceWidth + 500, true);
-        heightInput.setValue(workspaceHeight + 500, true);
-        updateRatio();
-    };
-    presetSquareBtn.onclick = function (): void {
-        const { width, height } = createRatioSize(
-            1,
-            1,
-            workspaceWidth,
-            workspaceHeight,
-            templatePadding,
-        );
-        widthInput.setValue(width, true);
-        heightInput.setValue(height, true);
-        updateRatio();
-    };
-    presetLandscapeBtn.onclick = function (): void {
-        const { width, height } = createRatioSize(
-            4,
-            3,
-            workspaceWidth,
-            workspaceHeight,
-            templatePadding,
-        );
-        widthInput.setValue(width, true);
-        heightInput.setValue(height, true);
-        updateRatio();
-    };
-    presetPortraitBtn.onclick = function (): void {
-        const { width, height } = createRatioSize(
-            3,
-            4,
-            workspaceWidth,
-            workspaceHeight,
-            templatePadding,
-        );
-        widthInput.setValue(width, true);
-        heightInput.setValue(height, true);
-        updateRatio();
-    };
-
-    const select = new Select({
+    const select = new SelectCustom({
         isFocusable: true,
         optionArr: [
             ['screen', LANG('new-screen')],
@@ -445,13 +463,7 @@ export function newImageDialog(p: {
         div: newImDiv,
         buttons: ['Ok', 'Cancel'],
         callback: function (result) {
-            BB.unsetEventHandler(presetCurrentBtn, 'onclick');
-            BB.unsetEventHandler(presetFitBtn, 'onclick');
-            BB.unsetEventHandler(presetOversizeBtn, 'onclick');
-            BB.unsetEventHandler(presetSquareBtn, 'onclick');
-            BB.unsetEventHandler(presetLandscapeBtn, 'onclick');
-            BB.unsetEventHandler(presetPortraitBtn, 'onclick');
-
+            destroyer.destroy();
             select.destroy();
             colorOptions.destroy();
             widthInput.destroy();

@@ -1,5 +1,5 @@
 import { BB } from '../../../bb/bb';
-import { css } from '../../../bb/base/base';
+import { css, Destroyer } from '../../../bb/base/base';
 import { TCss } from '../../../bb/bb-types';
 import * as classes from './options.module.scss';
 import { focusableElementClassName } from '../../../bb/base/ui';
@@ -19,6 +19,7 @@ export class Options<IdType> {
     private readonly onChange: ((id: IdType) => void) | undefined;
     private readonly onBeforeChange: ((id: IdType) => boolean) | undefined;
     private readonly keydownListener: ((event: KeyboardEvent) => void) | undefined;
+    private readonly destroyer = new Destroyer();
 
     private getIndex(): number {
         for (let i = 0; i < this.optionArr.length; i++) {
@@ -70,7 +71,7 @@ export class Options<IdType> {
         onChange?: (id: IdType) => void;
         // element - the element that was clicked
         onClickSelected?: (id: IdType, element: HTMLElement) => void;
-        /** before the change happens, check if you allow it. true -> yes */
+        // before the change happens, check if you allow it. true -> yes
         onBeforeChange?: (id: IdType) => boolean;
         changeOnInit?: boolean; // trigger change on creation
         isFocusable?: boolean; // default false
@@ -86,10 +87,10 @@ export class Options<IdType> {
         this.wrapperEl = BB.el({
             parent: this.rootEl,
             className: classes.wrapper,
-            custom: {
+            props: {
                 role: 'radiogroup',
-                'aria-orientation': p.isColumn ? 'vertical' : 'horizontal',
-                ...(p.ariaLabel ? { 'aria-label': p.ariaLabel } : {}),
+                ariaOrientation: p.isColumn ? 'vertical' : 'horizontal',
+                ...(p.ariaLabel ? { ariaLabel: p.ariaLabel } : {}),
             },
             css: {
                 display: 'flex',
@@ -136,6 +137,7 @@ export class Options<IdType> {
                     tagName: 'button',
                     content: o.label ?? '',
                     className: classArr,
+                    destroyer: this.destroyer,
                     onClick: () => {
                         if (this.selectedId === optionObj.id) {
                             p.onClickSelected?.(optionObj.id, optionObj.el);
@@ -150,11 +152,11 @@ export class Options<IdType> {
                         ...p.optionCss,
                         ...o.css,
                     },
-                    custom: {
+                    props: {
                         // per default would be "submit"
                         type: 'button',
                         role: 'radio',
-                        ...(ariaLabel ? { 'aria-label': ariaLabel } : {}),
+                        ...(ariaLabel ? { ariaLabel } : {}),
                     },
                 }),
             };
@@ -256,9 +258,7 @@ export class Options<IdType> {
             this.wrapperEl.removeEventListener('keydown', this.keydownListener);
         }
         this.rootEl.remove();
-        this.optionArr.forEach((item) => {
-            BB.destroyEl(item.el);
-        });
+        this.destroyer.destroy();
         this.optionArr.splice(0, this.optionArr.length);
     }
 }

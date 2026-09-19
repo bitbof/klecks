@@ -1,0 +1,15 @@
+.root {
+    pointer-events: none;
+    background: var(--kl-checkerboard-background);
+    position: absolute;
+    top: 10px;
+    border: 1px solid #aaa;
+    box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
+    user-select: none;
+    display: block;
+    -webkit-touch-callout: none;
+
+    > * {
+        display: block;
+    }
+}

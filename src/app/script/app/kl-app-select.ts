@@ -1,18 +1,17 @@
 import { SelectUi, TSelectToolMode } from '../klecks/ui/tool-tabs/select-ui';
 import { EaselSelect } from '../klecks/ui/easel/tools/easel-select';
 import { KlCanvas } from '../klecks/canvas/kl-canvas';
-import { throwIfNull } from '../bb/base/base';
 import { SelectTool } from '../klecks/select-tool/select-tool';
 import { FfdRenderer } from '../klecks/transform/ffd-renderer';
 import { KlTempHistory, TTempHistoryEntry } from '../klecks/history/kl-temp-history';
 import { StatusOverlay } from '../klecks/ui/components/status-overlay';
-import { showModal } from '../klecks/ui/modals/base/show-modal';
+import { showError } from '../klecks/ui/modals/base/show-modal';
 import { LANG } from '../language/language';
 import { KlHistory } from '../klecks/history/kl-history';
 import { boundsToRect, rectToBounds } from '../bb/math/math';
 import { TInterpolationAlgorithm } from '../klecks/kl-types';
 import { klCanvasTransform } from '../klecks/canvas/kl-canvas-transform';
-import { testComposedLayerHasTransparency } from '../klecks/filters/filter-transform';
+import { composedLayerHasTransparency } from '../klecks/utils/composed-layer-has-transparency';
 import { klCanvasFfd } from '../klecks/canvas/kl-canvas-ffd';
 import {
     centerTransformation,
@@ -89,7 +88,7 @@ function initialiseTransformState(p: {
 
 export type TKlAppSelectParams = {
     klCanvas: KlCanvas;
-    getCurrentLayerCtx: () => CanvasRenderingContext2D;
+    getCurrentLayerIndex: () => number;
     klHistory: KlHistory;
     tempHistory: KlTempHistory;
     statusOverlay: StatusOverlay;
@@ -105,7 +104,7 @@ export type TKlAppSelectParams = {
 export class KlAppSelect {
     // from params
     private readonly klCanvas: KlCanvas;
-    private readonly getCurrentLayerCtx: () => CanvasRenderingContext2D;
+    private readonly getCurrentLayerIndex: () => number;
     private readonly klHistory: KlHistory;
     private readonly tempHistory: KlTempHistory;
     private readonly statusOverlay: StatusOverlay;
@@ -147,8 +146,7 @@ export class KlAppSelect {
 
     /** reset KlCanvas layer composites **/
     private resetKlCanvasLayerComposites(): void {
-        const srcLayerCtx = this.getCurrentLayerCtx();
-        const srcLayerIndex = throwIfNull(this.klCanvas.getLayerIndex(srcLayerCtx.canvas));
+        const srcLayerIndex = this.getCurrentLayerIndex();
         this.klCanvas.setComposite(srcLayerIndex, undefined);
         if (this.transformState && this.transformState.targetLayerIndex !== srcLayerIndex) {
             this.klCanvas.setComposite(this.transformState.targetLayerIndex, undefined);
@@ -160,8 +158,7 @@ export class KlAppSelect {
             return;
         }
 
-        const srcLayerCanvas = this.getCurrentLayerCtx().canvas;
-        const srcLayerIndex = throwIfNull(this.klCanvas.getLayerIndex(srcLayerCanvas));
+        const srcLayerIndex = this.getCurrentLayerIndex();
 
         const config: Parameters<typeof createTransformationComposite>[0] = {
             klCanvasWidth: this.klCanvas.getWidth(),
@@ -266,7 +263,7 @@ export class KlAppSelect {
     constructor(p: TKlAppSelectParams) {
         this.klCanvas = p.klCanvas;
         this.onUpdateProject = p.onUpdateProject;
-        this.getCurrentLayerCtx = p.getCurrentLayerCtx;
+        this.getCurrentLayerIndex = p.getCurrentLayerIndex;
         this.klHistory = p.klHistory;
         this.tempHistory = p.tempHistory;
         this.statusOverlay = p.statusOverlay;
@@ -345,9 +342,7 @@ export class KlAppSelect {
         this.selectUi = new SelectUi({
             onChangeMode: (mode) => {
                 if (mode === 'select') {
-                    const layerIndex = throwIfNull(
-                        this.klCanvas.getLayerIndex(this.getCurrentLayerCtx().canvas),
-                    );
+                    const layerIndex = this.getCurrentLayerIndex();
                     if (
                         this.transformState &&
                         (this.isTransformationChanged() ||
@@ -427,15 +422,11 @@ export class KlAppSelect {
                     // -> transform
 
                     // avoid changing state while mode-change can be rejected
-                    const currentLayerCanvas = this.getCurrentLayerCtx().canvas;
-                    const layerIndex = throwIfNull(this.klCanvas.getLayerIndex(currentLayerCanvas));
+                    const layerIndex = this.getCurrentLayerIndex();
                     const selectionSample = createSelectionSample(layerIndex, this.klCanvas);
                     if (!selectionSample) {
                         setTimeout(() => {
-                            showModal({
-                                message: LANG('select-transform-empty'),
-                                type: 'error',
-                            });
+                            showError(LANG('select-transform-empty'));
                         });
                         return false;
                     }
@@ -447,7 +438,7 @@ export class KlAppSelect {
                         const layer = Object.entries(this.klHistory.getComposed().layerMap).find(
                             ([_, layer]) => layer.index === layerIndex,
                         )![1];
-                        isTransparent = testComposedLayerHasTransparency(layer);
+                        isTransparent = composedLayerHasTransparency(layer);
                         this.selectUi.setBackgroundIsTransparent(isTransparent);
                     }
                     this.transformState = initialiseTransformState({
@@ -542,9 +533,7 @@ export class KlAppSelect {
                         return;
                     }
                     // commit
-                    const layerIndex = throwIfNull(
-                        this.klCanvas.getLayerIndex(this.getCurrentLayerCtx().canvas),
-                    );
+                    const layerIndex = this.getCurrentLayerIndex();
                     const transform = this.transformState.transform;
                     // apply
                     // should always apply. user might want to make something more opaque.
@@ -809,8 +798,7 @@ export class KlAppSelect {
             }
             this.easelSelect.setTransform(this.transformState.transform);
             this.selectUi.setMoveToLayer(
-                this.klCanvas.getLayerIndex(this.getCurrentLayerCtx().canvas) ===
-                    state.targetLayerIndex
+                this.getCurrentLayerIndex() === state.targetLayerIndex
                     ? undefined
                     : state.targetLayerIndex,
             );

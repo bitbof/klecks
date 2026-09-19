@@ -1,3 +1,4 @@
+import { LayerCompositor } from './layer-compositor';
 import { isLayerFill, TRgb } from '../kl-types';
 import { BB } from '../../bb/bb';
 import { THistoryEntryDataComposed } from '../history/history.types';
@@ -5,6 +6,10 @@ import { HISTORY_TILE_SIZE } from '../history/kl-history';
 import { sortLayerMap } from '../history/sort-layer-map';
 
 export class Eyedropper {
+    private canvas?: HTMLCanvasElement;
+    private ctx?: CanvasRenderingContext2D;
+    private readonly compositor = new LayerCompositor();
+
     // ----------------------------------- public -----------------------------------
     constructor() {}
 
@@ -16,21 +21,23 @@ export class Eyedropper {
             return new BB.RGB(0, 0, 0);
         }
 
-        const canvas = BB.canvas(1, 1);
-        const ctx = BB.ctx(canvas);
-        ctx.imageSmoothingEnabled = false;
-
         const tilesX = Math.ceil(composed.size.width / HISTORY_TILE_SIZE);
         const tileCol = Math.floor(x / HISTORY_TILE_SIZE);
         const tileRow = Math.floor(y / HISTORY_TILE_SIZE);
         const tileIndex = tileRow * tilesX + tileCol;
 
-        Object.values(composed.layerMap)
-            .sort(sortLayerMap)
-            .forEach((layer) => {
-                if (!layer.isVisible || layer.opacity === 0) {
-                    return;
-                }
+        this.canvas ??= BB.canvas(1, 1);
+        this.ctx ??= BB.ctx(this.canvas);
+        const ctx = this.ctx;
+        ctx.clearRect(0, 0, 1, 1);
+        ctx.imageSmoothingEnabled = false;
+
+        this.compositor.draw(
+            ctx,
+            Object.values(composed.layerMap).sort(sortLayerMap),
+            1,
+            1,
+            (targetCtx, layer) => {
                 const tile = layer.tiles[tileIndex];
                 let fillStyle = '';
                 if (isLayerFill(tile)) {
@@ -38,26 +45,30 @@ export class Eyedropper {
                 } else {
                     const pixelIndex =
                         (y % HISTORY_TILE_SIZE) * tile.data.width + (x % HISTORY_TILE_SIZE);
-
-                    if (tile.data.data[pixelIndex * 4 + 3] === 0) {
-                        return;
-                    }
+                    const alpha = tile.data.data[pixelIndex * 4 + 3];
 
                     fillStyle = BB.ColorConverter.toRgbaStr({
                         r: tile.data.data[pixelIndex * 4],
                         g: tile.data.data[pixelIndex * 4 + 1],
                         b: tile.data.data[pixelIndex * 4 + 2],
-                        a: tile.data.data[pixelIndex * 4 + 3] / 255,
+                        a: alpha / 255,
                     });
                 }
 
-                ctx.fillStyle = fillStyle;
-                ctx.globalAlpha = layer.opacity;
-                ctx.globalCompositeOperation = layer.mixModeStr;
-                ctx.fillRect(0, 0, 1, 1);
-            });
-
+                targetCtx.fillStyle = fillStyle;
+                targetCtx.fillRect(0, 0, 1, 1);
+            },
+        );
         const imData = ctx.getImageData(0, 0, 1, 1);
         return new BB.RGB(imData.data[0], imData.data[1], imData.data[2]);
+    }
+
+    destroy(): void {
+        this.compositor.destroy();
+        if (this.canvas) {
+            BB.freeCanvas(this.canvas);
+            this.canvas = undefined;
+            this.ctx = undefined;
+        }
     }
 }

@@ -53,10 +53,6 @@ export function mergeLayerDialog(
     });
     div.append(spacer, preview);
 
-    const alphaCanvas = BB.copyCanvas(preview);
-    BB.ctx(alphaCanvas).drawImage(p.topCanvas, 0, 0, alphaCanvas.width, alphaCanvas.height);
-    BB.convertToAlphaChannelCanvas(alphaCanvas);
-
     const update = () => {
         const ctx = BB.ctx(preview);
         ctx.save();
@@ -66,15 +62,9 @@ export function mergeLayerDialog(
         }
         ctx.drawImage(p.bottomCanvas, 0, 0, preview.width, preview.height);
 
-        if (options.getValue() === 'as-alpha') {
-            ctx.globalCompositeOperation = 'destination-in';
-            ctx.globalAlpha = p.topOpacity;
-            ctx.drawImage(alphaCanvas, 0, 0, preview.width, preview.height);
-        } else {
-            ctx.globalCompositeOperation = options.getValue() as GlobalCompositeOperation;
-            ctx.globalAlpha = p.topOpacity;
-            ctx.drawImage(p.topCanvas, 0, 0, preview.width, preview.height);
-        }
+        ctx.globalCompositeOperation = options.getValue() as GlobalCompositeOperation;
+        ctx.globalAlpha = p.topOpacity;
+        ctx.drawImage(p.topCanvas, 0, 0, preview.width, preview.height);
         ctx.restore();
     };
 

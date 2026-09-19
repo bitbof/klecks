@@ -1,5 +1,6 @@
 import { BB } from '../../../bb/bb';
 import { TCss, TVector2D } from '../../../bb/bb-types';
+import { Destroyer } from '../../../bb/base/base';
 import { focusableElementClassName } from '../../../bb/base/ui';
 import { TRgb } from '../../kl-types';
 import * as classes from './color-input.module.scss';
@@ -14,6 +15,7 @@ export class ColorInput {
     private color: TRgb;
     private colorPickerWindow: ColorPickerWindow | undefined;
     private colorPickerPosition: TVector2D | undefined;
+    private readonly destroyer = new Destroyer();
 
     private update(): void {
         const colorStr = '#' + BB.ColorConverter.toHexString(this.color);
@@ -79,9 +81,10 @@ export class ColorInput {
         this.rootEl = BB.el({
             tagName: 'button',
             className: [classes.button, focusableElementClassName],
+            destroyer: this.destroyer,
             onClick: () => this.toggleColorPicker(),
             css: p.css,
-            custom: {
+            props: {
                 type: 'button',
                 name: p.name,
             },
@@ -111,6 +114,6 @@ export class ColorInput {
     destroy(): void {
         this.closeColorPicker();
         this.rootEl.remove();
-        BB.destroyEl(this.rootEl);
+        this.destroyer.destroy();
     }
 }

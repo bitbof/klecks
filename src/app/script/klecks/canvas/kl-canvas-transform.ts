@@ -49,7 +49,7 @@ export function klCanvasTransform(p: {
 }): void {
     const backgroundIsTransparent = p.backgroundIsTransparent ?? false;
     const klHistory = p.klCanvas.getKlHistory();
-    const layers = p.klCanvas.getLayersRaw();
+    const layers = p.klCanvas.getLayersReference();
     const targetLayer = layers[p.targetLayerIndex];
     const matrix = freeTransformToMatrix(
         p.freeTransform,

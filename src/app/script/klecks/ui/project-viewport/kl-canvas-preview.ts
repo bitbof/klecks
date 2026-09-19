@@ -1,4 +1,5 @@
 import { BB } from '../../../bb/bb';
+import { LayerCompositor } from '../../canvas/layer-compositor';
 import { TKlBasicLayer } from '../../kl-types';
 import { css } from '../../../bb/base/base';
 
@@ -9,14 +10,11 @@ import { css } from '../../../bb/base/base';
 export class KlCanvasPreview {
     private readonly canvas: HTMLCanvasElement;
     private readonly ctx: CanvasRenderingContext2D | null;
-    private readonly layers: TKlBasicLayer[];
+    private readonly compositor = new LayerCompositor();
+    private layers: TKlBasicLayer[];
 
     // ----------------------------------- public -----------------------------------
-    constructor(p: {
-        width: number;
-        height: number;
-        layers: TKlBasicLayer[]; // items can be changed after the fact - but not the object
-    }) {
+    constructor(p: { width: number; height: number; layers: TKlBasicLayer[] }) {
         this.layers = p.layers;
 
         const scale = p.width / p.layers[0].image.width;
@@ -41,28 +39,36 @@ export class KlCanvasPreview {
         return this.canvas;
     }
 
+    setLayers(layers: TKlBasicLayer[]): void {
+        this.layers = layers;
+        this.render();
+    }
+
     render(): void {
         if (!this.ctx) {
             return;
         }
+        const ctx = this.ctx;
 
-        this.ctx.save();
-        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-        for (let i = 0; i < this.layers.length; i++) {
-            const layer = this.layers[i];
-            if (!layer.isVisible || layer.opacity === 0) {
-                continue;
-            }
-            this.ctx.globalAlpha = this.layers[i].opacity;
-            this.ctx.globalCompositeOperation = this.layers[i]
-                .mixModeStr as GlobalCompositeOperation;
-            if (this.canvas.width > this.layers[i].image.width) {
-                this.ctx.imageSmoothingEnabled = false;
-            }
-            this.ctx.drawImage(this.layers[i].image, 0, 0, this.canvas.width, this.canvas.height);
-        }
-        this.ctx.restore();
+        ctx.save();
+        ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        this.compositor.draw(
+            ctx,
+            this.layers,
+            this.canvas.width,
+            this.canvas.height,
+            (target, layer) => {
+                if (this.canvas.width > layer.image.width) {
+                    target.imageSmoothingEnabled = false;
+                }
+                target.drawImage(layer.image, 0, 0, this.canvas.width, this.canvas.height);
+            },
+        );
+        ctx.restore();
     }
 
-    destroy(): void {}
+    destroy(): void {
+        BB.freeCanvas(this.canvas);
+        this.compositor.destroy();
+    }
 }

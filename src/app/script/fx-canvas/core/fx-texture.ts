@@ -1,4 +1,4 @@
-import { gl } from './gl';
+import { fxGl, gl } from './gl';
 import { BB } from '../../bb/bb';
 import { TFxGl, TFxSupportedElements } from '../fx-canvas-types';
 
@@ -17,6 +17,7 @@ import { TFxGl, TFxSupportedElements } from '../fx-canvas-types';
  */
 export type TTextureFormat = GLenum;
 export type TTextureType = GLenum;
+export type TTextureSampling = 'linear' | 'nearest';
 
 export class FxTexture {
     // ---- static ----
@@ -27,35 +28,19 @@ export class FxTexture {
     }
 
     // ---- private ----
-    private canvas: HTMLCanvasElement | null;
     private type: TTextureType;
-
-    /*
-    // never seen this being used
-    private getCanvas(texture: Texture): CanvasRenderingContext2D {
-        if (this.canvas == null) {
-            this.canvas = BB.canvas(texture.width, texture.height);
-        }
-        this.canvas.width = texture.width;
-        this.canvas.height = texture.height;
-        const c = BB.ctx(this.canvas);
-        c.clearRect(0, 0, this.canvas.width, this.canvas.height);
-        return c;
-    }*/
 
     // ----------------------------------- public -----------------------------------
     constructor(width: number, height: number, format: TTextureFormat, type: TTextureType) {
-        this.gl = gl;
+        this.fxGl = fxGl;
         this.id = BB.throwIfNull(gl.createTexture());
         this.width = width;
         this.height = height;
         this.format = format;
         this.type = type;
-        this.canvas = null;
 
         gl.bindTexture(gl.TEXTURE_2D, this.id);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+        this.setSampling('linear');
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
         if (width && height) {
@@ -75,11 +60,25 @@ export class FxTexture {
 
     // ---- interface ----
 
-    gl: TFxGl;
+    fxGl: TFxGl;
     width: number;
     height: number;
     id: WebGLTexture | null; // null -> destroyed
     format: TTextureFormat;
+
+    setSampling(minification: TTextureSampling, magnification = minification): void {
+        gl.bindTexture(gl.TEXTURE_2D, this.id);
+        gl.texParameteri(
+            gl.TEXTURE_2D,
+            gl.TEXTURE_MIN_FILTER,
+            minification === 'nearest' ? gl.NEAREST : gl.LINEAR,
+        );
+        gl.texParameteri(
+            gl.TEXTURE_2D,
+            gl.TEXTURE_MAG_FILTER,
+            magnification === 'nearest' ? gl.NEAREST : gl.LINEAR,
+        );
+    }
 
     loadContentsOf(element: TFxSupportedElements): void {
         this.width = element.width || (element as HTMLVideoElement).videoWidth;
@@ -125,10 +124,10 @@ export class FxTexture {
     ensureFormat(width: number, height: number, format: TTextureFormat, type: TTextureType): void {
         // change the format only if required
         if (
-            width != this.width ||
-            height != this.height ||
-            format != this.format ||
-            type != this.type
+            width !== this.width ||
+            height !== this.height ||
+            format !== this.format ||
+            type !== this.type
         ) {
             this.width = width;
             this.height = height;
@@ -155,8 +154,9 @@ export class FxTexture {
 
     drawTo(callback: () => void): void {
         // start rendering to this texture
-        gl.framebuffer = gl.framebuffer || gl.createFramebuffer();
-        gl.bindFramebuffer(gl.FRAMEBUFFER, gl.framebuffer);
+        fxGl.framebuffer ??= BB.throwIfNull(gl.createFramebuffer());
+        const framebuffer = fxGl.framebuffer;
+        gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffer);
         gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, this.id, 0);
         const fbStatus = gl.checkFramebufferStatus(gl.FRAMEBUFFER);
         if (fbStatus !== gl.FRAMEBUFFER_COMPLETE) {
@@ -186,34 +186,6 @@ export class FxTexture {
         // stop rendering to this texture
         gl.bindFramebuffer(gl.FRAMEBUFFER, null);
     }
-
-    /*
-    // never seen this being used
-    fillUsingCanvas (callback: (canvas: CanvasRenderingContext2D) => void): Texture {
-        callback(this.getCanvas(this));
-        this.format = gl.RGBA;
-        this.type = gl.UNSIGNED_BYTE;
-        gl.bindTexture(gl.TEXTURE_2D, this.id);
-        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, this.canvas);
-        return this;
-    }
-
-    // never seen this being used
-    toImage (image: HTMLImageElement): void {
-        this.use();
-        Shader.getDefaultShader().drawRect();
-        const size = this.width * this.height * 4;
-        const pixels = new Uint8Array(size);
-        const c = this.getCanvas(this);
-        const data = c.createImageData(this.width, this.height);
-        gl.readPixels(0, 0, this.width, this.height, gl.RGBA, gl.UNSIGNED_BYTE, pixels);
-        for (let i = 0; i < size; i++) {
-            data.data[i] = pixels[i];
-        }
-        c.putImageData(data, 0, 0);
-        image.src = this.canvas.toDataURL();
-    }
-     */
 
     swapWith(other: FxTexture): void {
         let temp;

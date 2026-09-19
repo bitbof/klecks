@@ -628,7 +628,8 @@ a:not([href]):hover {
 
 textarea,
 input {
-    border: 1px solid #b2b2b2;
+    border: 1px solid #888;
+    border-radius: 3px;
     box-sizing: border-box;
     background: #fff;
     padding: 5px;

@@ -144,9 +144,11 @@ export const filterPattern = {
         const isSmall = testIsSmall();
         const maxSize = 1024;
         const rootEl = BB.el();
-        const context = params.context;
-        const width = context.canvas.width;
-        const height = context.canvas.height;
+        const klCanvas = params.klCanvas;
+        const layer = klCanvas.getLayer(params.selectedLayerIndex);
+        const context = layer.context;
+        const width = layer.canvas.width;
+        const height = layer.canvas.height;
 
         let settings: TFilterPatternInput = {
             x: 0,
@@ -311,9 +313,8 @@ export const filterPattern = {
 
         // ---- previews ----
 
-        const klCanvas = params.klCanvas;
         const layers = klCanvas.getLayers();
-        const selectedLayerIndex = throwIfNull(klCanvas.getLayerIndex(context.canvas));
+        const selectedLayerIndex = params.selectedLayerIndex;
 
         const fit = BB.fitInto(
             context.canvas.width,
@@ -343,16 +344,18 @@ export const filterPattern = {
             isVisible: layers[selectedLayerIndex].isVisible,
             opacity: layers[selectedLayerIndex].opacity,
             mixModeStr: layers[selectedLayerIndex].mixModeStr,
+            hasClipping: layers[selectedLayerIndex].hasClipping,
         };
         const previewLayerArr = layers.map((item, i) => {
             if (i === selectedLayerIndex) {
                 return previewLayer;
             } else {
                 return {
-                    image: item.context.canvas,
+                    image: item.canvas,
                     isVisible: item.isVisible,
                     opacity: item.opacity,
                     mixModeStr: item.mixModeStr,
+                    hasClipping: item.hasClipping,
                 };
             }
         });

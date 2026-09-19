@@ -1,0 +1,26 @@
+.clippingIconWrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 30px;
+    height: 30px;
+    opacity: 1 !important;
+}
+
+.clippingIcon {
+    color: inherit;
+}
+
+.clippingToggle {
+    padding: 5px;
+}
+
+.clippingIndicator {
+    color: var(--kl-color);
+}
+
+:global(.kl-theme-dark) {
+    .clippingIndicator {
+        color: #ccc;
+    }
+}

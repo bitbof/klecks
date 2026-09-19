@@ -20,15 +20,11 @@ export type TFilterPerspectiveInput = {
 
 export const filterPerspective = {
     getDialog(params: TFilterGetDialogParam) {
-        const context = params.context;
         const klCanvas = params.klCanvas;
-        if (!context || !klCanvas) {
-            return false;
-        }
-
+        const selectedLayerIndex = params.selectedLayerIndex;
+        const layer = klCanvas.getLayer(selectedLayerIndex);
         const isSmall = testIsSmall();
         const layers = klCanvas.getLayers();
-        const selectedLayerIndex = klCanvas.getLayerIndex(context.canvas);
 
         const rootEl = BB.el();
         const result: TFilterGetDialogResult<TFilterPerspectiveInput> = {
@@ -39,7 +35,7 @@ export const filterPerspective = {
         }
 
         const fxCanvas = throwIfNull(getSharedFx());
-        const texture = throwIfUndefined(fxCanvas?.texture(context.canvas));
+        const texture = throwIfUndefined(fxCanvas?.texture(layer.canvas));
 
         function update(): void {
             if (isBefore) {
@@ -58,9 +54,9 @@ export const filterPerspective = {
 
         const rectPoints = [
             { x: 0, y: 0 },
-            { x: context.canvas.width, y: 0 },
-            { x: context.canvas.width, y: context.canvas.height },
-            { x: 0, y: context.canvas.height },
+            { x: layer.canvas.width, y: 0 },
+            { x: layer.canvas.width, y: layer.canvas.height },
+            { x: 0, y: layer.canvas.height },
         ];
         const beforeInputs = rectPoints.map((point) => {
             return new DraggableInput({
@@ -116,11 +112,11 @@ export const filterPerspective = {
         {
             for (let i = 0; i < layers.length; i++) {
                 previewLayerArr.push({
-                    image: i === selectedLayerIndex ? fxCanvas : layers[i].context.canvas,
+                    image: i === selectedLayerIndex ? fxCanvas.canvas : layers[i].canvas,
                     isVisible: layers[i].isVisible,
                     opacity: layers[i].opacity,
                     mixModeStr: layers[i].mixModeStr,
-                    hasClipping: false,
+                    hasClipping: layers[i].hasClipping,
                 });
             }
         }
@@ -129,8 +125,8 @@ export const filterPerspective = {
             width: getPreviewWidth(isSmall),
             height: getPreviewHeight(isSmall),
             project: {
-                width: context.canvas.width,
-                height: context.canvas.height,
+                width: layer.canvas.width,
+                height: layer.canvas.height,
                 layers: previewLayerArr,
             },
             onTransformChange: (transform) => {
@@ -190,7 +186,7 @@ export const filterPerspective = {
             .unmultiplyAlpha()
             .update();
         context.clearRect(0, 0, context.canvas.width, context.canvas.height);
-        context.drawImage(fxCanvas, 0, 0);
+        context.drawImage(fxCanvas.canvas, 0, 0);
         texture.destroy();
         {
             const layerMap = Object.fromEntries(

@@ -86,10 +86,10 @@ export function edgeWork(radius) {
         );
 
     simpleShader.call(this, gl.edgeWork1, {
-        delta: [radius / this.width, 0],
+        delta: [radius / this.canvas.width, 0],
     });
     simpleShader.call(this, gl.edgeWork2, {
-        delta: [0, radius / this.height],
+        delta: [0, radius / this.canvas.height],
     });
 
     return this;

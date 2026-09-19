@@ -6,6 +6,7 @@ type TSelectItem<ValueType> = [ValueType, string] | [ValueType, string, { css: T
 
 /**
  * A select dropdown
+ * Deprecated for now, because some Chromebook users report that the dropdown doesn't open (unreproduced). Maybe due to the unfocus stuff, I don't know.
  */
 export class Select<ValueType extends string> {
     private readonly selectEl: HTMLSelectElement;
@@ -35,7 +36,7 @@ export class Select<ValueType extends string> {
                 fontSize: 15,
                 padding: 3,
             },
-            custom: {
+            props: {
                 name: p.name,
             },
         });

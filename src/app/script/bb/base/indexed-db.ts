@@ -1,4 +1,4 @@
-import { getAbortError, timeoutWrapper } from './base';
+import { getSignalAbortError, timeoutWrapper } from './base';
 
 function requestToPromise<G>(request: IDBRequest<G>): Promise<G> {
     return new Promise((resolve, reject) => {
@@ -343,12 +343,12 @@ export class IndexedDb<GSchema extends TIdbSchema> {
         return this.disconnectAfterwardsWrapper(async () => {
             const { durability, signal } = options ?? {};
             if (signal?.aborted) {
-                throw getAbortError(signal);
+                throw getSignalAbortError(signal);
             }
 
             const db = await this.openDb();
             if (signal?.aborted) {
-                throw getAbortError(signal);
+                throw getSignalAbortError(signal);
             }
 
             for (const storeName of storeNames) {
@@ -400,12 +400,12 @@ export class IndexedDb<GSchema extends TIdbSchema> {
                             error,
                         );
                     }
-                    throw signal?.aborted ? getAbortError(signal) : error;
+                    throw signal?.aborted ? getSignalAbortError(signal) : error;
                 }
 
                 const transactionResult = await transactionResultPromise;
                 if (transactionResult.status === 'abort') {
-                    throw signal?.aborted ? getAbortError(signal) : transactionResult.error;
+                    throw signal?.aborted ? getSignalAbortError(signal) : transactionResult.error;
                 }
                 return result;
             } finally {

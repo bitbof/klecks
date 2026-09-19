@@ -1,6 +1,7 @@
 import { getIconSvg, getIconUrl } from '../../../../icon/icon';
 import { DIALOG_COUNTER } from '../modal-count';
 import { BB } from '../../../../bb/bb';
+import { Destroyer } from '../../../../bb/base/base';
 import { LANG } from '../../../../language/language';
 import { TCss } from '../../../../bb/bb-types';
 
@@ -29,6 +30,7 @@ export function showModal<const GButton extends TModalButton<string> = never>(p:
     DIALOG_COUNTER.increase();
     let isClosed = false;
     let ignoreBackground = !!p.ignoreBackground;
+    const destroyer = new Destroyer();
 
     // need this extra layer because chrome mobile otherwise scrolls the page and then glitches as the address bar goes away
     const rootRootEl = BB.el({
@@ -63,6 +65,7 @@ export function showModal<const GButton extends TModalButton<string> = never>(p:
 
     const bgEl = BB.el({
         parent: scrollContent,
+        destroyer,
         onClick: () => {
             if (ignoreBackground) {
                 return;
@@ -83,6 +86,7 @@ export function showModal<const GButton extends TModalButton<string> = never>(p:
     const xButton = BB.el({
         tagName: 'button',
         className: 'popup-x',
+        destroyer,
         content: `<img alt="${LANG('modal-close')}" height="20" src="${getIconUrl('cancel')}">`,
         title: LANG('modal-close'),
         onClick: () => {
@@ -234,6 +238,7 @@ export function showModal<const GButton extends TModalButton<string> = never>(p:
                 parent: buttonRowEl,
                 tagName: 'button',
                 className: [...btnClasses],
+                destroyer,
                 content: [
                     iconImg,
                     BB.el({
@@ -272,13 +277,10 @@ export function showModal<const GButton extends TModalButton<string> = never>(p:
         BB.unfocusAnyInput();
         rootRootEl.remove();
         DIALOG_COUNTER.decrease();
-        BB.destroyEl(xButton);
-        BB.destroyEl(bgEl);
+        destroyer.destroy();
         keyListener.destroy();
         rootEl.removeEventListener('wheel', wheelPrevent);
-        // (disabled) eslint-disable-next-line no-null/no-null
         rootEl.onclick = null;
-        btnElArr.forEach((item) => BB.destroyEl(item));
         btnElArr.splice(0, btnElArr.length);
 
         if (p.callback) {
@@ -297,4 +299,12 @@ export function showModal<const GButton extends TModalButton<string> = never>(p:
             ignoreBackground = b;
         },
     } as const;
+}
+
+export function showError(message: string | Element) {
+    showModal({
+        message,
+        type: 'error',
+        buttons: ['Ok'],
+    });
 }

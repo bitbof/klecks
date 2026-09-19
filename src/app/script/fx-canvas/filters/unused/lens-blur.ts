@@ -113,9 +113,12 @@ export function lensBlur(radius, brightness, angle) {
     const dir = [];
     for (let i = 0; i < 3; i++) {
         const a = angle + (i * Math.PI * 2) / 3;
-        dir.push([(radius * Math.sin(a)) / this.width, (radius * Math.cos(a)) / this.height]);
+        dir.push([
+            (radius * Math.sin(a)) / this.canvas.width,
+            (radius * Math.cos(a)) / this.canvas.height,
+        ]);
     }
-    const power = Math.pow(10, BB.clamp(brightness, -1, 1));
+    const power = 10 ** BB.clamp(brightness, -1, 1);
 
     // Remap the texture values, which will help make the bokeh effect
     simpleShader.call(this, gl.lensBlurPrePass, {

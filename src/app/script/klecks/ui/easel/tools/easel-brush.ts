@@ -91,15 +91,14 @@ export class EaselBrush implements TEaselTool {
         }
 
         if (e.type === 'pointerdown' && e.button === 'left') {
+            this.isDragging = true;
             if (shiftIsPressed) {
                 if (this.lastLineEnd) {
                     this.onLine(this.lastLineEnd, { x, y });
                 }
                 return;
             }
-
             this.onLineStart({ x, y, pressure, isCoalesced });
-            this.isDragging = true;
         }
         if (e.type === 'pointermove' && e.button === 'left') {
             if (shiftIsPressed) {
@@ -123,12 +122,12 @@ export class EaselBrush implements TEaselTool {
             }
         }
         if (e.type === 'pointerup' && e.button === undefined && this.isDragging) {
-            this.onLineEnd();
             this.isDragging = false;
             if (e.pointerType === 'touch') {
                 // due to delay of double-tap listener, pointerleave fires to early
                 this.onPointerLeave();
             }
+            this.onLineEnd();
         }
     }
 

@@ -138,7 +138,7 @@ export class EaselSelect implements TEaselTool {
         return true;
     }
 
-    /** boolean operation if you also consider keys */
+    // boolean operation if you also consider keys
     private getEffectiveBooleanOperation(): TBooleanOperation {
         const isSubtract =
             this.defaultBooleanOperation === 'new'
@@ -208,7 +208,7 @@ export class EaselSelect implements TEaselTool {
 
             if (this.selectShape === 'poly') {
                 if (event.type === 'pointermove') {
-                    if (this.polyShape[this.polyShape.length - 1]?.temp) {
+                    if (this.polyShape.at(-1)?.temp) {
                         this.polyShape.pop();
                     }
                     this.polyShape.push({
@@ -225,10 +225,10 @@ export class EaselSelect implements TEaselTool {
                     this.doubleTapPointerTypes = [];
                     this.easel.updateDoubleTapPointerTypes();
 
-                    if (this.polyShape[this.polyShape.length - 1]?.temp) {
+                    if (this.polyShape.at(-1)?.temp) {
                         this.polyShape.pop();
                     }
-                    const lastPolyShapePoint = this.polyShape[this.polyShape.length - 1];
+                    const lastPolyShapePoint = this.polyShape.at(-1);
                     if (
                         !lastPolyShapePoint ||
                         cursorCanvasPos.x !== lastPolyShapePoint.x ||
@@ -239,7 +239,7 @@ export class EaselSelect implements TEaselTool {
                     }
 
                     const first = this.polyShape[0];
-                    const last = this.polyShape[this.polyShape.length - 1];
+                    const last = this.polyShape.at(-1)!;
                     if (
                         this.polyShape.length > 2 &&
                         BB.dist(first.x, first.y, last.x, last.y) * this.viewportTransform.scale < 4

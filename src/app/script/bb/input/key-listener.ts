@@ -111,7 +111,7 @@ const globalKey = ((): TGlobalKey => {
             codeIsDownObj[code] = undefined;
             // remove from combo
             for (let i = 0; i < comboArr.length; i++) {
-                if (comboArr[i] == keyStr) {
+                if (comboArr[i] === keyStr) {
                     comboArr.splice(i, 1);
                     i--;
                 }
@@ -218,7 +218,7 @@ const globalKey = ((): TGlobalKey => {
 
             // remove from combo
             for (let i = 0; i < comboArr.length; i++) {
-                if (comboArr[i] == keyStr) {
+                if (comboArr[i] === keyStr) {
                     comboArr.splice(i, 1);
                     i--;
                 }

@@ -1,4 +1,6 @@
 import { BB } from '../../bb/bb';
+import { ctx, freeCanvas } from '../../bb/base/canvas';
+import { changeCanvasDimensions } from '../../bb/base/change-canvas-dimensions';
 import { floodFillBits } from '../image-operations/flood-fill';
 import { drawShape } from '../image-operations/shape-tool';
 import { renderText, TRenderTextParam } from '../image-operations/render-text';
@@ -7,8 +9,8 @@ import {
     TFillSampling,
     TGradient,
     TInterpolationAlgorithm,
+    TKlNamedLayer,
     TKlProject,
-    TLayerFromKlCanvas,
     TMixMode,
     TRgb,
     TShapeToolObject,
@@ -43,6 +45,8 @@ import { randomUuid } from '../../bb/base/base';
 import { translateMultiPolygon } from '../../bb/multi-polygon/translate-multi-polygon';
 import { getBinaryMask } from '../select-tool/get-binary-mask';
 import { TIndexBounds } from '../../bb/bb-types';
+import { LayerCompositor } from './layer-compositor';
+import { getMixModeStr } from './get-mix-mode';
 
 export const MAX_LAYERS = 16;
 
@@ -51,6 +55,7 @@ export type TKlCanvasLayer = {
     index: number; // certain brushes need to know
     name: string;
     mixModeStr: TMixMode;
+    hasClipping: boolean;
     isVisible: boolean;
     opacity: number;
     compositeObj?: TLayerComposite;
@@ -61,8 +66,6 @@ export type TKlCanvasLayer = {
 export type TLayerComposite = {
     draw: (ctx: CanvasRenderingContext2D) => void;
 };
-
-const KL_CANVAS_DEBUGGING = false;
 
 /**
  * The image/canvas that the user paints on
@@ -93,9 +96,6 @@ export class KlCanvas {
     ) {
         this.klHistory = history;
         this.layers = [];
-        if (KL_CANVAS_DEBUGGING) {
-            (window as any).getCanvasLayers = () => this.layers;
-        }
         this.eyedropper = new Eyedropper();
         this.width = 0;
         this.height = 0;
@@ -123,14 +123,9 @@ export class KlCanvas {
         color?: TRgb; // optional - fill color
         image?: HTMLImageElement | HTMLCanvasElement; // image drawn on layer
         layerName?: string; // if via image
-        layers?: {
+        layers?: (TKlNamedLayer<HTMLCanvasElement> & {
             id: TLayerId;
-            name: string;
-            isVisible: boolean;
-            opacity: number;
-            mixModeStr: TMixMode;
-            image: HTMLCanvasElement;
-        }[];
+        })[];
     }): number {
         if (
             !p.width ||
@@ -159,9 +154,11 @@ export class KlCanvas {
                     layer.id = pItem.id;
                     layer.name = pItem.name;
                     layer.isVisible = pItem.isVisible;
-                    layer.mixModeStr = pItem.mixModeStr ? pItem.mixModeStr : 'source-over';
-                    layer.canvas.width = this.width;
-                    layer.canvas.height = this.height;
+                    layer.mixModeStr = pItem.mixModeStr;
+                    layer.hasClipping = pItem.hasClipping;
+                    changeCanvasDimensions(layer.canvas, this.width, this.height, {
+                        ensureCleared: true,
+                    });
                     layer.context.drawImage(pItem.image, 0, 0);
                     this.setOpacity(i, pItem.opacity);
                 }
@@ -169,8 +166,10 @@ export class KlCanvas {
                 const layer = this.layers[0];
                 layer.name = p.layerName ? p.layerName : LANG('layers-layer') + ' 1';
                 layer.isVisible = true;
-                layer.canvas.width = this.width;
-                layer.canvas.height = this.height;
+                layer.hasClipping = false;
+                changeCanvasDimensions(layer.canvas, this.width, this.height, {
+                    ensureCleared: true,
+                });
                 layer.mixModeStr = 'source-over';
                 this.setOpacity(0, 1);
                 if (p.color) {
@@ -194,7 +193,7 @@ export class KlCanvas {
                     height: this.height,
                 },
                 selection: { value: this.selection },
-                activeLayerId: this.layers[this.layers.length - 1].id,
+                activeLayerId: this.layers.at(-1)!.id,
                 layerMap: createLayerMap(this.layers, {
                     attributes: 'all',
                 }) as Record<TLayerId, THistoryEntryLayerComposed>,
@@ -256,18 +255,16 @@ export class KlCanvas {
                 }
                 const layer = this.layers[i];
                 tmp1Ctx.drawImage(layer.canvas, 0, 0, w, h);
-                layer.canvas.width = w;
-                layer.canvas.height = h;
+                changeCanvasDimensions(layer.canvas, w, h, { ensureCleared: true });
                 layer.context.drawImage(tmp1, 0, 0);
             }
-        } else if (algorithm === 'smooth') {
+        } else {
+            // smooth
             tmp1 = BB.canvas();
             tmp2 = BB.canvas();
             for (let i = 0; i < this.layers.length; i++) {
                 BB.resizeCanvas(this.layers[i].canvas, w, h, tmp1, tmp2);
             }
-        } else {
-            throw new Error('unknown resize algorithm');
         }
 
         if (this.selection) {
@@ -294,20 +291,20 @@ export class KlCanvas {
     /**
      * crop / extend
      */
-    resizeCanvas(p: {
+    cropExtend(p: {
         left: number;
         top: number;
         right: number;
         bottom: number;
         fillColor?: TRgb;
-    }): void {
+    }): boolean {
         const newW = Math.round(p.left) + this.width + Math.round(p.right);
         const newH = Math.round(p.top) + this.height + Math.round(p.bottom);
         const offX = Math.round(p.left);
         const offY = Math.round(p.top);
 
         if (isNaN(newW) || isNaN(newH) || newW < 1 || newH < 1) {
-            throw new Error('KlCanvas.resizeCanvas - invalid canvas size');
+            return false;
         }
 
         for (let i = 0; i < this.layers.length; i++) {
@@ -315,8 +312,7 @@ export class KlCanvas {
             const layer = this.layers[i];
             BB.ctx(ctemp).drawImage(layer.canvas, 0, 0);
 
-            layer.canvas.width = newW;
-            layer.canvas.height = newH;
+            changeCanvasDimensions(layer.canvas, newW, newH, { ensureCleared: true });
 
             layer.context.save();
             if (i === 0 && p.fillColor) {
@@ -341,6 +337,7 @@ export class KlCanvas {
             layerMap: createLayerMap(this.layers, { attributes: ['tiles'] }),
             ...(this.selection ? { selection: { value: this.selection } } : {}),
         });
+        return true;
     }
 
     /**
@@ -350,7 +347,8 @@ export class KlCanvas {
         selectedIndex?: number,
         data?: {
             name?: string;
-            mixModeStr?: TMixMode;
+            mixModeStr: TMixMode;
+            hasClipping?: boolean;
             isVisible: boolean;
             opacity: number;
             image: HTMLCanvasElement | HTMLImageElement | ((ctx: CanvasRenderingContext2D) => void);
@@ -379,7 +377,8 @@ export class KlCanvas {
                 data && data.name !== undefined
                     ? data.name
                     : LANG('layers-layer') + ' ' + (this.layers.length + this.layerNrOffset),
-            mixModeStr: data ? (data.mixModeStr ?? 'source-over') : 'source-over',
+            mixModeStr: getMixModeStr(data?.mixModeStr),
+            hasClipping: data?.hasClipping ?? false,
             isVisible: data ? data.isVisible : true,
             opacity: data ? data.opacity : 1,
             canvas,
@@ -434,6 +433,7 @@ export class KlCanvas {
             index: newIndex,
             name: srcLayer.name + ' ' + LANG('layers-copy'),
             mixModeStr: srcLayer.mixModeStr,
+            hasClipping: srcLayer.hasClipping,
             isVisible: srcLayer.isVisible,
             opacity: srcLayer.opacity,
             canvas,
@@ -587,6 +587,24 @@ export class KlCanvas {
         }
     }
 
+    setLayerHasClipping(layerIndex: number, hasClipping: boolean): void {
+        if (this.layers[layerIndex]) {
+            this.layers[layerIndex].hasClipping = hasClipping;
+        } else {
+            throw new Error(`layer ${layerIndex} undefined`);
+        }
+
+        if (!this.klHistory.isPaused()) {
+            // todo could this also do replace top like setLayerIsVisible? - might require extra effort
+            this.klHistory.push({
+                layerMap: createLayerMap(this.layers, {
+                    layerId: this.layers[layerIndex].id,
+                    attributes: ['hasClipping'],
+                }),
+            });
+        }
+    }
+
     moveLayer(index: number, delta: number): void | number {
         if (delta === 0) {
             return;
@@ -610,57 +628,29 @@ export class KlCanvas {
         return targetIndex;
     }
 
-    mergeLayers(
-        layerBottomIndex: number,
-        layerTopIndex: number,
-        mixModeStr?: TMixMode | 'as-alpha',
-    ): void | number {
-        if (
-            !this.layers[layerBottomIndex] ||
-            !this.layers[layerTopIndex] ||
-            layerBottomIndex === layerTopIndex
-        ) {
+    mergeLayer(layerIndex: number, mixModeStr?: TMixMode): number | undefined {
+        const topLayer = this.layers[layerIndex];
+        const bottomLayer = this.layers[layerIndex - 1];
+        if (!bottomLayer || !topLayer) {
             return;
         }
-        //order messed up
-        if (layerBottomIndex > layerTopIndex) {
-            const temp = layerBottomIndex;
-            layerBottomIndex = layerTopIndex;
-            layerTopIndex = temp;
+
+        const compositor = new LayerCompositor();
+        let hasChanges: boolean;
+        try {
+            hasChanges = compositor.merge(
+                bottomLayer.context,
+                bottomLayer,
+                { ...topLayer, mixModeStr: mixModeStr ?? topLayer.mixModeStr },
+                (ctx, layer) => ctx.drawImage(layer.canvas, 0, 0),
+            );
+        } finally {
+            compositor.destroy();
         }
 
-        const topLayer = this.layers[layerTopIndex];
-        const bottomLayer = this.layers[layerBottomIndex];
-        if (mixModeStr === undefined) {
-            mixModeStr = topLayer.mixModeStr;
-        }
-
-        const topOpacity = this.layers[layerTopIndex].opacity;
-        const mergedPixelData = topLayer.opacity > 0;
-        if (mergedPixelData) {
-            const bottomCtx = bottomLayer.context;
-            bottomCtx.save();
-
-            if (mixModeStr === 'as-alpha') {
-                // todo remove this?
-
-                BB.convertToAlphaChannelCanvas(topLayer.canvas);
-                bottomCtx.globalCompositeOperation = 'destination-in';
-                bottomCtx.globalAlpha = topOpacity;
-                bottomCtx.drawImage(topLayer.canvas, 0, 0);
-            } else {
-                if (mixModeStr) {
-                    bottomCtx.globalCompositeOperation = mixModeStr;
-                }
-                bottomCtx.globalAlpha = topOpacity;
-                bottomCtx.drawImage(topLayer.canvas, 0, 0);
-            }
-
-            bottomCtx.restore();
-        }
         this.klHistory.pause(true);
         try {
-            this.removeLayer(layerTopIndex);
+            this.removeLayer(layerIndex);
         } finally {
             this.klHistory.pause(false);
         }
@@ -670,34 +660,33 @@ export class KlCanvas {
                 layerMap: createLayerMap(
                     this.layers,
                     { attributes: ['index'] },
-                    mergedPixelData ? { layerId: bottomLayer.id, attributes: 'all' } : undefined,
+                    hasChanges ? { layerId: bottomLayer.id, attributes: ['tiles'] } : undefined,
                 ),
             });
         }
 
-        return layerBottomIndex;
+        return bottomLayer.index;
     }
 
     mergeAll(): number | false {
-        if (this.layers.length === 1) {
+        if (this.layers.length <= 1) {
             return false;
         }
 
-        // draw all on bottom layer
-        const bottomLayer = this.layers[0];
-        bottomLayer.name = LANG('layers-layer') + ' 1';
-        const bottomCtx = bottomLayer.context;
-        for (let i = 1; i < this.layers.length; i++) {
-            const layer = this.layers[i];
-            if (!layer.isVisible || layer.opacity === 0) {
-                continue;
-            }
-            bottomCtx.save();
-            bottomCtx.globalCompositeOperation = layer.mixModeStr;
-            bottomCtx.globalAlpha = layer.opacity;
-            bottomCtx.drawImage(layer.canvas, 0, 0);
-            bottomCtx.restore();
-        }
+        const mergedCanvas = drawProject(this.getProject());
+        const bottomLayer: TKlCanvasLayer = {
+            id: this.layers[0].id,
+            index: 0,
+            canvas: mergedCanvas,
+            context: ctx(mergedCanvas),
+            name: LANG('layers-layer') + ' 1',
+            opacity: 1,
+            isVisible: true,
+            mixModeStr: 'source-over',
+            hasClipping: false,
+        };
+        freeCanvas(this.layers[0].canvas);
+        this.layers[0] = bottomLayer;
 
         this.klHistory.pause(true);
         try {
@@ -713,7 +702,10 @@ export class KlCanvas {
             const activeLayerId = bottomLayer.id;
             this.klHistory.push({
                 activeLayerId,
-                layerMap: createLayerMap(this.layers, { attributes: ['tiles'] }),
+                layerMap: createLayerMap(this.layers, {
+                    layerId: bottomLayer.id,
+                    attributes: 'all',
+                }),
             });
         }
 
@@ -731,11 +723,9 @@ export class KlCanvas {
         }
         const temp = BB.canvas();
         if (deg === 180) {
-            temp.width = this.width;
-            temp.height = this.height;
+            changeCanvasDimensions(temp, this.width, this.height);
         } else if (deg === 90 || deg === 270) {
-            temp.width = this.height;
-            temp.height = this.width;
+            changeCanvasDimensions(temp, this.height, this.width);
         }
         let matrix: Matrix = identity();
         if (deg === 90) {
@@ -752,8 +742,9 @@ export class KlCanvas {
             ctx.setTransform(...matrixToTuple(matrix));
             ctx.drawImage(this.layers[i].canvas, 0, 0);
             ctx.restore();
-            this.layers[i].canvas.width = temp.width;
-            this.layers[i].canvas.height = temp.height;
+            changeCanvasDimensions(this.layers[i].canvas, temp.width, temp.height, {
+                ensureCleared: true,
+            });
             this.layers[i].context.drawImage(temp, 0, 0);
         }
         this.width = temp.width;
@@ -779,8 +770,7 @@ export class KlCanvas {
         }
 
         const temp = BB.canvas(this.width, this.height);
-        temp.width = this.width;
-        temp.height = this.height;
+        changeCanvasDimensions(temp, this.width, this.height);
         const tempCtx = BB.ctx(temp);
 
         const matrix = compose(
@@ -873,43 +863,6 @@ export class KlCanvas {
         );
         ctx.restore();
 
-        // workaround for chrome bug https://bugs.chromium.org/p/chromium/issues/detail?id=1281185
-        // TODO remove if chrome updated
-        ctx.save();
-        ctx.fillStyle = 'rgba(0,0,0,0.01)';
-        ctx.fillRect(-0.9999999, -0.9999999, 1, 1);
-        ctx.restore();
-
-        /*if (!document.getElementById('testocanvas')) {
-            layerCanvasArr[layerIndex].id = 'testocanvas';
-            document.body.append(layerCanvasArr[layerIndex]);
-            css(layerCanvasArr[layerIndex], {
-                position: 'fixed',
-                left: '0',
-                top: '0',
-                zIndex: '1111111',
-                transform: 'scale(0.2)',
-                border: '10px solid red',
-            });
-        }
-        if (!document.getElementById('testocanvas')) {
-            let c = document.createElement('canvas');
-            c.width = 1000;
-            c.height = 1000;
-            let ctx2 = c.getContext('2d');
-            ctx2.drawImage(layerCanvasArr[layerIndex], 0, 0);
-            c.id = 'testocanvas';
-            document.body.append(c);
-            css(c, {
-                position: 'fixed',
-                left: '0',
-                top: '0',
-                zIndex: '1111111',
-                transform: 'scale(0.2)',
-                border: '10px solid red',
-            });
-        }*/
-
         if (!this.klHistory.isPaused()) {
             const targetLayer = this.layers[layerIndex];
             this.klHistory.push({
@@ -960,8 +913,7 @@ export class KlCanvas {
         let targetImageData;
 
         if (sampleStr === 'all') {
-            const srcCanvas =
-                this.layers.length === 1 ? this.layers[0].canvas : this.getCompleteCanvas(1);
+            const srcCanvas = this.layers.length === 1 ? this.layers[0].canvas : this.getCanvas();
             const srcCtx = BB.ctx(srcCanvas);
             const srcImageData = srcCtx.getImageData(0, 0, this.width, this.height);
             const srcData = srcImageData.data;
@@ -1196,84 +1148,22 @@ export class KlCanvas {
         return this.klHistory;
     }
 
-    getLayersRaw(): TKlCanvasLayer[] {
+    getLayersReference(): TKlCanvasLayer[] {
         return this.layers;
     }
 
-    getLayers(): {
-        id: string;
-        canvas: HTMLCanvasElement;
-        context: CanvasRenderingContext2D;
-        isVisible: boolean;
-        opacity: number;
-        name: string;
-        mixModeStr: TMixMode;
-    }[] {
-        return this.layers.map((layer) => {
-            return {
-                id: layer.id,
-                canvas: layer.canvas,
-                context: layer.context,
-                isVisible: layer.isVisible,
-                opacity: layer.opacity,
-                name: layer.name,
-                mixModeStr: layer.mixModeStr,
-            };
-        });
+    getLayers(): TKlCanvasLayer[] {
+        return this.layers.map((layer) => ({ ...layer }));
     }
 
-    getLayersFast(): {
-        canvas: HTMLCanvasElement;
-        isVisible: boolean;
-        opacity: number;
-        name: string;
-        mixModeStr: TMixMode;
-        compositeObj?: TLayerComposite;
-    }[] {
-        return this.layers.map((item) => {
-            return {
-                canvas: item.canvas,
-                isVisible: item.isVisible,
-                opacity: item.opacity,
-                name: item.name,
-                mixModeStr: item.mixModeStr,
-                ...(item.compositeObj ? { compositeObj: item.compositeObj } : {}),
-            };
-        });
-    }
-
-    getLayerIndex(canvasObj: HTMLCanvasElement, doReturnNull?: boolean): null | number {
-        for (let i = 0; i < this.layers.length; i++) {
-            if (this.layers[i].canvas === canvasObj) {
-                return i;
-            }
-        }
-        if (!doReturnNull) {
-            throw new Error('layer not found (in ' + this.layers.length + ' layers)');
-        }
-        return null;
-    }
-
-    getLayerOld(index: number, doReturnNull?: boolean): null | TLayerFromKlCanvas {
-        if (this.layers[index]) {
-            return {
-                context: this.layers[index].context,
-                isVisible: this.layers[index].isVisible,
-                opacity: this.layers[index].opacity,
-                name: this.layers[index].name,
-                id: index,
-            };
-        }
-        if (!doReturnNull) {
+    getLayer(index: number): TKlCanvasLayer {
+        const layer = this.layers[index];
+        if (!layer) {
             throw new Error(
                 'layer of index ' + index + ' not found (in ' + this.layers.length + ' layers)',
             );
         }
-        return null;
-    }
-
-    getLayer(index: number): TKlCanvasLayer {
-        return this.layers[index];
+        return { ...layer };
     }
 
     getColorAt(x: number, y: number): TRgb | undefined {
@@ -1286,8 +1176,8 @@ export class KlCanvas {
         return result;
     }
 
-    getCompleteCanvas(factor: number, maskSelection?: boolean): HTMLCanvasElement {
-        return drawProject(this.getProject(), factor, maskSelection ? this.selection : undefined);
+    getCanvas(factor: number = 1, masksSelection?: boolean): HTMLCanvasElement {
+        return drawProject(this.getProject(), factor, masksSelection ? this.selection : undefined);
     }
 
     getProject(): TKlProject {
@@ -1301,6 +1191,7 @@ export class KlCanvas {
                     isVisible: layer.isVisible,
                     opacity: layer.opacity,
                     mixModeStr: layer.mixModeStr,
+                    hasClipping: layer.hasClipping,
                     image: layer.canvas,
                 };
             }),
@@ -1375,6 +1266,7 @@ export class KlCanvas {
             layer.context = {} as CanvasRenderingContext2D;
         });
         this.layers = [];
+        this.eyedropper.destroy();
         this.isDestroyed = true;
     }
 }

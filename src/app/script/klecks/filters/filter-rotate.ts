@@ -1,6 +1,7 @@
 import { BB } from '../../bb/bb';
 import { TFilterApply, TFilterGetDialogParam, TFilterGetDialogResult } from '../kl-types';
 import { SMALL_PREVIEW } from '../ui/utils/preview-size';
+import { Destroyer } from '../../bb/base/base';
 
 export type TFilterRotateInput = {
     deg: number;
@@ -20,9 +21,10 @@ export const filterRotate = {
         const previewFactor = w / klCanvas.getWidth();
         const tempCanvas = BB.canvas(w, h);
         tempCanvas.style.display = 'block';
-        BB.ctx(tempCanvas).drawImage(klCanvas.getCompleteCanvas(previewFactor), 0, 0, w, h);
+        BB.ctx(tempCanvas).drawImage(klCanvas.getCanvas(previewFactor), 0, 0, w, h);
 
         const rootEl = BB.el();
+        const destroyer = new Destroyer();
         const result: TFilterGetDialogResult<TFilterRotateInput> = {
             element: rootEl,
         };
@@ -51,11 +53,11 @@ export const filterRotate = {
                 }),
                 ' 90°',
             ],
+            destroyer,
             onClick: () => {
                 deg -= 90;
                 update();
             },
-            noRef: true,
         });
         const plusBtn = BB.el({
             tagName: 'button',
@@ -70,11 +72,11 @@ export const filterRotate = {
                 }),
                 ' 90°',
             ],
+            destroyer,
             onClick: () => {
                 deg += 90;
                 update();
             },
-            noRef: true,
             css: {
                 marginLeft: 5,
             },
@@ -118,7 +120,9 @@ export const filterRotate = {
         rootEl.append(previewWrapper);
         update();
 
-        result.destroy = (): void => {};
+        result.destroy = (): void => {
+            destroyer.destroy();
+        };
         result.getInput = function (): TFilterRotateInput {
             result.destroy!();
             return {

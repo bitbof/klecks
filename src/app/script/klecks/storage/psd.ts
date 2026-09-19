@@ -53,7 +53,7 @@ export function blendKlToPsd(str: TMixMode): BlendMode {
  * Converts ag-psd object into something that KlCanvas can represent
  * @param psdObj
  */
-export function readPsd(psdObj: Psd): TKlPsd {
+export function psdToKlPsd(psdObj: Psd): TKlPsd {
     if (!psdObj.canvas) {
         throw new Error('psdObj.canvas undefined');
     }
@@ -65,9 +65,7 @@ export function readPsd(psdObj: Psd): TKlPsd {
     };
 
     function addWarning(warningStr: TKlPsdError): void {
-        if (!result.warningArr) {
-            result.warningArr = [];
-        }
+        result.warningArr ??= [];
         if (result.warningArr.includes(warningStr)) {
             return;
         }
@@ -106,7 +104,7 @@ export function readPsd(psdObj: Psd): TKlPsd {
         if (groupObj.children) {
             for (let i = 0; i < groupObj.children.length; i++) {
                 const item = groupObj.children[i];
-                if (item.clipping || item.adjustment) {
+                if (item.adjustment) {
                     continue;
                 }
 
@@ -164,20 +162,9 @@ export function readPsd(psdObj: Psd): TKlPsd {
         if (psdGroupObj.children) {
             for (let i = 0; i < psdGroupObj.children.length; i++) {
                 const item = psdGroupObj.children[i];
-                if (item.clipping) {
-                    continue;
-                }
                 if (item.adjustment) {
                     addWarning('adjustment');
                     continue;
-                }
-
-                const hasClipping =
-                    (item.children || item.canvas) &&
-                    psdGroupObj.children[i + 1] &&
-                    psdGroupObj.children[i + 1].clipping;
-                if (hasClipping) {
-                    addWarning('clipping');
                 }
 
                 if (item.children) {
@@ -186,51 +173,6 @@ export function readPsd(psdObj: Psd): TKlPsd {
                     for (let e = 0; e < convertedChildGroupItems.length; e++) {
                         const innerItem = convertedChildGroupItems[e];
                         const innerCtx = BB.ctx(innerItem.image);
-
-                        // clipping
-                        if (hasClipping) {
-                            const clippingCanvas = createCanvas(result.width, result.height);
-                            const clippingCtx = BB.ctx(clippingCanvas);
-                            clippingCtx.drawImage(innerItem.image, 0, 0);
-
-                            for (
-                                let f = i + 1;
-                                f < psdGroupObj.children.length && psdGroupObj.children[f].clipping;
-                                f++
-                            ) {
-                                const clippingItem = psdGroupObj.children[f];
-                                if (clippingItem.opacity === 0 || clippingItem.hidden) {
-                                    continue;
-                                }
-                                if (clippingItem.blendMode === undefined) {
-                                    throw new Error('clippingItem.blendMode undefined');
-                                }
-                                if (clippingItem.opacity === undefined) {
-                                    throw new Error('clippingItem.opacity undefined');
-                                }
-                                if (clippingItem.canvas === undefined) {
-                                    throw new Error('clippingItem.canvas undefined');
-                                }
-                                if (clippingItem.left === undefined) {
-                                    throw new Error('clippingItem.left undefined');
-                                }
-                                if (clippingItem.top === undefined) {
-                                    throw new Error('clippingItem.top undefined');
-                                }
-                                clippingCtx.globalCompositeOperation = getMixModeStr(
-                                    clippingItem.blendMode,
-                                );
-                                clippingCtx.globalAlpha = clippingItem.opacity;
-                                clippingCtx.drawImage(
-                                    clippingItem.canvas,
-                                    clippingItem.left,
-                                    clippingItem.top,
-                                );
-                            }
-
-                            innerCtx.globalCompositeOperation = 'source-atop';
-                            innerCtx.drawImage(clippingCanvas, 0, 0);
-                        }
 
                         // group mask
                         if (psdGroupObj.mask) {
@@ -310,69 +252,6 @@ export function readPsd(psdObj: Psd): TKlPsd {
                     ctx.drawImage(item.mask.canvas, item.mask.left, item.mask.top);
                 }
 
-                // clipping
-                if (hasClipping) {
-                    if (item.right === undefined) {
-                        throw new Error('item.right undefined');
-                    }
-                    if (item.left === undefined) {
-                        throw new Error('item.left undefined');
-                    }
-                    if (item.bottom === undefined) {
-                        throw new Error('item.bottom undefined');
-                    }
-                    if (item.top === undefined) {
-                        throw new Error('item.top undefined');
-                    }
-                    if (item.canvas === undefined) {
-                        throw new Error('item.canvas undefined');
-                    }
-                    const clippingCanvas = createCanvas(
-                        item.right - item.left,
-                        item.bottom - item.top,
-                    );
-                    const clippingCtx = BB.ctx(clippingCanvas);
-                    clippingCtx.drawImage(item.canvas, 0, 0);
-
-                    for (
-                        let e = i + 1;
-                        e < psdGroupObj.children.length && psdGroupObj.children[e].clipping;
-                        e++
-                    ) {
-                        const clippingItem = psdGroupObj.children[e];
-                        if (clippingItem.opacity === 0 || clippingItem.hidden) {
-                            continue;
-                        }
-                        if (clippingItem.blendMode === undefined) {
-                            throw new Error('clippingItem.blendMode undefined');
-                        }
-                        if (clippingItem.opacity === undefined) {
-                            throw new Error('clippingItem.opacity undefined');
-                        }
-                        if (clippingItem.canvas === undefined) {
-                            throw new Error('clippingItem.canvas undefined');
-                        }
-                        if (clippingItem.left === undefined) {
-                            throw new Error('clippingItem.left undefined');
-                        }
-                        if (clippingItem.top === undefined) {
-                            throw new Error('clippingItem.top undefined');
-                        }
-                        clippingCtx.globalCompositeOperation = getMixModeStr(
-                            clippingItem.blendMode,
-                        );
-                        clippingCtx.globalAlpha = clippingItem.opacity;
-                        clippingCtx.drawImage(
-                            clippingItem.canvas,
-                            clippingItem.left - item.left,
-                            clippingItem.top - item.top,
-                        );
-                    }
-
-                    ctx.globalCompositeOperation = 'source-atop';
-                    ctx.drawImage(clippingCanvas, item.left, item.top);
-                }
-
                 // group mask
                 if (psdGroupObj.mask) {
                     ctx.globalCompositeOperation =
@@ -418,6 +297,7 @@ export function readPsd(psdObj: Psd): TKlPsd {
                         isVisible: !item.hidden && groupIsVisible,
                         opacity: item.opacity * groupOpacity,
                         mixModeStr: getMixModeStr(item.blendMode),
+                        hasClipping: !!item.clipping,
                         image: canvas,
                     });
                 }
@@ -434,6 +314,7 @@ export function readPsd(psdObj: Psd): TKlPsd {
                     isVisible: groupIsVisible,
                     opacity: groupOpacity,
                     mixModeStr: groupMixModeStr,
+                    hasClipping: !!psdGroupObj.clipping,
                     image: groupCanvas,
                 },
             ];
@@ -467,6 +348,7 @@ export function klPsdToKlProject(klPsd: TKlPsd): TKlProject {
                 isVisible: item.isVisible,
                 opacity: item.opacity,
                 mixModeStr: item.mixModeStr,
+                hasClipping: item.hasClipping,
                 image: item.image,
             };
         });
@@ -478,6 +360,7 @@ export function klPsdToKlProject(klPsd: TKlPsd): TKlProject {
                 isVisible: true,
                 opacity: 1,
                 mixModeStr: 'source-over',
+                hasClipping: false,
                 image: klPsd.canvas,
             },
         ];

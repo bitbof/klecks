@@ -27,19 +27,15 @@ export const filterBrightnessContrast = {
             result.width = getPreviewWidth(isSmall);
         }
 
-        const context = params.context;
         const klCanvas = params.klCanvas;
-        if (!context || !klCanvas) {
-            return false;
-        }
-
+        const selectedLayerIndex = params.selectedLayerIndex;
+        const layer = klCanvas.getLayer(selectedLayerIndex);
         const layers = klCanvas.getLayers();
-        const selectedLayerIndex = klCanvas.getLayerIndex(context.canvas);
 
         let brightness = 0,
             contrast = 0;
         const fxPreviewRenderer = new FxPreviewRenderer({
-            original: context.canvas,
+            original: layer.canvas,
             onUpdate: (fxCanvas) => {
                 return fxCanvas.brightnessContrast(brightness, contrast);
             },
@@ -80,14 +76,11 @@ export const filterBrightnessContrast = {
         {
             for (let i = 0; i < layers.length; i++) {
                 previewLayerArr.push({
-                    image:
-                        i === selectedLayerIndex
-                            ? fxPreviewRenderer.render
-                            : layers[i].context.canvas,
+                    image: i === selectedLayerIndex ? fxPreviewRenderer.render : layers[i].canvas,
                     isVisible: layers[i].isVisible,
                     opacity: layers[i].opacity,
                     mixModeStr: layers[i].mixModeStr,
-                    hasClipping: false,
+                    hasClipping: layers[i].hasClipping,
                 });
             }
         }
@@ -96,8 +89,8 @@ export const filterBrightnessContrast = {
             width: getPreviewWidth(isSmall),
             height: getPreviewHeight(isSmall),
             project: {
-                width: context.canvas.width,
-                height: context.canvas.height,
+                width: layer.canvas.width,
+                height: layer.canvas.height,
                 layers: previewLayerArr,
             },
             selection: klCanvas.getSelection(),

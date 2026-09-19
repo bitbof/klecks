@@ -74,13 +74,13 @@ export class FreeTransformCanvas {
             return {
                 image: item.image,
                 isVisible: item.isVisible,
-                mixModeStr: item.mixModeStr ?? 'source-over',
+                mixModeStr: item.mixModeStr,
                 opacity: item.opacity,
-                hasClipping: false,
+                hasClipping: item.hasClipping,
             };
         });
         this.previewCanvas = BB.canvas(this.imageWidth, this.imageHeight);
-        this.previewLayerArr[this.previewLayerArr.length - 1].image = this.previewCanvas;
+        this.previewLayerArr.at(-1)!.image = this.previewCanvas;
 
         this.preview = new Preview({
             width: p.elementWidth,

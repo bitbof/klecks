@@ -25,6 +25,7 @@ import { MultiPolygon } from 'polygon-clipping';
 import { SelectionRenderer } from '../easel/selection-renderer';
 import { css } from '../../../bb/base/base';
 import { EASEL_MAX_SCALE } from '../easel/easel.config';
+import { Destroyer } from '../../../bb/base/base';
 
 const toolZoomInImg = getIconUrl('tool-zoom-in');
 const toolZoomOutImg = getIconUrl('tool-zoom-out');
@@ -70,6 +71,7 @@ export class Preview {
     private readonly modeToggle: Options<TPreviewMode> | undefined;
     private readonly pointerChain: EventChain;
     private selectionRenderer: SelectionRenderer | undefined;
+    private readonly destroyer = new Destroyer();
 
     private renderLoop = (): void => {
         this.animationFrameId = requestAnimationFrame(this.renderLoop);
@@ -239,9 +241,7 @@ export class Preview {
         const pinchZoomer = new PinchZoomer({
             onPinch: (e) => {
                 if (e.type === 'move') {
-                    if (!oldTransform) {
-                        oldTransform = this.viewport.getTransform();
-                    }
+                    oldTransform ??= this.viewport.getTransform();
                     const metaTransform = toMetaTransform(oldTransform, {
                         x: e.downRelX,
                         y: e.downRelY,
@@ -381,16 +381,17 @@ export class Preview {
                         tagName: 'button',
                         className: 'kl-button',
                         title: LANG('hand-reset'),
+                        destroyer: this.destroyer,
                         onClick: () => {
                             this.reset();
                         },
                         content: `<img alt="reset" height="20" src="${viewportResetImg}">`,
-                        noRef: true,
                     }),
                     c({
                         tagName: 'button',
                         className: 'kl-button',
                         title: LANG('zoom-in'),
+                        destroyer: this.destroyer,
                         onClick: () => {
                             const oldScale = this.viewport.getTransform().scale;
                             const newScale = zoomByStep(oldScale, 1);
@@ -400,12 +401,12 @@ export class Preview {
                             });
                         },
                         content: `<img alt="zoom-in" height="20" src="${toolZoomInImg}">`,
-                        noRef: true,
                     }),
                     c({
                         tagName: 'button',
                         className: 'kl-button',
                         title: LANG('zoom-out'),
+                        destroyer: this.destroyer,
                         onClick: () => {
                             const oldScale = this.viewport.getTransform().scale;
                             const newScale = zoomByStep(oldScale, -1);
@@ -415,7 +416,6 @@ export class Preview {
                             });
                         },
                         content: `<img alt="zoom-out" height="20" src="${toolZoomOutImg}">`,
-                        noRef: true,
                     }),
                 ]),
             ],
@@ -449,7 +449,7 @@ export class Preview {
         e.event?.preventDefault();
 
         const oldScale = this.viewport.getTransform().scale;
-        const newScale = oldScale * Math.pow(1 + 4 / 10, -e.deltaY);
+        const newScale = oldScale * (1 + 4 / 10) ** -e.deltaY;
 
         this.transformCanvas({
             type: 'zoom',
@@ -470,5 +470,6 @@ export class Preview {
         this.rootEl.remove();
         this.modeToggle && this.modeToggle.destroy();
         this.selectionRenderer?.destroy();
+        this.destroyer.destroy();
     }
 }

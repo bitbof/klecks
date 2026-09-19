@@ -30,7 +30,7 @@ export const filterCropExtend = {
         if (!klCanvas) {
             return false;
         }
-        const tempCanvas = klCanvas.getCompleteCanvas(1);
+        const tempCanvas = klCanvas.getCanvas();
 
         const rootEl = BB.el();
         const result: TFilterGetDialogResult<TFilterCropExtendInput> = {
@@ -371,17 +371,9 @@ export const filterCropExtend = {
 
     apply(params: TFilterApply<TFilterCropExtendInput>): boolean {
         const klCanvas = params.klCanvas;
-        if (
-            !klCanvas ||
-            isNaN(params.input.left) ||
-            isNaN(params.input.right) ||
-            isNaN(params.input.top) ||
-            isNaN(params.input.bottom)
-        ) {
+        if (!klCanvas) {
             return false;
         }
-        klCanvas.resizeCanvas(params.input);
-
-        return true;
+        return klCanvas.cropExtend(params.input);
     },
 };

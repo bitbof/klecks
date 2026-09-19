@@ -60,7 +60,7 @@ export class SelectTool {
         return result;
     }
 
-    /** current state of selection */
+    // current state of selection
     getSelection(): MultiPolygon | undefined {
         // combine selections
         let selection: MultiPolygon = this.selection || [];
@@ -72,7 +72,7 @@ export class SelectTool {
 
             if (this.shape === 'rect') {
                 const first = this.selectDragInputs[0];
-                const last = this.selectDragInputs[this.selectDragInputs.length - 1];
+                const last = this.selectDragInputs.at(-1)!;
                 // floor and ceil already limit precision
                 const minX = Math.floor(Math.min(first.x, last.x));
                 const minY = Math.floor(Math.min(first.y, last.y));
@@ -89,7 +89,7 @@ export class SelectTool {
                 ]);
             } else if (this.shape === 'ellipse') {
                 const first = this.selectDragInputs[0];
-                const last = this.selectDragInputs[this.selectDragInputs.length - 1];
+                const last = this.selectDragInputs.at(-1)!;
 
                 const cx = (first.x + last.x) / 2;
                 const cy = (first.y + last.y) / 2;

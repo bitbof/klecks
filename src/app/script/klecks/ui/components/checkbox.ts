@@ -50,10 +50,10 @@ export class Checkbox {
                 width: 14,
                 height: 14,
             },
-            custom: {
+            props: {
                 type: 'checkbox',
                 name: p.name,
-                ...(!isEnabled ? { disabled: 'true' } : {}),
+                ...(!isEnabled ? { disabled: true } : {}),
             },
         });
 

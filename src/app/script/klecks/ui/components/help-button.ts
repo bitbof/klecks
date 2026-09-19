@@ -1,10 +1,12 @@
 import { BB } from '../../../bb/bb';
 import { getIconSvg } from '../../../icon/icon';
+import { Destroyer } from '../../../bb/base/base';
 
 export function createHelpButton(p: {
     title: string;
     onClick: () => void;
     isFocusable?: boolean;
+    destroyer?: Destroyer;
 }): HTMLButtonElement {
     const result = BB.el({
         tagName: 'button',
@@ -14,12 +16,9 @@ export function createHelpButton(p: {
             height: 19,
         }),
         title: p.title,
-        custom: {
-            type: 'button',
-            'aria-label': p.title,
-        },
+        destroyer: p.destroyer,
+        props: { type: 'button', ariaLabel: p.title },
         onClick: p.onClick,
-        noRef: true,
     });
     if (p.isFocusable === false) {
         result.tabIndex = -1;

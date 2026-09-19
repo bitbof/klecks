@@ -1,8 +1,10 @@
-import { TMixMode } from '../../kl-types';
+import { LayerCompositor } from '../../canvas/layer-compositor';
+import { TKlLayer } from '../../kl-types';
 import { BB } from '../../../bb/bb';
+import { changeCanvasDimensions } from '../../../bb/base/change-canvas-dimensions';
 import { css } from '../../../bb/base/base';
 import { THEME } from '../../../theme/theme';
-import { compose, Matrix } from 'transformation-matrix';
+import { Matrix } from 'transformation-matrix';
 import { createMatrixFromTransform } from '../../../bb/transform/create-matrix-from-transform';
 import { matrixToTuple } from '../../../bb/math/matrix-to-tuple';
 import { DEBUG_RENDER, DEBUG_RENDERER_ENABLED } from './debug-render';
@@ -23,17 +25,15 @@ export type TProjectViewportLayerFunc = (
     viewportHeight: number,
 ) => CanvasImageSource | { image: CanvasImageSource; transform: Matrix }; // image drawn with ctx.setTransform(transform)
 
+export type TProjectViewportLayer = TKlLayer<CanvasImageSource | TProjectViewportLayerFunc>;
+
 export type TProjectViewportProject = {
     width: number;
     height: number;
-    layers: {
-        image: CanvasImageSource | TProjectViewportLayerFunc;
-        isVisible: boolean;
-        opacity: number;
-        mixModeStr: TMixMode;
-        hasClipping: boolean;
-    }[];
+    layers: TProjectViewportLayer[];
 };
+
+type TRenderedImage = { image: CanvasImageSource; transform?: Matrix };
 
 export type TViewportTransform = {
     scale: number;
@@ -80,7 +80,9 @@ export class ProjectViewport {
     private height: number;
     private readonly canvas: HTMLCanvasElement;
     private readonly ctx: CanvasRenderingContext2D;
+    private readonly compositor = new LayerCompositor();
     private transform: TViewportTransform;
+    private renderedTransform!: TViewportTransformXY;
 
     private project: TProjectViewportProject;
     private useNativeResolution: boolean;
@@ -155,8 +157,12 @@ export class ProjectViewport {
         if (this.doResize) {
             this.doResize = false;
             this.resFactor = this.useNativeResolution ? devicePixelRatio : 1;
-            this.canvas.width = Math.round(this.width * this.resFactor);
-            this.canvas.height = Math.round(this.height * this.resFactor);
+            changeCanvasDimensions(
+                this.canvas,
+                Math.round(this.width * this.resFactor),
+                Math.round(this.height * this.resFactor),
+                // we'll clear later anyway
+            );
         }
 
         const renderedTransform: TViewportTransformXY = optimizeForAnimation
@@ -175,6 +181,7 @@ export class ProjectViewport {
                   angleDeg: transform.angleDeg,
               };
         const renderedMat = createMatrixFromTransform(renderedTransform);
+        this.renderedTransform = renderedTransform;
 
         this.ctx.save();
 
@@ -217,29 +224,37 @@ export class ProjectViewport {
             this.ctx.restore();
         }
 
-        this.project.layers.forEach((layer) => {
-            if (!layer.isVisible || !layer.opacity) {
-                return;
-            }
-            this.ctx.save();
-            this.ctx.globalCompositeOperation = layer.mixModeStr;
-            this.ctx.globalAlpha = layer.opacity;
-
-            let image: CanvasImageSource;
-            if (typeof layer.image === 'function') {
-                const res = layer.image(renderedTransform, this.canvas.width, this.canvas.height);
-                if ('image' in res && 'transform' in res) {
-                    image = res.image;
-                    this.ctx.setTransform(...matrixToTuple(compose(renderedMat, res.transform)));
-                } else {
-                    image = res;
+        // Resolve dynamic sources once per render so the base and its mask use the same image.
+        const renderedImages = new Map<TProjectViewportLayer, TRenderedImage>();
+        this.compositor.draw(
+            this.ctx,
+            this.project.layers,
+            this.project.width,
+            this.project.height,
+            (ctx, layer) => {
+                let renderedImage = renderedImages.get(layer);
+                if (!renderedImage) {
+                    if (typeof layer.image === 'function') {
+                        const result = layer.image(
+                            this.renderedTransform,
+                            this.canvas.width,
+                            this.canvas.height,
+                        );
+                        renderedImage =
+                            'image' in result && 'transform' in result
+                                ? result
+                                : { image: result };
+                    } else {
+                        renderedImage = { image: layer.image };
+                    }
+                    renderedImages.set(layer, renderedImage);
                 }
-            } else {
-                image = layer.image;
-            }
-            this.ctx.drawImage(image, 0, 0); // , this.project.width, this.project.height);
-            this.ctx.restore();
-        });
+                if (renderedImage.transform) {
+                    ctx.transform(...matrixToTuple(renderedImage.transform));
+                }
+                ctx.drawImage(renderedImage.image, 0, 0);
+            },
+        );
 
         this.renderAfter?.(this.ctx, renderedTransform);
 
@@ -297,6 +312,7 @@ export class ProjectViewport {
 
     destroy(): void {
         BB.freeCanvas(this.canvas);
+        this.compositor.destroy();
         THEME.removeIsDarkListener(this.onIsDark);
         removeIsPixelatedZoomListener(this.onPixelatedZoomChange);
         window.removeEventListener('resize', this.resizeListener);

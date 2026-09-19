@@ -9,7 +9,6 @@ import {
     TMixMode,
 } from '../kl-types';
 import { LANG } from '../../language/language';
-import { throwIfNull } from '../../bb/base/base';
 import { Options } from '../ui/components/options';
 import { SMALL_PREVIEW } from '../ui/utils/preview-size';
 
@@ -21,16 +20,12 @@ export type TFilterFlipInput = {
 
 export const filterFlip = {
     getDialog(params: TFilterGetDialogParam) {
-        const context = params.context;
         const klCanvas = params.klCanvas;
-        if (!context || !klCanvas) {
-            return false;
-        }
-
+        const selectedLayerIndex = params.selectedLayerIndex;
+        const layer = klCanvas.getLayer(selectedLayerIndex);
         const layers = klCanvas.getLayers();
-        const selectedLayerIndex = klCanvas.getLayerIndex(context.canvas);
 
-        const fit = BB.fitInto(context.canvas.width, context.canvas.height, 280, 200, 1);
+        const fit = BB.fitInto(layer.canvas.width, layer.canvas.height, 280, 200, 1);
         const w = parseInt('' + fit.width),
             h = parseInt('' + fit.height);
 
@@ -99,17 +94,68 @@ export const filterFlip = {
             },
         });
 
-        const previewLayer: TKlBasicLayer = {
-            image: BB.canvas(Math.round(w), Math.round(h)),
-            isVisible: true,
-            opacity: 1,
-            mixModeStr: 'source-over' as TMixMode,
-        };
+        const previewLayers: TKlBasicLayer[] = layers.map((item) => ({
+            image: item.canvas,
+            isVisible: item.isVisible,
+            opacity: item.opacity,
+            mixModeStr: item.mixModeStr,
+            hasClipping: item.hasClipping,
+        }));
+        const composedCanvas = klCanvas.getCanvas();
+        const flippedCanvas = BB.canvas(composedCanvas.width, composedCanvas.height);
+
+        function drawFlipped(
+            source: TKlBasicLayer['image'],
+            horizontal: boolean,
+            vertical: boolean,
+        ): HTMLCanvasElement {
+            const ctx = BB.ctx(flippedCanvas);
+            ctx.save();
+            ctx.globalCompositeOperation = 'copy';
+            if (horizontal) {
+                ctx.translate(flippedCanvas.width, 0);
+                ctx.scale(-1, 1);
+            }
+            if (vertical) {
+                ctx.translate(0, flippedCanvas.height);
+                ctx.scale(1, -1);
+            }
+            ctx.drawImage(source, 0, 0);
+            ctx.restore();
+            return flippedCanvas;
+        }
+
+        function buildLayers(): TKlBasicLayer[] {
+            if (doFlipCanvas) {
+                return [
+                    {
+                        image: drawFlipped(composedCanvas, isHorizontal, isVertical),
+                        isVisible: true,
+                        opacity: 1,
+                        mixModeStr: 'source-over' as TMixMode,
+                        hasClipping: false,
+                    },
+                ];
+            }
+            return previewLayers.map((item, i) =>
+                i === selectedLayerIndex
+                    ? {
+                          ...item,
+                          image: drawFlipped(item.image, isHorizontal, isVertical),
+                      }
+                    : item,
+            );
+        }
+
         const klCanvasPreview = new KlCanvasPreview({
             width: Math.round(w),
             height: Math.round(h),
-            layers: [previewLayer],
+            layers: buildLayers(),
         });
+
+        function updatePreview(): void {
+            klCanvasPreview.setLayers(buildLayers());
+        }
 
         const previewInnerWrapper = BB.el({
             className: 'kl-preview-wrapper__canvas',
@@ -121,63 +167,14 @@ export const filterFlip = {
         previewInnerWrapper.append(klCanvasPreview.getElement());
         previewWrapper.append(previewInnerWrapper);
 
-        function updatePreview(): void {
-            const ctx = BB.ctx(previewLayer.image as HTMLCanvasElement);
-            ctx.save();
-            ctx.clearRect(0, 0, previewLayer.image.width, previewLayer.image.height);
-
-            if (doFlipCanvas) {
-                if (isHorizontal) {
-                    ctx.translate(previewLayer.image.width, 0);
-                    ctx.scale(-1, 1);
-                }
-                if (isVertical) {
-                    ctx.translate(0, previewLayer.image.height);
-                    ctx.scale(1, -1);
-                }
-            }
-
-            for (let i = 0; i < layers.length; i++) {
-                if (!layers[i].isVisible) {
-                    continue;
-                }
-
-                ctx.save();
-                if (!doFlipCanvas && selectedLayerIndex === i) {
-                    if (isHorizontal) {
-                        ctx.translate(previewLayer.image.width, 0);
-                        ctx.scale(-1, 1);
-                    }
-                    if (isVertical) {
-                        ctx.translate(0, previewLayer.image.height);
-                        ctx.scale(1, -1);
-                    }
-                }
-                if (ctx.canvas.width > layers[i].context.canvas.width) {
-                    ctx.imageSmoothingEnabled = false;
-                }
-                ctx.globalAlpha = layers[i].opacity;
-                ctx.globalCompositeOperation = layers[i].mixModeStr;
-                ctx.drawImage(
-                    layers[i].context.canvas,
-                    0,
-                    0,
-                    previewLayer.image.width,
-                    previewLayer.image.height,
-                );
-                ctx.restore();
-            }
-            klCanvasPreview.render();
-            ctx.restore();
-        }
-        setTimeout(updatePreview, 0);
-
         rootEl.append(previewWrapper);
         result.destroy = (): void => {
             horizontalCheckbox.destroy();
             verticalCheckbox.destroy();
             targetOptions.destroy();
             klCanvasPreview.destroy();
+            BB.freeCanvas(composedCanvas);
+            BB.freeCanvas(flippedCanvas);
         };
         result.getInput = function (): TFilterFlipInput {
             result.destroy!();
@@ -200,11 +197,7 @@ export const filterFlip = {
             return false;
         }
 
-        klCanvas.flip(
-            horizontal,
-            vertical,
-            flipCanvas ? undefined : throwIfNull(klCanvas.getLayerIndex(context.canvas)),
-        );
+        klCanvas.flip(horizontal, vertical, flipCanvas ? undefined : params.layer.index);
         return true;
     },
 };

@@ -555,10 +555,10 @@ export class FreeTransform {
                             };
                         }
                     }
-                    if (snap.x != undefined) {
+                    if (snap.x !== undefined) {
                         this.value.x = snap.x;
                     }
-                    if (snap.y != undefined) {
+                    if (snap.y !== undefined) {
                         this.value.y = snap.y;
                     }
 

@@ -28,6 +28,9 @@ export type THistoryEntryLayer = {
     // if blend mode changed
     mixModeStr?: TMixMode;
 
+    // if clipping changed
+    hasClipping?: boolean;
+
     // if index changed (did it move up or down)
     index?: number;
 

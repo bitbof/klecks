@@ -1,4 +1,4 @@
-import { gl } from '../core/gl';
+import { fxGl } from '../core/gl';
 import { FxShader } from '../core/fx-shader';
 import { simpleShader } from '../core/simple-shader';
 import { TFxCanvas } from '../fx-canvas-types';
@@ -13,8 +13,8 @@ import { TFxCanvas } from '../fx-canvas-types';
 export type TFilterUnsharpMask = (this: TFxCanvas, radius: number, strength: number) => TFxCanvas;
 
 export const unsharpMask: TFilterUnsharpMask = function (radius, strength) {
-    gl.unsharpMask =
-        gl.unsharpMask ||
+    fxGl.unsharpMask =
+        fxGl.unsharpMask ||
         new FxShader(
             null,
             '\
@@ -32,23 +32,25 @@ export const unsharpMask: TFilterUnsharpMask = function (radius, strength) {
             'unsharpMask',
         );
 
+    const texture = this._.texture!;
+    const extraTexture = this._.extraTexture!;
     // Store a copy of the current texture in the second texture unit
-    this._.extraTexture.ensureFormatViaTexture(this._.texture);
-    this._.texture.use();
-    this._.extraTexture.drawTo(function () {
+    extraTexture.ensureFormatViaTexture(texture);
+    texture.use();
+    extraTexture.drawTo(function () {
         FxShader.getDefaultShader().drawRect();
     });
 
     // Blur the current texture, then use the stored texture to detect edges
-    this._.extraTexture.use(1);
+    extraTexture.use(1);
     this.triangleBlur(radius);
-    gl.unsharpMask.textures({
+    fxGl.unsharpMask.textures({
         originalTexture: 1,
     });
-    simpleShader.call(this, gl.unsharpMask, {
+    simpleShader.call(this, fxGl.unsharpMask, {
         strength: strength,
     });
-    this._.extraTexture.unuse(1);
+    extraTexture.unuse(1);
 
     return this;
 };

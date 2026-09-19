@@ -61,7 +61,7 @@ export class EraserBrush {
             this.context.globalCompositeOperation = 'destination-out';
         }
         const radgrad = this.context.createRadialGradient(size, size, 0, size, size, size);
-        let sharpness = Math.pow(opacity, 2);
+        let sharpness = opacity ** 2;
         sharpness = Math.max(0, Math.min((size - 1) / size, sharpness));
         const oFac = Math.max(0, Math.min(1, opacity));
         const localOpacity = 2 * oFac - oFac * oFac;
@@ -206,7 +206,7 @@ export class EraserBrush {
             return;
         }
 
-        const mouseDist = Math.sqrt(Math.pow(x2 - x1, 2.0) + Math.pow(y2 - y1, 2.0));
+        const mouseDist = Math.sqrt((x2 - x1) ** 2.0 + (y2 - y1) ** 2.0);
         const eX = (x2 - x1) / mouseDist;
         const eY = (y2 - y1) / mouseDist;
         let loopDist;

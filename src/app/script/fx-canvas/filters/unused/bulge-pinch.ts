@@ -41,7 +41,7 @@ export function bulgePinch(centerX, centerY, radius, strength) {
         radius: radius,
         strength: BB.clamp(strength, -1, 1),
         center: [centerX, centerY],
-        texSize: [this.width, this.height],
+        texSize: [this.canvas.width, this.canvas.height],
     });
 
     return this;

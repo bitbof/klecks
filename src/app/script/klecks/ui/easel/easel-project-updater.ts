@@ -1,6 +1,7 @@
 import { KlCanvas } from '../../canvas/kl-canvas';
 import { Easel } from './easel';
 import { BB } from '../../../bb/bb';
+import { changeCanvasDimensions } from '../../../bb/base/change-canvas-dimensions';
 import { throwIfNull } from '../../../bb/base/base';
 
 export type TEaselProjectUpdaterParams<T extends string> = {
@@ -27,7 +28,7 @@ export class EaselProjectUpdater<T extends string> {
     update(): void {
         const width = this.klCanvas.getWidth();
         const height = this.klCanvas.getHeight();
-        const layers = this.klCanvas.getLayersFast();
+        const layers = this.klCanvas.getLayers();
 
         // free resources if no compositing being done
         if (layers.some((layer) => layer.compositeObj)) {
@@ -49,15 +50,10 @@ export class EaselProjectUpdater<T extends string> {
                     image:
                         layer.compositeObj && compositeCanvas
                             ? () => {
-                                  if (
-                                      compositeCanvas.width != width ||
-                                      compositeCanvas.height != height
-                                  ) {
-                                      compositeCanvas.width = width;
-                                      compositeCanvas.height = height;
-                                  }
+                                  changeCanvasDimensions(compositeCanvas, width, height, {
+                                      ensureCleared: true,
+                                  });
                                   const ctx = compositeCanvas.getContext('2d')!;
-                                  ctx.clearRect(0, 0, width, height);
                                   ctx.drawImage(layer.canvas, 0, 0);
                                   layer.compositeObj?.draw(
                                       throwIfNull(compositeCanvas.getContext('2d')),
@@ -68,7 +64,7 @@ export class EaselProjectUpdater<T extends string> {
                     isVisible: layer.isVisible,
                     opacity: layer.opacity,
                     mixModeStr: layer.mixModeStr,
-                    hasClipping: false,
+                    hasClipping: layer.hasClipping,
                 };
             }),
             selection: this.klCanvas.getSelection(),

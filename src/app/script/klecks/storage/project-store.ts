@@ -11,6 +11,7 @@ import { isBlob, randomUuid } from '../../bb/base/base';
 import { TIdb } from './kl-indexed-db.types';
 import { BB } from '../../bb/bb';
 import { canvasToBlob } from '../../bb/base/canvas';
+import { getMixModeStr } from '../canvas/get-mix-mode';
 
 export function isImageDataReference(
     input: unknown,
@@ -167,7 +168,8 @@ export class ProjectStore {
                 return {
                     ...layer,
                     isVisible: layer.isVisible ?? true,
-                    mixModeStr: layer.mixModeStr ?? 'source-over',
+                    mixModeStr: getMixModeStr(layer.mixModeStr),
+                    hasClipping: layer.hasClipping ?? false,
                     // for now ignores the ImageData case because we only write blobs for browser storage projects
                     blob: isBlob(storedBlob) ? storedBlob : undefined,
                 };

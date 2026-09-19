@@ -1,4 +1,4 @@
-import { gl } from '../core/gl';
+import { fxGl } from '../core/gl';
 import { FxShader } from '../core/fx-shader';
 import { simpleShader } from '../core/simple-shader';
 import { TFxCanvas } from '../fx-canvas-types';
@@ -10,8 +10,8 @@ import { TFxCanvas } from '../fx-canvas-types';
 export type TFilterInvert = (this: TFxCanvas) => TFxCanvas;
 
 export const invert: TFilterInvert = function () {
-    gl.invert =
-        gl.invert ||
+    fxGl.invert =
+        fxGl.invert ||
         new FxShader(
             null,
             '\
@@ -28,8 +28,8 @@ export const invert: TFilterInvert = function () {
             'invert',
         );
 
-    simpleShader.call(this, gl.invert, {
-        texSize: [this.width, this.height],
+    simpleShader.call(this, fxGl.invert, {
+        texSize: [this.canvas.width, this.canvas.height],
     });
 
     return this;

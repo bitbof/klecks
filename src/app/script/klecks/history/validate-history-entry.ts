@@ -2,6 +2,7 @@ import { isLayerFill } from '../kl-types';
 import { THistoryEntryData } from './history.types';
 import { HISTORY_TILE_SIZE } from './kl-history';
 import { getTileSizeFromIndex } from './image-data-tile';
+import { asyncThrow } from '../../bb/base/base';
 
 // creates some visibility for problems with history entries.
 export function validateHistoryEntry(
@@ -21,9 +22,7 @@ export function validateHistoryEntry(
         }
         if (layer.tiles.length !== expectedTileCount) {
             const err = `[KlHistory] Invalid tile count for layer "${layerId}": expected ${expectedTileCount}, got ${layer.tiles.length}`;
-            setTimeout(() => {
-                throw new Error(err);
-            });
+            asyncThrow(new Error(err));
             // one error is enough
             return;
         }
@@ -36,9 +35,7 @@ export function validateHistoryEntry(
             const tileSize = getTileSizeFromIndex(tileIndex, size);
             if (tile.data.width !== tileSize.width || tile.data.height !== tileSize.height) {
                 const err = `[KlHistory] Invalid tile dimensions for layer "${layerId}" at index ${tileIndex}: expected ${tileSize.width}x${tileSize.height}, got ${tile.data.width}x${tile.data.height}`;
-                setTimeout(() => {
-                    throw new Error(err);
-                });
+                asyncThrow(new Error(err));
                 // one error is enough
                 return;
             }

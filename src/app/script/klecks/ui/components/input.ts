@@ -55,7 +55,7 @@ export class Input<G extends string | number> {
             tagName: 'input',
             parent: this.rootEl,
             title: p.title,
-            custom: {
+            props: {
                 name: p.name,
             },
         });

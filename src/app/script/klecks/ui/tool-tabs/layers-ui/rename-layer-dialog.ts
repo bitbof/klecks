@@ -4,6 +4,7 @@ import { LANG } from '../../../../language/language';
 import { showModal } from '../../modals/base/show-modal';
 import { Input } from '../../components/input';
 import { css } from '../../../../bb/base/base';
+import { Destroyer } from '../../../../bb/base/base';
 
 export function renameLayerDialog(
     parentEl: HTMLElement,
@@ -11,6 +12,7 @@ export function renameLayerDialog(
     callback: (newName: string | undefined) => void,
 ): void {
     const div = BB.el();
+    const destroyer = new Destroyer();
 
     const label = BB.el({
         content: LANG('layers-rename-name') + ':',
@@ -38,6 +40,7 @@ export function renameLayerDialog(
             height: 20,
         }),
         title: LANG('layers-rename-clear'),
+        destroyer,
         css: {
             marginLeft: 10,
         },
@@ -70,6 +73,7 @@ export function renameLayerDialog(
             tagName: 'button',
             className: 'kl-button',
             content: item,
+            destroyer,
             onClick: () => {
                 input.setValue(btn.textContent ?? '');
             },
@@ -97,10 +101,7 @@ export function renameLayerDialog(
         callback: (val) => {
             const newName = val === 'rename' ? input.getValue() : undefined;
             input.destroy();
-            BB.destroyEl(clearBtn);
-            suggestionBtns.forEach((item) => {
-                BB.destroyEl(item);
-            });
+            destroyer.destroy();
             suggestionBtns.splice(0, suggestionBtns.length);
             callback(newName);
         },
