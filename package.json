@@ -1,7 +1,8 @@
 {
   "type": "module",
   "browserslist": [
-    "defaults and fully supports es6-module"
+    "defaults and fully supports es6-module",
+    "last 6 iOS major versions"
   ],
   "scripts": {
     "start": "parcel serve src/index.html --no-cache",

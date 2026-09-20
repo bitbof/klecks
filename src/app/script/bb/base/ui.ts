@@ -129,7 +129,13 @@ export function el<GTag extends keyof HTMLElementTagNameMap = 'div'>(params?: {
         params.destroyer?.add(() => result.removeEventListener('change', onChange));
     }
     if (params.props) {
-        Object.assign(result, params.props);
+        Object.assign(
+            result,
+            // filter out undefined, to avoid things like title = "undefined"
+            Object.fromEntries(
+                Object.entries(params.props).filter(([, value]) => value !== undefined),
+            ),
+        );
     }
     return result as HTMLElementTagNameMap[GTag];
 }
