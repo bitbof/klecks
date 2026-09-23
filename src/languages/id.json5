@@ -7,7 +7,7 @@
   'toggle-show-tools': {
     hint: 'Button that hides/shows the toolbar.',
     original: 'Show/Hide Tools',
-    value: 'Menampilkan/Menyembunyikan Alat'
+    value: 'Tampilkan/Sembunyikan Alat'
   },
   scroll: {
     hint: 'Verb. As in scrolling a page.',
@@ -64,15 +64,15 @@
   'tool-hand': {
     hint: 'Tool for navigating (or scrolling around) the canvas. Same name in Photoshop.',
     original: 'Hand Tool',
-    value: 'Alat Bantu Tangan'
+    value: 'Alat Tangan'
   },
   'tool-select': {
     original: 'Select Tool',
-    value: 'Pilih Alat'
+    value: 'Alat Pilih'
   },
   'tool-zoom': {
     original: 'Zoom',
-    value: 'Perbesar'
+    value: 'Zoom'
   },
   'tool-more-tools': {
     hint: 'when hovering the caret on the tool button',
@@ -99,12 +99,12 @@
   'brush-blend': {
     hint: 'brush with watercolor feel. Makes colors blend/bleed into each other. Different from smudging though.',
     original: 'Blend',
-    value: 'Mencampur'
+    value: 'Campur'
   },
   'brush-sketchy': {
     hint: 'Made up brush name. Pictures drawn with this brush often look like sketches.',
     original: 'Sketchy',
-    value: 'Samar-samar'
+    value: 'Sketsa'
   },
   'brush-pixel': {
     original: 'Pixel',
@@ -118,7 +118,7 @@
   'brush-smudge': {
     hint: 'Common brush/tool in image editing software. Smudges colors around canvas.',
     original: 'Smudge',
-    value: 'Noda'
+    value: 'Gosok'
   },
   'brush-size': {
     original: 'Size',
@@ -132,7 +132,7 @@
   'brush-toggle-pressure': {
     hint: 'google "pressure sensitivity". Feature of Wacom tablets, Apple Pencil, XP Pen, etc.',
     original: 'Toggle Pressure Sensitivity',
-    value: 'Mengalihkan Sensitivitas Tekanan'
+    value: 'Alihkan Sensitivitas Tekanan'
   },
   'brush-pen-circle': {
     hint: 'as in circle shape',
@@ -162,7 +162,7 @@
   'brush-pixel-dither': {
     hint: 'Dithering/halftone pattern',
     original: 'Dither',
-    value: 'Bimbang'
+    value: 'Dither'
   },
   'brush-chemy-fill': {
     hint: 'Like in MS Paint. A shape can have be outlined, and filled.',
@@ -175,7 +175,7 @@
   },
   'brush-chemy-mirror-x': {
     original: 'Horizontal Symmetry',
-    value: 'Simetri Horisontal'
+    value: 'Simetri Horizontal'
   },
   'brush-chemy-mirror-y': {
     original: 'Vertical Symmetry',
@@ -199,11 +199,11 @@
   'stabilizer-title': {
     hint: '-title keys are usually more verbose description. shown as a tooltip.',
     original: 'Stroke Stabilizer',
-    value: 'Penstabil Stroke'
+    value: 'Penstabil Goresan'
   },
   eyedropper: {
     original: 'Eyedropper',
-    value: 'Penetes Mata'
+    value: 'Pipet Warna'
   },
   'secondary-color': {
     hint: 'or sometimes called "background" color. Photoshop, MS Paint, etc. allow user to switch between two colors.',
@@ -251,12 +251,12 @@
   'layers-copy': {
     hint: 'noun',
     original: 'copy',
-    value: 'salin'
+    value: 'salinan'
   },
   'layers-blending': {
     hint: 'Common feature in image editing & drawing software. All layers-blend- keys relate to this. https://en.wikipedia.org/wiki/Blend_modes',
     original: 'Blending',
-    value: 'Campuran'
+    value: 'Pencampuran'
   },
   'layers-new': {
     hint: 'action',
@@ -276,12 +276,12 @@
   'layers-merge': {
     hint: 'action',
     original: 'Merge with layer below',
-    value: 'Gabung dengan layer di bawah ini'
+    value: 'Gabung dengan lapisan di bawah'
   },
   'layers-clear': {
     hint: 'to make a layer empty',
     original: 'Clear layer',
-    value: 'Lapisan bening'
+    value: 'Hapus lapisan'
   },
   'layers-merge-advanced': {
     original: 'Advanced merge',
@@ -302,15 +302,15 @@
   },
   'layers-active-layer-hidden': {
     original: 'Active layer is hidden',
-    value: 'Lapisan aktif tak terlihat'
+    value: 'Lapisan aktif tersembunyi'
   },
   'layers-visibility-toggle': {
     original: 'Layer Visibility',
-    value: 'Ketampakan Lapisan'
+    value: 'Visibilitas Lapisan'
   },
   'layers-blend-normal': {
     original: 'normal',
-    value: 'biasa'
+    value: 'normal'
   },
   'layers-blend-darken': {
     original: 'darken',
@@ -318,11 +318,11 @@
   },
   'layers-blend-multiply': {
     original: 'multiply',
-    value: 'gandakan'
+    value: 'kalikan'
   },
   'layers-blend-color-burn': {
     original: 'color burn',
-    value: 'membakar warna'
+    value: 'color burn'
   },
   'layers-blend-lighten': {
     original: 'lighten',
@@ -330,15 +330,15 @@
   },
   'layers-blend-screen': {
     original: 'screen',
-    value: 'layar'
+    value: 'screen'
   },
   'layers-blend-color-dodge': {
     original: 'color dodge',
-    value: 'menghindari warna'
+    value: 'color dodge'
   },
   'layers-blend-overlay': {
     original: 'overlay',
-    value: 'hamparan'
+    value: 'overlay'
   },
   'layers-blend-soft-light': {
     original: 'soft light',
@@ -370,7 +370,7 @@
   },
   'layers-blend-luminosity': {
     original: 'luminosity',
-    value: 'kilau'
+    value: 'luminositas'
   },
   'layers-rename-title': {
     hint: '-title in code usually means it shows up in a tooltip, or it’s the header of a dialog box, so it can be a little bit longer.',
@@ -385,7 +385,7 @@
   'layers-rename-clear': {
     hint: 'aka action of deleting entered name',
     original: 'Clear Name',
-    value: 'Bersih Nama'
+    value: 'Hapus Nama'
   },
   'layers-rename-sketch': {
     hint: 'noun. Name suggestion for a layer',
@@ -395,7 +395,7 @@
   'layers-rename-colors': {
     hint: 'noun. Name suggestion for a layer',
     original: 'Colors',
-    value: 'Warna-warna'
+    value: 'Warna'
   },
   'layers-rename-shading': {
     hint: 'noun. Name suggestion for a layer',
@@ -405,12 +405,12 @@
   'layers-rename-lines': {
     hint: 'noun. Name suggestion for a layer',
     original: 'Lines',
-    value: 'Garis-garis'
+    value: 'Garis'
   },
   'layers-rename-effects': {
     hint: 'noun. Name suggestion for a layer',
     original: 'Effects',
-    value: 'Efek-efek'
+    value: 'Efek'
   },
   'layers-rename-foreground': {
     hint: 'noun. Name suggestion for a layer',
@@ -424,12 +424,12 @@
   'layers-merge-description': {
     hint: 'After ":" a list of mix/blend modes is shown.',
     original: 'Merges the selected layer with the one underneath. Select the mix mode:',
-    value: 'Menggabungkan layer yang dipilih dengan layer di bawahnya. Pilih mode campuran:'
+    value: 'Menggabungkan lapisan yang dipilih dengan lapisan di bawahnya. Pilih mode pencampuran:'
   },
   'file-no-autosave': {
     hint: "let user know they can't autosave, and there's no cloud storage. Keep short so fits on one line",
     original: 'No autosave, no cloud storage',
-    value: 'Tidak ada simpan otomatis, tidak ada awan'
+    value: 'Tidak ada simpan otomatis, tidak ada penyimpanan awan'
   },
   'file-new': {
     hint: 'action',
@@ -453,7 +453,7 @@
   'file-show-save-dialog': {
     hint: 'setting for showing/not showing a dialog where user picks folder and filename',
     original: 'Show save dialog',
-    value: 'Tanpilkan simpan dialog'
+    value: 'Tampilkan dialog simpan'
   },
   'file-copy': {
     hint: 'verb',
@@ -476,17 +476,17 @@
   'file-storage': {
     hint: 'Made up term. Allows users to store drawing in the browser. (not synced across devices)',
     original: 'Browser Storage',
-    value: 'Penyimpanan Peramban'
+    value: 'Penyimpanan Browser'
   },
   'file-storage-about': {
     hint: 'link to Browser Storage help/user manual',
     original: 'About Browser Storage',
-    value: 'Tentang Penyimpanan Peramban'
+    value: 'Tentang Penyimpanan Browser'
   },
   'file-storage-cant-access': {
     hint: 'an error. Can’t access the storage.',
     original: "Can't access storage.",
-    value: 'Tidak bisa akses penyimpanan.'
+    value: 'Tidak bisa mengakses penyimpanan.'
   },
   'file-storage-empty': {
     hint: 'nothing stored',
@@ -496,7 +496,7 @@
   'file-storage-store': {
     hint: 'verb',
     original: 'Store',
-    value: 'Menyimpan'
+    value: 'Simpan'
   },
   'file-storage-open': {
     hint: 'verb. to open, or to load',
@@ -513,16 +513,16 @@
   },
   'file-storage-clear': {
     original: 'Clear',
-    value: 'Bersih'
+    value: 'Hapus'
   },
   'file-storage-clear-prompt': {
     original: 'Clear Browser Storage? Clearing can not be undone.',
-    value: 'Menghapus Penyimpanan Browser? Kliring tidak dapat dibatalkan.'
+    value: 'Hapus Penyimpanan Browser? Penghapusan tidak dapat dibatalkan.'
   },
   'file-storage-storing': {
     hint: 'while it is in the process of storing',
     original: 'Storing',
-    value: 'Penyimpanan'
+    value: 'Menyimpan'
   },
   'file-storage-overwrite': {
     hint: 'overwrite what is already stored',
@@ -531,7 +531,7 @@
   },
   'file-storage-overwrite-confirm': {
     original: 'Overwrite Browser Storage? Overwritten data will be permanently deleted.',
-    value: 'Menimpa Penyimpanan Browser? Data yang ditimpa akan dihapus secara permanen.'
+    value: 'Timpa Penyimpanan Browser? Data yang tertimpa akan dihapus secara permanen.'
   },
   'file-storage-min-ago': {
     hint: "{x} <- needs to stay, it's a placeholder.",
@@ -552,15 +552,15 @@
   },
   'file-storage-restored': {
     original: 'Restored from Browser Storage',
-    value: 'Dipulihkan dari Penyimpanan Peramban'
+    value: 'Dipulihkan dari Penyimpanan Browser'
   },
   'file-storage-stored': {
     original: 'Stored to Browser Storage',
-    value: 'Disimpan ke Penyimpanan Peramban'
+    value: 'Disimpan ke Penyimpanan Browser'
   },
   'file-storage-failed': {
     original: 'Failed to store to Browser Storage',
-    value: 'Gagal menyimpan ke Penyimpanan Peramban'
+    value: 'Gagal menyimpan ke Penyimpanan Browser'
   },
   'file-storage-failed-1': {
     original: 'Failed to store. Possible causes:',
@@ -568,7 +568,7 @@
   },
   'file-storage-failed-2': {
     original: 'Out of disk space',
-    value: 'Kehabisan Penyimpanan'
+    value: 'Kehabisan ruang penyimpanan'
   },
   'file-storage-failed-3': {
     original: 'Storage disabled in incognito tab',
@@ -577,11 +577,11 @@
   'file-storage-failed-4': {
     hint: 'as in: unsupported feature',
     original: "Browser doesn't support storage",
-    value: 'Peramban tidak mendukung penyimpanan'
+    value: 'Browser tidak mendukung penyimpanan'
   },
   'file-storage-failed-clear': {
     original: 'Failed to clear.',
-    value: 'Gagal untuk bersih.'
+    value: 'Gagal menghapus.'
   },
   'file-upload': {
     hint: 'verb',
@@ -591,7 +591,7 @@
   'tab-recovery-recover-tabs': {
     hint: 'allows user to recover browser tabs (including the drawing) of this app.',
     original: 'Recover closed tabs',
-    value: 'Memulihkan tab yang tertutup'
+    value: 'Pulihkan tab yang tertutup'
   },
   'tab-recovery-explanation': {
     original: 'Recovery data is only kept for a little while. Save to ensure your work is not lost.',
@@ -615,7 +615,7 @@
   },
   'tab-recovery-delete-confirmation': {
     original: 'Delete this recovery? Deletion can not be undone.',
-    value: 'Menghapus pemulihan ini? Penghapusan tidak dapat dibatalkan.'
+    value: 'Hapus pemulihan ini? Penghapusan tidak dapat dibatalkan.'
   },
   'tab-recovery-failed-to-recover': {
     original: 'Failed to recover tab.',
@@ -627,16 +627,16 @@
   },
   'tab-recovery-restoring-session': {
     original: 'Restoring your previous session...',
-    value: ''
+    value: 'Memulihkan sesi Anda sebelumnya...'
   },
   'cleared-layer': {
     hint: 'the layer has been cleared. It is now empty',
     original: 'Cleared layer',
-    value: 'Lapisan yang dibersihkan'
+    value: 'Lapisan dihapus'
   },
   'cleared-selected-area': {
     original: 'Cleared selected area',
-    value: 'Membersihkan area yang dipilih'
+    value: 'Area yang dipilih dihapus'
   },
   filled: {
     hint: 'layer got filled with a color',
@@ -645,7 +645,7 @@
   },
   'filled-selected-area': {
     original: 'Filled selection',
-    value: 'Pilihan yang terisi'
+    value: 'Pilihan terisi'
   },
   'new-title': {
     original: 'New Image',
@@ -659,7 +659,7 @@
   'new-fit': {
     hint: 'make dimensions of image fit your window size',
     original: 'Fit',
-    value: 'Cocok'
+    value: 'Sesuaikan'
   },
   'new-oversize': {
     hint: 'like oversized clothes.',
@@ -713,7 +713,7 @@
   'upload-link-notice': {
     hint: 'Explaining to user even though their upload is unlisted, they should be careful who they share the link with. No password protection.',
     original: 'Anyone with the link to your uploaded image will be able to view it.',
-    value: 'Siapa pun yang memiliki tautan ke gambar yang anda unggah akan dapat melihatnya.'
+    value: 'Siapa pun yang memiliki tautan ke gambar yang Anda unggah akan dapat melihatnya.'
   },
   'upload-name': {
     hint: 'noun',
@@ -722,7 +722,7 @@
   },
   'upload-title-untitled': {
     original: 'Untitled',
-    value: 'Tak berjudul'
+    value: 'Tanpa judul'
   },
   'upload-caption': {
     hint: 'as in image caption / description',
@@ -741,7 +741,7 @@
   },
   'upload-success': {
     original: 'Upload Successful',
-    value: 'Unggah selesai'
+    value: 'Unggah berhasil'
   },
   'upload-failed': {
     original: 'Upload failed.',
@@ -749,7 +749,7 @@
   },
   'upload-delete': {
     original: 'To delete your image from Imgur visit:',
-    value: 'Untuk menghapus gambar anda dari Imgur, kunjungi:'
+    value: 'Untuk menghapus gambar Anda dari Imgur, kunjungi:'
   },
   'cropcopy-title-copy': {
     original: 'Copy To Clipboard',
@@ -762,11 +762,11 @@
   },
   'cropcopy-mask': {
     original: 'Mask unselected',
-    value: 'Topeng tidak dipilih'
+    value: 'Masker tidak dipilih'
   },
   'cropcopy-click-hold': {
     original: 'Right-click or press hold to copy.',
-    value: 'Klik kanan atau tekan terus untuk menyalin.'
+    value: 'Klik kanan atau tekan lama untuk menyalin.'
   },
   'cropcopy-btn-copy': {
     hint: 'confirmation button. Should be short.',
@@ -785,11 +785,11 @@
   'crop-drag-to-crop': {
     hint: 'drag the mouse to adjust cropping',
     original: 'Drag to crop',
-    value: 'Seret untuk memotong'
+    value: 'Seret untuk memangkas'
   },
   'filter-crop-extend': {
     original: 'Crop/Extend',
-    value: 'Pangkas/Perpanjangan'
+    value: 'Pangkas/Perluas'
   },
   'filter-flip': {
     original: 'Flip',
@@ -802,7 +802,7 @@
   },
   'filter-resize': {
     original: 'Resize',
-    value: 'Memperbesar'
+    value: 'Ubah Ukuran'
   },
   'filter-rotate': {
     original: 'Rotate',
@@ -811,12 +811,12 @@
   'filter-transform': {
     hint: 'more generic transformation. Commonly known as "free transform"',
     original: 'Transform',
-    value: 'Mengubah'
+    value: 'Transformasi'
   },
   'filter-bright-contrast': {
     hint: 'brightness contrast',
     original: 'Bright/Contrast',
-    value: 'Cerah/Kontras'
+    value: 'Kecerahan/Kontras'
   },
   'filter-curves': {
     hint: 'color curves',
@@ -825,17 +825,17 @@
   },
   'filter-hue-sat': {
     original: 'Hue/Saturation',
-    value: 'Rona/Kejenuhan'
+    value: 'Rona/Saturasi'
   },
   'filter-invert': {
     hint: 'invert the colors',
     original: 'Invert',
-    value: 'Membalikkan'
+    value: 'Balikkan'
   },
   'filter-tilt-shift': {
     hint: 'or just depth-of-field. https://en.wikipedia.org/wiki/Tilt%E2%80%93shift_photography',
     original: 'Tilt Shift',
-    value: 'Pergeseran Miring'
+    value: 'Tilt Shift'
   },
   'filter-to-alpha': {
     hint: 'feature that can isolate line drawings if it is a black and white image.',
@@ -845,22 +845,22 @@
   'filter-triangle-blur': {
     hint: 'or just blur',
     original: 'Triangle Blur',
-    value: 'Segitiga Kabur'
+    value: 'Blur Segitiga'
   },
   'filter-unsharp-mask': {
     hint: 'or just sharpen, https://en.wikipedia.org/wiki/Unsharp_masking',
     original: 'Unsharp Mask',
-    value: 'Topeng Tidak Tajam'
+    value: 'Masker Penajam'
   },
   'filter-crop-title': {
     hint: 'same as the button, but can be longer',
     original: 'Crop / Extend',
-    value: 'Pangkas / Perpanjangan'
+    value: 'Pangkas / Perluas'
   },
   'filter-crop-description': {
     hint: 'descriptions explain the "filter" a tiny bit. Most importantly it says if it’s applied to a single layer, or the entire image (all layer)',
     original: 'Crop or extend the image.',
-    value: 'Pangkas atau perpanjangan gambar.'
+    value: 'Pangkas atau perluas gambar.'
   },
   'filter-crop-left': {
     original: 'Left',
@@ -872,7 +872,7 @@
   },
   'filter-crop-top': {
     original: 'Top',
-    value: 'Bagian Atas'
+    value: 'Atas'
   },
   'filter-crop-bottom': {
     original: 'Bottom',
@@ -881,7 +881,7 @@
   'filter-crop-rule-thirds': {
     hint: 'https://en.wikipedia.org/wiki/Rule_of_thirds',
     original: 'Rule of Thirds',
-    value: 'Aturan Thrids'
+    value: 'Aturan Sepertiga'
   },
   'filter-crop-fill': {
     hint: 'If image gets extended, what color to fill that new area with',
@@ -899,7 +899,7 @@
   },
   'filter-flip-horizontal': {
     original: 'Horizontal',
-    value: 'Horisontal'
+    value: 'Horizontal'
   },
   'filter-flip-vertical': {
     original: 'Vertical',
@@ -925,11 +925,11 @@
   'filter-resize-title': {
     hint: 'same as the button, but can be longer',
     original: 'Resize',
-    value: 'Memperbesar'
+    value: 'Ubah Ukuran'
   },
   'filter-resize-description': {
     original: 'Resizes the image.',
-    value: 'Memperbesar ukuran gambar.'
+    value: 'Mengubah ukuran gambar.'
   },
   'filter-rotate-title': {
     hint: 'same as the button, but can be longer',
@@ -938,12 +938,12 @@
   },
   'filter-rotate-description': {
     original: 'Rotates the image.',
-    value: 'Putar gambar.'
+    value: 'Memutar gambar.'
   },
   'filter-transform-empty': {
     hint: 'nothing on the layer, just transparency',
     original: 'Layer is empty.',
-    value: 'Lapisan sudah kosong.'
+    value: 'Lapisan kosong.'
   },
   'filter-transform-empty-selection': {
     hint: 'nothing on the layer, in selected area (via select tool), just transparency',
@@ -953,12 +953,12 @@
   'filter-transform-title': {
     hint: 'same as the button, but can be longer',
     original: 'Transform',
-    value: 'Mengubah'
+    value: 'Transformasi'
   },
   'filter-transform-description': {
     hint: 'as in the Shift key.',
     original: 'Transforms selected layer. Hold Shift for additional behavior.',
-    value: 'Mengubah lapisan yang dipilih. Tahan Shift untuk perilaku tambahan.'
+    value: 'Mentransformasi lapisan yang dipilih. Tahan Shift untuk perilaku tambahan.'
   },
   'filter-transform-rotation': {
     hint: 'or Angle',
@@ -977,17 +977,17 @@
   'filter-transform-constrain': {
     hint: 'short version of "constrain proportions" – feature that locks the aspect ratio',
     original: 'Constrain',
-    value: 'Batasan'
+    value: 'Batasi'
   },
   'filter-transform-snap': {
     hint: 'or snapping. Common feature in graphics software. Makes stuff snap into place so it’s easier to align elements in an image',
     original: 'Snap',
-    value: 'Jepret'
+    value: 'Snap'
   },
   'filter-transform-snap-title': {
     hint: 'same as above, but as a tooltip',
     original: 'Snap Rotation And Position',
-    value: 'Rotasi Dan Posisi Jepret'
+    value: 'Snap Rotasi dan Posisi'
   },
   'filter-bright-contrast-title': {
     hint: 'same as the button, but can be longer',
@@ -1013,7 +1013,7 @@
   },
   'filter-curves-description': {
     original: 'Apply curves on the selected layer.',
-    value: 'Menerapkan kurva pada layer yang dipilih.'
+    value: 'Menerapkan kurva pada lapisan yang dipilih.'
   },
   'filter-curves-all': {
     original: 'All',
@@ -1022,11 +1022,11 @@
   'filter-hue-sat-title': {
     hint: 'same as the button, but can be longer',
     original: 'Hue / Saturation',
-    value: 'Rona Warna / Saturasi'
+    value: 'Rona / Saturasi'
   },
   'filter-hue-sat-description': {
     original: 'Change hue and saturation for the selected layer.',
-    value: 'Mengubah rona warna dan saturasi untuk lapisan yang dipilih.'
+    value: 'Mengubah rona dan saturasi untuk lapisan yang dipilih.'
   },
   'filter-hue-sat-hue': {
     original: 'Hue',
@@ -1044,16 +1044,16 @@
   'filter-tilt-shift-title': {
     hint: 'same as the button, but can be longer',
     original: 'Tilt Shift',
-    value: 'Pergeseran Miring'
+    value: 'Tilt Shift'
   },
   'filter-tilt-shift-description': {
     original: 'Applies tilt shift on the selected layer.',
-    value: 'Menerapkan pergeseran kemiringan pada layer yang dipilih.'
+    value: 'Menerapkan tilt shift pada lapisan yang dipilih.'
   },
   'filter-tilt-shift-blur': {
     hint: 'words can be individually translated',
     original: 'Blur Radius',
-    value: 'Radius Keburaman'
+    value: 'Radius Blur'
   },
   'filter-tilt-shift-gradient': {
     hint: 'words can be individually translated',
@@ -1073,34 +1073,34 @@
   'filter-to-alpha-inverted-lum': {
     hint: 'luminance is same as the layer blend mode "luminosity"',
     original: 'Inverted Luminance',
-    value: 'Pencahayaan Terbalik'
+    value: 'Luminansi Terbalik'
   },
   'filter-to-alpha-lum': {
     original: 'Luminance',
-    value: 'Pencahayaan'
+    value: 'Luminansi'
   },
   'filter-to-alpha-replace': {
     hint: 'What color to replace the rgb channels with',
     original: 'Replace RGB',
-    value: 'Gantikan RGB'
+    value: 'Ganti RGB'
   },
   'filter-triangle-blur-title': {
     hint: 'same as the button, but can be longer',
     original: 'Triangle Blur',
-    value: 'Segitiga Buram'
+    value: 'Blur Segitiga'
   },
   'filter-triangle-blur-description': {
     original: 'Applies triangle blur on the selected layer.',
-    value: 'Menerapkan keburaman segitiga pada lapisan yang dipilih.'
+    value: 'Menerapkan blur segitiga pada lapisan yang dipilih.'
   },
   'filter-unsharp-mask-title': {
     hint: 'same as the button, but can be longer',
     original: 'Unsharp Mask',
-    value: 'Topeng Tidak Tajam'
+    value: 'Masker Penajam'
   },
   'filter-unsharp-mask-description': {
     original: 'Sharpens the selected layer by scaling pixels away from the average of their neighbors.',
-    value: 'Mempertajam layer yang dipilih dengan menskalakan piksel dari rata-rata tetangganya.'
+    value: 'Mempertajam lapisan yang dipilih dengan menskalakan piksel dari rata-rata tetangganya.'
   },
   'filter-unsharp-mask-strength': {
     original: 'Strength',
@@ -1112,15 +1112,15 @@
   },
   'filter-grid-description': {
     original: 'Draws grid on selected layer.',
-    value: 'Menggambar kisi-kisi pada layer yang dipilih.'
+    value: 'Menggambar kisi pada lapisan yang dipilih.'
   },
   'filter-noise': {
     original: 'Noise',
-    value: 'Kebisingan'
+    value: 'Derau'
   },
   'filter-noise-description': {
     original: 'Adds noise to selected layer.',
-    value: 'Menambahkan kebisingan ke lapisan yang dipilih.'
+    value: 'Menambahkan derau ke lapisan yang dipilih.'
   },
   'filter-noise-scale': {
     original: 'Scale',
@@ -1132,7 +1132,7 @@
   },
   'filter-pattern': {
     original: 'Pattern',
-    value: 'Corak'
+    value: 'Pola'
   },
   'filter-pattern-description': {
     original: 'Generates pattern on selected layer. Drag the preview for further controls.',
@@ -1140,7 +1140,7 @@
   },
   'filter-distort': {
     original: 'Distort',
-    value: 'Mendistorsi'
+    value: 'Distorsi'
   },
   'filter-distort-description': {
     original: 'Distorts the selected layer.',
@@ -1156,7 +1156,7 @@
   },
   'filter-distort-sync-xy': {
     original: 'Sync XY',
-    value: 'Sinkronisasi XY'
+    value: 'Sinkron XY'
   },
   'filter-vanish-point': {
     original: 'Vanish Point',
@@ -1164,7 +1164,7 @@
   },
   'filter-vanish-point-title': {
     original: 'Vanishing Point',
-    value: 'Titik Hilang'
+    value: 'Titik Lenyap'
   },
   'filter-vanish-point-description': {
     original: 'Adds vanishing point to selected layer. Drag preview to move.',
@@ -1173,7 +1173,7 @@
   'filter-vanish-point-lines': {
     hint: 'As in: the number of lines',
     original: 'Lines',
-    value: 'Garis-garis'
+    value: 'Garis'
   },
   'dropper-drop': {
     hint: 'as in, drag and drop a file',
@@ -1222,22 +1222,22 @@
   'import-as-layer-limit-reached': {
     hint: 'Kleki allows only a certain number of layers',
     original: 'Layer limit reached. Image will be placed on existing layer.',
-    value: 'Batas lapisan tercapai. Gambar akan ditempatkan pada layer yang ada.'
+    value: 'Batas lapisan tercapai. Gambar akan ditempatkan pada lapisan yang ada.'
   },
   'import-as-layer-fit': {
     hint: 'verb. imported image made to fit inside canvas.',
     original: 'Fit',
-    value: 'Cocok'
+    value: 'Sesuaikan'
   },
   'import-flatten': {
     hint: 'Turn image that has multiple layers into an image that has only one layer.',
     original: 'Flatten image',
-    value: 'Meratakan gambar'
+    value: 'Ratakam gambar'
   },
   'import-unsupported-file': {
     hint: 'e.g. user tried to open a WAV',
     original: 'Unsupported file type. See Help for supported types.',
-    value: 'Jenis file yang tak didukung. Lihat Bantuan untuk jenis yang didukung.'
+    value: 'Jenis berkas tidak didukung. Lihat Bantuan untuk jenis yang didukung.'
   },
   'import-broken-file': {
     hint: 'if an image file is broken',
@@ -1247,16 +1247,16 @@
   'import-psd-unsupported': {
     hint: 'PSD is photoshop file format. flatten as in „flatten image“ in photoshop. Merged all layers',
     original: 'Unsupported features. PSD had to be flattened.',
-    value: 'Fitur yang tak didukung. PSD harus diratakan.'
+    value: 'Fitur tidak didukung. PSD harus diratakan.'
   },
   'import-psd-limited-support': {
     hint: 'PSD has lots of fancy features that Kleki doesn\'t have, so when importing a PSD it often has to simplify things. So it might look different compared to when opening in Photoshop. We’re informing the user if they "flatten" the image it will be accurate despite losing layers. The user has to weigh, do they care about having layers, or do they care about it looking right.',
     original: 'PSD support is limited. Flattened will more likely look correct.',
-    value: 'Dukungan PSD terbatas. Ratakan kemungkinan besar akan terlihat benar.'
+    value: 'Dukungan PSD terbatas. Diratakan kemungkinan besar akan terlihat benar.'
   },
   'import-psd-too-large': {
     original: 'Image exceeds maximum dimensions of {x} x {x} pixels. Unable to import.',
-    value: 'Gambar melebihi dimensi maksimum {x} x {x} piksel. Tak dapat mengimpor.'
+    value: 'Gambar melebihi dimensi maksimum {x} x {x} piksel. Tidak dapat mengimpor.'
   },
   'import-psd-size': {
     original: 'Image size',
@@ -1278,22 +1278,22 @@
   'hand-fit': {
     hint: 'makes canvas cover whole working area',
     original: 'Fit',
-    value: 'Sesuai'
+    value: 'Sesuaikan'
   },
   'hand-inertia-scrolling': {
     hint: 'Canvas will continue to move even after releasing pointer.',
     original: 'Inertia Scrolling',
-    value: 'Pengguliran Inersia'
+    value: 'Gulir Inersia'
   },
   'bucket-tolerance': {
     hint: 'a common feature for paint bucket',
     original: 'Tolerance',
-    value: 'Tenggang Rasa'
+    value: 'Toleransi'
   },
   'bucket-sample': {
     hint: 'like "taking a sample"',
     original: 'Sample',
-    value: 'Contoh'
+    value: 'Sampel'
   },
   'bucket-sample-title': {
     original: 'Which layers to sample color from',
@@ -1317,16 +1317,16 @@
   'bucket-grow': {
     hint: 'verb. Or expand.',
     original: 'Grow',
-    value: 'Tumbuh'
+    value: 'Perluas'
   },
   'bucket-grow-title': {
     original: 'Grow filled area (in pixels)',
-    value: 'Menumbuhkan area yang terisi (dalam piksel)'
+    value: 'Perluas area yang terisi (dalam piksel)'
   },
   'bucket-contiguous': {
     hint: 'common setting for paint bucket in image editing software',
     original: 'Contiguous',
-    value: 'Berbatasan'
+    value: 'Bersambung'
   },
   'bucket-contiguous-title': {
     hint: 'tooltip explaining Contiguous',
@@ -1339,7 +1339,7 @@
   },
   'gradient-linear-mirror': {
     original: 'Linear-Mirror',
-    value: 'Cermin-Linier'
+    value: 'Linier-Cermin'
   },
   'gradient-radial': {
     original: 'Radial',
@@ -1347,7 +1347,7 @@
   },
   'shape-stroke': {
     original: 'Stroke',
-    value: 'Stroke'
+    value: 'Goresan'
   },
   'shape-fill': {
     original: 'Fill',
@@ -1361,15 +1361,15 @@
   'shape-ellipse': {
     hint: 'ellipse shape',
     original: 'Ellipse',
-    value: 'Elipsis'
+    value: 'Elips'
   },
   'shape-line': {
     original: 'Line',
-    value: 'Baris'
+    value: 'Garis'
   },
   'shape-line-width': {
     original: 'Line Width',
-    value: 'Baris Lebar'
+    value: 'Lebar Garis'
   },
   'shape-outwards': {
     hint: 'grows shape from the center outwards',
@@ -1379,15 +1379,15 @@
   'shape-fixed': {
     hint: 'fixed ratio of 1:1',
     original: 'Fixed 1:1',
-    value: 'Diperbaiki 1:1'
+    value: 'Tetap 1:1'
   },
   'shape-auto-pan': {
     original: 'Auto-pan',
-    value: 'Pena-otomatis'
+    value: 'Geser Otomatis'
   },
   'shape-auto-pan-title': {
     original: 'Automatically moves as you draw',
-    value: 'Secara otomatis bergerak saat anda menggambar'
+    value: 'Secara otomatis bergerak saat Anda menggambar'
   },
   'text-instruction': {
     original: 'Click canvas to place text',
@@ -1424,7 +1424,7 @@
   },
   'text-letter-spacing': {
     original: 'Letter Spacing',
-    value: 'Pengaturan Jarak Huruf'
+    value: 'Jarak Huruf'
   },
   'text-left': {
     hint: 'left, center, right text formatting like in Word',
@@ -1449,11 +1449,11 @@
   },
   'text-failed-import': {
     original: 'Failed to import the following files:',
-    value: 'Gagal untuk mengimpor berkas berikut:'
+    value: 'Gagal mengimpor berkas berikut:'
   },
   'text-supported-formats': {
     original: 'Supported formats:',
-    value: 'Format didukung:'
+    value: 'Format yang didukung:'
   },
   'select-select': {
     original: 'Select',
@@ -1461,7 +1461,7 @@
   },
   'select-transform': {
     original: 'Transform',
-    value: 'Mengubah'
+    value: 'Transformasi'
   },
   'select-lasso': {
     original: 'Lasso',
@@ -1481,7 +1481,7 @@
   },
   'select-boolean-subtract': {
     original: 'Subtract',
-    value: 'Mengurangkan'
+    value: 'Kurangi'
   },
   'select-all': {
     original: 'All',
@@ -1489,7 +1489,7 @@
   },
   'select-invert': {
     original: 'Invert',
-    value: 'Membalikkan'
+    value: 'Balikkan'
   },
   'select-reset': {
     original: 'Reset',
@@ -1517,7 +1517,7 @@
   },
   'select-transform-move-to-layer': {
     original: 'Move to layer:',
-    value: 'Pindah ke lapisan:'
+    value: 'Pindahkan ke lapisan:'
   },
   'select-transform-applied': {
     original: 'Transformation applied',
@@ -1535,7 +1535,7 @@
   'save-reminder-text': {
     hint: 'turns into: "...saved in <strong>12 minutes</strong>. Save..."',
     original: 'Image was not saved in {a} minutes{b}. Save now to prevent eventual loss.',
-    value: 'Gambar tak disimpan dalam {a} menit{b}. Menabung sekarang untuk mencegah kerugian di kemudian hari.'
+    value: 'Gambar tidak disimpan dalam {a} menit{b}. Simpan sekarang untuk mencegah kehilangan.'
   },
   'save-reminder-save-psd': {
     original: 'Save As PSD',
@@ -1567,7 +1567,7 @@
   'submit-submitting': {
     hint: 'in the process of uploading',
     original: 'Submitting',
-    value: 'Mengirimkan'
+    value: 'Mengirim'
   },
   'embed-init-loading': {
     hint: 'when opening the app',
@@ -1577,7 +1577,7 @@
   'embed-init-waiting': {
     hint: 'The app is loaded, but it’s still waiting for image',
     original: 'Waiting for image',
-    value: 'Tunggu untuk gambar'
+    value: 'Menunggu gambar'
   },
   help: {
     hint: 'or user manual',
@@ -1603,31 +1603,31 @@
   },
   'settings-pixelated-zoom': {
     original: 'Always pixelated zoom',
-    value: ''
+    value: 'Selalu zoom pikselasi'
   },
   'settings-save-reminder-label': {
     original: 'Save Reminder',
-    value: 'Simpan Pengingat'
+    value: 'Pengingat Simpan'
   },
   'settings-save-reminder-disabled': {
     original: 'disabled',
-    value: 'dimatikan'
+    value: 'dinonaktifkan'
   },
   'settings-save-reminder-confirm-title': {
     original: 'Turn off Save Reminder?',
-    value: 'Matikan Simpan Pengingat?'
+    value: 'Matikan Pengingat Simpan?'
   },
   'settings-save-reminder-confirm-a': {
     original: "There is no autosave and browser tabs don't last forever. If you don't periodically save you will likely lose work.",
-    value: 'Tidak ada penyimpanan otomatis dan tab peramban tidak bertahan selamanya. Jika anda tidak menyimpan secara berkala, kemungkinan besar Anda akan kehilangan pekerjaan.'
+    value: 'Tidak ada simpan otomatis dan tab browser tidak bertahan selamanya. Jika Anda tidak menyimpan secara berkala, kemungkinan besar Anda akan kehilangan pekerjaan.'
   },
   'settings-save-reminder-confirm-b': {
     original: 'Disable at your own risk?',
-    value: 'Mematikan pada resiko anda sendiri?'
+    value: 'Nonaktifkan dengan risiko Anda sendiri?'
   },
   'settings-save-reminder-confirm-disable': {
     original: 'Disable',
-    value: 'Mematikan'
+    value: 'Nonaktifkan'
   },
   'theme-dark': {
     original: 'Dark',
@@ -1677,17 +1677,17 @@
   },
   height: {
     original: 'Height',
-    value: 'Panjang'
+    value: 'Tinggi'
   },
   opacity: {
     hint: 'for layer opacity, brush opacity, text opacity, ...',
     original: 'Opacity',
-    value: 'Keburaman'
+    value: 'Opasitas'
   },
   scatter: {
     hint: 'for brush scatter',
     original: 'Scatter',
-    value: 'Menyebar'
+    value: 'Sebar'
   },
   red: {
     original: 'Red',
@@ -1714,7 +1714,7 @@
   layers: {
     hint: 'layers in the context of image editing software',
     original: 'Layers',
-    value: 'Lapisan-Lapisan'
+    value: 'Lapisan'
   },
   background: {
     hint: 'as in background layer',
@@ -1742,11 +1742,11 @@
   'angle-snap': {
     hint: 'Snapping. Like when transforming an image and it snaps to the side of the frame.',
     original: 'Snap',
-    value: 'Jepret'
+    value: 'Snap'
   },
   'angle-snap-title': {
     original: '45° Angle Snapping',
-    value: 'Gertakan Sudut 45°'
+    value: 'Snap Sudut 45°'
   },
   'lock-alpha': {
     hint: 'Short. Freezes the alpha channel of image. Images consist of 4 channels (red, green, blue, alpha). Alpha lock also found in Procreate and photoshop',
@@ -1761,7 +1761,7 @@
   reverse: {
     hint: 'Reversing the direction of a color gradient',
     original: 'Reverse',
-    value: 'Membalikkan'
+    value: 'Balikkan'
   },
   'compare-before': {
     original: 'Before',
@@ -1777,7 +1777,7 @@
   },
   more: {
     original: 'More',
-    value: 'Lebih lanjut'
+    value: 'Lainnya'
   },
   'x-minutes': {
     original: '{x}min',
@@ -1785,22 +1785,22 @@
   },
   wip: {
     original: 'Work in progress',
-    value: 'Pekerjaan yang Sedang Berlangsung'
+    value: 'Sedang Dikerjakan'
   },
   'browser-zoom-help': {
     original: 'Double-tap or pinch-out to reset browser zoom.',
-    value: 'Ketuk dua kali atau jepit untuk mengatur ulang zoom browser.'
+    value: 'Ketuk dua kali atau cubit untuk mengatur ulang zoom browser.'
   },
   dismiss: {
     original: 'Dismiss',
-    value: 'Bubarkan'
+    value: 'Tutup'
   },
   error: {
     original: 'Error',
-    value: ''
+    value: 'Kesalahan'
   },
   retry: {
     original: 'Retry',
-    value: ''
+    value: 'Coba lagi'
   }
 }
