@@ -32,6 +32,9 @@ import { blendTransform } from '../project-viewport/utils/blend-transform';
 import { getFitRectTransform } from '../project-viewport/utils/get-fit-rect-transform';
 import { css } from '../../../bb/base/base';
 import { TWheelEvent } from '../../../bb/input/event.types';
+import { getIconSvg } from '../../../icon/icon';
+import { type IconName } from '../../../../icons/icons';
+import { LANG } from '../../../language/language';
 
 function getToolEntries<GToolId extends string>(
     tools: Record<GToolId, TEaselTool>,
@@ -49,6 +52,7 @@ export type TEaselParams<GToolId extends string> = {
     onTransformChange: (transform: TViewportTransform, scaleOrAngleChanged: boolean) => void; // whenever Viewport changes
     onUndo?: () => void; // gesture triggers undo
     onRedo?: () => void; // gesture triggers redo
+    onResetSelection: () => void; // via selection indicator
 };
 
 /**
@@ -59,6 +63,8 @@ export class Easel<GToolId extends string> {
     private readonly rootEl: HTMLElement;
     private readonly svgEl: SVGElement; // each tool gets an element in this SVG tag, for an SVG overlay
     private readonly htmlOverlayEl: HTMLElement; // each tool can get an element in this html node, for an interactive overlay
+    private readonly mirrorIndicatorEl: HTMLElement;
+    private readonly selectionIndicatorEl: HTMLElement;
     private readonly viewport: ProjectViewport;
     private readonly pointerPreprocessor: EaselPointerPreprocessor;
     private readonly pointerListener: PointerListener;
@@ -90,7 +96,7 @@ export class Easel<GToolId extends string> {
     private isFrozen: boolean = false; // disable interaction with the easel whatsoever
     private lastRenderedTransform: TViewportTransform = {} as TViewportTransform; // previously rendered viewport transformation
     private pinchInitialTransform: TViewportTransform | undefined; // when starting a pinch-to-zoom gesture
-    private targetTransform: TViewportTransform = {} as TViewportTransform;
+    private targetTransform: TViewportTransform;
 
     // custom interface passed to tools
     private readonly easelInterface: TEaselInterface = {
@@ -183,9 +189,10 @@ export class Easel<GToolId extends string> {
         const isScaleOrAngleChanged =
             newTransform.scale !== this.lastRenderedTransform.scale ||
             newTransform.angleDeg !== this.lastRenderedTransform.angleDeg;
+        const isMirroredChanged = newTransform.isMirrored !== this.lastRenderedTransform.isMirrored;
 
         this.viewport.render(!isTransformEqual(oldTransform, newTransform));
-        if (isPositionChanged || isScaleOrAngleChanged) {
+        if (isPositionChanged || isScaleOrAngleChanged || isMirroredChanged) {
             tool.onUpdateTransform?.(newTransform);
             this.selectionRenderer.setTransform(newTransform);
             this.onTransformChange(this.targetTransform, isScaleOrAngleChanged);
@@ -236,7 +243,7 @@ export class Easel<GToolId extends string> {
         return this.toolsMap[this.getActiveToolId()];
     }
 
-    private getResetTransform(): TViewportTransform {
+    private getResetTransform(isMirrored: boolean = false): TViewportTransform {
         return createTransform(
             {
                 x: this.width / 2,
@@ -245,6 +252,7 @@ export class Easel<GToolId extends string> {
             { x: this.project.width / 2, y: this.project.height / 2 },
             1,
             0,
+            isMirrored,
         );
     }
 
@@ -289,7 +297,13 @@ export class Easel<GToolId extends string> {
             EASEL_MAX_SCALE,
         );
         this.setTargetTransform(
-            createTransform(viewportPoint, canvasPoint, newScale, transform.angleDeg),
+            createTransform(
+                viewportPoint,
+                canvasPoint,
+                newScale,
+                transform.angleDeg,
+                transform.isMirrored,
+            ),
             isImmediate,
         );
     };
@@ -333,6 +347,7 @@ export class Easel<GToolId extends string> {
                 tool.renderAfterViewport?.(ctx, renderedTransform);
             },
         });
+        this.targetTransform = this.viewport.getTransform();
 
         Object.values<TEaselTool>(this.toolsMap).forEach((tool) => {
             tool.setEaselInterface?.(this.easelInterface);
@@ -382,6 +397,7 @@ export class Easel<GToolId extends string> {
                             metaTransform.canvasP,
                             metaTransform.scale,
                             metaTransform.angleDeg,
+                            metaTransform.isMirrored,
                         ),
                         true,
                     );
@@ -610,6 +626,46 @@ export class Easel<GToolId extends string> {
         );
         this.updateToolSvgs();
 
+        const createIndicator = (icon: IconName, title: string, onClick: () => void) => {
+            const el = BB.el({
+                content: getIconSvg(icon, { width: 20, height: 20 }),
+                title,
+                onClick,
+                css: {
+                    display: 'none',
+                    padding: 5,
+                    borderRadius: 5,
+                    background: 'var(--canvas-overlay-bg)',
+                    color: '#fff',
+                    cursor: 'pointer',
+                    pointerEvents: 'auto',
+                },
+            });
+            // rootEl prevents default on touchend, which would suppress the click
+            el.addEventListener('touchend', (e) => e.stopPropagation());
+            return el;
+        };
+        this.mirrorIndicatorEl = createIndicator('view-flip', LANG('hand-flip'), () =>
+            this.setIsMirrored(false),
+        );
+        this.selectionIndicatorEl = createIndicator(
+            'select-mode-select',
+            LANG('select-deselect'),
+            p.onResetSelection,
+        );
+        this.selectionIndicatorEl.style.display = this.project.selection ? '' : 'none';
+        const indicatorsEl = BB.el({
+            css: {
+                position: 'absolute',
+                left: 5,
+                bottom: 5,
+                display: 'flex',
+                gap: 5,
+                pointerEvents: 'none',
+            },
+        });
+        indicatorsEl.append(this.mirrorIndicatorEl, this.selectionIndicatorEl);
+
         this.rootEl = c(
             {
                 css: {
@@ -618,7 +674,7 @@ export class Easel<GToolId extends string> {
                     overscrollBehaviorX: 'none',
                 },
             },
-            [this.viewport.getElement(), this.svgEl, this.htmlOverlayEl],
+            [this.viewport.getElement(), this.svgEl, this.htmlOverlayEl, indicatorsEl],
         );
 
         // prevent contextmenu
@@ -662,6 +718,7 @@ export class Easel<GToolId extends string> {
             layers: this.project.layers,
         });
         this.selectionRenderer.setSelection(this.project.selection);
+        this.selectionIndicatorEl.style.display = this.project.selection ? '' : 'none';
         this.getActiveTool().onUpdateSelection?.(this.project.selection);
         this.requestRender();
     }
@@ -693,6 +750,7 @@ export class Easel<GToolId extends string> {
                 canvasCenterPoint,
                 transform.scale,
                 transform.angleDeg,
+                transform.isMirrored,
             ),
             true,
         );
@@ -757,12 +815,13 @@ export class Easel<GToolId extends string> {
                 metaTransform.canvasP,
                 metaTransform.scale,
                 metaTransform.angleDeg,
+                metaTransform.isMirrored,
             ),
         );
     }
 
     resetTransform(isImmediate?: boolean): void {
-        const transform = this.getResetTransform();
+        const transform = this.getResetTransform(this.targetTransform.isMirrored);
         this.setTargetTransform(transform, isImmediate);
         this.requestRender();
     }
@@ -816,8 +875,32 @@ export class Easel<GToolId extends string> {
             applyToPoint(inverse(viewportMat), viewportCenterP),
             viewportTransform.scale,
             newAngleDeg,
+            viewportTransform.isMirrored,
         );
         this.setTargetTransform(newViewportTransform);
+    }
+
+    setIsMirrored(isMirrored: boolean): void {
+        if (isMirrored === this.getIsMirrored()) {
+            return;
+        }
+        const transform = this.targetTransform;
+        const viewportCenterP = { x: this.width / 2, y: this.height / 2 };
+        this.setTargetTransform(
+            createTransform(
+                viewportCenterP,
+                applyToPoint(inverse(createMatrixFromTransform(transform)), viewportCenterP),
+                transform.scale,
+                minimizeAngleDeg(-transform.angleDeg),
+                isMirrored,
+            ),
+            true,
+        );
+        this.mirrorIndicatorEl.style.display = isMirrored ? '' : 'none';
+    }
+
+    getIsMirrored(): boolean {
+        return this.targetTransform.isMirrored;
     }
 
     getIsLocked(): boolean {

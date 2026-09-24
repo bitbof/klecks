@@ -40,10 +40,12 @@ export type TViewportTransform = {
     angleDeg: number;
     x: number;
     y: number;
+    // Horizontally. Applied before rotation. Angle stays as perceived by the user.
+    isMirrored: boolean;
 };
 
 export type TViewportTransformXY = {
-    scaleX: number;
+    scaleX: number; // negative if mirrored
     scaleY: number;
     angleDeg: number;
     x: number;
@@ -170,25 +172,28 @@ export class ProjectViewport {
                   x: transform.x,
                   y: transform.y,
                   angleDeg: transform.angleDeg,
-                  scaleX: transform.scale,
+                  scaleX: transform.isMirrored ? -transform.scale : transform.scale,
                   scaleY: transform.scale,
               }
             : {
                   x: Math.round(transform.x),
                   y: Math.round(transform.y),
-                  scaleX: fixScale(transform.scale, this.project.width),
+                  scaleX:
+                      (transform.isMirrored ? -1 : 1) *
+                      fixScale(transform.scale, this.project.width),
                   scaleY: fixScale(transform.scale, this.project.height),
                   angleDeg: transform.angleDeg,
               };
         const renderedMat = createMatrixFromTransform(renderedTransform);
         this.renderedTransform = renderedTransform;
+        const absRenderedScaleX = Math.abs(renderedTransform.scaleX);
 
         this.ctx.save();
 
         const isImageSmoothingEnabled =
             !isPixelatedZoomEnabled() &&
-            renderedTransform.scaleX < 4 &&
-            (renderedTransform.scaleX !== 1 || renderedTransform.angleDeg !== 0);
+            absRenderedScaleX < 4 &&
+            (absRenderedScaleX !== 1 || renderedTransform.angleDeg !== 0);
         this.ctx.imageSmoothingEnabled = isImageSmoothingEnabled;
         if (isImageSmoothingEnabled) {
             this.ctx.imageSmoothingQuality = 'low';
@@ -209,7 +214,7 @@ export class ProjectViewport {
 
             // outline
             this.ctx.fillStyle = THEME.isDark() ? 'rgba(255,255,255,0.25)' : 'rgba(0,0,0,0.2)';
-            const scaledPixelX = 1 / renderedTransform.scaleX;
+            const scaledPixelX = 1 / absRenderedScaleX;
             const scaledPixelY = 1 / renderedTransform.scaleY;
             this.ctx.fillRect(
                 -scaledPixelX,
@@ -241,9 +246,7 @@ export class ProjectViewport {
                             this.canvas.height,
                         );
                         renderedImage =
-                            'image' in result && 'transform' in result
-                                ? result
-                                : { image: result };
+                            'image' in result && 'transform' in result ? result : { image: result };
                     } else {
                         renderedImage = { image: layer.image };
                     }
@@ -263,7 +266,7 @@ export class ProjectViewport {
                 this.ctx,
                 this.project.width,
                 this.project.height,
-                renderedTransform.scaleX,
+                absRenderedScaleX,
             );
 
         this.ctx.restore();

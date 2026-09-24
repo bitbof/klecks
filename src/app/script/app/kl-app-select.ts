@@ -194,13 +194,6 @@ export class KlAppSelect {
         );
     }
 
-    private resetSelection(): void {
-        this.selectTool.reset();
-        const selection = this.selectTool.getSelection();
-        this.klCanvas.setSelection(selection);
-        this.selectUi.setHasSelection(!!selection);
-    }
-
     private tempHistoryPush(): void {
         if (!this.transformState) {
             return;
@@ -299,7 +292,6 @@ export class KlAppSelect {
             onEndSelect: () => {
                 this.selectTool.endSelect();
                 const selection = this.selectTool.getSelection();
-                this.easelSelect.clearRenderedSelection();
                 this.klCanvas.setSelection(selection);
                 this.selectUi.setHasSelection(!!selection);
             },
@@ -742,6 +734,16 @@ export class KlAppSelect {
 
     getSelectMode(): TSelectToolMode {
         return this.selectMode;
+    }
+
+    resetSelection(): void {
+        if (this.selectMode === 'transform') {
+            return;
+        }
+        this.selectTool.reset();
+        const selection = this.selectTool.getSelection();
+        this.klCanvas.setSelection(selection);
+        this.selectUi.setHasSelection(!!selection);
     }
 
     /**

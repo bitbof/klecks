@@ -751,7 +751,7 @@ export class KlApp {
                 this.mobileColorUi.setIsVisible(toolId !== 'select');
             },
             onTransformChange: (transform, isScaleOrAngleChanged) => {
-                handUi.update(transform.scale, transform.angleDeg);
+                handUi.update(transform.scale, transform.angleDeg, transform.isMirrored);
                 this.toolspaceToolRow.setEnableZoomIn(transform.scale !== EASEL_MAX_SCALE);
                 this.toolspaceToolRow.setEnableZoomOut(transform.scale !== EASEL_MIN_SCALE);
 
@@ -772,6 +772,7 @@ export class KlApp {
             onRedo: () => {
                 redo(true);
             },
+            onResetSelection: () => klAppSelect.resetSelection(),
         });
         css(this.easel.getElement(), {
             position: 'absolute',
@@ -821,7 +822,7 @@ export class KlApp {
         };
 
         const keyListener = new BB.KeyListener({
-            onDown: (keyStr, event, comboStr) => {
+            onDown: (keyStr, event, comboStr, isRepeat) => {
                 if (KL.DIALOG_COUNTER.get() > 0 || BB.isInputFocused(true)) {
                     return;
                 }
@@ -831,10 +832,10 @@ export class KlApp {
                     return;
                 }
 
-                if (comboStr === 'home') {
+                if (comboStr === 'home' && !isRepeat) {
                     this.easel.fitTransform();
                 }
-                if (comboStr === 'end') {
+                if (comboStr === 'end' && !isRepeat) {
                     this.easel.resetTransform();
                 }
                 if (['ctrl+z', 'cmd+z'].includes(comboStr)) {
@@ -851,12 +852,12 @@ export class KlApp {
                     redo();
                 }
                 if (!this.embed) {
-                    if (['ctrl+s', 'cmd+s'].includes(comboStr)) {
+                    if (['ctrl+s', 'cmd+s'].includes(comboStr) && !isRepeat) {
                         event.preventDefault();
                         applyUncommitted();
                         this.saveToComputer.save();
                     }
-                    if (['ctrl+shift+s', 'cmd+shift+s'].includes(comboStr)) {
+                    if (['ctrl+shift+s', 'cmd+shift+s'].includes(comboStr) && !isRepeat) {
                         event.preventDefault();
                         applyUncommitted();
                         if (projectStore) {
@@ -919,7 +920,7 @@ export class KlApp {
                             this.statusOverlay.out('❌ ' + LANG('file-storage-failed'), true);
                         }
                     }
-                    if (['ctrl+c', 'cmd+c'].includes(comboStr)) {
+                    if (['ctrl+c', 'cmd+c'].includes(comboStr) && !isRepeat) {
                         event.preventDefault();
                         applyUncommitted();
                         copyToClipboard(true);
@@ -939,7 +940,7 @@ export class KlApp {
                         Math.max(0.005, 0.03 / this.easel.getTransform().scale),
                     );
                 }
-                if (comboStr === 'enter') {
+                if (comboStr === 'enter' && !isRepeat) {
                     if (!applyUncommitted()) {
                         this.klCanvas.layerFill(
                             currentLayerIndex,
@@ -955,22 +956,22 @@ export class KlApp {
                         );
                     }
                 }
-                if (comboStr === 'esc') {
+                if (comboStr === 'esc' && !isRepeat) {
                     if (discardUncommitted()) {
                         event.preventDefault();
                     }
                 }
-                if (['delete', 'backspace'].includes(comboStr)) {
+                if (['delete', 'backspace'].includes(comboStr) && !isRepeat) {
                     clearLayer(true);
                 }
-                if (comboStr === 'ctrl+shift+e' || comboStr === 'shift+ctrl+e') {
+                if ((comboStr === 'ctrl+shift+e' || comboStr === 'shift+ctrl+e') && !isRepeat) {
                     event.preventDefault();
                     this.layersUi.advancedMergeDialog();
                 }
-                if (comboStr === 'shift+e') {
+                if (comboStr === 'shift+e' && !isRepeat) {
                     event.preventDefault();
                     currentBrushUi.toggleEraser?.();
-                } else if (comboStr === 'e') {
+                } else if (comboStr === 'e' && !isRepeat) {
                     event.preventDefault();
                     applyUncommitted();
                     this.easel.setTool('brush');
@@ -979,7 +980,7 @@ export class KlApp {
                     updateMainTabVisibility();
                     brushTabRow.open('eraserBrush');
                 }
-                if (comboStr === 'b') {
+                if (comboStr === 'b' && !isRepeat) {
                     event.preventDefault();
                     const prevMode = this.easel.getTool();
                     const prevMainTabId = mainTabRow?.getOpenedTabId();
@@ -991,10 +992,12 @@ export class KlApp {
                     brushTabRow.open(
                         prevMode === 'brush' && prevMainTabId === 'brush'
                             ? getNextBrushId()
-                            : currentBrushId,
+                            : currentBrushId === 'eraserBrush'
+                              ? lastNonEraserBrushId
+                              : currentBrushId,
                     );
                 }
-                if (comboStr === 'g') {
+                if (comboStr === 'g' && !isRepeat) {
                     event.preventDefault();
                     applyUncommitted();
                     const newMode =
@@ -1004,7 +1007,7 @@ export class KlApp {
                     mainTabRow?.open(newMode);
                     updateMainTabVisibility();
                 }
-                if (comboStr === 't') {
+                if (comboStr === 't' && !isRepeat) {
                     event.preventDefault();
                     applyUncommitted();
                     this.easel.setTool('text');
@@ -1012,7 +1015,7 @@ export class KlApp {
                     mainTabRow?.open('text');
                     updateMainTabVisibility();
                 }
-                if (comboStr === 'u') {
+                if (comboStr === 'u' && !isRepeat) {
                     event.preventDefault();
                     applyUncommitted();
                     this.easel.setTool('shape');
@@ -1020,7 +1023,7 @@ export class KlApp {
                     mainTabRow?.open('shape');
                     updateMainTabVisibility();
                 }
-                if (comboStr === 'l') {
+                if (comboStr === 'l' && !isRepeat) {
                     event.preventDefault();
                     const prevTool = this.easel.getTool();
                     const prevSelectMode = klAppSelect.getSelectMode();
@@ -1038,9 +1041,13 @@ export class KlApp {
                         klAppSelect.getSelectUi().setMode('transform');
                     }
                 }
-                if (comboStr === 'x') {
+                if (comboStr === 'x' && !isRepeat) {
                     event.preventDefault();
                     this.klColorSlider.swapColors();
+                }
+                if (comboStr === 'm' && !isRepeat) {
+                    event.preventDefault();
+                    this.easel.setIsMirrored(!this.easel.getIsMirrored());
                 }
             },
             onUp: (keyStr, event) => {},
@@ -1442,6 +1449,9 @@ export class KlApp {
             onAngleChange: (angleDeg, isRelative) => {
                 this.easel.setAngleDeg(angleDeg, isRelative);
             },
+            onChangeIsMirrored: (b) => {
+                this.easel.setIsMirrored(b);
+            },
             onChangeUseInertiaScrolling: (b) => {
                 easelHand.setUseInertiaScrolling(b);
             },
@@ -1836,7 +1846,7 @@ export class KlApp {
                   },
                   applyUncommitted: () => applyUncommitted(),
                   onChangeShowSaveDialog: (b) => {
-                      this.saveToComputer.setShowSaveDialog(b);
+                      this.saveToComputer.setShowsSaveDialog(b);
                   },
                   klRecoveryManager,
                   onOpenBrowserStorage,
@@ -2293,7 +2303,7 @@ export class KlApp {
     }
 
     getPSD = async (): Promise<Blob> => {
-        return await klCanvasToPsdBlob(this.klCanvas);
+        return await klCanvasToPsdBlob(this.klCanvas, false);
     };
 
     getProject(): TKlProject {

@@ -55,7 +55,13 @@ export class EaselZoom implements TEaselTool {
                 this.easel.maxScale,
             );
             this.easel.setTransform(
-                createTransform(viewportPoint, canvasPoint, newScale, this.downTransform.angleDeg),
+                createTransform(
+                    viewportPoint,
+                    canvasPoint,
+                    newScale,
+                    this.downTransform.angleDeg,
+                    this.downTransform.isMirrored,
+                ),
                 true,
             );
             this.easel.requestRender();

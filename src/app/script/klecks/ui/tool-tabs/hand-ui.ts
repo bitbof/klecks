@@ -1,9 +1,10 @@
-import { getIconUrl } from '../../../icon/icon';
+import { getIconSvg, getIconUrl } from '../../../icon/icon';
 import { BB } from '../../../bb/bb';
 import { LANG } from '../../../language/language';
 import { Checkbox } from '../components/checkbox';
 import { LocalStorage } from '../../../bb/base/local-storage';
 import { css } from '../../../bb/base/base';
+import { BoxToggle } from '../components/box-toggle';
 
 const angleImg = getIconUrl('angle');
 const rotateImg = getIconUrl('edit-rotate');
@@ -20,6 +21,7 @@ export class HandUi {
     private readonly scaleEl: HTMLElement;
     private readonly angleEl: HTMLElement;
     private readonly angleIm: HTMLImageElement;
+    private readonly flipToggle: BoxToggle;
 
     private updateUi(): void {
         this.scaleEl.innerHTML = Math.round(this.scale * 100) + '%';
@@ -42,6 +44,7 @@ export class HandUi {
         onReset: () => void;
         onFit: () => void;
         onAngleChange: (angleDeg: number, isRelative?: boolean) => void;
+        onChangeIsMirrored: (b: boolean) => void;
         onChangeUseInertiaScrolling: (b: boolean) => void;
     }) {
         this.rootEl = BB.el({
@@ -144,7 +147,7 @@ export class HandUi {
             className: 'kl-button',
             content: '0°',
             css: {
-                marginLeft: 10,
+                marginLeft: 5,
             },
             onClick: function () {
                 p.onAngleChange(0);
@@ -157,14 +160,40 @@ export class HandUi {
             className: 'kl-button',
             content: '<img height="20" src="' + rotateImg + '" alt="Rotate"/>',
             css: {
-                marginLeft: 10,
+                marginLeft: 5,
             },
             onClick: function () {
                 p.onAngleChange(15, true);
             },
         });
         rightRotateButton.tabIndex = -1;
-        row3.append(leftRotateButton, resetAngleButton, rightRotateButton);
+
+        this.flipToggle = new BoxToggle({
+            keepOriginalLabel: true,
+            label: BB.el({
+                content: getIconSvg('view-flip', { width: 20, height: 20 }),
+                css: {
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    width: 30,
+                    height: 30,
+                    opacity: '1',
+                },
+            }),
+            title: LANG('hand-flip') + ' [M]',
+            onChange: p.onChangeIsMirrored,
+        });
+        css(this.flipToggle.getElement(), {
+            marginLeft: 10,
+        });
+
+        row3.append(
+            leftRotateButton,
+            resetAngleButton,
+            rightRotateButton,
+            this.flipToggle.getElement(),
+        );
 
         const inertiaToggle = new Checkbox({
             label: LANG('hand-inertia-scrolling'),
@@ -197,9 +226,10 @@ export class HandUi {
         }
     }
 
-    update(pScale: number, pAngleDeg: number): void {
+    update(pScale: number, pAngleDeg: number, pIsMirrored: boolean): void {
         this.scale = pScale;
         this.angleDeg = pAngleDeg;
+        this.flipToggle.setValue(pIsMirrored);
         if (this.isVisible) {
             this.updateUi();
         }

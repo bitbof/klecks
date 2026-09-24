@@ -18,6 +18,7 @@
         0 0 / 8px;
 
     --modal-backdrop-background: rgba(0, 0, 0, 0.45);
+    --canvas-overlay-bg: rgba(100, 100, 100, 0.9); // ui elements floating on top of the canvas
     --modal-shadow: 0 5px 30px rgba(0, 0, 0, 0.25);
 }
 
@@ -549,7 +550,7 @@ a:not([href]):hover {
 .top-overlay--inner {
     text-align: center;
     padding: 7px 10px;
-    background-color: rgba(0, 0, 0, 0.4);
+    background-color: var(--canvas-overlay-bg);
     color: #fff;
     border-bottom-left-radius: 10px;
     border-bottom-right-radius: 10px;
@@ -982,6 +983,7 @@ clip-path seems the cleanest.
 .kl-layer-preview {
     color: #555;
     canvas {
+        background: var(--kl-checkerboard-background);
         box-shadow: 0 0 0 1px #9e9e9e;
     }
 }

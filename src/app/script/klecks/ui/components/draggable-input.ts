@@ -35,6 +35,7 @@ export class DraggableInput {
             y: 0,
             scale: 1,
             angleDeg: 0,
+            isMirrored: false,
         };
 
         this.rootEl = BB.el({

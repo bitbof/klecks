@@ -67,6 +67,7 @@ export class Preview {
         y: 0,
         scale: 0,
         angleDeg: 0,
+        isMirrored: false,
     };
     private readonly modeToggle: Options<TPreviewMode> | undefined;
     private readonly pointerChain: EventChain;
@@ -105,7 +106,7 @@ export class Preview {
             );
 
             this.viewport.setTransform(
-                createTransform({ x: this.width / 2, y: this.height / 2 }, canvasP, 1, 0),
+                createTransform({ x: this.width / 2, y: this.height / 2 }, canvasP, 1, 0, false),
             );
             this.requestRerender();
         } else {
@@ -127,6 +128,7 @@ export class Preview {
                 { x: this.project.width / 2, y: this.project.height / 2 },
                 scale,
                 0,
+                false,
             ),
         );
         this.isReset = true;
@@ -178,6 +180,7 @@ export class Preview {
                     metaTransform.canvasP,
                     metaTransform.scale,
                     metaTransform.angleDeg,
+                    metaTransform.isMirrored,
                 ),
             );
         }
@@ -210,6 +213,7 @@ export class Preview {
                 { x: this.project.width / 2, y: this.project.height / 2 },
                 scale,
                 0,
+                false,
             ),
             project: this.project,
             useNativeResolution: false,
@@ -255,6 +259,7 @@ export class Preview {
                             metaTransform.canvasP,
                             metaTransform.scale,
                             metaTransform.angleDeg,
+                            metaTransform.isMirrored,
                         ),
                     );
                     this.requestRerender();

@@ -163,6 +163,7 @@ export class CropCopy {
         css(this.eventTarget, {
             height: p.height,
             width: p.width,
+            touchAction: 'none',
         });
         this.rootEl.append(this.eventTarget);
         this.updateCroppedCanvas();

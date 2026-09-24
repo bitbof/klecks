@@ -293,11 +293,17 @@ export function attempt<T>(fn: () => T | Promise<T>): T | AttemptError | Promise
     }
 }
 
-export function asyncThrow(e: unknown): void {
-    setTimeout(() => {
-        throw e;
-    });
-}
+export const asyncThrow = (() => {
+    if (typeof window.reportError === 'function') {
+        return window.reportError;
+    } else {
+        return (error: unknown): void => {
+            setTimeout(() => {
+                throw error;
+            });
+        };
+    }
+})();
 
 const matchMediaDark =
     typeof window.matchMedia === 'function'

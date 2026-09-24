@@ -31,7 +31,7 @@ export class ToolspaceCollapser {
             css: {
                 width: 36,
                 height: 36,
-                background: 'rgba(100, 100, 100, 0.9)',
+                background: 'var(--canvas-overlay-bg)',
                 color: '#fff',
                 textAlign: 'center',
                 lineHeight: '36px',

@@ -610,8 +610,6 @@ export class LayersUi {
                 this.update(this.selectedSpotIndex);
             },
         });
-        this.clippingToggle.getElement().classList.add(classes.clippingToggle);
-
         this.moreDropdown = new DropdownMenu({
             button: BB.el({
                 content: getIconSvg('chevron-down', { width: '13px' }),

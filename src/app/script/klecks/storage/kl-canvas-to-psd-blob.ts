@@ -6,14 +6,14 @@ import { attempt, AttemptError } from '../../bb/base/base';
 
 export async function klCanvasToPsdBlob(
     klCanvas: KlCanvas,
-    isPreviewIncluded: boolean = false,
+    isPreviewIncluded: boolean = true,
 ): Promise<Blob> {
     const layerArr = klCanvas.getLayers();
 
     let canvas: HTMLCanvasElement | undefined;
     if (isPreviewIncluded) {
         // makes saving less likely to fail
-        const c = attempt(klCanvas.getCanvas);
+        const c = attempt(() => klCanvas.getCanvas());
         if (!(c instanceof AttemptError)) {
             canvas = c;
         }

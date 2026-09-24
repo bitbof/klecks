@@ -93,5 +93,6 @@ export function getFitRectTransform(
         { x: rectCenterX, y: rectCenterY },
         factor,
         newAngleDeg,
+        viewportTransform.isMirrored,
     );
 }

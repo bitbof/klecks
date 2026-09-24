@@ -560,7 +560,11 @@ export class KlAppImportHandler {
                                 }
                             } catch (e) {
                                 closeLoader?.();
-                                showError('Failed to load PSD.');
+                                // todo localize
+                                showError(
+                                    'Failed to load PSD: ' +
+                                        (e instanceof Error ? e.message : String(e)),
+                                );
                                 asyncThrow(e);
                             }
                         })

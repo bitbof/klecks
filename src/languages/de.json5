@@ -1293,6 +1293,11 @@
     original: 'Fit',
     value: 'Passen'
   },
+  'hand-flip': {
+    hint: 'mirrors the view horizontally. The image itself does not change.',
+    original: 'Flip View',
+    value: 'Ansicht spiegeln'
+  },
   'hand-inertia-scrolling': {
     hint: 'Canvas will continue to move even after releasing pointer.',
     original: 'Inertia Scrolling',
@@ -1507,6 +1512,11 @@
   'select-reset': {
     original: 'Reset',
     value: 'Zurücksetzen'
+  },
+  'select-deselect': {
+    hint: 'More descriptive than "reset". Used as tooltip on the selection indicator.',
+    original: 'Deselect',
+    value: 'Auswahl aufheben'
   },
   'select-fill': {
     original: 'Fill',

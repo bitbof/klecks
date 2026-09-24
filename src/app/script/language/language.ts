@@ -101,7 +101,14 @@ export function getLanguage(useLocalStorage?: boolean): string {
         try {
             const item = LocalStorage.getItem(LS_LANGUAGE_KEY);
             if (item) {
-                langs.unshift(item);
+                const found = languages.find((language) => {
+                    return language.code === item;
+                });
+                if (found) {
+                    return found.code;
+                } else {
+                    LocalStorage.removeItem(LS_LANGUAGE_KEY);
+                }
             }
         } catch (e) {
             // likely cookies disabled in Safari

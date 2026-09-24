@@ -3,7 +3,7 @@ import { changeCanvasDimensions } from '../../../bb/base/change-canvas-dimension
 import { LANG } from '../../../language/language';
 import { TSize2D } from '../../../bb/bb-types';
 import { THEME } from '../../../theme/theme';
-import { css, throwIfNull } from '../../../bb/base/base';
+import { css } from '../../../bb/base/base';
 import { KlCanvas, TKlCanvasLayer } from '../../canvas/kl-canvas';
 import { KlHistory } from '../../history/kl-history';
 import { getIconSvg } from '../../../icon/icon';
@@ -39,44 +39,12 @@ export class LayerPreview {
     private readonly canvas: HTMLCanvasElement;
     private readonly canvasCtx: CanvasRenderingContext2D;
 
-    private animationCount: number; // >0 means it's animating
-    private readonly animationLength: number;
-
-    private readonly animationCanvas: HTMLCanvasElement;
-    private readonly animationCanvasCtx: CanvasRenderingContext2D;
-    private animationCanvasCheckerPattern: CanvasPattern = {} as CanvasPattern;
-
     private readonly largeCanvasSize: number;
     private readonly largeCanvas: HTMLCanvasElement;
     private readonly largeCanvasCtx: CanvasRenderingContext2D;
 
-    private updateCheckerPatterns(): void {
-        const checker = BB.createCheckerCanvas(4, THEME.isDark());
-        this.animationCanvasCheckerPattern = throwIfNull(
-            this.animationCanvasCtx.createPattern(checker, 'repeat'),
-        );
-    }
-
     private updateClippingIconColor(): void {
         this.clippingIconEl.style.color = THEME.isDark() ? '#ccc' : 'var(--kl-color)';
-    }
-
-    private animate(): void {
-        if (this.animationCount === 0) {
-            return;
-        }
-
-        this.animationCount--;
-
-        this.canvasCtx.save();
-        this.canvasCtx.globalAlpha =
-            ((this.animationLength - this.animationCount) / this.animationLength) ** 2;
-        this.canvasCtx.drawImage(this.animationCanvas, 0, 0);
-        this.canvasCtx.restore();
-
-        if (this.animationCount > 0) {
-            requestAnimationFrame(() => this.animate());
-        }
     }
 
     private getLayer(): TKlCanvasLayer {
@@ -150,11 +118,7 @@ export class LayerPreview {
         }
     }
 
-    private draw(isInstant: boolean): void {
-        // cross-fade done via 2 canvases (old and new state)
-        // both have checkerboard background drawn on them, both fully opaque
-        // -> no "lighter" is needed for accurate cross-fading
-
+    private draw(): void {
         const layer = this.getLayer();
         if (!this.isPreviewVisible || !layer) {
             return;
@@ -163,54 +127,24 @@ export class LayerPreview {
 
         const layerCanvas = layer.canvas;
 
-        if (
-            layerCanvas.width !== this.lastDrawnSize.width ||
-            layerCanvas.height !== this.lastDrawnSize.height
-        ) {
-            const canvasDimensions = BB.fitInto(
-                layerCanvas.width,
-                layerCanvas.height,
-                this.canvasSize,
-                this.canvasSize,
-                1,
-            );
-            changeCanvasDimensions(
-                this.canvas,
-                Math.round(canvasDimensions.width),
-                Math.round(canvasDimensions.height),
-            );
-            changeCanvasDimensions(this.animationCanvas, this.canvas.width, this.canvas.height);
-
-            isInstant = true; // can't animate when size changed
-        }
-
-        this.animationCanvasCtx.save();
-        this.animationCanvasCtx.imageSmoothingEnabled = false;
-        this.animationCanvasCtx.fillStyle = this.animationCanvasCheckerPattern;
-        this.animationCanvasCtx.fillRect(
-            0,
-            0,
-            this.animationCanvas.width,
-            this.animationCanvas.height,
+        const canvasDimensions = BB.fitInto(
+            layerCanvas.width,
+            layerCanvas.height,
+            this.canvasSize,
+            this.canvasSize,
+            1,
         );
-        this.animationCanvasCtx.drawImage(
-            layerCanvas,
-            0,
-            0,
-            this.animationCanvas.width,
-            this.animationCanvas.height,
+        changeCanvasDimensions(
+            this.canvas,
+            Math.round(canvasDimensions.width),
+            Math.round(canvasDimensions.height),
+            { ensureCleared: true },
         );
-        this.animationCanvasCtx.restore();
 
-        if (isInstant) {
-            this.animationCount = 0;
-            this.canvasCtx.save();
-            this.canvasCtx.drawImage(this.animationCanvas, 0, 0);
-            this.canvasCtx.restore();
-        } else {
-            this.animationCount = this.animationLength;
-            this.animate();
-        }
+        this.canvasCtx.save();
+        this.canvasCtx.imageSmoothingEnabled = false;
+        this.canvasCtx.drawImage(layerCanvas, 0, 0, this.canvas.width, this.canvas.height);
+        this.canvasCtx.restore();
 
         this.lastDrawnSize.width = layerCanvas.width;
         this.lastDrawnSize.height = layerCanvas.height;
@@ -224,11 +158,6 @@ export class LayerPreview {
         klHistory: KlHistory;
         klCanvas: KlCanvas;
     }) {
-        // internally redraws with in an interval. checks history is something changed
-        // this update will be animated
-        // it will not be animated if the resolution changed
-        // also redraws when you call updateLayer - not animated
-
         // syncs via updateLayer, and internally updates layer opacity via a hack
 
         this.rootEl = BB.el({
@@ -245,11 +174,6 @@ export class LayerPreview {
             width: 0,
             height: 0,
         };
-        this.animationCanvas = BB.canvas(); // to help animate the transition
-        this.animationCanvasCtx = BB.ctx(this.animationCanvas);
-        this.animationLength = 30;
-        this.animationCount = 0;
-
         // --- setup dom ---
         this.contentWrapperEl = BB.el({
             css: {
@@ -354,12 +278,9 @@ export class LayerPreview {
         this.contentWrapperEl.append(checkWrapper, canvasWrapperEl, nameWrapper, this.opacityEl);
         this.rootEl.append(this.contentWrapperEl);
 
-        this.updateCheckerPatterns();
         this.updateClippingIconColor();
         THEME.addIsDarkListener(() => {
-            this.updateCheckerPatterns();
             this.updateClippingIconColor();
-            this.draw(true);
         });
 
         let previousLayerId = '';
@@ -370,13 +291,13 @@ export class LayerPreview {
             const activeLayerId = this.klHistory.getComposed().activeLayerId;
             if (activeLayerId !== previousLayerId) {
                 // layer changed, draw instantly
-                this.draw(true);
+                this.draw();
                 timeout = undefined;
             } else {
                 // layer didn't change, can update slowly
                 timeout ??= setTimeout(() => {
                     timeout = undefined;
-                    this.draw(false);
+                    this.draw();
                 }, 500);
             }
             previousLayerId = activeLayerId;
@@ -395,7 +316,7 @@ export class LayerPreview {
             },
         });
 
-        this.draw(true);
+        this.draw();
     }
 
     // ---- interface ----
@@ -411,6 +332,6 @@ export class LayerPreview {
         this.isPreviewVisible = b;
         this.contentWrapperEl.style.display = this.isPreviewVisible ? 'flex' : 'none';
         this.rootEl.style.marginBottom = this.isPreviewVisible ? '' : '10px';
-        this.draw(true);
+        this.draw();
     }
 }

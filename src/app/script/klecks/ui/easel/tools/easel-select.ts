@@ -247,7 +247,7 @@ export class EaselSelect implements TEaselTool {
                         this.polyShape.pop();
                         this.polyShape.push({ ...this.polyShape[0] });
                         const shape = this.polyShape;
-                        this.polyShape = [];
+                        this.resetPolyShape();
                         this.onSelectAddPoly(shape, this.appliedBooleanOperation!);
                         this.appliedBooleanOperation = undefined;
                     }
@@ -262,6 +262,7 @@ export class EaselSelect implements TEaselTool {
                 }
                 if (event.type === 'pointerup' && wasDragging) {
                     this.onEndSelect();
+                    this.clearRenderedSelection(true);
                     this.appliedBooleanOperation = undefined;
                 }
             }
@@ -359,7 +360,7 @@ export class EaselSelect implements TEaselTool {
             isConstrained: this.freeTransformIsConstrained,
             snapX: [],
             snapY: [],
-            viewportTransform: { scale: 1, x: 0, y: 0, angleDeg: 0 },
+            viewportTransform: { scale: 1, x: 0, y: 0, angleDeg: 0, isMirrored: false },
             callback: (transform) => {
                 if (
                     this.mode === 'select' ||
@@ -520,7 +521,11 @@ export class EaselSelect implements TEaselTool {
             chainArr: [
                 new DoubleTapper({
                     onDoubleTap: (e) => {
+                        if (this.mode !== 'select' || this.selectShape !== 'poly') {
+                            return;
+                        }
                         if (this.polyShape.length < 3) {
+                            this.resetPolyShape();
                             return;
                         }
                         const shape = this.polyShape.map((item) => ({ x: item.x, y: item.y }));
@@ -687,7 +692,7 @@ export class EaselSelect implements TEaselTool {
     renderAfterViewport(ctx: CanvasRenderingContext2D, transform: TViewportTransformXY): void {
         if (this.mode === 'transform' && this.transformation?.type === 'ffd') {
             ctx.save();
-            this.renderLattice(ctx, transform.scaleX);
+            this.renderLattice(ctx, transform.scaleY);
             ctx.restore();
         }
 
@@ -703,7 +708,7 @@ export class EaselSelect implements TEaselTool {
         for (let i = 1; i < shape.length; i++) {
             ctx.lineTo(shape[i].x, shape[i].y);
         }
-        ctx.lineWidth = 1 / transform.scaleX;
+        ctx.lineWidth = 1 / transform.scaleY;
         ctx.strokeStyle = 'white';
         ctx.lineCap = 'round';
         ctx.lineJoin = 'round';

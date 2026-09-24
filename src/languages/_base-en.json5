@@ -832,6 +832,10 @@ Renaming a key across multiple language files:
     hint: 'makes canvas cover whole working area',
     value: 'Fit',
   },
+  "hand-flip": {
+    hint: 'mirrors the view horizontally. The image itself does not change.',
+    value: 'Flip View',
+  },
   "hand-inertia-scrolling": {
     hint: 'Canvas will continue to move even after releasing pointer.',
     value: 'Inertia Scrolling',
@@ -937,6 +941,10 @@ Renaming a key across multiple language files:
   "select-all": 'All',
   "select-invert": 'Invert',
   "select-reset": 'Reset',
+  "select-deselect": {
+    hint: 'More descriptive than "reset". Used as tooltip on the selection indicator.',
+    value: 'Deselect',
+  },
   "select-fill": 'Fill',
   "select-erase": 'Erase',
   "select-transform-warp": 'Warp',

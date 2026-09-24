@@ -1,5 +1,5 @@
 import { SelectCustom } from '../components/select-custom';
-import { getIconUrl } from '../../../icon/icon';
+import { getIconSvg, getIconUrl } from '../../../icon/icon';
 import { BB } from '../../../bb/bb';
 import { LANG, LANGUAGE_STRINGS, LS_LANGUAGE_KEY } from '../../../language/language';
 import { languages } from '../../../../languages/languages';
@@ -39,8 +39,11 @@ export class SettingsUi {
         const langWrapper = BB.el({
             parent: this.rootEl,
             content: BB.el({
-                content: LANG('settings-language') + ':',
+                content: [getIconSvg('language', { height: 20 }), LANG('settings-language') + ':'],
                 css: {
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 5,
                     marginRight: 5,
                     marginBottom: 2,
                 },

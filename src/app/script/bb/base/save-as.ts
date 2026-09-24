@@ -1,12 +1,6 @@
 import { asyncThrow, attempt, AttemptError } from './base';
 
-type TFilePickerAcceptType = {
-    description?: string;
-    accept: Record<string, string[]>;
-};
-
-type TMimeType = string;
-const types: Record<TMimeType, TFilePickerAcceptType> = {
+const pickerTypes = {
     'image/png': {
         description: 'PNG Image',
         accept: { 'image/png': ['.png'] },
@@ -19,65 +13,57 @@ const types: Record<TMimeType, TFilePickerAcceptType> = {
         description: 'Adobe Photoshop Document',
         accept: { 'image/vnd.adobe.photoshop': ['.psd'] },
     },
-} as const;
+};
 
 export type TFileSaveResult = 'saved' | 'cancel' | 'error';
 
-// resolves to true if it saves via file picker (or user aborted)
-async function saveViaFilePicker(blob: Blob, fileName: string): Promise<TFileSaveResult> {
-    const mimeType = blob.type;
-    if (!('showSaveFilePicker' in window)) {
-        return 'error';
-    }
-    if (!types[mimeType]) {
-        asyncThrow(new Error('unknown mime type' + mimeType));
-        return 'error';
-    }
-    type TMaybeUndefined = undefined | null;
-    const fileHandle: FileSystemFileHandle | TMaybeUndefined | AttemptError = await attempt(
-        async () =>
-            (window as any).showSaveFilePicker({
-                suggestedName: fileName,
-                types: [types[mimeType]],
-            }),
-    );
-    if (fileHandle instanceof AttemptError) {
-        const e = fileHandle.error;
-        if (e instanceof Error && e.name === 'AbortError') {
-            // canceled dialog
-            return 'cancel';
-        }
-        asyncThrow(e);
-        return 'error';
-    }
-    if (!fileHandle) {
-        // might be impossible
-        asyncThrow('fileHandle is not defined');
-        return 'error';
-    }
-    try {
-        const writableStream = await fileHandle.createWritable();
-        await writableStream.write(blob);
-        await writableStream.close();
-    } catch (e) {
-        asyncThrow(e);
-        return 'error';
-    }
-    return 'saved';
-}
-
 export async function saveAs(
-    blob: Blob,
     fileName: string,
-    showDialog: boolean = false,
+    mimeType: keyof typeof pickerTypes,
+    createBlob: () => Promise<Blob>,
+    showsFilePicker: boolean = false,
 ): Promise<TFileSaveResult> {
-    if (showDialog) {
-        const result = await saveViaFilePicker(blob, fileName);
-        if (result !== 'error') {
-            // saved or canceled
-            return result;
+    let fileHandle: FileSystemFileHandle | undefined;
+    // Open the picker before creating the blob while the user gesture is still active.
+    if (showsFilePicker && 'showSaveFilePicker' in window) {
+        try {
+            fileHandle = await (window as any).showSaveFilePicker({
+                suggestedName: fileName,
+                types: [pickerTypes[mimeType]],
+            });
+            if (!fileHandle) {
+                asyncThrow(new Error('showSaveFilePicker returned no file handle'));
+            }
+        } catch (error) {
+            const name =
+                typeof error === 'object' && error !== null && 'name' in error
+                    ? error.name
+                    : undefined;
+            if (name === 'AbortError') {
+                return 'cancel';
+            }
+            asyncThrow(error);
         }
     }
+
+    const blob = await attempt(createBlob);
+    if (blob instanceof AttemptError) {
+        asyncThrow(blob.error);
+        return 'error';
+    }
+
+    if (fileHandle) {
+        try {
+            const writableStream = await fileHandle.createWritable();
+            await writableStream.write(blob);
+            await writableStream.close();
+            return 'saved';
+        } catch (e) {
+            asyncThrow(e);
+            // Still try to save the regular way now.
+        }
+    }
+
     try {
         // Namespace is used to prevent conflict w/ Chrome Poper Blocker extension (Issue https://github.com/eligrey/FileSaver.js/issues/561)
         const a = document.createElementNS(

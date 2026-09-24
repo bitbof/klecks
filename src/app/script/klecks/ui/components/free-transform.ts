@@ -102,6 +102,14 @@ export class FreeTransform {
         updateDOM: () => void;
     };
 
+    // counterclockwise angle in canvas space -> counterclockwise angle in viewport space
+    private toViewportAngleDeg(angleDeg: number): number {
+        return (
+            (this.viewportTransform.isMirrored ? 180 - angleDeg : angleDeg) -
+            this.viewportTransform.angleDeg
+        );
+    }
+
     private updateScaled(): void {
         const viewportMatrix = createMatrixFromTransform(this.viewportTransform);
         const centerInViewport = applyToPoint(viewportMatrix, { x: this.value.x, y: this.value.y });
@@ -305,7 +313,7 @@ export class FreeTransform {
             left: this.rectInViewport.x,
             top: this.rectInViewport.y,
             transformOrigin: '0 0',
-            transform: 'rotate(' + (this.value.angleDeg + this.viewportTransform.angleDeg) + 'deg)',
+            transform: `rotate(${this.viewportTransform.angleDeg}deg) scaleX(${this.viewportTransform.isMirrored ? -1 : 1}) rotate(${this.value.angleDeg}deg)`,
         });
 
         css(this.boundsEl, {
@@ -645,10 +653,9 @@ export class FreeTransform {
                         x: cornerVectors[i].x * xMult,
                         y: cornerVectors[i].y * yMult * -1, // *-1 so 90° point up
                     };
-                    const angleDeg =
-                        pointsToAngleDeg({ x: 0, y: 0 }, cornerVector) -
-                        this.value.angleDeg -
-                        this.viewportTransform.angleDeg;
+                    const angleDeg = this.toViewportAngleDeg(
+                        pointsToAngleDeg({ x: 0, y: 0 }, cornerVector) - this.value.angleDeg,
+                    );
                     css(g.el, {
                         cursor: angleDegToCursor(angleDeg),
                     });
@@ -819,8 +826,7 @@ export class FreeTransform {
                         yFlipped ? 90 : -90,
                         xFlipped ? 0 : 180,
                     ];
-                    const angleDeg =
-                        angles[i] - this.value.angleDeg - this.viewportTransform.angleDeg;
+                    const angleDeg = this.toViewportAngleDeg(angles[i] - this.value.angleDeg);
                     css(g.el, {
                         cursor: angleDegToCursor(angleDeg),
                     });

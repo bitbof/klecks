@@ -5,6 +5,7 @@ import { getEllipsePath } from '../../bb/multi-polygon/get-ellipse-path';
 import { KlCanvas } from '../canvas/kl-canvas';
 import { BB } from '../../bb/bb';
 import { applyPolygonClipping } from '../../bb/multi-polygon/apply-polygon-clipping';
+import { getMultiPolyBounds } from '../../bb/multi-polygon/get-multi-polygon-bounds';
 
 export type TBooleanOperation = 'union' | 'difference' | 'new';
 export type TSelectShape = 'rect' | 'ellipse' | 'lasso' | 'poly';
@@ -15,6 +16,12 @@ export function limitPrecision(num: number): number {
 }
 export function limitPolygonPrecision(poly: Polygon): Polygon {
     return poly.map((ring) => ring.map(([x, y]) => [limitPrecision(x), limitPrecision(y)]));
+}
+
+// bounds smaller than 1px (canvas coordinates) in either dimension
+function isTooThin(multiPolygon: MultiPolygon): boolean {
+    const bounds = getMultiPolyBounds(multiPolygon, 'coordinate');
+    return bounds.x2 - bounds.x1 < 1 || bounds.y2 - bounds.y1 < 1;
 }
 
 export type TSelectToolParams = {
@@ -60,52 +67,58 @@ export class SelectTool {
         return result;
     }
 
+    // ignores polygon if too thin. empties selection if result too thin.
+    private commit(polygon: Polygon): void {
+        if (isTooThin([polygon])) {
+            if (this.selectOperation === 'new') {
+                this.selection = undefined;
+            }
+            return;
+        }
+        const selection = this.combineSelection(polygon);
+        this.selection = selection.length === 0 || isTooThin(selection) ? undefined : selection;
+    }
+
+    // polygon of shape currently being inputted
+    private getDragPolygon(): Polygon | undefined {
+        if (this.selectDragInputs.length <= 1) {
+            return undefined;
+        }
+        const first = this.selectDragInputs[0];
+        const last = this.selectDragInputs.at(-1)!;
+
+        if (this.shape === 'rect') {
+            // floor and ceil already limit precision
+            const minX = Math.floor(Math.min(first.x, last.x));
+            const minY = Math.floor(Math.min(first.y, last.y));
+            const maxX = Math.ceil(Math.max(first.x, last.x));
+            const maxY = Math.ceil(Math.max(first.y, last.y));
+            return [
+                [
+                    [minX, minY],
+                    [maxX, minY],
+                    [maxX, maxY],
+                    [minX, maxY],
+                ],
+            ];
+        }
+        if (this.shape === 'ellipse') {
+            const cx = (first.x + last.x) / 2;
+            const cy = (first.y + last.y) / 2;
+            const rx = Math.abs(last.x - first.x) / 2;
+            const ry = Math.abs(last.y - first.y) / 2;
+            return limitPolygonPrecision(getEllipsePath(cx, cy, rx, ry, 50));
+        }
+        if (this.shape === 'lasso') {
+            return [this.selectDragInputs.map((p) => [limitPrecision(p.x), limitPrecision(p.y)])];
+        }
+        return undefined;
+    }
+
     // current state of selection
     getSelection(): MultiPolygon | undefined {
-        // combine selections
-        let selection: MultiPolygon = this.selection || [];
-
-        if (this.selectDragInputs.length > 1) {
-            // currently inputting
-
-            const operation = this.selectOperation === 'difference' ? 'difference' : 'union';
-
-            if (this.shape === 'rect') {
-                const first = this.selectDragInputs[0];
-                const last = this.selectDragInputs.at(-1)!;
-                // floor and ceil already limit precision
-                const minX = Math.floor(Math.min(first.x, last.x));
-                const minY = Math.floor(Math.min(first.y, last.y));
-                const maxX = Math.ceil(Math.max(first.x, last.x));
-                const maxY = Math.ceil(Math.max(first.y, last.y));
-
-                selection = this.combineSelection([
-                    [
-                        [minX, minY],
-                        [maxX, minY],
-                        [maxX, maxY],
-                        [minX, maxY],
-                    ],
-                ]);
-            } else if (this.shape === 'ellipse') {
-                const first = this.selectDragInputs[0];
-                const last = this.selectDragInputs.at(-1)!;
-
-                const cx = (first.x + last.x) / 2;
-                const cy = (first.y + last.y) / 2;
-                const rx = Math.abs(last.x - first.x) / 2;
-                const ry = Math.abs(last.y - first.y) / 2;
-
-                selection = this.combineSelection(
-                    limitPolygonPrecision(getEllipsePath(cx, cy, rx, ry, 50)),
-                );
-            } else if (this.shape === 'lasso') {
-                selection = this.combineSelection([
-                    this.selectDragInputs.map((p) => [limitPrecision(p.x), limitPrecision(p.y)]),
-                ] as Polygon);
-            }
-        }
-
+        const dragPolygon = this.getDragPolygon();
+        const selection = dragPolygon ? this.combineSelection(dragPolygon) : (this.selection ?? []);
         return selection.length === 0 ? undefined : selection;
     }
 
@@ -141,9 +154,9 @@ export class SelectTool {
     }
 
     endSelect(): void {
-        if (this.selectDragInputs.length > 1) {
-            // commit
-            this.selection = this.getSelection();
+        const dragPolygon = this.getDragPolygon();
+        if (dragPolygon) {
+            this.commit(dragPolygon);
         } else {
             this.reset();
         }
@@ -152,9 +165,7 @@ export class SelectTool {
 
     addPoly(polygon: TVector2D[], operation: TBooleanOperation): void {
         this.selectOperation = operation;
-        this.selection = this.combineSelection([
-            polygon.map((p) => [limitPrecision(p.x), limitPrecision(p.y)]),
-        ]);
+        this.commit([polygon.map((p) => [limitPrecision(p.x), limitPrecision(p.y)])]);
     }
 
     // --- moving selection ---

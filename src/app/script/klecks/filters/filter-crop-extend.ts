@@ -300,6 +300,7 @@ export const filterCropExtend = {
                     },
                     scale,
                     0,
+                    false,
                 ),
             );
         }
