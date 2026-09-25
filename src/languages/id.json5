@@ -186,7 +186,7 @@
   },
   'brush-chemy-stroke': {
     original: 'Stroke',
-    value: 'Stroke'
+    value: 'Goresan'
   },
   'brush-chemy-mirror-x': {
     original: 'Horizontal Symmetry',
@@ -296,7 +296,7 @@
   'layers-clear': {
     hint: 'to make a layer empty',
     original: 'Clear layer',
-    value: 'Hapus lapisan'
+    value: 'Kosongkan lapisan'
   },
   'layers-merge-advanced': {
     original: 'Advanced merge',
@@ -326,7 +326,7 @@
   'layers-clipping': {
     hint: 'tooltip for toggling whether the active layer is clipped to the layer below',
     original: 'Clipping Mask',
-    value: ''
+    value: 'Masker Kliping'
   },
   'layers-blend-normal': {
     original: 'normal',
@@ -435,7 +435,7 @@
   'layers-rename-foreground': {
     hint: 'noun. Name suggestion for a layer',
     original: 'Foreground',
-    value: 'Latar depan'
+    value: 'Latar Depan'
   },
   'layers-merge-modal-title': {
     original: 'Merge/Mix Layers',
@@ -449,7 +449,7 @@
   'file-no-autosave': {
     hint: "let user know they can't autosave, and there's no cloud storage. Keep short so fits on one line",
     original: 'No autosave, no cloud storage',
-    value: 'Tidak ada simpan otomatis, tidak ada penyimpanan awan'
+    value: 'Tidak ada simpan otomatis, tidak ada penyimpanan cloud'
   },
   'file-new': {
     hint: 'action',
@@ -556,19 +556,19 @@
   'file-storage-min-ago': {
     hint: "{x} <- needs to stay, it's a placeholder.",
     original: '{x}min ago',
-    value: '{x}menit yang lalu'
+    value: '{x} menit yang lalu'
   },
   'file-storage-hours-ago': {
     original: '{x}h ago',
-    value: '{x}jam yang lalu'
+    value: '{x} jam yang lalu'
   },
   'file-storage-days-ago': {
     original: '{x}d ago',
-    value: '{x}hari yang lalu'
+    value: '{x} hari yang lalu'
   },
   'file-storage-month-ago': {
     original: '> 1month ago',
-    value: '> 1bulan yang lalu'
+    value: '> 1 bulan yang lalu'
   },
   'file-storage-restored': {
     original: 'Restored from Browser Storage',
@@ -652,11 +652,11 @@
   'cleared-layer': {
     hint: 'the layer has been cleared. It is now empty',
     original: 'Cleared layer',
-    value: 'Lapisan dihapus'
+    value: 'Lapisan dikosongkan'
   },
   'cleared-selected-area': {
     original: 'Cleared selected area',
-    value: 'Area yang dipilih dihapus'
+    value: 'Area yang dipilih dikosongkan'
   },
   filled: {
     hint: 'layer got filled with a color',
@@ -684,7 +684,7 @@
   'new-oversize': {
     hint: 'like oversized clothes.',
     original: 'Oversize',
-    value: 'Kebesaran'
+    value: 'Melebihi Ukuran'
   },
   'new-square': {
     hint: 'square image format',
@@ -1093,11 +1093,11 @@
   'filter-to-alpha-inverted-lum': {
     hint: 'luminance is same as the layer blend mode "luminosity"',
     original: 'Inverted Luminance',
-    value: 'Luminansi Terbalik'
+    value: 'Luminositas Terbalik'
   },
   'filter-to-alpha-lum': {
     original: 'Luminance',
-    value: 'Luminansi'
+    value: 'Luminositas'
   },
   'filter-to-alpha-replace': {
     hint: 'What color to replace the rgb channels with',
@@ -1215,11 +1215,11 @@
   },
   'import-many-files-warning': {
     original: 'You are about to import {x} files. Importing many files at once can cause instability.',
-    value: ''
+    value: 'Anda akan mengimpor {x} berkas. Mengimpor banyak berkas sekaligus dapat menyebabkan ketidakstabilan.'
   },
   'import-many-files-confirm': {
     original: 'Import {x} files',
-    value: ''
+    value: 'Impor {x} berkas'
   },
   'import-title': {
     original: 'Import Image',
@@ -1260,7 +1260,7 @@
   'import-flatten': {
     hint: 'Turn image that has multiple layers into an image that has only one layer.',
     original: 'Flatten image',
-    value: 'Ratakam gambar'
+    value: 'Ratakan gambar'
   },
   'import-unsupported-file': {
     hint: 'e.g. user tried to open a WAV',
@@ -1311,7 +1311,7 @@
   'hand-flip': {
     hint: 'mirrors the view horizontally. The image itself does not change.',
     original: 'Flip View',
-    value: ''
+    value: 'Balik Tampilan'
   },
   'hand-inertia-scrolling': {
     hint: 'Canvas will continue to move even after releasing pointer.',
@@ -1531,7 +1531,7 @@
   'select-deselect': {
     hint: 'More descriptive than "reset". Used as tooltip on the selection indicator.',
     original: 'Deselect',
-    value: ''
+    value: 'Batalkan Pilihan'
   },
   'select-fill': {
     original: 'Fill',
@@ -1819,7 +1819,7 @@
   },
   'x-minutes': {
     original: '{x}min',
-    value: '{x}menit'
+    value: '{x} menit'
   },
   wip: {
     original: 'Work in progress',
@@ -1827,7 +1827,7 @@
   },
   'browser-zoom-help': {
     original: 'Double-tap or pinch-out to reset browser zoom.',
-    value: 'Ketuk dua kali atau cubit untuk mengatur ulang zoom browser.'
+    value: 'Ketuk dua kali atau regangkan untuk mengatur ulang zoom browser.'
   },
   dismiss: {
     original: 'Dismiss',
