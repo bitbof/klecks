@@ -58,10 +58,6 @@ export const DEFAULT_PIXEL_PATTERNS: readonly TPixelPattern[] = [
     patternFromRows(['10000001', '01000010', '00100100', '00011000']), // zigzag
 ];
 
-export function getIsSolidPixelPattern(pattern: TPixelPattern): boolean {
-    return pattern.data.every((value) => value === 1);
-}
-
 // Sizes the pattern editor works with.
 export const EDITABLE_PIXEL_PATTERN_SIZES = [4, 8] as const;
 

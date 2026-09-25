@@ -18,11 +18,7 @@ import {
     updateBounds,
 } from '../../bb/math/math';
 import { getMultiPolyBounds } from '../../bb/multi-polygon/get-multi-polygon-bounds';
-import {
-    DEFAULT_PIXEL_PATTERNS,
-    getIsSolidPixelPattern,
-    TPixelPattern,
-} from './pixel-brush-patterns';
+import { DEFAULT_PIXEL_PATTERNS, TPixelPattern } from './pixel-brush-patterns';
 
 export type TPixelBrushTip = 'square' | 'round';
 
@@ -178,11 +174,9 @@ export class PixelBrush {
         const colorStr = this.settingIsEraser
             ? `rgb(${ERASE_COLOR},${ERASE_COLOR},${ERASE_COLOR})`
             : this.settingColorStr;
+        // Always a pattern, even when solid. Filling with a plain color is slower in Firefox
+        // (lower fps at size 1).
         const pattern = this.settingPattern;
-        if (getIsSolidPixelPattern(pattern)) {
-            this.fillStyle = colorStr;
-            return;
-        }
         if (
             this.patternCanvas.width !== pattern.width ||
             this.patternCanvas.height !== pattern.height
