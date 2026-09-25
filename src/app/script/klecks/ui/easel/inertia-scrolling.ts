@@ -127,6 +127,11 @@ export class InertiaScrolling {
         this.isDragging = false;
     }
 
+    // true while a fling is still moving
+    getIsActive(): boolean {
+        return this.animationFrameHandle !== undefined;
+    }
+
     setIsEnabled(b: boolean): void {
         this.isEnabled = b;
     }

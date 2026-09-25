@@ -560,10 +560,14 @@ export class KlAppImportHandler {
                                 }
                             } catch (e) {
                                 closeLoader?.();
-                                // todo localize
                                 showError(
-                                    'Failed to load PSD: ' +
-                                        (e instanceof Error ? e.message : String(e)),
+                                    BB.el({
+                                        // error messages can be influenced. safer to avoid innerHTML
+                                        textContent:
+                                            // todo localize
+                                            'Failed to load PSD: ' +
+                                            (e instanceof Error ? e.message : String(e)),
+                                    }),
                                 );
                                 asyncThrow(e);
                             }
