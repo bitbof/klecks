@@ -1,0 +1,58 @@
+// 0 -> no fade on that edge, 1 -> full fade. Registered, so it can transition.
+@property --kl-fade-left {
+    syntax: '<number>';
+    inherits: false;
+    initial-value: 0;
+}
+
+@property --kl-fade-right {
+    syntax: '<number>';
+    inherits: false;
+    initial-value: 0;
+}
+
+.root {
+    display: flex;
+    gap: 4px;
+}
+
+.viewport {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    touch-action: none;
+    // fixed width fade on each edge, fades in/out when there is more to scroll to
+    -webkit-mask-image: linear-gradient(
+        to right,
+        rgb(0 0 0 / calc(1 - var(--kl-fade-left))),
+        #000 28px,
+        #000 calc(100% - 28px),
+        rgb(0 0 0 / calc(1 - var(--kl-fade-right)))
+    );
+    mask-image: linear-gradient(
+        to right,
+        rgb(0 0 0 / calc(1 - var(--kl-fade-left))),
+        #000 28px,
+        #000 calc(100% - 28px),
+        rgb(0 0 0 / calc(1 - var(--kl-fade-right)))
+    );
+    transition:
+        --kl-fade-left 150ms ease-out,
+        --kl-fade-right 150ms ease-out;
+}
+
+.track {
+    position: relative; // offsetParent of the options
+    width: max-content;
+    will-change: transform;
+}
+
+.addButton {
+    flex: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 35px;
+    height: 35px;
+    padding: 0;
+}

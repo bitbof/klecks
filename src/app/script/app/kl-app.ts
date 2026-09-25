@@ -70,6 +70,7 @@ import { runBrowserStorageBanner } from '../klecks/ui/components/browser-storage
 import { requestPersistentStorage } from '../klecks/storage/request-persistent-storage';
 import { CrossTabChannel } from '../bb/base/cross-tab-channel';
 import { MobileColorUi } from '../klecks/ui/mobile/mobile-color-ui';
+import { PixelBrush } from '../klecks/brushes/pixel-brush';
 import { getSelectionPath2d } from '../bb/multi-polygon/get-selection-path-2d';
 import { ToolspaceTopRow } from '../klecks/ui/components/toolspace-top-row';
 import { setupUnfocusOnClickService } from '../klecks/ui/onfocus-on-click-service';
@@ -1069,6 +1070,7 @@ export class KlApp {
                         sizeSlider: KL.BRUSHES_UI[currentBrushId].sizeSlider,
                         opacitySlider: KL.BRUSHES_UI[currentBrushId].opacitySlider,
                     });
+                    updateBrushCursor();
                 },
             });
             brushUiMap[b] = ui;
@@ -1330,6 +1332,15 @@ export class KlApp {
         });
         this.klColorSlider.setHeight(Math.max(163, Math.min(400, this.uiHeight - 505)));
 
+        const updateBrushCursor = () => {
+            const brush = currentBrushUi.getBrush();
+            this.easelBrush.setBrush(
+                brush instanceof PixelBrush
+                    ? { type: 'pixel', pixelTip: brush.getTip() }
+                    : { type: 'round' },
+            );
+        };
+
         const setCurrentBrush = (brushId: string) => {
             if (brushId !== 'eraserBrush') {
                 lastNonEraserBrushId = brushId;
@@ -1347,9 +1358,7 @@ export class KlApp {
             currentBrushUi = brushUiMap[brushId];
             currentBrushUi.setColor(currentColor);
             currentBrushUi.setLayer(this.klCanvas.getLayer(currentLayerIndex));
-            this.easelBrush.setBrush({
-                type: currentBrushId === 'pixelBrush' ? 'pixel-square' : 'round',
-            });
+            updateBrushCursor();
             this.toolspaceToolRow.setActive('brush');
             updateMainTabVisibility();
         };

@@ -164,6 +164,21 @@
     original: 'Dither',
     value: 'Dither'
   },
+  'brush-pixel-pattern-add': {
+    hint: 'Button tooltip. Creates a new pattern for the pixel brush.',
+    original: 'New Pattern',
+    value: 'Neues Muster'
+  },
+  'brush-pixel-pattern-delete': {
+    hint: 'Button. Deletes a pattern the user created for the pixel brush.',
+    original: 'Delete',
+    value: 'Löschen'
+  },
+  'brush-pixel-pattern-edit-default-error': {
+    hint: 'Error message. Only patterns the user created can be edited, not the built-in ones.',
+    original: "Can't edit default patterns",
+    value: 'Standardmuster können nicht bearbeitet werden'
+  },
   'brush-chemy-fill': {
     hint: 'Like in MS Paint. A shape can have be outlined, and filled.',
     original: 'Fill',

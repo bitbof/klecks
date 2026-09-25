@@ -7,7 +7,44 @@ import { KlSlider } from '../ui/components/kl-slider';
 import { createPenPressureToggle } from '../ui/components/create-pen-pressure-toggle';
 import { TBrushUi } from '../kl-types';
 import { LANG, LANGUAGE_STRINGS } from '../../language/language';
-import { PixelBrush } from '../brushes/pixel-brush';
+import { Options } from '../ui/components/options';
+import { getPixelDiscHalfWidths, PixelBrush, TPixelBrushTip } from '../brushes/pixel-brush';
+import {
+    DEFAULT_PIXEL_PATTERNS,
+    loadCustomPixelPatterns,
+    saveCustomPixelPatterns,
+    TPixelPattern,
+} from '../brushes/pixel-brush-patterns';
+import { PixelPatternPicker } from '../ui/components/pixel-pattern-picker';
+import { showPixelPatternDialog } from '../ui/modals/show-pixel-pattern-dialog';
+import { showError } from '../ui/modals/base/show-modal';
+
+function createTipPreview(tip: TPixelBrushTip): HTMLElement {
+    // drawn at 1x, displayed at 3x -> crisp pixels. odd scale, so it can be centered in odd sized option
+    const size = 7;
+    const scale = 3;
+    const canvas = BB.canvas(size, size);
+    const ctx = BB.ctx(canvas);
+    if (tip === 'round') {
+        getPixelDiscHalfWidths(size).forEach((halfWidth, y) => {
+            ctx.fillRect(size / 2 - halfWidth, y, halfWidth * 2, 1);
+        });
+    } else {
+        ctx.fillRect(0, 0, size, size);
+    }
+    return BB.el({
+        className: 'dark-invert',
+        css: {
+            // option size stays the same (35)
+            width: size * scale,
+            height: size * scale,
+            margin: 7,
+            backgroundImage: 'url(' + canvas.toDataURL('image/png') + ')',
+            backgroundSize: `${size * scale}px ${size * scale}px`,
+            imageRendering: 'pixelated',
+        },
+    });
+}
 
 export const pixelBrushUi = (function () {
     const brushInterface = {
@@ -41,6 +78,20 @@ export const pixelBrushUi = (function () {
         let sizeSlider: KlSlider;
         let opacitySlider: KlSlider;
 
+        const tipOptions = new Options<TPixelBrushTip>({
+            optionArr: (['round', 'square'] as const).map((tip) => ({
+                id: tip,
+                label: createTipPreview(tip),
+                title: LANG(tip === 'round' ? 'brush-pen-circle' : 'brush-pen-square'),
+            })),
+            initId: brush.getTip(),
+            onChange: (tip) => {
+                brush.setTip(tip);
+                p.onConfigChange();
+            },
+            css: { marginTop: 10 },
+        });
+
         const lockAlphaToggle = new Checkbox({
             init: brush.getLockAlpha(),
             label: LANG('lock-alpha'),
@@ -61,13 +112,58 @@ export const pixelBrushUi = (function () {
             name: 'eraser-toggle',
         });
 
-        const ditherToggle = new Checkbox({
-            init: brush.getUseDither(),
-            label: LANG('brush-pixel-dither'),
-            callback: function (b) {
-                brush.setUseDither(b);
+        // patterns: defaults + the user's own. Identified by index, custom ones come after defaults.
+        let customPatterns: TPixelPattern[] = loadCustomPixelPatterns();
+        const getPatterns = (): TPixelPattern[] => [...DEFAULT_PIXEL_PATTERNS, ...customPatterns];
+        const selectPattern = (index: number): void => {
+            brush.setPattern(getPatterns()[index]);
+        };
+        const updateCustomPatterns = (patterns: TPixelPattern[], selectedIndex: number): void => {
+            customPatterns = patterns;
+            saveCustomPixelPatterns(customPatterns);
+            patternPicker.setPatterns(getPatterns(), selectedIndex);
+            selectPattern(selectedIndex);
+        };
+        const patternPicker = new PixelPatternPicker({
+            patterns: getPatterns(),
+            selectedIndex: 0, // solid
+            onSelect: selectPattern,
+            onClickSelected: (index) => {
+                const customIndex = index - DEFAULT_PIXEL_PATTERNS.length;
+                if (customIndex < 0) {
+                    showError(LANG('brush-pixel-pattern-edit-default-error'));
+                    return;
+                }
+                showPixelPatternDialog({
+                    pattern: customPatterns[customIndex],
+                    onOk: (pattern) => {
+                        updateCustomPatterns(
+                            customPatterns.map((item, i) => (i === customIndex ? pattern : item)),
+                            index,
+                        );
+                    },
+                    onDelete: () => {
+                        updateCustomPatterns(
+                            customPatterns.filter((_, i) => i !== customIndex),
+                            0, // solid
+                        );
+                    },
+                });
             },
-            name: 'dither-toggle',
+            onAdd: () => {
+                showPixelPatternDialog({
+                    // new patterns start fully filled
+                    pattern: { width: 4, height: 4, data: new Array<number>(16).fill(1) },
+                    onOk: (pattern) => {
+                        const patterns = [...customPatterns, pattern];
+                        updateCustomPatterns(
+                            patterns,
+                            DEFAULT_PIXEL_PATTERNS.length + patterns.length - 1,
+                        );
+                    },
+                });
+            },
+            css: { marginTop: 10 },
         });
 
         const spacingSpline = new BB.SplineInterpolator([
@@ -128,6 +224,8 @@ export const pixelBrushUi = (function () {
                     },
                 }),
                 opacitySlider.getElement(),
+                tipOptions.getElement(),
+                patternPicker.getElement(),
             );
 
             const toggleRow = BB.el({
@@ -140,11 +238,7 @@ export const pixelBrushUi = (function () {
                 },
             });
 
-            toggleRow.append(
-                lockAlphaToggle.getElement(),
-                eraserToggle.getElement(),
-                ditherToggle.getElement(),
-            );
+            toggleRow.append(lockAlphaToggle.getElement(), eraserToggle.getElement());
         }
 
         init();

@@ -164,6 +164,21 @@
     original: 'Dither',
     value: 'Dither'
   },
+  'brush-pixel-pattern-add': {
+    hint: 'Button tooltip. Creates a new pattern for the pixel brush.',
+    original: 'New Pattern',
+    value: ''
+  },
+  'brush-pixel-pattern-delete': {
+    hint: 'Button. Deletes a pattern the user created for the pixel brush.',
+    original: 'Delete',
+    value: ''
+  },
+  'brush-pixel-pattern-edit-default-error': {
+    hint: 'Error message. Only patterns the user created can be edited, not the built-in ones.',
+    original: "Can't edit default patterns",
+    value: ''
+  },
   'brush-chemy-fill': {
     hint: 'Like in MS Paint. A shape can have be outlined, and filled.',
     original: 'Fill',
@@ -307,6 +322,11 @@
   'layers-visibility-toggle': {
     original: 'Layer Visibility',
     value: 'Laagzichtbaarheid'
+  },
+  'layers-clipping': {
+    hint: 'tooltip for toggling whether the active layer is clipped to the layer below',
+    original: 'Clipping Mask',
+    value: ''
   },
   'layers-blend-normal': {
     original: 'normal',
@@ -1193,6 +1213,14 @@
     original: 'Opening file...',
     value: 'Bestand wordt geopend...'
   },
+  'import-many-files-warning': {
+    original: 'You are about to import {x} files. Importing many files at once can cause instability.',
+    value: ''
+  },
+  'import-many-files-confirm': {
+    original: 'Import {x} files',
+    value: ''
+  },
   'import-title': {
     original: 'Import Image',
     value: 'Afbeelding importeren'
@@ -1279,6 +1307,11 @@
     hint: 'makes canvas cover whole working area',
     original: 'Fit',
     value: 'Aanpassen'
+  },
+  'hand-flip': {
+    hint: 'mirrors the view horizontally. The image itself does not change.',
+    original: 'Flip View',
+    value: ''
   },
   'hand-inertia-scrolling': {
     hint: 'Canvas will continue to move even after releasing pointer.',
@@ -1494,6 +1527,11 @@
   'select-reset': {
     original: 'Reset',
     value: 'Resetten'
+  },
+  'select-deselect': {
+    hint: 'More descriptive than "reset". Used as tooltip on the selection indicator.',
+    original: 'Deselect',
+    value: ''
   },
   'select-fill': {
     original: 'Fill',

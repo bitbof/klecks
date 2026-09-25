@@ -18,12 +18,26 @@ import {
     updateBounds,
 } from '../../bb/math/math';
 import { getMultiPolyBounds } from '../../bb/multi-polygon/get-multi-polygon-bounds';
+import { DEFAULT_PIXEL_PATTERNS, TPixelPattern } from './pixel-brush-patterns';
+
+export type TPixelBrushTip = 'square' | 'round';
+
+export function getPixelDiscHalfWidths(diameter: number): number[] {
+    const r = diameter <= 2 ? diameter / 2 : diameter / 2 - 0.3;
+    const center = diameter / 2;
+    return Array.from({ length: diameter }, (_, y) => {
+        const dY = y + 0.5 - center;
+        const halfWidth = Math.sqrt(r * r - dY * dY);
+        const x0 = Math.ceil(center - halfWidth - 0.5);
+        const x1 = Math.floor(center + halfWidth - 0.5);
+        return (x1 - x0 + 1) / 2;
+    });
+}
 
 export class PixelBrush {
     private klHistory: KlHistory = {} as KlHistory;
     private context: CanvasRenderingContext2D = {} as CanvasRenderingContext2D;
     private settingHasSizePressure: boolean = true;
-    private settingHasOpacityPressure: boolean = false;
     private settingSize: number = 0.5;
     private settingSpacing: number = 0.9;
     private settingOpacity: number = 1;
@@ -31,33 +45,15 @@ export class PixelBrush {
     private settingColorStr: string = '';
     private settingLockLayerAlpha: boolean = false;
     private settingIsEraser: boolean = false;
-    private settingUseDither: boolean = true;
+    private settingPattern: TPixelPattern = DEFAULT_PIXEL_PATTERNS[0]; // solid
+    private settingTip: TPixelBrushTip = 'round';
     private inputIsDrawing: boolean = false;
     private lastInput: TPressureInput = { x: 0, y: 0, pressure: 0 };
     private lastInput2: TPressureInput = { x: 0, y: 0, pressure: 0 };
     private bezierLine: BezierLine | null = null;
-    private readonly ditherArr: [number, number][] = [
-        [3, 2],
-        [1, 0],
-        [3, 0],
-        [1, 2],
-        [2, 1],
-        [0, 3],
-        [0, 1],
-        [2, 3],
-
-        [2, 0],
-        [0, 2],
-        [0, 0],
-        [2, 2],
-        [1, 1],
-        [3, 3],
-        [3, 1],
-        [1, 3],
-    ];
-    private readonly ditherCanvas: HTMLCanvasElement;
-    private readonly ditherCtx: CanvasRenderingContext2D;
-    private ditherPattern: CanvasPattern = {} as CanvasPattern;
+    private readonly patternCanvas: HTMLCanvasElement;
+    private readonly patternCtx: CanvasRenderingContext2D;
+    private fillStyle: string | CanvasPattern = '';
 
     /*
         Draw brush into fresh canvas for each line,
@@ -66,9 +62,17 @@ export class PixelBrush {
      */
     private canvasClone: HTMLCanvasElement = {} as HTMLCanvasElement;
     private ctxClone: CanvasRenderingContext2D = {} as CanvasRenderingContext2D;
+    /*
+        Stroke is drawn opaque into its own canvas, then composited with opacity.
+        That way overlapping dots don't accumulate -> opacity instead of flow.
+     */
+    private strokeCanvas: HTMLCanvasElement = {} as HTMLCanvasElement;
+    private strokeCtx: CanvasRenderingContext2D = {} as CanvasRenderingContext2D;
 
     // area that changed since last redraw
     private redrawBounds: TIndexBounds | undefined;
+    // area that changed during the whole stroke
+    private strokeBounds: TIndexBounds | undefined;
     // changed tiles that will be pushed to history
     private historyTiles: boolean[] = [];
 
@@ -96,21 +100,51 @@ export class PixelBrush {
             this.context.canvas.width,
             this.context.canvas.height,
         );
-        this.redrawBounds = this.redrawBounds
-            ? updateBounds(this.redrawBounds, boundsWithinSelection)
-            : boundsWithinSelection;
+        this.redrawBounds = updateBounds(this.redrawBounds, boundsWithinSelection);
+        this.strokeBounds = updateBounds(this.strokeBounds, boundsWithinSelection);
         this.historyTiles = updateChangedTiles(this.historyTiles, changedTiles);
     }
 
     private initClone(): void {
-        this.canvasClone = BB.canvas(this.context.canvas.width, this.context.canvas.height);
+        const width = this.context.canvas.width;
+        const height = this.context.canvas.height;
+        this.canvasClone = BB.canvas(width, height);
         this.ctxClone = BB.ctx(this.canvasClone);
         this.ctxClone.drawImage(this.context.canvas, 0, 0);
+        this.strokeCanvas = BB.canvas(width, height);
+        this.strokeCtx = BB.ctx(this.strokeCanvas);
     }
 
     private freeClone(): void {
         BB.freeCanvas(this.canvasClone);
         this.ctxClone = {} as CanvasRenderingContext2D;
+        BB.freeCanvas(this.strokeCanvas);
+        this.strokeCtx = {} as CanvasRenderingContext2D;
+    }
+
+    /**
+     * Composites stroke onto ctx within rect.
+     */
+    private drawStroke(ctx: CanvasRenderingContext2D, rect: TRect): void {
+        ctx.save();
+        ctx.globalAlpha = this.settingOpacity;
+        if (this.settingLockLayerAlpha) {
+            ctx.globalCompositeOperation = 'source-atop';
+        } else if (this.settingIsEraser) {
+            ctx.globalCompositeOperation = 'destination-out';
+        }
+        ctx.drawImage(
+            this.strokeCanvas,
+            rect.x,
+            rect.y,
+            rect.width,
+            rect.height,
+            rect.x,
+            rect.y,
+            rect.width,
+            rect.height,
+        );
+        ctx.restore();
     }
 
     private redrawToCanvas(): void {
@@ -132,24 +166,34 @@ export class PixelBrush {
             boundsRect.height,
         );
         this.context.restore();
+        this.drawStroke(this.context, boundsRect);
         this.redrawBounds = undefined;
     }
 
-    private updateDither(): void {
-        this.ditherCtx.clearRect(0, 0, 4, 4);
-        this.ditherCtx.fillStyle = this.settingIsEraser
+    private updateFillStyle(): void {
+        const colorStr = this.settingIsEraser
             ? `rgb(${ERASE_COLOR},${ERASE_COLOR},${ERASE_COLOR})`
             : this.settingColorStr;
-        for (
-            let i = 0;
-            i < Math.max(1, Math.round(this.settingOpacity * this.ditherArr.length));
-            i++
+        // Always a pattern, even when solid. Filling with a plain color is slower in Firefox
+        // (lower fps at size 1).
+        const pattern = this.settingPattern;
+        if (
+            this.patternCanvas.width !== pattern.width ||
+            this.patternCanvas.height !== pattern.height
         ) {
-            this.ditherCtx.fillRect(this.ditherArr[i][0], this.ditherArr[i][1], 1, 1);
+            this.patternCanvas.width = pattern.width;
+            this.patternCanvas.height = pattern.height;
         }
-        this.ditherPattern = throwIfNull(
+        this.patternCtx.clearRect(0, 0, pattern.width, pattern.height);
+        this.patternCtx.fillStyle = colorStr;
+        pattern.data.forEach((value, i) => {
+            if (value) {
+                this.patternCtx.fillRect(i % pattern.width, Math.floor(i / pattern.width), 1, 1);
+            }
+        });
+        this.fillStyle = throwIfNull(
             // InvalidStateError: The object is in an invalid state.
-            this.context.createPattern(this.ditherCanvas, 'repeat'),
+            this.strokeCtx.createPattern(this.patternCanvas, 'repeat'),
         );
     }
 
@@ -220,7 +264,7 @@ export class PixelBrush {
         }
     }
 
-    private drawDot(x: number, y: number, size: number, opacity: number): void {
+    private drawDot(x: number, y: number, size: number): void {
         const rect: TRect = {
             x: Math.round(x + -size),
             y: Math.round(y + -size),
@@ -229,26 +273,19 @@ export class PixelBrush {
         };
         this.updateChangedTiles(rectToBounds(rect, 'index'));
 
-        this.ctxClone.save();
-        if (this.settingIsEraser) {
-            this.ctxClone.fillStyle = this.settingUseDither ? this.ditherPattern : '#fff';
-            if (this.settingLockLayerAlpha) {
-                this.ctxClone.globalCompositeOperation = 'source-atop';
-            } else {
-                this.ctxClone.globalCompositeOperation = 'destination-out';
-            }
+        this.strokeCtx.save();
+        this.strokeCtx.fillStyle = this.fillStyle;
+        if (this.settingTip === 'round') {
+            this.strokeCtx.beginPath();
+            getPixelDiscHalfWidths(rect.width).forEach((halfWidth, y) => {
+                const x = rect.x + rect.width / 2 - halfWidth;
+                this.strokeCtx.rect(x, rect.y + y, halfWidth * 2, 1);
+            });
+            this.strokeCtx.fill();
         } else {
-            this.ctxClone.fillStyle = this.settingUseDither
-                ? this.ditherPattern
-                : this.settingColorStr;
-            if (this.settingLockLayerAlpha) {
-                this.ctxClone.globalCompositeOperation = 'source-atop';
-            }
+            this.strokeCtx.fillRect(rect.x, rect.y, rect.width, rect.height);
         }
-        this.ctxClone.globalAlpha = this.settingUseDither ? 1 : opacity;
-
-        this.ctxClone.fillRect(rect.x, rect.y, rect.width, rect.height);
-        this.ctxClone.restore();
+        this.strokeCtx.restore();
     }
 
     private continueLine(x: number | null, y: number | null, size: number, pressure: number): void {
@@ -257,19 +294,16 @@ export class PixelBrush {
             this.bezierLine.add(this.lastInput.x, this.lastInput.y, 0, () => {});
         }
 
-        this.ctxClone.save();
-        this.selectionPath && this.ctxClone.clip(this.selectionPath);
+        this.strokeCtx.save();
+        this.selectionPath && this.strokeCtx.clip(this.selectionPath);
 
         const dotCallback: TBezierLineCallback = (val): void => {
             const localPressure = BB.mix(this.lastInput2.pressure, pressure, val.t);
-            const localOpacity =
-                this.settingOpacity *
-                (this.settingHasOpacityPressure ? localPressure * localPressure : 1);
             const localSize = Math.max(
                 0.5,
                 this.settingSize * (this.settingHasSizePressure ? localPressure : 1),
             );
-            this.drawDot(val.x, val.y, localSize, localOpacity);
+            this.drawDot(val.x, val.y, localSize);
         };
 
         const controlCallback = (controlObj: {
@@ -288,26 +322,15 @@ export class PixelBrush {
             } else {
                 this.bezierLine.add(x, y, 4, undefined, controlCallback);
             }
-            if (this.settingIsEraser) {
-                this.ctxClone.fillStyle = this.settingUseDither ? this.ditherPattern : '#fff';
-                if (this.settingLockLayerAlpha) {
-                    this.ctxClone.globalCompositeOperation = 'source-atop';
-                } else {
-                    this.ctxClone.globalCompositeOperation = 'destination-out';
-                }
-            } else {
-                this.ctxClone.fillStyle = this.settingUseDither
-                    ? this.ditherPattern
-                    : this.settingColorStr;
-                if (this.settingLockLayerAlpha) {
-                    this.ctxClone.globalCompositeOperation = 'source-atop';
-                }
-            }
-            this.ctxClone.globalAlpha = this.settingUseDither ? 1 : this.settingOpacity;
-            this.ctxClone.fill(this.bresenheimPath!);
+            this.strokeCtx.fillStyle = this.fillStyle;
+            this.strokeCtx.fill(this.bresenheimPath!);
             this.bresenheimPath = undefined;
         } else {
-            const localSpacing = size * this.settingSpacing;
+            // round tip needs dense spacing, otherwise the stroke edges become scalloped
+            const localSpacing =
+                this.settingTip === 'round'
+                    ? Math.min(1, size * this.settingSpacing)
+                    : size * this.settingSpacing;
 
             if (x === null || y === null) {
                 this.bezierLine.addFinal(localSpacing, dotCallback);
@@ -316,7 +339,7 @@ export class PixelBrush {
             }
         }
 
-        this.ctxClone.restore();
+        this.strokeCtx.restore();
     }
 
     /**
@@ -366,8 +389,8 @@ export class PixelBrush {
 
     // ----------------------------------- public -----------------------------------
     constructor() {
-        this.ditherCanvas = BB.canvas(4, 4);
-        this.ditherCtx = BB.ctx(this.ditherCanvas);
+        this.patternCanvas = BB.canvas(4, 4);
+        this.patternCtx = BB.ctx(this.patternCanvas);
     }
 
     // ---- interface ----
@@ -380,24 +403,20 @@ export class PixelBrush {
             : undefined;
         this.historyTiles = [];
         this.redrawBounds = undefined;
-        if (this.settingUseDither) {
-            this.updateDither();
-        }
+        this.strokeBounds = undefined;
         this.initClone();
+        this.updateFillStyle();
 
         p = Math.max(0, Math.min(1, p));
-        const localOpacity = this.settingHasOpacityPressure
-            ? this.settingOpacity * p * p
-            : this.settingOpacity;
         const localSize = this.settingHasSizePressure
             ? Math.max(0.5, p * this.settingSize)
             : Math.max(0.5, this.settingSize);
 
         this.inputIsDrawing = true;
-        this.ctxClone.save();
-        this.selectionPath && this.ctxClone.clip(this.selectionPath);
-        this.drawDot(x, y, localSize, localOpacity);
-        this.ctxClone.restore();
+        this.strokeCtx.save();
+        this.selectionPath && this.strokeCtx.clip(this.selectionPath);
+        this.drawDot(x, y, localSize);
+        this.strokeCtx.restore();
         this.lastInput.x = x;
         this.lastInput.y = y;
         this.lastInput.pressure = p;
@@ -409,7 +428,6 @@ export class PixelBrush {
         if (!this.inputIsDrawing) {
             return;
         }
-
         //debug
         //drawDot(x, y, 1, 0.5);
 
@@ -447,6 +465,9 @@ export class PixelBrush {
         this.bezierLine = null;
 
         this.redrawToCanvas();
+        if (this.strokeBounds) {
+            this.drawStroke(this.ctxClone, boundsToRect(this.strokeBounds));
+        }
         if (this.historyTiles.some((item) => item)) {
             this.klHistory.push(
                 getPushableLayerChange(
@@ -509,10 +530,6 @@ export class PixelBrush {
         this.settingHasSizePressure = b;
     }
 
-    opacityPressure(b: boolean): void {
-        this.settingHasOpacityPressure = b;
-    }
-
     setLockAlpha(b: boolean): void {
         this.settingLockLayerAlpha = b;
     }
@@ -521,8 +538,12 @@ export class PixelBrush {
         this.settingIsEraser = b;
     }
 
-    setUseDither(b: boolean): void {
-        this.settingUseDither = b;
+    setPattern(pattern: TPixelPattern): void {
+        this.settingPattern = pattern;
+    }
+
+    setTip(tip: TPixelBrushTip): void {
+        this.settingTip = tip;
     }
 
     //GET
@@ -546,7 +567,11 @@ export class PixelBrush {
         return this.settingIsEraser;
     }
 
-    getUseDither(): boolean {
-        return this.settingUseDither;
+    getPattern(): TPixelPattern {
+        return this.settingPattern;
+    }
+
+    getTip(): TPixelBrushTip {
+        return this.settingTip;
     }
 }
