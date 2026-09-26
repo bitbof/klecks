@@ -279,8 +279,8 @@ export const pixelBrushUi = (function () {
         this.startLine = function (x, y, p) {
             brush.startLine(x, y, p);
         };
-        this.goLine = function (x, y, p) {
-            brush.goLine(x, y, p);
+        this.goLine = function (points) {
+            brush.goLine(points);
         };
         this.endLine = function () {
             brush.endLine();
@@ -290,6 +290,9 @@ export const pixelBrushUi = (function () {
         };
         this.isDrawing = function () {
             return brush.isDrawing();
+        };
+        this.freeResources = () => {
+            brush.freeResources();
         };
         this.toggleEraser = () => {
             eraserToggle.setValue(!eraserToggle.getValue());

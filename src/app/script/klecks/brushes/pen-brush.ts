@@ -1,7 +1,7 @@
 import { BB } from '../../bb/bb';
 import { ALPHA_IM_ARR } from './brushes-common';
 import { TPressureInput, TRgb } from '../kl-types';
-import { BezierLine, TBezierLineCallback } from '../../bb/math/line';
+import { LinearLine } from '../../bb/math/line';
 import { KlHistory } from '../history/kl-history';
 import { getPushableLayerChange } from '../history/push-helpers/get-pushable-layer-change';
 import { canvasAndChangedTilesToLayerTiles } from '../history/push-helpers/canvas-to-layer-tiles';
@@ -18,6 +18,9 @@ const ALPHA_CAL = 2; // calligraphy
 const ALPHA_SQUARE = 3;
 
 const TWO_PI = 2 * Math.PI;
+
+// x, y, size, opacity, scatter, angle
+type TPenDot = [number, number, number, number, number, number | undefined];
 
 export class PenBrush {
     private context: CanvasRenderingContext2D = {} as CanvasRenderingContext2D;
@@ -38,10 +41,9 @@ export class PenBrush {
     private hasDrawnDot: boolean = false;
     private lineToolLastDot: number = 0;
     private lastInput: TPressureInput = { x: 0, y: 0, pressure: 0 };
-    private lastInput2: TPressureInput = { x: 0, y: 0, pressure: 0 };
     private inputArr: TPressureInput[] = [];
     private inputIsDrawing: boolean = false;
-    private bezierLine: BezierLine | null = null;
+    private linearLine: LinearLine | null = null;
 
     // mipmapping
     private readonly alphaCanvas128: HTMLCanvasElement = BB.canvas(128, 128);
@@ -141,7 +143,7 @@ export class PenBrush {
         opacity: number,
         scatter: number,
         angle?: number,
-        before?: [number, number, number, number, number, number | undefined],
+        before?: TPenDot,
     ): void {
         if (size <= 0) {
             return;
@@ -218,17 +220,20 @@ export class PenBrush {
         }
     }
 
-    // continueLine
-    private continueLine(x: number | null, y: number | null, size: number, pressure: number): void {
-        if (this.bezierLine === null) {
-            this.bezierLine = new BB.BezierLine();
-            this.bezierLine.add(this.lastInput.x, this.lastInput.y, 0, () => {});
+    /**
+     * Continues line to point. Pushes resulting dots into drawArr.
+     */
+    private continueLine(point: TPressureInput, drawArr: TPenDot[]): void {
+        if (this.linearLine === null) {
+            this.linearLine = new LinearLine(this.lastInput);
         }
+        const pressure = BB.clamp(point.pressure, 0, 1);
+        const size = this.settingHasSizePressure
+            ? Math.max(0.1, pressure * this.settingSize)
+            : Math.max(0.1, this.settingSize);
 
-        const drawArr: [number, number, number, number, number, number | undefined][] = []; //draw instructions. will be all drawn at once
-
-        const dotCallback: TBezierLineCallback = (val): void => {
-            const localPressure = BB.mix(this.lastInput2.pressure, pressure, val.t);
+        this.linearLine.add(point.x, point.y, size * this.settingSpacing, (val) => {
+            const localPressure = BB.mix(this.lastInput.pressure, pressure, val.t);
             const localOpacity = this.calcOpacity(localPressure);
             const localSize = Math.max(
                 0.1,
@@ -236,24 +241,12 @@ export class PenBrush {
             );
             const localScatter = this.calcScatter(localPressure);
             drawArr.push([val.x, val.y, localSize, localOpacity, localScatter, val.angle]);
-        };
+        });
 
-        const localSpacing = size * this.settingSpacing;
-        if (x === null || y === null) {
-            this.bezierLine.addFinal(localSpacing, dotCallback);
-        } else {
-            this.bezierLine.add(x, y, localSpacing, dotCallback);
-        }
-
-        // execute draw instructions
-        this.context.save();
-        let before: (typeof drawArr)[number] | undefined = undefined;
-        for (let i = 0; i < drawArr.length; i++) {
-            const item = drawArr[i];
-            this.drawDot(item[0], item[1], item[2], item[3], item[4], item[5], before);
-            before = item;
-        }
-        this.context.restore();
+        this.lastInput.x = point.x;
+        this.lastInput.y = point.y;
+        this.lastInput.pressure = pressure;
+        this.inputArr.push({ ...point });
     }
 
     // ----------------------------------- public -----------------------------------
@@ -288,7 +281,6 @@ export class PenBrush {
         this.lastInput.x = x;
         this.lastInput.y = y;
         this.lastInput.pressure = p;
-        this.lastInput2.pressure = p;
 
         this.inputArr = [
             {
@@ -299,47 +291,26 @@ export class PenBrush {
         ];
     }
 
-    goLine(x: number, y: number, p: number): void {
+    goLine(points: TPressureInput[]): void {
         if (!this.inputIsDrawing) {
             return;
         }
 
-        const pressure = BB.clamp(p, 0, 1);
-        const localSize = this.settingHasSizePressure
-            ? Math.max(0.1, this.lastInput.pressure * this.settingSize)
-            : Math.max(0.1, this.settingSize);
+        const drawArr: TPenDot[] = []; // draw instructions. will be all drawn at once
+        points.forEach((point) => this.continueLine(point, drawArr));
 
         this.context.save();
         this.selectionPath && this.context.clip(this.selectionPath);
-        this.continueLine(x, y, localSize, this.lastInput.pressure);
-
-        /*context.fillStyle = 'red';
-        context.fillRect(Math.floor(x), Math.floor(y - 10), 1, 20);
-        context.fillRect(Math.floor(x - 10), Math.floor(y), 20, 1);*/
-
+        let before: TPenDot | undefined = undefined;
+        for (let i = 0; i < drawArr.length; i++) {
+            const item = drawArr[i];
+            this.drawDot(item[0], item[1], item[2], item[3], item[4], item[5], before);
+            before = item;
+        }
         this.context.restore();
-
-        this.lastInput.x = x;
-        this.lastInput.y = y;
-        this.lastInput2.pressure = this.lastInput.pressure;
-        this.lastInput.pressure = pressure;
-
-        this.inputArr.push({
-            x,
-            y,
-            pressure: p,
-        });
     }
 
     endLine(): void {
-        const localSize = this.settingHasSizePressure
-            ? Math.max(0.1, this.lastInput.pressure * this.settingSize)
-            : Math.max(0.1, this.settingSize);
-        this.context.save();
-        this.selectionPath && this.context.clip(this.selectionPath);
-        this.continueLine(null, null, localSize, this.lastInput.pressure);
-        this.context.restore();
-
         this.inputIsDrawing = false;
 
         if (this.settingAlphaId === ALPHA_SQUARE && !this.hasDrawnDot) {
@@ -354,13 +325,16 @@ export class PenBrush {
             this.context.save();
             this.selectionPath && this.context.clip(this.selectionPath);
             const p = BB.clamp(maxInput.pressure, 0, 1);
+            const localSize = this.settingHasSizePressure
+                ? Math.max(0.1, this.lastInput.pressure * this.settingSize)
+                : Math.max(0.1, this.settingSize);
             const localOpacity = this.calcOpacity(p);
             const localScatter = this.calcScatter(p);
             this.drawDot(maxInput.x, maxInput.y, localSize, localOpacity, localScatter, 0);
             this.context.restore();
         }
 
-        this.bezierLine = null;
+        this.linearLine = null;
 
         if (this.changedTiles.some((item) => item)) {
             this.klHistory.push(

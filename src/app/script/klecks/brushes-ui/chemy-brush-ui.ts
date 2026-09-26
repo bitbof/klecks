@@ -358,8 +358,8 @@ export const chemyBrushUi = (function () {
         this.startLine = function (x, y, p) {
             brush.startLine(x, y);
         };
-        this.goLine = function (x, y, p, isCoalesced) {
-            brush.goLine(x, y);
+        this.goLine = function (points) {
+            brush.goLine(points);
         };
         this.endLine = function () {
             brush.endLine();

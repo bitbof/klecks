@@ -3,7 +3,7 @@ import { changeCanvasDimensions } from '../../bb/base/change-canvas-dimensions';
 import { isLayerFill, TRgb, TRgba } from '../kl-types';
 import { TIndexBounds, TPressureInput } from '../../bb/bb-types';
 import { clamp, intersectBounds } from '../../bb/math/math';
-import { BezierLine, TBezierLineCallback } from '../../bb/math/line';
+import { LinearLine, TLinearLineCallback } from '../../bb/math/line';
 import { HISTORY_TILE_SIZE, KlHistory } from '../history/kl-history';
 import { getPushableLayerChange } from '../history/push-helpers/get-pushable-layer-change';
 import { copyImageData } from '../utils/copy-image-data';
@@ -14,11 +14,20 @@ import { getMultiPolyBounds } from '../../bb/multi-polygon/get-multi-polygon-bou
 import { getChangedTiles } from '../history/push-helpers/changed-tiles';
 import { freeCanvas } from '../../bb/base/canvas';
 
+// Distance (px) along the stroke between color samples.
+const BLEND_SAMPLE_DISTANCE = 5;
+
+// Dot spacing is a fixed fraction of the dot diameter -> same overlap at every size.
+// Spacing never goes below SPACING_MIN. Instead, the dot alpha is raised to reach the same shade.
+const SPACING_RATIO = 0.08;
+const SPACING_MIN = 1; // px
+
 type TDrawBufferItem = {
     x: number;
     y: number;
     size: number;
     opacity: number;
+    alphaExponent: number; // alpha -> 1 - (1 - alpha)^alphaExponent. 1 -> unchanged
 
     // indices
     x1: number;
@@ -38,23 +47,25 @@ export class BlendBrush {
     private context: CanvasRenderingContext2D = {} as CanvasRenderingContext2D;
     private layerId: string = 'NOT_SET';
     private color: TRgb = {} as TRgb;
-    private size: number = 29; // radius - 0.5 - 99999
+    private size: number = 30; // radius - 0.5 - 99999
     private opacity: number = 0.6; // 0-1
-    private blending: number = 0.65; // 0-1
+    private blending: number = 0.8; // 0-1
 
     private settingLockLayerAlpha: boolean = false;
-    private settingSizePressure: boolean = true;
-    private settingOpacityPressure: boolean = false;
+    private settingSizePressure: boolean = false;
+    private settingOpacityPressure: boolean = true;
+    private settingBlendingPressure: boolean = true;
 
     private blendCol: TRgba = { r: 0, g: 0, b: 0, a: 1 }; // todo docs
     private blendMix: number = 0.45; // todo docs
     private mixCol: TRgb = { r: 0, g: 0, b: 0 }; // todo docs
-    private localColOld: TRgba = {} as TRgba; // todo docs
+    private localColOld: TRgba = {} as TRgba; // color of the previous sample
+    private localColNew: TRgba = {} as TRgba; // color of the latest sample
+    private distSinceSample: number = 0;
 
     private isDrawing: boolean = false;
     private lastInput: TPressureInput = { x: 0, y: 0, pressure: 0 }; // todo docs
-    private lastInput2: TPressureInput = { x: 0, y: 0, pressure: 0 }; // todo docs
-    private bezierLine: undefined | BezierLine;
+    private linearLine: undefined | LinearLine;
 
     private klHistory: KlHistory = {} as KlHistory;
     private redrawBounds: TIndexBounds | undefined;
@@ -317,6 +328,7 @@ export class BlendBrush {
         const sizeSquared = params.size * params.size;
         const distDivisor = (sizeSquared * invSharpness) / params.opacity;
         const alphaMinuend = (1 + sharpnessSubtrahend) * params.opacity;
+        const hasAlphaExponent = params.alphaExponent !== 1;
 
         const slicedBounds = this.sliceBounds({
             type: 'index',
@@ -374,7 +386,15 @@ export class BlendBrush {
                             if (dist >= sizeSquared) {
                                 continue;
                             }
-                            alphaO += clamp(alphaMinuend - dist / distDivisor, 0, params.opacity);
+                            const sampleAlpha = clamp(
+                                alphaMinuend - dist / distDivisor,
+                                0,
+                                params.opacity,
+                            );
+                            // compensate per sample, so the coverage (antialiasing) stays linear
+                            alphaO += hasAlphaExponent
+                                ? 1 - (1 - sampleAlpha) ** params.alphaExponent
+                                : sampleAlpha;
                         }
                         if (!alphaO) {
                             continue;
@@ -387,6 +407,9 @@ export class BlendBrush {
                             continue;
                         }
                         alphaO = clamp(alphaMinuend - dist / distDivisor, 0, params.opacity);
+                        if (hasAlphaExponent) {
+                            alphaO = 1 - (1 - alphaO) ** params.alphaExponent;
+                        }
                     }
 
                     const invAlphaO = 1 - alphaO;
@@ -420,125 +443,177 @@ export class BlendBrush {
         });
     }
 
-    private calcSpacing(size: number): number {
-        return BB.mix(
-            (size * 2) / 2, // until size 5.3
-            (size * 2) / 9, // at size 24
-            clamp((size - 2.7) / (12 - 2.7), 0, 1),
-        );
+    // desired spacing, before clamping to SPACING_MIN
+    private calcSpacingUnclamped(size: number): number {
+        return size * 2 * SPACING_RATIO;
     }
 
-    private continueLine(
-        x: number | undefined,
-        y: number | undefined,
-        p: number,
-        isCoalesced: boolean,
-    ): void {
+    private calcSpacing(size: number): number {
+        return Math.max(SPACING_MIN, this.calcSpacingUnclamped(size));
+    }
+
+    private calcOpacity(pressure: number): number {
+        return this.settingOpacityPressure
+            ? this.opacity * BB.mix(0.05, 1, pressure * pressure)
+            : this.opacity;
+    }
+
+    private getIsBlending(): boolean {
+        return this.blending !== 0 || this.settingBlendingPressure;
+    }
+
+    private calcBlending(pressure: number): number {
+        // pressure 0 -> full blending, pressure 1 -> chosen blending
+        // So with high pressure you apply color. With low pressure you blend.
+        return this.settingBlendingPressure ? BB.mix(1, this.blending, pressure) : this.blending;
+    }
+
+    /**
+     * How much the alpha of a dot of this size needs to be raised, so the spacing clamped to SPACING_MIN
+     * results in the same shade as the unclamped spacing would.
+     */
+    private calcAlphaExponent(size: number): number {
+        // Sub-pixel dots already get lower alpha from partial pixel coverage.
+        // Limit compensation to the spacing for a 1px diameter dot.
+        return Math.max(1, SPACING_MIN / this.calcSpacingUnclamped(Math.max(0.5, size)));
+    }
+
+    /**
+     * Samples canvas color at x y, and blends it into blendCol.
+     * Returns the new color to draw with.
+     */
+    private sampleColor(x: number, y: number, p: number): TRgba {
+        const avgSize = this.settingSizePressure
+            ? Math.max(0.5, p * this.size)
+            : Math.max(0.5, this.size);
+        const avgBounds = this.getDotBounds(x, y, avgSize);
+        if (avgBounds) {
+            this.copyFromCanvas(avgBounds);
+        }
+        const average = this.getAverage(x, y, avgSize);
+
+        if (average.a > 0 && this.blendCol.a === 0) {
+            this.blendCol.r = average.r;
+            this.blendCol.g = average.g;
+            this.blendCol.b = average.b;
+            this.blendCol.a = average.a;
+        } else {
+            if (average.a === 0) {
+                average.r = this.color.r;
+                average.g = this.color.g;
+                average.b = this.color.b;
+                average.a = 1 - this.calcBlending(p);
+            }
+
+            this.blendCol.r = BB.mix(
+                this.blendCol.r,
+                BB.mix(this.blendCol.r, average.r, this.blendMix),
+                average.a,
+            );
+            this.blendCol.g = BB.mix(
+                this.blendCol.g,
+                BB.mix(this.blendCol.g, average.g, this.blendMix),
+                average.a,
+            );
+            this.blendCol.b = BB.mix(
+                this.blendCol.b,
+                BB.mix(this.blendCol.b, average.b, this.blendMix),
+                average.a,
+            );
+            this.blendCol.a = Math.min(1, this.blendCol.a + average.a);
+        }
+        return { ...this.blendCol };
+    }
+
+    private flushDrawBuffer(): void {
+        this.copyFromCanvas(this.redrawBounds);
+        this.drawBuffer.forEach((item) => {
+            this.drawDot(item);
+        });
         this.drawBuffer = [];
+    }
+
+    /**
+     * Continues line to point. Samples the color exactly every BLEND_SAMPLE_DISTANCE along the line, independent of
+     * how far apart the points are. Before sampling, the dots so far are drawn.
+     */
+    private continueLine(point: TPressureInput): void {
+        point = { ...point, pressure: clamp(point.pressure, 0, 1) };
+        if (this.getIsBlending()) {
+            const from = { ...this.lastInput };
+            const length = BB.dist(from.x, from.y, point.x, point.y);
+            let traveled = 0;
+            while (length - traveled >= BLEND_SAMPLE_DISTANCE - this.distSinceSample) {
+                traveled += BLEND_SAMPLE_DISTANCE - this.distSinceSample;
+                const t = traveled / length;
+                const samplePoint = {
+                    x: BB.mix(from.x, point.x, t),
+                    y: BB.mix(from.y, point.y, t),
+                    pressure: BB.mix(from.pressure, point.pressure, t),
+                };
+                this.drawTo(samplePoint);
+                this.flushDrawBuffer();
+                this.localColOld = this.localColNew;
+                this.localColNew = this.sampleColor(
+                    samplePoint.x,
+                    samplePoint.y,
+                    samplePoint.pressure,
+                );
+                this.distSinceSample = 0;
+            }
+        }
+        this.drawTo(point);
+    }
+
+    /**
+     * Pushes dots from lastInput to point into drawBuffer. Color transitions from the previous to the latest sample.
+     */
+    private drawTo(point: TPressureInput): void {
+        const { x, y } = point;
+        const p = point.pressure;
 
         let localPressure;
         let localOpacity;
+        let localBlending;
         let localSize = this.settingSizePressure
             ? Math.max(1, p * this.size)
             : Math.max(1, this.size);
 
         const bDist = this.calcSpacing(localSize);
 
-        const avgX = x === undefined ? this.lastInput.x : x;
-        const avgY = y === undefined ? this.lastInput.y : y;
-
-        let localColNew: TRgba;
-
-        if (this.blending === 0) {
+        if (!this.getIsBlending()) {
             this.mixCol.r = this.color.r;
             this.mixCol.g = this.color.g;
             this.mixCol.b = this.color.b;
-        } else {
-            let average;
-            if (isCoalesced) {
-                average = {
-                    r: this.localColOld.r,
-                    g: this.localColOld.g,
-                    b: this.localColOld.b,
-                    a: 0,
-                };
-            } else {
-                const avgParams = [
-                    avgX,
-                    avgY,
-                    this.settingSizePressure
-                        ? Math.max(0.5, p * this.size)
-                        : Math.max(0.5, this.size),
-                ];
-                const bounds = this.getDotBounds(avgParams[0], avgParams[1], avgParams[2]);
-                if (bounds) {
-                    this.copyFromCanvas(bounds);
-                }
-                average = this.getAverage(avgParams[0], avgParams[1], avgParams[2]);
-            }
-            localColNew = { r: 0, g: 0, b: 0, a: 0 };
-
-            if (average.a > 0 && this.blendCol.a === 0) {
-                this.blendCol.r = average.r;
-                this.blendCol.g = average.g;
-                this.blendCol.b = average.b;
-                this.blendCol.a = average.a;
-                localColNew.r = this.blendCol.r;
-                localColNew.g = this.blendCol.g;
-                localColNew.b = this.blendCol.b;
-                localColNew.a = this.blendCol.a;
-            } else {
-                if (average.a === 0) {
-                    average.r = this.color.r;
-                    average.g = this.color.g;
-                    average.b = this.color.b;
-                    average.a = 1 - this.blending;
-                }
-
-                this.blendCol.r = BB.mix(
-                    this.blendCol.r,
-                    BB.mix(this.blendCol.r, average.r, this.blendMix),
-                    average.a,
-                );
-                this.blendCol.g = BB.mix(
-                    this.blendCol.g,
-                    BB.mix(this.blendCol.g, average.g, this.blendMix),
-                    average.a,
-                );
-                this.blendCol.b = BB.mix(
-                    this.blendCol.b,
-                    BB.mix(this.blendCol.b, average.b, this.blendMix),
-                    average.a,
-                );
-                this.blendCol.a = Math.min(1, this.blendCol.a + average.a);
-                localColNew.r = this.blendCol.r;
-                localColNew.g = this.blendCol.g;
-                localColNew.b = this.blendCol.b;
-                localColNew.a = this.blendCol.a;
-            }
         }
 
-        const dotCallback: TBezierLineCallback = (val) => {
-            if (this.blending >= 1 && this.blendCol.a <= 0) {
+        const segmentLength = BB.dist(this.lastInput.x, this.lastInput.y, x, y);
+        const segmentStart = this.distSinceSample;
+
+        const dotCallback: TLinearLineCallback = (val) => {
+            const factor = val.t;
+            localPressure = this.lastInput.pressure * (1 - factor) + p * factor;
+            localBlending = this.calcBlending(localPressure);
+            if (localBlending >= 1 && this.blendCol.a <= 0) {
                 return;
             }
-            const factor = val.t;
-            localPressure = this.lastInput2.pressure * (1 - factor) + p * factor;
-            localOpacity = this.settingOpacityPressure
-                ? this.opacity * localPressure * localPressure
-                : this.opacity;
+            localOpacity = this.calcOpacity(localPressure);
             localSize = this.settingSizePressure
                 ? Math.max(0.1, localPressure * this.size)
                 : Math.max(0.1, this.size);
-            if (this.blending !== 0) {
-                this.mixCol.r = BB.mix(this.localColOld.r, localColNew.r, factor);
-                this.mixCol.g = BB.mix(this.localColOld.g, localColNew.g, factor);
-                this.mixCol.b = BB.mix(this.localColOld.b, localColNew.b, factor);
+            if (this.getIsBlending()) {
+                const colorFactor = Math.min(
+                    1,
+                    (segmentStart + factor * segmentLength) / BLEND_SAMPLE_DISTANCE,
+                );
+                this.mixCol.r = BB.mix(this.localColOld.r, this.localColNew.r, colorFactor);
+                this.mixCol.g = BB.mix(this.localColOld.g, this.localColNew.g, colorFactor);
+                this.mixCol.b = BB.mix(this.localColOld.b, this.localColNew.b, colorFactor);
             }
-            if (this.blending === 1 && this.localColOld.a === 0) {
-                this.mixCol.r = localColNew.r;
-                this.mixCol.g = localColNew.g;
-                this.mixCol.b = localColNew.b;
+            if (localBlending === 1 && this.localColOld.a === 0) {
+                this.mixCol.r = this.localColNew.r;
+                this.mixCol.g = this.localColNew.g;
+                this.mixCol.b = this.localColNew.b;
             }
             const bounds = this.getDotBounds(val.x, val.y, localSize);
             if (bounds) {
@@ -548,32 +623,24 @@ export class BlendBrush {
                     y: val.y,
                     size: localSize,
                     opacity: localOpacity,
+                    alphaExponent: this.calcAlphaExponent(localSize),
                     x1: bounds.x1,
                     y1: bounds.y1,
                     x2: bounds.x2,
                     y2: bounds.y2,
-                    r: BB.mix(this.color.r, this.mixCol.r, this.blending),
-                    g: BB.mix(this.color.g, this.mixCol.g, this.blending),
-                    b: BB.mix(this.color.b, this.mixCol.b, this.blending),
+                    r: BB.mix(this.color.r, this.mixCol.r, localBlending),
+                    g: BB.mix(this.color.g, this.mixCol.g, localBlending),
+                    b: BB.mix(this.color.b, this.mixCol.b, localBlending),
                 });
             }
         };
 
-        if (x === undefined || y === undefined) {
-            this.bezierLine!.addFinal(bDist, dotCallback);
-        } else {
-            this.bezierLine!.add(x, y, bDist, dotCallback);
-        }
+        this.linearLine!.add(x, y, bDist, dotCallback);
 
-        this.copyFromCanvas(this.redrawBounds);
-        this.drawBuffer.forEach((item) => {
-            this.drawDot(item);
-        });
-        this.drawBuffer = [];
-
-        if (this.blending !== 0) {
-            this.localColOld = localColNew!;
-        }
+        this.distSinceSample += segmentLength;
+        this.lastInput.x = x;
+        this.lastInput.y = y;
+        this.lastInput.pressure = p;
     }
 
     // ----------------------------------- public -----------------------------------
@@ -624,6 +691,10 @@ export class BlendBrush {
         this.settingOpacityPressure = b;
     }
 
+    setBlendingPressure(b: boolean): void {
+        this.settingBlendingPressure = b;
+    }
+
     getLockAlpha(): boolean {
         return this.settingLockLayerAlpha;
     }
@@ -654,11 +725,12 @@ export class BlendBrush {
         this.isDrawing = true;
 
         p = Math.max(0, Math.min(1, p));
-        const localOpacity = this.settingOpacityPressure ? this.opacity * p * p : this.opacity;
+        const localOpacity = this.calcOpacity(p);
+        const localBlending = this.calcBlending(p);
         const localSize = this.settingSizePressure
             ? Math.max(0.1, p * this.size)
             : Math.max(0.1, this.size);
-        if (this.blending === 0) {
+        if (!this.getIsBlending()) {
             this.mixCol.r = this.color.r;
             this.mixCol.g = this.color.g;
             this.mixCol.b = this.color.b;
@@ -675,7 +747,7 @@ export class BlendBrush {
                     r: this.color.r,
                     g: this.color.g,
                     b: this.color.b,
-                    a: 1 - this.blending,
+                    a: 1 - localBlending,
                 };
             } else {
                 this.blendCol = {
@@ -697,11 +769,13 @@ export class BlendBrush {
             b: this.mixCol.b,
             a: this.blendCol.a,
         };
+        this.localColNew = { ...this.localColOld };
+        this.distSinceSample = 0;
 
         this.redrawBounds = undefined;
         this.drawBuffer = [];
 
-        if (this.blending < 1 || this.blendCol.a > 0) {
+        if (localBlending < 1 || this.blendCol.a > 0) {
             const bounds = this.getDotBounds(x, y, localSize);
             if (bounds) {
                 this.updateRedrawBounds(bounds);
@@ -710,46 +784,37 @@ export class BlendBrush {
                     y: y,
                     size: localSize,
                     opacity: localOpacity,
+                    alphaExponent: this.calcAlphaExponent(localSize),
                     x1: bounds.x1,
                     y1: bounds.y1,
                     x2: bounds.x2,
                     y2: bounds.y2,
-                    r: BB.mix(this.color.r, this.mixCol.r, this.blending),
-                    g: BB.mix(this.color.g, this.mixCol.g, this.blending),
-                    b: BB.mix(this.color.b, this.mixCol.b, this.blending),
+                    r: BB.mix(this.color.r, this.mixCol.r, localBlending),
+                    g: BB.mix(this.color.g, this.mixCol.g, localBlending),
+                    b: BB.mix(this.color.b, this.mixCol.b, localBlending),
                 });
             }
         }
 
-        this.copyFromCanvas(this.redrawBounds);
-        this.drawBuffer.forEach((item) => {
-            this.drawDot(item);
-        });
-        this.drawBuffer = [];
+        this.flushDrawBuffer();
 
-        this.bezierLine = new BB.BezierLine();
-        this.bezierLine.add(x, y, 0, function () {});
+        this.linearLine = new LinearLine({ x, y });
 
         this.lastInput.x = x;
         this.lastInput.y = y;
         this.lastInput.pressure = p;
-        this.lastInput2 = BB.copyObj(this.lastInput);
 
         if (!this.isTesting) {
             this.drawChangedCells();
         }
     }
 
-    goLine(x: number, y: number, p: number, isCoalesced: boolean): void {
+    goLine(points: TPressureInput[]): void {
         if (!this.isDrawing) {
             return;
         }
-        this.continueLine(x, y, this.lastInput.pressure, isCoalesced);
-
-        this.lastInput2 = BB.copyObj(this.lastInput);
-        this.lastInput.x = x;
-        this.lastInput.y = y;
-        this.lastInput.pressure = p;
+        points.forEach((point) => this.continueLine(point));
+        this.flushDrawBuffer();
 
         if (!this.isTesting) {
             this.drawChangedCells();
@@ -757,12 +822,8 @@ export class BlendBrush {
     }
 
     endLine(): void {
-        if (this.bezierLine) {
-            this.continueLine(undefined, undefined, this.lastInput.pressure, false);
-        }
-
         this.isDrawing = false;
-        this.bezierLine = undefined;
+        this.linearLine = undefined;
 
         this.drawChangedCells();
 
@@ -792,20 +853,8 @@ export class BlendBrush {
     }
 
     drawLineSegment(x1: number, y1: number, x2: number, y2: number): void {
-        const dx = x2 - x1;
-        const dy = y2 - y1;
-        const distance = Math.sqrt(dx * dx + dy * dy);
-        const steps = Math.ceil(distance / 10);
-
         this.startLine(x1, y1, 1);
-
-        for (let i = 1; i <= steps; i++) {
-            const t = i / steps;
-            const xi = x1 + dx * t;
-            const yi = y1 + dy * t;
-            this.goLine(xi, yi, 1, false);
-        }
-
+        this.goLine([{ x: x2, y: y2, pressure: 1 }]);
         this.endLine();
     }
 }

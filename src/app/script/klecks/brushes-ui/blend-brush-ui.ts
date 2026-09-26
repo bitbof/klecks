@@ -21,6 +21,11 @@ export const blendBrushUi = (function () {
         opacitySlider: {
             min: 1 / 100,
             max: 1,
+            curve: [
+                [0, 1 / 100],
+                [0.5, 30 / 100],
+                [1, 1],
+            ],
         },
     } as TBrushUi<BlendBrush>;
 
@@ -48,7 +53,7 @@ export const blendBrushUi = (function () {
                 height: 30,
                 min: brushInterface.sizeSlider.min,
                 max: brushInterface.sizeSlider.max,
-                value: 58,
+                value: brush.getSize(),
                 curve: brushInterface.sizeSlider.curve,
                 eventResMs: EVENT_RES_MS,
                 toDisplayValue: (val) => val * 2,
@@ -88,13 +93,15 @@ export const blendBrushUi = (function () {
                     brush.setBlending(val);
                 },
             });
-            blendingSlider.getElement().style.marginTop = '10px';
 
-            const pressureSizeToggle = createPenPressureToggle(true, function (b) {
+            const pressureSizeToggle = createPenPressureToggle(false, function (b) {
                 brush.setSizePressure(b);
             });
-            const pressureOpacityToggle = createPenPressureToggle(false, function (b) {
+            const pressureOpacityToggle = createPenPressureToggle(true, function (b) {
                 brush.setOpacityPressure(b);
+            });
+            const pressureBlendingToggle = createPenPressureToggle(true, function (b) {
+                brush.setBlendingPressure(b);
             });
 
             const lockAlphaToggle = new Checkbox({
@@ -130,7 +137,15 @@ export const blendBrushUi = (function () {
                         alignItems: 'center',
                     },
                 }),
-                blendingSlider.getElement(),
+                BB.el({
+                    content: [blendingSlider.getElement(), pressureBlendingToggle],
+                    css: {
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        marginTop: 10,
+                    },
+                }),
                 lockAlphaToggle.getElement(),
             );
         }
@@ -172,8 +187,8 @@ export const blendBrushUi = (function () {
         this.startLine = function (x, y, p) {
             brush.startLine(x, y, p);
         };
-        this.goLine = function (x, y, p, isCoalesced) {
-            brush.goLine(x, y, p, false); // looks weird with isCoalesced
+        this.goLine = function (points) {
+            brush.goLine(points);
         };
         this.endLine = function () {
             brush.endLine();

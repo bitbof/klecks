@@ -150,8 +150,8 @@ export const sketchyBrushUi = (function () {
         this.startLine = function (x, y, pressure) {
             brush.startLine(x, y, pressure);
         };
-        this.goLine = function (x, y, pressure) {
-            brush.goLine(x, y, pressure, undefined);
+        this.goLine = function (points) {
+            brush.goLine(points);
         };
         this.endLine = function () {
             brush.endLine();

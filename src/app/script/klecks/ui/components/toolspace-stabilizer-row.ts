@@ -4,7 +4,7 @@ import { LANG } from '../../../language/language';
 import { PointerListener } from '../../../bb/input/pointer-listener';
 
 /**
- * Ui to select stabilizer level. 4 options. returned as 0-3
+ * Ui to select stabilizer level.
  */
 export class ToolspaceStabilizerRow {
     private readonly rootEl: HTMLElement;
@@ -12,8 +12,8 @@ export class ToolspaceStabilizerRow {
 
     // ----------------------------------- public -----------------------------------
     constructor(p: {
-        smoothing: number; // initial level [0,3]
-        onSelect: (level: number) => void; // [0-3], when level changes
+        smoothing: number; // initial level
+        onSelect: (level: number) => void;
     }) {
         this.rootEl = BB.el({
             tagName: 'label',
@@ -25,7 +25,9 @@ export class ToolspaceStabilizerRow {
         const strengthSelect = new SelectCustom({
             optionArr: [
                 ['0', '0'],
+                ['0.5', '0.5'],
                 ['1', '1'],
+                ['1.5', '1.5'],
                 ['2', '2'],
                 ['3', '3'],
                 ['4', '4'],
@@ -33,7 +35,7 @@ export class ToolspaceStabilizerRow {
             ],
             initValue: '' + p.smoothing,
             onChange: function (val) {
-                p.onSelect(parseInt(val));
+                p.onSelect(parseFloat(val));
             },
             name: 'stabilizer-strength',
         });

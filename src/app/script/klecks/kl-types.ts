@@ -214,7 +214,8 @@ export type TBrushUiInstance<GBrush> = {
     setColor: (c: TRgb) => void;
     setLayer: (layer: TKlCanvasLayer) => void;
     startLine: (x: number, y: number, p: number) => void;
-    goLine: (x: number, y: number, p: number, isCoalesced?: boolean) => void;
+    // points since the last call. Only the last point is not coalesced.
+    goLine: (points: TPressureInput[]) => void;
     endLine: () => void;
     getBrush: () => GBrush;
     isDrawing: () => boolean;
@@ -223,6 +224,8 @@ export type TBrushUiInstance<GBrush> = {
     getSeed?: () => number;
     setSeed?: (s: number) => void;
     toggleEraser?: () => void;
+    // free resources that are kept between strokes
+    freeResources?: () => void;
 };
 
 export type TBrushUi<GBrush> = TSliderConfig & {

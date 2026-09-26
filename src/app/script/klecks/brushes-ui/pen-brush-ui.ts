@@ -283,8 +283,8 @@ export const penBrushUi = (function () {
         this.startLine = function (x, y, p) {
             brush.startLine(x, y, p);
         };
-        this.goLine = function (x, y, p) {
-            brush.goLine(x, y, p);
+        this.goLine = function (points) {
+            brush.goLine(points);
         };
         this.endLine = function () {
             brush.endLine();
