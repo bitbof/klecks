@@ -19,20 +19,9 @@ import {
 } from '../../bb/math/math';
 import { getMultiPolyBounds } from '../../bb/multi-polygon/get-multi-polygon-bounds';
 import { DEFAULT_PIXEL_PATTERNS, TPixelPattern } from './pixel-brush-patterns';
+import { PixelDiscUnion } from './pixel-brush-disc';
 
 export type TPixelBrushTip = 'square' | 'round';
-
-export function getPixelDiscHalfWidths(diameter: number): number[] {
-    const r = diameter <= 2 ? diameter / 2 : diameter / 2 - 0.3;
-    const center = diameter / 2;
-    return Array.from({ length: diameter }, (_, y) => {
-        const dY = y + 0.5 - center;
-        const halfWidth = Math.sqrt(r * r - dY * dY);
-        const x0 = Math.ceil(center - halfWidth - 0.5);
-        const x1 = Math.floor(center + halfWidth - 0.5);
-        return (x1 - x0 + 1) / 2;
-    });
-}
 
 export class PixelBrush {
     private klHistory: KlHistory = {} as KlHistory;
@@ -77,6 +66,10 @@ export class PixelBrush {
     private historyTiles: boolean[] = [];
 
     private bresenheimPath: Path2D | undefined;
+
+    // round dots of the current segment. Filled together in fillDiscs.
+    private discs: TRect[] = [];
+    private readonly discUnion = new PixelDiscUnion();
 
     private selection: MultiPolygon | undefined;
     private selectionPath: Path2D | undefined;
@@ -273,19 +266,35 @@ export class PixelBrush {
         };
         this.updateChangedTiles(rectToBounds(rect, 'index'));
 
-        this.strokeCtx.save();
-        this.strokeCtx.fillStyle = this.fillStyle;
         if (this.settingTip === 'round') {
-            this.strokeCtx.beginPath();
-            getPixelDiscHalfWidths(rect.width).forEach((halfWidth, y) => {
-                const x = rect.x + rect.width / 2 - halfWidth;
-                this.strokeCtx.rect(x, rect.y + y, halfWidth * 2, 1);
-            });
-            this.strokeCtx.fill();
+            this.discs.push(rect);
         } else {
+            this.strokeCtx.save();
+            this.strokeCtx.fillStyle = this.fillStyle;
             this.strokeCtx.fillRect(rect.x, rect.y, rect.width, rect.height);
+            this.strokeCtx.restore();
         }
-        this.strokeCtx.restore();
+    }
+
+    /**
+     * Round dots are dense and overlap heavily. Filling their union as one path is
+     * much cheaper than filling each dot.
+     */
+    private fillDiscs(): void {
+        const rects = this.discUnion.getRects(this.discs, {
+            x: 0,
+            y: 0,
+            width: this.strokeCanvas.width,
+            height: this.strokeCanvas.height,
+        });
+        this.discs = [];
+        if (rects.length === 0) {
+            return;
+        }
+        this.strokeCtx.beginPath();
+        rects.forEach((rect) => this.strokeCtx.rect(rect.x, rect.y, rect.width, rect.height));
+        this.strokeCtx.fillStyle = this.fillStyle;
+        this.strokeCtx.fill();
     }
 
     private continueLine(x: number | null, y: number | null, size: number, pressure: number): void {
@@ -337,6 +346,7 @@ export class PixelBrush {
             } else {
                 this.bezierLine.add(x, y, localSpacing, dotCallback);
             }
+            this.fillDiscs();
         }
 
         this.strokeCtx.restore();
@@ -416,6 +426,7 @@ export class PixelBrush {
         this.strokeCtx.save();
         this.selectionPath && this.strokeCtx.clip(this.selectionPath);
         this.drawDot(x, y, localSize);
+        this.fillDiscs();
         this.strokeCtx.restore();
         this.lastInput.x = x;
         this.lastInput.y = y;

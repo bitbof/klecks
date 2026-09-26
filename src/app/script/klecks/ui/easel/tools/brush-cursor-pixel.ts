@@ -4,7 +4,8 @@ import { TVector2D } from '../../../../bb/bb-types';
 import { setAttributes } from '../../../../bb/base/base';
 import { applyToPoint, inverse } from 'transformation-matrix';
 import { createMatrixFromTransform } from '../../../../bb/transform/create-matrix-from-transform';
-import { getPixelDiscHalfWidths, TPixelBrushTip } from '../../../brushes/pixel-brush';
+import { TPixelBrushTip } from '../../../brushes/pixel-brush';
+import { getPixelDiscHalfWidths } from '../../../brushes/pixel-brush-disc';
 
 /**
  * Outline of a mask made of centered pixel rows, shrunk by inset.

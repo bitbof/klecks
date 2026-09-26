@@ -8,7 +8,8 @@ import { createPenPressureToggle } from '../ui/components/create-pen-pressure-to
 import { TBrushUi } from '../kl-types';
 import { LANG, LANGUAGE_STRINGS } from '../../language/language';
 import { Options } from '../ui/components/options';
-import { getPixelDiscHalfWidths, PixelBrush, TPixelBrushTip } from '../brushes/pixel-brush';
+import { PixelBrush, TPixelBrushTip } from '../brushes/pixel-brush';
+import { getPixelDiscHalfWidths } from '../brushes/pixel-brush-disc';
 import {
     DEFAULT_PIXEL_PATTERNS,
     loadCustomPixelPatterns,
