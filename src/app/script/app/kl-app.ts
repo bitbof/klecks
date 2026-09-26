@@ -21,7 +21,7 @@ import { SaveReminder } from '../klecks/ui/components/save-reminder';
 import { KlCanvas } from '../klecks/canvas/kl-canvas';
 import { LANG } from '../language/language';
 import { LocalStorage } from '../bb/base/local-storage';
-import { LineSmoothing } from '../klecks/events/line-smoothing';
+import { HybridLineSmoothing } from '../klecks/events/hybrid-line-smoothing';
 import { LineSanitizer } from '../klecks/events/line-sanitizer';
 import { TabRow } from '../klecks/ui/components/tab-row';
 import { LayerPreview } from '../klecks/ui/components/layer-preview';
@@ -30,7 +30,6 @@ import { ToolspaceToolRow } from '../klecks/ui/components/toolspace-tool-row';
 import { StatusOverlay } from '../klecks/ui/components/status-overlay';
 import { SaveToComputer } from '../klecks/storage/save-to-computer';
 import { ToolspaceScroller } from '../klecks/ui/components/toolspace-scroller';
-import { translateSmoothing } from '../klecks/utils/translate-smoothing';
 import { KlAppImportHandler } from './kl-app-import-handler';
 import { LayersUi } from '../klecks/ui/tool-tabs/layers-ui/layers-ui';
 import { TCss, TVector2D } from '../bb/bb-types';
@@ -406,7 +405,7 @@ export class KlApp {
             },
         });
 
-        const lineSmoothing = new LineSmoothing(translateSmoothing(1));
+        const lineSmoothing = new HybridLineSmoothing(1);
         this.lineSanitizer = new LineSanitizer();
 
         const drawEventChain = new BB.EventChain({
@@ -1399,7 +1398,7 @@ export class KlApp {
         const toolspaceStabilizerRow = new KL.ToolspaceStabilizerRow({
             smoothing: 1,
             onSelect: (v) => {
-                lineSmoothing.setSettings(translateSmoothing(v));
+                lineSmoothing.setLevel(v);
             },
         });
 
