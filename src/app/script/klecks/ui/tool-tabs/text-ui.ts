@@ -18,7 +18,7 @@ export class TextUi {
     }) {
         this.rootEl = BB.el({
             css: {
-                margin: '10px',
+                margin: 10,
             },
         });
         this.colorSlider = p.colorSlider;
@@ -26,7 +26,7 @@ export class TextUi {
         this.colorDiv = BB.el({
             parent: this.rootEl,
             css: {
-                marginBottom: '10px',
+                marginBottom: 10,
             },
         });
 

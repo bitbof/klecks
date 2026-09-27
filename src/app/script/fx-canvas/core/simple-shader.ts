@@ -9,9 +9,14 @@ export function simpleShader(
     textureIn?: FxTexture,
     textureOut?: FxTexture,
 ): void {
-    (textureIn || this._.texture).use();
-    this._.spareTexture.drawTo(function () {
+    const texture = this._.texture;
+    const spareTexture = this._.spareTexture;
+    if (texture === undefined || spareTexture === undefined) {
+        throw new Error('FX canvas is not initialized');
+    }
+    (textureIn || texture).use();
+    spareTexture.drawTo(function () {
         shader.uniforms(uniforms).drawRect();
     });
-    this._.spareTexture.swapWith(textureOut || this._.texture);
+    spareTexture.swapWith(textureOut || texture);
 }

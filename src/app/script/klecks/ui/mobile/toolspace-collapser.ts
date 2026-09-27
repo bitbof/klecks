@@ -1,8 +1,9 @@
+import { getIconUrl } from '../../../icon/icon';
 import { BB } from '../../../bb/bb';
-import collapseImg from 'url:/src/app/img/ui/ui-collapse.svg';
 import { LANG } from '../../../language/language';
 import { TUiLayout } from '../../kl-types';
 
+const collapseImg = getIconUrl('ui-collapse');
 /**
  * button that allows to collapse toolspace (for mobile)
  */
@@ -28,15 +29,15 @@ export class ToolspaceCollapser {
         this.rootEl = BB.el({
             className: 'kl-toolspace-toggle',
             css: {
-                width: '36px',
-                height: '36px',
-                background: 'rgba(100, 100, 100, 0.9)',
+                width: 36,
+                height: 36,
+                background: 'var(--canvas-overlay-bg)',
                 color: '#fff',
                 textAlign: 'center',
                 lineHeight: '36px',
                 cursor: 'pointer',
                 userSelect: 'none',
-                padding: '6px',
+                padding: 6,
                 boxSizing: 'border-box',
             },
             title: LANG('toggle-show-tools'),

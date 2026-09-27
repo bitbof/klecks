@@ -1,9 +1,9 @@
+import { getIconSvg } from '../../icon/icon';
 import { BB } from '../../bb/bb';
 import { EVENT_RES_MS } from './brushes-consts';
 import { Checkbox } from '../ui/components/checkbox';
 import { BRUSHES } from '../brushes/brushes';
 import { KlSlider } from '../ui/components/kl-slider';
-import brushIconImg from 'url:/src/app/img/ui/brush-chemy.svg';
 import { TBrushUi } from '../kl-types';
 import { Options } from '../ui/components/options';
 import { BoxToggle } from '../ui/components/box-toggle';
@@ -13,7 +13,7 @@ import { css } from '../../bb/base/base';
 
 export const chemyBrushUi = (function () {
     const brushInterface = {
-        image: brushIconImg,
+        image: getIconSvg('brush-chemy'),
         tooltip: LANG('brush-chemy'),
         sizeSlider: {
             min: 0.25,
@@ -89,7 +89,7 @@ export const chemyBrushUi = (function () {
             });
 
             css(opacitySlider.getElement(), {
-                marginTop: '10px',
+                marginTop: 10,
             });
 
             eraserToggle = new Checkbox({
@@ -99,8 +99,8 @@ export const chemyBrushUi = (function () {
                     brush.setIsEraser(b);
                 },
                 css: {
-                    marginTop: '10px',
-                    marginLeft: '10px',
+                    marginTop: 10,
+                    marginLeft: 10,
                 },
                 name: 'eraser-toggle',
             });
@@ -114,7 +114,7 @@ export const chemyBrushUi = (function () {
                 doHighlight: true,
                 title: LANG('lock-alpha-title'),
                 css: {
-                    marginTop: '10px',
+                    marginTop: 10,
                 },
                 name: 'lock-alpha-toggle',
             });
@@ -122,7 +122,7 @@ export const chemyBrushUi = (function () {
             const toggleRow = BB.el({
                 css: {
                     display: 'flex',
-                    marginTop: '10px',
+                    marginTop: 10,
                 },
             });
 
@@ -203,7 +203,7 @@ export const chemyBrushUi = (function () {
                             fill: 'none',
                             stroke: '#000',
                             css: {
-                                strokeWidth: '1px',
+                                strokeWidth: 1,
                             },
                             d: `M ${halfSize + padding},${padding} ${halfSize + padding},${actualIconSize + padding}`,
                         },
@@ -228,7 +228,7 @@ export const chemyBrushUi = (function () {
                             fill: 'none',
                             stroke: '#000',
                             css: {
-                                strokeWidth: '1px',
+                                strokeWidth: 1,
                             },
                             d: `M ${padding},${halfSize + padding} ${actualIconSize + padding},${halfSize + padding}`,
                         },
@@ -291,11 +291,11 @@ export const chemyBrushUi = (function () {
             });
 
             css(mirrorXToggle.getElement(), {
-                marginLeft: '10px',
+                marginLeft: 10,
             });
             {
                 const margin = {
-                    marginLeft: '4px',
+                    marginLeft: 4,
                 };
                 css(mirrorYToggle.getElement(), margin);
                 css(gradientToggle.getElement(), margin);
@@ -358,8 +358,8 @@ export const chemyBrushUi = (function () {
         this.startLine = function (x, y, p) {
             brush.startLine(x, y);
         };
-        this.goLine = function (x, y, p, isCoalesced) {
-            brush.goLine(x, y);
+        this.goLine = function (points) {
+            brush.goLine(points);
         };
         this.endLine = function () {
             brush.endLine();

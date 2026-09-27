@@ -1,18 +1,19 @@
 import { BB } from '../../bb/bb';
 import { TFilterApply, TFilterGetDialogParam, TFilterGetDialogResult, TRgb } from '../kl-types';
 import { LANG } from '../../language/language';
-import { input } from '../ui/components/input';
+import { Input } from '../ui/components/input';
 import { ColorOptions } from '../ui/components/color-options';
 import { drawVanishPoint } from '../image-operations/draw-vanish-point';
 import { KlSlider } from '../ui/components/kl-slider';
 import { EVENT_RES_MS } from './filters-consts';
-import { css, throwIfNull } from '../../bb/base/base';
+import { css } from '../../bb/base/base';
 import { Preview } from '../ui/project-viewport/preview';
 import { TProjectViewportProject } from '../ui/project-viewport/project-viewport';
 import { DraggableInput } from '../ui/components/draggable-input';
 import { testIsSmall } from '../ui/utils/test-is-small';
 import { getPreviewHeight, getPreviewWidth } from '../ui/utils/preview-size';
 import { canvasToLayerTiles } from '../history/push-helpers/canvas-to-layer-tiles';
+import { freeCanvas } from '../../bb/base/canvas';
 
 export type TFilterVanishPointInput = {
     x: number;
@@ -25,16 +26,12 @@ export type TFilterVanishPointInput = {
 
 export const filterVanishPoint = {
     getDialog(params: TFilterGetDialogParam) {
-        const context = params.context;
         const klCanvas = params.klCanvas;
-        if (!context || !klCanvas) {
-            return false;
-        }
-
+        const selectedLayerIndex = params.selectedLayerIndex;
+        const layer = klCanvas.getLayer(selectedLayerIndex);
         const layers = klCanvas.getLayers();
-        const selectedLayerIndex = throwIfNull(klCanvas.getLayerIndex(context.canvas));
 
-        const previewCanvas = BB.canvas(context.canvas.width, context.canvas.height);
+        const previewCanvas = BB.canvas(layer.canvas.width, layer.canvas.height);
         const previewCtx = BB.ctx(previewCanvas);
 
         const rootEl = BB.el();
@@ -47,8 +44,8 @@ export const filterVanishPoint = {
         }
 
         const settingsObj: TFilterVanishPointInput = {
-            x: context.canvas.width / 2,
-            y: context.canvas.height / 2,
+            x: layer.canvas.width / 2,
+            y: layer.canvas.height / 2,
             lines: 8,
             thickness: 2,
             color: { r: 0, g: 0, b: 0 },
@@ -60,7 +57,7 @@ export const filterVanishPoint = {
             width: 300,
             height: 30,
             min: 2,
-            max: 20,
+            max: 40,
             value: settingsObj.lines,
             curve: 'quadratic',
             eventResMs: EVENT_RES_MS,
@@ -84,16 +81,17 @@ export const filterVanishPoint = {
             css: {
                 display: 'flex',
                 alignItems: 'center',
-                marginTop: '10px',
-                marginBottom: '10px',
+                marginTop: 10,
+                marginBottom: 10,
             },
         });
-        const xInput = input({
+        const xInput = new Input({
             init: settingsObj.x,
             type: 'number',
-            css: { width: '75px', marginRight: '20px' },
-            callback: function (v) {
-                settingsObj.x = parseFloat(v);
+            name: 'vanish-point-x',
+            css: { width: 75, marginRight: 20 },
+            onChange: function (v) {
+                settingsObj.x = v;
                 dragInput.setValue({
                     x: settingsObj.x,
                     y: settingsObj.y,
@@ -101,12 +99,13 @@ export const filterVanishPoint = {
                 update();
             },
         });
-        const yInput = input({
+        const yInput = new Input({
             init: settingsObj.y,
             type: 'number',
-            css: { width: '75px', marginRight: '20px' },
-            callback: function (v) {
-                settingsObj.y = parseFloat(v);
+            name: 'vanish-point-y',
+            css: { width: 75, marginRight: 20 },
+            onChange: function (v) {
+                settingsObj.y = v;
                 dragInput.setValue({
                     x: settingsObj.x,
                     y: settingsObj.y,
@@ -114,13 +113,15 @@ export const filterVanishPoint = {
                 update();
             },
         });
-        const thicknessInput = input({
+        const thicknessInput = new Input({
             init: 2,
             type: 'number',
+            name: 'vanish-point-thickness',
             min: 1,
-            css: { width: '75px', marginRight: '20px' },
-            callback: function (v) {
-                settingsObj.thickness = parseFloat(v);
+            step: 1,
+            css: { width: 75, marginRight: 20 },
+            onChange: function (v) {
+                settingsObj.thickness = v;
                 update();
             },
         });
@@ -156,25 +157,25 @@ export const filterVanishPoint = {
 
         const labelStyle = {
             display: 'inline-block',
-            marginRight: '5px',
+            marginRight: 5,
         };
         line1.append(
             BB.el({ content: 'X:', css: labelStyle }),
-            xInput,
+            xInput.getElement(),
             BB.el({ content: 'Y:', css: labelStyle }),
-            yInput,
+            yInput.getElement(),
         );
         line2.append(
             BB.el({ content: LANG('shape-line-width') + ':', css: labelStyle }),
-            thicknessInput,
-            BB.el({ css: { flexGrow: '1' } }),
+            thicknessInput.getElement(),
+            BB.el({ css: { flexGrow: 1 } }),
             colorOptions.getElement(),
         );
 
         // ---- preview input processing ----
         function syncInputs(): void {
-            xInput.value = '' + settingsObj.x;
-            yInput.value = '' + settingsObj.y;
+            xInput.setValue(settingsObj.x);
+            yInput.setValue(settingsObj.y);
         }
 
         function update(): void {
@@ -184,7 +185,7 @@ export const filterVanishPoint = {
 
             ctx.save();
             ctx.clearRect(0, 0, w, h);
-            ctx.drawImage(context.canvas, 0, 0, w, h);
+            ctx.drawImage(layer.canvas, 0, 0, w, h);
             drawVanishPoint(
                 ctx,
                 settingsObj.x,
@@ -208,11 +209,11 @@ export const filterVanishPoint = {
         {
             for (let i = 0; i < layers.length; i++) {
                 previewLayerArr.push({
-                    image: i === selectedLayerIndex ? onRender : layers[i].context.canvas,
+                    image: i === selectedLayerIndex ? onRender : layers[i].canvas,
                     isVisible: layers[i].isVisible,
                     opacity: layers[i].opacity,
                     mixModeStr: layers[i].mixModeStr,
-                    hasClipping: false,
+                    hasClipping: layers[i].hasClipping,
                 });
             }
         }
@@ -221,14 +222,14 @@ export const filterVanishPoint = {
             width: getPreviewWidth(isSmall),
             height: getPreviewHeight(isSmall),
             project: {
-                width: context.canvas.width,
-                height: context.canvas.height,
+                width: layer.canvas.width,
+                height: layer.canvas.height,
                 layers: previewLayerArr,
             },
         });
         css(preview.getElement(), {
-            marginLeft: '-20px',
-            marginRight: '-20px',
+            marginLeft: -20,
+            marginRight: -20,
             overflow: 'hidden',
         });
 
@@ -254,6 +255,11 @@ export const filterVanishPoint = {
             linesSlider.destroy();
             colorOptions.destroy();
             preview.destroy();
+            xInput.destroy();
+            yInput.destroy();
+            thicknessInput.destroy();
+            dragInput.destroy();
+            freeCanvas(previewCanvas);
         };
         result.getInput = function (): TFilterVanishPointInput {
             result.destroy!();

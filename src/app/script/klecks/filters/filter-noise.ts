@@ -11,10 +11,8 @@ import { KlSlider } from '../ui/components/kl-slider';
 import { getSharedFx } from '../../fx-canvas/shared-fx';
 import { Options } from '../ui/components/options';
 import { EVENT_RES_MS } from './filters-consts';
-import { Select } from '../ui/components/select';
+import { SelectCustom } from '../ui/components/select-custom';
 import { translateBlending } from '../canvas/translate-blending';
-import { KL } from '../kl';
-import { ColorConverter } from '../../bb/color/color';
 import { Checkbox } from '../ui/components/checkbox';
 import { TWrappedTexture } from '../../fx-canvas/fx-canvas-types';
 import { css, throwIfNull } from '../../bb/base/base';
@@ -28,6 +26,7 @@ import { noise } from '../../fx-canvas/filters/noise';
 import { drawSelectionMask } from '../../bb/base/canvas';
 import { getPushableLayerChange } from '../history/push-helpers/get-pushable-layer-change';
 import { getMultiPolyBounds } from '../../bb/multi-polygon/get-multi-polygon-bounds';
+import { ColorInput } from '../ui/components/color-input';
 
 // see noise(...) in fx-canvas
 type TNoisePreset = {
@@ -221,14 +220,10 @@ function createNoiseParameters(settings: TNoiseSettings): Parameters<typeof nois
 
 export const filterNoise = {
     getDialog(params: TFilterGetDialogParam) {
-        const context = params.context;
         const klCanvas = params.klCanvas;
-        if (!context || !klCanvas) {
-            return false;
-        }
-
+        const selectedLayerIndex = params.selectedLayerIndex;
+        const layer = klCanvas.getLayer(selectedLayerIndex);
         const layers = klCanvas.getLayers();
-        const selectedLayerIndex = throwIfNull(klCanvas.getLayerIndex(context.canvas));
 
         const thumbImgArr: HTMLImageElement[] = [];
         const thumbSize = 32;
@@ -246,7 +241,7 @@ export const filterNoise = {
                 settings.scaleX /= 10;
                 settings.scaleY /= 10;
                 fxCanvas.noise(...createNoiseParameters(settings)).update();
-                ctx.drawImage(fxCanvas, 0, 0);
+                ctx.drawImage(fxCanvas.canvas, 0, 0);
                 thumbImg.src = canvas.toDataURL('image/png');
                 thumbImgArr.push(thumbImg);
             });
@@ -276,10 +271,11 @@ export const filterNoise = {
         };
 
         const presetOptions = new Options({
+            isFocusable: true,
             optionArr: thumbImgArr.map((img, index) => {
                 css(img, {
-                    margin: '1px',
-                    borderRadius: '3px',
+                    margin: 1,
+                    borderRadius: 3,
                     transition: 'all 0.1s ease-in-out',
                 });
                 return {
@@ -293,7 +289,7 @@ export const filterNoise = {
                 update();
             },
             css: {
-                marginBottom: '10px',
+                marginBottom: 10,
             },
         });
         rootEl.append(presetOptions.getElement());
@@ -335,18 +331,19 @@ export const filterNoise = {
             css: {
                 display: 'flex',
                 alignItems: 'center',
-                marginBottom: '10px',
+                marginBottom: 10,
             },
         });
 
         const row2El = BB.el({
             css: {
                 display: 'flex',
-                marginBottom: '10px',
+                marginBottom: 10,
             },
         });
 
         const channelsOptions = new Options<TNoiseChannels>({
+            isFocusable: true,
             optionArr: [
                 { id: 'rgb', label: 'RGB' },
                 { id: 'alpha', label: LANG('filter-noise-alpha') },
@@ -397,7 +394,7 @@ export const filterNoise = {
             'luminosity',
         ];
 
-        const blendSelect = new Select({
+        const blendSelect = new SelectCustom({
             isFocusable: true,
             optionArr: mixModes.map((item) => {
                 return item ? ([item, translateBlending(item)] as [TMixMode, string]) : undefined;
@@ -418,56 +415,52 @@ export const filterNoise = {
         });
 
         const colInputStyle = {
-            width: '34px',
-            height: '34px',
-            marginRight: '5px',
+            width: 34,
+            height: 34,
+            marginRight: 5,
         };
-        const colAInput = KL.input({
-            type: 'color',
-            init: '#' + ColorConverter.toHexString(noiseInput.colA),
-            callback: (val) => {
-                const newColor = ColorConverter.hexToRGB(val);
-                if (newColor) {
-                    noiseInput.colA = newColor;
-                    update();
-                }
+        const colAInput = new ColorInput({
+            init: noiseInput.colA,
+            name: 'noise-color-a',
+            ariaLabel: 'Color A',
+            onChange: (color) => {
+                noiseInput.colA = color;
+                update();
             },
             css: colInputStyle,
         });
 
-        const colBInput = KL.input({
-            type: 'color',
-            init: '#' + ColorConverter.toHexString(noiseInput.colB),
-            callback: (val) => {
-                const newColor = ColorConverter.hexToRGB(val);
-                if (newColor) {
-                    noiseInput.colB = newColor;
-                    update();
-                }
+        const colBInput = new ColorInput({
+            init: noiseInput.colB,
+            name: 'noise-color-b',
+            ariaLabel: 'Color B',
+            onChange: (color) => {
+                noiseInput.colB = color;
+                update();
             },
             css: colInputStyle,
         });
 
-        colorWrapper.append(colAInput, colBInput);
+        colorWrapper.append(colAInput.getElement(), colBInput.getElement());
 
         row1El.append(
             channelsOptions.getElement(),
-            BB.el({ css: { flexGrow: '1' } }),
+            BB.el({ css: { flexGrow: 1 } }),
             reverseToggle.getElement(),
         );
 
-        row2El.append(blendSelect.getElement(), BB.el({ css: { flexGrow: '1' } }), colorWrapper);
+        row2El.append(blendSelect.getElement(), BB.el({ css: { flexGrow: 1 } }), colorWrapper);
 
         rootEl.append(scaleSlider.getElement(), opacitySlider.getElement(), row1El, row2El);
 
         const fxPreviewRenderer = new FxPreviewRenderer({
-            original: context.canvas,
+            original: layer.canvas,
             onUpdate: (fxCanvas, transform) => {
                 const settings = createNoiseSettings(noiseInput);
                 settings.scaleX *= transform.scaleX;
                 settings.scaleY *= transform.scaleY;
-                settings.offsetX = (context.canvas.width / 2) * transform.scaleX + transform.x;
-                settings.offsetY = (context.canvas.height / 2) * transform.scaleY + transform.y;
+                settings.offsetX = (layer.canvas.width / 2) * transform.scaleX + transform.x;
+                settings.offsetY = (layer.canvas.height / 2) * transform.scaleY + transform.y;
                 return fxCanvas.noise(...createNoiseParameters(settings));
             },
             postMix: {
@@ -486,11 +479,11 @@ export const filterNoise = {
                     image:
                         i === selectedLayerIndex
                             ? fxPreviewRenderer.render
-                            : layers[i].context.canvas,
+                            : layers[i].canvas,
                     isVisible: layers[i].isVisible,
                     opacity: layers[i].opacity,
                     mixModeStr: layers[i].mixModeStr,
-                    hasClipping: false,
+                    hasClipping: layers[i].hasClipping,
                 });
             }
         }
@@ -499,16 +492,16 @@ export const filterNoise = {
             width: getPreviewWidth(isSmall),
             height: getPreviewHeight(isSmall),
             project: {
-                width: context.canvas.width,
-                height: context.canvas.height,
+                width: layer.canvas.width,
+                height: layer.canvas.height,
                 layers: previewLayerArr,
             },
             selection: klCanvas.getSelection(),
         });
         preview.render();
         css(preview.getElement(), {
-            marginLeft: '-20px',
-            marginRight: '-20px',
+            marginLeft: -20,
+            marginRight: -20,
         });
         rootEl.append(preview.getElement());
 
@@ -530,6 +523,8 @@ export const filterNoise = {
             blendSelect.destroy();
             preview.destroy();
             fxPreviewRenderer.destroy();
+            colAInput.destroy();
+            colBInput.destroy();
         };
         result.getInput = function (): TFilterNoiseInput {
             result.destroy!();
@@ -582,7 +577,7 @@ export const filterNoise = {
         } else {
             context.globalCompositeOperation = input.mixModeStr;
         }
-        context.drawImage(fxCanvas, 0, 0);
+        context.drawImage(fxCanvas.canvas, 0, 0);
         context.restore();
 
         klHistory.push(

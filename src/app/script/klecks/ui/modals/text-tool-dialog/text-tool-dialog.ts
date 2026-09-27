@@ -1,6 +1,6 @@
 import { BB } from '../../../../bb/bb';
 import { TRenderTextParam } from '../../../image-operations/render-text';
-import { showModal } from '../base/showModal';
+import { showModal } from '../base/show-modal';
 import { TRgb } from '../../../kl-types';
 import { KlCanvas } from '../../../canvas/kl-canvas';
 import { LANG } from '../../../../language/language';
@@ -55,7 +55,7 @@ export function textToolDialog(p: {
     const colorWrapper = BB.el({
         css: {
             display: 'flex',
-            gap: '10px',
+            gap: 10,
             flexDirection: 'column',
         },
     });
@@ -184,8 +184,8 @@ export function textToolDialog(p: {
         callback: onModalExit,
         style: {
             width: 'calc(100% - 50px)',
-            maxWidth: '1000px',
-            minWidth: '300px',
+            maxWidth: 1000,
+            minWidth: 300,
             boxSizing: 'border-box',
         },
         clickOnEnter: 'Ok',

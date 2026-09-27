@@ -1,11 +1,11 @@
+import { getIconUrl } from '../../../../icon/icon';
 import { KeyListener } from '../../../../bb/input/key-listener';
 import { DIALOG_COUNTER } from '../modal-count';
 import { BB } from '../../../../bb/bb';
+import { css, Destroyer } from '../../../../bb/base/base';
 import { LANG } from '../../../../language/language';
-import './scroll-fix';
-import cancelImg from 'url:/src/app/img/ui/cancel.svg';
-import { css } from '../../../../bb/base/base';
 
+const cancelImg = getIconUrl('cancel');
 /**
  * popup that fill whole height, with some padding.
  * currently only used for iframe popups.
@@ -18,19 +18,17 @@ export class DynamicModal {
     private readonly xButton: HTMLElement;
     private readonly bgEl: HTMLElement;
     private readonly onClose: ((result?: string) => void) | undefined;
+    private readonly destroyer = new Destroyer();
 
     // ----------------------------------- public -----------------------------------
     constructor(p: {
         title?: HTMLElement;
         content?: HTMLElement;
-        buttonArr?: string[];
-        autoFocus?: string | false; // todo - not implemented
-        clickOnEnter?: string; // button name - todo not implemented
         onClose?: (result?: string) => void;
 
         //size and position
         width: number;
-        isMaxHeight: boolean; // todo - not implemented
+        height?: number;
     }) {
         DIALOG_COUNTER.increase();
         this.onClose = p.onClose;
@@ -40,15 +38,16 @@ export class DynamicModal {
             className: 'g-root kl-d-modal-root',
             css: {
                 position: 'fixed',
-                left: '0',
-                top: '0',
-                bottom: '0',
-                right: '0',
+                left: 0,
+                top: 0,
+                bottom: 0,
+                right: 0,
                 overflow: 'auto',
                 animationName: 'consoleIn',
                 animationDuration: '0.3s',
                 animationTimingFunction: 'ease-out',
             },
+            destroyer: this.destroyer,
             onClick: BB.handleClick,
         });
 
@@ -57,11 +56,12 @@ export class DynamicModal {
             parent: this.rootEl,
             css: {
                 position: 'absolute',
-                left: '0',
-                top: '0',
-                bottom: '0',
-                right: '0',
+                left: 0,
+                top: 0,
+                bottom: 0,
+                right: 0,
             },
+            destroyer: this.destroyer,
             onClick: () => this.close(),
         });
 
@@ -71,11 +71,12 @@ export class DynamicModal {
             className: 'kl-d-modal',
             css: {
                 position: 'absolute',
-                width: BB.isCssMinMaxSupported()
-                    ? 'min(calc(100% - 40px), ' + (p.width ? p.width : 400) + 'px)'
-                    : (p.width ? p.width : 400) + 'px',
-                height: 'calc(100% - 40px)',
-                borderRadius: '10px',
+                width: `min(calc(100% - 40px), ${p.width ? p.width : 400}px)`,
+                height:
+                    p.height === undefined
+                        ? 'calc(100% - 40px)'
+                        : `min(calc(100% - 40px), ${p.height}px)`,
+                borderRadius: 10,
                 overflow: 'hidden',
             },
         });
@@ -86,8 +87,8 @@ export class DynamicModal {
             const elH = popupEl.offsetHeight;
 
             css(popupEl, {
-                left: Math.max(0, (window.innerWidth - elW) / 2) + 'px',
-                top: Math.max(20, (window.innerHeight - elH) / 2 - elH * 0.2) + 'px',
+                left: Math.max(0, (window.innerWidth - elW) / 2),
+                top: Math.max(20, (window.innerHeight - elH) / 2 - elH * 0.2),
             });
         };
 
@@ -99,11 +100,11 @@ export class DynamicModal {
         const titleEl = BB.el({
             parent: popupEl,
             css: {
-                height: titleHeight + 'px',
+                height: titleHeight,
                 display: 'flex',
                 justifyContent: 'space-between',
                 alignItems: 'center',
-                paddingLeft: titleHeight / 2 + 'px',
+                paddingLeft: titleHeight / 2,
             },
         });
         if (p.title) {
@@ -113,18 +114,19 @@ export class DynamicModal {
             parent: titleEl,
             tagName: 'button',
             className: 'popup-x',
+            destroyer: this.destroyer,
             content: `<img alt="${LANG('modal-close')}" height="20" src="${cancelImg}">`,
             title: LANG('modal-close'),
             onClick: () => this.close(),
             css: {
-                width: titleHeight + 'px',
-                height: titleHeight + 'px',
+                width: titleHeight,
+                height: titleHeight,
                 lineHeight: titleHeight + 'px',
                 background: 'none',
                 boxShadow: 'none',
             },
-            custom: {
-                tabindex: '0',
+            props: {
+                tabIndex: 0,
             },
         });
 
@@ -152,12 +154,10 @@ export class DynamicModal {
     // ---- interface ----
     close(): void {
         DIALOG_COUNTER.decrease();
-        BB.destroyEl(this.rootEl);
         this.rootEl.remove();
+        this.destroyer.destroy();
         window.removeEventListener('resize', this.updatePos);
         this.keyListener.destroy();
-        BB.destroyEl(this.xButton);
-        BB.destroyEl(this.bgEl);
         this.onClose && this.onClose();
     }
 }

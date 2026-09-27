@@ -1,4 +1,4 @@
-import { gl } from '../core/gl';
+import { fxGl } from '../core/gl';
 import { FxShader } from '../core/fx-shader';
 import { simpleShader } from '../core/simple-shader';
 import { BB } from '../../bb/bb';
@@ -19,8 +19,8 @@ import { TFxCanvas } from '../fx-canvas-types';
 export type TFilterHueSaturation = (this: TFxCanvas, hue: number, saturation: number) => TFxCanvas;
 
 export const hueSaturation: TFilterHueSaturation = function (hue, saturation) {
-    gl.hueSaturation =
-        gl.hueSaturation ||
+    fxGl.hueSaturation =
+        fxGl.hueSaturation ||
         new FxShader(
             null,
             '\
@@ -56,7 +56,7 @@ export const hueSaturation: TFilterHueSaturation = function (hue, saturation) {
             'hueSaturation',
         );
 
-    simpleShader.call(this, gl.hueSaturation, {
+    simpleShader.call(this, fxGl.hueSaturation, {
         hue: BB.clamp(hue, -1, 1),
         saturation: BB.clamp(saturation, -1, 1),
     });

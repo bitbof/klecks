@@ -1,8 +1,9 @@
+import { getIconUrl } from '../../../icon/icon';
 import { BB } from '../../../bb/bb';
 import { LANG } from '../../../language/language';
-import iconImg from 'url:/src/app/img/ui/brush-pressure.svg';
 import { BoxToggle } from './box-toggle';
 
+const iconImg = getIconUrl('brush-pressure');
 /**
  * small toggle button with a pen icon - representing toggling pressure sensitivity
  * @param isChecked initial value
@@ -16,13 +17,13 @@ export const createPenPressureToggle = function (
         label: BB.el({
             className: 'dark-invert',
             css: {
-                width: '17px',
-                height: '17px',
+                width: 17,
+                height: 17,
                 backgroundImage: 'url("' + iconImg + '")',
                 backgroundSize: 'contain',
                 backgroundRepeat: 'no-repeat',
-                margin: '1px',
-                borderRadius: '3px',
+                margin: 1,
+                borderRadius: 3,
             },
         }),
         title: LANG('brush-toggle-pressure'),

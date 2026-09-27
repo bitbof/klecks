@@ -59,7 +59,7 @@ export function zoomBlur(centerX, centerY, strength) {
     simpleShader.call(this, gl.zoomBlur, {
         center: [centerX, centerY],
         strength: strength,
-        texSize: [this.width, this.height],
+        texSize: [this.canvas.width, this.canvas.height],
     });
 
     return this;

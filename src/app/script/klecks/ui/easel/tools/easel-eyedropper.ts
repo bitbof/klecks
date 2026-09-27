@@ -60,7 +60,7 @@ export class EaselEyedropper implements TEaselTool {
         const p = applyToPoint(inverse(m), { x: e.relX, y: e.relY });
 
         let color: TRgb | undefined = undefined;
-        let isDown = ['left', 'right'].includes(e.button!);
+        const isDown = ['left', 'right'].includes(e.button!);
         if (isDown) {
             this.svgEl.setAttribute('transform', `translate(${e.relX},${e.relY})`);
             this.svgEl.style.opacity = '1';
@@ -69,17 +69,15 @@ export class EaselEyedropper implements TEaselTool {
         }
 
         if (e.type === 'pointerdown' && isDown) {
-            color = this.onPick(p);
             this.isDragging = true;
-            isDown = true;
+            color = this.onPick(p);
         }
         if (e.type === 'pointermove' && isDown) {
             color = this.onPick(p);
-            isDown = true;
         }
         if (e.type === 'pointerup' && e.button === undefined && this.isDragging) {
-            this.onPickEnd();
             this.isDragging = false;
+            this.onPickEnd();
         }
         if (color && isDown) {
             this.previewColor.setAttribute('stroke', BB.ColorConverter.toRgbStr(color));

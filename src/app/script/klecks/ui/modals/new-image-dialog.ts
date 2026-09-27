@@ -1,12 +1,14 @@
 import { BB } from '../../../bb/bb';
-import { Select } from '../components/select';
+import { SelectCustom } from '../components/select-custom';
 import { ColorOptions } from '../components/color-options';
-import { showModal } from './base/showModal';
+import { showModal } from './base/show-modal';
 import { LANG } from '../../../language/language';
 import { TRgb, TRgba } from '../../kl-types';
 import { TSize2D } from '../../../bb/bb-types';
 import { table } from '../components/table';
 import { css } from '../../../bb/base/base';
+import { Input } from '../components/input';
+import { Destroyer } from '../../../bb/base/base';
 
 export function newImageDialog(p: {
     currentColor: TRgb; // current color
@@ -46,59 +48,54 @@ export function newImageDialog(p: {
     }
 
     const newImDiv = BB.el();
-    const widthInput = BB.el({ tagName: 'input', custom: { name: 'image-width' } });
+    const widthInput = new Input({
+        type: 'number',
+        init: canvasWidth,
+        min: 1,
+        max: maxCanvasSize,
+        step: 1,
+        name: 'image-width',
+        isFocusIgnored: true,
+        css: { width: 70 },
+        onChange: () => updateRatio(),
+    });
     const unitStyle = {
         color: '#888',
-        fontSize: '12px',
-        marginLeft: '5px',
+        fontSize: 12,
+        marginLeft: 5,
     };
     const widthUnit = BB.el({
         textContent: LANG('new-px'),
         css: unitStyle,
     });
-    const heightInput = BB.el({ tagName: 'input', custom: { name: 'image-height' } });
+    const heightInput = new Input({
+        type: 'number',
+        init: canvasHeight,
+        min: 1,
+        max: maxCanvasSize,
+        step: 1,
+        name: 'image-height',
+        isFocusIgnored: true,
+        css: { width: 70 },
+        onChange: () => updateRatio(),
+    });
     const heightUnit = BB.el({
         textContent: LANG('new-px'),
         css: unitStyle,
     });
 
-    widthInput.setAttribute('data-ignore-focus', 'true');
-    heightInput.setAttribute('data-ignore-focus', 'true');
-
-    widthInput.type = 'number';
-    widthInput.min = '1';
-    widthInput.max = '' + maxCanvasSize;
-    css(widthInput, {
-        width: '70px',
-    });
-
-    heightInput.type = 'number';
-    heightInput.min = '1';
-    heightInput.max = '' + maxCanvasSize;
-    heightInput.style.width = '70px';
-    widthInput.value = '' + canvasWidth;
-    heightInput.value = '' + canvasHeight;
-    widthInput.onclick = (): void => {
-        widthInput.focus();
-        updateRatio();
-    };
-    heightInput.onclick = (): void => {
-        heightInput.focus();
-        updateRatio();
-    };
-
     const sizeTable = table([
-        [LANG('width') + ':&nbsp;', widthInput, widthUnit],
-        [BB.el({ css: { height: '5px' } }), '', ''],
-        [LANG('height') + ':&nbsp;', heightInput, heightUnit],
+        [LANG('width') + ':&nbsp;', widthInput.getElement(), widthUnit],
+        [BB.el({ css: { height: 5 } }), '', ''],
+        [LANG('height') + ':&nbsp;', heightInput.getElement(), heightUnit],
     ]);
     css(sizeTable, {
-        marginBottom: '10px',
+        marginBottom: 10,
     });
 
     const ratioWrapper = BB.el({
         css: {
-            marginTop: '5px',
+            marginTop: 5,
             color: '#888',
         },
     });
@@ -107,24 +104,97 @@ export function newImageDialog(p: {
         css: {
             display: 'flex',
             flexWrap: 'wrap',
-            gap: '5px',
-            marginBottom: '10px',
+            gap: 5,
+            marginBottom: 10,
         },
     });
-    const presetBtnConfig = { tagName: 'button', css: { flexGrow: '1' } } as const;
-    const presetFitBtn = BB.el(presetBtnConfig);
-    const presetCurrentBtn = BB.el(presetBtnConfig);
-    const presetSquareBtn = BB.el(presetBtnConfig);
-    const presetLandscapeBtn = BB.el(presetBtnConfig);
-    const presetPortraitBtn = BB.el(presetBtnConfig);
-    const presetOversizeBtn = BB.el(presetBtnConfig);
-
-    presetCurrentBtn.textContent = LANG('new-current');
-    presetFitBtn.textContent = LANG('new-fit');
-    presetOversizeBtn.textContent = LANG('new-oversize');
-    presetLandscapeBtn.textContent = LANG('new-landscape');
-    presetPortraitBtn.textContent = LANG('new-portrait');
-    presetSquareBtn.textContent = LANG('new-square');
+    const presetBtnConfig = {
+        tagName: 'button',
+        className: 'kl-button',
+        css: { flexGrow: '1' },
+    } as const;
+    const destroyer = new Destroyer();
+    const presetFitBtn = BB.el({
+        ...presetBtnConfig,
+        textContent: LANG('new-fit'),
+        destroyer,
+        onClick: () => {
+            widthInput.setValue(workspaceWidth, true);
+            heightInput.setValue(workspaceHeight, true);
+            updateRatio();
+        },
+    });
+    const presetCurrentBtn = BB.el({
+        ...presetBtnConfig,
+        textContent: LANG('new-current'),
+        destroyer,
+        onClick: () => {
+            widthInput.setValue(canvasWidth, true);
+            heightInput.setValue(canvasHeight, true);
+            updateRatio();
+        },
+    });
+    const presetSquareBtn = BB.el({
+        ...presetBtnConfig,
+        textContent: LANG('new-square'),
+        destroyer,
+        onClick: () => {
+            const { width, height } = createRatioSize(
+                1,
+                1,
+                workspaceWidth,
+                workspaceHeight,
+                templatePadding,
+            );
+            widthInput.setValue(width, true);
+            heightInput.setValue(height, true);
+            updateRatio();
+        },
+    });
+    const presetLandscapeBtn = BB.el({
+        ...presetBtnConfig,
+        textContent: LANG('new-landscape'),
+        destroyer,
+        onClick: () => {
+            const { width, height } = createRatioSize(
+                4,
+                3,
+                workspaceWidth,
+                workspaceHeight,
+                templatePadding,
+            );
+            widthInput.setValue(width, true);
+            heightInput.setValue(height, true);
+            updateRatio();
+        },
+    });
+    const presetPortraitBtn = BB.el({
+        ...presetBtnConfig,
+        textContent: LANG('new-portrait'),
+        destroyer,
+        onClick: () => {
+            const { width, height } = createRatioSize(
+                3,
+                4,
+                workspaceWidth,
+                workspaceHeight,
+                templatePadding,
+            );
+            widthInput.setValue(width, true);
+            heightInput.setValue(height, true);
+            updateRatio();
+        },
+    });
+    const presetOversizeBtn = BB.el({
+        ...presetBtnConfig,
+        textContent: LANG('new-oversize'),
+        destroyer,
+        onClick: () => {
+            widthInput.setValue(workspaceWidth + 500, true);
+            heightInput.setValue(workspaceHeight + 500, true);
+            updateRatio();
+        },
+    });
 
     templateWrapper.append(
         presetCurrentBtn,
@@ -137,41 +207,7 @@ export function newImageDialog(p: {
 
     const templatePadding = 0;
 
-    presetCurrentBtn.onclick = function (): void {
-        widthInput.value = '' + canvasWidth;
-        heightInput.value = '' + canvasHeight;
-        updateRatio();
-    };
-    presetFitBtn.onclick = function (): void {
-        widthInput.value = '' + workspaceWidth;
-        heightInput.value = '' + workspaceHeight;
-        updateRatio();
-    };
-    presetOversizeBtn.onclick = function (): void {
-        widthInput.value = '' + (workspaceWidth + 500);
-        heightInput.value = '' + (workspaceHeight + 500);
-        updateRatio();
-    };
-    presetSquareBtn.onclick = function (): void {
-        const sizeObj = createRatioSize(1, 1, workspaceWidth, workspaceHeight, templatePadding);
-        widthInput.value = '' + Math.round(sizeObj.width);
-        heightInput.value = '' + Math.round(sizeObj.height);
-        updateRatio();
-    };
-    presetLandscapeBtn.onclick = function (): void {
-        const sizeObj = createRatioSize(4, 3, workspaceWidth, workspaceHeight, templatePadding);
-        widthInput.value = '' + Math.round(sizeObj.width);
-        heightInput.value = '' + Math.round(sizeObj.height);
-        updateRatio();
-    };
-    presetPortraitBtn.onclick = function (): void {
-        const sizeObj = createRatioSize(3, 4, workspaceWidth, workspaceHeight, templatePadding);
-        widthInput.value = '' + Math.round(sizeObj.width);
-        heightInput.value = '' + Math.round(sizeObj.height);
-        updateRatio();
-    };
-
-    const select = new Select({
+    const select = new SelectCustom({
         isFocusable: true,
         optionArr: [
             ['screen', LANG('new-screen')],
@@ -188,29 +224,29 @@ export function newImageDialog(p: {
         ],
         onChange: function (val): void {
             if (val === 'screen') {
-                widthInput.value = '' + window.screen.width;
-                heightInput.value = '' + window.screen.height;
+                widthInput.setValue(window.screen.width, true);
+                heightInput.setValue(window.screen.height, true);
             } else if (val === 'paper') {
-                const sizeObj = createRatioSize(
+                const { width, height } = createRatioSize(
                     Math.sqrt(2),
                     1,
                     workspaceWidth,
                     workspaceHeight,
                     templatePadding,
                 );
-                widthInput.value = '' + Math.round(sizeObj.width);
-                heightInput.value = '' + Math.round(sizeObj.height);
+                widthInput.setValue(width, true);
+                heightInput.setValue(height, true);
             } else {
                 const split = val.split(' ');
-                const sizeObj = createRatioSize(
+                const { width, height } = createRatioSize(
                     parseFloat(split[0]),
                     parseFloat(split[1]),
                     workspaceWidth,
                     workspaceHeight,
                     templatePadding,
                 );
-                widthInput.value = '' + Math.round(sizeObj.width);
-                heightInput.value = '' + Math.round(sizeObj.height);
+                widthInput.setValue(width, true);
+                heightInput.setValue(height, true);
             }
             updateRatio();
             select.setValue(undefined);
@@ -222,8 +258,8 @@ export function newImageDialog(p: {
         select.setValue(undefined);
     }, 0);
     css(select.getElement(), {
-        width: '80px',
-        flexGrow: '1',
+        width: 80,
+        flexGrow: 1,
     });
     templateWrapper.append(select.getElement());
 
@@ -269,20 +305,20 @@ export function newImageDialog(p: {
         className: 'kl-transparent-preview',
         css: {
             boxSizing: 'border-box',
-            width: '340px',
-            height: '140px',
+            width: 340,
+            height: 140,
             display: 'table',
-            padding: '10px',
-            marginTop: '10px',
-            marginLeft: '-20px',
+            padding: 10,
+            marginTop: 10,
+            marginLeft: -20,
             background: 'var(--kl-checkerboard-background)',
         },
     });
     const preview = BB.el({
         className: 'kl-transparent-preview__canvas',
         css: {
-            width: 200 + 'px',
-            height: 100 + 'px',
+            width: 200,
+            height: 100,
             backgroundColor:
                 'rgba(' +
                 backgroundRgba.r +
@@ -296,7 +332,7 @@ export function newImageDialog(p: {
             marginLeft: 'auto',
             marginRight: 'auto',
             color: '#aaa',
-            fontSize: '16px',
+            fontSize: 16,
             fontWeight: 'bold',
             textAlign: 'center',
             verticalAlign: 'center',
@@ -321,9 +357,6 @@ export function newImageDialog(p: {
     });
 
     function updateRatio(): void {
-        widthInput.value = '' + Math.min(maxCanvasSize, parseInt(widthInput.value));
-        heightInput.value = '' + Math.min(maxCanvasSize, parseInt(heightInput.value));
-
         function hcf(u: number, v: number): number {
             let U = u,
                 V = v;
@@ -338,18 +371,8 @@ export function newImageDialog(p: {
             }
         }
 
-        let w = parseInt(widthInput.value);
-        let h = parseInt(heightInput.value);
-        if (w < 1 || w > maxCanvasSize || h < 1 || h > maxCanvasSize) {
-            if (w > maxCanvasSize) {
-                w = maxCanvasSize;
-            } else if (h > maxCanvasSize) {
-                h = maxCanvasSize;
-            }
-
-            widthInput.value = '' + w;
-            heightInput.value = '' + h;
-        }
+        let w = widthInput.getValue();
+        let h = heightInput.getValue();
 
         //generated canvas size doesn't always match ratio. so check if a common ratio is very close
         const commonRatios = [
@@ -416,24 +439,6 @@ export function newImageDialog(p: {
         previewWrapper.style.backgroundSize = Math.round(Math.max(4, 60 * (w / realw))) + 'px';
     }
 
-    widthInput.onchange = (): void => {
-        if (widthInput.value === '' || parseInt(widthInput.value) < 0) {
-            widthInput.value = '1';
-        }
-        updateRatio();
-    };
-    widthInput.onkeyup = (): void => {
-        updateRatio();
-    };
-    heightInput.onchange = (): void => {
-        if (heightInput.value === '' || parseFloat(heightInput.value) < 0) {
-            heightInput.value = '1';
-        }
-        updateRatio();
-    };
-    heightInput.onkeyup = (): void => {
-        updateRatio();
-    };
     updateRatio();
 
     newImDiv.append(templateWrapper);
@@ -458,30 +463,17 @@ export function newImageDialog(p: {
         div: newImDiv,
         buttons: ['Ok', 'Cancel'],
         callback: function (result) {
-            BB.unsetEventHandler(widthInput, 'onclick', 'onchange', 'onkeyup');
-            BB.unsetEventHandler(widthInput, 'onclick', 'onchange', 'onkeyup');
-
-            BB.unsetEventHandler(presetCurrentBtn, 'onclick');
-            BB.unsetEventHandler(presetFitBtn, 'onclick');
-            BB.unsetEventHandler(presetOversizeBtn, 'onclick');
-            BB.unsetEventHandler(presetSquareBtn, 'onclick');
-            BB.unsetEventHandler(presetLandscapeBtn, 'onclick');
-            BB.unsetEventHandler(presetPortraitBtn, 'onclick');
-
+            destroyer.destroy();
             select.destroy();
             colorOptions.destroy();
+            widthInput.destroy();
+            heightInput.destroy();
 
-            if (
-                result === 'Cancel' ||
-                parseInt(widthInput.value) <= 0 ||
-                parseInt(heightInput.value) <= 0 ||
-                isNaN(parseInt(widthInput.value)) ||
-                isNaN(parseInt(heightInput.value))
-            ) {
+            if (result === 'Cancel') {
                 onCancel();
                 return;
             }
-            onConfirm(parseInt(widthInput.value), parseInt(heightInput.value), backgroundRgba);
+            onConfirm(widthInput.getValue(), heightInput.getValue(), backgroundRgba);
         },
         clickOnEnter: 'Ok',
     });

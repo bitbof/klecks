@@ -1,17 +1,17 @@
+import { getIconSvg } from '../../icon/icon';
 import { BB } from '../../bb/bb';
 import { BRUSHES } from '../brushes/brushes';
 import { EVENT_RES_MS } from './brushes-consts';
 import { KlSlider } from '../ui/components/kl-slider';
 import { createPenPressureToggle } from '../ui/components/create-pen-pressure-toggle';
 import { Checkbox } from '../ui/components/checkbox';
-import brushIconImg from 'url:/src/app/img/ui/brush-eraser.svg';
 import { TBrushUi } from '../kl-types';
 import { LANG, LANGUAGE_STRINGS } from '../../language/language';
 import { EraserBrush } from '../brushes/eraser-brush';
 
 export const eraserBrushUi = (function () {
     const brushInterface = {
-        image: brushIconImg,
+        image: getIconSvg('brush-eraser'),
         tooltip: LANG('eraser') + ' [E]',
         sizeSlider: {
             min: 0.5,
@@ -97,7 +97,7 @@ export const eraserBrushUi = (function () {
                         display: 'flex',
                         justifyContent: 'space-between',
                         alignItems: 'center',
-                        marginBottom: '10px',
+                        marginBottom: 10,
                     },
                 }),
                 BB.el({
@@ -118,7 +118,7 @@ export const eraserBrushUi = (function () {
                     brush.setTransparentBG(b);
                 },
                 css: {
-                    marginTop: '10px',
+                    marginTop: 10,
                 },
                 name: 'transparency-toggle',
             });
@@ -159,8 +159,8 @@ export const eraserBrushUi = (function () {
         this.startLine = function (x, y, p) {
             brush.startLine(x, y, p);
         };
-        this.goLine = function (x, y, p) {
-            brush.goLine(x, y, p);
+        this.goLine = function (points) {
+            brush.goLine(points);
         };
         this.endLine = function () {
             brush.endLine();

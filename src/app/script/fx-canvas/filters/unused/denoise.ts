@@ -47,7 +47,7 @@ export function denoise(exponent) {
     for (let i = 0; i < 2; i++) {
         simpleShader.call(this, gl.denoise, {
             exponent: Math.max(0, exponent),
-            texSize: [this.width, this.height],
+            texSize: [this.canvas.width, this.canvas.height],
         });
     }
 

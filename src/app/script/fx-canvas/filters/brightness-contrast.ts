@@ -1,7 +1,7 @@
 import { BB } from '../../bb/bb';
 import { simpleShader } from '../core/simple-shader';
 import { FxShader } from '../core/fx-shader';
-import { gl } from '../core/gl';
+import { fxGl } from '../core/gl';
 import { TFxCanvas } from '../fx-canvas-types';
 
 /**
@@ -17,8 +17,8 @@ export type TFilterBrightnessContrast = (
 ) => TFxCanvas;
 
 export const brightnessContrast: TFilterBrightnessContrast = function (brightness, contrast) {
-    gl.brightnessContrast =
-        gl.brightnessContrast ||
+    fxGl.brightnessContrast =
+        fxGl.brightnessContrast ||
         new FxShader(
             null,
             '\
@@ -40,7 +40,7 @@ export const brightnessContrast: TFilterBrightnessContrast = function (brightnes
             'brightnessContrast',
         );
 
-    simpleShader.call(this, gl.brightnessContrast, {
+    simpleShader.call(this, fxGl.brightnessContrast, {
         brightness: BB.clamp(brightness, -1, 1),
         contrast: BB.clamp(contrast, -1, 1),
     });

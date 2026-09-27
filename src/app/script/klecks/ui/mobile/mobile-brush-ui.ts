@@ -1,10 +1,11 @@
+import { getIconUrl } from '../../../icon/icon';
 import { BB } from '../../../bb/bb';
 import { Options } from '../components/options';
 import { LANG } from '../../../language/language';
-import brushIconImg from 'url:/src/app/img/ui/tool-paint.svg';
-import eraserIconImg from 'url:/src/app/img/ui/brush-eraser.svg';
 import { Icon } from '../components/icon';
 
+const brushIconImg = getIconUrl('tool-paint');
+const eraserIconImg = getIconUrl('brush-eraser');
 export type TMobileBrushUiParams = {
     onEraser: () => void;
     onBrush: () => void;
@@ -24,7 +25,7 @@ export class MobileBrushUi {
             height: 28,
             darkInvert: true,
             css: {
-                margin: '4px',
+                margin: 4,
             },
         });
 
@@ -34,7 +35,7 @@ export class MobileBrushUi {
             height: 28,
             darkInvert: true,
             css: {
-                margin: '4px',
+                margin: 4,
             },
         });
 

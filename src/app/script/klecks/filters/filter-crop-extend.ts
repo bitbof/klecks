@@ -1,14 +1,20 @@
 import { BB } from '../../bb/bb';
-import { input } from '../ui/components/input';
+import { Input } from '../ui/components/input';
 import { Checkbox } from '../ui/components/checkbox';
 import { ColorOptions } from '../ui/components/color-options';
-import { Cropper } from '../ui/components/cropper';
+import { ViewportCropper } from '../ui/components/cropper/viewport-cropper';
+import { Preview } from '../ui/project-viewport/preview';
 import { TFilterApply, TFilterGetDialogParam, TFilterGetDialogResult, TRgba } from '../kl-types';
 import { LANG } from '../../language/language';
-import { TRect } from '../../bb/bb-types';
-import { SMALL_PREVIEW } from '../ui/utils/preview-size';
+import { TCss, TRect } from '../../bb/bb-types';
+import { getPreviewHeight, getPreviewWidth } from '../ui/utils/preview-size';
 import { getMultiPolyBounds } from '../../bb/multi-polygon/get-multi-polygon-bounds';
-import { indexBoundsInArea } from '../../bb/math/math';
+import { indexBoundsInArea, indexBoundsToRect } from '../../bb/math/math';
+import { testIsSmall } from '../ui/utils/test-is-small';
+import { getIconUrl } from '../../icon/icon';
+import { createTransform } from '../../bb/transform/create-transform';
+import { EASEL_MAX_SCALE } from '../ui/easel/easel.config';
+import { css } from '../../bb/base/base';
 
 export type TFilterCropExtendInput = {
     left: number;
@@ -24,33 +30,24 @@ export const filterCropExtend = {
         if (!klCanvas) {
             return false;
         }
-        const tempCanvas = BB.canvas();
-        {
-            const fit = BB.fitInto(klCanvas.getWidth(), klCanvas.getHeight(), 560, 400, 1);
-            const w = parseInt('' + fit.width),
-                h = parseInt('' + fit.height);
-            const previewFactor = w / klCanvas.getWidth();
-            tempCanvas.width = w;
-            tempCanvas.height = h;
-            tempCanvas.style.display = 'block';
-            BB.ctx(tempCanvas).drawImage(klCanvas.getCompleteCanvas(previewFactor), 0, 0, w, h);
-        }
+        const tempCanvas = klCanvas.getCanvas();
 
         const rootEl = BB.el();
         const result: TFilterGetDialogResult<TFilterCropExtendInput> = {
             element: rootEl,
         };
-        let left = 0,
-            right = 0,
-            top = 0,
-            bottom = 0;
-        let leftChanged = false,
-            rightChanged = false,
-            topChanged = false,
-            bottomChanged = false;
+        const initialCrop = {
+            top: 0,
+            right: 0,
+            bottom: 0,
+            left: 0,
+        };
+        const isSmall = testIsSmall();
+        if (!isSmall) {
+            result.width = getPreviewWidth(isSmall);
+        }
         const maxWidth = params.maxWidth,
             maxHeight = params.maxHeight;
-        let scale: number = 1;
 
         const selection = klCanvas.getSelection();
         let selectionBounds = selection
@@ -64,156 +61,121 @@ export const filterCropExtend = {
             const boundsWidth = selectionBounds.x2 - selectionBounds.x1 + 1;
             const boundsHeight = selectionBounds.y2 - selectionBounds.y1 + 1;
             if (boundsWidth <= maxWidth && boundsHeight <= maxHeight) {
-                top = selectionBounds.y1;
-                right = selectionBounds.x2 - klCanvas.getWidth();
-                bottom = selectionBounds.y2 - klCanvas.getHeight();
-                left = selectionBounds.x1;
+                initialCrop.top = selectionBounds.y1;
+                initialCrop.right = selectionBounds.x2 - klCanvas.getWidth();
+                initialCrop.bottom = selectionBounds.y2 - klCanvas.getHeight();
+                initialCrop.left = selectionBounds.x1;
             } else {
                 selectionBounds = undefined;
             }
         }
 
         // --- input elements ---
-        const leftInput = input({
-            init: left,
+        const leftInput = new Input({
+            init: initialCrop.left,
             type: 'number',
-            min: -klCanvas.getWidth(),
-            max: maxWidth,
-            css: { width: '75px' },
-            callback: function () {
-                leftChanged = true;
-                updateInput();
+            name: 'crop-left',
+            css: { width: 75 },
+            step: 1,
+            onChange: function () {
+                onInputChange();
             },
         });
-        const rightInput = input({
-            init: right,
+        const rightInput = new Input({
+            init: initialCrop.right,
             type: 'number',
-            min: -klCanvas.getWidth(),
-            max: maxWidth,
-            css: { width: '75px' },
-            callback: function () {
-                rightChanged = true;
-                updateInput();
+            name: 'crop-right',
+            css: { width: 75 },
+            step: 1,
+            onChange: function () {
+                onInputChange();
             },
         });
-        const topInput = input({
-            init: top,
+        const topInput = new Input({
+            init: initialCrop.top,
             type: 'number',
-            min: -klCanvas.getHeight(),
-            max: maxHeight,
-            css: { width: '75px' },
-            callback: function () {
-                topChanged = true;
-                updateInput();
+            name: 'crop-top',
+            css: { width: 75 },
+            step: 1,
+            onChange: function () {
+                onInputChange();
             },
         });
-        const bottomInput = input({
-            init: bottom,
+        const bottomInput = new Input({
+            init: initialCrop.bottom,
             type: 'number',
-            min: -klCanvas.getHeight(),
-            max: maxHeight,
-            css: { width: '75px' },
-            callback: function () {
-                bottomChanged = true;
-                updateInput();
+            name: 'crop-bottom',
+            css: { width: 75 },
+            step: 1,
+            onChange: function () {
+                onInputChange();
             },
         });
 
-        const sharedCss = {
+        function getValues(): { left: number; right: number; top: number; bottom: number } {
+            return {
+                left: leftInput.getValue(),
+                right: rightInput.getValue(),
+                top: topInput.getValue(),
+                bottom: bottomInput.getValue(),
+            };
+        }
+
+        function updateInputRanges() {
+            const { left, right, top, bottom } = getValues();
+            const width = klCanvas.getWidth();
+            const height = klCanvas.getHeight();
+            leftInput.setRange(-width - right + 1, -width - right + maxWidth);
+            rightInput.setRange(-width - left + 1, -width - left + maxWidth);
+            topInput.setRange(-height - bottom + 1, -height - bottom + maxHeight);
+            bottomInput.setRange(-height - top + 1, -height - top + maxHeight);
+        }
+        updateInputRanges();
+
+        const sharedCss: TCss = {
             display: 'flex',
             flexDirection: 'column',
             width: 'calc(50% - 5px)',
-            gap: '3px',
+            gap: 3,
         };
         const leftWrapper = BB.el({
-            content: [LANG('filter-crop-left') + ':', leftInput],
+            content: [LANG('filter-crop-left') + ':', leftInput.getElement()],
             css: sharedCss,
         });
         const rightWrapper = BB.el({
-            content: [LANG('filter-crop-right') + ':', rightInput],
+            content: [LANG('filter-crop-right') + ':', rightInput.getElement()],
             css: sharedCss,
         });
         const topWrapper = BB.el({
-            content: [LANG('filter-crop-top') + ':', topInput],
+            content: [LANG('filter-crop-top') + ':', topInput.getElement()],
             css: sharedCss,
         });
         const bottomWrapper = BB.el({
-            content: [LANG('filter-crop-bottom') + ':', bottomInput],
+            content: [LANG('filter-crop-bottom') + ':', bottomInput.getElement()],
             css: sharedCss,
         });
         const wrapWrapper = BB.el({
             css: {
                 display: 'flex',
                 flexWrap: 'wrap',
-                gap: '10px',
+                gap: 10,
             },
         });
         wrapWrapper.append(leftWrapper, rightWrapper, topWrapper, bottomWrapper);
         rootEl.append(wrapWrapper);
 
-        function updateInput(): void {
-            left = parseInt(leftInput.value);
-            right = parseInt(rightInput.value);
-            top = parseInt(topInput.value);
-            bottom = parseInt(bottomInput.value);
-            let newWidth = klCanvas.getWidth() + left + right;
-            let newHeight = klCanvas.getHeight() + top + bottom;
-
-            if (newWidth <= 0) {
-                if (leftChanged) {
-                    left = -klCanvas.getWidth() - right + 1;
-                    leftInput.value = '' + left;
-                }
-                if (rightChanged) {
-                    right = -klCanvas.getWidth() - left + 1;
-                    rightInput.value = '' + right;
-                }
-                newWidth = 1;
-            }
-            if (newWidth > maxWidth) {
-                if (leftChanged) {
-                    left = -klCanvas.getWidth() - right + maxWidth;
-                    leftInput.value = '' + left;
-                }
-                if (rightChanged) {
-                    right = -klCanvas.getWidth() - left + maxWidth;
-                    rightInput.value = '' + right;
-                }
-                newWidth = maxWidth;
-            }
-            if (newHeight <= 0) {
-                if (topChanged) {
-                    top = -klCanvas.getHeight() - bottom + 1;
-                    topInput.value = '' + top;
-                }
-                if (bottomChanged) {
-                    bottom = -klCanvas.getHeight() - top + 1;
-                    bottomInput.value = '' + bottom;
-                }
-                newHeight = 1;
-            }
-            if (newHeight > maxHeight) {
-                if (topChanged) {
-                    top = -klCanvas.getHeight() - bottom + maxHeight;
-                    topInput.value = '' + top;
-                }
-                if (bottomChanged) {
-                    bottom = -klCanvas.getHeight() - top + maxHeight;
-                    bottomInput.value = '' + bottom;
-                }
-                newHeight = maxHeight;
-            }
-            cropper.setTransform({
+        function onInputChange(): void {
+            const { left, right, top, bottom } = getValues();
+            const width = klCanvas.getWidth() + left + right;
+            const height = klCanvas.getHeight() + top + bottom;
+            const newCrop: TRect = {
                 x: -left,
                 y: -top,
-                width: newWidth,
-                height: newHeight,
-            });
-
-            leftChanged = false;
-            rightChanged = false;
-            topChanged = false;
-            bottomChanged = false;
+                width: width,
+                height: height,
+            };
+            updateInputRanges();
+            cropper.setValue(newCrop);
         }
 
         let useRuleOfThirds = true;
@@ -223,7 +185,7 @@ export const filterCropExtend = {
             allowTab: true,
             callback: function (b) {
                 useRuleOfThirds = b;
-                cropper.showThirds(useRuleOfThirds);
+                cropper.setShowThirds(useRuleOfThirds);
             },
             name: 'rule-of-thirds',
         });
@@ -259,7 +221,11 @@ export const filterCropExtend = {
             colorArr: colorOptionsArr,
             onChange: function (rgbaObj) {
                 selectedRgbaObj = rgbaObj!;
-                updateBg();
+                preview.setBackground(
+                    selectedRgbaObj.a === 0
+                        ? 'checker'
+                        : BB.ColorConverter.toRgbStr(selectedRgbaObj),
+                );
             },
         });
 
@@ -268,159 +234,147 @@ export const filterCropExtend = {
                 display: 'flex',
                 justifyContent: 'space-between',
                 alignItems: 'center',
-                marginTop: '10px',
+                marginTop: 10,
             },
         });
         rootEl.append(flexRow);
         flexRow.append(ruleOThirdsCheckbox.getElement(), colorOptions.getElement());
 
-        // when input field changed, or dragging in preview finished
-        // adjusts the zoom
-        function update(transform: TRect): void {
-            const fit = BB.fitInto(transform.width, transform.height, 260, 180, 1);
-            scale = fit.width / transform.width;
+        function updateInputValues(crop: TRect): void {
+            leftInput.setValue(-crop.x);
+            topInput.setValue(-crop.y);
+            rightInput.setValue(crop.x + crop.width - klCanvas.getWidth());
+            bottomInput.setValue(crop.y + crop.height - klCanvas.getHeight());
+            updateInputRanges();
+        }
 
-            const offset = BB.centerWithin(
-                SMALL_PREVIEW.width,
-                previewHeight,
-                fit.width,
-                fit.height,
+        const previewPadding = 40;
+        const previewWidth = getPreviewWidth(isSmall);
+        const previewHeight = getPreviewHeight(isSmall);
+        const preview = new Preview({
+            width: previewWidth,
+            height: previewHeight,
+            project: {
+                width: klCanvas.getWidth(),
+                height: klCanvas.getHeight(),
+                layers: [
+                    {
+                        image: tempCanvas,
+                        isVisible: true,
+                        opacity: 1,
+                        mixModeStr: 'source-over',
+                        hasClipping: false,
+                    },
+                ],
+            },
+            hasEditMode: true,
+            editIcon: getIconUrl('edit-crop'),
+            onModeChange: (mode) => {
+                css(cropper.getElement(), {
+                    pointerEvents: mode === 'edit' ? undefined : 'none',
+                    opacity: mode === 'edit' ? undefined : 0.5,
+                });
+            },
+            onTransformChange: (transform) => {
+                cropper.setViewportTransform(transform);
+            },
+            padding: previewPadding,
+            background: 'checker',
+        });
+        if (selectionBounds) {
+            const selectionWidth = selectionBounds.x2 - selectionBounds.x1 + 1;
+            const selectionHeight = selectionBounds.y2 - selectionBounds.y1 + 1;
+            const fit = BB.fitInto(
+                selectionWidth,
+                selectionHeight,
+                previewWidth - previewPadding * 2,
+                previewHeight - previewPadding * 2,
             );
-
-            tempCanvas.style.width = klCanvas.getWidth() * scale + 'px';
-            tempCanvas.style.height = klCanvas.getHeight() * scale + 'px';
-
-            offsetWrapper.style.left = offset.x - transform.x * scale + 'px';
-            offsetWrapper.style.top = offset.y - transform.y * scale + 'px';
-
-            left = parseInt('' + -transform.x);
-            top = parseInt('' + -transform.y);
-            right = parseInt('' + (transform.x + transform.width - klCanvas.getWidth()));
-            bottom = parseInt('' + (transform.y + transform.height - klCanvas.getHeight()));
-            leftInput.value = '' + left;
-            topInput.value = '' + top;
-            rightInput.value = '' + right;
-            bottomInput.value = '' + bottom;
-
-            if (selectedRgbaObj.a !== 0) {
-                tempCanvas.style.background = 'var(--kl-checkerboard-background)';
-                tempCanvas.style.backgroundSize = 100 * scale + 'px';
-            }
-            previewWrapper.style.backgroundPosition = offset.x + 'px ' + offset.y + 'px';
-            previewWrapper.style.backgroundSize = 100 * scale + 'px';
-
-            cropper.setScale(scale);
+            const scale = Math.min(EASEL_MAX_SCALE, fit.width / selectionWidth);
+            preview.setTransform(
+                createTransform(
+                    { x: previewWidth / 2, y: previewHeight / 2 },
+                    {
+                        x: selectionBounds.x1 + selectionWidth / 2,
+                        y: selectionBounds.y1 + selectionHeight / 2,
+                    },
+                    scale,
+                    0,
+                    false,
+                ),
+            );
         }
-
-        const previewHeight = SMALL_PREVIEW.height - 2; // two less because of border
-        const previewWrapper = BB.el({
-            className: 'kl-edit-crop-preview',
-            css: {
-                width: SMALL_PREVIEW.width + 'px',
-                marginTop: '10px',
-                marginLeft: '-20px',
-                height: previewHeight + 'px',
-                backgroundColor: '#9e9e9e',
-                position: 'relative',
-                borderTop: '1px solid rgb(144,144,144)',
-                borderBottom: '1px solid rgb(144,144,144)',
-                overflow: 'hidden',
-                userSelect: 'none',
-                touchAction: 'none',
-                background: 'var(--kl-checkerboard-background)',
-            },
+        css(preview.getElement(), {
+            overflow: 'hidden',
+            marginLeft: -20,
+            marginRight: -20,
+            marginTop: 10,
         });
-        previewWrapper.oncontextmenu = function () {
-            return false;
-        };
-        const bgColorOverlay = BB.el({
-            css: {
-                position: 'absolute',
-                left: '0',
-                top: '0',
-                bottom: '0',
-                right: '0',
-            },
-        });
-        previewWrapper.append(bgColorOverlay);
+        rootEl.append(preview.getElement());
 
-        const offsetWrapper = BB.el({
-            parent: previewWrapper,
-            css: {
-                position: 'absolute',
-                left: '0',
-                top: '0',
-            },
+        const cropper = new ViewportCropper({
+            width: previewWidth,
+            height: previewHeight,
+            value: selectionBounds
+                ? indexBoundsToRect(selectionBounds)
+                : {
+                      x: 0,
+                      y: 0,
+                      width: klCanvas.getWidth(),
+                      height: klCanvas.getHeight(),
+                  },
+            viewportTransform: preview.getTransform(),
+            maxWidth,
+            maxHeight,
+            showThirds: useRuleOfThirds,
+            onChange: updateInputValues,
         });
-
-        BB.el({
-            parent: offsetWrapper,
-            content: tempCanvas,
-            css: {
-                boxShadow: '0 0 0px 1px rgb(130,130,130)',
-                position: 'absolute',
-                left: '0px',
-                top: '0px',
-            },
+        updateInputValues(cropper.getValue());
+        css(cropper.getElement(), {
+            position: 'absolute',
+            left: 0,
+            top: 0,
+            zIndex: 0,
         });
-
-        rootEl.append(previewWrapper);
-        const cropper = new Cropper({
-            x: 0,
-            y: 0,
-            width: klCanvas.getWidth(),
-            height: klCanvas.getHeight(),
-            scale: scale,
-            callback: update,
-            maxW: maxWidth,
-            maxH: maxHeight,
-            init: selectionBounds,
+        preview.getElement().append(cropper.getElement());
+        const cropperWheelListener = new BB.PointerListener({
+            target: cropper.getElement(),
+            onWheel: preview.onWheel,
+            useDirtyWheel: true,
         });
-        update(cropper.getTransform());
-        offsetWrapper.append(cropper.getElement());
-
-        function updateBg(): void {
-            if (selectedRgbaObj.a === 0) {
-                bgColorOverlay.style.background = '';
-                tempCanvas.style.background = '';
-            } else {
-                bgColorOverlay.style.background = BB.ColorConverter.toRgbStr(selectedRgbaObj);
-                tempCanvas.style.background = 'var(--kl-checkerboard-background)';
-                tempCanvas.style.backgroundSize = 100 * scale + 'px';
-            }
-        }
+        preview.render();
 
         result.destroy = (): void => {
+            cropperWheelListener.destroy();
             cropper.destroy();
+            preview.destroy();
+            BB.freeCanvas(tempCanvas);
             ruleOThirdsCheckbox.destroy();
             colorOptions.destroy();
+            leftInput.destroy();
+            rightInput.destroy();
+            topInput.destroy();
+            bottomInput.destroy();
         };
         result.getInput = function (): TFilterCropExtendInput {
-            result.destroy!();
-            return {
-                left: left,
-                right: right,
-                top: top,
-                bottom: bottom,
+            const inputs = {
+                left: leftInput.getValue(),
+                right: rightInput.getValue(),
+                top: topInput.getValue(),
+                bottom: bottomInput.getValue(),
                 fillColor: selectedRgbaObj.a === 0 ? undefined : selectedRgbaObj,
             };
+            result.destroy!();
+            return inputs;
         };
         return result;
     },
 
     apply(params: TFilterApply<TFilterCropExtendInput>): boolean {
         const klCanvas = params.klCanvas;
-        if (
-            !klCanvas ||
-            isNaN(params.input.left) ||
-            isNaN(params.input.right) ||
-            isNaN(params.input.top) ||
-            isNaN(params.input.bottom)
-        ) {
+        if (!klCanvas) {
             return false;
         }
-        klCanvas.resizeCanvas(params.input);
-
-        return true;
+        return klCanvas.cropExtend(params.input);
     },
 };

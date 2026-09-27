@@ -140,6 +140,18 @@ Renaming a key across multiple language files:
     "hint": "Dithering/halftone pattern",
     "value": "Dither"
   },
+  "brush-pixel-pattern-add": {
+    "hint": "Button tooltip. Creates a new pattern for the pixel brush.",
+    "value": "New Pattern"
+  },
+  "brush-pixel-pattern-delete": {
+    "hint": "Button. Deletes a pattern the user created for the pixel brush.",
+    "value": "Delete"
+  },
+  "brush-pixel-pattern-edit-default-error": {
+    "hint": "Error message. Only patterns the user created can be edited, not the built-in ones.",
+    "value": "Can't edit default patterns"
+  },
 
   "brush-chemy-fill": {
     "hint": "Like in MS Paint. A shape can have be outlined, and filled.",
@@ -244,6 +256,10 @@ Renaming a key across multiple language files:
   },
   "layers-visibility-toggle": {
     "value": "Layer Visibility"
+  },
+  "layers-clipping": {
+    "hint": "tooltip for toggling whether the active layer is clipped to the layer below",
+    "value": "Clipping Mask"
   },
 
   // Layer blend modes as seen in Photoshop and other image editing software
@@ -420,6 +436,7 @@ Renaming a key across multiple language files:
   "tab-recovery-delete-confirmation": "Delete this recovery? Deletion can not be undone.",
   "tab-recovery-failed-to-recover": "Failed to recover tab.",
   "tab-recovery-recovered": "Tab recovered.",
+  "tab-recovery-restoring-session": "Restoring your previous session...",
 
   "cleared-layer": {
     "hint": "the layer has been cleared. It is now empty",
@@ -689,7 +706,7 @@ Renaming a key across multiple language files:
 
   "filter-applied": {
     "hint": "used like this: „Invert“ applied. Informs that a filter was applied",
-    "value": "applied"
+    "value": '"{x}" applied'
   },
 
   "filter-tilt-shift-title": {
@@ -771,6 +788,8 @@ Renaming a key across multiple language files:
     "hint": "in the process of opening a large file",
     "value": "Opening file..."
   },
+  "import-many-files-warning": "You are about to import {x} files. Importing many files at once can cause instability.",
+  "import-many-files-confirm": "Import {x} files",
   "import-title": "Import Image",
   "import-too-large": "Image too large, will be downscaled.",
   "import-btn-as-layer": {
@@ -824,6 +843,10 @@ Renaming a key across multiple language files:
   "hand-fit": {
     hint: 'makes canvas cover whole working area',
     value: 'Fit',
+  },
+  "hand-flip": {
+    hint: 'mirrors the view horizontally. The image itself does not change.',
+    value: 'Flip View',
   },
   "hand-inertia-scrolling": {
     hint: 'Canvas will continue to move even after releasing pointer.',
@@ -930,6 +953,10 @@ Renaming a key across multiple language files:
   "select-all": 'All',
   "select-invert": 'Invert',
   "select-reset": 'Reset',
+  "select-deselect": {
+    hint: 'More descriptive than "reset". Used as tooltip on the selection indicator.',
+    value: 'Deselect',
+  },
   "select-fill": 'Fill',
   "select-erase": 'Erase',
   "select-transform-warp": 'Warp',
@@ -989,6 +1016,7 @@ Renaming a key across multiple language files:
     "value": "Will update after reloading."
   },
   "settings-theme": 'Theme',
+  "settings-pixelated-zoom": 'Always pixelated zoom',
   "settings-save-reminder-label": 'Save Reminder',
   "settings-save-reminder-disabled": 'disabled',
   "settings-save-reminder-confirm-title": 'Turn off Save Reminder?',
@@ -1078,4 +1106,6 @@ Renaming a key across multiple language files:
   "wip": 'Work in progress',
   "browser-zoom-help": "Double-tap or pinch-out to reset browser zoom.",
   "dismiss": "Dismiss",
+  "error": "Error",
+  "retry": "Retry",
 }

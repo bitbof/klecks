@@ -50,12 +50,18 @@ export class EaselZoom implements TEaselTool {
             const canvasPoint = applyToPoint(inverse(mat), viewportPoint);
             const dX = e.relX - this.downPos.x;
             const newScale = BB.clamp(
-                this.downTransform.scale * Math.pow(1 + 1 / 400, dX),
+                this.downTransform.scale * (1 + 1 / 400) ** dX,
                 this.easel.minScale,
                 this.easel.maxScale,
             );
             this.easel.setTransform(
-                createTransform(viewportPoint, canvasPoint, newScale, this.downTransform.angleDeg),
+                createTransform(
+                    viewportPoint,
+                    canvasPoint,
+                    newScale,
+                    this.downTransform.angleDeg,
+                    this.downTransform.isMirrored,
+                ),
                 true,
             );
             this.easel.requestRender();

@@ -1,0 +1,191 @@
+// try no to import anything here
+
+// sometimes Android WebView has no localStorage
+if (!('localStorage' in window)) {
+    try {
+        (window as any).localStorage = {
+            getItem: () => null,
+            setItem: () => {},
+            removeItem: () => {},
+        };
+    } catch (e) {
+        // maybe it fails?
+    }
+}
+
+// ---------------- polyfills for roughly pre-module era (2017-18) ----------------------------
+// sorted by first Chrome version with support
+
+// Chrome 61, Edge 79, Safari 16, Firefox 107
+if (!('scrollTo' in Element.prototype)) {
+    Object.defineProperty(Element.prototype, 'scrollTo', {
+        value: function (x: number, y: number) {
+            this.scrollLeft = x;
+            this.scrollTop = y;
+        },
+    });
+}
+
+// Chrome 61, Edge 79, Safari 16, Firefox 107
+if (!('scrollBy' in Element.prototype)) {
+    Object.defineProperty(Element.prototype, 'scrollBy', {
+        value: function (x: number, y: number) {
+            this.scrollLeft += x;
+            this.scrollTop += y;
+        },
+    });
+}
+
+// Chrome 69, Edge 79, Safari 12, Firefox 62
+if (!Array.prototype.flat) {
+    Object.defineProperty(Array.prototype, 'flat', {
+        configurable: true,
+        value: function flat(...args: any[]) {
+            const depth = isNaN(args[0]) ? 1 : Number(args[0]);
+
+            return depth
+                ? Array.prototype.reduce.call(
+                      this,
+                      function (acc: any, cur) {
+                          if (Array.isArray(cur)) {
+                              // eslint-disable-next-line prefer-spread
+                              acc.push.apply(acc, flat.call(cur, depth - 1));
+                          } else {
+                              acc.push(cur);
+                          }
+
+                          return acc;
+                      },
+                      [],
+                  )
+                : Array.prototype.slice.call(this);
+        },
+        writable: true,
+    });
+}
+
+// Chrome 69, Edge 79, Safari 12, Firefox 62
+if (!Array.prototype.flatMap) {
+    Object.defineProperty(Array.prototype, 'flatMap', {
+        configurable: true,
+        writable: true,
+        value: function (
+            callback: (value: any, index: number, array: any[]) => any,
+            thisArg?: any,
+        ) {
+            if (typeof callback !== 'function') {
+                throw new TypeError(callback + ' is not a function');
+            }
+            const result: any[] = [];
+            for (let i = 0; i < this.length; i++) {
+                if (i in this) {
+                    const mapped = callback.call(thisArg, this[i], i, this);
+                    if (Array.isArray(mapped)) {
+                        result.push(...mapped);
+                    } else {
+                        result.push(mapped);
+                    }
+                }
+            }
+            return result;
+        },
+    });
+}
+
+/*
+    Copyright 2018  Alfredo Mungo <alfredo.mungo@protonmail.ch>
+
+    Permission is hereby granted, free of charge, to any person obtaining a copy
+    of this software and associated documentation files (the "Software"), to
+    deal in the Software without restriction, including without limitation the
+    rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
+    sell copies of the Software, and to permit persons to whom the Software is
+    furnished to do so, subject to the following conditions:
+
+    The above copyright notice and this permission notice shall be included in
+    all copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+    FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+    IN THE SOFTWARE.
+*/
+// Chrome 73, Firefox 63, Safari 26.6
+if (!Object.fromEntries) {
+    Object.defineProperty(Object, 'fromEntries', {
+        value(entries: any) {
+            if (!entries || !entries[Symbol.iterator]) {
+                throw new Error('Object.fromEntries() requires a single iterable argument');
+            }
+            const o: any = {};
+            Object.keys(entries).forEach((key) => {
+                const [k, v] = entries[key];
+                o[k] = v;
+            });
+            return o;
+        },
+    });
+}
+
+// Chrome 85, Firefox 77, Safari 13.1
+// if there are problems, maybe use core-js
+if (!String.prototype.replaceAll) {
+    Object.defineProperty(String.prototype, 'replaceAll', {
+        value: function (searchValue: string | RegExp, replaceValue: string): string {
+            if (typeof replaceValue === 'function') {
+                throw new Error('replaceAll polyfill does not support replaceValue: function');
+            }
+            if (typeof searchValue === 'string') {
+                return this.split(searchValue).join(replaceValue);
+            }
+            const flags = searchValue.flags.includes('g')
+                ? searchValue.flags
+                : searchValue.flags + 'g';
+            return this.replace(new RegExp(searchValue.source, flags), replaceValue);
+        },
+    });
+}
+
+// Chrome 86, Edge 86, Safari 14, Firefox 78
+if (!('replaceChildren' in Element.prototype)) {
+    Object.defineProperty(Element.prototype, 'replaceChildren', {
+        value: function (this: Element, ...children: (Node | string)[]) {
+            this.innerHTML = '';
+            this.append(...children);
+        },
+    });
+}
+
+// Chrome 92, Firefox 90, Safari 15.4
+if (!('at' in Array.prototype)) {
+    Object.defineProperty(Array.prototype, 'at', {
+        value: function (index: number) {
+            if (index >= 0) {
+                return this[index];
+            }
+            if (index < 0) {
+                return this[index + this.length];
+            }
+        },
+    });
+}
+
+// Chrome 122, Firefox 127, Safari 17
+if (!Set.prototype.difference) {
+    Object.defineProperty(Set.prototype, 'difference', {
+        configurable: true,
+        writable: true,
+        value: function <T>(this: Set<T>, other: ReadonlySetLike<unknown>): Set<T> {
+            const result = new Set<T>();
+            for (const value of this) {
+                if (!other.has(value)) {
+                    result.add(value);
+                }
+            }
+            return result;
+        },
+    });
+}

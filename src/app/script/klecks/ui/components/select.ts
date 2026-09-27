@@ -1,13 +1,12 @@
 import { BB } from '../../../bb/bb';
-import { TKeyString } from '../../../bb/bb-types';
 import { css } from '../../../bb/base/base';
+import { TCss } from '../../../bb/bb-types';
 
-type TSelectItem<ValueType> =
-    | [ValueType, string]
-    | [ValueType, string, { css: Partial<CSSStyleDeclaration> }]; // [value, label, properties]
+type TSelectItem<ValueType> = [ValueType, string] | [ValueType, string, { css: TCss }]; // [value, label, properties]
 
 /**
  * A select dropdown
+ * Deprecated for now, because some Chromebook users report that the dropdown doesn't open (unreproduced). Maybe due to the unfocus stuff, I don't know.
  */
 export class Select<ValueType extends string> {
     private readonly selectEl: HTMLSelectElement;
@@ -24,7 +23,7 @@ export class Select<ValueType extends string> {
         optionArr: (TSelectItem<ValueType> | undefined)[];
         initValue?: ValueType; // default ''
         onChange?: (val: ValueType) => void;
-        css?: TKeyString;
+        css?: TCss;
         title?: string;
         name: string;
     }) {
@@ -34,10 +33,10 @@ export class Select<ValueType extends string> {
             className: 'kl-select',
             css: {
                 cursor: 'pointer',
-                fontSize: '15px',
-                padding: '3px',
+                fontSize: 15,
+                padding: 3,
             },
-            custom: {
+            props: {
                 name: p.name,
             },
         });

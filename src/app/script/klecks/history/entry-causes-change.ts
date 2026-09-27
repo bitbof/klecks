@@ -54,6 +54,12 @@ export function entryCausesChange(
             ) {
                 return true;
             }
+            if (
+                entryLayer.hasClipping !== undefined &&
+                entryLayer.hasClipping !== composedLayer.hasClipping
+            ) {
+                return true;
+            }
             if (entryLayer.index !== undefined && entryLayer.index !== composedLayer.index) {
                 return true;
             }

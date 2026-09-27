@@ -1,12 +1,13 @@
+import { getIconUrl } from '../../../icon/icon';
 import { c } from '../../../bb/base/c';
-import { ProjectViewport, TProjectViewportProject, TViewportTransform } from './project-viewport';
+import {
+    ProjectViewport,
+    TProjectViewportBackground,
+    TProjectViewportProject,
+    TViewportTransform,
+} from './project-viewport';
 import { BB } from '../../../bb/bb';
 import { PointerListener } from '../../../bb/input/pointer-listener';
-import toolZoomInImg from 'url:/src/app/img/ui/tool-zoom-in.svg';
-import toolZoomOutImg from 'url:/src/app/img/ui/tool-zoom-out.svg';
-import viewportResetImg from 'url:/src/app/img/ui/viewport-reset.svg';
-import toolHandImg from 'url:/src/app/img/ui/tool-hand.svg';
-import editPencilImg from 'url:/src/app/img/ui/edit-pencil.svg';
 import { EventChain } from '../../../bb/input/event-chain/event-chain';
 import { DoubleTapper } from '../../../bb/input/event-chain/double-tapper';
 import { TChainElement } from '../../../bb/input/event-chain/event-chain.types';
@@ -23,7 +24,14 @@ import { createMatrixFromTransform } from '../../../bb/transform/create-matrix-f
 import { MultiPolygon } from 'polygon-clipping';
 import { SelectionRenderer } from '../easel/selection-renderer';
 import { css } from '../../../bb/base/base';
+import { EASEL_MAX_SCALE } from '../easel/easel.config';
+import { Destroyer } from '../../../bb/base/base';
 
+const toolZoomInImg = getIconUrl('tool-zoom-in');
+const toolZoomOutImg = getIconUrl('tool-zoom-out');
+const viewportResetImg = getIconUrl('viewport-reset');
+const toolHandImg = getIconUrl('tool-hand');
+const editPencilImg = getIconUrl('edit-pencil');
 export type TPreviewMode = 'edit' | 'hand';
 
 export type TPreviewParams = {
@@ -37,6 +45,7 @@ export type TPreviewParams = {
     hasBorder?: boolean; // default true
     editIcon?: string;
     selection?: MultiPolygon;
+    background?: TProjectViewportBackground;
 };
 
 const DEFAULT_PADDING = 10;
@@ -58,10 +67,12 @@ export class Preview {
         y: 0,
         scale: 0,
         angleDeg: 0,
+        isMirrored: false,
     };
     private readonly modeToggle: Options<TPreviewMode> | undefined;
     private readonly pointerChain: EventChain;
     private selectionRenderer: SelectionRenderer | undefined;
+    private readonly destroyer = new Destroyer();
 
     private renderLoop = (): void => {
         this.animationFrameId = requestAnimationFrame(this.renderLoop);
@@ -95,7 +106,7 @@ export class Preview {
             );
 
             this.viewport.setTransform(
-                createTransform({ x: this.width / 2, y: this.height / 2 }, canvasP, 1, 0),
+                createTransform({ x: this.width / 2, y: this.height / 2 }, canvasP, 1, 0, false),
             );
             this.requestRerender();
         } else {
@@ -117,6 +128,7 @@ export class Preview {
                 { x: this.project.width / 2, y: this.project.height / 2 },
                 scale,
                 0,
+                false,
             ),
         );
         this.isReset = true;
@@ -160,7 +172,7 @@ export class Preview {
             t.vY = t.vY ?? viewportRect.height / 2;
 
             const metaTransform = toMetaTransform(old, { x: t.vX, y: t.vY });
-            metaTransform.scale *= t.fac;
+            metaTransform.scale = Math.min(EASEL_MAX_SCALE, metaTransform.scale * t.fac);
 
             this.viewport.setTransform(
                 createTransform(
@@ -168,6 +180,7 @@ export class Preview {
                     metaTransform.canvasP,
                     metaTransform.scale,
                     metaTransform.angleDeg,
+                    metaTransform.isMirrored,
                 ),
             );
         }
@@ -200,10 +213,11 @@ export class Preview {
                 { x: this.project.width / 2, y: this.project.height / 2 },
                 scale,
                 0,
+                false,
             ),
             project: this.project,
             useNativeResolution: false,
-            drawBackground: true,
+            background: p.background,
         });
 
         const doubleTapper = new DoubleTapper({
@@ -231,14 +245,12 @@ export class Preview {
         const pinchZoomer = new PinchZoomer({
             onPinch: (e) => {
                 if (e.type === 'move') {
-                    if (!oldTransform) {
-                        oldTransform = this.viewport.getTransform();
-                    }
+                    oldTransform ??= this.viewport.getTransform();
                     const metaTransform = toMetaTransform(oldTransform, {
                         x: e.downRelX,
                         y: e.downRelY,
                     });
-                    metaTransform.scale *= e.scale;
+                    metaTransform.scale = Math.min(EASEL_MAX_SCALE, metaTransform.scale * e.scale);
                     metaTransform.viewportP.x += e.relX - e.downRelX;
                     metaTransform.viewportP.y += e.relY - e.downRelY;
                     this.viewport.setTransform(
@@ -247,6 +259,7 @@ export class Preview {
                             metaTransform.canvasP,
                             metaTransform.scale,
                             metaTransform.angleDeg,
+                            metaTransform.isMirrored,
                         ),
                     );
                     this.requestRerender();
@@ -261,8 +274,7 @@ export class Preview {
             chainArr: [pinchZoomer as TChainElement, doubleTapper as TChainElement],
         });
         this.pointerChain.setChainOut((e) => {
-            if (e.button && ['left', 'middle'].includes(e.button)) {
-                // debugOut(JSON.stringify(e));
+            if (e.button && ['left', 'middle'].includes(e.button) && e.type === 'pointermove') {
                 this.transformCanvas({
                     type: 'translate',
                     x: e.dX,
@@ -295,10 +307,8 @@ export class Preview {
                 this.pointerChain.chainIn(e);
             },
             onWheel: this.onWheel,
+            useDirtyWheel: true,
             maxPointers: 2,
-        });
-        this.viewport.getElement().addEventListener('wheel', (e) => {
-            e.preventDefault();
         });
 
         const svgRoot = BB.createSvg({
@@ -306,8 +316,8 @@ export class Preview {
         });
         css(svgRoot, {
             position: 'absolute',
-            left: '0',
-            top: '0',
+            left: 0,
+            top: 0,
             width: '100%',
             height: '100%',
             pointerEvents: 'none',
@@ -324,14 +334,15 @@ export class Preview {
 
         if (p.hasEditMode) {
             this.modeToggle = new Options<TPreviewMode>({
+                isFocusable: true,
                 optionArr: (['edit', 'hand'] as const).map((id) => {
                     const el = BB.el({
                         className: 'dark-invert',
                         css: {
-                            width: '28px',
-                            height: '28px',
+                            width: 28,
+                            height: 28,
                             backgroundSize: 'contain',
-                            margin: '5px',
+                            margin: 5,
                             backgroundImage: `url(${id === 'edit' ? (p.editIcon ?? editPencilImg) : toolHandImg})`,
                             backgroundPosition: 'center',
                             backgroundRepeat: 'no-repeat',
@@ -357,7 +368,7 @@ export class Preview {
                 className: p.hasBorder === false ? undefined : classes.preview,
                 css: {
                     position: 'relative',
-                    zIndex: '0', // prevent buttons from sitting on top of other modals
+                    zIndex: 0, // prevent buttons from sitting on top of other modals
                 },
             },
             [
@@ -373,16 +384,19 @@ export class Preview {
                 c(',pos-absolute,right-5,bottom-5,flex,flexCol,gap-5,z-1,pointer-auto', [
                     c({
                         tagName: 'button',
+                        className: 'kl-button',
                         title: LANG('hand-reset'),
+                        destroyer: this.destroyer,
                         onClick: () => {
                             this.reset();
                         },
                         content: `<img alt="reset" height="20" src="${viewportResetImg}">`,
-                        noRef: true,
                     }),
                     c({
                         tagName: 'button',
+                        className: 'kl-button',
                         title: LANG('zoom-in'),
+                        destroyer: this.destroyer,
                         onClick: () => {
                             const oldScale = this.viewport.getTransform().scale;
                             const newScale = zoomByStep(oldScale, 1);
@@ -392,11 +406,12 @@ export class Preview {
                             });
                         },
                         content: `<img alt="zoom-in" height="20" src="${toolZoomInImg}">`,
-                        noRef: true,
                     }),
                     c({
                         tagName: 'button',
+                        className: 'kl-button',
                         title: LANG('zoom-out'),
+                        destroyer: this.destroyer,
                         onClick: () => {
                             const oldScale = this.viewport.getTransform().scale;
                             const newScale = zoomByStep(oldScale, -1);
@@ -406,7 +421,6 @@ export class Preview {
                             });
                         },
                         content: `<img alt="zoom-out" height="20" src="${toolZoomOutImg}">`,
-                        noRef: true,
                     }),
                 ]),
             ],
@@ -424,6 +438,10 @@ export class Preview {
         this.isReset = false;
     }
 
+    setBackground(background?: TProjectViewportBackground): void {
+        this.viewport.setBackground(background);
+    }
+
     getTransform(): TViewportTransform {
         return this.viewport.getTransform();
     }
@@ -433,17 +451,15 @@ export class Preview {
     }
 
     onWheel = (e: TWheelEvent): void => {
-        const viewportRect = this.viewport.getElement().getBoundingClientRect();
-        const vX = e.pageX - viewportRect.x;
-        const vY = e.pageY - viewportRect.y;
+        e.event?.preventDefault();
 
         const oldScale = this.viewport.getTransform().scale;
-        const newScale = zoomByStep(oldScale, -e.deltaY / 2);
+        const newScale = oldScale * (1 + 4 / 10) ** -e.deltaY;
 
         this.transformCanvas({
             type: 'zoom',
-            vX,
-            vY,
+            vX: e.relX,
+            vY: e.relY,
             fac: newScale / oldScale,
         });
     };
@@ -459,5 +475,6 @@ export class Preview {
         this.rootEl.remove();
         this.modeToggle && this.modeToggle.destroy();
         this.selectionRenderer?.destroy();
+        this.destroyer.destroy();
     }
 }

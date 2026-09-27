@@ -1,4 +1,4 @@
-import { gl } from '../core/gl';
+import { fxGl } from '../core/gl';
 import { FxShader } from '../core/fx-shader';
 import { randomShaderFunc } from '../shaders/random-shader-func';
 import { simpleShader } from '../core/simple-shader';
@@ -15,8 +15,8 @@ import { TFxCanvas } from '../fx-canvas-types';
 export type TFilterTriangleBlur = (this: TFxCanvas, radius: number) => TFxCanvas;
 
 export const triangleBlur: TFilterTriangleBlur = function (radius) {
-    gl.triangleBlur =
-        gl.triangleBlur ||
+    fxGl.triangleBlur =
+        fxGl.triangleBlur ||
         new FxShader(
             null,
             '\
@@ -48,11 +48,11 @@ export const triangleBlur: TFilterTriangleBlur = function (radius) {
             'triangleBlur',
         );
 
-    simpleShader.call(this, gl.triangleBlur, {
-        delta: [radius / this.width, 0],
+    simpleShader.call(this, fxGl.triangleBlur, {
+        delta: [radius / this.canvas.width, 0],
     });
-    simpleShader.call(this, gl.triangleBlur, {
-        delta: [0, radius / this.height],
+    simpleShader.call(this, fxGl.triangleBlur, {
+        delta: [0, radius / this.canvas.height],
     });
 
     return this;

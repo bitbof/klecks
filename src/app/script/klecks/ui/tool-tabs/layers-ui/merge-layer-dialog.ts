@@ -2,7 +2,7 @@ import { BB } from '../../../../bb/bb';
 import { LANG } from '../../../../language/language';
 import { Options } from '../../components/options';
 import { translateBlending } from '../../../canvas/translate-blending';
-import { showModal } from '../../modals/base/showModal';
+import { showModal } from '../../modals/base/show-modal';
 import { TMixMode } from '../../../kl-types';
 
 export function mergeLayerDialog(
@@ -19,6 +19,7 @@ export function mergeLayerDialog(
     div.innerHTML = LANG('layers-merge-description');
 
     const options = new Options({
+        isFocusable: true,
         optionArr: [
             { id: p.mixModeStr, label: translateBlending(p.mixModeStr) },
             { id: 'source-in', label: 'source-in' },
@@ -35,7 +36,7 @@ export function mergeLayerDialog(
         },
         isSmall: true,
         css: {
-            marginTop: '5px',
+            marginTop: 5,
         },
     });
     div.append(options.getElement());
@@ -52,10 +53,6 @@ export function mergeLayerDialog(
     });
     div.append(spacer, preview);
 
-    const alphaCanvas = BB.copyCanvas(preview);
-    BB.ctx(alphaCanvas).drawImage(p.topCanvas, 0, 0, alphaCanvas.width, alphaCanvas.height);
-    BB.convertToAlphaChannelCanvas(alphaCanvas);
-
     const update = () => {
         const ctx = BB.ctx(preview);
         ctx.save();
@@ -65,15 +62,9 @@ export function mergeLayerDialog(
         }
         ctx.drawImage(p.bottomCanvas, 0, 0, preview.width, preview.height);
 
-        if (options.getValue() === 'as-alpha') {
-            ctx.globalCompositeOperation = 'destination-in';
-            ctx.globalAlpha = p.topOpacity;
-            ctx.drawImage(alphaCanvas, 0, 0, preview.width, preview.height);
-        } else {
-            ctx.globalCompositeOperation = options.getValue() as GlobalCompositeOperation;
-            ctx.globalAlpha = p.topOpacity;
-            ctx.drawImage(p.topCanvas, 0, 0, preview.width, preview.height);
-        }
+        ctx.globalCompositeOperation = options.getValue() as GlobalCompositeOperation;
+        ctx.globalAlpha = p.topOpacity;
+        ctx.drawImage(p.topCanvas, 0, 0, preview.width, preview.height);
         ctx.restore();
     };
 

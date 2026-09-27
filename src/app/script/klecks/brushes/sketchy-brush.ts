@@ -9,6 +9,8 @@ import { intersectBounds } from '../../bb/math/math';
 import { getMultiPolyBounds } from '../../bb/multi-polygon/get-multi-polygon-bounds';
 import { TIndexBounds } from '../../bb/bb-types';
 
+const MAX_COALESCED_WEB_POINTS = 3;
+
 const sampleCanvas = BB.canvas(32, 32);
 const sampleCtx = BB.ctx(sampleCanvas);
 
@@ -128,67 +130,76 @@ export class SketchyBrush {
         }
     }
 
-    goLine(p_x: number, p_y: number, pressure: number, preMixedColor: TRgb | undefined): void {
-        if (!this.inputIsDrawing || (p_x === this.lastInput.x && p_y === this.lastInput.y)) {
+    /**
+     * Stroke goes through all points. Webbing uses the last point (not coalesced), and up to
+     * MAX_COALESCED_WEB_POINTS evenly spread coalesced points.
+     */
+    goLine(points: TPressureInput[]): void {
+        if (!this.inputIsDrawing) {
             return;
         }
-
         let e, b, a, g;
-        const x = parseInt('' + p_x);
-        const y = parseInt('' + p_y);
-        this.points.push([x, y]);
+        const linePoints: [number, number][] = [];
+        points.forEach((point) => {
+            const x = parseInt('' + point.x);
+            const y = parseInt('' + point.y);
+            const prev = linePoints.at(-1) ?? [this.lastX, this.lastY];
+            if (x !== prev[0] || y !== prev[1]) {
+                linePoints.push([x, y]);
+            }
+        });
+        if (linePoints.length === 0) {
+            return;
+        }
+        const [x, y] = linePoints.at(-1)!;
+
+        const coalescedCount = linePoints.length - 1;
+        const webCount = Math.min(MAX_COALESCED_WEB_POINTS, coalescedCount);
+        const webPoints: [number, number][] = [];
+        for (let i = 1; i <= webCount; i++) {
+            webPoints.push(linePoints[Math.ceil((i * (coalescedCount + 1)) / (webCount + 1)) - 1]);
+        }
+        webPoints.push([x, y]);
 
         let mixr = this.settingColor.r;
         let mixg = this.settingColor.g;
         let mixb = this.settingColor.b;
 
-        if (preMixedColor) {
-            mixr = preMixedColor.r;
-            mixg = preMixedColor.g;
-            mixb = preMixedColor.b;
-        } else {
-            if (this.settingBlending !== 0) {
-                if (
-                    x + 5 >= 0 &&
-                    y + 5 >= 0 &&
-                    x - 5 < this.context.canvas.width - 1 &&
-                    y - 5 < this.context.canvas.height - 1
-                ) {
-                    mixr = 0;
-                    mixg = 0;
-                    mixb = 0;
-                    const mixX = Math.min(this.context.canvas.width - 1, Math.max(0, x - 5));
-                    const mixY = Math.min(this.context.canvas.height - 1, Math.max(0, y - 5));
-                    let mixW = Math.min(this.context.canvas.width - 1, Math.max(0, x + 5));
-                    let mixH = Math.min(this.context.canvas.height - 1, Math.max(0, y + 5));
-                    mixW -= mixX;
-                    mixH -= mixY;
+        if (this.settingBlending !== 0) {
+            if (
+                x + 5 >= 0 &&
+                y + 5 >= 0 &&
+                x - 5 < this.context.canvas.width - 1 &&
+                y - 5 < this.context.canvas.height - 1
+            ) {
+                mixr = 0;
+                mixg = 0;
+                mixb = 0;
+                const mixX = Math.min(this.context.canvas.width - 1, Math.max(0, x - 5));
+                const mixY = Math.min(this.context.canvas.height - 1, Math.max(0, y - 5));
+                let mixW = Math.min(this.context.canvas.width - 1, Math.max(0, x + 5));
+                let mixH = Math.min(this.context.canvas.height - 1, Math.max(0, y + 5));
+                mixW -= mixX;
+                mixH -= mixY;
 
-                    if (mixW > 0 && mixH > 0) {
-                        const imDat = this.context.getImageData(mixX, mixY, mixW, mixH);
-                        let countMix = 0;
-                        for (let i = 0; i < imDat.data.length; i += 4) {
-                            mixr += imDat.data[i + 0];
-                            mixg += imDat.data[i + 1];
-                            mixb += imDat.data[i + 2];
-                            countMix++;
-                        }
-                        mixr /= countMix;
-                        mixg /= countMix;
-                        mixb /= countMix;
+                if (mixW > 0 && mixH > 0) {
+                    const imDat = this.context.getImageData(mixX, mixY, mixW, mixH);
+                    let countMix = 0;
+                    for (let i = 0; i < imDat.data.length; i += 4) {
+                        mixr += imDat.data[i + 0];
+                        mixg += imDat.data[i + 1];
+                        mixb += imDat.data[i + 2];
+                        countMix++;
                     }
-
-                    const mixed = this.mixMode[0](new BB.RGB(mixr, mixg, mixb), this.settingColor);
-                    mixr = parseInt(
-                        '' + BB.mix(this.settingColor.r, mixed.r, this.settingBlending),
-                    );
-                    mixg = parseInt(
-                        '' + BB.mix(this.settingColor.g, mixed.g, this.settingBlending),
-                    );
-                    mixb = parseInt(
-                        '' + BB.mix(this.settingColor.b, mixed.b, this.settingBlending),
-                    );
+                    mixr /= countMix;
+                    mixg /= countMix;
+                    mixb /= countMix;
                 }
+
+                const mixed = this.mixMode[0](new BB.RGB(mixr, mixg, mixb), this.settingColor);
+                mixr = parseInt('' + BB.mix(this.settingColor.r, mixed.r, this.settingBlending));
+                mixg = parseInt('' + BB.mix(this.settingColor.g, mixed.g, this.settingBlending));
+                mixb = parseInt('' + BB.mix(this.settingColor.b, mixed.b, this.settingBlending));
             }
         }
 
@@ -200,39 +211,44 @@ export class SketchyBrush {
 
         this.context.beginPath();
         this.context.moveTo(this.lastX, this.lastY);
-        this.context.lineTo(x, y);
+        linePoints.forEach((point) => this.context.lineTo(point[0], point[1]));
 
-        for (e = 0; e < this.points.length; e++) {
-            b = this.points[e][0] - this.points[this.count][0];
-            a = this.points[e][1] - this.points[this.count][1];
-            g = b * b + a * a;
-            if (
-                g < 4000 * this.settingScale * this.settingScale &&
-                this.rand() > g / 2000 / this.settingScale / this.settingScale
-            ) {
-                this.context.moveTo(
-                    this.points[this.count][0] + b * 0.3,
-                    this.points[this.count][1] + a * 0.3,
-                );
-                this.context.lineTo(this.points[e][0] - b * 0.3, this.points[e][1] - a * 0.3);
+        webPoints.forEach((webPoint) => {
+            this.points.push(webPoint);
+            for (e = 0; e < this.points.length; e++) {
+                b = this.points[e][0] - this.points[this.count][0];
+                a = this.points[e][1] - this.points[this.count][1];
+                g = b * b + a * a;
+                if (
+                    g < 4000 * this.settingScale * this.settingScale &&
+                    this.rand() > g / 2000 / this.settingScale / this.settingScale
+                ) {
+                    this.context.moveTo(
+                        this.points[this.count][0] + b * 0.3,
+                        this.points[this.count][1] + a * 0.3,
+                    );
+                    this.context.lineTo(this.points[e][0] - b * 0.3, this.points[e][1] - a * 0.3);
+                }
             }
-        }
+            this.count++;
+        });
 
         this.context.stroke();
         this.context.restore();
 
-        this.count++;
         this.lastX = x;
         this.lastY = y;
         this.lastInput.x = x;
         this.lastInput.y = y;
 
-        this.changedBounds = BB.updateBounds(this.changedBounds, {
-            type: 'index',
-            x1: Math.floor(x - this.settingSize / 2),
-            y1: Math.floor(y - this.settingSize / 2),
-            x2: Math.ceil(x + this.settingSize / 2),
-            y2: Math.ceil(y + this.settingSize / 2),
+        linePoints.forEach(([x, y]) => {
+            this.changedBounds = BB.updateBounds(this.changedBounds, {
+                type: 'index',
+                x1: Math.floor(x - this.settingSize / 2),
+                y1: Math.floor(y - this.settingSize / 2),
+                x2: Math.ceil(x + this.settingSize / 2),
+                y2: Math.ceil(y + this.settingSize / 2),
+            });
         });
     }
 

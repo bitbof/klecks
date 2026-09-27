@@ -1,4 +1,11 @@
-export type TWheelCleanerEvent = {
+type TModifierKeys = {
+    altKey: boolean;
+    ctrlKey: boolean;
+    metaKey: boolean;
+    shiftKey: boolean;
+};
+
+export type TWheelCleanerEvent = TModifierKeys & {
     deltaY: number;
     pageX: number;
     pageY: number;
@@ -33,6 +40,12 @@ export class WheelCleaner {
         clientX: number;
         clientY: number;
     } = null;
+    private latestModifiers: TModifierKeys = {
+        ctrlKey: false,
+        altKey: false,
+        metaKey: false,
+        shiftKey: false,
+    };
 
     private emit(delta: number): void {
         if (this.position === null || this.sequenceUnit === null) {
@@ -44,6 +57,7 @@ export class WheelCleaner {
             pageY: this.position.pageY,
             clientX: this.position.clientX,
             clientY: this.position.clientY,
+            ...this.latestModifiers,
         });
     }
 
@@ -69,6 +83,12 @@ export class WheelCleaner {
             pageY: event.pageY,
             clientX: event.clientX,
             clientY: event.clientY,
+        };
+        this.latestModifiers = {
+            ctrlKey: event.ctrlKey,
+            altKey: event.altKey,
+            metaKey: event.metaKey,
+            shiftKey: event.shiftKey,
         };
 
         if (this.endSequenceTimeout) {

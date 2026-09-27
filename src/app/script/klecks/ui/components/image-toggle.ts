@@ -1,4 +1,5 @@
 import { BB } from '../../../bb/bb';
+import { Destroyer } from '../../../bb/base/base';
 
 /**
  * Toggle button with an image
@@ -6,6 +7,7 @@ import { BB } from '../../../bb/bb';
 export class ImageToggle {
     private readonly rootEl: HTMLElement;
     private isActive: boolean;
+    private readonly destroyer = new Destroyer();
 
     private update(): void {
         this.rootEl.classList.toggle('image-toggle-active', this.isActive);
@@ -30,6 +32,7 @@ export class ImageToggle {
                     backgroundImage: "url('" + p.image + "')",
                 },
             }),
+            destroyer: this.destroyer,
             onClick: (e) => {
                 e.preventDefault();
                 if (p.isRadio && this.isActive) {
@@ -59,6 +62,6 @@ export class ImageToggle {
     }
 
     destroy(): void {
-        BB.destroyEl(this.rootEl);
+        this.destroyer.destroy();
     }
 }

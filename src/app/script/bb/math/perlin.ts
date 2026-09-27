@@ -63,8 +63,8 @@ const p = [
     78, 66, 215, 61, 156, 180,
 ];
 // To remove the need for index wrapping, double the permutation table length
-const perm = new Array(512);
-const gradP = new Array(512);
+const perm = new Array(512).fill(0);
+const gradP = new Array(512).fill(0);
 
 // This isn't a very good seeding function, but it works ok. It supports 2^16
 // different seed values. Write something better if you need more seeds.

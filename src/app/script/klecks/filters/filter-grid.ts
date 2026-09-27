@@ -1,10 +1,10 @@
 import { BB } from '../../bb/bb';
 import { TFilterApply, TFilterGetDialogParam, TFilterGetDialogResult } from '../kl-types';
 import { LANG } from '../../language/language';
-import { input } from '../ui/components/input';
+import { Input } from '../ui/components/input';
 import { ColorOptions } from '../ui/components/color-options';
 import { drawGrid } from '../image-operations/draw-grid';
-import { css, throwIfNull } from '../../bb/base/base';
+import { css } from '../../bb/base/base';
 import { Preview } from '../ui/project-viewport/preview';
 import { testIsSmall } from '../ui/utils/test-is-small';
 import { getPreviewHeight, getPreviewWidth } from '../ui/utils/preview-size';
@@ -20,14 +20,10 @@ export type TFilterGridInput = {
 
 export const filterGrid = {
     getDialog(params: TFilterGetDialogParam) {
-        const context = params.context;
         const klCanvas = params.klCanvas;
-        if (!context || !klCanvas) {
-            return false;
-        }
-
+        const selectedLayerIndex = params.selectedLayerIndex;
+        const layer = klCanvas.getLayer(selectedLayerIndex);
         const layers = klCanvas.getLayers();
-        const selectedLayerIndex = throwIfNull(klCanvas.getLayerIndex(context.canvas));
 
         const rootEl = BB.el();
         const result: TFilterGetDialogResult<TFilterGridInput> = {
@@ -58,37 +54,43 @@ export const filterGrid = {
             css: {
                 display: 'flex',
                 alignItems: 'center',
-                marginTop: '10px',
-                marginBottom: '10px',
+                marginTop: 10,
+                marginBottom: 10,
             },
         });
-        const xInput = input({
+        const xInput = new Input({
             init: 2,
             type: 'number',
+            name: 'grid-x',
             min: 1,
-            css: { width: '75px', marginRight: '20px' },
-            callback: function (v) {
-                settingsObj.x = parseFloat(v);
+            step: 1,
+            css: { width: 75, marginRight: 20 },
+            onChange: function (v) {
+                settingsObj.x = v;
                 updatePreview();
             },
         });
-        const yInput = input({
+        const yInput = new Input({
             init: 2,
             type: 'number',
+            name: 'grid-y',
             min: 1,
-            css: { width: '75px', marginRight: '20px' },
-            callback: function (v) {
-                settingsObj.y = parseFloat(v);
+            step: 1,
+            css: { width: 75, marginRight: 20 },
+            onChange: function (v) {
+                settingsObj.y = v;
                 updatePreview();
             },
         });
-        const thicknessInput = input({
+        const thicknessInput = new Input({
             init: settingsObj.thickness,
             type: 'number',
+            name: 'grid-thickness',
             min: 1,
-            css: { width: '75px', marginRight: '20px' },
-            callback: function (v) {
-                settingsObj.thickness = parseFloat(v);
+            step: 1,
+            css: { width: 75, marginRight: 20 },
+            onChange: function (v) {
+                settingsObj.thickness = v;
                 updatePreview();
             },
         });
@@ -124,30 +126,30 @@ export const filterGrid = {
 
         const labelStyle = {
             display: 'inline-block',
-            marginRight: '5px',
+            marginRight: 5,
         };
         line1.append(
             BB.el({ content: 'X:', css: labelStyle }),
-            xInput,
+            xInput.getElement(),
             BB.el({ content: 'Y:', css: labelStyle }),
-            yInput,
+            yInput.getElement(),
         );
         line2.append(
             BB.el({ content: LANG('shape-line-width') + ':', css: labelStyle }),
-            thicknessInput,
-            BB.el({ css: { flexGrow: '1' } }),
+            thicknessInput.getElement(),
+            BB.el({ css: { flexGrow: 1 } }),
             colorOptions.getElement(),
         );
 
-        const previewCanvas = BB.canvas(context.canvas.width, context.canvas.height);
+        const previewCanvas = BB.canvas(layer.canvas.width, layer.canvas.height);
         const previewCtx = BB.ctx(previewCanvas);
         const previewLayerArr = layers.map((item, i) => {
             return {
-                image: i === selectedLayerIndex ? previewCanvas : item.context.canvas,
+                image: i === selectedLayerIndex ? previewCanvas : item.canvas,
                 isVisible: item.isVisible,
                 opacity: item.opacity,
                 mixModeStr: item.mixModeStr,
-                hasClipping: false,
+                hasClipping: item.hasClipping,
             };
         });
 
@@ -155,14 +157,14 @@ export const filterGrid = {
             width: getPreviewWidth(isSmall),
             height: getPreviewHeight(isSmall),
             project: {
-                width: context.canvas.width,
-                height: context.canvas.height,
+                width: layer.canvas.width,
+                height: layer.canvas.height,
                 layers: previewLayerArr,
             },
         });
         css(preview.getElement(), {
-            marginLeft: '-20px',
-            marginRight: '-20px',
+            marginLeft: -20,
+            marginRight: -20,
         });
         rootEl.append(preview.getElement());
 
@@ -170,7 +172,7 @@ export const filterGrid = {
             const ctx = previewCtx;
             ctx.save();
             ctx.clearRect(0, 0, previewCanvas.width, previewCanvas.height);
-            ctx.drawImage(context.canvas, 0, 0);
+            ctx.drawImage(layer.canvas, 0, 0);
             drawGrid(
                 ctx,
                 settingsObj.x,
@@ -189,6 +191,9 @@ export const filterGrid = {
             preview.destroy();
             BB.freeCanvas(previewCanvas);
             colorOptions.destroy();
+            xInput.destroy();
+            yInput.destroy();
+            thicknessInput.destroy();
         };
         result.getInput = function (): TFilterGridInput {
             result.destroy!();

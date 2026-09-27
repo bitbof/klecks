@@ -18,14 +18,10 @@ export type TFilterToAlphaInput = {
 
 export const filterToAlpha = {
     getDialog(params: TFilterGetDialogParam) {
-        const context = params.context;
         const klCanvas = params.klCanvas;
-        if (!context || !klCanvas) {
-            return false;
-        }
-
+        const selectedLayerIndex = params.selectedLayerIndex;
+        const layer = klCanvas.getLayer(selectedLayerIndex);
         const layers = klCanvas.getLayers();
-        const selectedLayerIndex = klCanvas.getLayerIndex(context.canvas);
 
         const rootEl = BB.el();
         const result: TFilterGetDialogResult<TFilterToAlphaInput> = {
@@ -37,7 +33,7 @@ export const filterToAlpha = {
         }
 
         const fxPreviewRenderer = new FxPreviewRenderer({
-            original: context.canvas,
+            original: layer.canvas,
             onUpdate: (fxCanvas) => {
                 return fxCanvas.toAlpha(sourceId === 'inverted-luminance', selectedRgbaObj);
             },
@@ -47,6 +43,7 @@ export const filterToAlpha = {
         // source
         let sourceId = 'inverted-luminance';
         const sourceOptions = new Options({
+            isFocusable: true,
             optionArr: [
                 {
                     id: 'inverted-luminance',
@@ -106,11 +103,11 @@ export const filterToAlpha = {
                     image:
                         i === selectedLayerIndex
                             ? fxPreviewRenderer.render
-                            : layers[i].context.canvas,
+                            : layers[i].canvas,
                     isVisible: layers[i].isVisible,
                     opacity: layers[i].opacity,
                     mixModeStr: layers[i].mixModeStr,
-                    hasClipping: false,
+                    hasClipping: layers[i].hasClipping,
                 });
             }
         }
@@ -119,16 +116,16 @@ export const filterToAlpha = {
             width: getPreviewWidth(isSmall),
             height: getPreviewHeight(isSmall),
             project: {
-                width: context.canvas.width,
-                height: context.canvas.height,
+                width: layer.canvas.width,
+                height: layer.canvas.height,
                 layers: previewLayerArr,
             },
             selection: klCanvas.getSelection(),
         });
         preview.render();
         css(preview.getElement(), {
-            marginLeft: '-20px',
-            marginRight: '-20px',
+            marginLeft: -20,
+            marginRight: -20,
         });
         rootEl.append(preview.getElement());
 

@@ -91,6 +91,7 @@ export function updateLayersViaComposed(
                 index: composedAfterLayer.index,
                 name: composedAfterLayer.name,
                 mixModeStr: composedAfterLayer.mixModeStr,
+                hasClipping: composedAfterLayer.hasClipping,
                 isVisible: composedAfterLayer.isVisible,
                 opacity: composedAfterLayer.opacity,
                 canvas,

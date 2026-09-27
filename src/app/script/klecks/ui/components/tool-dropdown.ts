@@ -1,16 +1,18 @@
+import { getIconUrl } from '../../../icon/icon';
 import { BB } from '../../../bb/bb';
 import { DIALOG_COUNTER } from '../modals/modal-count';
-import toolPaintImg from 'url:/src/app/img/ui/tool-paint.svg';
-import toolFillImg from 'url:/src/app/img/ui/tool-fill.svg';
-import toolGradientImg from 'url:/src/app/img/ui/tool-gradient.svg';
-import toolTextImg from 'url:/src/app/img/ui/tool-text.svg';
-import toolShapeImg from 'url:/src/app/img/ui/tool-shape.svg';
-import toolSelectImg from 'url:/src/app/img/ui/tool-select.svg';
 import { LANG } from '../../../language/language';
 import { TToolType } from '../../kl-types';
 import { PointerListener } from '../../../bb/input/pointer-listener';
 import { c } from '../../../bb/base/c';
 import { css } from '../../../bb/base/base';
+
+const toolPaintImg = getIconUrl('tool-paint');
+const toolFillImg = getIconUrl('tool-fill');
+const toolGradientImg = getIconUrl('tool-gradient');
+const toolTextImg = getIconUrl('tool-text');
+const toolShapeImg = getIconUrl('tool-shape');
+const toolSelectImg = getIconUrl('tool-select');
 
 type TDropdownButton = {
     wrapper: HTMLElement;
@@ -82,7 +84,7 @@ export class ToolDropdown {
         this.rootEl = BB.el({
             css: {
                 position: 'relative',
-                flexGrow: '1',
+                flexGrow: 1,
             },
         });
 
@@ -155,7 +157,7 @@ export class ToolDropdown {
                 pointerEvents: 'auto',
                 height: '100%',
                 boxSizing: 'border-box',
-                zIndex: '1',
+                zIndex: 1,
             },
         });
 
@@ -177,7 +179,7 @@ export class ToolDropdown {
                 width: 'calc(100% - 7px)',
                 height: '100%',
                 pointerEvents: 'none',
-                opacity: '0.75',
+                opacity: 0.75,
             },
         });
 
@@ -197,10 +199,10 @@ export class ToolDropdown {
             css: {
                 position: 'absolute',
                 //background: 'rgba(255,0,0,0.5)',
-                left: '0',
-                top: '0',
-                right: '0',
-                bottom: '0',
+                left: 0,
+                top: 0,
+                right: 0,
+                bottom: 0,
             },
         });
         const overlayPointerListener = new BB.PointerListener({
@@ -220,13 +222,13 @@ export class ToolDropdown {
                 width: '100%',
                 height: 100 * (this.optionArr.length - 1) + '%',
                 top: '100%',
-                left: '0',
-                zIndex: '-1',
+                left: 0,
+                zIndex: -1,
                 boxSizing: 'border-box',
                 cursor: 'pointer',
                 transition: 'height 0.1s ease-in-out, opacity 0.1s ease-in-out',
-                borderBottomLeftRadius: '5px',
-                borderBottomRightRadius: '5px',
+                borderBottomLeftRadius: 5,
+                borderBottomRightRadius: 5,
                 overflow: 'hidden',
             },
         });
@@ -266,7 +268,7 @@ export class ToolDropdown {
                     backgroundSize: 'contain',
                     height: '100%',
                     pointerEvents: 'none',
-                    opacity: '0.75',
+                    opacity: 0.75,
                 },
             });
 
@@ -320,8 +322,10 @@ export class ToolDropdown {
                 this.dropdownBtnArr[i].show(this.currentActiveIndex !== i);
             }
 
-            this.arrowButton.style.setProperty('opacity', '0');
-            this.arrowButton.style.setProperty('pointer-events', 'none');
+            css(this.arrowButton, {
+                opacity: 0,
+                pointerEvents: 'none',
+            });
             this.rootEl.style.zIndex = '1';
             document.body.append(overlay);
             this.rootEl.append(dropdownWrapper);
@@ -330,8 +334,10 @@ export class ToolDropdown {
         const closeDropdown = () => {
             DIALOG_COUNTER.decrease(0.5);
             isOpen = false;
-            this.arrowButton.style.removeProperty('opacity');
-            this.arrowButton.style.removeProperty('pointer-events');
+            css(this.arrowButton, {
+                opacity: undefined,
+                pointerEvents: undefined,
+            });
             this.rootEl.style.removeProperty('z-index');
             overlay.remove();
             dropdownWrapper.remove();
@@ -348,8 +354,8 @@ export class ToolDropdown {
             this.dropdownBtnArr[i].setIsSmall(b);
         }
         css(this.arrowButton, {
-            width: b ? '14px' : '18px',
-            height: b ? '14px' : '18px',
+            width: b ? 14 : 18,
+            height: b ? 14 : 18,
         });
     }
 

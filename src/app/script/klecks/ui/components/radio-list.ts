@@ -29,7 +29,7 @@ export class RadioList {
             const input = BB.el({
                 tagName: 'input',
                 parent: label,
-                custom: {
+                props: {
                     name: name,
                     value: item.value,
                     type: 'radio',

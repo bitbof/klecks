@@ -28,11 +28,8 @@ export class CornerPanning {
 
     // only call through requestAnimationFrame when animationFrameHandle undefined
     private movementLoop(): void {
+        this.animationFrameHandle = undefined;
         if (!this.cornerDirection) {
-            if (this.animationFrameHandle) {
-                cancelAnimationFrame(this.animationFrameHandle);
-            }
-            this.animationFrameHandle = undefined;
             this.lastFrameTimestamp = 0;
             return;
         }
@@ -97,7 +94,7 @@ export class CornerPanning {
                 this.lastFrameTimestamp = performance.now();
             }
             this.repeatEvent = event;
-            this.animationFrameHandle = requestAnimationFrame(() => this.movementLoop());
+            this.animationFrameHandle ??= requestAnimationFrame(() => this.movementLoop());
         } else {
             this.cornerDirection = undefined;
         }

@@ -1,8 +1,9 @@
 import { TFxGl } from '../fx-canvas-types';
 
-export let gl: TFxGl;
+export let gl: WebGLRenderingContext;
+export let fxGl: TFxGl;
 
-export function setGl(newGl: TFxGl | null): void {
-    // more problems setting type to null
-    gl = newGl as TFxGl;
+export function setGl(newGl: TFxGl): void {
+    fxGl = newGl;
+    gl = newGl.gl;
 }

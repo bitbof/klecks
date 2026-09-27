@@ -61,7 +61,7 @@ const factorials = [1, 1, 2, 6, 24, 120, 720, 5040, 40320];
 
 export function bernstein(n: number, k: number, t: number): number {
     const coeff = factorials[n] / (factorials[k] * factorials[n - k]);
-    return coeff * Math.pow(1 - t, n - k) * Math.pow(t, k);
+    return coeff * (1 - t) ** (n - k) * t ** k;
 }
 
 // initial ffd lattice spanning area of rect
@@ -347,7 +347,7 @@ export function warpLatticeViaPoint(
             const si = j / n;
             const ti = i / m;
             const paramDist = Math.sqrt(
-                Math.pow(si - paramCoordinate.s, 2) + Math.pow(ti - paramCoordinate.t, 2),
+                (si - paramCoordinate.s) ** 2 + (ti - paramCoordinate.t) ** 2,
             );
 
             // Calculate a ramp from 1 to 0

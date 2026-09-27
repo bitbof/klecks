@@ -1,5 +1,5 @@
-import * as polygonClipping from 'polygon-clipping';
-import { Geom, MultiPolygon, Ring } from 'polygon-clipping';
+import polygonClipping, { Geom, MultiPolygon, Ring } from 'polygon-clipping';
+import { attempt, AttemptError } from '../base/base';
 
 // wrapper to catch errors, and offer fallback
 export function applyPolygonClipping(
@@ -7,13 +7,8 @@ export function applyPolygonClipping(
     geom: Geom,
     ...geoms: Geom[]
 ): MultiPolygon {
-    let result: MultiPolygon = []; // initialized with fallback
-    try {
-        result = polygonClipping[operation](geom, ...geoms);
-    } catch (e) {
-        /* */
-    }
-    return result;
+    const result = attempt(() => polygonClipping[operation](geom, ...geoms));
+    return result instanceof AttemptError ? [] : result;
 }
 
 // intersects each ring individually to avoid failing edge cases from clipping the whole multipolygon at once

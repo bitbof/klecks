@@ -1,16 +1,17 @@
 import { TBoundsType, TCoordinateBounds, TIndexBounds, TRect, TVector2D } from '../bb-types';
+import { attempt, AttemptError } from '../base/base';
 
 export function mix(a: number, b: number, f: number): number {
     return a * (1 - f) + b * f;
 }
 
 export function dist(ax: number, ay: number, bx: number, by: number): number {
-    return Math.sqrt(Math.pow(ax - bx, 2) + Math.pow(ay - by, 2));
+    return Math.sqrt((ax - bx) ** 2 + (ay - by) ** 2);
 }
 
 export function distSquared(ax: number, ay: number, bx: number, by: number): number {
     // faster because no square-root
-    return Math.pow(ax - bx, 2) + Math.pow(ay - by, 2);
+    return (ax - bx) ** 2 + (ay - by) ** 2;
 }
 
 export function lenSquared(x: number, y: number): number {
@@ -140,8 +141,33 @@ export function roundUneven(f: number): number {
  * - round(123, -1) = 120
  */
 export function round(f: number, digits: number): number {
-    const digitMult = Math.pow(10, digits);
-    return Math.round(f /* + Number.EPSILON*/ * digitMult) / digitMult;
+    const digitMult = 10 ** digits;
+    // adding epsilon is not much better
+    return Math.round(f * digitMult) / digitMult;
+}
+
+const roundFormatterCache = new Map<number, Intl.NumberFormat>();
+// can be multiple orders of magnitude slower, but is correct
+export function roundSlow(f: number, digits: number): number {
+    const result = attempt(() => {
+        let formatter = roundFormatterCache.get(digits);
+        if (!formatter) {
+            formatter = new Intl.NumberFormat('en-US-u-nu-latn', {
+                useGrouping: false,
+                maximumFractionDigits: digits,
+            });
+            roundFormatterCache.set(digits, formatter);
+        }
+        return Number(formatter.format(f));
+    });
+
+    return result instanceof AttemptError ? round(f, digits) : result;
+}
+
+export function getDecimalDigits(value: number): number {
+    const [coefficient, exponent = '0'] = value.toString().toLowerCase().split('e');
+    const fractionLength = coefficient.split('.')[1]?.length ?? 0;
+    return Math.max(0, fractionLength - Number(exponent));
 }
 
 export function fixBounds<GBoundsType extends TCoordinateBounds | TIndexBounds>(

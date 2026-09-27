@@ -1,12 +1,13 @@
+import { getIconSvg, getIconUrl } from '../../../icon/icon';
 import { BB } from '../../../bb/bb';
-import angleImg from 'url:/src/app/img/ui/angle.svg';
-import rotateImg from 'url:/src/app/img/ui/edit-rotate.svg';
 import { LANG } from '../../../language/language';
 import { Checkbox } from '../components/checkbox';
 import { LocalStorage } from '../../../bb/base/local-storage';
 import { css } from '../../../bb/base/base';
-import { makeUnfocusable } from '../../../bb/base/ui';
+import { BoxToggle } from '../components/box-toggle';
 
+const angleImg = getIconUrl('angle');
+const rotateImg = getIconUrl('edit-rotate');
 const LS_INERTIA_KEY = 'kl-inertia-scroll';
 
 /**
@@ -14,13 +15,13 @@ const LS_INERTIA_KEY = 'kl-inertia-scroll';
  */
 export class HandUi {
     private readonly rootEl: HTMLElement;
-    private readonly onAngleChange: (angleDeg: number, isRelative?: boolean) => void;
     private isVisible: boolean = true;
     private scale: number;
     private angleDeg: number;
     private readonly scaleEl: HTMLElement;
     private readonly angleEl: HTMLElement;
     private readonly angleIm: HTMLImageElement;
+    private readonly flipToggle: BoxToggle;
 
     private updateUi(): void {
         this.scaleEl.innerHTML = Math.round(this.scale * 100) + '%';
@@ -43,27 +44,27 @@ export class HandUi {
         onReset: () => void;
         onFit: () => void;
         onAngleChange: (angleDeg: number, isRelative?: boolean) => void;
+        onChangeIsMirrored: (b: boolean) => void;
         onChangeUseInertiaScrolling: (b: boolean) => void;
     }) {
         this.rootEl = BB.el({
             css: {
-                margin: '10px',
+                margin: 10,
             },
         });
         this.scale = p.scale;
         this.angleDeg = p.angleDeg;
-        this.onAngleChange = p.onAngleChange;
 
         const row1 = BB.el({
             css: {
-                marginBottom: '10px',
+                marginBottom: 10,
                 display: 'flex',
             },
         });
         const row2 = BB.el({
             css: {
                 display: 'flex',
-                marginBottom: '10px',
+                marginBottom: 10,
             },
         });
         const row3 = BB.el({
@@ -75,7 +76,7 @@ export class HandUi {
 
         this.scaleEl = BB.el({
             css: {
-                width: '65px',
+                width: 65,
                 userSelect: 'none',
                 fontFamily: 'monospace',
             },
@@ -86,10 +87,10 @@ export class HandUi {
         this.angleIm.src = angleImg;
         css(this.angleIm, {
             verticalAlign: 'bottom',
-            width: '20px',
-            height: '20px',
-            marginRight: '5px',
-            borderRadius: '10px',
+            width: 20,
+            height: 20,
+            marginRight: 5,
+            borderRadius: 10,
             background: 'rgba(0,0,0,0.2)',
             userSelect: 'none',
         });
@@ -106,20 +107,22 @@ export class HandUi {
 
         const resetButton = BB.el({
             tagName: 'button',
+            className: 'kl-button',
             content: LANG('hand-reset'),
             onClick: p.onReset,
         });
-        makeUnfocusable(resetButton);
+        resetButton.tabIndex = -1;
 
         const fitButton = BB.el({
             tagName: 'button',
+            className: 'kl-button',
             content: LANG('hand-fit'),
             css: {
-                marginLeft: '10px',
+                marginLeft: 10,
             },
             onClick: p.onFit,
         });
-        makeUnfocusable(fitButton);
+        fitButton.tabIndex = -1;
         row2.append(resetButton, fitButton);
 
         const leftRotateIcon = new Image();
@@ -131,37 +134,66 @@ export class HandUi {
         });
         const leftRotateButton = BB.el({
             tagName: 'button',
+            className: 'kl-button',
             content: leftRotateIcon,
             onClick: function () {
                 p.onAngleChange(-15, true);
             },
         });
-        makeUnfocusable(leftRotateButton);
+        leftRotateButton.tabIndex = -1;
 
         const resetAngleButton = BB.el({
             tagName: 'button',
+            className: 'kl-button',
             content: '0°',
             css: {
-                marginLeft: '10px',
+                marginLeft: 5,
             },
             onClick: function () {
                 p.onAngleChange(0);
             },
         });
-        makeUnfocusable(resetAngleButton);
+        resetAngleButton.tabIndex = -1;
 
         const rightRotateButton = BB.el({
             tagName: 'button',
+            className: 'kl-button',
             content: '<img height="20" src="' + rotateImg + '" alt="Rotate"/>',
             css: {
-                marginLeft: '10px',
+                marginLeft: 5,
             },
             onClick: function () {
                 p.onAngleChange(15, true);
             },
         });
-        makeUnfocusable(rightRotateButton);
-        row3.append(leftRotateButton, resetAngleButton, rightRotateButton);
+        rightRotateButton.tabIndex = -1;
+
+        this.flipToggle = new BoxToggle({
+            keepOriginalLabel: true,
+            label: BB.el({
+                content: getIconSvg('view-flip', { width: 20, height: 20 }),
+                css: {
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    width: 30,
+                    height: 30,
+                    opacity: '1',
+                },
+            }),
+            title: LANG('hand-flip') + ' [M]',
+            onChange: p.onChangeIsMirrored,
+        });
+        css(this.flipToggle.getElement(), {
+            marginLeft: 10,
+        });
+
+        row3.append(
+            leftRotateButton,
+            resetAngleButton,
+            rightRotateButton,
+            this.flipToggle.getElement(),
+        );
 
         const inertiaToggle = new Checkbox({
             label: LANG('hand-inertia-scrolling'),
@@ -176,7 +208,7 @@ export class HandUi {
             p.onChangeUseInertiaScrolling(inertiaToggle.getValue());
         }, 500);
         css(inertiaToggle.getElement(), {
-            marginTop: '10px',
+            marginTop: 10,
             display: 'inline-block',
         });
         this.rootEl.append(inertiaToggle.getElement());
@@ -194,9 +226,10 @@ export class HandUi {
         }
     }
 
-    update(pScale: number, pAngleDeg: number): void {
+    update(pScale: number, pAngleDeg: number, pIsMirrored: boolean): void {
         this.scale = pScale;
         this.angleDeg = pAngleDeg;
+        this.flipToggle.setValue(pIsMirrored);
         if (this.isVisible) {
             this.updateUi();
         }

@@ -1,6 +1,6 @@
 import { BB } from '../../../bb/bb';
 import { KlSlider } from '../components/kl-slider';
-import { Select } from '../components/select';
+import { SelectCustom } from '../components/select-custom';
 import { Checkbox } from '../components/checkbox';
 import { LANG } from '../../../language/language';
 import { TFillSampling } from '../../kl-types';
@@ -17,8 +17,8 @@ export class FillUi {
     private readonly colorSlider: KlColorSlider;
     private readonly toleranceSlider: KlSlider;
     private readonly opacitySlider: KlSlider;
-    private readonly modeSelect: Select<string>;
-    private readonly growSelect: Select<string>;
+    private readonly modeSelect: SelectCustom<string>;
+    private readonly growSelect: SelectCustom<string>;
     private isContiguous: boolean;
     private readonly eraserToggle: Checkbox;
 
@@ -29,7 +29,7 @@ export class FillUi {
     }) {
         this.rootEl = BB.el({
             css: {
-                margin: '10px',
+                margin: 10,
             },
         });
         this.isVisible = true;
@@ -37,7 +37,7 @@ export class FillUi {
         this.colorDiv = BB.el({
             parent: this.rootEl,
             css: {
-                marginBottom: '10px',
+                marginBottom: 10,
             },
         });
 
@@ -66,7 +66,7 @@ export class FillUi {
             toDisplayValue: (value) => value / (255 / 100),
         });
         css(this.toleranceSlider.getElement(), {
-            marginTop: '10px',
+            marginTop: 10,
         });
         this.rootEl.append(this.toleranceSlider.getElement());
 
@@ -74,7 +74,7 @@ export class FillUi {
             parent: this.rootEl,
             css: {
                 display: 'flex',
-                marginTop: '10px',
+                marginTop: 10,
             },
         });
 
@@ -82,10 +82,10 @@ export class FillUi {
             content: LANG('bucket-sample') + '&nbsp;',
             title: LANG('bucket-sample-title'),
             css: {
-                fontSize: '15px',
+                fontSize: 15,
             },
         });
-        this.modeSelect = new Select({
+        this.modeSelect = new SelectCustom({
             optionArr: [
                 ['all', LANG('bucket-sample-all')],
                 ['current', LANG('bucket-sample-active')],
@@ -107,11 +107,11 @@ export class FillUi {
             content: LANG('bucket-grow') + '&nbsp;',
             title: LANG('bucket-grow-title'),
             css: {
-                fontSize: '15px',
-                marginLeft: '10px',
+                fontSize: 15,
+                marginLeft: 10,
             },
         });
-        this.growSelect = new Select({
+        this.growSelect = new SelectCustom({
             optionArr: [
                 ['0', '0'],
                 ['1', '1'],
@@ -156,8 +156,8 @@ export class FillUi {
                 content: [contiguousToggle.getElement(), this.eraserToggle.getElement()],
                 css: {
                     display: 'flex',
-                    marginTop: '10px',
-                    gap: '10px',
+                    marginTop: 10,
+                    gap: 10,
                 },
             }),
         );

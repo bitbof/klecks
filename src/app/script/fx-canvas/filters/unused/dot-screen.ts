@@ -49,7 +49,7 @@ export function dotScreen(centerX, centerY, angle, size) {
         center: [centerX, centerY],
         angle: angle,
         scale: Math.PI / size,
-        texSize: [this.width, this.height],
+        texSize: [this.canvas.width, this.canvas.height],
     });
 
     return this;

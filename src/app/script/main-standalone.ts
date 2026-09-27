@@ -2,19 +2,16 @@
  * by bitbof (bitbof.com)
  */
 
-import './polyfills/polyfills';
+import './bb/base/polyfills';
 import { KlApp } from './app/kl-app';
-import { TDeserializedKlStorageProject, TKlProject } from './klecks/kl-types';
+import { TKlProject } from './klecks/kl-types';
 import { initLANG, LANG } from './language/language';
-import '../script/theme/theme';
-import {
-    getKlIndexedDbName,
-    KL_INDEXED_DB,
-    KL_INDEXED_DB_STORES,
-    KL_INDEXED_DB_UPGRADER,
-    KL_INDEXED_DB_VERSION,
-} from './klecks/storage/kl-indexed-db';
+import './theme/theme';
+import { getKlIndexedDbName, KL_INDEXED_DB } from './klecks/storage/kl-indexed-db';
 import { KlRecoveryManager } from './klecks/storage/kl-recovery-manager';
+import { loadRecovery } from './app/recovery-loader';
+import { initIconCss } from './icon/icon';
+import { asyncThrow } from './bb/base/base';
 
 function showInitError(e: Error): void {
     const el = document.createElement('div');
@@ -31,15 +28,11 @@ function showInitError(e: Error): void {
 
 (async () => {
     try {
+        initIconCss();
         const outQueue: string[] = [];
         await initLANG();
 
-        KL_INDEXED_DB.init(
-            getKlIndexedDbName(),
-            KL_INDEXED_DB_STORES,
-            KL_INDEXED_DB_VERSION,
-            KL_INDEXED_DB_UPGRADER,
-        );
+        KL_INDEXED_DB.init(getKlIndexedDbName());
         if (!(await KL_INDEXED_DB.testConnection())) {
             outQueue.push(LANG('file-storage-cant-access'));
         }
@@ -47,24 +40,20 @@ function showInitError(e: Error): void {
         const klRecoveryManager: KlRecoveryManager | undefined = KL_INDEXED_DB.getIsAvailable()
             ? new KlRecoveryManager({})
             : undefined;
+        const loadingScreenEl = document.getElementById('loading-screen');
         let project: TKlProject | undefined = undefined;
         try {
-            const readResult: TDeserializedKlStorageProject | undefined = klRecoveryManager
-                ? await klRecoveryManager.getRecovery()
-                : undefined;
+            const readResult = await loadRecovery(klRecoveryManager, loadingScreenEl);
             if (readResult) {
                 project = readResult.project;
                 outQueue.push(LANG('tab-recovery-recovered'));
             }
         } catch (e) {
-            setTimeout(() => {
-                throw e;
-            });
+            asyncThrow(e);
             outQueue.push(LANG('tab-recovery-failed-to-recover'));
         }
 
         // in case an extension manipulated the page
-        const loadingScreenEl = document.getElementById('loading-screen');
         loadingScreenEl?.remove();
 
         const klApp = new KlApp({ project, klRecoveryManager });

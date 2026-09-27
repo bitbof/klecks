@@ -1,6 +1,15 @@
 import { THistoryEntryData } from './history.types';
 import { isLayerFill } from '../kl-types';
 
+export function getImageDataBytes(imageData: ImageData): number {
+    return imageData.data.byteLength;
+}
+
+export function getFillBytes(fillStr: string): number {
+    // 2 byte per character
+    return fillStr.length * 2;
+}
+
 // estimates how much memory a history entry uses
 export function estimateBytes(entry: THistoryEntryData): number {
     let result = 0;
@@ -19,9 +28,9 @@ export function estimateBytes(entry: THistoryEntryData): number {
                     return;
                 }
                 if (isLayerFill(tile)) {
-                    result += tile.fill.length * 2; // 2 byte per character
+                    result += getFillBytes(tile.fill);
                 } else {
-                    result += tile.data.width * tile.data.height * 4; // 4 channels, each 1 byte
+                    result += getImageDataBytes(tile.data);
                 }
             });
         });

@@ -1,11 +1,18 @@
-import { TMixMode } from '../../kl-types';
+import { LayerCompositor } from '../../canvas/layer-compositor';
+import { TKlLayer } from '../../kl-types';
 import { BB } from '../../../bb/bb';
-import { css, throwIfNull } from '../../../bb/base/base';
+import { changeCanvasDimensions } from '../../../bb/base/change-canvas-dimensions';
+import { css } from '../../../bb/base/base';
 import { THEME } from '../../../theme/theme';
-import { Matrix, inverse, compose } from 'transformation-matrix';
+import { Matrix } from 'transformation-matrix';
 import { createMatrixFromTransform } from '../../../bb/transform/create-matrix-from-transform';
 import { matrixToTuple } from '../../../bb/math/matrix-to-tuple';
-import { DEBUG_RENDERER_ENABLED, DEBUG_RENDER } from './debug-render';
+import { DEBUG_RENDER, DEBUG_RENDERER_ENABLED } from './debug-render';
+import {
+    addIsPixelatedZoomListener,
+    isPixelatedZoomEnabled,
+    removeIsPixelatedZoomListener,
+} from '../components/pixelated-zoom-toggle';
 
 function fixScale(scale: number, pixels: number): number {
     return Math.round(pixels * scale) / pixels;
@@ -18,39 +25,42 @@ export type TProjectViewportLayerFunc = (
     viewportHeight: number,
 ) => CanvasImageSource | { image: CanvasImageSource; transform: Matrix }; // image drawn with ctx.setTransform(transform)
 
+export type TProjectViewportLayer = TKlLayer<CanvasImageSource | TProjectViewportLayerFunc>;
+
 export type TProjectViewportProject = {
     width: number;
     height: number;
-    layers: {
-        image: CanvasImageSource | TProjectViewportLayerFunc;
-        isVisible: boolean;
-        opacity: number;
-        mixModeStr: TMixMode;
-        hasClipping: boolean;
-    }[];
+    layers: TProjectViewportLayer[];
 };
+
+type TRenderedImage = { image: CanvasImageSource; transform?: Matrix };
 
 export type TViewportTransform = {
     scale: number;
     angleDeg: number;
     x: number;
     y: number;
+    // Horizontally. Applied before rotation. Angle stays as perceived by the user.
+    isMirrored: boolean;
 };
 
 export type TViewportTransformXY = {
-    scaleX: number;
+    scaleX: number; // negative if mirrored
     scaleY: number;
     angleDeg: number;
     x: number;
     y: number;
 };
 
+// undefined -> default, 'checker' -> checkerboard, all other strings -> CSS color
+export type TProjectViewportBackground = undefined | 'checker' | (string & Record<never, never>);
+
 export type TProjectViewportParams = {
     width: number;
     height: number;
     project: TProjectViewportProject;
     transform: TViewportTransform;
-    drawBackground?: boolean;
+    background?: TProjectViewportBackground;
     useNativeResolution?: boolean;
     renderAfter?: (ctx: CanvasRenderingContext2D, transform: TViewportTransformXY) => void;
     fillParent?: boolean;
@@ -72,24 +82,24 @@ export class ProjectViewport {
     private height: number;
     private readonly canvas: HTMLCanvasElement;
     private readonly ctx: CanvasRenderingContext2D;
+    private readonly compositor = new LayerCompositor();
     private transform: TViewportTransform;
+    private renderedTransform!: TViewportTransformXY;
 
     private project: TProjectViewportProject;
     private useNativeResolution: boolean;
 
-    private pattern: CanvasPattern;
     private resFactor: number;
-    private readonly drawBackground: boolean;
+    private background: TProjectViewportParams['background'];
     private doResize: boolean = true;
     private readonly doFillParent: boolean;
     private readonly renderAfter:
         | undefined
         | ((ctx: CanvasRenderingContext2D, transform: TViewportTransformXY) => void);
 
-    private onIsDark = (): void => {
-        this.pattern = throwIfNull(
-            this.ctx.createPattern(BB.createCheckerCanvas(10, THEME.isDark()), 'repeat'),
-        );
+    private onIsDark = () => this.render();
+
+    private onPixelatedZoomChange = (): void => {
         this.render();
     };
 
@@ -108,7 +118,7 @@ export class ProjectViewport {
         this.height = p.height;
         this.project = p.project;
         this.useNativeResolution = !!p.useNativeResolution;
-        this.drawBackground = p.drawBackground ?? true;
+        this.background = p.background;
         this.doFillParent = !!p.fillParent;
         this.renderAfter = p.renderAfter;
 
@@ -120,18 +130,19 @@ export class ProjectViewport {
         this.canvas = BB.canvas(this.width * this.resFactor, this.height * this.resFactor);
         this.ctx = BB.ctx(this.canvas);
         css(this.canvas, {
-            width: this.doFillParent ? '100%' : this.width + 'px',
-            height: this.doFillParent ? '100%' : this.height + 'px',
+            width: this.doFillParent ? '100%' : this.width,
+            height: this.doFillParent ? '100%' : this.height,
             imageRendering:
                 Math.round(devicePixelRatio) !== devicePixelRatio ? undefined : 'pixelated',
             display: 'block',
+            // achieves accurate mixing with all layer mix modes
+            background: 'var(--kl-checkerboard-background)',
+            backgroundSize: '20px',
         });
         window.addEventListener('resize', this.resizeListener);
 
-        this.pattern = throwIfNull(
-            this.ctx.createPattern(BB.createCheckerCanvas(10, THEME.isDark()), 'repeat'),
-        );
         THEME.addIsDarkListener(this.onIsDark);
+        addIsPixelatedZoomListener(this.onPixelatedZoomChange);
 
         // this.render();
     }
@@ -148,8 +159,12 @@ export class ProjectViewport {
         if (this.doResize) {
             this.doResize = false;
             this.resFactor = this.useNativeResolution ? devicePixelRatio : 1;
-            this.canvas.width = Math.round(this.width * this.resFactor);
-            this.canvas.height = Math.round(this.height * this.resFactor);
+            changeCanvasDimensions(
+                this.canvas,
+                Math.round(this.width * this.resFactor),
+                Math.round(this.height * this.resFactor),
+                // we'll clear later anyway
+            );
         }
 
         const renderedTransform: TViewportTransformXY = optimizeForAnimation
@@ -157,49 +172,49 @@ export class ProjectViewport {
                   x: transform.x,
                   y: transform.y,
                   angleDeg: transform.angleDeg,
-                  scaleX: transform.scale,
+                  scaleX: transform.isMirrored ? -transform.scale : transform.scale,
                   scaleY: transform.scale,
               }
             : {
                   x: Math.round(transform.x),
                   y: Math.round(transform.y),
-                  scaleX: fixScale(transform.scale, this.project.width),
+                  scaleX:
+                      (transform.isMirrored ? -1 : 1) *
+                      fixScale(transform.scale, this.project.width),
                   scaleY: fixScale(transform.scale, this.project.height),
                   angleDeg: transform.angleDeg,
               };
         const renderedMat = createMatrixFromTransform(renderedTransform);
+        this.renderedTransform = renderedTransform;
+        const absRenderedScaleX = Math.abs(renderedTransform.scaleX);
 
         this.ctx.save();
 
-        if (
-            renderedTransform.scaleX >= 4 ||
-            (renderedTransform.scaleX === 1 && renderedTransform.angleDeg === 0)
-        ) {
-            this.ctx.imageSmoothingEnabled = false;
-        } else {
-            this.ctx.imageSmoothingEnabled = true;
-            this.ctx.imageSmoothingQuality = 'low'; // art.scale >= 1 ? 'low' : 'medium';
+        const isImageSmoothingEnabled =
+            !isPixelatedZoomEnabled() &&
+            absRenderedScaleX < 4 &&
+            (absRenderedScaleX !== 1 || renderedTransform.angleDeg !== 0);
+        this.ctx.imageSmoothingEnabled = isImageSmoothingEnabled;
+        if (isImageSmoothingEnabled) {
+            this.ctx.imageSmoothingQuality = 'low';
         }
-        // this.ctx.imageSmoothingEnabled = false;
 
-        if (this.drawBackground) {
-            this.ctx.fillStyle = isDark ? 'rgb(33, 33, 33)' : 'rgb(158,158,158)';
+        // draw background
+        if (this.background === 'checker') {
+            this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        } else {
+            this.ctx.fillStyle =
+                this.background ?? (isDark ? 'rgb(33, 33, 33)' : 'rgb(158,158,158)');
             this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
-        } else {
-            this.ctx.fillStyle = this.pattern;
-            this.ctx.fillRect(0, 0, this.width, this.height);
         }
 
-        // this.ctx.scale(this.resFactor, this.resFactor);
-        this.ctx.translate(renderedTransform.x, renderedTransform.y);
-        this.ctx.scale(renderedTransform.scaleX, renderedTransform.scaleY);
-        this.ctx.rotate((renderedTransform.angleDeg / 180) * Math.PI);
-
-        if (this.drawBackground) {
+        this.ctx.transform(...matrixToTuple(renderedMat));
+        {
             this.ctx.save();
 
+            // outline
             this.ctx.fillStyle = THEME.isDark() ? 'rgba(255,255,255,0.25)' : 'rgba(0,0,0,0.2)';
-            const scaledPixelX = 1 / renderedTransform.scaleX;
+            const scaledPixelX = 1 / absRenderedScaleX;
             const scaledPixelY = 1 / renderedTransform.scaleY;
             this.ctx.fillRect(
                 -scaledPixelX,
@@ -208,41 +223,41 @@ export class ProjectViewport {
                 this.project.height + scaledPixelY * 2,
             );
 
-            this.ctx.fillStyle = this.pattern;
-            try {
-                // setTransform got browser support since 2018-2020. catch if fails.
-                this.pattern.setTransform(inverse(renderedMat));
-            } catch (e) {
-                /* */
-            }
-            this.ctx.fillRect(0, 0, this.project.width, this.project.height);
+            // checkerboard
+            this.ctx.clearRect(0, 0, this.project.width, this.project.height);
 
             this.ctx.restore();
         }
 
-        this.project.layers.forEach((layer) => {
-            if (!layer.isVisible || !layer.opacity) {
-                return;
-            }
-            this.ctx.save();
-            this.ctx.globalCompositeOperation = layer.mixModeStr;
-            this.ctx.globalAlpha = layer.opacity;
-
-            let image: CanvasImageSource;
-            if (typeof layer.image === 'function') {
-                const res = layer.image(renderedTransform, this.canvas.width, this.canvas.height);
-                if ('image' in res && 'transform' in res) {
-                    image = res.image;
-                    this.ctx.setTransform(...matrixToTuple(compose(renderedMat, res.transform)));
-                } else {
-                    image = res;
+        // Resolve dynamic sources once per render so the base and its mask use the same image.
+        const renderedImages = new Map<TProjectViewportLayer, TRenderedImage>();
+        this.compositor.draw(
+            this.ctx,
+            this.project.layers,
+            this.project.width,
+            this.project.height,
+            (ctx, layer) => {
+                let renderedImage = renderedImages.get(layer);
+                if (!renderedImage) {
+                    if (typeof layer.image === 'function') {
+                        const result = layer.image(
+                            this.renderedTransform,
+                            this.canvas.width,
+                            this.canvas.height,
+                        );
+                        renderedImage =
+                            'image' in result && 'transform' in result ? result : { image: result };
+                    } else {
+                        renderedImage = { image: layer.image };
+                    }
+                    renderedImages.set(layer, renderedImage);
                 }
-            } else {
-                image = layer.image;
-            }
-            this.ctx.drawImage(image, 0, 0); // , this.project.width, this.project.height);
-            this.ctx.restore();
-        });
+                if (renderedImage.transform) {
+                    ctx.transform(...matrixToTuple(renderedImage.transform));
+                }
+                ctx.drawImage(renderedImage.image, 0, 0);
+            },
+        );
 
         this.renderAfter?.(this.ctx, renderedTransform);
 
@@ -251,7 +266,7 @@ export class ProjectViewport {
                 this.ctx,
                 this.project.width,
                 this.project.height,
-                renderedTransform.scaleX,
+                absRenderedScaleX,
             );
 
         this.ctx.restore();
@@ -263,8 +278,8 @@ export class ProjectViewport {
         this.height = height;
 
         css(this.canvas, {
-            width: this.doFillParent ? '100%' : this.width + 'px',
-            height: this.doFillParent ? '100%' : this.height + 'px',
+            width: this.doFillParent ? '100%' : this.width,
+            height: this.doFillParent ? '100%' : this.height,
         });
     }
 
@@ -274,6 +289,11 @@ export class ProjectViewport {
 
     setProject(project: TProjectViewportProject): void {
         this.project = project;
+    }
+
+    setBackground(background?: TProjectViewportBackground): void {
+        this.background = background;
+        this.render();
     }
 
     getTransform(): TViewportTransform {
@@ -295,7 +315,9 @@ export class ProjectViewport {
 
     destroy(): void {
         BB.freeCanvas(this.canvas);
+        this.compositor.destroy();
         THEME.removeIsDarkListener(this.onIsDark);
+        removeIsPixelatedZoomListener(this.onPixelatedZoomChange);
         window.removeEventListener('resize', this.resizeListener);
     }
 }

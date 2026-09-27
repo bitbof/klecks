@@ -37,7 +37,7 @@ export function applyFxFilter(
     originalTexture.destroy();
     fxCanvas.update();
     context.clearRect(0, 0, context.canvas.width, context.canvas.height);
-    context.drawImage(fxCanvas, 0, 0);
+    context.drawImage(fxCanvas.canvas, 0, 0);
 
     klHistory.push(
         getPushableLayerChange(

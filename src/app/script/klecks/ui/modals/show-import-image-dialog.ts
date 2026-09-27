@@ -1,11 +1,12 @@
 import { BB } from '../../../bb/bb';
 import { CropCopy } from '../components/crop-copy';
 import { Checkbox } from '../components/checkbox';
-import { showModal } from './base/showModal';
+import { showModal } from './base/show-modal';
 import { LANG } from '../../../language/language';
 import { TKeyString, TRect } from '../../../bb/bb-types';
 import { TKlPsd, TKlPsdError } from '../../kl-types';
 import { css } from '../../../bb/base/base';
+import { Destroyer } from '../../../bb/base/base';
 
 /**
  * Shows first dialog when importing an image.
@@ -39,12 +40,13 @@ export function showImportImageDialog(p: {
     ) => void;
 }): void {
     const rootEl = BB.el();
+    const destroyer = new Destroyer();
     const isSmall = window.innerWidth < 550 || window.innerHeight < 550;
     const style: TKeyString = isSmall ? {} : { width: '540px' };
 
     const resolutionEl = BB.el({
         css: {
-            marginTop: '10px',
+            marginTop: 10,
             textAlign: 'center',
             color: '#888',
             lineHeight: '20px',
@@ -64,7 +66,7 @@ export function showImportImageDialog(p: {
         },
     });
     css(cropCopy.getElement(), {
-        marginLeft: '-20px',
+        marginLeft: -20,
     });
     cropCopy.getElement().title = LANG('crop-drag-to-crop');
 
@@ -85,10 +87,8 @@ export function showImportImageDialog(p: {
 
     let doFlatten = false;
     function showWarnings(psdWarningArr: TKlPsdError[]): void {
-        const contentArr = [];
         const warningMap = {
             mask: 'Masks not supported. Mask was applied.',
-            clipping: 'Clipping not supported. Clipping layers were merged.',
             group: 'Groups not supported. Layers were ungrouped.',
             adjustment: 'Adjustment layers not supported.',
             'layer-effect': 'Layer effects not supported.',
@@ -96,9 +96,7 @@ export function showImportImageDialog(p: {
             'blend-mode': 'Unsupported layer blend mode.',
             'bits-per-channel': 'Unsupported color depth. Only 8bit per channel supported.',
         };
-        for (let i = 0; i < psdWarningArr.length; i++) {
-            contentArr.push('- ' + warningMap[psdWarningArr[i]]);
-        }
+        const contentArr = psdWarningArr.map((warning) => '- ' + warningMap[warning]);
         alert(contentArr.join('\n'));
     }
 
@@ -125,8 +123,9 @@ export function showImportImageDialog(p: {
                 warningsEl = BB.el({
                     parent: noteEl,
                     tagName: 'a',
+                    destroyer,
                     content: 'Details',
-                    css: { marginLeft: '5px' },
+                    css: { marginLeft: 5 },
                     onClick: () => showWarnings(warnings),
                 });
                 rootEl.append(noteEl);
@@ -140,55 +139,59 @@ export function showImportImageDialog(p: {
         }
     }
 
-    function callback(result: string): void {
-        const croppedCanvas = cropCopy.getCroppedCanvas();
-        const cropRect = cropCopy.getCropRect();
-        const isCropped = p.image.width !== cropRect.width || p.image.height !== cropRect.height;
-        cropCopy.destroy();
-        BB.destroyEl(warningsEl);
-        if (flattenCheckbox) {
-            flattenCheckbox.destroy();
-        }
-
-        if (result === LANG('import-btn-as-layer')) {
-            p.callback({
-                type: 'as-layer',
-                image: isCropped ? croppedCanvas : p.image.canvas,
-            });
-            if (!isCropped) {
-                BB.freeCanvas(croppedCanvas);
-            }
-        } else if (result === LANG('import-btn-as-image')) {
-            if (p.image.type === 'psd') {
-                if (doFlatten) {
-                    delete p.image.layers;
-                }
-                p.callback({
-                    type: 'as-image-psd',
-                    image: p.image,
-                    cropObj: cropRect,
-                });
-                BB.freeCanvas(croppedCanvas);
-            } else if (p.image.type === 'image') {
-                p.callback({
-                    type: 'as-image',
-                    image: croppedCanvas,
-                });
-            }
-        } else {
-            p.callback({
-                type: 'cancel',
-            });
-            BB.freeCanvas(croppedCanvas);
-        }
-    }
     showModal({
         message: `<b>${LANG('import-title')}</b>`,
         div: rootEl,
         style,
-        buttons: [LANG('import-btn-as-layer'), LANG('import-btn-as-image'), 'Cancel'],
-        primaries: [LANG('import-btn-as-layer'), LANG('import-btn-as-image')],
-        callback,
-        autoFocus: 'As Image',
+        buttons: [
+            { id: 'as-layer', label: LANG('import-btn-as-layer') },
+            { id: 'as-image', label: LANG('import-btn-as-image') },
+            'Cancel',
+        ],
+        primaries: ['as-layer', 'as-image'],
+        callback: (result) => {
+            const croppedCanvas = cropCopy.getCroppedCanvas();
+            const cropRect = cropCopy.getCropRect();
+            const isCropped =
+                p.image.width !== cropRect.width || p.image.height !== cropRect.height;
+            cropCopy.destroy();
+            destroyer.destroy();
+            if (flattenCheckbox) {
+                flattenCheckbox.destroy();
+            }
+
+            if (result === 'as-layer') {
+                p.callback({
+                    type: 'as-layer',
+                    image: isCropped ? croppedCanvas : p.image.canvas,
+                });
+                if (!isCropped) {
+                    BB.freeCanvas(croppedCanvas);
+                }
+            } else if (result === 'as-image') {
+                if (p.image.type === 'psd') {
+                    if (doFlatten) {
+                        delete p.image.layers;
+                    }
+                    p.callback({
+                        type: 'as-image-psd',
+                        image: p.image,
+                        cropObj: cropRect,
+                    });
+                    BB.freeCanvas(croppedCanvas);
+                } else if (p.image.type === 'image') {
+                    p.callback({
+                        type: 'as-image',
+                        image: croppedCanvas,
+                    });
+                }
+            } else {
+                p.callback({
+                    type: 'cancel',
+                });
+                BB.freeCanvas(croppedCanvas);
+            }
+        },
+        autoFocus: 'as-image',
     });
 }

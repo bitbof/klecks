@@ -1,11 +1,12 @@
 import { BB } from '../../../bb/bb';
+import { TCss } from '../../../bb/bb-types';
 
 export type TIconParams = {
     imageUrl: string;
     width: number;
     height: number;
     darkInvert?: boolean;
-    css?: Partial<CSSStyleDeclaration>;
+    css?: TCss;
 };
 
 export class Icon {
@@ -20,8 +21,8 @@ export class Icon {
                 backgroundSize: 'contain',
                 backgroundPosition: 'center',
                 backgroundRepeat: 'no-repeat',
-                width: p.width + 'px',
-                height: p.height + 'px',
+                width: p.width,
+                height: p.height,
                 ...p.css,
             },
         });

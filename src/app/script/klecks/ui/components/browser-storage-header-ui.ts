@@ -1,19 +1,22 @@
 import { BB } from '../../../bb/bb';
 import { LANG } from '../../../language/language';
 import { showIframeModal } from '../modals/show-iframe-modal';
+import { createHelpButton } from './help-button';
+import { Destroyer } from '../../../bb/base/base';
 
 export class BrowserStorageHeaderUi {
     private readonly rootEl: HTMLElement;
     private readonly infoButton: HTMLElement;
+    private readonly destroyer = new Destroyer();
 
     // ----------------------------------- public -----------------------------------
-    constructor() {
-        this.infoButton = BB.el({
-            content: '?',
-            className: 'kl-info-btn',
+    constructor(helpPath: string) {
+        this.infoButton = createHelpButton({
             title: LANG('file-storage-about'),
+            isFocusable: false,
+            destroyer: this.destroyer,
             onClick: () => {
-                showIframeModal('./help/#help-browser-storage', false);
+                showIframeModal(helpPath + '#help-browser-storage', false);
             },
         });
 
@@ -22,7 +25,7 @@ export class BrowserStorageHeaderUi {
             css: {
                 display: 'flex',
                 margin: '-5px 0',
-                gap: '6px',
+                gap: 6,
             },
         });
         this.rootEl.append(this.infoButton);
@@ -35,6 +38,6 @@ export class BrowserStorageHeaderUi {
     show(): void {}
 
     destroy(): void {
-        BB.destroyEl(this.infoButton);
+        this.destroyer.destroy();
     }
 }

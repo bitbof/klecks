@@ -3,6 +3,7 @@
     color-scheme: dark;
 
     --ui-bg-dark: #333;
+    --ui-on-bg-full-contrast: #fff;
     --kl-checkerboard-background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 2 2'><path d='M0,0h2v2H0z' fill='%235a5a5a'/><path d='M0,0h1v1H0zM1,1h1v1H1z' fill='%233f3f3f'/></svg>")
         0 0 / 8px;
 
@@ -32,6 +33,10 @@
 
     .toolspace-row-button-activated {
         background: #6e6e6e;
+    }
+
+    .toolspace-row-button {
+        color: #949494;
     }
 
     .toolspace-row-button-hover {
@@ -68,9 +73,9 @@
         background-color: #6e6e6e;
     }
 
-    .tabrow__tab div {
+    /*.tabrow__tab div {
         filter: brightness(0.45);
-    }
+    }*/
 
     .tabrow__tab:not(.tabrow__tab--opened, .tabrow__tab--opened-accented):hover {
         background-color: #535353;
@@ -149,7 +154,6 @@
         }
     }
 
-    button,
     .kl-button {
         color: #ccc;
         background-color: #4a4a4a;
@@ -158,22 +162,19 @@
         user-select: none;
     }
 
-    button:hover,
     .kl-button:hover {
         background-color: #555;
         color: #eee;
     }
 
-    button:active,
     .kl-button:active {
         background-color: #555;
         color: #fff;
         box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.2);
     }
 
-    button:disabled,
     .kl-button:disabled {
-        color: #999;
+        color: #777;
         background-color: transparent;
         background-image: none;
         box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.1);
@@ -207,7 +208,6 @@
         }
     }
 
-    button:not(.kl-button-primary, .kl-button-cancel) img:not(.dark-no-invert),
     .kl-button:not(.kl-button-primary, .kl-button-cancel) img:not(.dark-no-invert) {
         filter: invert(1) hue-rotate(180deg);
     }
@@ -216,6 +216,7 @@
     textarea {
         background: #333;
         color: #ccc;
+        border-color: #777;
     }
 
     input:focus,
@@ -241,26 +242,6 @@
     .kl-checkbox--highlight {
         background: none;
         box-shadow: 0 0 0 1px var(--active-highlight-color);
-    }
-
-    .kl-option {
-        background: var(--ui-bg-dark);
-        color: #ccc;
-        box-shadow: inset 0 0 0 1px #606060;
-
-        &:not(.kl-option-selected):hover {
-            background: #444;
-        }
-
-        &:not(.kl-option-selected):active {
-            box-shadow: inset 0 0 0 2px #666;
-        }
-    }
-
-    .kl-option-selected {
-        background: #606060;
-        color: #fff;
-        box-shadow: inset 0 0 0 2px var(--active-highlight-color);
     }
 
     .kl-box-toggle {
@@ -359,12 +340,8 @@
         }
     }
 
-    .popup-x {
-        filter: invert(1);
-    }
-
     .popup-x:hover {
-        filter: invert(1) brightness(1.4);
+        filter: brightness(1.1);
     }
 
     .kl-preview-wrapper {
@@ -469,8 +446,16 @@
         box-shadow: 0 0 0 1px #5e5e5e;
     }
 
-    .kl-info-btn {
-        box-shadow: inset 0 0 0 1px #ffff;
+    .kl-help-btn {
+        color: #aaa;
+        background: none;
+
+        &:hover,
+        &:active {
+            color: #fff;
+            box-shadow: none;
+            background: none;
+        }
     }
 
     .kl-layer {
@@ -532,19 +517,6 @@
         border-top: 1px solid #fff3;
     }
 
-    .kl-color-option {
-        box-shadow: 0 0 0 1px #7a7a7a;
-        &:not(.kl-color-option--active):active {
-            box-shadow: 0 0 0 2px #7a7a7a;
-        }
-    }
-
-    .kl-color-option--active {
-        box-shadow:
-            0 0 0 2px var(--active-highlight-color),
-            0 0 5px 0 var(--active-highlight-color);
-    }
-
     .kl-text-error {
         color: #ff3838;
     }
@@ -557,7 +529,8 @@
         background: rgba(0, 0, 0, 0.5);
     }
 
-    .kl-floating-window-header {
+    .kl-floating-window {
         background: var(--ui-bg-dark);
+        box-shadow: 0 0 0 1px #636363;
     }
 }

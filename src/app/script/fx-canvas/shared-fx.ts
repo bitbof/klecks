@@ -1,5 +1,6 @@
 import { fxCanvas } from './fx-canvas';
 import { TFxCanvas } from './fx-canvas-types';
+import { asyncThrow } from '../bb/base/base';
 
 let failed = false;
 let fx: TFxCanvas | null = null;
@@ -10,15 +11,13 @@ export function getSharedFx(): TFxCanvas | null {
         return fx;
     }
 
-    if (!fx || fx._.gl.isContextLost()) {
+    if (!fx || fx.isContextLost()) {
         try {
             fx = fxCanvas();
         } catch (e) {
             failed = true;
             fx = null;
-            setTimeout(() => {
-                throw e;
-            });
+            asyncThrow(e);
         }
     }
     return fx;

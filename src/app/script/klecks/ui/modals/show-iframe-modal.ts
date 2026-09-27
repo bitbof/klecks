@@ -1,23 +1,45 @@
 import { BB } from '../../../bb/bb';
+import { Destroyer } from '../../../bb/base/base';
 import { DynamicModal } from './base/dynamic-modal';
 import { LANG } from '../../../language/language';
 
-export function showIframeModal(url: string, isEmbed: boolean) {
+type TIframeModalOptions = {
+    allowSmallScreenWindowOpen?: boolean;
+    showOpenInNewTabLink?: boolean;
+    closeOnMessage?: {
+        action: string;
+        origin: string;
+    };
+    modalWidth?: number;
+    modalHeight?: number;
+    iframeWidth?: string;
+    iframeHeight?: string;
+    iframeTitle?: string;
+};
+
+export function showIframeModal(url: string, isEmbed: boolean, options?: TIframeModalOptions) {
     // window very small, modal might look bad
-    if (!isEmbed && (window.innerHeight < 500 || window.innerWidth < 700)) {
+    if (
+        !isEmbed &&
+        options?.allowSmallScreenWindowOpen !== false &&
+        (window.innerHeight < 500 || window.innerWidth < 700)
+    ) {
         window.open(url);
         return;
     }
 
+    const destroyer = new Destroyer();
     const iframe = BB.el({
         tagName: 'iframe',
-        custom: {
+        props: {
             src: url,
+            title: options?.iframeTitle || 'Iframe Content',
         },
         css: {
-            width: '100%',
-            height: '100%',
-            opacity: '0',
+            width: options?.iframeWidth || '100%',
+            height: options?.iframeHeight || '100%',
+            border: 0,
+            opacity: 0,
         },
     });
     setTimeout(() => {
@@ -26,14 +48,17 @@ export function showIframeModal(url: string, isEmbed: boolean) {
 
     const titleEl = BB.el();
 
+    const showOpenInNewTabLink = !isEmbed && options?.showOpenInNewTabLink !== false;
+
     let linkEl: HTMLElement | undefined;
-    if (!isEmbed) {
+    if (showOpenInNewTabLink) {
         linkEl = BB.el({
             tagName: 'a',
             parent: titleEl,
+            destroyer,
             content: LANG('modal-new-tab'),
-            custom: {
-                href: 'help',
+            props: {
+                href: url,
                 target: '_blank',
             },
             onClick: function () {
@@ -54,15 +79,40 @@ export function showIframeModal(url: string, isEmbed: boolean) {
         };
     }
 
+    const onMessage = options?.closeOnMessage
+        ? (event: MessageEvent) => {
+              if (event.origin !== options.closeOnMessage?.origin) {
+                  return;
+              }
+              if (
+                  typeof event.data !== 'object' ||
+                  !event.data ||
+                  event.data.action !== options.closeOnMessage?.action
+              ) {
+                  return;
+              }
+              if (event.source !== iframe.contentWindow) {
+                  return;
+              }
+              popup.close();
+          }
+        : undefined;
+    if (onMessage) {
+        window.addEventListener('message', onMessage);
+    }
+
     const popup = new DynamicModal({
         title: titleEl,
         content: iframe,
-        width: 880,
-        isMaxHeight: true,
+        width: options?.modalWidth || 880,
+        height: options?.modalHeight,
         onClose: () => {
+            if (onMessage) {
+                window.removeEventListener('message', onMessage);
+            }
+            iframe.src = 'about:blank';
             if (linkEl) {
-                iframe.src = 'about:blank';
-                BB.destroyEl(linkEl);
+                destroyer.destroy();
                 linkEl = undefined;
             }
         },

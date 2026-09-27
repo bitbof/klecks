@@ -1,20 +1,22 @@
+import { getIconUrl } from '../../../../icon/icon';
 import { BB } from '../../../../bb/bb';
 import { TRenderTextParam, TTextFormat } from '../../../image-operations/render-text';
 import { Input } from '../../components/input';
 import { LANG } from '../../../../language/language';
 import { ImageRadioList } from '../../components/image-radio-list';
-import alignLeftImg from 'url:/src/app/img/ui/align-left.svg';
-import alignCenterImg from 'url:/src/app/img/ui/align-center.svg';
-import alignRightImg from 'url:/src/app/img/ui/align-right.svg';
-import typoItalicImg from 'url:/src/app/img/ui/typo-italic.svg';
-import typoBoldImg from 'url:/src/app/img/ui/typo-bold.svg';
 import { ImageToggle } from '../../components/image-toggle';
-import { Select } from '../../components/select';
+import { SelectCustom } from '../../components/select-custom';
 import { c } from '../../../../bb/base/c';
 import { PointerListener } from '../../../../bb/input/pointer-listener';
+import { Destroyer } from '../../../../bb/base/base';
 import { FONTS } from '../../../../../fonts/fonts';
-import { showModal } from '../base/showModal';
+import { showError } from '../base/show-modal';
 
+const alignLeftImg = getIconUrl('align-left');
+const alignCenterImg = getIconUrl('align-center');
+const alignRightImg = getIconUrl('align-right');
+const typoItalicImg = getIconUrl('typo-italic');
+const typoBoldImg = getIconUrl('typo-bold');
 type TFontParams = Pick<
     TRenderTextParam,
     'font' | 'size' | 'letterSpacing' | 'lineHeight' | 'align' | 'isItalic' | 'isBold'
@@ -61,14 +63,15 @@ async function loadBundledFonts(): Promise<void> {
 export class TextToolFontUI {
     private readonly rootEl: HTMLElement;
 
-    private readonly fontSelect: Select<string>;
+    private readonly fontSelect: SelectCustom<string>;
     private readonly fontPointerListener: PointerListener;
 
     private readonly importButton: HTMLButtonElement;
+    private readonly destroyer = new Destroyer();
 
-    private readonly sizeInput: Input;
-    private readonly lineHeightInput: Input;
-    private readonly letterSpacingInput: Input;
+    private readonly sizeInput: Input<number>;
+    private readonly lineHeightInput: Input<number>;
+    private readonly letterSpacingInput: Input<number>;
 
     private readonly alignRadioList: ImageRadioList<TTextFormat>;
     private readonly italicToggle: ImageToggle;
@@ -135,8 +138,8 @@ export class TextToolFontUI {
             }
 
             if (failedToLoadFilenames.length > 0) {
-                showModal({
-                    message: BB.el({
+                showError(
+                    BB.el({
                         content: [
                             LANG('text-failed-import'),
                             c('br'),
@@ -148,8 +151,7 @@ export class TextToolFontUI {
                             acceptedExtensions.join(', '),
                         ],
                     }),
-                    type: 'error',
-                });
+                );
             }
 
             if (!acceptedAtLeastOne) {
@@ -188,7 +190,7 @@ export class TextToolFontUI {
     constructor(p: TFontUIParams) {
         this.onUpdate = p.onUpdate;
 
-        this.fontSelect = new Select<string>({
+        this.fontSelect = new SelectCustom<string>({
             initValue: p.font,
             optionArr: importedFonts.map((i) => {
                 return [
@@ -204,7 +206,7 @@ export class TextToolFontUI {
             }),
             isFocusable: true,
             css: {
-                width: '180px',
+                width: 180,
             },
             onChange: (v) => {
                 this.loadBundledFonts();
@@ -223,7 +225,9 @@ export class TextToolFontUI {
 
         this.importButton = BB.el({
             tagName: 'button',
+            className: 'kl-button',
             content: LANG('file-import'),
+            destroyer: this.destroyer,
             onClick: () => {
                 this.importFont();
             },
@@ -241,8 +245,8 @@ export class TextToolFontUI {
                 'A',
             ],
             css: {
-                width: '25px',
-                height: '25px',
+                width: 25,
+                height: 25,
                 display: 'flex',
                 justifyContent: 'center',
                 alignItems: 'center',
@@ -258,13 +262,11 @@ export class TextToolFontUI {
             init: p.size,
             onChange: (v) => {
                 p.onUpdate({
-                    size: parseFloat(v),
+                    size: v,
                 });
             },
-            doResetIfInvalid: true,
-            doScrollWithoutFocus: true,
             css: {
-                width: '70px',
+                width: 70,
             },
             name: 'font-size',
         });
@@ -278,13 +280,11 @@ export class TextToolFontUI {
             init: p.lineHeight ?? 1,
             onChange: (v) => {
                 p.onUpdate({
-                    lineHeight: parseFloat(v),
+                    lineHeight: v,
                 });
             },
-            doResetIfInvalid: true,
-            doScrollWithoutFocus: true,
             css: {
-                width: '60px',
+                width: 60,
             },
             name: 'line-height',
         });
@@ -297,13 +297,11 @@ export class TextToolFontUI {
             init: p.letterSpacing ?? 0,
             onChange: (v) => {
                 p.onUpdate({
-                    letterSpacing: parseFloat(v),
+                    letterSpacing: v,
                 });
             },
-            doResetIfInvalid: true,
-            doScrollWithoutFocus: true,
             css: {
-                width: '60px',
+                width: 60,
             },
             name: 'letter-spacing',
         });
@@ -391,7 +389,7 @@ export class TextToolFontUI {
         this.fontPointerListener.destroy();
         this.fontSelect.getElement().removeEventListener('focus', this.onFocus);
         this.fontSelect.destroy();
-        BB.destroyEl(this.importButton);
+        this.destroyer.destroy();
         this.sizeInput.destroy();
         this.lineHeightInput.destroy();
         this.letterSpacingInput.destroy();

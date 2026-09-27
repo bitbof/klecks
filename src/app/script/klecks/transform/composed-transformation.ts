@@ -276,8 +276,7 @@ function warpSelection(
             const cosThreshold = Math.cos((angleDegThreshold / 180) * Math.PI);
             const optimizedRing: [number, number][] = [];
             for (let i = 0; i < warpedRing.length - 1; i++) {
-                const prev =
-                    optimizedRing[optimizedRing.length - 1] ?? warpedRing[warpedRing.length - 1];
+                const prev = optimizedRing.at(-1) ?? warpedRing.at(-1)!;
                 const curr = warpedRing[i];
                 const next = warpedRing[(i + 1) % warpedRing.length];
                 const ax = curr[0] - prev[0];
@@ -294,7 +293,7 @@ function warpSelection(
                     optimizedRing.push(curr);
                 }
             }
-            optimizedRing.push(warpedRing[warpedRing.length - 1]);
+            optimizedRing.push(warpedRing.at(-1)!);
 
             return optimizedRing;
         }),

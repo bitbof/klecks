@@ -12,8 +12,8 @@ export class ToolspaceScroller {
     private readonly toolspace: HTMLElement;
     private readonly upBtn: HTMLElement;
     private readonly downBtn: HTMLElement;
-    private downInterval: any;
-    private upInterval: any;
+    private downInterval: ReturnType<typeof setInterval> | undefined;
+    private upInterval: ReturnType<typeof setInterval> | undefined;
 
     private update(): void {
         let newUpDisplay = this.upBtn.style.display;
@@ -51,7 +51,7 @@ export class ToolspaceScroller {
             title: LANG('scroll'),
             className: 'kl-scroller',
             css: {
-                top: '0',
+                top: 0,
                 transform: 'rotate(180deg)',
             },
         });
@@ -60,7 +60,7 @@ export class ToolspaceScroller {
             title: LANG('scroll'),
             className: 'kl-scroller',
             css: {
-                bottom: '0',
+                bottom: 0,
             },
         });
         this.updateUiState(p.uiState);
@@ -69,16 +69,21 @@ export class ToolspaceScroller {
             target: this.upBtn,
             onPointer: (e) => {
                 if (e.type === 'pointerdown') {
+                    clearInterval(this.upInterval);
                     this.upInterval = setInterval(() => {
                         this.toolspace.scrollBy(0, -13);
                         this.update();
                     }, 20);
                 }
                 if (e.type === 'pointerup') {
-                    clearInterval(this.upInterval);
+                    const interval = this.upInterval;
+                    clearInterval(interval);
                     setTimeout(() => {
-                        // prevent ff pressing anything underneath
-                        this.upInterval = null;
+                        if (this.upInterval !== interval) {
+                            return;
+                        }
+                        // prevent ff clicking something underneath
+                        this.upInterval = undefined;
                         this.update();
                     }, 50);
                 }
@@ -88,16 +93,21 @@ export class ToolspaceScroller {
             target: this.downBtn,
             onPointer: (e) => {
                 if (e.type === 'pointerdown') {
+                    clearInterval(this.downInterval);
                     this.downInterval = setInterval(() => {
                         this.toolspace.scrollBy(0, 13);
                         this.update();
                     }, 20);
                 }
                 if (e.type === 'pointerup') {
-                    clearInterval(this.downInterval);
+                    const interval = this.downInterval;
+                    clearInterval(interval);
                     setTimeout(() => {
-                        // prevent ff pressing anything underneath
-                        this.downInterval = null;
+                        if (this.downInterval !== interval) {
+                            return;
+                        }
+                        // prevent ff clicking something underneath
+                        this.downInterval = undefined;
                         this.update();
                     }, 50);
                 }
@@ -131,12 +141,12 @@ export class ToolspaceScroller {
 
     updateUiState(uiState: 'left' | 'right'): void {
         css(this.upBtn, {
-            left: uiState === 'left' ? '0' : '',
-            right: uiState === 'right' ? '0' : '',
+            left: uiState === 'left' ? 0 : '',
+            right: uiState === 'right' ? 0 : '',
         });
         css(this.downBtn, {
-            left: uiState === 'left' ? '0' : '',
-            right: uiState === 'right' ? '0' : '',
+            left: uiState === 'left' ? 0 : '',
+            right: uiState === 'right' ? 0 : '',
         });
     }
 }

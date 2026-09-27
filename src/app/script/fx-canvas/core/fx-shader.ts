@@ -1,4 +1,4 @@
-import { gl } from './gl';
+import { fxGl, gl } from './gl';
 import { TUniforms } from '../fx-canvas-types';
 import { BB } from '../../bb/bb';
 
@@ -23,21 +23,13 @@ const defaultFragmentSource =
         gl_FragColor = texture2D(texture, texCoord);\
     }';
 
-function isArray(obj: unknown): obj is unknown[] {
-    return Object.prototype.toString.call(obj) == '[object Array]';
-}
-
-function isNumber(obj: unknown): obj is number {
-    return Object.prototype.toString.call(obj) == '[object Number]';
-}
-
 let floatPrecision: 'lowp' | 'mediump' | 'highp' | undefined;
 
 export class FxShader {
     // ---- static ----
     static getDefaultShader(): FxShader {
-        gl.defaultShader = gl.defaultShader || new FxShader();
-        return gl.defaultShader;
+        fxGl.defaultShader ??= new FxShader();
+        return fxGl.defaultShader;
     }
 
     // ---- private ----
@@ -62,8 +54,6 @@ export class FxShader {
 
     // ----------------------------------- public -----------------------------------
     constructor(vertexSource?: string | null, fragmentSource?: string | null, nameStr?: string) {
-        this.vertexAttribute = null;
-        this.texCoordAttribute = null;
         this.program = BB.throwIfNull(gl.createProgram());
         vertexSource = vertexSource || defaultVertexSource;
         fragmentSource = fragmentSource || defaultFragmentSource;
@@ -91,8 +81,8 @@ export class FxShader {
 
     // ---- interface ----
 
-    vertexAttribute: null | number;
-    texCoordAttribute: null | number;
+    vertexAttribute: undefined | number;
+    texCoordAttribute: undefined | number;
     program: WebGLProgram | null; // null = destroyed
 
     destroy(): void {
@@ -109,7 +99,7 @@ export class FxShader {
                 return;
             }
 
-            if (isArray(value)) {
+            if (Array.isArray(value)) {
                 switch (value.length) {
                     case 1:
                         gl.uniform1fv(location, new Float32Array(value));
@@ -137,7 +127,7 @@ export class FxShader {
                             value.length
                         );
                 }
-            } else if (isNumber(value)) {
+            } else if (typeof value === 'number') {
                 gl.uniform1f(location, value);
             } else {
                 throw (
@@ -175,36 +165,37 @@ export class FxShader {
         left = left !== undefined ? (left - viewport[0]) / viewport[2] : 0;
         right = right !== undefined ? (right - viewport[0]) / viewport[2] : 1;
         bottom = bottom !== undefined ? (bottom - viewport[1]) / viewport[3] : 1;
-        if (gl.vertexBuffer === undefined || gl.vertexBuffer === null) {
-            gl.vertexBuffer = BB.throwIfNull(gl.createBuffer());
-        }
-        gl.bindBuffer(gl.ARRAY_BUFFER, gl.vertexBuffer);
+        fxGl.vertexBuffer ??= BB.throwIfNull(gl.createBuffer());
+        const vertexBuffer = fxGl.vertexBuffer;
+        gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
         gl.bufferData(
             gl.ARRAY_BUFFER,
             new Float32Array([left, top, left, bottom, right, top, right, bottom]),
             gl.STATIC_DRAW,
         );
-        if (gl.texCoordBuffer == null) {
-            gl.texCoordBuffer = BB.throwIfNull(gl.createBuffer());
-            gl.bindBuffer(gl.ARRAY_BUFFER, gl.texCoordBuffer);
+        let texCoordBuffer = fxGl.texCoordBuffer;
+        if (texCoordBuffer === undefined) {
+            texCoordBuffer = BB.throwIfNull(gl.createBuffer());
+            fxGl.texCoordBuffer = texCoordBuffer;
+            gl.bindBuffer(gl.ARRAY_BUFFER, texCoordBuffer);
             gl.bufferData(
                 gl.ARRAY_BUFFER,
                 new Float32Array([0, 0, 0, 1, 1, 0, 1, 1]),
                 gl.STATIC_DRAW,
             );
         }
-        if (this.vertexAttribute == null) {
+        if (this.vertexAttribute === undefined) {
             this.vertexAttribute = gl.getAttribLocation(this.program!, 'vertex');
             gl.enableVertexAttribArray(this.vertexAttribute);
         }
-        if (this.texCoordAttribute == null) {
+        if (this.texCoordAttribute === undefined) {
             this.texCoordAttribute = gl.getAttribLocation(this.program!, '_texCoord');
             gl.enableVertexAttribArray(this.texCoordAttribute);
         }
         gl.useProgram(this.program);
-        gl.bindBuffer(gl.ARRAY_BUFFER, gl.vertexBuffer);
+        gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
         gl.vertexAttribPointer(this.vertexAttribute, 2, gl.FLOAT, false, 0, 0);
-        gl.bindBuffer(gl.ARRAY_BUFFER, gl.texCoordBuffer);
+        gl.bindBuffer(gl.ARRAY_BUFFER, texCoordBuffer);
         gl.vertexAttribPointer(this.texCoordAttribute, 2, gl.FLOAT, false, 0, 0);
         gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
     }

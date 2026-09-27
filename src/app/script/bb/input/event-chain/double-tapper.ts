@@ -66,7 +66,7 @@ export class DoubleTapper {
         this.timeoutObj.fail = null;
         this.timeoutObj.success = null;
         this.eventQueueArr = []; // events get swallowed
-        const lastSequenceItem = this.sequenceArr[this.sequenceArr.length - 1];
+        const lastSequenceItem = this.sequenceArr.at(-1)!;
         this.sequenceArr = [];
         if ('pageX' in lastSequenceItem) {
             this.onDoubleTap({
@@ -118,8 +118,7 @@ export class DoubleTapper {
         }
 
         this.nowTime = performance.now();
-        const lastSequenceItem =
-            this.sequenceArr.length > 0 ? this.sequenceArr[this.sequenceArr.length - 1] : null;
+        const lastSequenceItem = this.sequenceArr.at(-1) ?? null;
         if (event.type === 'pointerup') {
             this.lastUpTime = event.time;
         }

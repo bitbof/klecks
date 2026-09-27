@@ -66,10 +66,7 @@ export class InertiaScrolling {
         const transform = this.getTransform();
         if (
             this.lastTransform &&
-            (this.lastTransform.x !== transform.x ||
-                this.lastTransform.y !== transform.y ||
-                this.lastTransform.x !== transform.x ||
-                this.lastTransform.x !== transform.x)
+            (this.lastTransform.x !== transform.x || this.lastTransform.y !== transform.y)
         ) {
             this.momentum.x = 0;
             this.momentum.y = 0;
@@ -111,14 +108,14 @@ export class InertiaScrolling {
             x: BB.mix(this.momentum.x, dX, 0.6),
             y: BB.mix(this.momentum.y, dY, 0.6),
         };
-        this.lastDragTimestamp = new Date().getTime();
+        this.lastDragTimestamp = Date.now();
     }
 
     dragEnd(): void {
         if (!this.isEnabled) {
             return;
         }
-        if (new Date().getTime() - this.lastDragTimestamp > 80) {
+        if (Date.now() - this.lastDragTimestamp > 80) {
             this.momentum.x = 0;
             this.momentum.y = 0;
         } else {
@@ -128,6 +125,11 @@ export class InertiaScrolling {
         this.lastTransform = undefined;
         this.lastDragTimestamp = 0;
         this.isDragging = false;
+    }
+
+    // true while a fling is still moving
+    getIsActive(): boolean {
+        return this.animationFrameHandle !== undefined;
     }
 
     setIsEnabled(b: boolean): void {

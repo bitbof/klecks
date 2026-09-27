@@ -2,6 +2,8 @@ import { THistoryEntry, THistoryEntryData, THistoryEntryDataComposed } from './h
 import { composeHistoryStateData } from './compose-history-state-data';
 import { estimateBytes } from './estimate-bytes';
 import { entryCausesChange } from './entry-causes-change';
+import { getTotalMemoryBytes, trimOldestEntries } from './trim-oldest-entries';
+import { validateHistoryEntry } from './validate-history-entry';
 
 /*
 todo memory could be better limited.
@@ -22,37 +24,11 @@ export type TKlHistoryParams = {
 const HISTORY_DEBUGGING = false;
 
 export class KlHistory {
-    // total number of non-free undo steps
-    private readonly maxUndoSteps: number = 20;
-
-    /*
-    All entries together can't exceed this limit. Supersedes maxUndoSteps. Intended
-    to ensure app stability.
-
-    The worst-case (memory wise) happens when the project at max size with max layers is
-    rotated repeatedly, or the user continually imports a large project.
-
-    max image size:      2048 x 2048
-    max layers:          16
-    max history entries: 20 + 1 (+1 is the current state of KlCanvas)
-          1 layer @ 2048 x 2048 = 16,777,216 Bytes    = 16.78 MB    = 0.02 GB
-         16 layer @ 2048 x 2048 = 268,435,456 Bytes   = 268.44 MB   = 0.27 GB
-    21 x 16 layer @ 2048 x 2048 = 5,637,144,576 Bytes = 5,637.14 MB = 5.64 GB
-
-    (2024-09) Low-end Chromebooks may only have 2GB of RAM. 5.64 GB would be too much.
-    Going with 1 GB, which is 3.7 worst-case undo steps.
-     */
-    private readonly totalThresholdBytes: number = 1e9;
-
-    // up to a certain threshold an undo step counts as free, and doesn't get you closer to undo
-    // step limit. E.g. renaming a layer has virtually no impact on memory or performance.
-    private readonly isFreeThresholdBytes: number = 2048; // 2kb -> 1000 steps are 2MB
-
     private entries: THistoryEntry[]; // diffs or what changed each step. 0 is oldest
     private index: number = 0; // current action the user is on.
     private composed: THistoryEntryDataComposed; // all diffs until current action combined
 
-    private indexOffset: number = 0; // for getting the total number of actions (beyond undo limit)
+    private totalActions: number = 0;
     private changeCount: number = 0; // number keeps incrementing with each change (push, undo, redo)
     private pauseStack: number = 0; // how often paused without unpause. push does nothing when paused.
     private readonly listeners: TKlHistoryListener[] = []; // broadcasts on undo, redo, push
@@ -63,7 +39,7 @@ export class KlHistory {
             for (let i = 0; i < this.listeners.length; i++) {
                 this.listeners[i]();
             }
-        }, 1);
+        });
     }
 
     private updateComposed(): void {
@@ -74,9 +50,10 @@ export class KlHistory {
 
     // ----------------------------------- public -----------------------------------
     constructor(p: TKlHistoryParams) {
+        validateHistoryEntry(p.oldest, p.oldest.size);
         this.entries = [
             {
-                timestamp: new Date().getTime(),
+                timestamp: Date.now(),
                 memoryEstimateBytes: estimateBytes(p.oldest),
                 data: p.oldest,
             },
@@ -117,8 +94,9 @@ export class KlHistory {
             // no change -> noop
             return;
         }
+        validateHistoryEntry(entryData, this.composed.size);
         const entry: THistoryEntry = {
-            timestamp: new Date().getTime(),
+            timestamp: Date.now(),
             memoryEstimateBytes: estimateBytes(entryData),
             data: entryData,
         };
@@ -146,58 +124,14 @@ export class KlHistory {
             this.entries.push(entry);
         }
 
-        // determine oldest - consider maxUndoSteps, isFree, totalThresholdBytes
-        let remainingSteps = this.maxUndoSteps;
-        let oldestIndex = this.entries.length - 1;
-        let remainingBytes = this.totalThresholdBytes - entry.memoryEstimateBytes;
-        while (oldestIndex > 0 && remainingSteps >= 0) {
-            oldestIndex--;
-            const currentEntryBytes = this.entries[oldestIndex].memoryEstimateBytes;
-            if (currentEntryBytes < this.isFreeThresholdBytes) {
-                remainingBytes -= currentEntryBytes;
-                continue;
-            }
-            if (remainingSteps === 0) {
-                // already used up all steps
-                oldestIndex++;
-                break;
-            }
-            if (remainingBytes - currentEntryBytes < 0) {
-                // used up all memory
-                oldestIndex++;
-                break;
-            }
-            remainingBytes -= currentEntryBytes;
-            remainingSteps--;
-        }
-        // compose forward to the oldest index
-        while (oldestIndex > 0) {
-            const composedData = composeHistoryStateData(
-                this.entries.slice(0, oldestIndex + 1).map((item) => item.data),
-                oldestIndex,
+        this.entries = trimOldestEntries(this.entries);
+        if (HISTORY_DEBUGGING) {
+            const totalBytes = getTotalMemoryBytes(this.entries);
+            console.log(
+                `[KlHistory] pushed ${(entry.memoryEstimateBytes / 1e6).toFixed(1)} MB — total: ${(totalBytes / 1e6).toFixed(1)} MB (${this.entries.length} entries)`,
             );
-            const memoryEstimateBytes = estimateBytes(composedData);
-            this.entries = [
-                {
-                    timestamp: this.entries[oldestIndex].timestamp,
-                    memoryEstimateBytes,
-                    description: 'oldest',
-                    data: composedData,
-                },
-                ...this.entries.slice(oldestIndex + 1),
-            ];
-
-            this.indexOffset += oldestIndex;
-            oldestIndex = 0;
-
-            // despite the earlier check, it can still exceed the threshold
-            if (
-                this.entries.reduce((before, item) => before + item.memoryEstimateBytes, 0) >
-                this.totalThresholdBytes
-            ) {
-                oldestIndex = 1;
-            }
         }
+        this.totalActions++;
         this.index = this.entries.length - 1;
         this.updateComposed();
         this.broadcast();
@@ -242,7 +176,7 @@ export class KlHistory {
     }
 
     getTotalIndex(): number {
-        return this.indexOffset + this.index;
+        return this.totalActions;
     }
 
     isPaused(): boolean {

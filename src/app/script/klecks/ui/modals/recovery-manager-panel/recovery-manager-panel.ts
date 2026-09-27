@@ -1,3 +1,4 @@
+import { getIconSvg } from '../../../../icon/icon';
 import { BB } from '../../../../bb/bb';
 import {
     DEBUG_RETURN_ALL_RECOVERIES,
@@ -7,12 +8,12 @@ import {
     TRecoveryMetaData,
 } from '../../../storage/kl-recovery-manager';
 import { timestampToAge } from '../../utils/timestamp-to-age';
-import { showModal } from '../base/showModal';
-import { copyCanvas } from '../../../../bb/base/canvas';
+import { showModal } from '../base/show-modal';
 import * as classes from './recovery-manager-panel.module.scss';
 import { LANG } from '../../../../language/language';
-import removeLayerImg from 'url:/src/app/img/ui/remove-layer.svg';
-import { css } from '../../../../bb/base/base';
+import { asyncThrow, css, Destroyer } from '../../../../bb/base/base';
+import loadingImg from 'url:/src/app/img/ui/loading.gif';
+import { deserializeRecoveryThumbnail } from '../../../storage/kl-recovery-serialization';
 
 export type TRecoveryManagerPanelParams = {
     klRecoveryManager: KlRecoveryManager;
@@ -27,8 +28,10 @@ export class RecoveryManagerPanel {
         this.update(metas, totalMemoryUsedBytes);
     };
     private readonly klRecoveryManager: KlRecoveryManager;
+    private readonly destroyer = new Destroyer();
 
     async update(metas: TRecoveryMetaData[], totalMemoryUsedBytes: number): Promise<void> {
+        this.destroyer.destroy();
         const elements: HTMLElement[] = [];
         metas
             .sort((a, b) => {
@@ -45,23 +48,33 @@ export class RecoveryManagerPanel {
                     tagName: 'a',
                     className: 'kl-button kl-button-link',
                     content: LANG('tab-recovery-recover'),
-                    custom: {
+                    props: {
                         href: '#' + meta.id,
                         target: '_blank',
                     },
                 });
                 const deleteBtn = BB.el({
                     tagName: 'button',
-                    className: 'kl-button-delete',
-                    content: `<img src="${removeLayerImg}" height="20"/>${LANG('tab-recovery-delete')}`,
+                    className: 'kl-button kl-button-delete',
+                    content: [
+                        getIconSvg('remove-layer', {
+                            height: 20,
+                        }),
+                        LANG('tab-recovery-delete'),
+                    ],
+                    destroyer: this.destroyer,
                     onClick: () => {
                         deleteBtn.blur();
-                        const thumbnail2 = copyCanvas(meta.thumbnail!);
-                        css(thumbnail2, {
-                            alignSelf: 'start',
-                            background: 'var(--kl-checkerboard-background)',
-                            maxWidth: '100%',
-                        });
+                        const thumbnail2 = BB.el();
+                        (async () => {
+                            const preview = await deserializeRecoveryThumbnail(meta.thumbnail);
+                            css(preview, {
+                                alignSelf: 'start',
+                                background: 'var(--kl-checkerboard-background)',
+                                maxWidth: '100%',
+                            });
+                            thumbnail2.append(preview);
+                        })();
                         showModal({
                             type: 'warning',
                             message: BB.el({
@@ -69,11 +82,14 @@ export class RecoveryManagerPanel {
                                 css: {
                                     display: 'flex',
                                     flexDirection: 'column',
-                                    gap: '10px',
+                                    gap: 10,
                                 },
                             }),
-                            buttons: [LANG('tab-recovery-delete'), 'Cancel'],
-                            deleteButtonName: LANG('tab-recovery-delete'),
+                            buttons: [
+                                { id: 'delete', label: LANG('tab-recovery-delete') },
+                                'Cancel',
+                            ],
+                            deleteButton: 'delete',
                             callback: async (result) => {
                                 if (result === 'Cancel') {
                                     return;
@@ -82,24 +98,24 @@ export class RecoveryManagerPanel {
                             },
                         });
                     },
-                    noRef: true,
                 });
-
-                const preview = meta.thumbnail!;
 
                 const previewWrapper = BB.el({
                     tagName: 'a',
-                    content: preview,
                     className: classes.preview,
                     title: LANG('tab-recovery-recover'),
                     css: {
-                        minHeight: RECOVERY_THUMB_HEIGHT_PX + 'px',
+                        minHeight: RECOVERY_THUMB_HEIGHT_PX,
                     },
-                    custom: {
+                    props: {
                         href: '#' + meta.id,
                         target: '_blank',
                     },
                 });
+                (async () => {
+                    const preview = await deserializeRecoveryThumbnail(meta.thumbnail);
+                    previewWrapper.append(preview);
+                })();
 
                 const infoEl = BB.el({
                     content: [
@@ -117,7 +133,7 @@ export class RecoveryManagerPanel {
                         css: {
                             display: 'flex',
                             flexDirection: 'column',
-                            gap: '5px',
+                            gap: 5,
                             maxWidth: '100%',
                         },
                     }),
@@ -170,16 +186,52 @@ export class RecoveryManagerPanel {
         this.klRecoveryManager = p.klRecoveryManager;
         this.rootEl = BB.el({ content: LANG('loading') });
         this.klRecoveryManager.subscribe(this.recoveryListener);
-        setTimeout(async () => {
+
+        const refresh = async () => {
             try {
+                this.rootEl.innerHTML = '';
+                this.rootEl.append(
+                    BB.el({
+                        tagName: 'img',
+                        props: {
+                            src: loadingImg,
+                            alt: '',
+                        },
+                    }),
+                );
                 await this.klRecoveryManager.update();
-            } catch (e) {
-                setTimeout(() => {
-                    throw e;
-                });
-                this.rootEl.innerHTML = 'error';
+            } catch (error) {
+                asyncThrow(error);
+                const errorText =
+                    error instanceof Error ? `${error.name}: ${error.message}` : String(error);
+                this.rootEl.innerHTML = '';
+                this.rootEl.append(
+                    BB.el({
+                        textContent: LANG('error'),
+                    }),
+                    BB.el({
+                        className: 'info-hint',
+                        textContent: errorText,
+                        css: {
+                            marginTop: 5,
+                            fontFamily: 'monospace',
+                            overflowWrap: 'anywhere',
+                        },
+                    }),
+                    BB.el({
+                        tagName: 'button',
+                        className: 'kl-button',
+                        textContent: LANG('retry'),
+                        destroyer: this.destroyer,
+                        onClick: (e) => {
+                            (e.target as HTMLButtonElement).disabled = true;
+                            refresh();
+                        },
+                    }),
+                );
             }
-        });
+        };
+        setTimeout(refresh);
     }
 
     getElement(): HTMLElement {
@@ -188,5 +240,6 @@ export class RecoveryManagerPanel {
 
     destroy(): void {
         this.klRecoveryManager.unsubscribe(this.recoveryListener);
+        this.destroyer.destroy();
     }
 }

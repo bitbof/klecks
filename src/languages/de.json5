@@ -164,6 +164,21 @@
     original: 'Dither',
     value: 'Dither'
   },
+  'brush-pixel-pattern-add': {
+    hint: 'Button tooltip. Creates a new pattern for the pixel brush.',
+    original: 'New Pattern',
+    value: 'Neues Muster'
+  },
+  'brush-pixel-pattern-delete': {
+    hint: 'Button. Deletes a pattern the user created for the pixel brush.',
+    original: 'Delete',
+    value: 'Löschen'
+  },
+  'brush-pixel-pattern-edit-default-error': {
+    hint: 'Error message. Only patterns the user created can be edited, not the built-in ones.',
+    original: "Can't edit default patterns",
+    value: 'Standardmuster können nicht bearbeitet werden'
+  },
   'brush-chemy-fill': {
     hint: 'Like in MS Paint. A shape can have be outlined, and filled.',
     original: 'Fill',
@@ -307,6 +322,11 @@
   'layers-visibility-toggle': {
     original: 'Layer Visibility',
     value: 'Ebenensichtbarkeit'
+  },
+  'layers-clipping': {
+    hint: 'tooltip for toggling whether the active layer is clipped to the layer below',
+    original: 'Clipping Mask',
+    value: 'Schnittmaske'
   },
   'layers-blend-normal': {
     original: 'normal',
@@ -624,6 +644,10 @@
   'tab-recovery-recovered': {
     original: 'Tab recovered.',
     value: 'Tab wiederhergestellt.'
+  },
+  'tab-recovery-restoring-session': {
+    original: 'Restoring your previous session...',
+    value: 'Letzte Sitzung wird wiederhergestellt...'
   },
   'cleared-layer': {
     hint: 'the layer has been cleared. It is now empty',
@@ -944,7 +968,7 @@
   'filter-transform-empty-selection': {
     hint: 'nothing on the layer, in selected area (via select tool), just transparency',
     original: 'Layer is empty in selected area.',
-    value: ''
+    value: 'Ebene ist leer im gewählten Bereich'
   },
   'filter-transform-title': {
     hint: 'same as the button, but can be longer',
@@ -1034,8 +1058,8 @@
   },
   'filter-applied': {
     hint: 'used like this: „Invert“ applied. Informs that a filter was applied',
-    original: 'applied',
-    value: 'angewendet'
+    original: '"{x}" applied',
+    value: '„{x}" angewendet'
   },
   'filter-tilt-shift-title': {
     hint: 'same as the button, but can be longer',
@@ -1189,6 +1213,14 @@
     original: 'Opening file...',
     value: 'Öffne Datei...'
   },
+  'import-many-files-warning': {
+    original: 'You are about to import {x} files. Importing many files at once can cause instability.',
+    value: 'Du importierst {x} Dateien. Viele Dateien auf einmal können zu Instabilität führen.'
+  },
+  'import-many-files-confirm': {
+    original: 'Import {x} files',
+    value: '{x} Dateien importieren'
+  },
   'import-title': {
     original: 'Import Image',
     value: 'Datei öffnen'
@@ -1275,6 +1307,11 @@
     hint: 'makes canvas cover whole working area',
     original: 'Fit',
     value: 'Passen'
+  },
+  'hand-flip': {
+    hint: 'mirrors the view horizontally. The image itself does not change.',
+    original: 'Flip View',
+    value: 'Ansicht spiegeln'
   },
   'hand-inertia-scrolling': {
     hint: 'Canvas will continue to move even after releasing pointer.',
@@ -1491,6 +1528,11 @@
     original: 'Reset',
     value: 'Zurücksetzen'
   },
+  'select-deselect': {
+    hint: 'More descriptive than "reset". Used as tooltip on the selection indicator.',
+    original: 'Deselect',
+    value: 'Auswahl aufheben'
+  },
   'select-fill': {
     original: 'Fill',
     value: 'Füllen'
@@ -1596,6 +1638,10 @@
   'settings-theme': {
     original: 'Theme',
     value: 'Farbe'
+  },
+  'settings-pixelated-zoom': {
+    original: 'Always pixelated zoom',
+    value: 'Immer pixelig zoomen'
   },
   'settings-save-reminder-label': {
     original: 'Save Reminder',
@@ -1786,5 +1832,13 @@
   dismiss: {
     original: 'Dismiss',
     value: 'Schließen'
+  },
+  error: {
+    original: 'Error',
+    value: 'Fehler'
+  },
+  retry: {
+    original: 'Retry',
+    value: 'Erneut versuchen'
   }
 }

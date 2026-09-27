@@ -22,8 +22,8 @@ export class DraggableInput {
     private update(): void {
         const p = applyToPoint(createMatrixFromTransform(this.transform), this.value);
         css(this.rootEl, {
-            left: p.x - SIZE / 2 + 'px',
-            top: p.y - SIZE / 2 + 'px',
+            left: p.x - SIZE / 2,
+            top: p.y - SIZE / 2,
         });
     }
 
@@ -35,15 +35,16 @@ export class DraggableInput {
             y: 0,
             scale: 1,
             angleDeg: 0,
+            isMirrored: false,
         };
 
         this.rootEl = BB.el({
             css: {
-                width: SIZE + 'px',
-                height: SIZE + 'px',
+                width: SIZE,
+                height: SIZE,
                 backgroundColor: '#fff',
                 border: '2px solid #000',
-                borderRadius: SIZE + 'px',
+                borderRadius: SIZE,
                 position: 'absolute',
                 cursor: 'move',
                 userSelect: 'none',

@@ -1,18 +1,20 @@
 import { BB } from '../../../bb/bb';
 import { PointerListener } from '../../../bb/input/pointer-listener';
 import { css } from '../../../bb/base/base';
+import { TCss } from '../../../bb/bb-types';
+import { Destroyer } from '../../../bb/base/base';
 
 // type all functions
 
 type TTabInit = {
     id: string; // e.g. 'draw',
-    label?: string;
+    label?: string | HTMLElement | SVGSVGElement;
     image?: string; // background image
     title?: string;
     isVisible?: boolean; // default is true
     onOpen: () => void;
     onClose: () => void;
-    css?: Partial<CSSStyleDeclaration>;
+    css?: TCss;
 };
 
 type TTab = {
@@ -34,6 +36,7 @@ export class TabRow {
     private activeTab: TTab;
     private readonly roundRight: HTMLElement;
     private readonly roundLeft: HTMLElement;
+    private readonly destroyer = new Destroyer();
 
     // update
     update(): void {
@@ -53,7 +56,7 @@ export class TabRow {
         this.rootEl = BB.el({
             className: 'tabrow',
             css: {
-                height: height + 1 + 'px',
+                height: height + 1,
             },
         });
 
@@ -100,6 +103,7 @@ export class TabRow {
                         lineHeight: height + 'px',
                         display: isVisible ? 'block' : 'none',
                     },
+                    destroyer: this.destroyer,
                     onClick: () => {
                         if (this.activeTab === result) {
                             return;
@@ -120,7 +124,7 @@ export class TabRow {
                         backgroundPosition: 'center',
                         backgroundRepeat: 'no-repeat',
                         display: 'flex',
-                        height: height - 7 + 'px',
+                        height: height - 7,
                         justifyContent: 'center',
                         margin: '4px auto',
                     },
@@ -203,8 +207,8 @@ export class TabRow {
 
     destroy(): void {
         this.tabArr.forEach((item) => {
-            BB.destroyEl(item.el);
             item.pointerListener.destroy();
         });
+        this.destroyer.destroy();
     }
 }

@@ -19,12 +19,11 @@ export function showLicensesDialog() {
             css: {
                 height: '100%',
                 overflowY: 'auto',
-                padding: '10px',
+                padding: 10,
                 boxSizing: 'border-box',
             },
         }),
         width: 800,
-        isMaxHeight: true,
         onClose: () => {
             if (window.location.hash === '#licenses') {
                 history.replaceState(

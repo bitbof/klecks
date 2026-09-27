@@ -4,6 +4,7 @@ import { TRgb } from '../../kl-types';
 import { PointerListener } from '../../../bb/input/pointer-listener';
 import { HSV } from '../../../bb/color/color';
 import { css } from '../../../bb/base/base';
+import { addHueStops } from '../../utils/hue-gradient';
 
 /**
  * a small color slider
@@ -20,6 +21,8 @@ export class KlColorSliderSmall {
     private readonly pointerSV: HTMLElement;
     private readonly pointerH: HTMLElement;
     private readonly canvasSV: HTMLCanvasElement;
+
+    readonly svCircleRadius = 6;
 
     private updateSV(): void {
         const ctx = BB.ctx(this.canvasSV);
@@ -44,11 +47,11 @@ export class KlColorSliderSmall {
     }
 
     private updateSVPointer(): void {
-        const left = (this.color.s / 100) * this.width - 4;
-        const top = (1 - this.color.v / 100) * this.heightSV - 4;
+        const left = (this.color.s / 100) * this.width - this.svCircleRadius;
+        const top = (1 - this.color.v / 100) * this.heightSV - this.svCircleRadius;
         css(this.pointerSV, {
-            left: left + 'px',
-            top: top + 'px',
+            left: left,
+            top: top,
         });
     }
 
@@ -66,7 +69,7 @@ export class KlColorSliderSmall {
     }) {
         this.rootEl = BB.el({
             css: {
-                width: p.width + 'px',
+                width: p.width,
                 position: 'relative',
                 overflow: 'hidden',
                 userSelect: 'none',
@@ -81,8 +84,8 @@ export class KlColorSliderSmall {
 
         this.canvasSV = BB.canvas(10, 10);
         css(this.canvasSV, {
-            width: this.width + 'px',
-            height: this.heightSV + 'px',
+            width: this.width,
+            height: this.heightSV,
             cursor: 'crosshair',
         });
 
@@ -92,41 +95,28 @@ export class KlColorSliderSmall {
         canvasH.style.cursor = 'ew-resize';
         (() => {
             const ctx = BB.ctx(canvasH);
-
             const gradH = ctx.createLinearGradient(0, 0, p.width, 0);
-            for (let i = 0; i < 1; i += 0.01) {
-                const col = BB.ColorConverter.toRGB(new BB.HSV(i * 360, 100, 100));
-                gradH.addColorStop(
-                    i,
-                    'rgba(' +
-                        parseInt('' + col.r) +
-                        ', ' +
-                        parseInt('' + col.g) +
-                        ', ' +
-                        parseInt('' + col.b) +
-                        ', 1)',
-                );
-            }
+            addHueStops(gradH);
             ctx.fillStyle = gradH;
             ctx.fillRect(0, 0, p.width, p.heightH);
         })();
         css(this.canvasSV, {
-            width: p.width + 'px',
-            height: p.heightSV + 'px',
+            width: p.width,
+            height: p.heightSV,
             overflow: 'hidden',
             position: 'relative',
         });
-        this.canvasSV.style.cssFloat = 'left';
-        canvasH.style.cssFloat = 'left';
+        this.canvasSV.style.float = 'left';
+        canvasH.style.float = 'left';
 
         this.rootEl.append(this.canvasSV, canvasH);
 
         this.pointerSV = BB.el({
             parent: this.rootEl,
             css: {
-                width: '8px',
-                height: '8px',
-                borderRadius: '8px',
+                width: this.svCircleRadius * 2,
+                height: this.svCircleRadius * 2,
+                borderRadius: this.svCircleRadius,
                 position: 'absolute',
                 pointerEvents: 'none',
                 boxShadow: '0 0 0 1px #000, inset 0 0 0 1px #fff',
@@ -136,12 +126,12 @@ export class KlColorSliderSmall {
         this.pointerH = BB.el({
             parent: this.rootEl,
             css: {
-                width: '0',
-                height: p.heightH + 'px',
+                width: 0,
+                height: p.heightH,
                 borderLeft: '1px solid #fff',
                 borderRight: '1px solid #000',
                 position: 'absolute',
-                top: p.heightSV + 'px',
+                top: p.heightSV,
                 pointerEvents: 'none',
             },
         });

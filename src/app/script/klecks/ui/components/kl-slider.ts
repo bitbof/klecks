@@ -128,12 +128,9 @@ export class KlSlider {
     private updateEnable(): void {
         this.sliderWrapperEl.classList.toggle('slider-wrapper--disabled', !this.isEnabled);
         css(this.sliderWrapperEl, {
-            opacity: this.isEnabled ? '' : '0.5',
-            pointerEvents: this.isEnabled ? '' : 'none',
+            opacity: this.isEnabled ? undefined : 0.5,
+            pointerEvents: this.isEnabled ? undefined : 'none',
         });
-        if (this.manualInput) {
-            this.manualInput.setIsEnabled(this.isEnabled);
-        }
     }
 
     private showManualInput(): void {
@@ -161,7 +158,6 @@ export class KlSlider {
                 ? this.manualInputRoundDigits
                 : 0,
         );
-        this.manualInput.setIsEnabled(this.isEnabled);
         this.rootEl.append(this.manualInput.getElement());
         setTimeout(() => {
             this.manualInput && this.manualInput.focus();
@@ -199,7 +195,7 @@ export class KlSlider {
         if (!p.label) {
             throw new Error('KlSlider missing params');
         }
-        if (p.min != 0 && p.max != 0 && p.value != 0) {
+        if (p.min !== 0 && p.max !== 0 && p.value !== 0) {
             if (!p.min || !p.max || !p.value) {
                 throw new Error('KlSlider broken params');
             }
@@ -246,8 +242,8 @@ export class KlSlider {
             css: {
                 overflow: 'hidden',
                 position: 'relative',
-                width: this.elementWidth + 'px',
-                height: this.elementHeight + 'px',
+                width: this.elementWidth,
+                height: this.elementHeight,
                 userSelect: 'none',
             },
         });
@@ -277,19 +273,19 @@ export class KlSlider {
                 padding: '0 7px',
                 height: '100%',
                 width: '100%',
-                fontSize: labelFontSize + 'px',
+                fontSize: labelFontSize,
                 pointerEvents: 'none',
-                gap: '8px',
+                gap: 8,
             },
         });
         this.control = BB.el({
             className: 'slider-inner',
             css: {
                 position: 'absolute',
-                left: '0',
-                top: '0',
-                width: this.valueToSliderValue(this.value) * this.elementWidth + 'px',
-                height: this.elementHeight + 'px',
+                left: 0,
+                top: 0,
+                width: this.valueToSliderValue(this.value) * this.elementWidth,
+                height: this.elementHeight,
             },
         });
         const controlInner = document.createElement('div');
@@ -363,12 +359,14 @@ export class KlSlider {
                     eventChain.chainIn(e);
                 },
                 onWheel: (event) => {
+                    event.event?.preventDefault();
                     let sliderValue = this.valueToSliderValue(this.value);
                     sliderValue = BB.clamp(sliderValue - event.deltaY / 40, 0, 1);
                     this.value = this.sliderValueToValue(sliderValue);
                     this.updateLabel();
                     this.onChange(this.value);
                 },
+                useDirtyWheel: true,
             });
             this.updateLabel();
         }, 1);

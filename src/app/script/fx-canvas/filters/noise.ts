@@ -1,4 +1,4 @@
-import { gl } from '../core/gl';
+import { fxGl } from '../core/gl';
 import { FxShader } from '../core/fx-shader';
 import { simpleShader } from '../core/simple-shader';
 import shaderNoise from '../shaders/shader-noise.glsl';
@@ -40,15 +40,15 @@ export const noise: TFilterNoise = function (
     colB,
     channels,
 ) {
-    gl.noise = gl.noise || new FxShader(null, shaderNoise.replace(/#define.*/, ''), 'noise');
-    simpleShader.call(this, gl.noise, {
+    fxGl.noise = fxGl.noise || new FxShader(null, shaderNoise.replace(/#define.*/, ''), 'noise');
+    simpleShader.call(this, fxGl.noise, {
         seed: seed || 0,
         type,
         scale: [scale[0], scale[1]],
         offset,
         octaves,
         samples,
-        texSize: [this.width, this.height],
+        texSize: [this.canvas.width, this.canvas.height],
         peaks,
         brightness,
         contrast,

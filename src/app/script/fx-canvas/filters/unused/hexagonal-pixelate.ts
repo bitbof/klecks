@@ -64,7 +64,7 @@ export function hexagonalPixelate(centerX, centerY, scale) {
     simpleShader.call(this, gl.hexagonalPixelate, {
         center: [centerX, centerY],
         scale: scale,
-        texSize: [this.width, this.height],
+        texSize: [this.canvas.width, this.canvas.height],
     });
 
     return this;

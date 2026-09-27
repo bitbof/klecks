@@ -1,7 +1,10 @@
+import { getIconSvg } from '../../../../icon/icon';
 import { BB } from '../../../../bb/bb';
 import { LANG } from '../../../../language/language';
-import { showModal } from '../../modals/base/showModal';
-import removeLayerImg from 'url:/src/app/img/ui/remove-layer.svg';
+import { showModal } from '../../modals/base/show-modal';
+import { Input } from '../../components/input';
+import { css } from '../../../../bb/base/base';
+import { Destroyer } from '../../../../bb/base/base';
 
 export function renameLayerDialog(
     parentEl: HTMLElement,
@@ -9,11 +12,12 @@ export function renameLayerDialog(
     callback: (newName: string | undefined) => void,
 ): void {
     const div = BB.el();
+    const destroyer = new Destroyer();
 
     const label = BB.el({
         content: LANG('layers-rename-name') + ':',
         css: {
-            marginRight: '5px',
+            marginRight: 5,
         },
     });
 
@@ -22,19 +26,26 @@ export function renameLayerDialog(
             display: 'flex',
         },
     });
-    const input = BB.el({ tagName: 'input' });
-    input.value = currentName;
-    input.setAttribute('data-ignore-focus', 'true');
-    input.style.flexGrow = '1';
+    const input = new Input({
+        init: currentName,
+        name: 'layer-name',
+        isFocusIgnored: true,
+        css: { width: '100%' },
+    });
+    css(input.getElement(), { flexGrow: 1 });
     const clearBtn = BB.el({
         tagName: 'button',
-        content: '<img src="' + removeLayerImg + '" height="20"/>',
+        className: 'kl-button',
+        content: getIconSvg('remove-layer', {
+            height: 20,
+        }),
         title: LANG('layers-rename-clear'),
+        destroyer,
         css: {
-            marginLeft: '10px',
+            marginLeft: 10,
         },
         onClick: () => {
-            input.value = '';
+            input.setValue('');
             input.focus();
         },
     });
@@ -52,17 +63,19 @@ export function renameLayerDialog(
         css: {
             display: 'flex',
             flexWrap: 'wrap',
-            marginTop: '5px',
-            marginLeft: '-5px',
+            marginTop: 5,
+            marginLeft: -5,
         },
     });
     suggestions.forEach((item) => {
         const btn = BB.el({
             parent: row2,
             tagName: 'button',
+            className: 'kl-button',
             content: item,
+            destroyer,
             onClick: () => {
-                input.value = '' + btn.textContent;
+                input.setValue(btn.textContent ?? '');
             },
             css: {
                 margin: '5px 0 0 5px',
@@ -73,7 +86,7 @@ export function renameLayerDialog(
 
     div.append(label);
     label.append(row, row2);
-    row.append(input, clearBtn);
+    row.append(input.getElement(), clearBtn);
 
     setTimeout(() => {
         input.focus();
@@ -83,20 +96,15 @@ export function renameLayerDialog(
     showModal({
         message: `<b>${LANG('layers-rename-title')}</b>`,
         div: div,
-        buttons: [LANG('layers-rename'), 'Cancel'],
-        primaries: [LANG('layers-rename')],
+        buttons: [{ id: 'rename', label: LANG('layers-rename') }, 'Cancel'],
+        primaries: ['rename'],
         callback: (val) => {
-            BB.destroyEl(clearBtn);
-            suggestionBtns.forEach((item) => {
-                BB.destroyEl(item);
-            });
+            const newName = val === 'rename' ? input.getValue() : undefined;
+            input.destroy();
+            destroyer.destroy();
             suggestionBtns.splice(0, suggestionBtns.length);
-            if (val === LANG('layers-rename')) {
-                callback(input.value);
-            } else {
-                callback(undefined);
-            }
+            callback(newName);
         },
-        clickOnEnter: LANG('layers-rename'),
+        clickOnEnter: 'rename',
     });
 }

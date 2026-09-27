@@ -13,11 +13,15 @@ export type TPointerListenerParams = {
     target: HTMLElement | SVGElement;
     onPointer?: (pointerEvent: TPointerEvent) => void;
     onWheel?: (wheelEvent: TWheelEvent) => void;
-    useDirtyWheel?: boolean; // default false - use dirty wheel events - not just increments of 1
-    isWheelPassive?: boolean; // default false
-    onEnterLeave?: (isOver: boolean) => void; // optional
-    maxPointers?: number; // int [1,n] default is 1 - how many concurrent pointers to pay attention to
-    fixScribble?: boolean; // fix ipad scribble issue - TODO remove, fixed start of 2022 -> https://bugs.webkit.org/show_bug.cgi?id=217430#c2
+    // default false - use dirty wheel events - not just increments of 1
+    useDirtyWheel?: boolean;
+    // default false
+    isWheelPassive?: boolean;
+    onEnterLeave?: (isOver: boolean) => void;
+    // int [1,n] default is 1 - how many concurrent pointers to pay attention to
+    maxPointers?: number;
+    // fix ipad scribble issue - TODO remove, fixed start of 2022 -> https://bugs.webkit.org/show_bug.cgi?id=217430#c2
+    fixScribble?: boolean;
 };
 
 type TPointer = {
@@ -38,6 +42,10 @@ type TDragObj = {
 };
 
 type TCoalescedPointerEvent = {
+    altKey: boolean;
+    ctrlKey: boolean;
+    metaKey: boolean;
+    shiftKey: boolean;
     pageX: number;
     pageY: number;
     clientX: number;
@@ -51,6 +59,10 @@ type TCoalescedPointerEvent = {
 type TCorrectedPointerEvent = {
     pointerId: number;
     pointerType: string;
+    altKey: boolean;
+    ctrlKey: boolean;
+    metaKey: boolean;
+    shiftKey: boolean;
     pageX: number;
     pageY: number;
     clientX: number;
@@ -62,6 +74,7 @@ type TCorrectedPointerEvent = {
     buttons: number;
     button: number;
     coalescedArr: TCoalescedPointerEvent[];
+    target: Node | undefined;
     eventPreventDefault: () => void;
     eventStopPropagation: () => void;
 };
@@ -111,7 +124,9 @@ function getButtonStr(buttons: number): TPointerButton | undefined {
 }
 
 const pressureNormalizer = new PressureNormalizer();
-const timeStampOffset = EVENT_USES_HIGH_RES_TIMESTAMP() ? 0 : -performance.timing.navigationStart;
+const timeStampOffset = EVENT_USES_HIGH_RES_TIMESTAMP()
+    ? 0
+    : -(performance.timing?.navigationStart ?? performance.timeOrigin);
 
 const pointerDownEvt = (HAS_POINTER_EVENTS ? 'pointerdown' : 'mousedown') as 'pointerdown';
 const pointerMoveEvt = (HAS_POINTER_EVENTS ? 'pointermove' : 'mousemove') as 'pointermove';
@@ -126,6 +141,7 @@ const pointerEnterEvt = (HAS_POINTER_EVENTS ? 'pointerenter' : 'mouseenter') as 
  */
 function correctPointerEvent(
     event: PointerEvent | TExtendedDOMPointerEvent,
+    isPointerDown?: boolean,
 ): TCorrectedPointerEvent {
     if ('corrected' in event) {
         return event.corrected;
@@ -154,6 +170,10 @@ function correctPointerEvent(
     const correctedObj: TCorrectedPointerEvent = {
         pointerId: event.pointerId,
         pointerType: event.pointerType,
+        altKey: event.altKey,
+        ctrlKey: event.ctrlKey,
+        metaKey: event.metaKey,
+        shiftKey: event.shiftKey,
         pageX: event.pageX,
         pageY: event.pageY,
         clientX: event.clientX,
@@ -165,6 +185,7 @@ function correctPointerEvent(
         buttons: determineButtons(),
         button: event.button,
         coalescedArr: [],
+        target: (event.target ?? undefined) as Node | undefined,
         eventPreventDefault: () => event.preventDefault(),
         eventStopPropagation: () => event.stopPropagation(),
     };
@@ -194,7 +215,7 @@ function correctPointerEvent(
 
     if (
         IS_FIREFOX &&
-        event.pointerType != 'mouse' &&
+        event.pointerType !== 'mouse' &&
         event.type === 'pointermove' &&
         event.buttons === 0
     ) {
@@ -219,6 +240,10 @@ function correctPointerEvent(
         const eventItem = coalescedEventArr[i];
 
         correctedObj.coalescedArr.push({
+            altKey: eventItem.altKey,
+            ctrlKey: eventItem.ctrlKey,
+            metaKey: eventItem.metaKey,
+            shiftKey: eventItem.shiftKey,
             pageX: eventItem.pageX,
             pageY: eventItem.pageY,
             clientX: eventItem.clientX,
@@ -241,9 +266,13 @@ function correctPointerEvent(
 
     pointerObj.lastPageX = correctedObj.pageX;
     pointerObj.lastPageY = correctedObj.pageY;
-    correctedObj.movementX = totalLastX === null ? 0 : pointerObj.lastPageX - totalLastX;
-    correctedObj.movementY = totalLastY === null ? 0 : pointerObj.lastPageY - totalLastY;
-
+    if (isPointerDown) {
+        correctedObj.movementX = 0;
+        correctedObj.movementY = 0;
+    } else {
+        correctedObj.movementX = totalLastX === null ? 0 : pointerObj.lastPageX - totalLastX;
+        correctedObj.movementY = totalLastY === null ? 0 : pointerObj.lastPageY - totalLastY;
+    }
     return correctedObj;
 }
 
@@ -326,9 +355,14 @@ export class PointerListener {
     ): TPointerEvent {
         const bounds: DOMRect = this.targetElement.getBoundingClientRect();
         const result: TPointerEvent = {
+            target: correctedEvent.target,
             type: typeStr,
             pointerId: correctedEvent.pointerId,
             pointerType: correctedEvent.pointerType as TPointerType,
+            altKey: correctedEvent.altKey,
+            ctrlKey: correctedEvent.ctrlKey,
+            metaKey: correctedEvent.metaKey,
+            shiftKey: correctedEvent.shiftKey,
             pageX: correctedEvent.pageX,
             pageY: correctedEvent.pageY,
             clientX: correctedEvent.clientX,
@@ -350,6 +384,10 @@ export class PointerListener {
                 for (let i = 0; i < correctedEvent.coalescedArr.length; i++) {
                     coalescedItem = correctedEvent.coalescedArr[i];
                     result.coalescedArr.push({
+                        altKey: coalescedItem.altKey,
+                        ctrlKey: coalescedItem.ctrlKey,
+                        metaKey: coalescedItem.metaKey,
+                        shiftKey: coalescedItem.shiftKey,
                         pageX: coalescedItem.pageX,
                         pageY: coalescedItem.pageY,
                         clientX: coalescedItem.clientX,
@@ -407,6 +445,10 @@ export class PointerListener {
                 ...(e instanceof WheelEvent
                     ? { deltaY: e.deltaY / 120, pageX: e.pageX, pageY: e.pageY }
                     : e),
+                altKey: e.altKey,
+                ctrlKey: e.ctrlKey,
+                metaKey: e.metaKey,
+                shiftKey: e.shiftKey,
                 relX: e.clientX - bounds.left + this.targetElement.scrollLeft,
                 relY: e.clientY - bounds.top + this.targetElement.scrollTop,
                 ...(e instanceof WheelEvent ? { event: e } : {}),
@@ -448,7 +490,7 @@ export class PointerListener {
 
             this.onPointerDown = (event: PointerEvent, onSkipGlobal?: boolean) => {
                 //BB.throwOut('pointerdown ' + event.pointerId + ' | ' + dragPointerIdArr.length);
-                const correctedEvent = correctPointerEvent(event);
+                const correctedEvent = correctPointerEvent(event, true);
                 ////console.log('debug: ' + event.pointerId + ' pointerdown');
                 if (
                     this.dragPointerIdArr.includes(correctedEvent.pointerId) ||
@@ -619,6 +661,10 @@ export class PointerListener {
                     return {
                         pointerId: touch.identifier,
                         pointerType: 'touch',
+                        altKey: touchEvent.altKey,
+                        ctrlKey: touchEvent.ctrlKey,
+                        metaKey: touchEvent.metaKey,
+                        shiftKey: touchEvent.shiftKey,
                         pageX: touch.pageX,
                         pageY: touch.pageY,
                         clientX: touch.clientX,

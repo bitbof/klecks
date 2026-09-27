@@ -49,27 +49,31 @@ export function klCanvasTransform(p: {
 }): void {
     const backgroundIsTransparent = p.backgroundIsTransparent ?? false;
     const klHistory = p.klCanvas.getKlHistory();
-    const layers = p.klCanvas.getLayersRaw();
+    const layers = p.klCanvas.getLayersReference();
     const targetLayer = layers[p.targetLayerIndex];
     const matrix = freeTransformToMatrix(
         p.freeTransform,
         getSelectionBoundsFromSample(p.selectionSample),
     );
 
+    let transformedSelection: MultiPolygon | undefined;
     klHistory.pause(true);
-    if (p.eraseLayerIndex !== undefined) {
-        p.klCanvas.eraseLayer({
-            layerIndex: p.eraseLayerIndex,
-            useSelection: true,
-            useAlphaLock: p.eraseLayerIndex === 0 && !backgroundIsTransparent,
-        });
+    try {
+        if (p.eraseLayerIndex !== undefined) {
+            p.klCanvas.eraseLayer({
+                layerIndex: p.eraseLayerIndex,
+                useSelection: true,
+                useAlphaLock: p.eraseLayerIndex === 0 && !backgroundIsTransparent,
+            });
+        }
+        drawTransformedSelectionSample(p.algorithm, p.selectionSample, targetLayer.context, matrix);
+        transformedSelection = p.selection
+            ? transformSelection({ type: 'free', freeTransform: p.freeTransform }, p.selection)
+            : undefined;
+        p.klCanvas.setSelection(transformedSelection);
+    } finally {
+        klHistory.pause(false);
     }
-    drawTransformedSelectionSample(p.algorithm, p.selectionSample, targetLayer.context, matrix);
-    const transformedSelection = p.selection
-        ? transformSelection({ type: 'free', freeTransform: p.freeTransform }, p.selection)
-        : undefined;
-    p.klCanvas.setSelection(transformedSelection);
-    klHistory.pause(false);
 
     if (!klHistory.isPaused()) {
         const eraseLayer = p.eraseLayerIndex !== undefined ? layers[p.eraseLayerIndex!] : undefined;

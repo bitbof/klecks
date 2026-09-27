@@ -2,7 +2,7 @@ import { BB } from '../../bb/bb';
 import { TIndexBounds, TPressureInput, TVector2D } from '../../bb/bb-types';
 import { TRgb } from '../kl-types';
 import { clamp, intersectBounds } from '../../bb/math/math';
-import { BezierLine, TBezierLineCallback } from '../../bb/math/line';
+import { LinearLine } from '../../bb/math/line';
 import { KlHistory } from '../history/kl-history';
 import { getPushableLayerChange } from '../history/push-helpers/get-pushable-layer-change';
 import { canvasToLayerTiles } from '../history/push-helpers/canvas-to-layer-tiles';
@@ -284,12 +284,11 @@ export class SmudgeBrush {
 
     private lineToolLastDot: number = 0;
     private lastInput: TPressureInput = { x: 0, y: 0, pressure: 0 };
-    private lastInput2: TPressureInput = { x: 0, y: 0, pressure: 0 };
     private lastDot: TVector2D | undefined;
 
     private isDrawing: boolean = false;
 
-    private bezierLine: BezierLine | undefined;
+    private linearLine: LinearLine | undefined;
 
     private redrawBounds: TIndexBounds | undefined;
     private completeRedrawBounds: TIndexBounds | undefined;
@@ -458,23 +457,20 @@ export class SmudgeBrush {
         };
     }
 
-    continueLine(
-        x: number | undefined,
-        y: number | undefined,
-        size: number,
-        pressure: number,
-    ): void {
-        this.drawBuffer = [];
-
-        if (!this.bezierLine) {
-            this.bezierLine = new BB.BezierLine();
-            this.bezierLine.add(this.lastInput.x, this.lastInput.y, 0, function () {});
+    /**
+     * Continues line to point. Fills drawBuffer.
+     */
+    continueLine(point: TPressureInput): void {
+        if (!this.linearLine) {
+            this.linearLine = new LinearLine(this.lastInput);
         }
+        const pressure = BB.clamp(point.pressure, 0, 1);
+        const size = this.settingHasSizePressure
+            ? Math.max(0.1, pressure * this.settingSize)
+            : Math.max(0.1, this.settingSize);
 
-        const drawArr: Parameters<typeof this.prepDot>[] = []; //draw instructions. will be all drawn at once
-
-        const dotCallback: TBezierLineCallback = (val): void => {
-            const localPressure = BB.mix(this.lastInput2.pressure, pressure, val.t);
+        this.linearLine.add(point.x, point.y, (size * this.settingSpacing) / 3, (val) => {
+            const localPressure = BB.mix(this.lastInput.pressure, pressure, val.t);
             const localOpacity =
                 this.settingOpacity *
                 (this.settingHasOpacityPressure ? localPressure * localPressure : 1);
@@ -482,27 +478,12 @@ export class SmudgeBrush {
                 0.1,
                 this.settingSize * (this.settingHasSizePressure ? localPressure : 1),
             );
-            drawArr.push([val.x, val.y, localSize, localOpacity]); //, val.angle]);
-        };
+            this.prepDot(val.x, val.y, localSize, localOpacity);
+        });
 
-        const localSpacing = (size * this.settingSpacing) / 3;
-        if (x === undefined || y === undefined) {
-            this.bezierLine.addFinal(localSpacing, dotCallback);
-        } else {
-            this.bezierLine.add(x, y, localSpacing, dotCallback);
-        }
-
-        // execute draw instructions
-        for (let i = 0; i < drawArr.length; i++) {
-            const item = drawArr[i];
-            this.prepDot(item[0], item[1], item[2], item[3]);
-        }
-
-        this.copyFromCanvas();
-
-        for (let i = 0; i < this.drawBuffer.length; i++) {
-            smudge(this.copyImageData, this.mask, this.drawBuffer[i]);
-        }
+        this.lastInput.x = point.x;
+        this.lastInput.y = point.y;
+        this.lastInput.pressure = pressure;
     }
 
     // ----------------------------------- public -----------------------------------
@@ -538,23 +519,23 @@ export class SmudgeBrush {
         this.lastInput.x = x;
         this.lastInput.y = y;
         this.lastInput.pressure = p;
-        this.lastInput2.pressure = p;
 
         this.completeRedrawBounds = undefined;
     }
 
-    goLine(x: number, y: number, p: number): void {
+    goLine(points: TPressureInput[]): void {
         if (!this.isDrawing) {
             return;
         }
 
         this.resetRedrawBounds();
-        const pressure = BB.clamp(p, 0, 1);
-        const localSize = this.settingHasSizePressure
-            ? Math.max(0.1, this.lastInput.pressure * this.settingSize)
-            : Math.max(0.1, this.settingSize);
+        this.drawBuffer = [];
+        points.forEach((point) => this.continueLine(point));
 
-        this.continueLine(x, y, localSize, this.lastInput.pressure);
+        this.copyFromCanvas();
+        for (let i = 0; i < this.drawBuffer.length; i++) {
+            smudge(this.copyImageData, this.mask, this.drawBuffer[i]);
+        }
 
         if (this.redrawBounds) {
             this.context.putImageData(
@@ -573,42 +554,11 @@ export class SmudgeBrush {
                 this.redrawBounds.y2,
             );
         }
-
-        this.lastInput.x = x;
-        this.lastInput.y = y;
-        this.lastInput2.pressure = this.lastInput.pressure;
-        this.lastInput.pressure = pressure;
     }
 
     endLine(): void {
-        this.resetRedrawBounds();
-        const localSize = this.settingHasSizePressure
-            ? Math.max(0.1, this.lastInput.pressure * this.settingSize)
-            : Math.max(0.1, this.settingSize);
-        this.context.save();
-        this.continueLine(undefined, undefined, localSize, this.lastInput.pressure);
-        this.context.restore();
-
         this.isDrawing = false;
-        this.bezierLine = undefined;
-
-        if (this.redrawBounds) {
-            this.context.putImageData(
-                this.copyImageData,
-                0,
-                0,
-                this.redrawBounds.x1,
-                this.redrawBounds.y1,
-                this.redrawBounds.x2 - this.redrawBounds.x1,
-                this.redrawBounds.y2 - this.redrawBounds.y1,
-            );
-            this.updateCompleteRedrawBounds(
-                this.redrawBounds.x1,
-                this.redrawBounds.y1,
-                this.redrawBounds.x2,
-                this.redrawBounds.y2,
-            );
-        }
+        this.linearLine = undefined;
 
         if (this.completeRedrawBounds) {
             this.klHistory.push(

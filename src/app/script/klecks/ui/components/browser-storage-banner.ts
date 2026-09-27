@@ -1,3 +1,4 @@
+import { getIconUrl } from '../../../icon/icon';
 import { BB } from '../../../bb/bb';
 import * as classes from './browser-storage-banner.module.scss';
 import { LANG } from '../../../language/language';
@@ -6,8 +7,8 @@ import { KlRecoveryManager } from '../../storage/kl-recovery-manager';
 import { css, fitInto, sleep } from '../../../bb/base/base';
 import { CrossTabChannel } from '../../../bb/base/cross-tab-channel';
 import { KlHistory } from '../../history/kl-history';
-import cancelImg from 'url:/src/app/img/ui/cancel.svg';
 
+const cancelImg = getIconUrl('cancel');
 export type TBrowserStorageBannerParams = {
     projectStore?: ProjectStore;
     klRecoveryManager?: KlRecoveryManager;
@@ -29,9 +30,10 @@ export async function runBrowserStorageBanner(p: TBrowserStorageBannerParams): P
     }
 
     const openedProjectIds: string[] = [];
-    const crossTabChannel = new CrossTabChannel('kl-tab-communication');
     {
-        // subscription stays up during run of application
+        const crossTabChannel = new CrossTabChannel('kl-tab-communication');
+        // This subscription stays up during run of application.
+        // It's to ensure other tabs know if the browser storage project is already opened.
         crossTabChannel.subscribe((message) => {
             if (message.type === 'request-project-ids') {
                 crossTabChannel.postMessage({
@@ -68,8 +70,8 @@ export async function runBrowserStorageBanner(p: TBrowserStorageBannerParams): P
 
     const fit = fitInto(meta.thumbnail.width, meta.thumbnail.height, 100, 100);
     css(meta.thumbnail, {
-        width: fit.width + 'px',
-        height: fit.height + 'px',
+        width: fit.width,
+        height: fit.height,
     });
 
     const closeButton = BB.el({
@@ -77,8 +79,8 @@ export async function runBrowserStorageBanner(p: TBrowserStorageBannerParams): P
         className: classes.closeButton + ' popup-x',
         content: `<img alt="${LANG('modal-close')}" height="20" src="${cancelImg}">`,
         title: LANG('modal-close'),
-        custom: {
-            tabindex: '0',
+        props: {
+            tabIndex: 0,
         },
     });
     closeButton.onclick = close;
@@ -98,10 +100,10 @@ export async function runBrowserStorageBanner(p: TBrowserStorageBannerParams): P
     const buttonClass = classes.btn;
     const openBtn = BB.el({
         tagName: 'button',
-        className: ['kl-button-primary', buttonClass].join(' '),
+        className: ['kl-button', 'kl-button-primary', buttonClass],
         content: LANG('file-storage-open'),
-        custom: {
-            tabIndex: '-1',
+        props: {
+            tabIndex: -1,
         },
     });
     openBtn.onclick = () => {
@@ -122,11 +124,11 @@ export async function runBrowserStorageBanner(p: TBrowserStorageBannerParams): P
     closeArea.onclick = close;
     const banner = BB.el({
         className: classes.banner,
-        content: [closeArea, mainContent, closeButton],
+        content: [mainContent, closeButton],
     });
     banner.onclick = BB.handleClick;
     const rootEl = BB.el({
-        content: [banner],
+        content: [closeArea, banner],
         className: classes.root,
     });
     document.body.append(rootEl);
@@ -135,7 +137,7 @@ export async function runBrowserStorageBanner(p: TBrowserStorageBannerParams): P
         clearTimeout(timeout);
         document.removeEventListener('pointerdown', onPointerDown);
         css(rootEl, {
-            opacity: '0',
+            opacity: 0,
         });
         css(banner, {
             pointerEvents: 'none',
@@ -145,11 +147,19 @@ export async function runBrowserStorageBanner(p: TBrowserStorageBannerParams): P
         }, 200);
     }
 
-    const timeout = setTimeout(close, 4500);
+    function checkCanClose() {
+        if (banner.matches(':hover')) {
+            timeout = setTimeout(checkCanClose, 500);
+            return;
+        }
+        close();
+    }
+
+    let timeout = setTimeout(checkCanClose, 4500);
 
     const onPointerDown = (e: PointerEvent) => {
         const target = e.target as HTMLElement | null;
-        if (banner.contains(target) || banner.contains(target)) {
+        if (banner.contains(target)) {
             return;
         }
         close();

@@ -29,7 +29,9 @@ export const filterDistort = {
     getDialog(params: TFilterGetDialogParam) {
         const isSmall = testIsSmall();
         const rootEl = BB.el();
-        const context = params.context;
+        const klCanvas = params.klCanvas;
+        const selectedLayerIndex = params.selectedLayerIndex;
+        const layer = klCanvas.getLayer(selectedLayerIndex);
 
         let isSynced = true;
         const settings: TFilterDistortInput = {
@@ -89,7 +91,7 @@ export const filterDistort = {
                     .unmultiplyAlpha()
                     .update();
                 ctx.clearRect(0, 0, thumbSize, thumbSize);
-                ctx.drawImage(fxCanvas, 0, 0);
+                ctx.drawImage(fxCanvas.canvas, 0, 0);
                 thumbImg.src = canvas.toDataURL('image/png');
                 thumbImgArr.push(thumbImg);
             });
@@ -108,10 +110,11 @@ export const filterDistort = {
         });
 
         const typeOptions = new Options({
+            isFocusable: true,
             optionArr: thumbImgArr.map((img, index) => {
                 css(img, {
-                    margin: '1px',
-                    borderRadius: '3px',
+                    margin: 1,
+                    borderRadius: 3,
                     transition: 'all 0.1s ease-in-out',
                 });
                 return {
@@ -161,7 +164,7 @@ export const filterDistort = {
 
         topRowEl.append(
             typeOptions.getElement(),
-            BB.el({ css: { flexGrow: '1' } }),
+            BB.el({ css: { flexGrow: 1 } }),
             syncToggle.getElement(),
         );
 
@@ -175,7 +178,7 @@ export const filterDistort = {
         const leftCol = BB.el({
             parent: xyRowEl,
             css: {
-                marginRight: '10px',
+                marginRight: 10,
             },
         });
         const rightCol = BB.el({ parent: xyRowEl });
@@ -276,12 +279,10 @@ export const filterDistort = {
 
         // ---- preview ----
 
-        const klCanvas = params.klCanvas;
         const layers = klCanvas.getLayers();
-        const selectedLayerIndex = throwIfNull(klCanvas.getLayerIndex(context.canvas));
 
         const fxPreviewRenderer = new FxPreviewRenderer({
-            original: context.canvas,
+            original: layer.canvas,
             onUpdate: (fxCanvas, transform) => {
                 const scaledSettings = BB.copyObj(settings);
                 scaledSettings.stepSize *= transform.scaleX;
@@ -301,27 +302,27 @@ export const filterDistort = {
 
         const previewLayerArr: TProjectViewportProject['layers'] = layers.map((item, i) => {
             return {
-                image: i === selectedLayerIndex ? fxPreviewRenderer.render : item.context.canvas,
+                image: i === selectedLayerIndex ? fxPreviewRenderer.render : item.canvas,
                 isVisible: item.isVisible,
                 opacity: item.opacity,
                 mixModeStr: item.mixModeStr,
-                hasClipping: false,
+                hasClipping: item.hasClipping,
             };
         });
         const preview = new Preview({
             width: getPreviewWidth(isSmall),
             height: getPreviewHeight(isSmall),
             project: {
-                width: context.canvas.width,
-                height: context.canvas.height,
+                width: layer.canvas.width,
+                height: layer.canvas.height,
                 layers: previewLayerArr,
             },
             selection: klCanvas.getSelection(),
         });
         preview.render();
         css(preview.getElement(), {
-            marginLeft: '-20px',
-            marginRight: '-20px',
+            marginLeft: -20,
+            marginRight: -20,
         });
         rootEl.append(preview.getElement());
 

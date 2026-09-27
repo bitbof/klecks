@@ -28,7 +28,7 @@ export function createSelectionSample(
     layerIndex: number,
     klCanvas: KlCanvas,
 ): TSelectionSample | undefined {
-    const srcLayer = klCanvas.getLayersRaw()[layerIndex];
+    const srcLayer = klCanvas.getLayer(layerIndex);
 
     const klCanvasSelection = klCanvas.getSelection();
     const hasSelection = !!klCanvasSelection;

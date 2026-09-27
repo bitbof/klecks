@@ -37,6 +37,9 @@ function createEntryLayer(
     if (useAll || attributes.includes('mixModeStr')) {
         result.mixModeStr = layer.mixModeStr;
     }
+    if (useAll || attributes.includes('hasClipping')) {
+        result.hasClipping = layer.hasClipping;
+    }
     if (useAll || attributes.includes('index')) {
         result.index = layer.index;
     }

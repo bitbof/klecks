@@ -1,14 +1,11 @@
-import { showModal } from './ui/modals/base/showModal';
 import { DynamicModal } from './ui/modals/base/dynamic-modal';
 import { DIALOG_COUNTER } from './ui/modals/modal-count';
 import { Checkbox } from './ui/components/checkbox';
-import { input } from './ui/components/input';
 import { Select } from './ui/components/select';
 import { ImageToggle } from './ui/components/image-toggle';
 import { ImageRadioList } from './ui/components/image-radio-list';
 import { createPenPressureToggle } from './ui/components/create-pen-pressure-toggle';
 import { KlSlider } from './ui/components/kl-slider';
-import { HexColorDialog } from './ui/modals/color-slider-hex-dialog';
 import { KlColorSlider } from './ui/components/kl-color-slider';
 import { KlColorSliderSmall } from './ui/components/kl-color-slider-small';
 import { PointSlider } from './ui/components/point-slider';
@@ -21,7 +18,7 @@ import { LayersUi } from './ui/tool-tabs/layers-ui/layers-ui';
 import { KlCanvasPreview } from './ui/project-viewport/kl-canvas-preview';
 import { FreeTransform } from './ui/components/free-transform';
 import { FreeTransformCanvas } from './ui/components/free-transform-canvas';
-import { Cropper } from './ui/components/cropper';
+import { Cropper } from './ui/components/cropper/cropper';
 import { LayerPreview } from './ui/components/layer-preview';
 import { showImportAsLayerDialog } from './ui/modals/show-import-as-layer-dialog';
 import { KlImageDropper } from './ui/components/kl-image-dropper';
@@ -95,14 +92,12 @@ export const KL = {
 
     // --- ui - components ---
     Checkbox,
-    input,
     Select,
     ImageToggle,
     ImageRadioList,
     RadioList,
     createPenPressureToggle,
     KlSlider,
-    HexColorDialog,
     KlColorSlider,
     KlColorSliderSmall,
     PointSlider,
@@ -129,7 +124,6 @@ export const KL = {
 
     // --- ui - modals ---
     DIALOG_COUNTER,
-    popup: showModal,
     Popup: DynamicModal,
     clipboardDialog,
     showImportAsLayerDialog,

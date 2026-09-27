@@ -1,4 +1,32 @@
-import { TKeyString, TSize2D, TSvg, TVector2D } from '../bb-types';
+import { TCss, TKeyString, TSize2D, TSvg, TVector2D } from '../bb-types';
+
+type TDestroyerCallback = () => void;
+export class Destroyer {
+    private callbacks: TDestroyerCallback[] = [];
+
+    // ------------------------ public -----------------------------
+    constructor() {}
+
+    add(callback: TDestroyerCallback): void {
+        this.callbacks.push(callback);
+    }
+
+    destroy(): void {
+        const callbacks = this.callbacks;
+        this.callbacks = [];
+        callbacks.forEach((callback) => {
+            try {
+                callback();
+            } catch (e) {
+                asyncThrow(e);
+            }
+        });
+    }
+}
+
+export function getSignalAbortError(signal: AbortSignal): unknown {
+    return signal.reason ?? new DOMException('Operation aborted', 'AbortError');
+}
 
 export function insertAfter(referenceNode: Element, newNode: Element): void {
     if (referenceNode.parentNode) {
@@ -6,41 +34,25 @@ export function insertAfter(referenceNode: Element, newNode: Element): void {
     }
 }
 
-export function loadImage(im: HTMLImageElement, callback: () => void): void {
-    let counter = 0;
-
-    function check(): void {
-        if (counter === 1000) {
-            alert("couldn't load");
-            return;
-        }
-        if (im.complete) {
-            counter++;
-            callback();
-        } else {
-            setTimeout(check, 1);
-        }
-    }
-
-    check();
-}
-
-export function asyncLoadImage(src: string): Promise<HTMLImageElement> {
-    return new Promise((resolve, reject) => {
-        const img = new Image();
-        img.onload = () => resolve(img);
-        img.onerror = reject;
-        img.src = src;
-    });
-}
-
-export function css(el: HTMLElement | SVGElement, styleObj: Partial<CSSStyleDeclaration>): void {
+export function css(el: HTMLElement | SVGElement, cssObj: TCss): void {
     const elStyle: any = el.style;
-    Object.keys(styleObj).forEach((key) => {
-        const property = key as keyof CSSStyleDeclaration;
-        elStyle[property] = styleObj[property];
+    Object.entries(cssObj).forEach(([key, value]) => {
+        const property = key as keyof TCss;
+
+        if (typeof value === 'number') {
+            // Let the browser distinguish unitless properties from lengths.
+            elStyle[property] = '';
+            elStyle[property] = value;
+            // e.g. width = 12 will be reset to ''
+            if (elStyle[property] === '') {
+                elStyle[property] = value + 'px';
+            }
+        } else {
+            // undefined would not assign, we must use '' instead for a reset.
+            elStyle[property] = value ?? '';
+        }
         if (property === 'userSelect') {
-            elStyle.webkitUserSelect = styleObj[property]; // Safari support
+            elStyle.webkitUserSelect = elStyle[property]; // Safari support
         }
     });
 }
@@ -57,7 +69,10 @@ export function setAttributes(el: Element, attrObj: TKeyString): void {
 /**
  * append a list to DOM element
  */
-export function append(target: HTMLElement, els: (HTMLElement | string | undefined)[]): void {
+export function append(
+    target: HTMLElement,
+    els: (HTMLElement | SVGElement | string | undefined)[],
+): void {
     const fragment = document.createDocumentFragment();
     els.forEach((item) => item && fragment.append(item));
     target.append(fragment);
@@ -66,7 +81,14 @@ export function append(target: HTMLElement, els: (HTMLElement | string | undefin
 /**
  * a needs to fit into b
  */
-export function fitInto(aw: number, ah: number, bw: number, bh: number, min?: number): TSize2D {
+export function fitInto(
+    aw: number,
+    ah: number,
+    bw: number,
+    bh: number,
+    min?: number,
+    applyFloor?: boolean,
+): TSize2D {
     let width = aw * bw,
         height = ah * bw;
     if (width > bw) {
@@ -80,6 +102,10 @@ export function fitInto(aw: number, ah: number, bw: number, bh: number, min?: nu
     if (min) {
         width = Math.max(min, width);
         height = Math.max(min, height);
+    }
+    if (applyFloor) {
+        width = Math.floor(width);
+        height = Math.floor(height);
     }
     return { width, height };
 }
@@ -98,7 +124,7 @@ export function centerWithin(aw: number, ah: number, bw: number, bh: number): TV
     };
 }
 
-export function getDate(): string {
+export function getFilenameDate(): string {
     const date = new Date();
     const year = date.getFullYear();
     const month = (date.getMonth() + 1).toString().padStart(2, '0');
@@ -119,7 +145,7 @@ export function reduce(numerator: number, denominator: number): [number, number]
 
 export function decToFraction(decimalNumber: number): [number, number] {
     const len = decimalNumber.toString().length - 2;
-    const denominator = Math.pow(10, len);
+    const denominator = 10 ** len;
     const numerator = decimalNumber * denominator;
     return reduce(numerator, denominator);
 }
@@ -128,29 +154,6 @@ export function isBlob(maybeBlob: unknown): maybeBlob is Blob {
     return (
         maybeBlob instanceof Blob || Object.prototype.toString.call(maybeBlob) === '[object Blob]'
     );
-}
-
-/**
- * blobObj isn't always a Blob, but rather an object, because Blob doesn't exist.
- * @param blobObj
- * @returns {string}
- */
-export function imageBlobToUrl(blobObj: Blob): string {
-    if (!blobObj) {
-        throw new Error('blobObj is undefined or null');
-    }
-    if (window.Blob && blobObj instanceof Blob) {
-        return URL.createObjectURL(blobObj); // object url
-    } else if (blobObj.constructor.name === 'Object') {
-        const fauxBlob = blobObj as unknown as {
-            type: string;
-            encoding: string;
-            data: string;
-        };
-        return 'data:' + fauxBlob.type + ';' + fauxBlob.encoding + ',' + fauxBlob.data; // data url
-    } else {
-        throw new Error('unknown blob format');
-    }
 }
 
 export function dateDayDifference(dateA: string | Date, dateB: string | Date): number {
@@ -244,7 +247,7 @@ export function createSvg(p: TSvg): SVGElement {
                 result.append(createSvg(child));
             });
         } else if (keyStr === 'css') {
-            css(result, item as Partial<CSSStyleDeclaration>);
+            css(result, item as TCss);
         } else if (keyStr !== 'elementType') {
             result.setAttribute(keyStr, item as string);
         }
@@ -253,7 +256,6 @@ export function createSvg(p: TSvg): SVGElement {
 }
 
 export function throwIfNull<T>(v: T | null): T {
-    // (disabled) eslint-disable-next-line no-null/no-null
     if (v === null) {
         throw new Error('value is null');
     }
@@ -271,23 +273,57 @@ export function nullToUndefined<T>(v: T | null): T | undefined {
     return v === null ? undefined : v;
 }
 
+export class AttemptError {
+    constructor(public readonly error: unknown) {}
+}
+
+export function attempt<T>(fn: () => Promise<T>): Promise<T | AttemptError>;
+export function attempt<T>(fn: () => T): T | AttemptError;
+export function attempt<T>(fn: () => T | Promise<T>): T | AttemptError | Promise<T | AttemptError> {
+    try {
+        const result = fn();
+
+        if (result instanceof Promise) {
+            return result.catch((error) => new AttemptError(error));
+        }
+
+        return result;
+    } catch (error) {
+        return new AttemptError(error);
+    }
+}
+
+export const asyncThrow = (() => {
+    if (typeof window.reportError === 'function') {
+        return window.reportError;
+    } else {
+        return (error: unknown): void => {
+            setTimeout(() => {
+                throw error;
+            });
+        };
+    }
+})();
+
 const matchMediaDark =
-    'matchMedia' in window ? window.matchMedia('(prefers-color-scheme: dark)') : false;
+    typeof window.matchMedia === 'function'
+        ? window.matchMedia('(prefers-color-scheme: dark)')
+        : false;
 
 export function isDark(): boolean {
     return matchMediaDark && matchMediaDark.matches;
 }
 
 export function addIsDarkListener(func: () => void): void {
-    matchMediaDark &&
-        'addEventListener' in matchMediaDark &&
+    if (matchMediaDark && typeof matchMediaDark.addEventListener === 'function') {
         matchMediaDark.addEventListener('change', func);
+    }
 }
 
 export function removeIsDarkListener(func: () => void): void {
-    matchMediaDark &&
-        'removeEventListener' in matchMediaDark &&
+    if (matchMediaDark && typeof matchMediaDark.removeEventListener === 'function') {
         matchMediaDark.removeEventListener('change', func);
+    }
 }
 
 export function base64ToBlob(base64Str: string): Blob {
@@ -311,7 +347,7 @@ export function createArray<T>(length: number, fillValue: T): T[] {
 }
 
 export function randomUuid(): string {
-    if ('randumUUID' in crypto) {
+    if (typeof crypto.randomUUID === 'function') {
         return crypto.randomUUID();
     }
     // fallback just for dev
@@ -327,17 +363,27 @@ export function sleep(ms: number) {
 }
 
 // if a promise takes too long
-export async function timeoutWrapper<G>(
+export function timeoutWrapper<G>(
     promise: Promise<G>,
     name: string,
     timeoutMs: number = 5000,
 ): Promise<G> {
-    return Promise.race<G>([
-        promise,
-        new Promise((_, reject) => {
-            setTimeout(() => reject(new Error(`Promise "${name}" timed out.`)), timeoutMs);
-        }),
-    ]);
+    return new Promise<G>((resolve, reject) => {
+        const timeoutId = setTimeout(
+            () => reject(new Error(`Promise "${name}" timed out.`)),
+            timeoutMs,
+        );
+        promise.then(
+            (value) => {
+                clearTimeout(timeoutId);
+                resolve(value);
+            },
+            (error) => {
+                clearTimeout(timeoutId);
+                reject(error);
+            },
+        );
+    });
 }
 
 export async function loadSvg(url: string): Promise<SVGSVGElement> {

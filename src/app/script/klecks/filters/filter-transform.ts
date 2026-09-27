@@ -1,15 +1,10 @@
 import { BB } from '../../bb/bb';
 import { Checkbox } from '../ui/components/checkbox';
 import { FreeTransform } from '../ui/components/free-transform';
-import { Select } from '../ui/components/select';
-import {
-    isLayerFill,
-    TFilterApply,
-    TFilterGetDialogParam,
-    TFilterGetDialogResult,
-} from '../kl-types';
+import { InterpolationAlgorithmToggle } from '../ui/components/interpolation-algorithm-toggle';
+import { TFilterApply, TFilterGetDialogParam, TFilterGetDialogResult } from '../kl-types';
 import { LANG } from '../../language/language';
-import { css, throwIfNull } from '../../bb/base/base';
+import { css, Destroyer } from '../../bb/base/base';
 import { Preview } from '../ui/project-viewport/preview';
 import { TProjectViewportProject } from '../ui/project-viewport/project-viewport';
 import { testIsSmall } from '../ui/utils/test-is-small';
@@ -22,7 +17,6 @@ import { matrixToTuple } from '../../bb/math/matrix-to-tuple';
 import { MultiPolygon } from 'polygon-clipping';
 import { TRect } from '../../bb/bb-types';
 import { transformMultiPolygon } from '../../bb/multi-polygon/transform-multi-polygon';
-import { THistoryEntryLayerComposed } from '../history/history.types';
 import { getCanvasBounds } from '../../bb/base/canvas';
 import { TFreeTransform } from '../transform/transform-types';
 import {
@@ -32,6 +26,8 @@ import {
     scaleTransformation,
     TComposedFree,
 } from '../transform/composed-transformation';
+import { Input } from '../ui/components/input';
+import { composedLayerHasTransparency } from '../utils/composed-layer-has-transparency';
 
 // preference expressed by user
 let preferenceIsTransparentBg: undefined | boolean;
@@ -48,56 +44,6 @@ function getIsTransparentBg(
         return preference;
     }
     return layerHasTransparency;
-}
-
-function parseCssColor(colorString: string) {
-    if (colorString.startsWith('#')) {
-        let hex = colorString.slice(1);
-        if (hex.length === 3) {
-            hex = hex
-                .split('')
-                .map((c) => c + c)
-                .join('');
-        }
-        if (hex.length === 6) {
-            // assume full alpha
-            hex += 'ff';
-        }
-        const intVal = parseInt(hex, 16);
-        return {
-            r: (intVal >> 24) & 255,
-            g: (intVal >> 16) & 255,
-            b: (intVal >> 8) & 255,
-            a: (intVal & 255) / 255,
-        };
-    }
-
-    const rgbMatch = colorString.match(/rgba?\(([^)]+)\)/);
-    if (rgbMatch) {
-        const [r, g, b, a = 1] = rgbMatch[1].split(',').map((v) => parseFloat(v.trim()));
-        return { r, g, b, a };
-    }
-
-    return undefined;
-}
-
-export function testComposedLayerHasTransparency(layer: THistoryEntryLayerComposed): boolean {
-    for (const tile of layer.tiles) {
-        if (isLayerFill(tile)) {
-            const color = parseCssColor(tile.fill);
-            if (color && color.a < 1) {
-                return true;
-            }
-        } else {
-            const data = tile.data.data;
-            for (let i = 3; i < data.length; i += 4) {
-                if (data[i] < 255) {
-                    return true;
-                }
-            }
-        }
-    }
-    return false;
 }
 
 function drawTransform(
@@ -197,22 +143,19 @@ export type TFilterTransformInput = {
 
 export const filterTransform = {
     getDialog(params: TFilterGetDialogParam) {
-        const context = params.context;
         const klCanvas = params.klCanvas;
-        if (!context || !klCanvas) {
-            return false;
-        }
-
+        const selectedLayerIndex = params.selectedLayerIndex;
+        const layer = klCanvas.getLayer(selectedLayerIndex);
+        const context = layer.context;
         const isSmall = testIsSmall();
         const layers = klCanvas.getLayers();
-        const selectedLayerIndex = throwIfNull(klCanvas.getLayerIndex(context.canvas));
         const isBgLayer = selectedLayerIndex === 0;
         let hasTransparency = false;
         if (isBgLayer) {
             const layer = Object.entries(params.composed.layerMap).find(
                 ([_, layer]) => layer.index === selectedLayerIndex,
             )![1];
-            hasTransparency = testComposedLayerHasTransparency(layer);
+            hasTransparency = composedLayerHasTransparency(layer);
         }
         const selection = klCanvas.getSelection();
 
@@ -236,6 +179,7 @@ export const filterTransform = {
         };
 
         const rootEl = BB.el();
+        const destroyer = new Destroyer();
         const result: TFilterGetDialogResult<TFilterTransformInput> = {
             element: rootEl,
         };
@@ -250,19 +194,19 @@ export const filterTransform = {
                 }
 
                 if (keyStr === 'left') {
-                    inputX.value = '' + (parseFloat(inputX.value) - 1);
+                    inputX.setValue(inputX.getValue() - 1);
                     onInputsChanged();
                 }
                 if (keyStr === 'right') {
-                    inputX.value = '' + (parseFloat(inputX.value) + 1);
+                    inputX.setValue(inputX.getValue() + 1);
                     onInputsChanged();
                 }
                 if (keyStr === 'up') {
-                    inputY.value = '' + (parseFloat(inputY.value) - 1);
+                    inputY.setValue(inputY.getValue() - 1);
                     onInputsChanged();
                 }
                 if (keyStr === 'down') {
-                    inputY.value = '' + (parseFloat(inputY.value) + 1);
+                    inputY.setValue(inputY.getValue() + 1);
                     onInputsChanged();
                 }
             },
@@ -270,75 +214,60 @@ export const filterTransform = {
 
         const leftWrapper = BB.el({
             css: {
-                width: '100px',
-                height: '30px',
+                width: 100,
+                height: 30,
                 display: 'inline-block',
             },
         });
         const rightWrapper = BB.el({
             css: {
-                width: '100px',
-                height: '30px',
+                width: 100,
+                height: 30,
                 display: 'inline-block',
             },
         });
         const rotWrapper = BB.el({
             css: {
-                width: '150px',
-                height: '30px',
+                width: 150,
+                height: 30,
                 display: 'inline-block',
             },
         });
-        const inputY = BB.el({ tagName: 'input' });
-        const inputX = BB.el({ tagName: 'input' });
-        const inputR = BB.el({ tagName: 'input' });
-        inputY.type = 'number';
-        inputX.type = 'number';
-        inputR.type = 'number';
-        inputX.style.width = 70 + 'px';
-        inputY.style.width = 70 + 'px';
-        inputR.style.width = 70 + 'px';
-        inputY.value = '0';
-        inputX.value = '0';
-        inputR.value = '0';
-        inputY.onclick = function () {
-            inputY.focus();
-            onInputsChanged();
-        };
-        inputX.onclick = function () {
-            inputX.focus();
-            onInputsChanged();
-        };
-        inputR.onclick = function () {
-            inputR.focus();
-            onInputsChanged();
-        };
-        inputY.onchange = function () {
-            onInputsChanged();
-        };
-        inputX.onchange = function () {
-            onInputsChanged();
-        };
-        inputR.onchange = function () {
-            onInputsChanged();
-        };
-        inputY.onkeyup = function () {
-            onInputsChanged();
-        };
-        inputX.onkeyup = function () {
-            onInputsChanged();
-        };
-        inputR.onkeyup = function () {
-            onInputsChanged();
-        };
-        leftWrapper.append('X: ', inputX);
-        rightWrapper.append('Y: ', inputY);
-        rotWrapper.append(LANG('filter-transform-rotation') + ': ', inputR);
+        const inputX = new Input<number>({
+            type: 'number',
+            init: 0,
+            step: 1,
+            name: 'transform-x',
+            label: 'X:',
+            css: { width: 70 },
+            onChange: () => onInputsChanged(),
+        });
+        const inputY = new Input<number>({
+            type: 'number',
+            init: 0,
+            step: 1,
+            name: 'transform-y',
+            label: 'Y:',
+            css: { width: 70 },
+            onChange: () => onInputsChanged(),
+        });
+        const inputR = new Input<number>({
+            type: 'number',
+            init: 0,
+            step: 1,
+            name: 'transform-rotation',
+            label: LANG('filter-transform-rotation') + ':',
+            css: { width: 70 },
+            onChange: () => onInputsChanged(),
+        });
+        leftWrapper.append(inputX.getElement());
+        rightWrapper.append(inputY.getElement());
+        rotWrapper.append(inputR.getElement());
         if (!isSmall) {
             const inputRow = BB.el({
                 parent: rootEl,
                 css: {
-                    marginTop: '10px',
+                    marginTop: 10,
                 },
             });
             inputRow.append(leftWrapper, rightWrapper, rotWrapper);
@@ -351,14 +280,16 @@ export const filterTransform = {
                 display: 'flex',
                 flexWrap: 'wrap',
                 alignItems: 'center',
-                gap: '10px',
-                marginTop: '10px',
+                gap: 10,
+                marginTop: 10,
             },
         });
         const flipXBtn = BB.el({
             parent: buttonRow,
             tagName: 'button',
+            className: 'kl-button',
             content: LANG('filter-transform-flip') + ' X',
+            destroyer,
             onClick: () => {
                 const transformed = flipTransformation(
                     {
@@ -374,7 +305,9 @@ export const filterTransform = {
         const flipYBtn = BB.el({
             parent: buttonRow,
             tagName: 'button',
+            className: 'kl-button',
             content: LANG('filter-transform-flip') + ' Y',
+            destroyer,
             onClick: () => {
                 const transformed = flipTransformation(
                     {
@@ -390,7 +323,9 @@ export const filterTransform = {
         const scaleRotLeftBtn = BB.el({
             parent: buttonRow,
             tagName: 'button',
+            className: 'kl-button',
             content: '-90°',
+            destroyer,
             onClick: () => {
                 const transformed = rotateTransformation(
                     {
@@ -400,14 +335,16 @@ export const filterTransform = {
                     -90,
                 ) as TComposedFree;
                 freeTransform.initialise(transformed.freeTransform);
-                inputR.value = '' + Math.round(transformed.freeTransform.angleDeg);
+                inputR.setValue(Math.round(transformed.freeTransform.angleDeg));
                 updatePreview();
             },
         });
         const scaleRotRightBtn = BB.el({
             parent: buttonRow,
             tagName: 'button',
+            className: 'kl-button',
             content: '+90°',
+            destroyer,
             onClick: () => {
                 const transformed = rotateTransformation(
                     {
@@ -417,14 +354,16 @@ export const filterTransform = {
                     90,
                 ) as TComposedFree;
                 freeTransform.initialise(transformed.freeTransform);
-                inputR.value = '' + Math.round(transformed.freeTransform.angleDeg);
+                inputR.setValue(Math.round(transformed.freeTransform.angleDeg));
                 updatePreview();
             },
         });
         const scaleDoubleBtn = BB.el({
             parent: buttonRow,
             tagName: 'button',
+            className: 'kl-button',
             content: '2&times;',
+            destroyer,
             onClick: () => {
                 const transformed = scaleTransformation(
                     {
@@ -440,7 +379,9 @@ export const filterTransform = {
         const scaleHalfBtn = BB.el({
             parent: buttonRow,
             tagName: 'button',
+            className: 'kl-button',
             content: '&frac12;&times;',
+            destroyer,
             onClick: () => {
                 const transformed = scaleTransformation(
                     {
@@ -456,7 +397,9 @@ export const filterTransform = {
         const centerBtn = BB.el({
             parent: buttonRow,
             tagName: 'button',
+            className: 'kl-button',
             content: LANG('center'),
+            destroyer,
             onClick: () => {
                 const transformed = centerTransformation(
                     {
@@ -466,8 +409,8 @@ export const filterTransform = {
                     { x: context.canvas.width / 2, y: context.canvas.height / 2 },
                 ) as TComposedFree;
                 freeTransform.initialise(transformed.freeTransform);
-                inputX.value = '' + Math.round(transformed.freeTransform.x - initTransform.x);
-                inputY.value = '' + Math.round(transformed.freeTransform.y - initTransform.y);
+                inputX.setValue(Math.round(transformed.freeTransform.x - initTransform.x));
+                inputY.setValue(Math.round(transformed.freeTransform.y - initTransform.y));
                 updatePreview();
             },
         });
@@ -538,7 +481,7 @@ export const filterTransform = {
             },
             css: {
                 display: 'inline-block',
-                marginLeft: '10px',
+                marginLeft: 10,
             },
             name: 'enable-snapping',
         });
@@ -549,7 +492,7 @@ export const filterTransform = {
             BB.el({
                 css: {
                     clear: 'both',
-                    height: '10px',
+                    height: 10,
                 },
             }),
         );
@@ -560,35 +503,29 @@ export const filterTransform = {
                 display: 'flex',
                 justifyContent: 'space-between',
                 alignItems: 'center',
-                marginBottom: '10px',
+                marginBottom: 10,
             },
         });
 
-        const algorithmSelect = new Select({
-            isFocusable: true,
-            optionArr: [
-                ['smooth', LANG('algorithm-smooth')],
-                ['pixelated', LANG('algorithm-pixelated')],
-            ],
+        const algorithmToggle = new InterpolationAlgorithmToggle({
             initValue: 'smooth',
-            title: LANG('scaling-algorithm'),
+            isFocusable: true,
             onChange: (): void => {
                 updatePreview(true);
             },
-            name: 'interpolation-algorithm',
         });
-        bottomRow.append(checkboxWrapper, algorithmSelect.getElement());
+        bottomRow.append(checkboxWrapper, algorithmToggle.getElement());
 
         const previewCanvas = BB.canvas(context.canvas.width, context.canvas.height);
         const previewLayerArr: TProjectViewportProject['layers'] = [];
         {
             for (let i = 0; i < layers.length; i++) {
                 previewLayerArr.push({
-                    image: i === selectedLayerIndex ? previewCanvas : layers[i].context.canvas,
+                    image: i === selectedLayerIndex ? previewCanvas : layers[i].canvas,
                     isVisible: layers[i].isVisible,
                     opacity: layers[i].opacity,
                     mixModeStr: layers[i].mixModeStr,
-                    hasClipping: false,
+                    hasClipping: layers[i].hasClipping,
                 });
             }
         }
@@ -614,8 +551,8 @@ export const filterTransform = {
         preview.render();
         css(preview.getElement(), {
             overflow: 'hidden',
-            marginLeft: '-20px',
-            marginRight: '-20px',
+            marginLeft: -20,
+            marginRight: -20,
         });
         rootEl.append(preview.getElement());
 
@@ -633,8 +570,8 @@ export const filterTransform = {
             const ctx = BB.ctx(previewCanvas);
             drawTransform(
                 ctx,
-                layers[selectedLayerIndex].context.canvas,
-                algorithmSelect.getValue() === 'pixelated',
+                layers[selectedLayerIndex].canvas,
+                algorithmToggle.getValue() === 'pixelated',
                 transform,
                 selection,
                 boundsObj,
@@ -654,26 +591,26 @@ export const filterTransform = {
             snapX: [0, context.canvas.width],
             snapY: [0, context.canvas.height],
             callback: function (t) {
-                inputX.value = '' + Math.round(t.x - initTransform.x);
-                inputY.value = '' + Math.round(t.y - initTransform.y);
-                inputR.value = '' + Math.round(t.angleDeg);
+                inputX.setValue(Math.round(t.x - initTransform.x));
+                inputY.setValue(Math.round(t.y - initTransform.y));
+                inputR.setValue(Math.round(t.angleDeg));
                 updatePreview();
             },
             viewportTransform: preview.getTransform(),
         });
         css(freeTransform.getElement(), {
             position: 'absolute',
-            left: '0',
-            top: '0',
+            left: 0,
+            top: 0,
         });
         preview.getElement().append(freeTransform.getElement());
 
         function onInputsChanged() {
             freeTransform.setPos({
-                x: parseInt(inputX.value) + initTransform.x,
-                y: parseInt(inputY.value) + initTransform.y,
+                x: inputX.getValue() + initTransform.x,
+                y: inputY.getValue() + initTransform.y,
             });
-            freeTransform.setAngleDeg(parseInt(inputR.value));
+            freeTransform.setAngleDeg(inputR.getValue());
             updatePreview();
         }
 
@@ -684,13 +621,11 @@ export const filterTransform = {
             freeTransform.destroy();
             constrainCheckbox.destroy();
             snappingCheckbox.destroy();
-            BB.destroyEl(flipXBtn);
-            BB.destroyEl(flipYBtn);
-            BB.destroyEl(scaleRotLeftBtn);
-            BB.destroyEl(scaleRotRightBtn);
-            BB.destroyEl(scaleDoubleBtn);
-            BB.destroyEl(scaleHalfBtn);
-            BB.destroyEl(centerBtn);
+            algorithmToggle.destroy();
+            inputX.destroy();
+            inputY.destroy();
+            inputR.destroy();
+            destroyer.destroy();
             preview.destroy();
             BB.freeCanvas(previewCanvas);
         };
@@ -702,7 +637,7 @@ export const filterTransform = {
             const input: TFilterTransformInput = {
                 transform,
                 bounds: boundsObj,
-                isPixelated: algorithmSelect.getValue() === 'pixelated',
+                isPixelated: algorithmToggle.getValue() === 'pixelated',
                 doClone,
                 isTransparentBg,
             };
@@ -718,11 +653,10 @@ export const filterTransform = {
         if (!context) {
             return false;
         }
-        klHistory.pause(true);
         const input = params.input;
-        const selectedLayerIndex = params.klCanvas.getLayerIndex(context.canvas)!;
+        const selectedLayerIndex = params.layer.index;
 
-        const copyCanvas = BB.copyCanvas(context.canvas);
+        const copyCanvas = BB.copyToCanvas(context.canvas);
         let selection = params.klCanvas.getSelection();
         const matrix = drawTransform(
             context,
@@ -736,9 +670,13 @@ export const filterTransform = {
         );
         if (selection && matrix) {
             selection = transformMultiPolygon(selection, matrix);
-            params.klCanvas.setSelection(selection);
+            klHistory.pause(true);
+            try {
+                params.klCanvas.setSelection(selection);
+            } finally {
+                klHistory.pause(false);
+            }
         }
-        klHistory.pause(false);
 
         {
             const layerMap = Object.fromEntries(

@@ -1,6 +1,5 @@
 import { BB } from '../../../bb/bb';
 import rotateImg from 'url:/src/app/img/ui/cursor-rotate.png';
-import { KeyListener } from '../../../bb/input/key-listener';
 import { TVector2D } from '../../../bb/bb-types';
 import { PointerListener } from '../../../bb/input/pointer-listener';
 import {
@@ -15,11 +14,15 @@ import { TViewportTransform } from '../project-viewport/project-viewport';
 import { createMatrixFromTransform } from '../../../bb/transform/create-matrix-from-transform';
 import { applyToPoint, inverse } from 'transformation-matrix';
 import { pointsToAngleDeg } from '../../../bb/math/math';
-import { TWheelEvent } from '../../../bb/input/event.types';
+import { TPointerEvent, TWheelEvent } from '../../../bb/input/event.types';
 import { TFreeTransform } from '../../transform/transform-types';
 
 const gripSize = 16;
 const edgeSize = 10;
+
+function isOnlyShiftPressed(event: TPointerEvent): boolean {
+    return event.shiftKey && !event.altKey && !event.ctrlKey && !event.metaKey;
+}
 
 // 0 - east
 function angleDegToCursor(angleDeg: number): string {
@@ -88,7 +91,6 @@ export class FreeTransform {
     private readonly transEl: HTMLElement; // at middle of transform. rotates
     private readonly boundsEl: HTMLElement; // draggable bounds rectangle with outline
     private readonly corners: TFreeTransformCorner[] = [];
-    private keyListener: KeyListener;
     private boundsPointerListener: PointerListener;
     private anglePointerListener: PointerListener;
     private readonly edges: TFreeTransformEdge[] = [];
@@ -99,6 +101,14 @@ export class FreeTransform {
         snap: boolean;
         updateDOM: () => void;
     };
+
+    // counterclockwise angle in canvas space -> counterclockwise angle in viewport space
+    private toViewportAngleDeg(angleDeg: number): number {
+        return (
+            (this.viewportTransform.isMirrored ? 180 - angleDeg : angleDeg) -
+            this.viewportTransform.angleDeg
+        );
+    }
 
     private updateScaled(): void {
         const viewportMatrix = createMatrixFromTransform(this.viewportTransform);
@@ -300,19 +310,17 @@ export class FreeTransform {
         this.updateScaled();
 
         css(this.transEl, {
-            left: this.rectInViewport.x + 'px',
-            top: this.rectInViewport.y + 'px',
+            left: this.rectInViewport.x,
+            top: this.rectInViewport.y,
             transformOrigin: '0 0',
-            transform: 'rotate(' + (this.value.angleDeg + this.viewportTransform.angleDeg) + 'deg)',
+            transform: `rotate(${this.viewportTransform.angleDeg}deg) scaleX(${this.viewportTransform.isMirrored ? -1 : 1}) rotate(${this.value.angleDeg}deg)`,
         });
 
         css(this.boundsEl, {
-            width: Math.abs(this.rectInViewport.width) + 'px',
-            height: Math.abs(this.rectInViewport.height) + 'px',
-            left:
-                Math.min(this.rectInViewport.corners[0].x, this.rectInViewport.corners[1].x) + 'px',
-            top:
-                Math.min(this.rectInViewport.corners[0].y, this.rectInViewport.corners[3].y) + 'px',
+            width: Math.abs(this.rectInViewport.width),
+            height: Math.abs(this.rectInViewport.height),
+            left: Math.min(this.rectInViewport.corners[0].x, this.rectInViewport.corners[1].x),
+            top: Math.min(this.rectInViewport.corners[0].y, this.rectInViewport.corners[3].y),
         });
 
         this.corners[0].updateDOM();
@@ -411,8 +419,6 @@ export class FreeTransform {
             pointerRemainder.x = 0;
             pointerRemainder.y = 0;
         }
-        this.keyListener = new BB.KeyListener({});
-
         let boundsStartP = {
             x: 0,
             y: 0,
@@ -498,7 +504,7 @@ export class FreeTransform {
                             }
                         }
                     }
-                    if (this.keyListener.getComboStr() === 'shift') {
+                    if (isOnlyShiftPressed(event)) {
                         let projected = BB.projectPointOnLine(
                             { x: 0, y: boundsStartP.y },
                             { x: 10, y: boundsStartP.y },
@@ -557,10 +563,10 @@ export class FreeTransform {
                             };
                         }
                     }
-                    if (snap.x != undefined) {
+                    if (snap.x !== undefined) {
                         this.value.x = snap.x;
                     }
-                    if (snap.y != undefined) {
+                    if (snap.y !== undefined) {
                         this.value.y = snap.y;
                     }
 
@@ -583,8 +589,8 @@ export class FreeTransform {
                     i: i,
                     el: BB.el({
                         css: {
-                            width: gripSize + 'px',
-                            height: gripSize + 'px',
+                            width: gripSize,
+                            height: gripSize,
                             background: '#fff',
                             /*background: [
                                 '#ff0000',
@@ -592,7 +598,7 @@ export class FreeTransform {
                                 '#0000ff',
                                 '#ff00ff',
                             ][i],*/
-                            borderRadius: gripSize + 'px',
+                            borderRadius: gripSize,
                             position: 'absolute',
                             border: '2px solid #000',
                         },
@@ -627,13 +633,11 @@ export class FreeTransform {
                         left:
                             this.rectInViewport.corners[g.i].x -
                             gripSize / 2 +
-                            offsetArr[i][0] * tinyOffset +
-                            'px',
+                            offsetArr[i][0] * tinyOffset,
                         top:
                             this.rectInViewport.corners[g.i].y -
                             gripSize / 2 +
-                            offsetArr[i][1] * tinyOffset +
-                            'px',
+                            offsetArr[i][1] * tinyOffset,
                     });
 
                     // cursor
@@ -649,10 +653,9 @@ export class FreeTransform {
                         x: cornerVectors[i].x * xMult,
                         y: cornerVectors[i].y * yMult * -1, // *-1 so 90° point up
                     };
-                    const angleDeg =
-                        pointsToAngleDeg({ x: 0, y: 0 }, cornerVector) -
-                        this.value.angleDeg -
-                        this.viewportTransform.angleDeg;
+                    const angleDeg = this.toViewportAngleDeg(
+                        pointsToAngleDeg({ x: 0, y: 0 }, cornerVector) - this.value.angleDeg,
+                    );
                     css(g.el, {
                         cursor: angleDegToCursor(angleDeg),
                     });
@@ -726,7 +729,7 @@ export class FreeTransform {
 
                             this.corners[indexes[0]].x = this.corners[i].x;
                             this.corners[indexes[1]].y = this.corners[i].y;
-                            if (this.keyListener.isPressed('shift')) {
+                            if (event.shiftKey) {
                                 this.corners[indexes[2]].x -= dX;
                                 this.corners[indexes[2]].y -= dY;
                                 this.corners[indexes[1]].x = this.corners[indexes[2]].x;
@@ -751,8 +754,8 @@ export class FreeTransform {
                 this.edges[i] = {
                     el: BB.el({
                         css: {
-                            width: edgeSize + 'px',
-                            height: edgeSize + 'px',
+                            width: edgeSize,
+                            height: edgeSize,
                             //background: ['red', 'green', 'blue', 'orange'][i],
                             position: 'absolute',
                         },
@@ -762,50 +765,43 @@ export class FreeTransform {
                 g.updateDOM = () => {
                     if (i === 0) {
                         css(g.el, {
-                            left:
-                                Math.min(
-                                    this.rectInViewport.corners[0].x,
-                                    this.rectInViewport.corners[1].x,
-                                ) + 'px',
+                            left: Math.min(
+                                this.rectInViewport.corners[0].x,
+                                this.rectInViewport.corners[1].x,
+                            ),
                             top:
                                 Math.min(
                                     this.rectInViewport.corners[0].y,
                                     this.rectInViewport.corners[3].y,
-                                ) -
-                                edgeSize +
-                                'px',
-                            width: Math.abs(this.rectInViewport.width) + 'px',
-                            height: edgeSize + 'px',
+                                ) - edgeSize,
+                            width: Math.abs(this.rectInViewport.width),
+                            height: edgeSize,
                         });
                     } else if (i === 1) {
                         css(g.el, {
-                            left:
-                                Math.max(
-                                    this.rectInViewport.corners[0].x,
-                                    this.rectInViewport.corners[1].x,
-                                ) + 'px',
-                            top:
-                                Math.min(
-                                    this.rectInViewport.corners[1].y,
-                                    this.rectInViewport.corners[2].y,
-                                ) + 'px',
-                            width: edgeSize + 'px',
-                            height: Math.abs(this.rectInViewport.height) + 'px',
+                            left: Math.max(
+                                this.rectInViewport.corners[0].x,
+                                this.rectInViewport.corners[1].x,
+                            ),
+                            top: Math.min(
+                                this.rectInViewport.corners[1].y,
+                                this.rectInViewport.corners[2].y,
+                            ),
+                            width: edgeSize,
+                            height: Math.abs(this.rectInViewport.height),
                         });
                     } else if (i === 2) {
                         css(g.el, {
-                            left:
-                                Math.min(
-                                    this.rectInViewport.corners[3].x,
-                                    this.rectInViewport.corners[2].x,
-                                ) + 'px',
-                            top:
-                                Math.max(
-                                    this.rectInViewport.corners[0].y,
-                                    this.rectInViewport.corners[3].y,
-                                ) + 'px',
-                            width: Math.abs(this.rectInViewport.width) + 'px',
-                            height: edgeSize + 'px',
+                            left: Math.min(
+                                this.rectInViewport.corners[3].x,
+                                this.rectInViewport.corners[2].x,
+                            ),
+                            top: Math.max(
+                                this.rectInViewport.corners[0].y,
+                                this.rectInViewport.corners[3].y,
+                            ),
+                            width: Math.abs(this.rectInViewport.width),
+                            height: edgeSize,
                         });
                     } else if (i === 3) {
                         css(g.el, {
@@ -813,16 +809,13 @@ export class FreeTransform {
                                 Math.min(
                                     this.rectInViewport.corners[0].x,
                                     this.rectInViewport.corners[1].x,
-                                ) -
-                                edgeSize +
-                                'px',
-                            top:
-                                Math.min(
-                                    this.rectInViewport.corners[0].y,
-                                    this.rectInViewport.corners[3].y,
-                                ) + 'px',
-                            width: edgeSize + 'px',
-                            height: Math.abs(this.rectInViewport.height) + 'px',
+                                ) - edgeSize,
+                            top: Math.min(
+                                this.rectInViewport.corners[0].y,
+                                this.rectInViewport.corners[3].y,
+                            ),
+                            width: edgeSize,
+                            height: Math.abs(this.rectInViewport.height),
                         });
                     }
                     const xFlipped = this.value.width < 0;
@@ -833,8 +826,7 @@ export class FreeTransform {
                         yFlipped ? 90 : -90,
                         xFlipped ? 0 : 180,
                     ];
-                    const angleDeg =
-                        angles[i] - this.value.angleDeg - this.viewportTransform.angleDeg;
+                    const angleDeg = this.toViewportAngleDeg(angles[i] - this.value.angleDeg);
                     css(g.el, {
                         cursor: angleDegToCursor(angleDeg),
                     });
@@ -915,7 +907,7 @@ export class FreeTransform {
                                 this.corners[indexes[2]][dimension] += d;
                                 this.corners[indexes[3]][dimension] += d;
                             }
-                            if (this.keyListener.isPressed('shift')) {
+                            if (event.shiftKey) {
                                 if (isInverted) {
                                     this.corners[indexes[2]][dimension] -= d;
                                     this.corners[indexes[3]][dimension] -= d;
@@ -946,10 +938,10 @@ export class FreeTransform {
             el: BB.el({
                 css: {
                     cursor: 'url(' + rotateImg + ') 10 10, move',
-                    width: gripSize + 'px',
-                    height: gripSize + 'px',
+                    width: gripSize,
+                    height: gripSize,
                     background: '#0ff',
-                    borderRadius: gripSize + 'px',
+                    borderRadius: gripSize,
                     position: 'absolute',
                     boxShadow: 'inset 0 0 0 2px #000',
                 },
@@ -959,18 +951,18 @@ export class FreeTransform {
             snap: false,
             updateDOM: () => {
                 css(this.angleGrip.el, {
-                    left: this.angleGrip.x - gripSize / 2 + 'px',
-                    top: this.angleGrip.y - gripSize / 2 + 'px',
+                    left: this.angleGrip.x - gripSize / 2,
+                    top: this.angleGrip.y - gripSize / 2,
                 });
             },
         };
         BB.el({
             parent: this.angleGrip.el,
             css: {
-                width: '2px',
-                height: '13px',
-                left: gripSize / 2 - 1 + 'px',
-                top: gripSize + 'px',
+                width: 2,
+                height: 13,
+                left: gripSize / 2 - 1,
+                top: gripSize,
                 background: '#0ff',
                 position: 'absolute',
             },
@@ -1000,7 +992,7 @@ export class FreeTransform {
                         ) + 90;
                     this.value.angleDeg = a;
                     const snapDeg = Math.round((a / 360) * 8) * 45;
-                    if (this.keyListener.getComboStr() === 'shift') {
+                    if (isOnlyShiftPressed(event)) {
                         this.value.angleDeg = snapDeg;
                     } else if (this.snappingEnabled && Math.abs(snapDeg - a) < 8) {
                         this.value.angleDeg = snapDeg;
@@ -1113,7 +1105,6 @@ export class FreeTransform {
     }
 
     destroy(): void {
-        this.keyListener.destroy();
         this.boundsPointerListener.destroy();
         this.corners.forEach((item) => item.pointerListener.destroy());
         this.edges.forEach((item) => item.pointerListener.destroy());

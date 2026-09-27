@@ -1,40 +1,22 @@
+import { getIconImg, getIconSvg, getIconUrl } from '../../../icon/icon';
 import { BB } from '../../../bb/bb';
 import { Options } from '../components/options';
-import modeSelectImg from 'url:/src/app/img/ui/select-mode-select.svg';
-import modeMoveImg from 'url:/src/app/img/ui/select-mode-move.svg';
 import { c } from '../../../bb/base/c';
 import { TBooleanOperation, TSelectShape } from '../../select-tool/select-tool';
-import defaultImSvg from 'url:/src/app/img/ui/select-default.svg';
-import unionImSvg from 'url:/src/app/img/ui/select-union.svg';
-import subtractImSvg from 'url:/src/app/img/ui/select-subtract.svg';
-import rectSvg from 'url:/src/app/img/ui/select-shape-rect.svg';
-import ellipseSvg from 'url:/src/app/img/ui/select-shape-ellipse.svg';
-import lassoSvg from 'url:/src/app/img/ui/select-shape-lasso.svg';
-import polySvg from 'url:/src/app/img/ui/select-shape-poly.svg';
-import removeLayerImg from 'url:/src/app/img/ui/remove-layer.svg';
-import duplicateLayerImg from 'url:/src/app/img/ui/duplicate-layer.svg';
-import warpImg from 'url:/src/app/img/ui/select-transform-warp.svg';
-import { Select } from '../components/select';
+import { SelectCustom } from '../components/select-custom';
 import { LANG } from '../../../language/language';
 import { Checkbox } from '../components/checkbox';
-import { createImage } from '../../../bb/base/ui';
 import { css } from '../../../bb/base/base';
 import { TInterpolationAlgorithm } from '../../kl-types';
 import { Icon } from '../components/icon';
-import { createCanvas } from '../../../bb/base/create-canvas';
 import { TFreeTransform } from '../../transform/transform-types';
 import { webGl2IsSupported } from '../../image-operations/gpu-composite-canvas';
+import { InterpolationAlgorithmToggle } from '../components/interpolation-algorithm-toggle';
 
-function getAlgorithmIconDataUrl(): string {
-    const canvas = createCanvas(3, 3);
-    const ctx = BB.ctx(canvas);
-    ctx.fillRect(0, 0, 1, 1);
-    ctx.fillRect(2, 0, 1, 1);
-    ctx.fillRect(1, 1, 1, 1);
-    ctx.fillRect(0, 2, 1, 1);
-    ctx.fillRect(2, 2, 1, 1);
-    return canvas.toDataURL('image/png');
-}
+const modeSelectImg = getIconUrl('select-mode-select');
+const modeMoveImg = getIconUrl('select-mode-move');
+const duplicateLayerImg = getIconUrl('duplicate-layer');
+const warpImg = getIconUrl('select-transform-warp');
 
 export type TSelectUiParams = {
     // return false to reject mode-change
@@ -78,9 +60,9 @@ export class SelectUi {
     private hasSelection: boolean = false;
     private selectResetBtn: HTMLButtonElement;
     private positionOutput: HTMLElement;
-    private moveToLayerSelect: Select<string>;
+    private moveToLayerSelect: SelectCustom<string>;
     private transparentBackgroundToggle: Checkbox;
-    private algorithmOptions: Options<TInterpolationAlgorithm>;
+    private algorithmOptions: InterpolationAlgorithmToggle;
     private warpCheckbox: Checkbox;
     private constrainCheckbox: Checkbox;
     private snappingCheckbox: Checkbox;
@@ -109,7 +91,7 @@ export class SelectUi {
                                 '</span>',
                             css: {
                                 display: 'flex',
-                                gap: '5px',
+                                gap: 5,
                                 alignItems: 'center',
                                 height: '100%',
                                 margin: '10px 4px',
@@ -131,7 +113,7 @@ export class SelectUi {
                                 '</span>',
                             css: {
                                 display: 'flex',
-                                gap: '5px',
+                                gap: 5,
                                 alignItems: 'center',
                                 height: '100%',
                                 margin: '10px 4px',
@@ -153,25 +135,27 @@ export class SelectUi {
                 return this.onChangeMode(val);
             },
             optionCss: {
-                flexGrow: '1',
-                flexBasis: '0',
+                flexGrow: 1,
+                flexBasis: 0,
             },
             css: {
-                marginBottom: '10px',
+                marginBottom: 10,
             },
         });
 
         // --- select ---
         const selectModeEl = BB.el();
 
-        const defaultIm = new Image();
-        defaultIm.src = defaultImSvg;
+        const selectOptionImageStyle = {
+            width: 32,
+            height: 32,
+        };
+
+        const defaultIm = getIconImg('select-default', selectOptionImageStyle);
         defaultIm.classList.add('dark-invert');
-        const unionIm = new Image();
-        unionIm.src = unionImSvg;
+        const unionIm = getIconImg('select-union', selectOptionImageStyle);
         unionIm.classList.add('dark-invert');
-        const subtractIm = new Image();
-        subtractIm.src = subtractImSvg;
+        const subtractIm = getIconImg('select-subtract', selectOptionImageStyle);
         subtractIm.classList.add('dark-invert');
 
         this.operationOptions = new Options<TBooleanOperation>({
@@ -197,30 +181,18 @@ export class SelectUi {
                 p.onChangeBooleanOperation(v);
             },
             css: {
-                marginBottom: '10px',
+                marginBottom: 10,
             },
         });
 
-        const imStyle = {
-            width: '32px',
-            height: '32px',
-        };
-        const rectIm = new Image();
-        rectIm.src = rectSvg;
+        const rectIm = getIconImg('select-shape-rect', selectOptionImageStyle);
         rectIm.classList.add('dark-invert');
-        css(rectIm, imStyle);
-        const ellipseIm = new Image();
-        ellipseIm.src = ellipseSvg;
+        const ellipseIm = getIconImg('select-shape-ellipse', selectOptionImageStyle);
         ellipseIm.classList.add('dark-invert');
-        css(ellipseIm, imStyle);
-        const lassoIm = new Image();
-        lassoIm.src = lassoSvg;
+        const lassoIm = getIconImg('select-shape-lasso', selectOptionImageStyle);
         lassoIm.classList.add('dark-invert');
-        css(lassoIm, imStyle);
-        const polyIm = new Image();
-        polyIm.src = polySvg;
+        const polyIm = getIconImg('select-shape-poly', selectOptionImageStyle);
         polyIm.classList.add('dark-invert');
-        css(polyIm, imStyle);
 
         const shapeOptions = new Options<TSelectShape>({
             optionArr: [
@@ -250,7 +222,7 @@ export class SelectUi {
                 p.select.onChangeShape(val);
             },
             css: {
-                marginBottom: '10px',
+                marginBottom: 10,
             },
         });
         selectModeEl.append(shapeOptions.getElement(), this.operationOptions.getElement());
@@ -259,7 +231,7 @@ export class SelectUi {
             parent: selectModeEl,
             css: {
                 display: 'flex',
-                gap: '5px',
+                gap: 5,
                 flexWrap: 'wrap',
             },
         });
@@ -267,56 +239,47 @@ export class SelectUi {
         const selectAllBtn = BB.el({
             parent: actionRow,
             tagName: 'button',
+            className: 'kl-button',
             content: LANG('select-all'),
-            onClick: () => {
-                p.select.onAll();
-            },
-            custom: {
-                tabindex: '-1',
+            onClick: () => p.select.onAll(),
+            props: {
+                tabIndex: -1,
             },
             css: {
-                minHeight: '30px',
+                minHeight: 30,
             },
         });
         const selectInvertBtn = BB.el({
             parent: actionRow,
             tagName: 'button',
+            className: 'kl-button',
             content: LANG('select-invert'),
-            onClick: () => {
-                p.select.onInvert();
-            },
-            custom: {
-                tabindex: '-1',
+            onClick: () => p.select.onInvert(),
+            props: {
+                tabIndex: -1,
             },
             css: {
-                minHeight: '30px',
+                minHeight: 30,
             },
         });
         this.selectResetBtn = BB.el({
             parent: actionRow,
             tagName: 'button',
             content: [
-                createImage({
-                    src: removeLayerImg,
-                    alt: 'icon',
+                getIconSvg('remove-layer', {
                     height: 20,
-                    css: {
-                        marginRight: '3px',
-                        filter: 'invert(1)',
-                    },
+                    marginRight: 3,
                 }),
                 LANG('select-reset'),
             ],
             className: 'kl-button kl-button-primary',
             css: {
-                paddingRight: '8px',
+                paddingRight: 8,
                 display: 'none',
             },
-            onClick: () => {
-                p.select.onReset();
-            },
-            custom: {
-                tabindex: '-1',
+            onClick: () => p.select.onReset(),
+            props: {
+                tabIndex: -1,
             },
         });
 
@@ -330,30 +293,28 @@ export class SelectUi {
             parent: selectModeEl,
             css: {
                 display: 'flex',
-                gap: '5px',
+                gap: 5,
             },
         });
         const eraseBtn = BB.el({
             parent: actionsWrapper,
             tagName: 'button',
+            className: 'kl-button',
             content: LANG('select-erase'),
-            onClick: () => {
-                p.onErase();
-            },
-            custom: {
-                tabindex: '-1',
+            onClick: () => p.onErase(),
+            props: {
+                tabIndex: -1,
             },
         });
 
         const fillBtn = BB.el({
             parent: actionsWrapper,
             tagName: 'button',
+            className: 'kl-button',
             content: LANG('select-fill'),
-            onClick: () => {
-                p.onFill();
-            },
-            custom: {
-                tabindex: '-1',
+            onClick: () => p.onFill(),
+            props: {
+                tabIndex: -1,
             },
         });
 
@@ -362,52 +323,47 @@ export class SelectUi {
             css: {
                 display: 'flex',
                 flexDirection: 'column',
-                gap: '10px',
+                gap: 10,
             },
         });
 
-        this.positionOutput = BB.el({ css: { fontFamily: 'monospace', fontSize: '13px' } });
+        this.positionOutput = BB.el({ css: { fontFamily: 'monospace', fontSize: 13 } });
         transformModeEl.append(this.positionOutput);
 
         const transformFlipXBtn = BB.el({
             tagName: 'button',
             content: LANG('filter-transform-flip') + ' X',
             className: 'kl-button',
-            onClick: () => {
-                p.transform.onFlipX();
-            },
-            custom: {
-                tabindex: '-1',
+            onClick: () => p.transform.onFlipX(),
+            props: {
+                tabIndex: -1,
             },
         });
         const transformFlipYBtn = BB.el({
             tagName: 'button',
+            className: 'kl-button',
             content: LANG('filter-transform-flip') + ' Y',
-            onClick: () => {
-                p.transform.onFlipY();
-            },
-            custom: {
-                tabindex: '-1',
+            onClick: () => p.transform.onFlipY(),
+            props: {
+                tabIndex: -1,
             },
         });
         const rotateNegativeBtn = BB.el({
             tagName: 'button',
+            className: 'kl-button',
             content: '-90°',
-            onClick: () => {
-                p.transform.onRotateDeg(-90);
-            },
-            custom: {
-                tabindex: '-1',
+            onClick: () => p.transform.onRotateDeg(-90),
+            props: {
+                tabIndex: -1,
             },
         });
         const rotatePositiveBtn = BB.el({
             tagName: 'button',
+            className: 'kl-button',
             content: '+90°',
-            onClick: () => {
-                p.transform.onRotateDeg(90);
-            },
-            custom: {
-                tabindex: '-1',
+            onClick: () => p.transform.onRotateDeg(90),
+            props: {
+                tabIndex: -1,
             },
         });
 
@@ -419,49 +375,45 @@ export class SelectUi {
         });
         const transformDuplicateBtn = BB.el({
             tagName: 'button',
+            className: 'kl-button',
             content: [duplicateIcon.getElement(), LANG('select-transform-clone')],
-            onClick: () => {
-                p.transform.onClone();
-            },
+            onClick: () => p.transform.onClone(),
             css: {
                 display: 'flex',
-                gap: '5px',
+                gap: 5,
             },
-            custom: {
-                tabindex: '-1',
+            props: {
+                tabIndex: -1,
             },
         });
 
         const scaleDoubleBtn = BB.el({
             tagName: 'button',
+            className: 'kl-button',
             content: '2&times;',
-            onClick: () => {
-                p.transform.onScale(2);
-            },
-            custom: {
-                tabindex: '-1',
+            onClick: () => p.transform.onScale(2),
+            props: {
+                tabIndex: -1,
             },
         });
 
         const scaleHalfBtn = BB.el({
             tagName: 'button',
+            className: 'kl-button',
             content: '&frac12;&times;',
-            onClick: () => {
-                p.transform.onScale(1 / 2);
-            },
-            custom: {
-                tabindex: '-1',
+            onClick: () => p.transform.onScale(1 / 2),
+            props: {
+                tabIndex: -1,
             },
         });
 
         const centerBtn = BB.el({
             tagName: 'button',
+            className: 'kl-button',
             content: LANG('center'),
-            onClick: () => {
-                p.transform.onCenter();
-            },
-            custom: {
-                tabindex: '-1',
+            onClick: () => p.transform.onCenter(),
+            props: {
+                tabIndex: -1,
             },
         });
 
@@ -480,7 +432,7 @@ export class SelectUi {
             css: {
                 display: 'flex',
                 flexWrap: 'wrap',
-                gap: '5px',
+                gap: 5,
             },
         });
 
@@ -505,7 +457,7 @@ export class SelectUi {
             },
             css: {
                 display: 'inline-block',
-                marginLeft: '10px',
+                marginLeft: 10,
             },
             name: 'enable-snapping',
         });
@@ -534,45 +486,14 @@ export class SelectUi {
         );
         transformModeEl.append(checkboxWrapper);
 
-        const iconSmooth = new Image();
-        iconSmooth.src = getAlgorithmIconDataUrl();
-        iconSmooth.className = 'dark-invert';
-        css(iconSmooth, {
-            width: '20px',
-            height: '20px',
-            margin: '4px',
-        });
-
-        const iconPixelated = new Image();
-        iconPixelated.src = iconSmooth.src;
-        iconPixelated.className = 'dark-invert';
-        css(iconPixelated, {
-            width: '20px',
-            height: '20px',
-            margin: '4px',
-            imageRendering: 'pixelated',
-        });
-
-        this.algorithmOptions = new Options({
-            optionArr: [
-                {
-                    id: 'smooth',
-                    label: iconSmooth,
-                    title: LANG('algorithm-smooth'),
-                },
-                {
-                    id: 'pixelated',
-                    label: iconPixelated,
-                    title: LANG('algorithm-pixelated'),
-                },
-            ],
+        this.algorithmOptions = new InterpolationAlgorithmToggle({
             onChange: (algorithm) => {
                 p.transform.onChangeAlgorithm(algorithm);
             },
         });
         transformModeEl.append(this.algorithmOptions.getElement());
 
-        this.moveToLayerSelect = new Select({
+        this.moveToLayerSelect = new SelectCustom({
             optionArr: [
                 ['1', 'Layer 2'],
                 ['0', 'Layer 1'],
@@ -619,7 +540,7 @@ export class SelectUi {
         this.rootEl = BB.el({
             content: [this.modeOptions.getElement()],
             css: {
-                margin: '10px',
+                margin: 10,
             },
         });
         updateMode();
@@ -694,6 +615,6 @@ export class SelectUi {
     }
 
     destroy(): void {
-        // ...
+        this.algorithmOptions.destroy();
     }
 }

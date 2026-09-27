@@ -8,6 +8,7 @@ export type TMetaTransform = {
     canvasP: TVector2D;
     scale: number;
     angleDeg: number;
+    isMirrored: boolean;
 };
 
 export function toMetaTransform(
@@ -21,5 +22,6 @@ export function toMetaTransform(
         canvasP,
         scale: transform.scale,
         angleDeg: transform.angleDeg,
+        isMirrored: transform.isMirrored,
     };
 }

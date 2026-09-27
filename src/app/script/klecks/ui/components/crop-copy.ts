@@ -1,4 +1,6 @@
+import { getIconUrl } from '../../../icon/icon';
 import { BB } from '../../../bb/bb';
+import { changeCanvasDimensions } from '../../../bb/base/change-canvas-dimensions';
 import { KeyListener } from '../../../bb/input/key-listener';
 import { PointerListener } from '../../../bb/input/pointer-listener';
 import { TRect, TVector2D } from '../../../bb/bb-types';
@@ -7,14 +9,14 @@ import { applyToPoint, inverse } from 'transformation-matrix';
 import { createMatrixFromTransform } from '../../../bb/transform/create-matrix-from-transform';
 import { clamp } from '../../../bb/math/math';
 import { LANG } from '../../../language/language';
-import editCropImg from 'url:/src/app/img/ui/edit-crop.svg';
 import { EventChain } from '../../../bb/input/event-chain/event-chain';
 import { OnePointerLimiter } from '../../../bb/input/event-chain/one-pointer-limiter';
 import { TChainElement } from '../../../bb/input/event-chain/event-chain.types';
 import { canvasToBlob } from '../../../bb/base/canvas';
-import { TProjectViewportProject } from '../project-viewport/project-viewport';
+import { TProjectViewportLayer } from '../project-viewport/project-viewport';
 import { css } from '../../../bb/base/base';
 
+const editCropImg = getIconUrl('edit-crop');
 export type TCropCopyParams = {
     // size of dom element
     width: number;
@@ -56,7 +58,7 @@ export class CropCopy {
     private readonly selectionRectEl: HTMLElement;
     private readonly preview: Preview;
     private mode: TPreviewMode = 'edit';
-    private previewLayer: TProjectViewportProject['layers'][number];
+    private previewLayer: TProjectViewportLayer;
 
     private resetCrop(): void {
         this.cropRect = {
@@ -80,8 +82,12 @@ export class CropCopy {
     }
 
     private async updateCroppedCanvas(): Promise<void> {
-        this.croppedCanvas.width = Math.round(this.cropRect.width);
-        this.croppedCanvas.height = Math.round(this.cropRect.height);
+        changeCanvasDimensions(
+            this.croppedCanvas,
+            Math.round(this.cropRect.width),
+            Math.round(this.cropRect.height),
+            { ensureCleared: true },
+        );
         const ctx = BB.ctx(this.croppedCanvas);
         ctx.drawImage(this.canvas, Math.round(-this.cropRect.x), Math.round(-this.cropRect.y));
 
@@ -100,10 +106,10 @@ export class CropCopy {
         const rect = this.getViewportSelectionRect();
 
         css(this.selectionRectEl, {
-            left: rect.x + 'px',
-            top: rect.y + 'px',
-            width: rect.width + 'px',
-            height: rect.height + 'px',
+            left: rect.x,
+            top: rect.y,
+            width: rect.width,
+            height: rect.height,
             display: this.isReset() ? 'none' : '',
         });
         this.onChange?.(Math.round(this.cropRect.width), Math.round(this.cropRect.height));
@@ -125,8 +131,8 @@ export class CropCopy {
             className: 'kl-edit-crop-preview',
             css: {
                 position: 'relative',
-                height: p.height + 'px',
-                width: p.width + 'px',
+                height: p.height,
+                width: p.width,
                 overflow: 'hidden',
             },
         });
@@ -155,8 +161,9 @@ export class CropCopy {
             this.eventTarget = this.croppedImageElement;
         }
         css(this.eventTarget, {
-            height: p.height + 'px',
-            width: p.width + 'px',
+            height: p.height,
+            width: p.width,
+            touchAction: 'none',
         });
         this.rootEl.append(this.eventTarget);
         this.updateCroppedCanvas();
@@ -189,8 +196,8 @@ export class CropCopy {
         });
         css(this.preview.getElement(), {
             position: 'absolute',
-            left: '0',
-            top: '0',
+            left: 0,
+            top: 0,
             overflow: 'hidden',
             pointerEvents: 'none',
         });
@@ -300,6 +307,7 @@ export class CropCopy {
             onWheel: (event) => {
                 this.preview.onWheel(event);
             },
+            useDirtyWheel: true,
             onPointer: (event) => {
                 if (this.mode === 'hand') {
                     event.eventPreventDefault();

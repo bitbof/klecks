@@ -1,18 +1,21 @@
+import { LayerCompositor } from '../../../canvas/layer-compositor';
+import { getIconUrl } from '../../../../icon/icon';
 import { BB } from '../../../../bb/bb';
-import { css, throwIfNull } from '../../../../bb/base/base';
+import { changeCanvasDimensions } from '../../../../bb/base/change-canvas-dimensions';
+import { css, Destroyer, throwIfNull } from '../../../../bb/base/base';
 import { THEME } from '../../../../theme/theme';
 import { renderText, TRenderTextParam } from '../../../image-operations/render-text';
-import { KlCanvas } from '../../../canvas/kl-canvas';
+import { KlCanvas, TKlCanvasLayer } from '../../../canvas/kl-canvas';
 import { KlSlider } from '../../components/kl-slider';
 import { PointerListener } from '../../../../bb/input/pointer-listener';
 import { LANG } from '../../../../language/language';
-import toolZoomInImg from 'url:/src/app/img/ui/tool-zoom-in.svg';
-import toolZoomOutImg from 'url:/src/app/img/ui/tool-zoom-out.svg';
 import { c } from '../../../../bb/base/c';
 import { TVector2D } from '../../../../bb/bb-types';
 import { KeyListener } from '../../../../bb/input/key-listener';
 import { getSelectionPath2d } from '../../../../bb/multi-polygon/get-selection-path-2d';
 
+const toolZoomInImg = getIconUrl('tool-zoom-in');
+const toolZoomOutImg = getIconUrl('tool-zoom-out');
 type TViewportParams = Pick<TRenderTextParam, 'x' | 'y' | 'angleRad'>;
 
 type TViewportUIParams = {
@@ -36,7 +39,7 @@ export class TextToolViewportUI {
     private zoomFac: number = 0;
     private scale: number = 1;
 
-    private readonly layerArr: ReturnType<KlCanvas['getLayersFast']> = [];
+    private readonly layerArr: TKlCanvasLayer[] = [];
     private readonly layerIndex: number;
 
     private readonly textCanvas: HTMLCanvasElement;
@@ -47,6 +50,8 @@ export class TextToolViewportUI {
 
     private readonly layersCanvas: HTMLCanvasElement;
     private readonly layersCtx: CanvasRenderingContext2D;
+
+    private readonly compositor = new LayerCompositor();
 
     private readonly previewCanvas: HTMLCanvasElement;
     private readonly previewCtx: CanvasRenderingContext2D;
@@ -64,6 +69,7 @@ export class TextToolViewportUI {
 
     private readonly previewPointerListener: PointerListener;
     private readonly keyListener: KeyListener;
+    private readonly destroyer = new Destroyer();
 
     private readonly onDarkChange = () => {
         this.checkerPattern = throwIfNull(
@@ -83,7 +89,7 @@ export class TextToolViewportUI {
         this.zoomOutBtn.disabled = !this.canZoom(-1);
     }
 
-    /** Move text by x y **/
+    // Move text by x y
     private move(x: number, y: number): void {
         const rotated = BB.rotate(x, y, (-this.rotationSlider.getValue() / Math.PI) * 180);
         this.text.x += rotated.x / this.scale;
@@ -112,7 +118,7 @@ export class TextToolViewportUI {
         this.width = isSmallWidth ? 340 : 540;
         this.height = isSmallWidth ? (isSmallHeight ? 210 : 260) : isSmallHeight ? 230 : 350;
 
-        this.layerArr = p.klCanvas.getLayersFast();
+        this.layerArr = p.klCanvas.getLayers();
         this.textCanvas = BB.canvas(p.klCanvas.getWidth(), p.klCanvas.getHeight());
         this.textCtx = BB.ctx(this.textCanvas);
         this.targetCanvas = BB.canvas(this.width, this.height);
@@ -128,7 +134,7 @@ export class TextToolViewportUI {
             parent: this.rootEl,
             css: {
                 position: 'relative',
-                width: this.width + 'px',
+                width: this.width,
                 cursor: 'move',
                 touchAction: 'none',
             },
@@ -200,6 +206,7 @@ export class TextToolViewportUI {
                 }
                 if (e.type === 'pointerup' && offsetDragged) {
                     let count = 0;
+                    clearInterval(this.interval);
                     this.interval = setInterval(() => {
                         if (count > 8) {
                             clearInterval(this.interval);
@@ -222,12 +229,11 @@ export class TextToolViewportUI {
                 }
             },
             onWheel: (e) => {
+                e.event?.preventDefault();
                 this.changeZoomFac(-e.deltaY);
             },
+            useDirtyWheel: true,
         });
-
-        const wheelPrevent = (event: WheelEvent): void => event.preventDefault();
-        this.previewCanvas.addEventListener('wheel', wheelPrevent, { passive: false });
 
         this.rotationSlider = new KlSlider({
             label: LANG('filter-transform-rotation'),
@@ -249,8 +255,10 @@ export class TextToolViewportUI {
 
         this.zoomInBtn = BB.el({
             tagName: 'button',
+            className: 'kl-button',
             content: `<img height="20" src="${toolZoomInImg}">`,
             title: LANG('zoom-in'),
+            destroyer: this.destroyer,
             onClick: () => this.changeZoomFac(1),
             css: {
                 fontWeight: 'bold',
@@ -258,8 +266,10 @@ export class TextToolViewportUI {
         });
         this.zoomOutBtn = BB.el({
             tagName: 'button',
+            className: 'kl-button',
             content: `<img height="20" src="${toolZoomOutImg}">`,
             title: LANG('zoom-out'),
+            destroyer: this.destroyer,
             onClick: () => this.changeZoomFac(-1),
             css: {
                 fontWeight: 'bold',
@@ -269,10 +279,10 @@ export class TextToolViewportUI {
         this.eventCapture = BB.el({
             css: {
                 position: 'absolute',
-                left: '0',
-                top: '0',
-                right: '0',
-                bottom: '0',
+                left: 0,
+                top: 0,
+                right: 0,
+                bottom: 0,
                 zIndex: '999',
                 cursor: 'move',
             },
@@ -326,17 +336,6 @@ export class TextToolViewportUI {
             this.selectionPath,
         );
 
-        if (this.selectionPath) {
-            this.textCtx.save();
-            this.textCtx.setLineDash([4]);
-            this.textCtx.strokeStyle = '#000';
-            this.textCtx.stroke(this.selectionPath);
-            this.textCtx.lineDashOffset = 4;
-            this.textCtx.strokeStyle = '#fff';
-            this.textCtx.stroke(this.selectionPath);
-            this.textCtx.restore();
-        }
-
         // transform offset
         const transformedOffset = BB.Vec2.mul(
             BB.rotate(this.offset.x, this.offset.y, (-angleRad / Math.PI) * 180),
@@ -362,7 +361,7 @@ export class TextToolViewportUI {
             this.height - padding,
         );
         this.scale = Math.min(1, fitBounds.width / bounds.width);
-        this.scale = Math.min(4, this.scale * Math.pow(2, this.zoomFac));
+        this.scale = Math.min(4, this.scale * 2 ** this.zoomFac);
 
         // --- compose text and target layer ---
         this.targetCtx.save();
@@ -435,40 +434,25 @@ export class TextToolViewportUI {
                 this.layersCtx.imageSmoothingQuality = this.scale >= 1 ? 'low' : 'medium';
             }
 
-            // layers below
-            this.layersCtx.save();
-            this.layersCtx.translate(this.width / 2, this.height / 2);
-            this.layersCtx.scale(this.scale, this.scale);
-            this.layersCtx.rotate(angleRad);
-            for (let i = 0; i < this.layerIndex; i++) {
-                if (this.layerArr[i].isVisible && this.layerArr[i].opacity > 0) {
-                    this.layersCtx.globalAlpha = this.layerArr[i].opacity;
-                    this.layersCtx.globalCompositeOperation = this.layerArr[i].mixModeStr;
-                    this.layersCtx.drawImage(this.layerArr[i].canvas, -centerX, -centerY);
-                }
-            }
-            this.layersCtx.restore();
-
-            // target layer
-            this.layersCtx.globalAlpha =
-                this.layerArr[this.layerIndex].opacity *
-                (this.layerArr[this.layerIndex].isVisible ? 1 : 0);
-            this.layersCtx.globalCompositeOperation = this.layerArr[this.layerIndex].mixModeStr;
-            this.layersCtx.drawImage(this.targetCanvas, 0, 0);
-
-            // layers above
-            this.layersCtx.save();
-            this.layersCtx.translate(this.width / 2, this.height / 2);
-            this.layersCtx.scale(this.scale, this.scale);
-            this.layersCtx.rotate(angleRad);
-            for (let i = this.layerIndex + 1; i < this.layerArr.length; i++) {
-                if (this.layerArr[i].isVisible && this.layerArr[i].opacity > 0) {
-                    this.layersCtx.globalAlpha = this.layerArr[i].opacity;
-                    this.layersCtx.globalCompositeOperation = this.layerArr[i].mixModeStr;
-                    this.layersCtx.drawImage(this.layerArr[i].canvas, -centerX, -centerY);
-                }
-            }
-            this.layersCtx.restore();
+            this.compositor.draw(
+                this.layersCtx,
+                this.layerArr,
+                this.width,
+                this.height,
+                (ctx, layer) => {
+                    const layerIndex = this.layerArr.indexOf(layer);
+                    if (layerIndex === this.layerIndex) {
+                        ctx.drawImage(this.targetCanvas, 0, 0);
+                    } else {
+                        ctx.save();
+                        ctx.translate(this.width / 2, this.height / 2);
+                        ctx.scale(this.scale, this.scale);
+                        ctx.rotate(angleRad);
+                        ctx.drawImage(this.layerArr[layerIndex].canvas, -centerX, -centerY);
+                        ctx.restore();
+                    }
+                },
+            );
         }
 
         this.layersCtx.restore();
@@ -479,6 +463,28 @@ export class TextToolViewportUI {
         this.previewCtx.fillRect(0, 0, this.previewCanvas.width, this.previewCanvas.height);
         this.previewCtx.drawImage(this.layersCanvas, 0, 0);
         this.previewCtx.restore();
+
+        if (this.selectionPath) {
+            const selectionPath = new Path2D();
+            selectionPath.addPath(
+                this.selectionPath,
+                new DOMMatrix()
+                    .translate(this.width / 2, this.height / 2)
+                    .scale(this.scale)
+                    .rotate((angleRad / Math.PI) * 180)
+                    .translate(-centerX, -centerY),
+            );
+
+            this.previewCtx.save();
+            this.previewCtx.setLineDash([4]);
+            this.previewCtx.lineWidth = 1;
+            this.previewCtx.strokeStyle = '#000';
+            this.previewCtx.stroke(selectionPath);
+            this.previewCtx.lineDashOffset = 4;
+            this.previewCtx.strokeStyle = '#fff';
+            this.previewCtx.stroke(selectionPath);
+            this.previewCtx.restore();
+        }
 
         // bounds
         this.previewCtx.save();
@@ -537,14 +543,9 @@ export class TextToolViewportUI {
         this.width = width;
         this.height = height;
 
-        this.targetCanvas.width = this.width;
-        this.targetCanvas.height = this.height;
-
-        this.layersCanvas.width = this.width;
-        this.layersCanvas.height = this.height;
-
-        this.previewCanvas.width = this.width;
-        this.previewCanvas.height = this.height;
+        changeCanvasDimensions(this.targetCanvas, this.width, this.height);
+        changeCanvasDimensions(this.layersCanvas, this.width, this.height);
+        changeCanvasDimensions(this.previewCanvas, this.width, this.height);
 
         this.previewWrapper.style.width = this.width + 'px';
 
@@ -552,17 +553,14 @@ export class TextToolViewportUI {
     }
 
     destroy(): void {
-        BB.destroyEl(this.rootEl);
-        BB.destroyEl(this.inputsRootEl);
-        BB.destroyEl(this.previewWrapper);
         clearInterval(this.interval);
 
         this.rotationSlider.destroy();
-        BB.destroyEl(this.zoomInBtn);
-        BB.destroyEl(this.zoomOutBtn);
+        this.destroyer.destroy();
         this.eventCapture.remove();
         this.previewPointerListener.destroy();
         this.keyListener.destroy();
+        this.compositor.destroy();
         THEME.removeIsDarkListener(this.onDarkChange);
     }
 }

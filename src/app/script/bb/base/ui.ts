@@ -1,4 +1,5 @@
-import { css } from './base';
+import { css, Destroyer } from './base';
+import { TCss } from '../bb-types';
 import { BB } from '../bb';
 
 export function appendTextDiv(target: HTMLElement, text: string): HTMLDivElement {
@@ -8,6 +9,8 @@ export function appendTextDiv(target: HTMLElement, text: string): HTMLDivElement
     return div;
 }
 
+// if you want a button to be registered by isInputFocused()
+export const focusableElementClassName = 'kl-focusable-element';
 /**
  * Is an input element focused.
  * Set attribute "data-ignore-focus" to "true" if its focus should be ignored.
@@ -15,14 +18,14 @@ export function appendTextDiv(target: HTMLElement, text: string): HTMLDivElement
  * @param getAll - check all, even those with "data-ignore-focus" = "true"
  */
 export function isInputFocused(getAll: boolean = false): boolean {
+    const activeElement = document.activeElement;
     const result: boolean =
-        !!document.activeElement &&
-        ['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement.tagName);
-    if (getAll) {
-        return result;
-    } else {
-        return result && !document.activeElement?.getAttribute('data-ignore-focus');
-    }
+        !!activeElement &&
+        (['INPUT', 'TEXTAREA', 'SELECT'].includes(activeElement.tagName) ||
+            (activeElement.tagName === 'BUTTON' &&
+                activeElement.classList.contains(focusableElementClassName)));
+
+    return result && (getAll || !activeElement?.getAttribute('data-ignore-focus'));
 }
 
 export function unfocusAnyInput(): void {
@@ -40,9 +43,9 @@ export function unfocusAnyInput(): void {
             parent: document.body,
             tagName: 'input',
             css: {
-                opacity: '0',
-                width: '0',
-                height: '0',
+                opacity: 0,
+                width: 0,
+                height: 0,
             },
         });
         setTimeout(() => {
@@ -69,76 +72,19 @@ export function clearSelection(): void {
     }
 }
 
-/**
- * prevents being able to focus element.
- * warning: it creates a listener
- *
- * @param el - dom element
- */
-export const makeUnfocusable = (function (): (el: HTMLElement) => void {
-    function preventFocus(event: FocusEvent): void {
-        event.preventDefault();
-        let didFocusRelated = false;
-        if (event.relatedTarget) {
-            try {
-                (event.relatedTarget as HTMLElement).focus();
-                didFocusRelated = true;
-            } catch (e) {
-                console.error('failed to focus');
-            }
-        }
-        if (!didFocusRelated) {
-            (event.currentTarget as HTMLElement).blur();
-        }
-    }
-
-    return function (el) {
-        el.setAttribute('tabindex', '-1');
-        el.addEventListener('focus', preventFocus);
-    };
-})();
-
-const els: {
-    el: HTMLElement;
-    listeners: [keyof HTMLElementEventMap, EventListener][];
-}[] = [];
-// window['els'] = els;
-
-/**
- *
- * Create DOM element - div by default
- * params = {
- * 	    parent: someOtherDiv,
- * 	    css: {
- * 		    width: "500px",
- * 		    backgroundColor: "#fff"
- * 	    },
- * 	    content: "test", //or  content: [divA, divB, divC]   or content: someDiv
- * 	    className: "bla",
- *      id: "bla"
- * }
- *
- *  If onClick or onChange is used, then BB.destroyEl MUST be called
- *  to prevent a memory leak.
- *
- * @param params
- */
 export function el<GTag extends keyof HTMLElementTagNameMap = 'div'>(params?: {
     parent?: HTMLElement;
-    css?: Partial<CSSStyleDeclaration>;
-    custom?: { [key: string]: string };
-    content?: string | (HTMLElement | string | undefined)[] | Element;
+    css?: TCss;
+    props?: Partial<HTMLElementTagNameMap[GTag]>;
+    content?: string | (HTMLElement | SVGSVGElement | string | undefined)[] | Element;
     textContent?: string;
-    className?: string;
+    className?: string | string[];
     title?: string;
     id?: string;
     tagName?: GTag;
     onClick?: (e: Event) => void;
     onChange?: (e: Event) => void;
-    // Don't keep references of listeners.
-    // If false and has onClick/onChange handler, must call destroyEl.
-    // default = false
-    noRef?: boolean;
+    destroyer?: Destroyer;
 }) {
     if (!params) {
         return document.createElement('div') as HTMLElementTagNameMap[GTag];
@@ -159,7 +105,9 @@ export function el<GTag extends keyof HTMLElementTagNameMap = 'div'>(params?: {
         result.textContent = params.textContent;
     }
     if (params.className) {
-        result.className = params.className;
+        result.className = Array.isArray(params.className)
+            ? params.className.join(' ')
+            : params.className;
     }
     if (params.id) {
         result.id = params.id;
@@ -170,52 +118,26 @@ export function el<GTag extends keyof HTMLElementTagNameMap = 'div'>(params?: {
     if ('title' in params && params.title !== undefined) {
         result.title = params.title;
     }
-    const listeners: [keyof HTMLElementEventMap, EventListener][] = [];
-    if (params.onClick !== undefined) {
-        result.addEventListener('click', params.onClick);
-        !params.noRef && listeners.push(['click', params.onClick as EventListener]);
+    if (params.onClick) {
+        const onClick = params.onClick as EventListener;
+        result.addEventListener('click', onClick);
+        params.destroyer?.add(() => result.removeEventListener('click', onClick));
     }
-    if (params.onChange !== undefined) {
-        result.addEventListener('change', params.onChange);
-        !params.noRef && listeners.push(['change', params.onChange]);
+    if (params.onChange) {
+        const onChange = params.onChange;
+        result.addEventListener('change', onChange);
+        params.destroyer?.add(() => result.removeEventListener('change', onChange));
     }
-    if (listeners.length > 0) {
-        els.push({
-            el: result,
-            listeners,
-        });
-        /*div.style.backgroundColor = '#ff0';
-        div.style.border = '1px solid #ff0';*/
-    }
-    if ('custom' in params && params.custom) {
-        const customKeyArr = Object.keys(params.custom);
-        for (let i = 0; i < customKeyArr.length; i++) {
-            result.setAttribute(customKeyArr[i], params.custom[customKeyArr[i]]);
-        }
+    if (params.props) {
+        Object.assign(
+            result,
+            // filter out undefined, to avoid things like title = "undefined"
+            Object.fromEntries(
+                Object.entries(params.props).filter(([, value]) => value !== undefined),
+            ),
+        );
     }
     return result as HTMLElementTagNameMap[GTag];
-}
-
-/**
- * removes event listeners for Elements created via el()
- * @param el
- */
-export function destroyEl(el?: HTMLElement): void {
-    if (!el) {
-        return;
-    }
-    for (let i = 0; i < els.length; i++) {
-        const item = els[i];
-        if (item.el === el) {
-            item.listeners.forEach((item) => {
-                el.removeEventListener(item[0], item[1]);
-            });
-            els.splice(i, 1);
-            return;
-        }
-    }
-    // not found
-    return;
 }
 
 export function createImage(p: {
@@ -224,7 +146,7 @@ export function createImage(p: {
     width?: number;
     height?: number;
     className?: string;
-    css?: Partial<CSSStyleDeclaration>;
+    css?: TCss;
 }): HTMLImageElement {
     const result = new Image();
     if (p.src !== undefined) {
@@ -243,5 +165,25 @@ export function createImage(p: {
         result.className = p.className;
     }
     p.css && css(result, p.css);
+    return result;
+}
+
+/**
+ * Creates a monochrome element using any image URL as its CSS mask.
+ * Transparent image pixels remain transparent; visible pixels use currentColor.
+ */
+export function createImageMask(imageUrl: string, styleObj?: TCss): HTMLDivElement {
+    const result = document.createElement('div');
+    const mask = `url("${imageUrl}") center / contain no-repeat`;
+    result.style.setProperty('mask', mask);
+    result.style.setProperty('-webkit-mask', mask);
+    result.setAttribute('aria-hidden', 'true');
+    css(result, {
+        display: 'inline-block',
+        width: '1em',
+        height: '1em',
+        backgroundColor: 'currentColor',
+        ...styleObj,
+    });
     return result;
 }

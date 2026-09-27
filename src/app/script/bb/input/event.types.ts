@@ -6,6 +6,10 @@ export type TPointerEvent = {
     type: TPointerEventType;
     pointerId: number; // long
     pointerType: TPointerType;
+    altKey: boolean;
+    ctrlKey: boolean;
+    metaKey: boolean;
+    shiftKey: boolean;
     pageX: number; // todo docs
     pageY: number;
     clientX: number; // todo docs
@@ -16,6 +20,10 @@ export type TPointerEvent = {
     dY: number;
 
     coalescedArr?: {
+        altKey: boolean;
+        ctrlKey: boolean;
+        metaKey: boolean;
+        shiftKey: boolean;
         pageX: number;
         pageY: number;
         clientX: number;
@@ -35,9 +43,14 @@ export type TPointerEvent = {
 
     eventPreventDefault: () => void;
     eventStopPropagation: () => void;
+    target: Node | undefined; // the target of the original DOM event
 };
 
 export type TWheelEvent = {
+    altKey: boolean;
+    ctrlKey: boolean;
+    metaKey: boolean;
+    shiftKey: boolean;
     deltaY: number; // increments of 1
     pageX: number; // todo docs
     pageY: number;

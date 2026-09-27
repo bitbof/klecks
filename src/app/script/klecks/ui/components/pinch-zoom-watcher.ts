@@ -27,14 +27,15 @@ export class PinchZoomWatcher {
                 alignItems: 'center',
                 zIndex: '100',
                 flexDirection: 'column',
-                gap: '10px',
-                padding: '10px',
+                gap: 10,
+                padding: 10,
                 backdropFilter: 'blur(3px)',
             },
         });
         BB.el({
             parent: rootEl,
             tagName: 'button',
+            className: 'kl-button',
             content: LANG('dismiss'),
             onClick: () => {
                 isDismissed = true;
@@ -53,13 +54,18 @@ export class PinchZoomWatcher {
                 position: 'fixed',
                 width: '100vw',
                 height: '100vh',
-                zIndex: '99',
-                opacity: '0', // can't change iframe background color in some browsers
+                zIndex: 99,
+                opacity: 0, // can't change iframe background color in some browsers
             },
         });
 
         let isInDom = false;
         function check() {
+            if (!document.body) {
+                // somehow this is possible although all scripts run from within <body>
+                // observed with user agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36
+                return;
+            }
             if (isDismissed) {
                 return;
             }
@@ -67,8 +73,8 @@ export class PinchZoomWatcher {
                 parent: document.body,
                 css: {
                     position: 'fixed',
-                    inset: '0',
-                    zIndex: '-1',
+                    inset: 0,
+                    zIndex: -1,
                 },
             });
 
@@ -82,10 +88,10 @@ export class PinchZoomWatcher {
 
             if (isZoomed) {
                 css(rootEl, {
-                    left: viewport.offsetLeft + 'px',
-                    top: viewport.offsetTop + 'px',
-                    width: viewport.width + 'px',
-                    height: viewport.height + 'px',
+                    left: viewport.offsetLeft,
+                    top: viewport.offsetTop,
+                    width: viewport.width,
+                    height: viewport.height,
                 });
                 if (!isInDom) {
                     document.body.append(iframe);

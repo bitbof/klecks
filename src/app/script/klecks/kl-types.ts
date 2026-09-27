@@ -11,7 +11,7 @@ export type TFilterApply<T = unknown> = {
 };
 
 export type TFilterGetDialogParam = {
-    context: CanvasRenderingContext2D; // context of selected layer
+    selectedLayerIndex: number;
     klCanvas: KlCanvas;
     composed: THistoryEntryDataComposed;
     maxWidth: number; // limit for klCanvas size
@@ -20,6 +20,7 @@ export type TFilterGetDialogParam = {
     secondaryColorRgb: TRgb;
 };
 
+// we use these for creating the filter modal
 export type TFilterGetDialogResult<T = unknown> =
     | {
           element: HTMLElement; // contents of modal (excluding title, dialog buttons)
@@ -46,15 +47,9 @@ export type TFilter = {
     webGL?: boolean; // does the filter require webgl
 };
 
-export type TLayerFromKlCanvas = {
-    context: CanvasRenderingContext2D;
-    isVisible: boolean;
-    opacity: number;
-    name: string;
-    id: number; // actually the index
-};
-
-// a subset of CanvasRenderingContext2D.globalCompositeOperation
+// A subset of CanvasRenderingContext2D.globalCompositeOperation.
+// Blend modes only affect pixels where the destination is non-transparent,
+// so it's safe to draw with that on an empty canvas.
 export type TMixMode =
     | 'source-over' // default aka normal
     | 'darken'
@@ -76,28 +71,28 @@ export type TMixMode =
 export type TLayerFill = { fill: string }; // css color string. hex, rgb, rgba, color name
 
 export function isLayerFill(obj: unknown): obj is TLayerFill {
-    return (
-        typeof obj === 'object' &&
-        obj !== null &&
-        'fill' in obj &&
-        typeof (obj as any).fill === 'string'
-    );
+    return typeof obj === 'object' && obj !== null && 'fill' in obj && typeof obj.fill === 'string';
 }
 
-export type TKlBasicLayer = {
-    opacity: number; // 0 - 1
+export type TKlLayer<GImage> = {
     isVisible: boolean;
-    mixModeStr?: TMixMode; // default "source-over"
-    image: HTMLImageElement | HTMLCanvasElement; // already loaded
+    mixModeStr: TMixMode;
+    opacity: number;
+    hasClipping: boolean;
+    image: GImage;
 };
 
-export type TKlProjectLayer = {
+export type TKlNamedLayer<GImage> = TKlLayer<GImage> & {
     name: string;
-    isVisible: boolean;
-    opacity: number; // 0 - 1
-    mixModeStr?: TMixMode; // default "source-over"
-    image: HTMLImageElement | HTMLCanvasElement | TLayerFill | THistoryEntryLayerTile[]; // image already loaded
 };
+
+// image already loaded
+export type TKlBasicLayer = TKlLayer<HTMLImageElement | HTMLCanvasElement>;
+
+// image already loaded
+export type TKlProjectLayer = TKlNamedLayer<
+    HTMLImageElement | HTMLCanvasElement | TLayerFill | THistoryEntryLayerTile[]
+>;
 
 // A UUID, to make the project identifiable. (Not the recovery indexedDb key)
 // Used to test if current project is equal to what is in Browser Storage.
@@ -111,11 +106,18 @@ export type TKlProject = {
     projectId: TProjectId;
 };
 
-export type TKlProjectWithOptionalId = {
-    width: number; // int
-    height: number; // int
-    layers: TKlProjectLayer[];
+export type TKlEmbedProjectLayer = Omit<
+    TKlProjectLayer,
+    'isVisible' | 'hasClipping' | 'mixModeStr'
+> & {
+    isVisible?: boolean; // default true
+    hasClipping?: boolean; // default false
+    mixModeStr?: TMixMode; // default 'source-over'
+};
+
+export type TKlEmbedProject = Omit<TKlProject, 'projectId' | 'layers'> & {
     projectId?: TProjectId;
+    layers: TKlEmbedProjectLayer[];
 };
 
 export type TRawMeta = {
@@ -200,7 +202,6 @@ export type TKlSliderConfig = {
 export type TSliderConfig = {
     sizeSlider: TKlSliderConfig;
     opacitySlider: TKlSliderConfig;
-    scatterSlider: TKlSliderConfig;
 };
 
 export type TBrushUiInstance<GBrush> = {
@@ -210,12 +211,11 @@ export type TBrushUiInstance<GBrush> = {
     setSize: (size: number) => void;
     getOpacity: () => number;
     setOpacity: (opacity: number) => void;
-    getScatter: () => number;
-    setScatter: (opacity: number) => void;
     setColor: (c: TRgb) => void;
     setLayer: (layer: TKlCanvasLayer) => void;
     startLine: (x: number, y: number, p: number) => void;
-    goLine: (x: number, y: number, p: number, isCoalesced?: boolean) => void;
+    // points since the last call. Only the last point is not coalesced.
+    goLine: (points: TPressureInput[]) => void;
     endLine: () => void;
     getBrush: () => GBrush;
     isDrawing: () => boolean;
@@ -224,10 +224,12 @@ export type TBrushUiInstance<GBrush> = {
     getSeed?: () => number;
     setSeed?: (s: number) => void;
     toggleEraser?: () => void;
+    // free resources that are kept between strokes
+    freeResources?: () => void;
 };
 
 export type TBrushUi<GBrush> = TSliderConfig & {
-    image: string;
+    image: HTMLElement | SVGSVGElement;
     tooltip: string;
     Ui: (
         this: TBrushUiInstance<GBrush>,
@@ -235,7 +237,6 @@ export type TBrushUi<GBrush> = TSliderConfig & {
             klHistory: KlHistory;
             onSizeChange: (size: number) => void;
             onOpacityChange: (size: number) => void;
-            onScatterChange: (size: number) => void;
             onConfigChange: () => void;
         },
     ) => TBrushUiInstance<GBrush>;
@@ -290,7 +291,6 @@ export type TToolType = 'brush' | 'paintBucket' | 'text' | 'shape' | 'gradient' 
 
 export type TKlPsdError =
     | 'mask'
-    | 'clipping'
     | 'group'
     | 'adjustment'
     | 'layer-effect'
@@ -298,13 +298,7 @@ export type TKlPsdError =
     | 'blend-mode'
     | 'bits-per-channel';
 
-export type TKlPsdLayer = {
-    name: string;
-    isVisible: boolean;
-    mixModeStr: TMixMode;
-    opacity: number;
-    image: HTMLCanvasElement;
-};
+export type TKlPsdLayer = TKlNamedLayer<HTMLCanvasElement>;
 
 /**
  * Psd interpreted for usage in Klecks.
@@ -314,15 +308,17 @@ export type TKlPsd = {
     canvas: HTMLCanvasElement;
     width: number;
     height: number;
-    layers?: TKlPsdLayer[]; // not there if flattened
+    // undefined if flattened
+    layers?: TKlPsdLayer[];
     // if one of these features show up, they become a warning
     // because Klecks can't properly represent them (yet)
     warningArr?: TKlPsdError[];
-    error?: boolean; // true if flattened (too many layers)
+    // true if flattened (too many layers)
+    error?: boolean;
 };
 
 export type TFillSampling = 'current' | 'all' | 'above';
 
 export type TUiLayout = 'left' | 'right';
-export type TExportType = 'png' | 'layers' | 'psd';
+export type TExportType = 'png' | 'jpg' | 'layers' | 'psd';
 export type TInterpolationAlgorithm = 'smooth' | 'pixelated';

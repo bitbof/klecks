@@ -1,4 +1,4 @@
-import { gl } from '../core/gl';
+import { fxGl } from '../core/gl';
 import { FxShader } from '../core/fx-shader';
 import { simpleShader } from '../core/simple-shader';
 import { TFxCanvas } from '../fx-canvas-types';
@@ -10,8 +10,8 @@ import { TFxCanvas } from '../fx-canvas-types';
 export type TFilterUnmultiplyAlpha = (this: TFxCanvas) => TFxCanvas;
 
 export const unmultiplyAlpha: TFilterUnmultiplyAlpha = function () {
-    gl.unmultiplyAlpha =
-        gl.unmultiplyAlpha ||
+    fxGl.unmultiplyAlpha =
+        fxGl.unmultiplyAlpha ||
         new FxShader(
             null,
             '\
@@ -30,8 +30,8 @@ export const unmultiplyAlpha: TFilterUnmultiplyAlpha = function () {
             'unmultiplyAlpha',
         );
 
-    simpleShader.call(this, gl.unmultiplyAlpha, {
-        texSize: [this.width, this.height],
+    simpleShader.call(this, fxGl.unmultiplyAlpha, {
+        texSize: [this.canvas.width, this.canvas.height],
     });
 
     return this;

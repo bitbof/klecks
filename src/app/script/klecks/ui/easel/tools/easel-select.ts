@@ -45,10 +45,10 @@ export type TEaselSelectParams = {
     // select
 
     onStartSelect: (p: TVector2D, operation: TBooleanOperation) => void;
-    onGoSelect: (p: TVector2D) => void;
+    onGoSelect: (p: TVector2D, isShiftPressed: boolean) => void;
     onEndSelect: () => void;
     onStartMoveSelect: (p: TVector2D) => void;
-    onGoMoveSelect: (p: TVector2D) => void;
+    onGoMoveSelect: (p: TVector2D, isShiftPressed: boolean) => void;
     onEndMoveSelect: () => void;
     onSelectAddPoly: (path: TVector2D[], operation: TBooleanOperation) => void;
     onResetSelection: () => void;
@@ -67,10 +67,10 @@ export class EaselSelect implements TEaselTool {
     // from params
 
     private readonly onStartSelect: (p: TVector2D, operation: TBooleanOperation) => void;
-    private readonly onGoSelect: (p: TVector2D) => void;
+    private readonly onGoSelect: (p: TVector2D, isShiftPressed: boolean) => void;
     private readonly onEndSelect: () => void;
     private readonly onStartMoveSelect: (p: TVector2D) => void;
-    private readonly onGoMoveSelect: (p: TVector2D) => void;
+    private readonly onGoMoveSelect: (p: TVector2D, isShiftPressed: boolean) => void;
     private readonly onEndMoveSelect: () => void;
     private readonly onSelectAddPoly: (path: TVector2D[], operation: TBooleanOperation) => void;
     private readonly onResetSelection: () => void;
@@ -138,7 +138,7 @@ export class EaselSelect implements TEaselTool {
         return true;
     }
 
-    /** boolean operation if you also consider keys */
+    // boolean operation if you also consider keys
     private getEffectiveBooleanOperation(): TBooleanOperation {
         const isSubtract =
             this.defaultBooleanOperation === 'new'
@@ -195,7 +195,7 @@ export class EaselSelect implements TEaselTool {
             }
             if (event.type === 'pointermove' && event.button === 'left') {
                 this.didSelectionMove = true;
-                this.onGoMoveSelect(cursorCanvasPos);
+                this.onGoMoveSelect(cursorCanvasPos, this.easel.keyListener.isPressed('shift'));
             }
             if (event.type === 'pointerup') {
                 this.onEndMoveSelect();
@@ -208,7 +208,7 @@ export class EaselSelect implements TEaselTool {
 
             if (this.selectShape === 'poly') {
                 if (event.type === 'pointermove') {
-                    if (this.polyShape[this.polyShape.length - 1]?.temp) {
+                    if (this.polyShape.at(-1)?.temp) {
                         this.polyShape.pop();
                     }
                     this.polyShape.push({
@@ -225,10 +225,10 @@ export class EaselSelect implements TEaselTool {
                     this.doubleTapPointerTypes = [];
                     this.easel.updateDoubleTapPointerTypes();
 
-                    if (this.polyShape[this.polyShape.length - 1]?.temp) {
+                    if (this.polyShape.at(-1)?.temp) {
                         this.polyShape.pop();
                     }
-                    const lastPolyShapePoint = this.polyShape[this.polyShape.length - 1];
+                    const lastPolyShapePoint = this.polyShape.at(-1);
                     if (
                         !lastPolyShapePoint ||
                         cursorCanvasPos.x !== lastPolyShapePoint.x ||
@@ -239,7 +239,7 @@ export class EaselSelect implements TEaselTool {
                     }
 
                     const first = this.polyShape[0];
-                    const last = this.polyShape[this.polyShape.length - 1];
+                    const last = this.polyShape.at(-1)!;
                     if (
                         this.polyShape.length > 2 &&
                         BB.dist(first.x, first.y, last.x, last.y) * this.viewportTransform.scale < 4
@@ -247,7 +247,7 @@ export class EaselSelect implements TEaselTool {
                         this.polyShape.pop();
                         this.polyShape.push({ ...this.polyShape[0] });
                         const shape = this.polyShape;
-                        this.polyShape = [];
+                        this.resetPolyShape();
                         this.onSelectAddPoly(shape, this.appliedBooleanOperation!);
                         this.appliedBooleanOperation = undefined;
                     }
@@ -258,10 +258,11 @@ export class EaselSelect implements TEaselTool {
                     this.onStartSelect(cursorCanvasPos, this.appliedBooleanOperation!);
                 }
                 if (event.type === 'pointermove' && event.button === 'left' && this.isDragging) {
-                    this.onGoSelect(cursorCanvasPos);
+                    this.onGoSelect(cursorCanvasPos, this.easel.keyListener.isPressed('shift'));
                 }
                 if (event.type === 'pointerup' && wasDragging) {
                     this.onEndSelect();
+                    this.clearRenderedSelection(true);
                     this.appliedBooleanOperation = undefined;
                 }
             }
@@ -350,7 +351,6 @@ export class EaselSelect implements TEaselTool {
     }
 
     private createFreeTransform(): void {
-        let isFirstCallback = true;
         this.freeTransform = new FreeTransform({
             x: 1,
             y: 1,
@@ -360,12 +360,8 @@ export class EaselSelect implements TEaselTool {
             isConstrained: this.freeTransformIsConstrained,
             snapX: [],
             snapY: [],
-            viewportTransform: { scale: 1, x: 0, y: 0, angleDeg: 0 },
+            viewportTransform: { scale: 1, x: 0, y: 0, angleDeg: 0, isMirrored: false },
             callback: (transform) => {
-                if (isFirstCallback) {
-                    isFirstCallback = false;
-                    return;
-                }
                 if (
                     this.mode === 'select' ||
                     !this.transformation ||
@@ -525,7 +521,11 @@ export class EaselSelect implements TEaselTool {
             chainArr: [
                 new DoubleTapper({
                     onDoubleTap: (e) => {
+                        if (this.mode !== 'select' || this.selectShape !== 'poly') {
+                            return;
+                        }
                         if (this.polyShape.length < 3) {
+                            this.resetPolyShape();
                             return;
                         }
                         const shape = this.polyShape.map((item) => ({ x: item.x, y: item.y }));
@@ -631,8 +631,10 @@ export class EaselSelect implements TEaselTool {
         if (checkRectFullyVisible(rect, viewportTransform, easelSize, 0)) {
             return;
         }
+        // Don't zoom in further than we are currently. It's less annoying.
+        const maxScale = Math.max(viewportTransform.scale, 1);
         this.easel.setTransform(
-            getFitRectTransform(rect, viewportTransform, easelSize, false, padding),
+            getFitRectTransform(rect, viewportTransform, easelSize, false, padding, maxScale),
         );
     }
 
@@ -690,7 +692,7 @@ export class EaselSelect implements TEaselTool {
     renderAfterViewport(ctx: CanvasRenderingContext2D, transform: TViewportTransformXY): void {
         if (this.mode === 'transform' && this.transformation?.type === 'ffd') {
             ctx.save();
-            this.renderLattice(ctx, transform.scaleX);
+            this.renderLattice(ctx, transform.scaleY);
             ctx.restore();
         }
 
@@ -706,7 +708,7 @@ export class EaselSelect implements TEaselTool {
         for (let i = 1; i < shape.length; i++) {
             ctx.lineTo(shape[i].x, shape[i].y);
         }
-        ctx.lineWidth = 1 / transform.scaleX;
+        ctx.lineWidth = 1 / transform.scaleY;
         ctx.strokeStyle = 'white';
         ctx.lineCap = 'round';
         ctx.lineJoin = 'round';

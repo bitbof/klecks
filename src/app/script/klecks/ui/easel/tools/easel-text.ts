@@ -3,6 +3,7 @@ import { TVector2D } from '../../../../bb/bb-types';
 import { TPointerEvent } from '../../../../bb/input/event.types';
 import textImg from 'url:/src/app/img/ui/cursor-text.png';
 import { createMatrixFromTransform } from '../../../../bb/transform/create-matrix-from-transform';
+import { getViewportTransformAngleRad } from '../../project-viewport/utils/get-viewport-transform-angle-rad';
 import { applyToPoint, inverse } from 'transformation-matrix';
 import { TEaselInterface, TEaselTool } from '../easel.types';
 
@@ -34,7 +35,7 @@ export class EaselText implements TEaselTool {
         const p = applyToPoint(inverse(m), { x: e.relX, y: e.relY });
 
         if (e.type === 'pointerdown' && e.button === 'left') {
-            this.onDown(p, (vTransform.angleDeg / 180) * Math.PI);
+            this.onDown(p, getViewportTransformAngleRad(vTransform));
         }
     }
 

@@ -1,7 +1,33 @@
-🖌️ [Demo](https://kleki.com/) | ❓ [About](https://kleki.com/about/) | 📝 [Dev Blog](https://blog.kleki.com/)
+<div align="center">
+ <img src="https://bitbof.com/stuff/2022-01-klecks/2026-04-06-logo.png" alt="Klecks" title="Klecks">
+</div>
 
-<p style="text-align:center">
-<img src="https://bitbof.com/stuff/2022-01-klecks/2022-03-klecks-github.png" alt="Klecks"><br>
+<div align="center">
+  Modern and feature-rich painting app for the web
+</div>
+
+<div align="center">
+  <h3>
+    <a href="https://kleki.com">
+      Try it out
+    </a>
+    <span> | </span>
+    <a href="https://kleki.com/about/">
+      About
+    </a>
+    <span> | </span>
+    <a href="https://blog.kleki.com">
+      Dev Blog
+    </a>
+    <span> | </span>
+    <a href="https://kleki.com/donate/">
+      Donate
+    </a>
+  </h3>
+</div>
+
+<p align="center">
+<img src="https://bitbof.com/stuff/2022-01-klecks/2026-03-28-klecks-github.png" alt="Klecks"><br>
 </p>
 
 Klecks (German for "splash of color", pronounced "clex") is the official open-source release of the community-funded online painting app [Kleki](https://kleki.com).
@@ -16,7 +42,7 @@ Klecks can run in standalone mode (e.g. on [kleki.com](https://kleki.com)), or e
 - Tools: selection, paint bucket, text, shapes, gradient
 - WebGL-powered filters: blur, tilt-shift, curves, distort, noise.
 - Lineart extraction
-- Editing tools: transform, crop/expand, resize, perspective
+- Editing tools: transform, warp, crop/expand, resize, perspective
 - Supports all major form factors: desktop, tablet and phone
 - Multi-language (10+ languages)
 
@@ -28,12 +54,12 @@ Created by developer/artist [bitbof](https://bitbof.com)
 
 # Commands
 - initialize via `npm ci` (requires node and npm to be installed already)
+- `npm run icon:build` - generate icon files necessary to run Klecks
 - `npm run lang:build` - generate language files necessary to run Klecks
 - `npm run lang:build -- --missing` - generate language files and list all keys with a missing translation.
-- `npm run start` - dev server (to run it locally)
-- `npm run build` - build standalone into `/dist/`
-- `npm run build:embed` - build of embed into `/dist/`
-- `npm run build:help` - build help page (when clicking the question mark) into `/dist/`
+- `npm run start` - dev server (to run `standalone` locally)
+- `npm run build` - build `standalone` into `/dist/`
+- `npm run build:embed` - build `embed` into `/dist/`
 
 # Embed
 Example usage of the embed can be found under: `/examples/embed/`
@@ -107,4 +133,4 @@ Klecks and Kleki are community funded. [Donate today](https://kleki.com/donate/)
 # License
 
 bitbof © 2026 - Released under the MIT License. Icons by bitbof are public domain (excluding the Klecks logo, bitbof logo).
-While Kleki and Klecks are jointly developed, Kleki's license is separate from Klecks. Kleki must be licensed from bitbof.
+While Kleki and Klecks are jointly developed, Kleki's license is separate from Klecks. Kleki at [kleki.com](https://kleki.com) is free to use, but the name and brand "Kleki" are not covered by this license — you may not use Klecks to offer a service branded or presented as "Kleki" without a license from bitbof.

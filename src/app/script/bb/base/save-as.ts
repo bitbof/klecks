@@ -1,75 +1,89 @@
-type TFilePickerAcceptType = {
-    description?: string;
-    accept: Record<string, string[]>;
-};
+import { asyncThrow, attempt, AttemptError } from './base';
 
-type TMimeType = string;
-const types: Record<TMimeType, TFilePickerAcceptType> = {
+const pickerTypes = {
     'image/png': {
         description: 'PNG Image',
         accept: { 'image/png': ['.png'] },
+    },
+    'image/jpeg': {
+        description: 'JPEG Image',
+        accept: { 'image/jpeg': ['.jpg', '.jpeg'] },
     },
     'image/vnd.adobe.photoshop': {
         description: 'Adobe Photoshop Document',
         accept: { 'image/vnd.adobe.photoshop': ['.psd'] },
     },
-    // jpg etc
-} as const;
+};
 
-// resolves to true if it saves via file picker (or user aborted)
-async function saveViaFilePicker(blob: Blob, fileName: string): Promise<boolean> {
-    const mimeType = blob.type;
-    if ('showSaveFilePicker' in window) {
-        let fileHandle: FileSystemFileHandle | undefined;
-        if (!types[mimeType]) {
-            console.error('unknown mime type:', mimeType);
-            return false;
-        }
-        try {
-            fileHandle = await (window.showSaveFilePicker as any)({
-                suggestedName: fileName,
-                types: [types[mimeType]],
-            });
-        } catch (e) {
-            if (e instanceof Error && e.name === 'AbortError') {
-                // cancelled dialog
-                return true;
-            }
-            console.log('unpredicted error', e);
-            return false;
-        }
-        if (!fileHandle) {
-            return false;
-        }
-        const writableStream = await fileHandle.createWritable();
-        await writableStream.write(blob);
-        await writableStream.close();
-        return true;
-    } else {
-        return false;
-    }
-}
+export type TFileSaveResult = 'saved' | 'cancel' | 'error';
 
 export async function saveAs(
-    blob: Blob,
     fileName: string,
-    showDialog: boolean = false,
-): Promise<void> {
-    if (showDialog && (await saveViaFilePicker(blob, fileName))) {
-        return;
+    mimeType: keyof typeof pickerTypes,
+    createBlob: () => Promise<Blob>,
+    showsFilePicker: boolean = false,
+): Promise<TFileSaveResult> {
+    let fileHandle: FileSystemFileHandle | undefined;
+    // Open the picker before creating the blob while the user gesture is still active.
+    if (showsFilePicker && 'showSaveFilePicker' in window) {
+        try {
+            fileHandle = await (window as any).showSaveFilePicker({
+                suggestedName: fileName,
+                types: [pickerTypes[mimeType]],
+            });
+            if (!fileHandle) {
+                asyncThrow(new Error('showSaveFilePicker returned no file handle'));
+            }
+        } catch (error) {
+            const name =
+                typeof error === 'object' && error !== null && 'name' in error
+                    ? error.name
+                    : undefined;
+            if (name === 'AbortError') {
+                return 'cancel';
+            }
+            asyncThrow(error);
+        }
     }
 
-    // Namespace is used to prevent conflict w/ Chrome Poper Blocker extension (Issue https://github.com/eligrey/FileSaver.js/issues/561)
-    const a = document.createElementNS('http://www.w3.org/1999/xhtml', 'a') as HTMLAnchorElement;
-    a.download = fileName;
-    a.rel = 'noopener';
-    const objectUrl = URL.createObjectURL(blob);
-    a.href = objectUrl;
+    const blob = await attempt(createBlob);
+    if (blob instanceof AttemptError) {
+        asyncThrow(blob.error);
+        return 'error';
+    }
 
-    setTimeout(() => URL.revokeObjectURL(objectUrl), 40 /* sec */ * 1000);
-    setTimeout(() => {
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-    }, 1);
+    if (fileHandle) {
+        try {
+            const writableStream = await fileHandle.createWritable();
+            await writableStream.write(blob);
+            await writableStream.close();
+            return 'saved';
+        } catch (e) {
+            asyncThrow(e);
+            // Still try to save the regular way now.
+        }
+    }
+
+    try {
+        // Namespace is used to prevent conflict w/ Chrome Poper Blocker extension (Issue https://github.com/eligrey/FileSaver.js/issues/561)
+        const a = document.createElementNS(
+            'http://www.w3.org/1999/xhtml',
+            'a',
+        ) as HTMLAnchorElement;
+        a.download = fileName;
+        a.rel = 'noopener';
+        const objectUrl = URL.createObjectURL(blob);
+        a.href = objectUrl;
+
+        setTimeout(() => URL.revokeObjectURL(objectUrl), 40 /* sec */ * 1000);
+        setTimeout(() => {
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }, 1);
+    } catch (e) {
+        asyncThrow(e);
+        return 'error';
+    }
+    return 'saved';
 }

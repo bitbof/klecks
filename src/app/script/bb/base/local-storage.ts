@@ -6,7 +6,6 @@ export class LocalStorage {
     private static error: unknown | undefined;
 
     static getItem(key: string): string | null {
-        // (disabled) eslint-disable-next-line no-null/no-null
         let result = null;
         try {
             result = localStorage.getItem(key);

@@ -1,8 +1,9 @@
+import { getIconUrl } from '../../../icon/icon';
 import { BB } from '../../../bb/bb';
 import { KL } from '../../kl';
 import { TKeyString } from '../../../bb/bb-types';
 import { StatusOverlay } from '../components/status-overlay';
-import { KlCanvas, TKlCanvasLayer } from '../../canvas/kl-canvas';
+import { KlCanvas } from '../../canvas/kl-canvas';
 import { LANG } from '../../../language/language';
 import { TFilterApply, TFilterGetDialogParam, TFilterGetDialogResult } from '../../kl-types';
 import { KlColorSlider } from '../components/kl-color-slider';
@@ -11,9 +12,12 @@ import { RGB } from '../../../bb/color/color';
 import { getSharedFx } from '../../../fx-canvas/shared-fx';
 import { c } from '../../../bb/base/c';
 import { KlHistory } from '../../history/kl-history';
-import copyImg from 'url:/src/app/img/ui/copy.svg';
 import { createImage } from '../../../bb/base/ui';
+import { createHelpButton } from '../components/help-button';
+import { showError, showModal } from '../modals/base/show-modal';
+import { asyncThrow } from '../../../bb/base/base';
 
+const copyImg = getIconUrl('copy');
 export type TEditUiParams = {
     klRootEl: HTMLElement;
     klColorSlider: KlColorSlider;
@@ -21,7 +25,7 @@ export type TEditUiParams = {
     getCurrentColor: () => RGB;
     maxCanvasSize: number;
     klCanvas: KlCanvas;
-    getCurrentLayer: () => TKlCanvasLayer;
+    getCurrentLayerIndex: () => number;
     isEmbed: boolean;
     statusOverlay: StatusOverlay;
     onCanvasChanged: () => void; // dimensions/orientation changed
@@ -39,7 +43,7 @@ export class EditUi {
     private readonly getCurrentColor: () => RGB;
     private readonly maxCanvasSize: number;
     private readonly klCanvas: KlCanvas;
-    private readonly getCurrentLayer: () => TKlCanvasLayer;
+    private readonly getCurrentLayerIndex: () => number;
     private readonly isEmbed: boolean;
     private readonly statusOverlay: StatusOverlay;
     private readonly onCanvasChanged: () => void; // dimensions/orientation changed
@@ -71,20 +75,21 @@ export class EditUi {
                 className: 'kl-toolspace-note',
                 content: 'Features disabled because WebGL is failing.',
                 css: {
-                    margin: '10px',
-                    marginBottom: '0',
+                    margin: 10,
+                    marginBottom: 0,
                 },
             });
             const noteButton = BB.el({
                 parent: note,
                 tagName: 'button',
+                className: 'kl-button',
                 textContent: 'Learn More',
                 css: {
-                    marginLeft: '5px',
+                    marginLeft: 5,
                 },
             });
             noteButton.onclick = () => {
-                KL.popup({
+                showModal({
                     message: '<b>WebGL is not working</b>',
                     div: BB.el({
                         content: `
@@ -105,7 +110,7 @@ This has been reported to Google.
 
             const button = BB.el({
                 tagName: 'button',
-                className: 'grid-button grid-button--filter',
+                className: 'kl-button grid-button grid-button--filter',
                 content: [
                     createImage({
                         alt: 'icon',
@@ -114,17 +119,17 @@ This has been reported to Google.
                         height: 20,
                         className: filter.darkNoInvert ? 'dark-no-invert' : '',
                         css: {
-                            marginRight: '3px',
+                            marginRight: 3,
                         },
                     }),
                     LANG(filter.lang.button),
                 ],
                 css: {
                     lineHeight: '20px',
-                    fontSize: '12px',
+                    fontSize: 12,
                 },
-                custom: {
-                    tabIndex: '-1',
+                props: {
+                    tabIndex: -1,
                 },
             });
 
@@ -148,7 +153,7 @@ This has been reported to Google.
                         if ('error' in filterDialog) {
                             return;
                         }
-                        if (result == 'Cancel') {
+                        if (result === 'Cancel') {
                             if (filterDialog.destroy) {
                                 filterDialog.destroy();
                             }
@@ -158,9 +163,7 @@ This has been reported to Google.
                         try {
                             input = filterDialog.getInput!(); // also destroys
                         } catch (e) {
-                            if (
-                                (e as Error).message.indexOf('.getInput is not a function') !== -1
-                            ) {
+                            if ((e as Error).message.includes('.getInput is not a function')) {
                                 throw (
                                     'filterDialog.getInput is not a function, filter: ' + filterName
                                 );
@@ -172,25 +175,19 @@ This has been reported to Google.
                     };
 
                     if (!('apply' in filters[filterKey])) {
-                        KL.popup({
-                            message: 'Application not fully loaded',
-                            type: 'error',
-                        });
+                        showError('Application not fully loaded');
                         return;
                     }
 
                     const applyFilter = (input: any) => {
                         const filterResult = filters[filterKey].apply!({
-                            layer: this.getCurrentLayer(),
+                            layer: this.klCanvas.getLayer(this.getCurrentLayerIndex()),
                             klCanvas: this.klCanvas,
                             klHistory: this.klHistory,
                             input: input,
                         } as TFilterApply);
                         if (!filterResult) {
-                            KL.popup({
-                                message: "Couldn't apply the edit action",
-                                type: 'error',
-                            });
+                            showError("Couldn't apply the edit action");
                         }
                         filters[filterKey].updatePos && this.onCanvasChanged();
                         this.layersUi.update();
@@ -199,17 +196,14 @@ This has been reported to Google.
                     if (filters[filterKey].isInstant) {
                         button.blur();
                         applyFilter(null);
-                        this.statusOverlay.out(
-                            '"' + filterName + '" ' + LANG('filter-applied'),
-                            true,
-                        );
+                        this.statusOverlay.out(LANG('filter-applied', { x: filterName }), true);
                     } else {
                         const secondaryColorRGB = this.klColorSlider.getSecondaryRGB();
                         let filterDialog: TFilterGetDialogResult<any> | undefined = undefined;
 
                         try {
                             filterDialog = filters[filterKey].getDialog!({
-                                context: this.getCurrentLayer().context,
+                                selectedLayerIndex: this.getCurrentLayerIndex(),
                                 klCanvas: this.klCanvas,
                                 maxWidth: this.maxCanvasSize,
                                 maxHeight: this.maxCanvasSize,
@@ -226,31 +220,23 @@ This has been reported to Google.
                                 composed: this.klHistory.getComposed(),
                             } as TFilterGetDialogParam) as TFilterGetDialogResult;
                         } catch (e) {
-                            setTimeout(() => {
-                                throw e;
-                            });
+                            asyncThrow(e);
                         }
 
                         if (!filterDialog || 'error' in filterDialog) {
-                            KL.popup({
-                                message: filterDialog
+                            showError(
+                                filterDialog
                                     ? filterDialog.error
                                     : 'Error: Could not perform action.',
-                                type: 'error',
-                            });
+                            );
                             return;
                         }
 
                         let closeFunc: () => void;
                         // Todo should move into getDialogParams
                         filterDialog.errorCallback = (e) => {
-                            KL.popup({
-                                message: 'Error: Could not perform action.',
-                                type: 'error',
-                            });
-                            setTimeout(() => {
-                                throw e;
-                            }, 0);
+                            showError('Error: Could not perform action.');
+                            asyncThrow(e);
                             closeFunc();
                         };
 
@@ -263,26 +249,22 @@ This has been reported to Google.
                         {
                             const els: HTMLElement[] = [c('b', filterName)];
                             if (filter.lang.description !== undefined) {
+                                const description = LANG(filter.lang.description);
                                 els.push(
-                                    c(
-                                        {
-                                            className: 'kl-info-btn',
-                                            onClick: () => {
-                                                KL.popup({
-                                                    message: LANG(filter.lang.description!),
-                                                });
-                                            },
-                                            title: LANG(filter.lang.description!),
-                                            noRef: true,
+                                    createHelpButton({
+                                        onClick: () => {
+                                            showModal({
+                                                message: description,
+                                            });
                                         },
-                                        '?',
-                                    ),
+                                        title: description,
+                                    }),
                                 );
                             }
                             title = c(',flex,gap-5', els);
                         }
 
-                        KL.popup({
+                        showModal({
                             message: title,
                             div: filterDialog.element,
                             style: style,
@@ -334,7 +316,7 @@ This has been reported to Google.
         if (!this.isEmbed) {
             const copyBtn = BB.el({
                 tagName: 'button',
-                className: 'grid-button grid-button--filter',
+                className: 'kl-button grid-button grid-button--filter',
                 content: [
                     createImage({
                         alt: 'icon',
@@ -342,15 +324,15 @@ This has been reported to Google.
                         width: 18,
                         height: 20,
                         css: {
-                            marginRight: '3px',
+                            marginRight: 3,
                         },
                     }),
                     LANG('file-copy'),
                 ],
                 onClick: () => this.onCopyToClipboard(),
                 title: LANG('file-copy-title'),
-                custom: {
-                    tabIndex: '-1',
+                props: {
+                    tabIndex: -1,
                 },
                 css: {
                     lineHeight: '20px',
@@ -359,18 +341,18 @@ This has been reported to Google.
 
             const pasteBtn = BB.el({
                 tagName: 'button',
-                className: 'grid-button grid-button--filter',
+                className: 'kl-button grid-button grid-button--filter',
                 content: [
                     BB.el({
                         css: {
-                            height: '20px',
-                            cssFloat: 'left',
+                            height: 20,
+                            float: 'left',
                         },
                     }),
                     LANG('file-paste'),
                 ],
-                custom: {
-                    tabIndex: '-1',
+                props: {
+                    tabIndex: -1,
                 },
                 css: {
                     lineHeight: '20px',
@@ -398,7 +380,7 @@ This has been reported to Google.
         this.getCurrentColor = p.getCurrentColor;
         this.maxCanvasSize = p.maxCanvasSize;
         this.klCanvas = p.klCanvas;
-        this.getCurrentLayer = p.getCurrentLayer;
+        this.getCurrentLayerIndex = p.getCurrentLayerIndex;
         this.isEmbed = p.isEmbed;
         this.statusOverlay = p.statusOverlay;
         this.onCanvasChanged = p.onCanvasChanged;

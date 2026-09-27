@@ -53,13 +53,14 @@ export class CurvesInput {
         this.rootEl = BB.el({
             css: {
                 position: 'relative',
-                marginBottom: '10px',
+                marginBottom: 10,
             },
         });
         this.rootEl.oncontextmenu = () => false;
         let mode = 'All';
         let curves = p.curves;
         this.modeButtons = new Options({
+            isFocusable: true,
             optionArr: [
                 {
                     id: 'All',
@@ -106,7 +107,7 @@ export class CurvesInput {
             className: 'kl-curves-graph',
             css: {
                 position: 'relative',
-                marginTop: '10px',
+                marginTop: 10,
             },
         });
 
@@ -132,18 +133,18 @@ export class CurvesInput {
             const pointEl = BB.el({
                 className: 'kl-curves-graph__grip',
                 css: {
-                    left: x - gripSize / 2 + 'px',
-                    top: y - gripSize / 2 + 'px',
-                    width: gripSize + 'px',
-                    height: gripSize + 'px',
-                    borderRadius: gripSize + 'px',
+                    left: x - gripSize / 2,
+                    top: y - gripSize / 2,
+                    width: gripSize,
+                    height: gripSize,
+                    borderRadius: gripSize,
                 },
             });
 
             const update = () => {
                 css(pointEl, {
-                    left: x - gripSize / 2 + 'px',
-                    top: y - gripSize / 2 + 'px',
+                    left: x - gripSize / 2,
+                    top: y - gripSize / 2,
                 });
             };
 
@@ -179,8 +180,8 @@ export class CurvesInput {
                 internalY = y;
                 internalX = x;
                 css(pointEl, {
-                    left: x - gripSize / 2 + 'px',
-                    top: y - gripSize / 2 + 'px',
+                    left: x - gripSize / 2,
+                    top: y - gripSize / 2,
                 });
             };
 

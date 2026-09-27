@@ -1,4 +1,4 @@
-import { gl } from '../core/gl';
+import { fxGl } from '../core/gl';
 import { warpShader } from '../shaders/warp-shader';
 import { simpleShader } from '../core/simple-shader';
 import { getInverse } from '../math/matrix';
@@ -27,8 +27,8 @@ export type TFilterMatrixWarp = (
 ) => TFxCanvas;
 
 export const matrixWarp: TFilterMatrixWarp = function (matrix, inverse, useTextureSpace) {
-    gl.matrixWarp =
-        gl.matrixWarp ||
+    fxGl.matrixWarp =
+        fxGl.matrixWarp ||
         warpShader(
             '\
         uniform mat3 matrix;\
@@ -46,15 +46,15 @@ export const matrixWarp: TFilterMatrixWarp = function (matrix, inverse, useTextu
     matrix = matrix.flat() as TMat2x2 | TMat3x3;
 
     // Extract a 3x3 matrix out of the arguments
-    if (matrix.length == 4) {
+    if (matrix.length === 4) {
         matrix = [matrix[0], matrix[1], 0, matrix[2], matrix[3], 0, 0, 0, 1];
-    } else if (matrix.length != 9) {
+    } else if (matrix.length !== 9) {
         throw 'can only warp with 2x2 or 3x3 matrix';
     }
 
-    simpleShader.call(this, gl.matrixWarp, {
+    simpleShader.call(this, fxGl.matrixWarp, {
         matrix: inverse ? getInverse(matrix) : matrix,
-        texSize: [this.width, this.height],
+        texSize: [this.canvas.width, this.canvas.height],
         useTextureSpace: useTextureSpace ? 1 : 0,
     });
 

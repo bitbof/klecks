@@ -1,5 +1,5 @@
 import { BB } from '../../../bb/bb';
-import { showModal } from './base/showModal';
+import { showModal, TModalButton } from './base/show-modal';
 import { CropCopy } from '../components/crop-copy';
 import { LANG } from '../../../language/language';
 import { StatusOverlay } from '../components/status-overlay';
@@ -8,7 +8,7 @@ import { MultiPolygon } from 'polygon-clipping';
 import { boundsToRect, indexBoundsInArea } from '../../../bb/math/math';
 import { getMultiPolyBounds } from '../../../bb/multi-polygon/get-multi-polygon-bounds';
 import { Checkbox } from '../components/checkbox';
-import { css } from '../../../bb/base/base';
+import { attempt, AttemptError, css } from '../../../bb/base/base';
 
 let maskSelection = false;
 
@@ -48,8 +48,10 @@ export function clipboardDialog(
     const topWrapper = BB.el({
         content: [
             maskToggle?.getElement(),
-            LANG('crop-drag-to-crop') +
-                (clipboardItemIsSupported ? '' : '<br>' + LANG('cropcopy-click-hold')),
+            LANG('crop-drag-to-crop'),
+            ...(clipboardItemIsSupported
+                ? []
+                : [BB.el({ tagName: 'br' }), LANG('cropcopy-click-hold')]),
         ],
         css: {
             textAlign: 'center',
@@ -72,26 +74,27 @@ export function clipboardDialog(
         init,
     });
     css(cropCopy.getElement(), {
-        marginTop: '10px',
-        marginLeft: '-20px',
+        marginTop: 10,
+        marginLeft: -20,
     });
     div.append(cropCopy.getElement());
 
     async function toClipboard() {
-        try {
+        const result = await attempt(async () => {
             const blob = cropCopy.getCroppedBlob();
             await (navigator.clipboard as any).write([
                 new ClipboardItem({
                     [blob.type]: blob,
                 }),
             ]);
-            setTimeout(function () {
-                output.out(LANG('cropcopy-copied'), true);
-            }, 200);
-        } catch (err) {
-            console.error((err as Error).name, (err as Error).message);
+        });
+        if (result instanceof AttemptError) {
+            console.error(result.error);
             return;
         }
+        setTimeout(function () {
+            output.out(LANG('cropcopy-copied'), true);
+        }, 200);
     }
 
     const keyListener = new BB.KeyListener({
@@ -111,12 +114,12 @@ export function clipboardDialog(
     }
     window.addEventListener('blur', blur);
 
-    const buttonArr = [];
+    const buttonArr: Exclude<TModalButton<'copy' | 'crop'>, 'Ok'>[] = [];
     if (clipboardItemIsSupported) {
-        buttonArr.push(LANG('cropcopy-btn-copy'));
+        buttonArr.push({ id: 'copy', label: LANG('cropcopy-btn-copy') });
     }
     if (showCropButton) {
-        buttonArr.push(LANG('cropcopy-btn-crop'));
+        buttonArr.push({ id: 'crop', label: LANG('cropcopy-btn-crop') });
     }
     buttonArr.push('Cancel');
 
@@ -131,14 +134,15 @@ export function clipboardDialog(
         style: isSmall
             ? {}
             : {
-                  width: '540px',
+                  width: 540,
               },
         buttons: buttonArr,
-        primaries: [LANG('cropcopy-btn-copy')],
+        primaries: ['copy'],
+        clickOnEnter: 'copy',
         callback: function (result) {
-            if (result === LANG('cropcopy-btn-copy')) {
+            if (result === 'copy') {
                 toClipboard();
-            } else if (result === LANG('cropcopy-btn-crop')) {
+            } else if (result === 'crop') {
                 const rectObj = cropCopy.getCropRect();
                 cropCallback({
                     left: Math.round(-rectObj.x),
@@ -152,7 +156,6 @@ export function clipboardDialog(
             cropCopy.destroy();
             keyListener.destroy();
         },
-        clickOnEnter: LANG('cropcopy-btn-copy'),
         closeFunc: function (func) {
             closeFunc = func;
         },

@@ -1,0 +1,39 @@
+.root {
+    button[role='radio'] {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 0;
+        width: 24px;
+        height: 24px;
+
+        &,
+        &:hover,
+        &:active {
+            color: rgba(0, 0, 0, 0.3);
+            cursor: pointer;
+        }
+    }
+}
+
+:global(:root.kl-theme-dark) {
+    .root {
+        button[role='radio'] {
+            &,
+            &:hover,
+            &:active {
+                color: #888;
+            }
+
+            &:not([aria-checked='true']) {
+                &:hover {
+                    box-shadow: inset 0 0 0 1px #888;
+                }
+
+                &:active {
+                    box-shadow: inset 0 0 0 2px #888;
+                }
+            }
+        }
+    }
+}

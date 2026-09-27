@@ -1,7 +1,9 @@
 import { BB } from '../../../bb/bb';
 import { TRgba } from '../../kl-types';
-import { ColorConverter } from '../../../bb/color/color';
-import { c } from '../../../bb/base/c';
+import { Options } from './options';
+import * as classes from './color-options.module.scss';
+import { TCss, TVector2D } from '../../../bb/bb-types';
+import { ColorPickerWindow } from './color-picker-window';
 
 /**
  * UI to pick between colors in colorArr. can display full transparent (checkerboard).
@@ -10,15 +12,59 @@ import { c } from '../../../bb/base/c';
  */
 export class ColorOptions {
     private readonly rootEl: HTMLElement;
-    private readonly buttonArr: {
-        el: HTMLElement;
-        setIsSelected: (b: boolean) => void;
-    }[];
+    private readonly options: Options<number>;
     private readonly colorArr: (TRgba | null)[] = [];
-    private selectedIndex: number = 0;
-    private readonly colorInput: HTMLInputElement;
+    private readonly onChange: (color: TRgba | null) => void;
+    private colorPickerWindow: ColorPickerWindow | undefined;
+    private colorPickerPosition: TVector2D | undefined;
 
-    private readonly onColorInputChange: () => void;
+    private closeColorPicker(): void {
+        if (this.colorPickerWindow) {
+            this.colorPickerWindow.destroy();
+            this.colorPickerWindow = undefined;
+        }
+    }
+
+    private toggleColorPicker(index: number, triggerElement: HTMLElement): void {
+        if (this.colorPickerWindow) {
+            this.closeColorPicker();
+            return;
+        }
+
+        const color = this.colorArr[index];
+        if (!color || color.a !== 1) {
+            return;
+        }
+
+        if (!this.colorPickerPosition) {
+            const rect = this.options.getElement().getBoundingClientRect();
+            this.colorPickerPosition = {
+                x: rect.left,
+                y: rect.bottom + 8,
+            };
+        }
+
+        this.colorPickerWindow = new ColorPickerWindow({
+            color,
+            onChange: (newColor) => {
+                const rgba = { ...newColor, a: 1 };
+                const colorStr = BB.ColorConverter.toRgbaStr(rgba);
+                this.colorArr[index] = rgba;
+                this.options.updateOption(index, {
+                    ariaLabel: colorStr,
+                    css: { backgroundColor: colorStr },
+                });
+                this.onChange(rgba);
+            },
+            onMove: (position) => {
+                this.colorPickerPosition = position;
+            },
+            onClose: () => this.closeColorPicker(),
+            position: this.colorPickerPosition,
+            closeOnOutsideClick: true,
+            triggerElement,
+        });
+    }
 
     // ----------------------------------- public -----------------------------------
     constructor(p: {
@@ -27,48 +73,24 @@ export class ColorOptions {
         label?: string;
         initialIndex?: number; // index before duplicates were removed
         title?: string;
-        css?: Partial<CSSStyleDeclaration>;
+        css?: TCss;
     }) {
+        this.onChange = p.onChange;
         this.rootEl = BB.el({
             content: p.label ? p.label : '',
             title: p.title ?? undefined,
+            className: classes.root,
             css: {
                 display: 'flex',
                 alignItems: 'center',
-                gap: '7px',
+                gap: 7,
                 position: 'relative',
+                width: 'fit-content',
                 ...p.css,
             },
         });
 
-        this.buttonArr = [];
-        const buttonSize = 22;
-
-        this.onColorInputChange = () => {
-            const i = this.selectedIndex;
-            const color = this.colorArr[i];
-            if (!color || color.a < 1) {
-                // ignore
-                return;
-            }
-
-            const newRawColor = this.colorInput.value;
-            this.buttonArr[this.selectedIndex].el.style.backgroundColor = newRawColor;
-            this.colorArr[i] = {
-                ...ColorConverter.hexToRGB(newRawColor)!,
-                a: 1,
-            };
-            p.onChange(this.colorArr[i]);
-        };
-        this.colorInput = BB.el({
-            tagName: 'input',
-            custom: {
-                type: 'color',
-                tabIndex: '-1',
-            },
-        });
-        this.colorInput.onchange = this.onColorInputChange;
-        this.colorInput.oninput = this.onColorInputChange;
+        let selectedIndex = 0;
 
         // build colorArr while removing duplicates
         for (let i = 0; i < p.colorArr.length; i++) {
@@ -98,63 +120,35 @@ export class ColorOptions {
             }
             this.colorArr.push(item);
             if ('initialIndex' in p && p.initialIndex === i) {
-                this.selectedIndex = this.colorArr.length - 1;
+                selectedIndex = this.colorArr.length - 1;
             }
         }
 
-        for (let i = 0; i < this.colorArr.length; i++) {
-            ((i) => {
-                const color = this.colorArr[i];
-
-                const colorButton = BB.el({
-                    parent: this.rootEl,
-                    content: color ? '' : 'X',
-                    className: 'kl-color-option',
-                    css: {
-                        width: buttonSize + 'px',
-                        height: buttonSize + 'px',
-                        backgroundColor: color ? BB.ColorConverter.toRgbaStr(color) : 'transparent',
-                        lineHeight: buttonSize + 1 + 'px',
-                    },
-                    onClick: (e) => {
-                        if (this.selectedIndex === i) {
-                            if (color && color.a === 1) {
-                                this.colorInput.showPicker
-                                    ? this.colorInput.showPicker()
-                                    : this.colorInput.click();
-                            }
-                            return;
-                        }
-
-                        e.preventDefault();
-                        this.selectedIndex = i;
-                        update();
-                        p.onChange(this.colorArr[i]); // color may change
-                    },
-                });
-                if (color && color.a === 0) {
-                    colorButton.style.background = 'var(--kl-checkerboard-background)';
-                }
-
-                const setIsSelected = (b: boolean): void => {
-                    colorButton.classList.toggle('kl-color-option--active', b);
+        this.options = new Options<number>({
+            optionArr: this.colorArr.map((color, index) => {
+                const colorStr = color ? BB.ColorConverter.toRgbaStr(color) : 'X';
+                return {
+                    id: index,
+                    label: color ? undefined : 'X',
+                    ariaLabel: color ? colorStr : undefined,
+                    css:
+                        color && color.a === 0
+                            ? { background: 'var(--kl-checkerboard-background)' }
+                            : { backgroundColor: color ? colorStr : 'transparent' },
                 };
-
-                this.buttonArr.push({
-                    el: colorButton,
-                    setIsSelected,
-                });
-            })(i);
-        }
-
-        this.rootEl.append(c(',w-0,h-0,overflow-hidden,abs-0-0', [this.colorInput]));
-
-        const update = () => {
-            for (let i = 0; i < this.buttonArr.length; i++) {
-                this.buttonArr[i].setIsSelected(i === this.selectedIndex);
-            }
-        };
-        update();
+            }),
+            initId: selectedIndex,
+            isFocusable: true,
+            ariaLabel: p.title ?? p.label,
+            onChange: (index) => {
+                this.closeColorPicker();
+                this.onChange(this.colorArr[index]);
+            },
+            onClickSelected: (index, element) => {
+                this.toggleColorPicker(index, element);
+            },
+        });
+        this.rootEl.append(this.options.getElement());
     }
 
     // ---- interface ----
@@ -163,16 +157,12 @@ export class ColorOptions {
     }
 
     getValue(): TRgba | null {
-        return this.colorArr[this.selectedIndex];
+        return this.colorArr[this.options.getValue()];
     }
 
     destroy(): void {
+        this.closeColorPicker();
+        this.options.destroy();
         this.rootEl.remove();
-        this.buttonArr.forEach((item) => {
-            BB.destroyEl(item.el);
-        });
-        this.buttonArr.splice(0, this.buttonArr.length);
-        this.colorInput.onchange = null;
-        this.colorInput.oninput = null;
     }
 }

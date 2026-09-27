@@ -1,7 +1,8 @@
+import { getIconUrl } from '../../../icon/icon';
 import { BB } from '../../../bb/bb';
-import angleSvg from 'url:/src/app/img/ui/angle.svg';
 import { css } from '../../../bb/base/base';
 
+const angleSvg = getIconUrl('angle');
 type TUiState = 'left' | 'right';
 
 /**
@@ -45,10 +46,10 @@ export class StatusOverlay {
         this.angleIm.src = angleSvg;
         css(this.angleIm, {
             verticalAlign: 'bottom',
-            width: '20px',
-            height: '20px',
-            marginLeft: '5px',
-            borderRadius: '10px',
+            width: 20,
+            height: 20,
+            marginLeft: 5,
+            borderRadius: 10,
         });
 
         this.innerInnerEl = document.createElement('div');

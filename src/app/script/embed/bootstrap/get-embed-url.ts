@@ -9,20 +9,12 @@ export function getEmbedUrl(): string {
         return embedUrl;
     }
 
-    let match: string[];
-    try {
-        throw new Error();
-    } catch (e) {
-        if (e instanceof Error) {
-            match = ('' + e.stack).match(/(https?|file|ftp):\/\/[^)\n]+/g)!;
-        }
+    const stack = new Error().stack ?? '';
+    const matches = stack.match(/(https?|file|ftp):\/\/[^)\n]+/g);
+    if (matches === null) {
+        throw new Error('Could not determine the embed URL');
     }
-    let index = 0;
-    match!.forEach((item, i) => {
-        if (item.indexOf('embed.js') !== -1) {
-            index = i;
-        }
-    });
-    embedUrl = getBaseUrl(match![index]);
+    const embedScriptUrl = matches.find((item) => item.includes('embed.js')) ?? matches[0];
+    embedUrl = getBaseUrl(embedScriptUrl);
     return embedUrl;
 }

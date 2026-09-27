@@ -143,7 +143,13 @@ export class EaselRotate implements TEaselTool {
             const mat = createMatrixFromTransform(this.downTransform);
             const canvasPoint = applyToPoint(inverse(mat), centerObj);
             this.easel.setTransform(
-                createTransform(centerObj, canvasPoint, this.downTransform.scale, newAngleDeg),
+                createTransform(
+                    centerObj,
+                    canvasPoint,
+                    this.downTransform.scale,
+                    newAngleDeg,
+                    this.downTransform.isMirrored,
+                ),
                 !this.easel.isKeyPressed('shift'),
             );
             this.easel.requestRender();
