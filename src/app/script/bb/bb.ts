@@ -31,7 +31,13 @@ import {
 } from './base/canvas';
 import { Matrix } from './math/matrix';
 import { Vec2 } from './math/vec2';
-import { LinearLine, powerSplineInput, projectPointOnLine, SplineInterpolator } from './math/line';
+import {
+    BezierLine,
+    PointLine,
+    powerSplineInput,
+    projectPointOnLine,
+    SplineInterpolator,
+} from './math/line';
 import { CMYK, ColorConverter, HSV, RGB, testIsWhiteBestContrast } from './color/color';
 import { appendTextDiv, clearSelection, el, isInputFocused, unfocusAnyInput } from './base/ui';
 import {
@@ -108,7 +114,8 @@ export const BB = {
 
     // ---- line ----
     projectPointOnLine,
-    LinearLine,
+    PointLine,
+    BezierLine,
     SplineInterpolator,
     powerSplineInput,
 

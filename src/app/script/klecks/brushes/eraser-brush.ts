@@ -1,5 +1,6 @@
+import { BB } from '../../bb/bb';
 import { TPressureInput } from '../kl-types';
-import { LinearLine } from '../../bb/math/line';
+import { BezierLine } from '../../bb/math/line';
 import { ERASE_COLOR } from './erase-color';
 import { TKlCanvasLayer } from '../canvas/kl-canvas';
 import { KlHistory } from '../history/kl-history';
@@ -28,7 +29,8 @@ export class EraserBrush {
     private started: boolean = false;
     private lastDot: number | undefined;
     private lastInput: TPressureInput = { x: 0, y: 0, pressure: 0 };
-    private linearLine: LinearLine | undefined;
+    private lastInput2: TPressureInput = { x: 0, y: 0, pressure: 0 };
+    private bezierLine: BezierLine | undefined;
 
     private changedTiles: boolean[] = [];
 
@@ -82,8 +84,8 @@ export class EraserBrush {
         });
     }
 
-    private continueLine(point: TPressureInput): void {
-        const p = Math.max(0, Math.min(1, point.pressure));
+    private continueLine(x: number | undefined, y: number | undefined, p: number): void {
+        p = Math.max(0, Math.min(1, p));
         let localPressure;
         let localOpacity;
         let localSize = this.useSizePressure
@@ -92,9 +94,15 @@ export class EraserBrush {
 
         const bdist = Math.max(1, Math.max(0.5, 1 - this.opacity) * localSize * this.spacing);
 
-        const dotCallback = (val: { x: number; y: number; t: number }): void => {
+        const bezierCallback = (val: {
+            x: number;
+            y: number;
+            t: number;
+            angle?: number;
+            dAngle: number;
+        }): void => {
             const factor = val.t;
-            localPressure = this.lastInput.pressure * (1 - factor) + p * factor;
+            localPressure = this.lastInput2.pressure * (1 - factor) + p * factor;
             localOpacity = this.useOpacityPressure
                 ? this.opacity * localPressure * localPressure
                 : this.opacity;
@@ -105,11 +113,14 @@ export class EraserBrush {
             this.drawDot(val.x, val.y, localSize, localOpacity);
         };
 
-        this.linearLine!.add(point.x, point.y, bdist, dotCallback);
-
-        this.lastInput.x = point.x;
-        this.lastInput.y = point.y;
-        this.lastInput.pressure = p;
+        this.context.save();
+        this.selectionPath && this.context.clip(this.selectionPath);
+        if (x === undefined || y === undefined) {
+            this.bezierLine!.addFinal(bdist, bezierCallback);
+        } else {
+            this.bezierLine!.add(x, y, bdist, bezierCallback);
+        }
+        this.context.restore();
     }
 
     // ----------------------------------- public -----------------------------------
@@ -142,24 +153,32 @@ export class EraserBrush {
         this.lastInput.x = x;
         this.lastInput.y = y;
         this.lastInput.pressure = p;
+        this.lastInput2 = BB.copyObj(this.lastInput);
 
-        this.linearLine = new LinearLine({ x, y });
+        this.bezierLine = new BB.BezierLine();
+        this.bezierLine.add(x, y, 0, () => undefined);
     }
 
-    goLine(points: TPressureInput[]): void {
+    goLine(x: number, y: number, p: number): void {
         if (!this.started) {
             return;
         }
 
-        this.context.save();
-        this.selectionPath && this.context.clip(this.selectionPath);
-        points.forEach((point) => this.continueLine(point));
-        this.context.restore();
+        this.continueLine(x, y, this.lastInput.pressure);
+
+        this.lastInput2 = BB.copyObj(this.lastInput);
+        this.lastInput.x = x;
+        this.lastInput.y = y;
+        this.lastInput.pressure = p;
     }
 
     endLine(): void {
+        if (this.bezierLine) {
+            this.continueLine(undefined, undefined, this.lastInput.pressure);
+        }
+
         this.started = false;
-        this.linearLine = undefined;
+        this.bezierLine = undefined;
 
         if (this.changedTiles.some((item) => item)) {
             this.klHistory.push(

@@ -1,5 +1,5 @@
 import { BB } from '../../bb/bb';
-import { TPressureInput, TRgb } from '../kl-types';
+import { TRgb } from '../kl-types';
 import { ERASE_COLOR } from './erase-color';
 import { KlHistory } from '../history/kl-history';
 import { getPushableLayerChange } from '../history/push-helpers/get-pushable-layer-change';
@@ -8,23 +8,9 @@ import { MultiPolygon } from 'polygon-clipping';
 import { getSelectionPath2d } from '../../bb/multi-polygon/get-selection-path-2d';
 import { intersectBounds } from '../../bb/math/math';
 import { getMultiPolyBounds } from '../../bb/multi-polygon/get-multi-polygon-bounds';
-import { TIndexBounds, TVector2D } from '../../bb/bb-types';
+import { TIndexBounds } from '../../bb/bb-types';
 
 type TChemyMode = 'fill' | 'stroke';
-
-// Max distance (px) of a dropped point from the simplified path. Measured as a distance, so points far apart
-// need to be closer to a straight line than points close together.
-const SIMPLIFY_TOLERANCE = 0.25;
-// Limits cost of checking dropped points on long straight lines
-const MAX_DROPPED_POINTS = 64;
-
-function distToSegment(p: TVector2D, a: TVector2D, b: TVector2D): number {
-    const abX = b.x - a.x;
-    const abY = b.y - a.y;
-    const lenSq = abX * abX + abY * abY;
-    const t = lenSq === 0 ? 0 : BB.clamp(((p.x - a.x) * abX + (p.y - a.y) * abY) / lenSq, 0, 1);
-    return BB.dist(p.x, p.y, a.x + abX * t, a.y + abY * t);
-}
 
 export class ChemyBrush {
     private context: CanvasRenderingContext2D = {} as CanvasRenderingContext2D;
@@ -34,6 +20,7 @@ export class ChemyBrush {
     private settingLockLayerAlpha: boolean = false;
     private settingIsEraser: boolean = false;
     private settingMode: TChemyMode = 'fill';
+    private settingDistort: number = 0; // 0 - 1
     private settingXSymmetry: boolean = false;
     private settingYSymmetry: boolean = false;
     private settingGradient: boolean = false;
@@ -43,11 +30,7 @@ export class ChemyBrush {
     private klHistory: KlHistory = {} as KlHistory;
 
     private copyCanvas: HTMLCanvasElement = {} as HTMLCanvasElement;
-    // simplified path. Excludes the latest point, which is not settled yet.
-    private path: TVector2D[] = [];
-    private latestPoint: TVector2D | undefined;
-    // points dropped since the last point of path
-    private droppedPoints: TVector2D[] = [];
+    private path: { x: number; y: number }[] = [];
     private minY: number = 0;
     private maxY: number = 0;
     private completeRedrawBounds: TIndexBounds | undefined;
@@ -85,33 +68,6 @@ export class ChemyBrush {
         this.completeRedrawBounds = BB.updateBounds(this.completeRedrawBounds, bounds);
     }
 
-    /**
-     * Adds point to path, while dropping points that would barely change the shape.
-     * The latest point is kept separate, because whether it can be dropped depends on the next point.
-     */
-    private addPoint(point: TVector2D): void {
-        if (this.latestPoint) {
-            const anchor = this.path.at(-1)!;
-            const canDrop =
-                this.droppedPoints.length < MAX_DROPPED_POINTS &&
-                distToSegment(this.latestPoint, anchor, point) <= SIMPLIFY_TOLERANCE &&
-                this.droppedPoints.every(
-                    (dropped) => distToSegment(dropped, anchor, point) <= SIMPLIFY_TOLERANCE,
-                );
-            if (canDrop) {
-                this.droppedPoints.push(this.latestPoint);
-            } else {
-                this.path.push(this.latestPoint);
-                this.droppedPoints = [];
-            }
-        }
-        this.latestPoint = point;
-    }
-
-    private getDrawnPath(): TVector2D[] {
-        return this.latestPoint ? [...this.path, this.latestPoint] : this.path;
-    }
-
     private drawShape(): void {
         this.context.save();
         this.context.clearRect(0, 0, this.context.canvas.width, this.context.canvas.height);
@@ -134,11 +90,10 @@ export class ChemyBrush {
             }
         }
 
-        const drawnPath = this.getDrawnPath();
-        if (drawnPath.length > 1) {
+        if (this.path.length > 1) {
             // path
             const path = new Path2D();
-            drawnPath.forEach((item, index) => {
+            this.path.forEach((item, index) => {
                 if (index === 0) {
                     path.moveTo(item.x, item.y);
                 } else {
@@ -153,7 +108,7 @@ export class ChemyBrush {
                 a: this.settingOpacity,
             });
             if (this.settingGradient) {
-                const startAtTop = drawnPath[0].x > drawnPath.at(-1)!.x;
+                const startAtTop = this.path[0].x > this.path.at(-1)!.x;
                 const gradient = this.context.createLinearGradient(
                     0,
                     startAtTop ? this.minY : this.maxY,
@@ -274,6 +229,14 @@ export class ChemyBrush {
         return this.settingMode;
     }
 
+    setDistort(distort: number): void {
+        this.settingDistort = BB.clamp(distort, 0, 1);
+    }
+
+    getDistort(): number {
+        return this.settingDistort;
+    }
+
     setXSymmetry(b: boolean): void {
         this.settingXSymmetry = b;
     }
@@ -326,8 +289,6 @@ export class ChemyBrush {
             : undefined;
         this.isDrawing = true;
         this.path = [{ x, y }];
-        this.latestPoint = undefined;
-        this.droppedPoints = [];
         this.minY = y;
         this.maxY = y;
         this.copyCanvas = BB.canvas(this.context.canvas.width, this.context.canvas.height);
@@ -336,17 +297,21 @@ export class ChemyBrush {
         this.updateCompleteRedrawBounds(x, y);
     }
 
-    goLine(points: TPressureInput[]): void {
+    goLine(x: number, y: number): void {
         if (!this.isDrawing) {
             return;
         }
 
-        points.forEach(({ x, y }) => {
-            this.minY = Math.min(this.minY, y);
-            this.maxY = Math.max(this.maxY, y);
-            this.addPoint({ x, y });
-            this.updateCompleteRedrawBounds(x, y);
-        });
+        const pos = { x, y };
+        if (this.settingDistort > 0) {
+            pos.x += (Math.random() - 0.5) * this.settingDistort * 80;
+            pos.y += (Math.random() - 0.5) * this.settingDistort * 80;
+        }
+
+        this.minY = Math.min(this.minY, pos.y);
+        this.maxY = Math.max(this.maxY, pos.y);
+        this.path.push(pos);
+        this.updateCompleteRedrawBounds(x, y);
         this.drawShape();
     }
 
@@ -363,13 +328,11 @@ export class ChemyBrush {
                 this.selectionBounds,
             );
         }
-        if (this.getDrawnPath().length > 1 && this.completeRedrawBounds) {
+        if (this.path.length > 1 && this.completeRedrawBounds) {
             const layerData = canvasToLayerTiles(this.context.canvas, this.completeRedrawBounds);
             this.klHistory.push(getPushableLayerChange(this.klHistory.getComposed(), layerData));
         }
         this.path = [];
-        this.latestPoint = undefined;
-        this.droppedPoints = [];
         this.copyCanvas = {} as HTMLCanvasElement;
     }
 

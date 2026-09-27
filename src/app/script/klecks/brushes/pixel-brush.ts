@@ -1,7 +1,7 @@
 import { BB } from '../../bb/bb';
 import { TPressureInput, TRgb } from '../kl-types';
 import { TIndexBounds, TRect, TVector2D } from '../../bb/bb-types';
-import { LinearLine } from '../../bb/math/line';
+import { BezierLine, TBezierLineCallback } from '../../bb/math/line';
 import { ERASE_COLOR } from './erase-color';
 import { throwIfNull } from '../../bb/base/base';
 import { KlHistory } from '../history/kl-history';
@@ -38,9 +38,8 @@ export class PixelBrush {
     private settingTip: TPixelBrushTip = 'round';
     private inputIsDrawing: boolean = false;
     private lastInput: TPressureInput = { x: 0, y: 0, pressure: 0 };
-    private linearLine: LinearLine | null = null;
-    // size 1: last plotted pixel
-    private pixelLineEnd: TVector2D | undefined;
+    private lastInput2: TPressureInput = { x: 0, y: 0, pressure: 0 };
+    private bezierLine: BezierLine | null = null;
     private readonly patternCanvas: HTMLCanvasElement;
     private readonly patternCtx: CanvasRenderingContext2D;
     private fillStyle: string | CanvasPattern = '';
@@ -55,9 +54,8 @@ export class PixelBrush {
     /*
         Stroke is drawn opaque into its own canvas, then composited with opacity.
         That way overlapping dots don't accumulate -> opacity instead of flow.
-        Kept between strokes (cleared after each), freed via freeResources.
      */
-    private strokeCanvas: HTMLCanvasElement | undefined;
+    private strokeCanvas: HTMLCanvasElement = {} as HTMLCanvasElement;
     private strokeCtx: CanvasRenderingContext2D = {} as CanvasRenderingContext2D;
 
     // area that changed since last redraw
@@ -106,22 +104,15 @@ export class PixelBrush {
         this.canvasClone = BB.canvas(width, height);
         this.ctxClone = BB.ctx(this.canvasClone);
         this.ctxClone.drawImage(this.context.canvas, 0, 0);
-        if (
-            !this.strokeCanvas ||
-            this.strokeCanvas.width !== width ||
-            this.strokeCanvas.height !== height
-        ) {
-            this.strokeCanvas && BB.freeCanvas(this.strokeCanvas);
-            this.strokeCanvas = BB.canvas(width, height);
-            this.strokeCtx = BB.ctx(this.strokeCanvas);
-        }
+        this.strokeCanvas = BB.canvas(width, height);
+        this.strokeCtx = BB.ctx(this.strokeCanvas);
     }
 
     private freeClone(): void {
         BB.freeCanvas(this.canvasClone);
         this.ctxClone = {} as CanvasRenderingContext2D;
-        // cleared right away, so the next stroke can start immediately
-        this.strokeCtx.clearRect(0, 0, this.strokeCtx.canvas.width, this.strokeCtx.canvas.height);
+        BB.freeCanvas(this.strokeCanvas);
+        this.strokeCtx = {} as CanvasRenderingContext2D;
     }
 
     /**
@@ -136,7 +127,7 @@ export class PixelBrush {
             ctx.globalCompositeOperation = 'destination-out';
         }
         ctx.drawImage(
-            this.strokeCtx.canvas,
+            this.strokeCanvas,
             rect.x,
             rect.y,
             rect.width,
@@ -199,6 +190,73 @@ export class PixelBrush {
         );
     }
 
+    /**
+     * Tests p1->p2 or p3->p4 deviate in their direction more than max, compared to p1->p4
+     */
+    private cubicCurveOverThreshold(
+        p1: TVector2D,
+        p2: TVector2D,
+        p3: TVector2D,
+        p4: TVector2D,
+        maxAngleRad: number,
+    ): boolean {
+        const d = BB.Vec2.nor({
+            x: p4.x - p1.x,
+            y: p4.y - p1.y,
+        });
+        const d2 = BB.Vec2.nor({
+            x: p2.x - p1.x,
+            y: p2.y - p1.y,
+        });
+        const d3 = BB.Vec2.nor({
+            x: p4.x - p3.x,
+            y: p4.y - p3.y,
+        });
+        // const a2 = Math.abs(BB.Vec2.angle(d, d2) % Math.PI) / Math.PI * 180;
+        // const a3 = Math.abs(BB.Vec2.angle(d, d3) % Math.PI) / Math.PI * 180;
+
+        return Math.max(BB.Vec2.dist(d, d2), BB.Vec2.dist(d, d3)) > maxAngleRad;
+    }
+
+    private plotCubicBezierLine(p1: TVector2D, p2: TVector2D, p3: TVector2D, p4: TVector2D): void {
+        const isOverThreshold = this.cubicCurveOverThreshold(p1, p2, p3, p4, 0.1);
+
+        p1.x = Math.floor(p1.x);
+        p1.y = Math.floor(p1.y);
+        p4.x = Math.floor(p4.x);
+        p4.y = Math.floor(p4.y);
+
+        const dist = BB.dist(p1.x, p1.y, p4.x, p4.y);
+        if (!isOverThreshold || dist < 7) {
+            this.plotLine(p1.x, p1.y, p4.x, p4.y, true);
+            return;
+        }
+
+        const n = Math.max(2, Math.round(dist / 4));
+        const pointArr = [];
+        for (let i = 0; i <= n; i++) {
+            const t = i / n;
+            const a = (1 - t) ** 3;
+            const b = 3 * t * (1 - t) ** 2;
+            const c = 3 * t ** 2 * (1 - t);
+            const d = t ** 3;
+            pointArr.push({
+                x: a * p1.x + b * p2.x + c * p3.x + d * p4.x,
+                y: a * p1.y + b * p2.y + c * p3.y + d * p4.y,
+            });
+        }
+
+        for (let i = 0; i < n; i++) {
+            this.plotLine(
+                Math.round(pointArr[i].x),
+                Math.round(pointArr[i].y),
+                Math.round(pointArr[i + 1].x),
+                Math.round(pointArr[i + 1].y),
+                true,
+            );
+        }
+    }
+
     private drawDot(x: number, y: number, size: number): void {
         const rect: TRect = {
             x: Math.round(x + -size),
@@ -226,8 +284,8 @@ export class PixelBrush {
         const rects = this.discUnion.getRects(this.discs, {
             x: 0,
             y: 0,
-            width: this.strokeCtx.canvas.width,
-            height: this.strokeCtx.canvas.height,
+            width: this.strokeCanvas.width,
+            height: this.strokeCanvas.height,
         });
         this.discs = [];
         if (rects.length === 0) {
@@ -239,61 +297,59 @@ export class PixelBrush {
         this.strokeCtx.fill();
     }
 
-    private isPixelLine(): boolean {
-        return Math.round(this.settingSize * 2) === 1;
-    }
-
-    /**
-     * Size 1: batch short coalesced segments to avoid stair-stepped corners, but plot regular points immediately.
-     */
-    private continuePixelLine(x: number, y: number, forcePlot: boolean): void {
-        const from = this.pixelLineEnd!;
-        const to = { x: Math.floor(x), y: Math.floor(y) };
-        const distance = Math.max(Math.abs(to.x - from.x), Math.abs(to.y - from.y));
-        if (distance === 0 || (!forcePlot && distance < 4)) {
-            return;
+    private continueLine(x: number | null, y: number | null, size: number, pressure: number): void {
+        if (this.bezierLine === null) {
+            this.bezierLine = new BB.BezierLine();
+            this.bezierLine.add(this.lastInput.x, this.lastInput.y, 0, () => {});
         }
-        this.plotLine(from.x, from.y, to.x, to.y, true);
-        this.pixelLineEnd = to;
-    }
 
-    private fillPixelLine(): void {
-        this.strokeCtx.fillStyle = this.fillStyle;
-        this.strokeCtx.fill(this.bresenheimPath!);
-        this.bresenheimPath = undefined;
-    }
+        this.strokeCtx.save();
+        this.selectionPath && this.strokeCtx.clip(this.selectionPath);
 
-    private continueLine(point: TPressureInput, forcePlot: boolean): void {
-        if (this.linearLine === null) {
-            this.linearLine = new LinearLine(this.lastInput);
-        }
-        const pressure = BB.clamp(point.pressure, 0, 1);
+        const dotCallback: TBezierLineCallback = (val): void => {
+            const localPressure = BB.mix(this.lastInput2.pressure, pressure, val.t);
+            const localSize = Math.max(
+                0.5,
+                this.settingSize * (this.settingHasSizePressure ? localPressure : 1),
+            );
+            this.drawDot(val.x, val.y, localSize);
+        };
 
-        if (this.isPixelLine()) {
-            this.continuePixelLine(point.x, point.y, forcePlot);
+        const controlCallback = (controlObj: {
+            p1: TVector2D;
+            p2: TVector2D;
+            p3: TVector2D;
+            p4: TVector2D;
+        }): void => {
+            this.plotCubicBezierLine(controlObj.p1, controlObj.p2, controlObj.p3, controlObj.p4);
+        };
+
+        if (Math.round(this.settingSize * 2) === 1) {
+            this.bresenheimPath = new Path2D();
+            if (x === null || y === null) {
+                this.bezierLine.addFinal(4, undefined, controlCallback);
+            } else {
+                this.bezierLine.add(x, y, 4, undefined, controlCallback);
+            }
+            this.strokeCtx.fillStyle = this.fillStyle;
+            this.strokeCtx.fill(this.bresenheimPath!);
+            this.bresenheimPath = undefined;
         } else {
-            const size = this.settingHasSizePressure
-                ? Math.max(0.1, pressure * this.settingSize)
-                : Math.max(0.1, this.settingSize);
             // round tip needs dense spacing, otherwise the stroke edges become scalloped
             const localSpacing =
                 this.settingTip === 'round'
                     ? Math.min(1, size * this.settingSpacing)
                     : size * this.settingSpacing;
 
-            this.linearLine.add(point.x, point.y, localSpacing, (val) => {
-                const localPressure = BB.mix(this.lastInput.pressure, pressure, val.t);
-                const localSize = Math.max(
-                    0.5,
-                    this.settingSize * (this.settingHasSizePressure ? localPressure : 1),
-                );
-                this.drawDot(val.x, val.y, localSize);
-            });
+            if (x === null || y === null) {
+                this.bezierLine.addFinal(localSpacing, dotCallback);
+            } else {
+                this.bezierLine.add(x, y, localSpacing, dotCallback);
+            }
+            this.fillDiscs();
         }
 
-        this.lastInput.x = point.x;
-        this.lastInput.y = point.y;
-        this.lastInput.pressure = pressure;
+        this.strokeCtx.restore();
     }
 
     /**
@@ -375,28 +431,28 @@ export class PixelBrush {
         this.lastInput.x = x;
         this.lastInput.y = y;
         this.lastInput.pressure = p;
-        this.pixelLineEnd = { x: Math.floor(x), y: Math.floor(y) };
+        this.lastInput2 = BB.copyObj(this.lastInput);
         this.redrawToCanvas();
     }
 
-    goLine(points: TPressureInput[]): void {
+    goLine(x: number, y: number, p: number): void {
         if (!this.inputIsDrawing) {
             return;
         }
+        //debug
+        //drawDot(x, y, 1, 0.5);
 
-        this.strokeCtx.save();
-        this.selectionPath && this.strokeCtx.clip(this.selectionPath);
-        if (this.isPixelLine()) {
-            this.bresenheimPath = new Path2D();
-            // The last point is regular; preceding points are coalesced.
-            points.forEach((point, index) => this.continueLine(point, index === points.length - 1));
-            this.fillPixelLine();
-        } else {
-            points.forEach((point) => this.continueLine(point, false));
-            this.fillDiscs();
-        }
-        this.strokeCtx.restore();
+        const pressure = BB.clamp(p, 0, 1);
+        const localSize = this.settingHasSizePressure
+            ? Math.max(0.1, this.lastInput.pressure * this.settingSize)
+            : Math.max(0.1, this.settingSize);
 
+        this.continueLine(x, y, localSize, this.lastInput.pressure);
+
+        this.lastInput2 = BB.copyObj(this.lastInput);
+        this.lastInput.x = x;
+        this.lastInput.y = y;
+        this.lastInput.pressure = pressure;
         this.redrawToCanvas();
     }
 
@@ -406,14 +462,10 @@ export class PixelBrush {
         }
         this.selection = this.klHistory.getComposed().selection.value;
         this.selectionPath = this.selection ? getSelectionPath2d(this.selection) : undefined;
-        if (this.isPixelLine()) {
-            this.strokeCtx.save();
-            this.selectionPath && this.strokeCtx.clip(this.selectionPath);
-            this.bresenheimPath = new Path2D();
-            this.continuePixelLine(this.lastInput.x, this.lastInput.y, true);
-            this.fillPixelLine();
-            this.strokeCtx.restore();
-        }
+        const localSize = this.settingHasSizePressure
+            ? Math.max(0.1, this.lastInput.pressure * this.settingSize)
+            : Math.max(0.1, this.settingSize);
+        this.continueLine(null, null, localSize, this.lastInput.pressure);
 
         //debug
         //drawDot(lastInput.x, lastInput.y, 3, 1);
@@ -421,7 +473,7 @@ export class PixelBrush {
 
         this.inputIsDrawing = false;
 
-        this.linearLine = null;
+        this.bezierLine = null;
 
         this.redrawToCanvas();
         if (this.strokeBounds) {
@@ -440,20 +492,8 @@ export class PixelBrush {
 
     drawLineSegment(x1: number, y1: number, x2: number, y2: number): void {
         this.startLine(x1, y1, 1);
-        this.goLine([{ x: x2, y: y2, pressure: 1 }]);
+        this.goLine(x2, y2, 1);
         this.endLine();
-    }
-
-    /**
-     * Frees resources that are kept between strokes. E.g. when switching to another tool.
-     */
-    freeResources(): void {
-        if (!this.strokeCanvas || this.inputIsDrawing) {
-            return;
-        }
-        BB.freeCanvas(this.strokeCanvas);
-        this.strokeCanvas = undefined;
-        this.strokeCtx = {} as CanvasRenderingContext2D;
     }
 
     //IS

@@ -173,6 +173,23 @@ if (!('at' in Array.prototype)) {
     });
 }
 
+// Chrome 92, Firefox 90, Safari 15.4
+// ImageData.data is a Uint8ClampedArray. All typed arrays share this prototype.
+const typedArrayPrototype = Object.getPrototypeOf(Uint8Array.prototype);
+if (!('at' in typedArrayPrototype)) {
+    Object.defineProperty(typedArrayPrototype, 'at', {
+        configurable: true,
+        writable: true,
+        value: function (
+            this: ArrayLike<number | bigint>,
+            index: number,
+        ): number | bigint | undefined {
+            const i = Math.trunc(index);
+            return this[i < 0 ? this.length + i : i];
+        },
+    });
+}
+
 // Chrome 122, Firefox 127, Safari 17
 if (!Set.prototype.difference) {
     Object.defineProperty(Set.prototype, 'difference', {
