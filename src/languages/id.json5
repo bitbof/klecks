@@ -167,17 +167,17 @@
   'brush-pixel-pattern-add': {
     hint: 'Button tooltip. Creates a new pattern for the pixel brush.',
     original: 'New Pattern',
-    value: ''
+    value: 'Pola Baru'
   },
   'brush-pixel-pattern-delete': {
     hint: 'Button. Deletes a pattern the user created for the pixel brush.',
     original: 'Delete',
-    value: ''
+    value: 'Hapus'
   },
   'brush-pixel-pattern-edit-default-error': {
     hint: 'Error message. Only patterns the user created can be edited, not the built-in ones.',
     original: "Can't edit default patterns",
-    value: ''
+    value: 'Tidak dapat mengedit pola bawaan'
   },
   'brush-chemy-fill': {
     hint: 'Like in MS Paint. A shape can have be outlined, and filled.',
