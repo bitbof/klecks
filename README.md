@@ -128,7 +128,7 @@ the embed-version.
   - Problems are printed to the command line output
 
 # Patreon
-Become a member of Kleki's patreon to get exclusive access to experimental protoypes of potential upcoming features. [Patreon](https://kleki.com/patreon?source=github)
+Become a member of Kleki's patreon to get exclusive access to experimental prototypes of potential upcoming features and more. [Patreon](https://kleki.com/patreon?source=github)
 
 # License
 
