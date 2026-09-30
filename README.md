@@ -20,8 +20,8 @@
       Dev Blog
     </a>
     <span> | </span>
-    <a href="https://kleki.com/donate/">
-      Donate
+    <a href="https://kleki.com/patreon?source=github">
+      Patreon
     </a>
   </h3>
 </div>
@@ -30,7 +30,7 @@
 <img src="https://bitbof.com/stuff/2022-01-klecks/2026-03-28-klecks-github.png" alt="Klecks"><br>
 </p>
 
-Klecks (German for "splash of color", pronounced "clex") is the official open-source release of the community-funded online painting app [Kleki](https://kleki.com).
+Klecks (German for "splash of color", pronounced "clex") is the official open-source release of the free online painting app [Kleki](https://kleki.com).
 
 Klecks can run in standalone mode (e.g. on [kleki.com](https://kleki.com)), or embed (e.g. on [2draw.net](https://2draw.net)) for drawing communities.
 
@@ -78,7 +78,7 @@ It is then accessible through: http://localhost:5050
 How you can contribute to this project:
 - Bug reporting (detailed bug reports that are reproducible)
 - Contribute to a translation (see below)
-- Donate to this project (Klecks, Kleki) [Donate](https://kleki.com/donate/)
+- Give it a star
 
 # Translations
 Are you a native speaker or have advanced skills in a language? Any contribution by you is highly encouraged and appreciated!
@@ -127,8 +127,8 @@ the embed-version.
 - `npm run lang:build` - generates JSON & TS files in `src/app/languages`
   - Problems are printed to the command line output
 
-# Help fund this project
-Klecks and Kleki are community funded. [Donate today](https://kleki.com/donate/)
+# Patreon
+Become a member of Kleki's patreon to get exclusive access to experimental protoypes of potential upcoming features. [Patreon](https://kleki.com/patreon?source=github)
 
 # License
 
