@@ -540,7 +540,7 @@ export class SelectUi {
         this.rootEl = BB.el({
             content: [this.modeOptions.getElement()],
             css: {
-                margin: 10,
+                margin: '10px 10px 0',
             },
         });
         updateMode();

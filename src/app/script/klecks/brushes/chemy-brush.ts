@@ -26,6 +26,7 @@ export class ChemyBrush {
     private settingGradient: boolean = false;
 
     private isDrawing: boolean = false;
+    private needsRedraw: boolean = false;
 
     private klHistory: KlHistory = {} as KlHistory;
 
@@ -282,6 +283,7 @@ export class ChemyBrush {
     }
 
     startLine(x: number, y: number): void {
+        this.needsRedraw = false;
         this.selection = this.klHistory.getComposed().selection.value;
         this.selectionPath = this.selection ? getSelectionPath2d(this.selection) : undefined;
         this.selectionBounds = this.selection
@@ -312,10 +314,11 @@ export class ChemyBrush {
         this.maxY = Math.max(this.maxY, pos.y);
         this.path.push(pos);
         this.updateCompleteRedrawBounds(x, y);
-        this.drawShape();
+        this.needsRedraw = true;
     }
 
     endLine(): void {
+        this.transferToCanvas();
         this.isDrawing = false;
         this.completeRedrawBounds = BB.indexBoundsInArea(
             this.completeRedrawBounds,
@@ -334,6 +337,14 @@ export class ChemyBrush {
         }
         this.path = [];
         this.copyCanvas = {} as HTMLCanvasElement;
+    }
+
+    transferToCanvas(): void {
+        if (!this.needsRedraw) {
+            return;
+        }
+        this.drawShape();
+        this.needsRedraw = false;
     }
 
     drawLineSegment(x1: number, y1: number, x2: number, y2: number): void {

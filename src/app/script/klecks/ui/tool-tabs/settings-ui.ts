@@ -29,7 +29,7 @@ export class SettingsUi {
     constructor({ onLeftRight, saveReminder, customAbout }: TSettingsUiParams) {
         this.rootEl = BB.el({
             css: {
-                margin: 10,
+                margin: '10px 10px 0',
             },
         });
 

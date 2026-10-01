@@ -291,6 +291,7 @@ export class SmudgeBrush {
 
     private bezierLine: BezierLine | undefined;
 
+    // Accumulated until transfer
     private redrawBounds: TIndexBounds | undefined;
     private completeRedrawBounds: TIndexBounds | undefined;
 
@@ -510,6 +511,7 @@ export class SmudgeBrush {
     constructor() {}
 
     startLine(x: number, y: number, p: number): void {
+        this.resetRedrawBounds();
         const selection = this.klHistory.getComposed().selection.value;
         this.selectionBounds = selection ? getMultiPolyBounds(selection, 'index') : undefined;
         this.mask = selection
@@ -548,7 +550,6 @@ export class SmudgeBrush {
             return;
         }
 
-        this.resetRedrawBounds();
         const pressure = BB.clamp(p, 0, 1);
         const localSize = this.settingHasSizePressure
             ? Math.max(0.1, this.lastInput.pressure * this.settingSize)
@@ -557,15 +558,6 @@ export class SmudgeBrush {
         this.continueLine(x, y, localSize, this.lastInput.pressure);
 
         if (this.redrawBounds) {
-            this.context.putImageData(
-                this.copyImageData,
-                0,
-                0,
-                this.redrawBounds.x1,
-                this.redrawBounds.y1,
-                this.redrawBounds.x2 - this.redrawBounds.x1,
-                this.redrawBounds.y2 - this.redrawBounds.y1,
-            );
             this.updateCompleteRedrawBounds(
                 this.redrawBounds.x1,
                 this.redrawBounds.y1,
@@ -581,7 +573,6 @@ export class SmudgeBrush {
     }
 
     endLine(): void {
-        this.resetRedrawBounds();
         const localSize = this.settingHasSizePressure
             ? Math.max(0.1, this.lastInput.pressure * this.settingSize)
             : Math.max(0.1, this.settingSize);
@@ -593,15 +584,6 @@ export class SmudgeBrush {
         this.bezierLine = undefined;
 
         if (this.redrawBounds) {
-            this.context.putImageData(
-                this.copyImageData,
-                0,
-                0,
-                this.redrawBounds.x1,
-                this.redrawBounds.y1,
-                this.redrawBounds.x2 - this.redrawBounds.x1,
-                this.redrawBounds.y2 - this.redrawBounds.y1,
-            );
             this.updateCompleteRedrawBounds(
                 this.redrawBounds.x1,
                 this.redrawBounds.y1,
@@ -609,6 +591,8 @@ export class SmudgeBrush {
                 this.redrawBounds.y2,
             );
         }
+
+        this.transferToCanvas();
 
         if (this.completeRedrawBounds) {
             this.klHistory.push(
@@ -619,6 +603,23 @@ export class SmudgeBrush {
             );
         }
         this.copyImageData = {} as ImageData;
+    }
+
+    transferToCanvas(): void {
+        const bounds = this.redrawBounds;
+        if (!bounds) {
+            return;
+        }
+        this.context.putImageData(
+            this.copyImageData,
+            0,
+            0,
+            bounds.x1,
+            bounds.y1,
+            bounds.x2 - bounds.x1 + 1,
+            bounds.y2 - bounds.y1 + 1,
+        );
+        this.resetRedrawBounds();
     }
 
     drawImage(im: ImageData | HTMLCanvasElement, x: number, y: number): void {

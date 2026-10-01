@@ -291,6 +291,9 @@ export const pixelBrushUi = (function () {
         this.isDrawing = function () {
             return brush.isDrawing();
         };
+        this.freeResources = () => {
+            brush.freeResources();
+        };
         this.toggleEraser = () => {
             eraserToggle.setValue(!eraserToggle.getValue());
             brush.setIsEraser(eraserToggle.getValue());

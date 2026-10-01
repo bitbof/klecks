@@ -21,7 +21,7 @@ import { FloatingLayerPreview } from './floating-layer-preview';
 export class LayerPreview {
     private readonly rootEl: HTMLElement;
     private readonly contentWrapperEl: HTMLElement;
-    private readonly height: number;
+    private height: number;
     private readonly klHistory: KlHistory;
     private readonly klCanvas: KlCanvas;
     private isPreviewVisible: boolean;
@@ -35,9 +35,11 @@ export class LayerPreview {
     private readonly opacityEl: HTMLElement;
     private lastDrawnSize: TSize2D;
 
-    private readonly canvasSize: number;
+    private canvasSize: number;
     private readonly canvas: HTMLCanvasElement;
     private readonly canvasCtx: CanvasRenderingContext2D;
+    private readonly canvasWrapperEl: HTMLElement;
+    private isSmall: boolean;
 
     private readonly largeCanvasSize: number;
     private readonly largeCanvas: HTMLCanvasElement;
@@ -167,6 +169,7 @@ export class LayerPreview {
         this.klCanvas = p.klCanvas;
         this.floatingLayerPreview = p.floatingLayerPreview;
         this.isPreviewVisible = true;
+        this.isSmall = false;
         this.height = 40;
         this.canvasSize = this.height - 10;
         this.largeCanvasSize = 300;
@@ -205,7 +208,7 @@ export class LayerPreview {
             },
         });
 
-        const canvasWrapperEl = BB.el({
+        this.canvasWrapperEl = BB.el({
             css: {
                 //background: '#f00',
                 minWidth: this.height,
@@ -273,9 +276,9 @@ export class LayerPreview {
         this.largeCanvas = BB.canvas(this.largeCanvasSize, this.largeCanvasSize);
         this.largeCanvasCtx = BB.ctx(this.largeCanvas);
 
-        canvasWrapperEl.append(this.canvas);
+        this.canvasWrapperEl.append(this.canvas);
         nameWrapper.append(this.nameLabelEl, clickableEl);
-        this.contentWrapperEl.append(checkWrapper, canvasWrapperEl, nameWrapper, this.opacityEl);
+        this.contentWrapperEl.append(checkWrapper, this.canvasWrapperEl, nameWrapper, this.opacityEl);
         this.rootEl.append(this.contentWrapperEl);
 
         this.updateClippingIconColor();
@@ -332,6 +335,19 @@ export class LayerPreview {
         this.isPreviewVisible = b;
         this.contentWrapperEl.style.display = this.isPreviewVisible ? 'flex' : 'none';
         this.rootEl.style.marginBottom = this.isPreviewVisible ? '' : '10px';
+        this.draw();
+    }
+
+    setIsSmall(b: boolean): void {
+        if (this.isSmall === b) {
+            return;
+        }
+        this.isSmall = b;
+        this.height = b ? 36 : 40;
+        this.canvasSize = this.height - 10;
+        this.contentWrapperEl.style.height = `${this.height}px`;
+        this.canvasWrapperEl.style.minWidth = `${this.height}px`;
+        this.canvasWrapperEl.style.height = `${this.height}px`;
         this.draw();
     }
 }

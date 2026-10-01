@@ -50,6 +50,7 @@ export type TEaselParams<GToolId extends string> = {
     tool: NoInfer<GToolId>;
     onChangeTool: (toolId: NoInfer<GToolId>) => void;
     onTransformChange: (transform: TViewportTransform, scaleOrAngleChanged: boolean) => void; // whenever Viewport changes
+    onBeforeRender?: () => void;
     onUndo?: () => void; // gesture triggers undo
     onRedo?: () => void; // gesture triggers redo
     onResetSelection: () => void; // via selection indicator
@@ -342,6 +343,7 @@ export class Easel<GToolId extends string> {
                 layers: this.project.layers,
             },
             transform: this.getResetTransform(),
+            onBeforeRender: p.onBeforeRender,
             renderAfter: (ctx, renderedTransform) => {
                 const tool = this.getActiveTool();
                 tool.renderAfterViewport?.(ctx, renderedTransform);

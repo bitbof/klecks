@@ -223,6 +223,8 @@ export type TBrushUiInstance<GBrush> = {
     getSeed?: () => number;
     setSeed?: (s: number) => void;
     toggleEraser?: () => void;
+    // free resources that are kept between strokes
+    freeResources?: () => void;
 };
 
 export type TBrushUi<GBrush> = TSliderConfig & {

@@ -34,7 +34,7 @@ export class ShapeUi {
     }) {
         this.rootEl = BB.el({
             css: {
-                margin: 10,
+                margin: '10px 10px 0',
             },
         });
         this.isVisible = true;

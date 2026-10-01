@@ -561,7 +561,7 @@ export class LayersUi {
         this.rootEl = BB.el({
             css: {
                 marginRight: 10,
-                marginBottom: 10,
+                marginBottom: 0,
                 marginLeft: 10,
                 marginTop: 10,
                 cursor: 'default',

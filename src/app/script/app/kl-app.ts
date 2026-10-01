@@ -88,6 +88,41 @@ const tabLayersImg = getIconUrl('tab-layers');
 const tabEditImg = getIconUrl('tab-edit');
 importFilters();
 
+/**
+ * Toolspace shrinks as the window gets shorter: first the color slider, then the tool row becomes small,
+ * then the layer preview hides. Only after that does it overflow.
+ * Values are tuned so the tallest brush tab (pixel) fits, with 10px spacing above the bottom bar.
+ */
+function getToolspaceLayout(uiHeight: number): {
+    isLayerPreviewVisible: boolean;
+    isLayerPreviewSmall: boolean;
+    isToolRowSmall: boolean;
+    colorSliderHeight: number;
+} {
+    const otherContentHeight = 478; // everything but color slider, with layer preview and large tool row
+    const toolRowSaving = 18; // when small
+    const layerPreviewSmallSaving = 4; // 36px instead of 40px
+    const colorSliderMin = 158;
+    const colorSliderMax = 400;
+
+    let available = uiHeight - otherContentHeight;
+    const isToolRowSmall = available < colorSliderMin;
+    if (isToolRowSmall) {
+        available += toolRowSaving + layerPreviewSmallSaving;
+    }
+    const isLayerPreviewSmall = isToolRowSmall;
+    const isLayerPreviewVisible = available >= colorSliderMin;
+    if (!isLayerPreviewVisible) {
+        available += isLayerPreviewSmall ? 26 : 30; // hidden preview keeps a 10px bottom margin
+    }
+    return {
+        isLayerPreviewVisible,
+        isLayerPreviewSmall,
+        isToolRowSmall,
+        colorSliderHeight: Math.max(colorSliderMin, Math.min(colorSliderMax, available)),
+    };
+}
+
 type TKlAppOptionsEmbed = {
     url: string;
     enableImageDropperImport?: boolean; // default false
@@ -210,18 +245,6 @@ export class KlApp {
             this.statusOverlay.setWide(false);
         }
         this.mobileUi.update();
-    }
-
-    private updateBottomBar(): void {
-        if (!this.bottomBar) {
-            return;
-        }
-        const isVisible = this.toolspaceInner.scrollHeight + 40 < window.innerHeight;
-        const newDisplay = isVisible ? '' : 'none';
-        // check to prevent infinite MutationObserver loop in Pale Moon
-        if (newDisplay !== this.bottomBarWrapper.style.display) {
-            this.bottomBarWrapper.style.display = newDisplay;
-        }
     }
 
     private updateUi(): void {
@@ -628,6 +651,9 @@ export class KlApp {
 
         let isFirstTransform = true;
         this.easel = new Easel({
+            onBeforeRender: () => {
+                currentBrushUi?.getBrush().transferToCanvas?.();
+            },
             width: Math.max(0, this.uiWidth - this.toolWidth),
             height: this.uiHeight,
             project: {
@@ -748,6 +774,9 @@ export class KlApp {
             },
             tool: 'brush',
             onChangeTool: (toolId) => {
+                if (toolId !== 'brush' && toolId !== 'eyedropper') {
+                    currentBrushUi.freeResources?.();
+                }
                 this.mobileBrushUi.setIsVisible(toolId === 'brush');
                 this.mobileColorUi.setIsVisible(toolId !== 'select');
             },
@@ -1074,7 +1103,8 @@ export class KlApp {
                 },
             });
             brushUiMap[b] = ui;
-            ui.getElement().style.padding = 10 + 'px';
+            // no bottom padding. spacer above bottom bar provides it
+            ui.getElement().style.padding = '10px 10px 0';
         });
 
         this.toolspace = BB.el({
@@ -1092,6 +1122,11 @@ export class KlApp {
         });
         this.toolspaceInner = BB.el({
             parent: this.toolspace,
+            css: {
+                display: 'flex',
+                flexDirection: 'column',
+                minHeight: '100%',
+            },
         });
         this.toolspace.oncontextmenu = () => {
             return false;
@@ -1302,7 +1337,7 @@ export class KlApp {
                 redo();
             },
         });
-        this.toolspaceToolRow.setIsSmall(this.uiHeight < 540);
+        this.toolspaceToolRow.setIsSmall(getToolspaceLayout(this.uiHeight).isToolRowSmall);
         this.toolspaceInner.append(this.toolspaceToolRow.getElement());
 
         const setBrushColor = (p_color: TRgb) => {
@@ -1330,7 +1365,7 @@ export class KlApp {
                 }
             },
         });
-        this.klColorSlider.setHeight(Math.max(163, Math.min(400, this.uiHeight - 505)));
+        this.klColorSlider.setHeight(getToolspaceLayout(this.uiHeight).colorSliderHeight);
 
         const updateBrushCursor = () => {
             const brush = currentBrushUi.getBrush();
@@ -1342,6 +1377,9 @@ export class KlApp {
         };
 
         const setCurrentBrush = (brushId: string) => {
+            if (currentBrushUi && brushId !== currentBrushId) {
+                currentBrushUi.freeResources?.();
+            }
             if (brushId !== 'eraserBrush') {
                 lastNonEraserBrushId = brushId;
             }
@@ -1604,7 +1642,9 @@ export class KlApp {
             klHistory: this.klHistory,
             klCanvas: this.klCanvas,
         });
-        this.layerPreview.setIsVisible(this.uiHeight >= 579);
+        const toolspaceLayout = getToolspaceLayout(this.uiHeight);
+        this.layerPreview.setIsVisible(toolspaceLayout.isLayerPreviewVisible);
+        this.layerPreview.setIsSmall(toolspaceLayout.isLayerPreviewSmall);
 
         const editUi = new KL.EditUi({
             klRootEl: this.rootEl,
@@ -2089,20 +2129,11 @@ export class KlApp {
         this.bottomBarWrapper = BB.el({
             css: {
                 width: 270,
-                position: 'absolute',
-                bottom: 0,
-                left: 0,
             },
         });
         if (p.bottomBar) {
             this.bottomBar = p.bottomBar;
             this.bottomBarWrapper.append(this.bottomBar);
-            const observer = new MutationObserver(() => this.updateBottomBar());
-            observer.observe(this.toolspaceInner, {
-                attributes: true,
-                childList: true,
-                subtree: true,
-            });
         }
 
         BB.append(this.toolspaceInner, [
@@ -2122,6 +2153,7 @@ export class KlApp {
             BB.el({
                 css: {
                     height: 10, // a bit of spacing at the bottom
+                    flexGrow: 1,
                 },
             }),
             this.bottomBarWrapper ? this.bottomBarWrapper : undefined,
@@ -2296,11 +2328,12 @@ export class KlApp {
         this.uiHeight = Math.max(0, h);
 
         this.updateCollapse();
-        this.updateBottomBar();
 
-        this.layerPreview.setIsVisible(this.uiHeight >= 579);
-        this.klColorSlider.setHeight(Math.max(163, Math.min(400, this.uiHeight - 505)));
-        this.toolspaceToolRow.setIsSmall(this.uiHeight < 540);
+        const toolspaceLayout = getToolspaceLayout(this.uiHeight);
+        this.layerPreview.setIsVisible(toolspaceLayout.isLayerPreviewVisible);
+        this.layerPreview.setIsSmall(toolspaceLayout.isLayerPreviewSmall);
+        this.klColorSlider.setHeight(toolspaceLayout.colorSliderHeight);
+        this.toolspaceToolRow.setIsSmall(toolspaceLayout.isToolRowSmall);
     }
 
     out(msg: string): void {

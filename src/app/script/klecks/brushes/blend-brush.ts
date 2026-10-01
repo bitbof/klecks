@@ -32,9 +32,6 @@ type TDrawBufferItem = {
 };
 
 export class BlendBrush {
-    // testing mode - context only gets updated when line is finished
-    private isTesting: boolean = false;
-
     private context: CanvasRenderingContext2D = {} as CanvasRenderingContext2D;
     private layerId: string = 'NOT_SET';
     private color: TRgb = {} as TRgb;
@@ -636,10 +633,6 @@ export class BlendBrush {
         return this.isDrawing;
     }
 
-    setIsTesting(b: boolean): void {
-        this.isTesting = b;
-    }
-
     startLine(x: number, y: number, p: number): void {
         const selection = this.klHistory.getComposed().selection.value;
         this.selectionBounds = selection ? getMultiPolyBounds(selection, 'index') : undefined;
@@ -734,10 +727,6 @@ export class BlendBrush {
         this.lastInput.y = y;
         this.lastInput.pressure = p;
         this.lastInput2 = BB.copyObj(this.lastInput);
-
-        if (!this.isTesting) {
-            this.drawChangedCells();
-        }
     }
 
     goLine(x: number, y: number, p: number, isCoalesced: boolean): void {
@@ -750,10 +739,6 @@ export class BlendBrush {
         this.lastInput.x = x;
         this.lastInput.y = y;
         this.lastInput.pressure = p;
-
-        if (!this.isTesting) {
-            this.drawChangedCells();
-        }
     }
 
     endLine(): void {
@@ -789,6 +774,10 @@ export class BlendBrush {
             );
         }
         this.cells = [];
+    }
+
+    transferToCanvas(): void {
+        this.drawChangedCells();
     }
 
     drawLineSegment(x1: number, y1: number, x2: number, y2: number): void {

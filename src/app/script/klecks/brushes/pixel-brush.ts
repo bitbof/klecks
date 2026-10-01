@@ -54,8 +54,9 @@ export class PixelBrush {
     /*
         Stroke is drawn opaque into its own canvas, then composited with opacity.
         That way overlapping dots don't accumulate -> opacity instead of flow.
+        Kept between strokes (cleared after each), freed via freeResources.
      */
-    private strokeCanvas: HTMLCanvasElement = {} as HTMLCanvasElement;
+    private strokeCanvas: HTMLCanvasElement | undefined;
     private strokeCtx: CanvasRenderingContext2D = {} as CanvasRenderingContext2D;
 
     // area that changed since last redraw
@@ -104,15 +105,22 @@ export class PixelBrush {
         this.canvasClone = BB.canvas(width, height);
         this.ctxClone = BB.ctx(this.canvasClone);
         this.ctxClone.drawImage(this.context.canvas, 0, 0);
-        this.strokeCanvas = BB.canvas(width, height);
-        this.strokeCtx = BB.ctx(this.strokeCanvas);
+        if (
+            !this.strokeCanvas ||
+            this.strokeCanvas.width !== width ||
+            this.strokeCanvas.height !== height
+        ) {
+            this.strokeCanvas && BB.freeCanvas(this.strokeCanvas);
+            this.strokeCanvas = BB.canvas(width, height);
+            this.strokeCtx = BB.ctx(this.strokeCanvas);
+        }
     }
 
     private freeClone(): void {
         BB.freeCanvas(this.canvasClone);
         this.ctxClone = {} as CanvasRenderingContext2D;
-        BB.freeCanvas(this.strokeCanvas);
-        this.strokeCtx = {} as CanvasRenderingContext2D;
+        // cleared right away, so the next stroke can start immediately
+        this.strokeCtx.clearRect(0, 0, this.strokeCtx.canvas.width, this.strokeCtx.canvas.height);
     }
 
     /**
@@ -127,7 +135,7 @@ export class PixelBrush {
             ctx.globalCompositeOperation = 'destination-out';
         }
         ctx.drawImage(
-            this.strokeCanvas,
+            this.strokeCtx.canvas,
             rect.x,
             rect.y,
             rect.width,
@@ -284,8 +292,8 @@ export class PixelBrush {
         const rects = this.discUnion.getRects(this.discs, {
             x: 0,
             y: 0,
-            width: this.strokeCanvas.width,
-            height: this.strokeCanvas.height,
+            width: this.strokeCtx.canvas.width,
+            height: this.strokeCtx.canvas.height,
         });
         this.discs = [];
         if (rects.length === 0) {
@@ -432,7 +440,6 @@ export class PixelBrush {
         this.lastInput.y = y;
         this.lastInput.pressure = p;
         this.lastInput2 = BB.copyObj(this.lastInput);
-        this.redrawToCanvas();
     }
 
     goLine(x: number, y: number, p: number): void {
@@ -453,7 +460,6 @@ export class PixelBrush {
         this.lastInput.x = x;
         this.lastInput.y = y;
         this.lastInput.pressure = pressure;
-        this.redrawToCanvas();
     }
 
     endLine(): void {
@@ -475,7 +481,7 @@ export class PixelBrush {
 
         this.bezierLine = null;
 
-        this.redrawToCanvas();
+        this.transferToCanvas();
         if (this.strokeBounds) {
             this.drawStroke(this.ctxClone, boundsToRect(this.strokeBounds));
         }
@@ -490,10 +496,26 @@ export class PixelBrush {
         this.freeClone();
     }
 
+    transferToCanvas(): void {
+        this.redrawToCanvas();
+    }
+
     drawLineSegment(x1: number, y1: number, x2: number, y2: number): void {
         this.startLine(x1, y1, 1);
         this.goLine(x2, y2, 1);
         this.endLine();
+    }
+
+    /**
+     * Frees resources that are kept between strokes. E.g. when switching to another tool.
+     */
+    freeResources(): void {
+        if (!this.strokeCanvas || this.inputIsDrawing) {
+            return;
+        }
+        BB.freeCanvas(this.strokeCanvas);
+        this.strokeCanvas = undefined;
+        this.strokeCtx = {} as CanvasRenderingContext2D;
     }
 
     //IS

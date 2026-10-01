@@ -62,6 +62,7 @@ export type TProjectViewportParams = {
     transform: TViewportTransform;
     background?: TProjectViewportBackground;
     useNativeResolution?: boolean;
+    onBeforeRender?: () => void;
     renderAfter?: (ctx: CanvasRenderingContext2D, transform: TViewportTransformXY) => void;
     fillParent?: boolean;
 };
@@ -93,6 +94,7 @@ export class ProjectViewport {
     private background: TProjectViewportParams['background'];
     private doResize: boolean = true;
     private readonly doFillParent: boolean;
+    private readonly onBeforeRender: TProjectViewportParams['onBeforeRender'];
     private readonly renderAfter:
         | undefined
         | ((ctx: CanvasRenderingContext2D, transform: TViewportTransformXY) => void);
@@ -120,6 +122,7 @@ export class ProjectViewport {
         this.useNativeResolution = !!p.useNativeResolution;
         this.background = p.background;
         this.doFillParent = !!p.fillParent;
+        this.onBeforeRender = p.onBeforeRender;
         this.renderAfter = p.renderAfter;
 
         this.transform = {
@@ -148,6 +151,7 @@ export class ProjectViewport {
     }
 
     render(optimizeForAnimation?: boolean): void {
+        this.onBeforeRender?.();
         const isDark = THEME.isDark();
         const transform = {
             ...this.transform,
