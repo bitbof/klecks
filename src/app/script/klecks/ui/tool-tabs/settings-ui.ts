@@ -312,15 +312,6 @@ export class SettingsUi {
                 document.createTextNode(' | '),
                 BB.el({
                     tagName: 'a',
-                    content: LANG('donate'),
-                    props: {
-                        href: 'https://kleki.com/donate/',
-                        target: '_blank',
-                    },
-                }),
-                document.createTextNode(' | '),
-                BB.el({
-                    tagName: 'a',
                     content: LANG('source-code'),
                     props: {
                         href: 'https://klecks.org',

@@ -868,16 +868,19 @@ export class KlApp {
                 if (comboStr === 'end' && !isRepeat) {
                     this.easel.resetTransform();
                 }
-                if (['ctrl+z', 'cmd+z'].includes(comboStr)) {
+                // more reliably this way
+                const isCtrlOrCmd = (event.ctrlKey || event.metaKey) && !event.altKey;
+                const isShift = event.shiftKey;
+                // ctrl+z
+                const isUndo = isCtrlOrCmd && !isShift && keyStr === 'z';
+                // ctrl+shift+z or ctrl+y
+                const isRedo =
+                    (isCtrlOrCmd && isShift && keyStr === 'z') || (isCtrlOrCmd && keyStr === 'y');
+                if (isUndo) {
                     event.preventDefault();
                     undo();
                 }
-                if (
-                    ['ctrl+y', 'cmd+y'].includes(comboStr) ||
-                    ((BB.sameKeys('ctrl+shift+z', comboStr) ||
-                        BB.sameKeys('cmd+shift+z', comboStr)) &&
-                        keyStr === 'z')
-                ) {
+                if (isRedo) {
                     event.preventDefault();
                     redo();
                 }
@@ -1026,6 +1029,10 @@ export class KlApp {
                               ? lastNonEraserBrushId
                               : currentBrushId,
                     );
+                }
+                if (comboStr === 'h' && !isRepeat) {
+                    event.preventDefault();
+                    this.toolspaceToolRow.setActive('hand', true);
                 }
                 if (comboStr === 'g' && !isRepeat) {
                     event.preventDefault();

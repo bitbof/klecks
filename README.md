@@ -19,10 +19,7 @@
     <a href="https://blog.kleki.com">
       Dev Blog
     </a>
-    <span> | </span>
-    <a href="https://kleki.com/patreon?source=github">
-      Patreon
-    </a>
+    <span>
   </h3>
 </div>
 
@@ -126,9 +123,6 @@ the embed-version.
 - `npm run lang:sync <code>` - synchronizes with base file. (TODO)
 - `npm run lang:build` - generates JSON & TS files in `src/app/languages`
   - Problems are printed to the command line output
-
-# Patreon
-Become a member of Kleki's patreon to get exclusive access to experimental prototypes of potential upcoming features and more. [Patreon](https://kleki.com/patreon?source=github)
 
 # License
 

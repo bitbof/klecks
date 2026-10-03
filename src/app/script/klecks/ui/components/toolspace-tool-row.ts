@@ -348,7 +348,7 @@ export class ToolspaceToolRow {
             doLighten: true,
         });
         this.handButton.el.classList.add('kl-tool-row-border-right');
-        this.handButton.el.title = LANG('tool-hand');
+        this.handButton.el.title = `${LANG('tool-hand')} [H]`;
         this.rootEl.append(this.handButton.el);
 
         this.zoomInNOutButton = createTriangleButton({
