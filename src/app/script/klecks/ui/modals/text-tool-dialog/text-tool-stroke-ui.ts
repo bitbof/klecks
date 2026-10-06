@@ -72,10 +72,8 @@ export class TextToolStrokeUI {
             min: 1 / 100,
             max: 1,
             value: p.stroke ? p.stroke.color.a : 1,
-            resolution: 225,
             eventResMs: 1000 / 30,
-            toValue: (displayValue) => displayValue / 100,
-            toDisplayValue: (value) => value * 100,
+            displayScale: 100,
             onChange: () => emit(),
         });
 
@@ -87,7 +85,7 @@ export class TextToolStrokeUI {
             max: 100,
             value: p.stroke ? p.stroke.lineWidth : 2,
             eventResMs: 1000 / 30,
-            curve: 'quadratic',
+            exponent: 2,
             onChange: () => emit(),
         });
 

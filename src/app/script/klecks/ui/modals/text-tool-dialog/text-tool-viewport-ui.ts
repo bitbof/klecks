@@ -242,10 +242,8 @@ export class TextToolViewportUI {
             min: -Math.PI,
             max: Math.PI,
             value: p.text.angleRad,
-            resolution: 225,
             // eventResMs: 1000 / 30,
-            toValue: (deg) => (deg * Math.PI) / 180,
-            toDisplayValue: (rad) => (rad / Math.PI) * 180,
+            displayScale: 180 / Math.PI,
             onChange: () => {
                 this.offset = { x: 0, y: 0 };
                 this.render();

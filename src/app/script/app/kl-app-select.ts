@@ -96,6 +96,7 @@ export type TKlAppSelectParams = {
     onUpdateProject: () => void; // update easelProjectUpdater
     onFill: () => void;
     onErase: () => void;
+    onChangeMode?: (mode: TSelectToolMode) => void;
 };
 
 /**
@@ -110,6 +111,7 @@ export class KlAppSelect {
     private readonly statusOverlay: StatusOverlay;
     private readonly onUpdateProject: () => void;
     private readonly onFill: () => void;
+    private readonly onChangeMode: ((mode: TSelectToolMode) => void) | undefined;
     private readonly onErase: () => void;
 
     private readonly selectUi: SelectUi;
@@ -262,6 +264,7 @@ export class KlAppSelect {
         this.statusOverlay = p.statusOverlay;
         this.onFill = p.onFill;
         this.onErase = p.onErase;
+        this.onChangeMode = p.onChangeMode;
 
         // keep layer list up-to-date
         this.klHistory.addListener(() => {
@@ -461,6 +464,7 @@ export class KlAppSelect {
                     this.updateSelectUi();
                 }
                 this.selectMode = mode;
+                this.onChangeMode?.(mode);
                 return true;
             },
             onChangeBooleanOperation: (operation) => {

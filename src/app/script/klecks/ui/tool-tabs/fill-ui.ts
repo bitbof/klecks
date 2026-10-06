@@ -50,8 +50,7 @@ export class FillUi {
             min: 1 / 100,
             max: 1,
             value: 1,
-            toValue: (displayValue) => displayValue / 100,
-            toDisplayValue: (value) => value * 100,
+            displayScale: 100,
         });
         this.rootEl.append(this.opacitySlider.getElement());
 
@@ -62,8 +61,7 @@ export class FillUi {
             min: 0,
             max: 255,
             value: 20 * (255 / 100),
-            toValue: (displayValue) => displayValue * (255 / 100),
-            toDisplayValue: (value) => value / (255 / 100),
+            displayScale: 100 / 255,
         });
         css(this.toleranceSlider.getElement(), {
             marginTop: 10,

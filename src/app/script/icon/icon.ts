@@ -10,7 +10,7 @@ let isIconCssInitialized = false;
 let nextSvgInstanceId = 0;
 
 // The references occupy global namespace. Make them unique to avoid collisions.
-function makeSvgIdsUnique(svg: SVGSVGElement): void {
+export function makeSvgIdsUnique(svg: SVGSVGElement): void {
     const elements = [svg, ...svg.querySelectorAll('*')];
     const idMap = new Map<string, string>();
     const prefix = `kl-icon-${nextSvgInstanceId++}-`;

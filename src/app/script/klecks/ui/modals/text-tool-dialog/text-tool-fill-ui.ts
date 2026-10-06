@@ -63,10 +63,8 @@ export class TextToolFillUI {
             min: 1 / 100,
             max: 1,
             value: p.fill ? p.fill.color.a : 1,
-            resolution: 225,
             eventResMs: 1000 / 30,
-            toValue: (displayValue) => displayValue / 100,
-            toDisplayValue: (value) => value * 100,
+            displayScale: 100,
             onChange: () => emit(),
         });
         this.opacitySlider.getElement().style.display = p.fill ? '' : 'none';

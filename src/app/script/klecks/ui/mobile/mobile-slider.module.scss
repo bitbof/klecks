@@ -1,0 +1,85 @@
+.root {
+    position: relative;
+    flex: 0 1 200px; // shrinks on short screens
+    min-height: 56px;
+    width: 36px;
+    border-radius: 4px;
+    overflow: hidden;
+    cursor: ns-resize;
+    touch-action: none;
+    user-select: none;
+    -webkit-user-select: none;
+    background: #909090; // like top of horizontal slider (.slider-wrapper)
+    box-shadow: inset 0 0 0 1px #656565; // opaque, so checkerboard doesn't show through
+    color: #333;
+}
+
+.active {
+    background: #7a7a7a; // like horizontal slider (.slider-wrapper--active)
+    color: #000;
+}
+
+// e.g. for opacity. Track fades from opaque (top) to transparent (bottom)
+.root.checkerboard {
+    background:
+        linear-gradient(to bottom, #909090, rgba(144, 144, 144, 0)),
+        var(--kl-checkerboard-background);
+}
+
+.root.checkerboard.active {
+    background:
+        linear-gradient(to bottom, #7a7a7a, rgba(122, 122, 122, 0)),
+        var(--kl-checkerboard-background);
+}
+
+// still catches pointer events, so they don't reach the canvas underneath
+.disabled {
+    opacity: 0.5;
+    cursor: default;
+}
+
+// inset by outline width, so outline stays visible
+.fill {
+    position: absolute;
+    left: 1px;
+    right: 1px;
+    bottom: 1px;
+    border-radius: 3px;
+    background-color: #fff;
+    background-image: linear-gradient(to right, rgb(232, 232, 232) 0%, rgba(255, 255, 255, 1) 70%);
+}
+
+.label {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 4px;
+    text-align: center;
+    font-size: 15px; // values have max 3 characters
+    font-weight: bold;
+    pointer-events: none;
+}
+
+:global(:root.kl-theme-dark) {
+    .root {
+        background: #222;
+        box-shadow: inset 0 0 0 1px #777;
+        color: #ddd;
+    }
+
+    .active {
+        box-shadow: inset 0 0 0 1px #aaa;
+        color: #fff;
+    }
+
+    .root.checkerboard {
+        background:
+            linear-gradient(to bottom, #222, rgba(34, 34, 34, 0)),
+            var(--kl-checkerboard-background);
+    }
+
+    .fill {
+        background: #555;
+        box-shadow: 0 -1px 0 #777;
+    }
+}

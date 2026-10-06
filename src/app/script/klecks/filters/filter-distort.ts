@@ -195,7 +195,7 @@ export const filterDistort = {
                 height: 30,
                 min: 1,
                 max: 1000,
-                curve: 'quadratic',
+                exponent: 2,
                 value: settings.scale[item],
                 eventResMs: EVENT_RES_MS,
                 onChange: (val) => {
@@ -216,7 +216,7 @@ export const filterDistort = {
                 height: 30,
                 min: 0,
                 max: 200,
-                curve: 'quadratic',
+                exponent: 2,
                 value: settings.strength[item],
                 eventResMs: EVENT_RES_MS,
                 onChange: (val) => {
@@ -238,9 +238,8 @@ export const filterDistort = {
                 min: 0,
                 max: 1,
                 value: settings.phase[item],
-                manualInputRoundDigits: 2,
+                decimals: 2,
                 eventResMs: EVENT_RES_MS,
-                formatFunc: (val) => BB.round(val, 2),
                 onChange: (val) => {
                     settings.phase[item] = val;
                     if (isSynced) {
@@ -264,7 +263,7 @@ export const filterDistort = {
             height: 30,
             min: 1,
             max: 300,
-            curve: 'quadratic',
+            exponent: 2,
             value: settings.stepSize,
             eventResMs: EVENT_RES_MS,
             onChange: (val) => {

@@ -57,12 +57,7 @@ export const filterUnsharpMask = {
                 radius = val;
                 update();
             },
-            curve: [
-                [0, 0],
-                [0.1, 2],
-                [0.5, 50],
-                [1, 200],
-            ],
+            exponent: 2,
         });
         const strengthSlider = new KlSlider({
             label: LANG('filter-unsharp-mask-strength'),
@@ -76,12 +71,7 @@ export const filterUnsharpMask = {
                 strength = val / 10;
                 update();
             },
-            curve: [
-                [0, 0],
-                [0.1, 2],
-                [0.5, 10],
-                [1, 50],
-            ],
+            exponent: 2,
         });
         radiusSlider.getElement().style.marginBottom = '10px';
         strengthSlider.getElement().style.marginBottom = '10px';
@@ -92,10 +82,7 @@ export const filterUnsharpMask = {
         {
             for (let i = 0; i < layers.length; i++) {
                 previewLayerArr.push({
-                    image:
-                        i === selectedLayerIndex
-                            ? fxPreviewRenderer.render
-                            : layers[i].canvas,
+                    image: i === selectedLayerIndex ? fxPreviewRenderer.render : layers[i].canvas,
                     isVisible: layers[i].isVisible,
                     opacity: layers[i].opacity,
                     mixModeStr: layers[i].mixModeStr,

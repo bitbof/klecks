@@ -1,7 +1,7 @@
 import { getIconSvg } from '../../icon/icon';
 import { BB } from '../../bb/bb';
 import { EVENT_RES_MS } from './brushes-consts';
-import { Checkbox } from '../ui/components/checkbox';
+import { createEraserToggle, createLockAlphaToggle } from '../ui/components/create-brush-toggles';
 import { BRUSHES } from '../brushes/brushes';
 import { KlSlider } from '../ui/components/kl-slider';
 import { TBrushUi } from '../kl-types';
@@ -18,12 +18,15 @@ export const chemyBrushUi = (function () {
         sizeSlider: {
             min: 0.25,
             max: 25,
-            curve: BB.powerSplineInput(0.25, 25, 0.1),
+            exponent: 2,
             isDisabled: true,
+            displayScale: 2, // radius displayed as diameter
+            decimals: 'adaptive',
         },
         opacitySlider: {
             min: 1 / 100,
             max: 1,
+            displayScale: 100,
         },
     } as TBrushUi<ChemyBrush>;
 
@@ -44,44 +47,29 @@ export const chemyBrushUi = (function () {
             brush.setSize(size);
         }
 
-        let eraserToggle: Checkbox;
+        let eraserToggle: BoxToggle;
 
         function init() {
             sizeSlider = new KlSlider({
                 label: LANG('brush-size'),
                 width: 250,
                 height: 30,
-                min: brushInterface.sizeSlider.min,
-                max: brushInterface.sizeSlider.max,
+                ...brushInterface.sizeSlider,
                 value: brush.getSize(),
-                curve: brushInterface.sizeSlider.curve,
                 eventResMs: EVENT_RES_MS,
-                isEnabled: brush.getMode() === 'stroke',
-                toDisplayValue: (val) => val * 2,
-                toValue: (displayValue) => displayValue / 2,
+                isDisabled: brush.getMode() !== 'stroke',
                 onChange: (val) => {
                     setSize(val);
                     p.onSizeChange(val);
                 },
-                formatFunc: (displayValue) => {
-                    if (displayValue < 5) {
-                        return BB.round(displayValue, 1);
-                    } else {
-                        return Math.round(displayValue);
-                    }
-                },
-                manualInputRoundDigits: 1,
             });
             opacitySlider = new KlSlider({
                 label: LANG('opacity'),
                 width: 250,
                 height: 30,
-                min: brushInterface.opacitySlider.min,
-                max: brushInterface.opacitySlider.max,
+                ...brushInterface.opacitySlider,
                 value: brush.getOpacity(),
                 eventResMs: EVENT_RES_MS,
-                toDisplayValue: (val) => val * 100,
-                toValue: (displayValue) => displayValue / 100,
                 onChange: (val) => {
                     brush.setOpacity(val);
                     p.onOpacityChange(val);
@@ -92,31 +80,12 @@ export const chemyBrushUi = (function () {
                 marginTop: 10,
             });
 
-            eraserToggle = new Checkbox({
-                init: brush.getIsEraser(),
-                label: LANG('eraser'),
-                callback: function (b) {
-                    brush.setIsEraser(b);
-                },
-                css: {
-                    marginTop: 10,
-                    marginLeft: 10,
-                },
-                name: 'eraser-toggle',
+            eraserToggle = createEraserToggle(brush.getIsEraser(), (b) => {
+                brush.setIsEraser(b);
             });
 
-            const lockAlphaToggle = new Checkbox({
-                init: brush.getLockAlpha(),
-                label: LANG('lock-alpha'),
-                callback: function (b) {
-                    brush.setLockAlpha(b);
-                },
-                doHighlight: true,
-                title: LANG('lock-alpha-title'),
-                css: {
-                    marginTop: 10,
-                },
-                name: 'lock-alpha-toggle',
+            const lockAlphaToggle = createLockAlphaToggle(brush.getLockAlpha(), (b) => {
+                brush.setLockAlpha(b);
             });
 
             const toggleRow = BB.el({
@@ -316,6 +285,8 @@ export const chemyBrushUi = (function () {
                     content: [lockAlphaToggle.getElement(), eraserToggle.getElement()],
                     css: {
                         display: 'flex',
+                        gap: 4,
+                        marginTop: 10,
                     },
                 }),
             );

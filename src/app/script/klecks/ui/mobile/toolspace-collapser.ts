@@ -39,6 +39,7 @@ export class ToolspaceCollapser {
                 userSelect: 'none',
                 padding: 6,
                 boxSizing: 'border-box',
+                flexShrink: 0,
             },
             title: LANG('toggle-show-tools'),
             onClick: (e) => {

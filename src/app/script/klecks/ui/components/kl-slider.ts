@@ -1,9 +1,15 @@
 import { BB } from '../../../bb/bb';
 import { calcSliderFalloffFactor } from './slider-falloff';
 import { TKlSliderConfig } from '../../kl-types';
-import { LANGUAGE_STRINGS } from '../../../language/language';
 import { KlSliderManualInput } from './kl-slider-manual-input';
-import { SplineInterpolator } from '../../../bb/math/line';
+import {
+    displayValueToValue,
+    formatSliderValue,
+    getMaxDecimals,
+    sliderValueToValue,
+    valueToDisplayValue,
+    valueToSliderValue,
+} from './slider-value-mapping';
 import { PointerListener } from '../../../bb/input/pointer-listener';
 import { TPointerEvent } from '../../../bb/input/event.types';
 import { TChainElement } from '../../../bb/input/event-chain/event-chain.types';
@@ -18,39 +24,21 @@ import { css } from '../../../bb/base/base';
  * drag mouse vertically away - precision mode
  * double-click/tap slider - manual input mode
  *
- * Values can be spline interpolated
+ * Value can follow a curve (exponent)
  * On change callback can be debounced
  *
  */
 export class KlSlider {
-    /*
-    Three types of values
-    - value - the actual value, when using setValue(), getValue(), and what is emitted
-    - displayValue - the number that the user sees on the slider and in the manual input field
-        - might be further formatted with formatFunc
-        - also might be the same as value, if no toDisplayValue function provided
-    - sliderValue - the draggable position of the slider, 0 - 1
-     */
-
+    // value types (value, displayValue, sliderValue) explained in slider-value-mapping.ts
     private value: number;
 
     private readonly elementWidth: number;
     private readonly elementHeight: number;
     private isEnabled: boolean;
 
-    private min: number; // min value
-    private max: number; // max value
-    private useSpline: boolean;
-    private splineInterpolator: undefined | SplineInterpolator;
-    private readonly resolution: number;
-
-    private readonly isChangeOnFinal: boolean;
-    private readonly formatFunc: undefined | ((val: number) => number | string);
-    private readonly unit: string | undefined;
+    private config: TKlSliderConfig;
 
     private readonly onChange: (val: number) => void;
-    private readonly valueToDisplayValue: (value: number) => number;
-    private readonly displayValueToValue: (displayValue: number) => number;
 
     private readonly rootEl: HTMLElement;
     private readonly sliderWrapperEl: HTMLElement;
@@ -59,7 +47,6 @@ export class KlSlider {
     private readonly label: string;
     private readonly control: HTMLElement;
     private manualInput: undefined | KlSliderManualInput;
-    private readonly manualInputRoundDigits: number | undefined;
 
     private pointerListener: PointerListener | undefined;
     private readonly pointerListenerTimeout: ReturnType<typeof setTimeout>;
@@ -68,37 +55,13 @@ export class KlSlider {
     private emitValue: undefined | number; // next value for interval
     private emitInterval: ReturnType<typeof setTimeout> | undefined; // interval of eventResMs which calls onChange()
 
-    private valueToSliderValue(value: number): number {
-        if (this.useSpline && this.splineInterpolator) {
-            return this.splineInterpolator.findX(value, Math.floor(this.resolution)) || 0;
-        }
-        return (value - this.min) / (this.max - this.min);
-    }
-
-    private sliderValueToValue(sliderValue: number): number {
-        let result = this.min + sliderValue * (this.max - this.min);
-        if (this.useSpline && this.splineInterpolator) {
-            result = this.splineInterpolator.interpolate(sliderValue) || 0;
-        }
-        return result;
-    }
-
     private updateLabel(): void {
-        let displayValue: number | string = this.valueToDisplayValue(this.value);
-        displayValue = this.formatFunc ? this.formatFunc(displayValue) : Math.round(displayValue);
-        displayValue = displayValue.toLocaleString(LANGUAGE_STRINGS.getCode());
-        const unit = this.unit !== undefined ? this.unit : '';
-        this.labelValueEl.textContent = displayValue + unit;
-
-        const sliderValue = this.valueToSliderValue(this.value);
+        this.labelValueEl.textContent = formatSliderValue(this.config, this.value);
+        const sliderValue = valueToSliderValue(this.config, this.value);
         this.control.style.width = sliderValue * this.elementWidth + 'px';
     }
 
     private emit(isFinal: boolean): void {
-        if (!isFinal && this.isChangeOnFinal) {
-            return;
-        }
-
         if (isFinal || !this.eventResMs) {
             this.onChange(this.value);
             if (this.emitInterval) {
@@ -135,13 +98,12 @@ export class KlSlider {
 
     private showManualInput(): void {
         this.manualInput = new KlSliderManualInput(
-            this.valueToDisplayValue(this.value),
-            this.valueToDisplayValue(this.min),
-            this.valueToDisplayValue(this.max),
+            valueToDisplayValue(this.config, this.value),
+            valueToDisplayValue(this.config, this.config.min),
+            valueToDisplayValue(this.config, this.config.max),
             this.sliderWrapperEl.getBoundingClientRect(),
-            (val) => {
-                val = this.displayValueToValue(val);
-                this.setValue(BB.clamp(val, this.min, this.max));
+            (displayValue) => {
+                this.setValue(displayValueToValue(this.config, displayValue));
                 this.onChange(this.value);
             },
             () => {
@@ -154,9 +116,7 @@ export class KlSlider {
                 }
                 this.manualInput = undefined;
             },
-            this.manualInputRoundDigits && this.manualInputRoundDigits > 0
-                ? this.manualInputRoundDigits
-                : 0,
+            getMaxDecimals(this.config),
         );
         this.rootEl.append(this.manualInput.getElement());
         setTimeout(() => {
@@ -169,67 +129,34 @@ export class KlSlider {
 
     // ----------------------------------- public -----------------------------------
 
-    constructor(p: {
-        label: string;
-        width: number; // px
-        height: number; // px
-        min: number; // min value
-        max: number;
-        value: number;
-        resolution?: number; // int, if you want spline.findX() to use a custom resolution
-        curve?: 'quadratic' | [number, number][]; // optional. array is BB.SplineInterpolator points. 0-1
-        formatFunc?: (val: number) => number | string; // function to display a different number than value
-        onChange?: (val: number) => void;
-        isChangeOnFinal?: boolean; // only fire onChange on pointerUp
-        eventResMs?: number; // frequency of change events
-        isEnabled?: boolean; // default = true
-        manualInputRoundDigits?: number; // default 0, how value should be rounded for manual input
-        toDisplayValue?: (value: number) => number;
-        toValue?: (displayValue: number) => number;
-        unit?: string; // attached to end of value in output
-    }) {
-        this.isEnabled = p.isEnabled !== false;
-        this.manualInputRoundDigits = p.manualInputRoundDigits;
-        this.useSpline = !!p.curve;
-
-        if (!p.label) {
-            throw new Error('KlSlider missing params');
-        }
-        if (p.min !== 0 && p.max !== 0 && p.value !== 0) {
-            if (!p.min || !p.max || !p.value) {
-                throw new Error('KlSlider broken params');
-            }
-        }
+    constructor(
+        p: TKlSliderConfig & {
+            label: string;
+            width: number; // px
+            height: number; // px
+            value: number;
+            onChange?: (val: number) => void;
+            eventResMs?: number; // frequency of change events
+        },
+    ) {
         if (p.min >= p.max) {
             throw new Error('KlSlider broken params');
         }
 
-        this.min = p.min;
-        this.max = p.max;
-        this.value = BB.clamp(p.value, this.min, this.max);
+        this.config = {
+            min: p.min,
+            max: p.max,
+            exponent: p.exponent,
+            displayScale: p.displayScale,
+            decimals: p.decimals,
+            unit: p.unit,
+        };
+        this.isEnabled = !p.isDisabled;
+        this.value = BB.clamp(p.value, p.min, p.max);
         this.elementWidth = p.width;
         this.elementHeight = p.height;
-        this.resolution = p.resolution ? p.resolution : this.elementWidth * 2;
-
         this.onChange = p.onChange ? p.onChange : () => {};
-        if (!p.toValue !== !p.toDisplayValue) {
-            throw new Error('both or neither have to be set, toValue and toDisplayValue');
-        }
-        this.displayValueToValue = p.toValue ? p.toValue : (displayValue) => displayValue;
-        this.valueToDisplayValue = p.toDisplayValue ? p.toDisplayValue : (value) => value;
-        this.isChangeOnFinal = !!p.isChangeOnFinal;
-        this.formatFunc = p.formatFunc;
         this.eventResMs = p.eventResMs;
-        this.unit = p.unit;
-
-        if (this.useSpline) {
-            if (!p.curve) {
-                throw new Error('curve needs to be set if useSpline true');
-            }
-            const curveArr: [number, number][] =
-                p.curve === 'quadratic' ? BB.powerSplineInput(this.min, this.max, 0.1) : p.curve;
-            this.splineInterpolator = new BB.SplineInterpolator(curveArr);
-        }
 
         this.rootEl = BB.el({
             css: {
@@ -284,7 +211,7 @@ export class KlSlider {
                 position: 'absolute',
                 left: 0,
                 top: 0,
-                width: this.valueToSliderValue(this.value) * this.elementWidth,
+                width: valueToSliderValue(this.config, this.value) * this.elementWidth,
                 height: this.elementHeight,
             },
         });
@@ -322,11 +249,11 @@ export class KlSlider {
                 if (event.button === 'left') {
                     let sliderValue = event.relX / this.elementWidth;
                     sliderValue = Math.max(0, Math.min(1, sliderValue));
-                    this.value = this.sliderValueToValue(sliderValue);
+                    this.value = sliderValueToValue(this.config, sliderValue);
                     this.updateLabel();
                     this.emit(false);
                 }
-                virtualVal = this.valueToSliderValue(this.value);
+                virtualVal = valueToSliderValue(this.config, this.value);
             }
 
             if (event.type === 'pointermove' && ['left', 'right'].includes(event.button || '')) {
@@ -339,7 +266,7 @@ export class KlSlider {
                 virtualVal += deltaX;
 
                 const sliderValue = Math.max(0, Math.min(1, virtualVal));
-                this.value = this.sliderValueToValue(sliderValue);
+                this.value = sliderValueToValue(this.config, sliderValue);
                 this.updateLabel();
                 this.emit(false);
             }
@@ -360,9 +287,9 @@ export class KlSlider {
                 },
                 onWheel: (event) => {
                     event.event?.preventDefault();
-                    let sliderValue = this.valueToSliderValue(this.value);
+                    let sliderValue = valueToSliderValue(this.config, this.value);
                     sliderValue = BB.clamp(sliderValue - event.deltaY / 40, 0, 1);
-                    this.value = this.sliderValueToValue(sliderValue);
+                    this.value = sliderValueToValue(this.config, sliderValue);
                     this.updateLabel();
                     this.onChange(this.value);
                 },
@@ -376,15 +303,15 @@ export class KlSlider {
         if (!this.isEnabled) {
             return;
         }
-        let sliderValue = this.valueToSliderValue(this.value);
+        let sliderValue = valueToSliderValue(this.config, this.value);
         sliderValue = BB.clamp(sliderValue + f, 0, 1);
-        this.value = this.sliderValueToValue(sliderValue);
+        this.value = sliderValueToValue(this.config, sliderValue);
         this.updateLabel();
         this.onChange(this.value);
     }
 
     setValue(v: number): void {
-        this.value = BB.clamp(v, this.min, this.max);
+        this.value = BB.clamp(v, this.config.min, this.config.max);
         this.updateLabel();
     }
 
@@ -393,26 +320,13 @@ export class KlSlider {
     }
 
     getDisplayValue(): number {
-        return this.valueToDisplayValue(this.value);
+        return valueToDisplayValue(this.config, this.value);
     }
 
     update(config: TKlSliderConfig): void {
-        this.min = config.min;
-        this.max = config.max;
-        this.useSpline = !!config.curve;
-        if (this.useSpline) {
-            if (!config.curve) {
-                throw new Error('curve needs to be set if useSpline true');
-            }
-            const curveArr =
-                config.curve === 'quadratic'
-                    ? BB.powerSplineInput(this.min, this.max, 0.1)
-                    : config.curve;
-            this.splineInterpolator = new BB.SplineInterpolator(curveArr);
-        } else {
-            this.splineInterpolator = undefined;
-        }
+        this.config = config;
         this.setIsEnabled(!config.isDisabled);
+        this.setValue(this.value);
     }
 
     setIsEnabled(e: boolean): void {

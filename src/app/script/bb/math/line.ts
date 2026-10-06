@@ -419,24 +419,3 @@ export class SplineInterpolator {
         return x;
     }
 }
-
-/**
- * input for a spline, following curve of a power function x^n [0 - 1]
- * returns [[0, startVal], ..., [1, endVal]]
- */
-export function powerSplineInput(
-    startVal: number,
-    endVal: number,
-    stepSize: number,
-    exponent: number = 2,
-): TSplineInputPoints {
-    function round(v: number, dec: number): number {
-        return Math.round(v * 10 ** dec) / 10 ** dec;
-    }
-
-    const resultArr: TSplineInputPoints = [];
-    for (let i = 0; i <= 1; i += stepSize) {
-        resultArr.push([round(i, 4), round(startVal + i ** exponent * (endVal - startVal), 4)]);
-    }
-    return resultArr;
-}

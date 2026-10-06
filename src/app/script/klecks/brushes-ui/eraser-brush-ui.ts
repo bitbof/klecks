@@ -16,11 +16,14 @@ export const eraserBrushUi = (function () {
         sizeSlider: {
             min: 0.5,
             max: 200,
-            curve: BB.powerSplineInput(0.5, 200, 0.1),
+            exponent: 2,
+            displayScale: 2, // radius displayed as diameter
+            decimals: 'adaptive',
         },
         opacitySlider: {
             min: 1 / 100,
             max: 1,
+            displayScale: 100,
         },
     } as TBrushUi<EraserBrush>;
 
@@ -47,36 +50,21 @@ export const eraserBrushUi = (function () {
                 label: LANG('brush-size'),
                 width: 225,
                 height: 30,
-                min: brushInterface.sizeSlider.min,
-                max: brushInterface.sizeSlider.max,
+                ...brushInterface.sizeSlider,
                 value: 30,
-                curve: brushInterface.sizeSlider.curve,
                 eventResMs: EVENT_RES_MS,
-                toDisplayValue: (val) => val * 2,
-                toValue: (displayValue) => displayValue / 2,
                 onChange: (val) => {
                     setSize(val);
                     p.onSizeChange(val);
                 },
-                formatFunc: (displayValue) => {
-                    if (displayValue < 10) {
-                        return BB.round(displayValue, 1);
-                    } else {
-                        return Math.round(displayValue);
-                    }
-                },
-                manualInputRoundDigits: 1,
             });
             opacitySlider = new KlSlider({
                 label: LANG('opacity'),
                 width: 225,
                 height: 30,
-                min: brushInterface.opacitySlider.min,
-                max: brushInterface.opacitySlider.max,
+                ...brushInterface.opacitySlider,
                 value: brushInterface.opacitySlider.max,
                 eventResMs: EVENT_RES_MS,
-                toDisplayValue: (val) => val * 100,
-                toValue: (displayValue) => displayValue / 100,
                 onChange: (val) => {
                     brush.setOpacity(val);
                     p.onOpacityChange(val);

@@ -2,7 +2,7 @@ import { getIconSvg } from '../../icon/icon';
 import { BB } from '../../bb/bb';
 import { BRUSHES } from '../brushes/brushes';
 import { EVENT_RES_MS } from './brushes-consts';
-import { Checkbox } from '../ui/components/checkbox';
+import { createEraserToggle, createLockAlphaToggle } from '../ui/components/create-brush-toggles';
 import { KlSlider } from '../ui/components/kl-slider';
 import { createPenPressureToggle } from '../ui/components/create-pen-pressure-toggle';
 import { TBrushUi } from '../kl-types';
@@ -54,16 +54,14 @@ export const pixelBrushUi = (function () {
         sizeSlider: {
             min: 0.5,
             max: 100,
-            curve: BB.powerSplineInput(0.5, 100, 0.1),
+            exponent: 2,
+            displayScale: 2, // radius displayed as diameter
+            decimals: 'adaptive',
         },
         opacitySlider: {
             min: 1 / 100,
             max: 1,
-            curve: [
-                [0, 1 / 100],
-                [0.5, 0.3],
-                [1, 1],
-            ],
+            displayScale: 100,
         },
     } as TBrushUi<PixelBrush>;
 
@@ -90,27 +88,14 @@ export const pixelBrushUi = (function () {
                 brush.setTip(tip);
                 p.onConfigChange();
             },
-            css: { marginTop: 10 },
         });
 
-        const lockAlphaToggle = new Checkbox({
-            init: brush.getLockAlpha(),
-            label: LANG('lock-alpha'),
-            callback: function (b) {
-                brush.setLockAlpha(b);
-            },
-            doHighlight: true,
-            title: LANG('lock-alpha-title'),
-            name: 'lock-alpha-toggle',
+        const lockAlphaToggle = createLockAlphaToggle(brush.getLockAlpha(), (b) => {
+            brush.setLockAlpha(b);
         });
 
-        const eraserToggle = new Checkbox({
-            init: brush.getIsEraser(),
-            label: LANG('eraser'),
-            callback: function (b) {
-                brush.setIsEraser(b);
-            },
-            name: 'eraser-toggle',
+        const eraserToggle = createEraserToggle(brush.getIsEraser(), (b) => {
+            brush.setIsEraser(b);
         });
 
         // patterns: defaults + the user's own. Identified by index, custom ones come after defaults.
@@ -182,13 +167,9 @@ export const pixelBrushUi = (function () {
                 label: LANG('brush-size'),
                 width: 225,
                 height: 30,
-                min: brushInterface.sizeSlider.min,
-                max: brushInterface.sizeSlider.max,
+                ...brushInterface.sizeSlider,
                 value: brush.getSize(),
-                curve: brushInterface.sizeSlider.curve,
                 eventResMs: EVENT_RES_MS,
-                toDisplayValue: (val) => val * 2,
-                toValue: (displayValue) => displayValue / 2,
                 onChange: (val) => {
                     setSize(val);
                     p.onSizeChange(val);
@@ -198,12 +179,9 @@ export const pixelBrushUi = (function () {
                 label: LANG('opacity'),
                 width: 225,
                 height: 30,
-                min: brushInterface.opacitySlider.min,
-                max: brushInterface.opacitySlider.max,
+                ...brushInterface.opacitySlider,
                 value: brushInterface.opacitySlider.max,
                 eventResMs: EVENT_RES_MS,
-                toDisplayValue: (val) => val * 100,
-                toValue: (displayValue) => displayValue / 100,
                 onChange: (val) => {
                     brush.setOpacity(val);
                     p.onOpacityChange(val);
@@ -225,21 +203,25 @@ export const pixelBrushUi = (function () {
                     },
                 }),
                 opacitySlider.getElement(),
-                tipOptions.getElement(),
+                BB.el({
+                    content: [
+                        tipOptions.getElement(),
+                        BB.el({
+                            content: [lockAlphaToggle.getElement(), eraserToggle.getElement()],
+                            css: {
+                                display: 'flex',
+                                gap: 4,
+                            },
+                        }),
+                    ],
+                    css: {
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        marginTop: 10,
+                    },
+                }),
                 patternPicker.getElement(),
             );
-
-            const toggleRow = BB.el({
-                parent: div,
-                css: {
-                    display: 'flex',
-                    marginTop: 10,
-                    gap: 10,
-                    flexWrap: 'wrap',
-                },
-            });
-
-            toggleRow.append(lockAlphaToggle.getElement(), eraserToggle.getElement());
         }
 
         init();

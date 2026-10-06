@@ -1,5 +1,6 @@
 import { getIconUrl } from '../icon/icon';
 import { KL } from '../klecks/kl';
+import { TBrushId } from '../klecks/brushes-ui/brushes-ui';
 import { BB } from '../bb/bb';
 import { showIframeModal } from '../klecks/ui/modals/show-iframe-modal';
 import { EmbedToolspaceTopRow } from '../embed/embed-toolspace-top-row';
@@ -58,7 +59,7 @@ import { KlHistoryExecutor, THistoryExecutionType } from '../klecks/history/kl-h
 import { KlHistory } from '../klecks/history/kl-history';
 import { isHistoryEntryActiveLayerChange } from '../klecks/history/push-helpers/is-history-entry-active-layer-change';
 import { MobileUi } from '../klecks/ui/mobile/mobile-ui';
-import { MobileBrushUi } from '../klecks/ui/mobile/mobile-brush-ui';
+import { MobileToolUi } from '../klecks/ui/mobile/mobile-tool-ui';
 import { canvasToBlob } from '../bb/base/canvas';
 import { projectToComposed } from '../klecks/history/push-helpers/project-to-composed';
 import { ERASE_COLOR } from '../klecks/brushes/erase-color';
@@ -89,9 +90,8 @@ const tabEditImg = getIconUrl('tab-edit');
 importFilters();
 
 /**
- * Toolspace shrinks as the window gets shorter: first the color slider, then the tool row becomes small,
- * then the layer preview hides. Only after that does it overflow.
- * Values are tuned so the tallest brush tab (pixel) fits, with 10px spacing above the bottom bar.
+ * Toolspace shrinks as the window gets shorter: first the color slider, then the tool row and
+ * layer preview become small, then the layer preview hides. Only after that does it overflow.
  */
 function getToolspaceLayout(uiHeight: number): {
     isLayerPreviewVisible: boolean;
@@ -99,7 +99,9 @@ function getToolspaceLayout(uiHeight: number): {
     isToolRowSmall: boolean;
     colorSliderHeight: number;
 } {
-    const otherContentHeight = 478; // everything but color slider, with layer preview and large tool row
+    // everything but color slider, with layer preview and large tool row.
+    // Measured with the tallest brush tab, so it fits with 10px spacing above the bottom bar.
+    const otherContentHeight = 447;
     const toolRowSaving = 18; // when small
     const layerPreviewSmallSaving = 4; // 36px instead of 40px
     const colorSliderMin = 158;
@@ -174,7 +176,7 @@ export class KlApp {
     private readonly easelBrush: EaselBrush;
     private readonly collapseThreshold: number = 820;
     private readonly mobileUi: MobileUi;
-    private readonly mobileBrushUi: MobileBrushUi;
+    private readonly mobileToolUi: MobileToolUi;
     private readonly mobileColorUi: MobileColorUi;
     private readonly toolspace: HTMLElement;
     private readonly toolspaceInner: HTMLElement;
@@ -195,13 +197,7 @@ export class KlApp {
         this.unloadWarningTrigger?.update();
     }
 
-    private updateCollapse(isInitial?: boolean): void {
-        if (isInitial) {
-            const isMobile = Boolean(LocalStorage.getItem('uiShowMobile') ?? false);
-            if (isMobile) {
-                this.mobileUi.setToolspaceIsOpen(false);
-            }
-        }
+    private updateCollapse(): void {
         this.mobileUi.setOrientation(this.uiLayout);
         if (this.uiWidth < this.collapseThreshold) {
             this.mobileUi.setIsVisible(true);
@@ -233,7 +229,6 @@ export class KlApp {
                 this.statusOverlay.setWide(true);
             }
         } else {
-            this.mobileColorUi.closeColorPicker();
             this.mobileUi.setIsVisible(false);
             if (this.uiLayout === 'left') {
                 css(this.easel.getElement(), {
@@ -244,7 +239,6 @@ export class KlApp {
             this.easel.setSize(Math.max(0, this.uiWidth - this.toolWidth), this.uiHeight);
             this.statusOverlay.setWide(false);
         }
-        this.mobileUi.update();
     }
 
     private updateUi(): void {
@@ -382,16 +376,18 @@ export class KlApp {
 
         let currentColor = new BB.RGB(0, 0, 0);
         let currentBrushUi: TBrushUiInstance<any>;
-        let currentBrushId: string;
-        let lastNonEraserBrushId: string;
+        let currentBrushId: TBrushId;
+        let lastNonEraserBrushId: TBrushId;
         let currentLayerIndex: number = this.klCanvas.getLayerCount() - 1;
 
         // when cycling through brushes you need to know the next non-eraser brush
-        const getNextBrushId = (): string => {
+        const getNextBrushId = (): TBrushId => {
             if (currentBrushId === 'eraserBrush') {
                 return lastNonEraserBrushId;
             }
-            const keyArr = Object.keys(brushUiMap).filter((item) => item !== 'eraserBrush');
+            const keyArr = (Object.keys(KL.BRUSHES_UI) as TBrushId[]).filter(
+                (item) => item !== 'eraserBrush',
+            );
             const i = keyArr.findIndex((item) => item === currentBrushId);
             return keyArr[(i + 1) % keyArr.length];
         };
@@ -481,19 +477,12 @@ export class KlApp {
          * returns true if something was applied
          */
         const applyUncommitted = (): boolean => {
-            let didApply = false;
-            if (this.easel.getTool() === 'select') {
-                didApply = klAppSelect.commitTransform();
-            }
-            return didApply;
+            return klAppSelect.commitTransform();
         };
 
         /** see applyUncommitted **/
         const discardUncommitted = (): boolean => {
-            if (this.easel.getTool() === 'select') {
-                return klAppSelect.discardTransform();
-            }
-            return false;
+            return klAppSelect.discardTransform();
         };
 
         const propagateUndoRedoChanges = (
@@ -554,6 +543,7 @@ export class KlApp {
 
         const klAppSelect = new KlAppSelect({
             klCanvas: this.klCanvas,
+            onChangeMode: () => this.mobileToolUi.update(),
             getCurrentLayerIndex: () => currentLayerIndex,
             onUpdateProject: () => this.easelProjectUpdater.update(),
             klHistory: this.klHistory,
@@ -777,8 +767,7 @@ export class KlApp {
                 if (toolId !== 'brush' && toolId !== 'eyedropper') {
                     currentBrushUi.freeResources?.();
                 }
-                this.mobileBrushUi.setIsVisible(toolId === 'brush');
-                this.mobileColorUi.setIsVisible(toolId !== 'select');
+                this.mobileToolUi.update();
             },
             onTransformChange: (transform, isScaleOrAngleChanged) => {
                 handUi.update(transform.scale, transform.angleDeg, transform.isMirrored);
@@ -1007,8 +996,8 @@ export class KlApp {
                 } else if (comboStr === 'e' && !isRepeat) {
                     event.preventDefault();
                     applyUncommitted();
-                    this.easel.setTool('brush');
                     this.toolspaceToolRow.setActive('brush');
+                    this.easel.setTool('brush');
                     mainTabRow?.open('brush');
                     updateMainTabVisibility();
                     brushTabRow.open('eraserBrush');
@@ -1018,8 +1007,8 @@ export class KlApp {
                     const prevMode = this.easel.getTool();
                     const prevMainTabId = mainTabRow?.getOpenedTabId();
                     applyUncommitted();
-                    this.easel.setTool('brush');
                     this.toolspaceToolRow.setActive('brush');
+                    this.easel.setTool('brush');
                     mainTabRow?.open('brush');
                     updateMainTabVisibility();
                     brushTabRow.open(
@@ -1039,24 +1028,24 @@ export class KlApp {
                     applyUncommitted();
                     const newMode =
                         this.easel.getTool() === 'paintBucket' ? 'gradient' : 'paintBucket';
-                    this.easel.setTool(newMode);
                     this.toolspaceToolRow.setActive(newMode);
+                    this.easel.setTool(newMode);
                     mainTabRow?.open(newMode);
                     updateMainTabVisibility();
                 }
                 if (comboStr === 't' && !isRepeat) {
                     event.preventDefault();
                     applyUncommitted();
-                    this.easel.setTool('text');
                     this.toolspaceToolRow.setActive('text');
+                    this.easel.setTool('text');
                     mainTabRow?.open('text');
                     updateMainTabVisibility();
                 }
                 if (comboStr === 'u' && !isRepeat) {
                     event.preventDefault();
                     applyUncommitted();
-                    this.easel.setTool('shape');
                     this.toolspaceToolRow.setActive('shape');
+                    this.easel.setTool('shape');
                     mainTabRow?.open('shape');
                     updateMainTabVisibility();
                 }
@@ -1065,9 +1054,12 @@ export class KlApp {
                     const prevTool = this.easel.getTool();
                     const prevSelectMode = klAppSelect.getSelectMode();
                     const prevMainTabId = mainTabRow?.getOpenedTabId();
-                    applyUncommitted();
-                    this.easel.setTool('select');
+                    // coming from hand -> keep uncommitted transform, so it can be resumed
+                    if (prevTool !== 'hand') {
+                        applyUncommitted();
+                    }
                     this.toolspaceToolRow.setActive('select');
+                    this.easel.setTool('select');
                     mainTabRow?.open('select');
                     updateMainTabVisibility();
                     if (
@@ -1140,12 +1132,33 @@ export class KlApp {
         };
         this.toolspace.onclick = BB.handleClick;
 
-        this.mobileBrushUi = new MobileBrushUi({
-            onBrush: () => {
-                brushTabRow.open(lastNonEraserBrushId);
+        this.mobileToolUi = new MobileToolUi({
+            getToolId: () => this.toolspaceToolRow.getActive(),
+            getSelectMode: () => klAppSelect.getSelectMode(),
+            getCurrentBrushId: () => currentBrushId,
+            getLastNonEraserBrushId: () => lastNonEraserBrushId,
+            brushArr: (Object.keys(KL.BRUSHES_UI) as TBrushId[])
+                .filter((id) => id !== 'eraserBrush')
+                .map((id) => ({
+                    id,
+                    image: KL.BRUSHES_UI[id].image,
+                    title: KL.BRUSHES_UI[id].tooltip,
+                })),
+            brushSettingService,
+            onBrush: (brushId) => {
+                this.toolspaceToolRow.setActive('brush', true);
+                brushTabRow.open(brushId);
             },
-            onEraser: () => {
-                brushTabRow.open('eraserBrush');
+            onTool: (toolId) => {
+                if (toolId === 'select' || toolId === 'transform') {
+                    this.toolspaceToolRow.setActive('select', true);
+                    // transform can be rejected, if there's nothing to transform
+                    return klAppSelect
+                        .getSelectUi()
+                        .setMode(toolId === 'select' ? 'select' : 'transform');
+                }
+                this.toolspaceToolRow.setActive(toolId, true);
+                return true;
             },
         });
         this.mobileColorUi = new MobileColorUi({
@@ -1165,14 +1178,18 @@ export class KlApp {
         });
 
         this.mobileUi = new MobileUi({
+            orientation: this.uiLayout,
+            isVisible: this.uiWidth < this.collapseThreshold,
             onShowToolspace: (b) => {
-                this.mobileColorUi.closeColorPicker();
                 this.updateCollapse();
             },
-            toolUis: [this.mobileBrushUi.getElement(), this.mobileColorUi.getElement()],
+            colorUi: this.mobileColorUi,
+            toolUi: this.mobileToolUi,
+            onUndo: () => undo(),
+            onRedo: () => redo(),
         });
 
-        this.updateCollapse(true);
+        this.updateCollapse();
 
         let overlayToolspace;
         setTimeout(() => {
@@ -1293,8 +1310,8 @@ export class KlApp {
 
         this.toolspaceToolRow = new KL.ToolspaceToolRow({
             onActivate: (activeStr) => {
-                if (activeStr !== 'hand') {
-                    // hand only one that doesn't cause changes
+                // hand doesn't cause changes. Select -> can resume uncommitted transform after hand
+                if (activeStr !== 'hand' && activeStr !== 'select') {
                     applyUncommitted();
                 }
 
@@ -1383,7 +1400,7 @@ export class KlApp {
             );
         };
 
-        const setCurrentBrush = (brushId: string) => {
+        const setCurrentBrush = (brushId: TBrushId) => {
             if (currentBrushUi && brushId !== currentBrushId) {
                 currentBrushUi.freeResources?.();
             }
@@ -1446,7 +1463,7 @@ export class KlApp {
                     width: 28,
                     color: 'var(--ui-on-bg-full-contrast)',
                 };
-                const createTab = (keyStr: string) => {
+                const createTab = (keyStr: TBrushId) => {
                     const im = KL.BRUSHES_UI[keyStr].image;
                     css(im, commonStyle);
                     return {
@@ -1472,9 +1489,7 @@ export class KlApp {
                             });
                             sizeWatcher(brushUiMap[keyStr].getSize());
                             brushSettingService.emitOpacity(brushUiMap[keyStr].getOpacity());
-                            this.mobileBrushUi.setType(
-                                keyStr === 'eraserBrush' ? 'eraser' : 'brush',
-                            );
+                            this.mobileToolUi.update();
                         },
                         onClose: () => {
                             brushUiMap[keyStr].getElement().style.display = 'none';
@@ -1482,8 +1497,7 @@ export class KlApp {
                     };
                 };
 
-                const keyArr = Object.keys(brushUiMap);
-                return keyArr.map(createTab);
+                return (Object.keys(KL.BRUSHES_UI) as TBrushId[]).map(createTab);
             })(),
         });
         BB.append(brushDiv, [
@@ -1680,8 +1694,8 @@ export class KlApp {
             klHistory: this.klHistory,
             tempHistory,
             onCanUndoRedoChange: (canUndo, canRedo) => {
-                this.toolspaceToolRow.setEnableUndo(canUndo);
-                this.toolspaceToolRow.setEnableRedo(canRedo);
+                this.toolspaceToolRow.updateUndoRedo(canUndo, canRedo);
+                this.mobileUi.updateUndoRedo(canUndo, canRedo);
             },
         });
 

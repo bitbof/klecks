@@ -116,8 +116,7 @@ export class GradientUi {
             min: 1 / 100,
             max: 1,
             value: this.settings.opacity,
-            toValue: (displayValue) => displayValue / 100,
-            toDisplayValue: (value) => value * 100,
+            displayScale: 100,
             onChange: (val) => {
                 this.settings.opacity = val;
             },

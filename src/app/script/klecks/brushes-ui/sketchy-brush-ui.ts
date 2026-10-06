@@ -4,7 +4,6 @@ import { KlSlider } from '../ui/components/kl-slider';
 import brushIconImg from 'url:/src/app/img/ui/brush-sketchy.png';
 import { TBrushUi } from '../kl-types';
 import { LANG, LANGUAGE_STRINGS } from '../../language/language';
-import { BB } from '../../bb/bb';
 import { SketchyBrush } from '../brushes/sketchy-brush';
 import { createImageMask } from '../../bb/base/ui';
 
@@ -15,10 +14,13 @@ export const sketchyBrushUi = (function () {
         sizeSlider: {
             min: 0.5,
             max: 10,
+            displayScale: 2, // radius displayed as diameter
+            decimals: 'adaptive',
         },
         opacitySlider: {
             min: 1 / 100,
             max: 1,
+            displayScale: 100,
         },
         Ui: {} as TBrushUi<SketchyBrush>['Ui'],
     } as TBrushUi<SketchyBrush>;
@@ -44,35 +46,21 @@ export const sketchyBrushUi = (function () {
                 label: LANG('brush-size'),
                 width: 250,
                 height: 30,
-                min: brushInterface.sizeSlider.min,
-                max: brushInterface.sizeSlider.max,
-                value: brush.getSize() * 2,
+                ...brushInterface.sizeSlider,
+                value: brush.getSize(),
                 eventResMs: EVENT_RES_MS,
-                toDisplayValue: (val) => val * 2,
-                toValue: (displayValue) => displayValue / 2,
                 onChange: function (val) {
                     brush.setSize(val);
                     p.onSizeChange(val);
                 },
-                formatFunc: (displayValue) => {
-                    if (displayValue < 10) {
-                        return BB.round(displayValue, 1);
-                    } else {
-                        return Math.round(displayValue);
-                    }
-                },
-                manualInputRoundDigits: 1,
             });
             opacitySlider = new KlSlider({
                 label: LANG('opacity'),
                 width: 250,
                 height: 30,
-                min: brushInterface.opacitySlider.min,
-                max: brushInterface.opacitySlider.max,
+                ...brushInterface.opacitySlider,
                 value: brush.getOpacity(),
                 eventResMs: EVENT_RES_MS,
-                toDisplayValue: (val) => val * 100,
-                toValue: (displayValue) => displayValue / 100,
                 onChange: (val) => {
                     brush.setOpacity(val);
                     p.onOpacityChange(val);
@@ -84,10 +72,9 @@ export const sketchyBrushUi = (function () {
                 height: 30,
                 min: 0,
                 max: 1,
+                displayScale: 100,
                 value: brush.getBlending(),
                 eventResMs: EVENT_RES_MS,
-                toDisplayValue: (val) => val * 100,
-                toValue: (displayValue) => displayValue / 100,
                 onChange: function (val) {
                     brush.setBlending(val);
                 },

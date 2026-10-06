@@ -302,7 +302,7 @@ export const filterNoise = {
             max: 1000,
             value: noiseInput.scale,
             eventResMs: EVENT_RES_MS,
-            curve: BB.powerSplineInput(1, 1000, 0.1),
+            exponent: 2,
             onChange: (value) => {
                 noiseInput.scale = value;
                 update();
@@ -318,8 +318,7 @@ export const filterNoise = {
             max: 1,
             value: noiseInput.opacity,
             eventResMs: EVENT_RES_MS,
-            toValue: (displayValue) => displayValue / 100,
-            toDisplayValue: (value) => value * 100,
+            displayScale: 100,
             onChange: (value) => {
                 noiseInput.opacity = value;
                 update();
@@ -476,10 +475,7 @@ export const filterNoise = {
         {
             for (let i = 0; i < layers.length; i++) {
                 previewLayerArr.push({
-                    image:
-                        i === selectedLayerIndex
-                            ? fxPreviewRenderer.render
-                            : layers[i].canvas,
+                    image: i === selectedLayerIndex ? fxPreviewRenderer.render : layers[i].canvas,
                     isVisible: layers[i].isVisible,
                     opacity: layers[i].opacity,
                     mixModeStr: layers[i].mixModeStr,

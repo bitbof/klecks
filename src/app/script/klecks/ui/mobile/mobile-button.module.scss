@@ -1,0 +1,115 @@
+.button {
+    width: 36px;
+    height: 36px;
+    flex-shrink: 0;
+    padding: 6px;
+    border: 0;
+    border-radius: 4px;
+    cursor: pointer;
+    user-select: none;
+    -webkit-user-select: none;
+    background: var(--ui-bg-color);
+    box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.3);
+    color: rgba(0, 0, 0, 0.75); // for currentColor icons
+
+    &:hover {
+        background: #eee;
+    }
+
+    &:active {
+        box-shadow: inset 0 0 0 2px rgba(0, 0, 0, 0.3);
+    }
+
+    &:disabled {
+        cursor: default;
+
+        &:hover {
+            background: var(--ui-bg-color);
+        }
+
+        &:active {
+            box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.3);
+        }
+
+        .icon {
+            opacity: 0.25;
+        }
+    }
+}
+
+.icon {
+    width: 100%;
+    height: 100%;
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+    opacity: 0.75;
+}
+
+.mirrored {
+    transform: scaleX(-1);
+}
+
+// selectable option, e.g. in tool selection
+.option {
+    > * {
+        opacity: 0.75;
+    }
+
+    &[aria-pressed='true'],
+    &[aria-pressed='true']:hover,
+    &[aria-pressed='true']:active {
+        background: #fff;
+        color: #000;
+        box-shadow: inset 0 0 0 2px var(--active-highlight-color);
+        cursor: default;
+
+        > * {
+            opacity: 1;
+        }
+    }
+}
+
+:global(:root.kl-theme-dark) {
+    .button {
+        background: var(--ui-bg-dark);
+        box-shadow: inset 0 0 0 1px #606060;
+        color: #ccc;
+
+        &:hover {
+            background: #444;
+        }
+
+        &:active {
+            box-shadow: inset 0 0 0 2px #666;
+        }
+
+        &:disabled {
+            &:hover {
+                background: var(--ui-bg-dark);
+            }
+
+            &:active {
+                box-shadow: inset 0 0 0 1px #606060;
+            }
+        }
+    }
+
+    .option {
+        > * {
+            opacity: 0.6;
+        }
+
+        &[aria-pressed='true'],
+        &[aria-pressed='true']:hover,
+        &[aria-pressed='true']:active {
+            background: #606060;
+            color: #fff;
+            box-shadow: inset 0 0 0 2px var(--active-highlight-color);
+
+            > * {
+                opacity: 1;
+            }
+        }
+    }
+}

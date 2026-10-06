@@ -6,6 +6,7 @@ import { Icon } from '../components/icon';
 import { TRgb } from '../../kl-types';
 import { TVector2D } from '../../../bb/bb-types';
 import { ColorPickerWindow } from '../components/color-picker-window';
+import { testIsWhiteBestContrast } from '../../../bb/color/color';
 
 const eyedropperImg = getIconUrl('tool-picker');
 export type TMobileColorUiParams = {
@@ -22,6 +23,12 @@ export class MobileColorUi {
     private colorPickerPosition: TVector2D = { x: 100, y: 100 };
     private color: TRgb = { r: 0, g: 0, b: 0 };
 
+    private updateColorCircle(): void {
+        this.colorCircle.style.backgroundColor = BB.ColorConverter.toRgbStr(this.color);
+        const outlineColor = testIsWhiteBestContrast(this.color) ? '#fff' : '#000';
+        this.colorCircle.style.boxShadow = `0 0 0 1px ${outlineColor}`;
+    }
+
     // ----------------------------------- public -----------------------------------
     constructor(p: TMobileColorUiParams) {
         this.color = { ...p.color };
@@ -29,21 +36,19 @@ export class MobileColorUi {
             css: {
                 width: 30,
                 height: 30,
-                background: BB.ColorConverter.toRgbStr(p.color),
                 borderRadius: '100%',
-                boxShadow: '0 0 0 1px rgba(0,0,0,0.5), inset 0 0 0 1px rgba(255,255,255,0.5)',
                 alignSelf: 'center',
                 cursor: 'pointer',
             },
             onClick: () => {
                 if (this.colorPickerWindow) {
-                    this.closeColorPicker();
+                    this.close();
                     return;
                 }
                 this.colorPickerWindow = new ColorPickerWindow({
                     color: this.color,
                     onChange: p.onColorChange,
-                    onClose: () => this.closeColorPicker(),
+                    onClose: () => this.close(),
                     onMove: (position) => {
                         this.colorPickerPosition = position;
                     },
@@ -82,9 +87,11 @@ export class MobileColorUi {
                 display: 'flex',
                 flexDirection: 'column',
                 gap: 4,
+                flexShrink: 0,
             },
         });
         this.rootEl.append(this.colorCircle, this.eyedropperToggle.getElement());
+        this.updateColorCircle();
     }
 
     getIsEyedropping(): boolean {
@@ -97,21 +104,14 @@ export class MobileColorUi {
 
     setColor(color: TRgb): void {
         this.color = { ...color };
-        this.colorCircle.style.backgroundColor = BB.ColorConverter.toRgbStr(color);
+        this.updateColorCircle();
         this.colorPickerWindow?.setColor(color);
     }
 
-    closeColorPicker(): void {
+    close(): void {
         if (this.colorPickerWindow) {
             this.colorPickerWindow.destroy();
             this.colorPickerWindow = undefined;
-        }
-    }
-
-    setIsVisible(b: boolean): void {
-        this.rootEl.style.display = b ? 'flex' : 'none';
-        if (!b) {
-            this.closeColorPicker();
         }
     }
 

@@ -1,0 +1,29 @@
+// toggle shows one of two icons, depending on if it's active
+.iconOn {
+    display: none;
+}
+
+.iconOff {
+    display: block;
+}
+
+:global(.kl-box-toggle--active) {
+    .iconOn {
+        display: block;
+    }
+
+    .iconOff {
+        display: none;
+    }
+}
+
+// inactive dimming like Options (instead of BoxToggle's default)
+:global(.kl-box-toggle--custom-el).toggle:not(:global(.kl-box-toggle--active)) > * {
+    opacity: 0.75;
+}
+
+:global(:root.kl-theme-dark) {
+    .toggle:not(:global(.kl-box-toggle--active)) > * {
+        opacity: 0.6;
+    }
+}

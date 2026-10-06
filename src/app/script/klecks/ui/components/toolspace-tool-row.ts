@@ -457,14 +457,11 @@ export class ToolspaceToolRow {
         this.zoomInNOutButton.setIsEnabledRight(b);
     }
 
-    setEnableUndo(b: boolean): void {
-        this.undoButton.el.classList.toggle('toolspace-row-button-disabled', !b);
-        this.undoNRedoButton.setIsEnabledLeft(b);
-    }
-
-    setEnableRedo(b: boolean): void {
-        this.redoButton.el.classList.toggle('toolspace-row-button-disabled', !b);
-        this.undoNRedoButton.setIsEnabledRight(b);
+    updateUndoRedo(canUndo: boolean, canRedo: boolean): void {
+        this.undoButton.el.classList.toggle('toolspace-row-button-disabled', !canUndo);
+        this.undoNRedoButton.setIsEnabledLeft(canUndo);
+        this.redoButton.el.classList.toggle('toolspace-row-button-disabled', !canRedo);
+        this.undoNRedoButton.setIsEnabledRight(canRedo);
     }
 
     setActive(activeStr: TToolType, doEmit?: boolean): void {

@@ -13,9 +13,7 @@ import { TBrushUi } from '../kl-types';
  * So if you want to draw, you do it through the UI. should be changed sometime.
  */
 
-export const BRUSHES_UI: {
-    [key: string]: TBrushUi<any>;
-} = {
+export const BRUSHES_UI = {
     penBrush: penBrushUi,
     blendBrush: blendBrushUi,
     sketchyBrush: sketchyBrushUi,
@@ -23,4 +21,6 @@ export const BRUSHES_UI: {
     chemyBrush: chemyBrushUi,
     smudgeBrush: smudgeBrushUi,
     eraserBrush: eraserBrushUi,
-};
+} satisfies Record<string, TBrushUi<any>>;
+
+export type TBrushId = keyof typeof BRUSHES_UI;

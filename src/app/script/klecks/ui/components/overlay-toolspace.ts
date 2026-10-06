@@ -87,20 +87,12 @@ export class OverlayToolspace {
             height: sizeObj.sliderHeight,
             min: 0,
             max: 500,
+            displayScale: 2,
+            decimals: 'adaptive',
             value: 50,
-            resolution: 225,
             eventResMs: 1000 / 30,
-            toDisplayValue: (val) => val * 2,
-            toValue: (displayValue) => displayValue / 2,
             onChange: (v) => {
                 p.brushSettingService.setSize(v);
-            },
-            formatFunc: (displayValue) => {
-                if (displayValue < 10) {
-                    return BB.round(displayValue, 1);
-                } else {
-                    return Math.round(displayValue);
-                }
             },
         });
         css(sizeSlider.getElement(), {
@@ -113,11 +105,9 @@ export class OverlayToolspace {
             height: sizeObj.sliderHeight,
             min: 0,
             max: 1,
+            displayScale: 100,
             value: 1,
-            resolution: 225,
             eventResMs: 1000 / 30,
-            toDisplayValue: (val) => val * 100,
-            toValue: (displayValue) => displayValue / 100,
             onChange: (v) => {
                 p.brushSettingService.setOpacity(v);
             },

@@ -301,7 +301,7 @@ export class ShapeUi {
             min: 1,
             max: 200,
             value: 4,
-            curve: 'quadratic',
+            exponent: 2,
             onChange: () => {
                 updatePreviews();
             },
@@ -318,8 +318,7 @@ export class ShapeUi {
             min: 1 / 100,
             max: 1,
             value: 1,
-            toValue: (displayValue) => displayValue / 100,
-            toDisplayValue: (value) => value * 100,
+            displayScale: 100,
         });
         css(this.opacitySlider.getElement(), {
             marginTop: 10,

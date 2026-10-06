@@ -286,10 +286,7 @@ export const filterPattern = {
                 settings.blend = val;
                 updatePreview();
             },
-            formatFunc: (val) => {
-                return BB.round(val, 2);
-            },
-            manualInputRoundDigits: 2,
+            decimals: 2,
         });
         css(blendSlider.getElement(), {
             margin: '10px 0',

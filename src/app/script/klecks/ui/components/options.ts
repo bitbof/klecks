@@ -219,8 +219,9 @@ export class Options<IdType> {
         this.setValue(this.optionArr[(this.getIndex() + 1) % this.optionArr.length].id);
     }
 
-    setValue(val: IdType, skipEmit?: boolean): void {
-        this.selectValue(val, skipEmit);
+    // returns false if change was rejected via onBeforeChange
+    setValue(val: IdType, skipEmit?: boolean): boolean {
+        return this.selectValue(val, skipEmit);
     }
 
     updateOption(

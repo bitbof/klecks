@@ -59,7 +59,7 @@ export const filterVanishPoint = {
             min: 2,
             max: 40,
             value: settingsObj.lines,
-            curve: 'quadratic',
+            exponent: 2,
             eventResMs: EVENT_RES_MS,
             onChange: function (val) {
                 settingsObj.lines = Math.round(val);

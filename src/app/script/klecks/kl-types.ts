@@ -195,7 +195,10 @@ export type TShapeToolObject = {
 export type TKlSliderConfig = {
     min: number;
     max: number;
-    curve?: [number, number][] | 'quadratic';
+    exponent?: number; // curve of value along slider. default 1 (linear), 2 -> finer control near min
+    displayScale?: number; // displayed value = value * displayScale. default 1
+    decimals?: number | 'adaptive'; // of displayed value. default 0. 'adaptive' -> 1 below 10, else 0
+    unit?: string; // appended to displayed value
     isDisabled?: boolean; // default enabled
 };
 

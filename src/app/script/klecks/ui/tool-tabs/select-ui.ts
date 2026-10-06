@@ -554,8 +554,9 @@ export class SelectUi {
         }
     }
 
-    setMode(mode: TSelectToolMode): void {
-        this.modeOptions.setValue(mode);
+    // returns false if mode-change was rejected
+    setMode(mode: TSelectToolMode): boolean {
+        return this.modeOptions.setValue(mode);
     }
 
     setLayers(layers: string[]): void {
