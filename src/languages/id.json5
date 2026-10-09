@@ -68,7 +68,7 @@
   },
   'tool-select': {
     original: 'Select Tool',
-    value: 'Alat Pilih'
+    value: 'Alat Seleksi'
   },
   'tool-zoom': {
     original: 'Zoom',
@@ -118,7 +118,7 @@
   'brush-smudge': {
     hint: 'Common brush/tool in image editing software. Smudges colors around canvas.',
     original: 'Smudge',
-    value: 'Gosok'
+    value: 'Usap'
   },
   'brush-size': {
     original: 'Size',
@@ -342,7 +342,7 @@
   },
   'layers-blend-color-burn': {
     original: 'color burn',
-    value: 'color burn'
+    value: 'bakar warna'
   },
   'layers-blend-lighten': {
     original: 'lighten',
@@ -350,15 +350,15 @@
   },
   'layers-blend-screen': {
     original: 'screen',
-    value: 'screen'
+    value: 'layar'
   },
   'layers-blend-color-dodge': {
     original: 'color dodge',
-    value: 'color dodge'
+    value: 'dodge warna'
   },
   'layers-blend-overlay': {
     original: 'overlay',
-    value: 'overlay'
+    value: 'tumpang tindih'
   },
   'layers-blend-soft-light': {
     original: 'soft light',
