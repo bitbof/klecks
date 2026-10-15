@@ -547,6 +547,12 @@ export class PointerListener {
                     return;
                 }
 
+                // A delayed mouse move can reuse the active pen's pointer ID (Firefox on Android).
+                // Do not let that mouse event end the pen stroke.
+                if (dragObj.pointerType === 'pen' && correctedEvent.pointerType === 'mouse') {
+                    return;
+                }
+
                 //if pointer changes button its pressing -> turn into pointerup
                 if (correctedEvent.buttons !== dragObj.buttons) {
                     //pointer up
