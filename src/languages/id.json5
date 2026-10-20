@@ -684,7 +684,7 @@
   'new-oversize': {
     hint: 'like oversized clothes.',
     original: 'Oversize',
-    value: 'Melebihi Ukuran'
+    value: 'Ekstra Besar'
   },
   'new-square': {
     hint: 'square image format',
@@ -1543,7 +1543,7 @@
   },
   'select-transform-warp': {
     original: 'Warp',
-    value: 'Warp'
+    value: 'Pelintir'
   },
   'select-transform-clone': {
     original: 'Clone',
@@ -1799,7 +1799,7 @@
   reverse: {
     hint: 'Reversing the direction of a color gradient',
     original: 'Reverse',
-    value: 'Balikkan'
+    value: 'Balik'
   },
   'compare-before': {
     original: 'Before',
