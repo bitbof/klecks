@@ -128,6 +128,7 @@ function getToolspaceLayout(uiHeight: number): {
 type TKlAppOptionsEmbed = {
     url: string;
     enableImageDropperImport?: boolean; // default false
+    disableUnloadWarning?: boolean; // default false
     onSubmit: (onSuccess: () => void, onError: () => void) => void;
 };
 
@@ -2249,10 +2250,12 @@ export class KlApp {
             );
         }
 
-        this.unloadWarningTrigger = new UnloadWarningTrigger({
-            klHistory: this.klHistory,
-            getLastSavedHistoryIndex: () => this.lastSavedHistoryIndex,
-        });
+        if (!this.embed?.disableUnloadWarning) {
+            this.unloadWarningTrigger = new UnloadWarningTrigger({
+                klHistory: this.klHistory,
+                getLastSavedHistoryIndex: () => this.lastSavedHistoryIndex,
+            });
+        }
 
         {
             window.addEventListener('resize', () => {
@@ -2371,6 +2374,10 @@ export class KlApp {
 
     getProject(): TKlProject {
         return this.klCanvas.getProject();
+    }
+
+    getKlHistory(): KlHistory {
+        return this.klHistory;
     }
 
     swapUiLeftRight(): void {

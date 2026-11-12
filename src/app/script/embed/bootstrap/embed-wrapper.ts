@@ -17,6 +17,8 @@ let wrapperCreated = false;
  * Lazy loads rest of library, shows a loading screen, exposes Embed interface
  */
 export class EmbedWrapper {
+    static readonly features = { draft: 1 }; // the `draft` option
+
     private project: TKlEmbedProject | undefined;
     private errorStr: string | undefined;
     private psds: TReadPSD[] = []; // if instance not loaded yet, these are psds to be read
