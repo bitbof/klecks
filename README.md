@@ -61,6 +61,8 @@ Created by developer/artist [bitbof](https://bitbof.com)
 # Embed
 Example usage of the embed can be found under: `/examples/embed/`
 
+Opt-in autosave through the embedder's storage (`draft` option): `/examples/embed/example-draft.html`, store interface in `src/app/script/embed/embed-draft.ts`.
+
 # Docker
 To run Klecks (standalone) within a Docker container, run the following commands in project root:
 

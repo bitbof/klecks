@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<!-- mocked drawing page that keeps a draft: draw, reload, and the drawing is still there -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Draw (draft)</title>
+    <meta name="color-scheme" content="dark light" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+</head>
+<body>
+
+<script src="../../dist/embed.js"></script>
+<script type="text/javascript">
+    // A minimal draft store: the whole draft in one IndexedDB record. A real store would add the
+    // new pieces without writing the old ones again.
+    const db = new Promise((resolve, reject) => {
+        const request = indexedDB.open('klecks-example-draft', 1);
+        request.onupgradeneeded = () => request.result.createObjectStore('drafts');
+        request.onsuccess = () => resolve(request.result);
+        request.onerror = () => reject(request.error);
+    });
+    const idb = async (mode, fn) => {
+        const tx = (await db).transaction('drafts', mode);
+        const request = fn(tx.objectStore('drafts'));
+        return new Promise((resolve, reject) => {
+            tx.oncomplete = () => resolve(request.result);
+            tx.onerror = () => reject(tx.error);
+        });
+    };
+
+    (async () => {
+        let saved = (await idb('readonly', (store) => store.get('draft'))) ?? null;
+        const flushes = [];
+        const klecks = new Klecks({
+            onSubmit: async (onSuccess) => {
+                await idb('readwrite', (store) => store.delete('draft'));
+                onSuccess();
+            },
+            draft: {
+                saved,
+                store: {
+                    save: async ({ format, append, tail, fresh }) => {
+                        const pieces = fresh ? append : [...saved.pieces, ...append];
+                        saved = { format, pieces, tail };
+                        await idb('readwrite', (store) => store.put(saved, 'draft'));
+                    },
+                    changed: () => {},
+                    onFlush: (flush) => flushes.push(flush),
+                    unreadable: (error) => console.error('draft could not be opened', error),
+                },
+            },
+        });
+        // used when there's no draft yet, or it can't be read
+        klecks.openProject({
+            width: 500,
+            height: 500,
+            layers: [{ name: 'Background', opacity: 1, image: { fill: '#fff' } }],
+        });
+        document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'hidden') {
+                flushes.forEach((flush) => flush());
+            }
+        });
+    })();
+</script>
+
+</body>
+</html>

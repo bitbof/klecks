@@ -8,6 +8,7 @@ import { KL_CONFIG } from './klecks/kl-config';
 import { asyncThrow, randomUuid } from './bb/base/base';
 import { initIconCss } from './icon/icon';
 import { getMixModeStr } from './klecks/canvas/get-mix-mode';
+import { EmbedDraft, restoreDraft, TDraftRestored, TEmbedDraft } from './embed/embed-draft';
 
 initIconCss();
 
@@ -20,6 +21,9 @@ export type TEmbedParams = {
     aboutEl?: HTMLElement;
     disableAutoFit?: boolean; // disable automatic Fit to View for small canvases
     enableImageDropperImport?: boolean; // default false
+    // Opt-in autosave through the embedder's storage. A draft.saved is opened instead of
+    // project/openProject(), which are only used if it can't be read.
+    draft?: TEmbedDraft;
 };
 
 export type TReadPSD = {
@@ -51,10 +55,19 @@ export class Embed {
     private agPsd: TAgPsd | 'error' | undefined;
     private loadingScreenEl: HTMLElement | null;
     private loadingScreenTextEl: HTMLElement | null;
+    private isRestoringDraft: boolean = false;
+    private fallbackProject: TKlEmbedProject | undefined; // if draft.saved can't be read
+    private restoredDraft: TDraftRestored | undefined;
 
     onProjectReady(embedProject: TKlEmbedProject) {
+        if (this.isRestoringDraft) {
+            this.fallbackProject = embedProject;
+            return;
+        }
         if (this.isInitialized) {
-            asyncThrow(new Error('Already called openProject'));
+            if (!this.restoredDraft) {
+                asyncThrow(new Error('Already called openProject'));
+            }
             return;
         }
 
@@ -68,9 +81,17 @@ export class Embed {
                 embed: {
                     url: this.p.embedUrl,
                     enableImageDropperImport: !!this.p.enableImageDropperImport,
+                    disableUnloadWarning: !!this.p.draft, // the embedder warns
                     onSubmit: this.p.onSubmit,
                 },
             });
+            if (this.p.draft) {
+                new EmbedDraft({
+                    klApp: this.klApp,
+                    store: this.p.draft.store,
+                    restored: this.restoredDraft,
+                });
+            }
 
             void this.loadingScreenEl?.remove();
             this.loadingScreenEl = null;
@@ -93,6 +114,25 @@ export class Embed {
 
         if (p.disableAutoFit) {
             KL_CONFIG.disableAutoFit = true;
+        }
+        const draft = p.draft;
+        if (draft?.saved) {
+            this.isRestoringDraft = true;
+            restoreDraft(draft.saved).then(
+                (restored) => {
+                    this.isRestoringDraft = false;
+                    this.fallbackProject = undefined;
+                    this.restoredDraft = restored;
+                    this.onProjectReady(restored.project);
+                },
+                (error) => {
+                    this.isRestoringDraft = false;
+                    draft.store.unreadable(error);
+                    if (this.fallbackProject) {
+                        this.onProjectReady(this.fallbackProject);
+                    }
+                },
+            );
         }
         if (p.project) {
             this.onProjectReady(p.project);
